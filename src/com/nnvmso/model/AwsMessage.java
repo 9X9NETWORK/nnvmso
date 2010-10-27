@@ -10,8 +10,11 @@ public class AwsMessage implements Serializable {
 	private String token;
 	private String type; 
 	private String fileUrl;
+	private String length;
+	private String size;
 	private String errorCode;
-	private String errorReason;	
+	private String errorReason;
+	private String thumbnail;	
 	private Slideshow slideshow;
 	
 	public AwsMessage() {}
@@ -93,6 +96,31 @@ public class AwsMessage implements Serializable {
 
 	public void setSlideshow(Slideshow slideshow) {
 		this.slideshow = slideshow;
-	}	
+	}
+
+	public String getLength() {
+		return length;
+	}
+
+	public void setLength(String length) {
+		this.length = length;
+	}
+
+	public String getSize() {
+		return size;
+	}
+
+	public void setSize(String size) {
+		this.size = size;
+	}
+
+	public String getThumbnail() {
+		return thumbnail;
+	}
+
+	public void setThumbnail(String thumbnail) {
+		this.thumbnail = thumbnail;
+	}
+	
 } 
 
