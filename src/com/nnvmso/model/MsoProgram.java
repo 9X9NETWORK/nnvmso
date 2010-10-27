@@ -244,9 +244,16 @@ public class MsoProgram implements Serializable {
 
 	public short getStatus() {
 		status = STATUS_OK;		
-		if (mpeg4FileUrl == null || webMFileUrl == null) {
-			status = STATUS_PROCESSING;
-		}
+		if (!type.equals(TYPE_SLIDESHOW)) {
+			if (mpeg4FileUrl == null || webMFileUrl == null) {
+				status = STATUS_PROCESSING;
+			}
+		} else {
+			if (this.getScript() == null) {
+				System.out.println("getscript == null");
+				status = STATUS_PROCESSING;
+			}
+		}		
 		if (errorCode != null) {
 			if (!errorCode.equals("0")) {
 				status = STATUS_ERROR;
