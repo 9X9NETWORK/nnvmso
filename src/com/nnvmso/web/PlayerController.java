@@ -2,6 +2,9 @@ package com.nnvmso.web;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.jdo.PersistenceManager;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -10,6 +13,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.nnvmso.lib.DebugLib;
+import com.nnvmso.lib.PMF;
 import com.nnvmso.lib.PlayerLib;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
@@ -30,6 +36,8 @@ public class PlayerController {
 	}
 	
 	/**
+	 * Get a user's subscribed channels
+	 * 
 	 * Example: http://localhost:8888/player/channelLineup?user=aghubmUzdm1zb3INCxIGTm5Vc2VyGKsEDA
 	 *  
 	 * @param  user: NnUserKey
@@ -56,6 +64,8 @@ public class PlayerController {
 	}
 	
 	/**
+	 * Get curator information based on curator key
+	 * 
 	 * @param  curator: MsoKey
 	 * @return Curator info.
 	 * 		   Fields are tab delimited.           
@@ -69,13 +79,26 @@ public class PlayerController {
 		return PlayerLib.getTabDelimitedStr(ori);
 	}
 	
-	@RequestMapping("script")
-	public @ResponseBody String nnScript(@RequestParam(value="program") String programId)
+	/**
+	 * Get program script based on program id
+	 * 
+	 * Examples:
+	 *  http://localhost:8888/player/nnscript?program=566
+	*/
+	@RequestMapping("nnscript")
+	public @ResponseBody String nnScript(@RequestParam(value="program") long programId)
 	{
-		return "";
+		//!!!!!! fix detached child in programService
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		MsoProgram program = pm.getObjectById(MsoProgram.class, programId);		
+		String script = program.getScript().getScript().getValue();
+		System.out.println(DebugLib.OUT + script);
+		return script;
 	}
 	
 	/**
+	 * Get program information based on query criteria
+	 * 
 	 * Examples:
 	 *  http://localhost:8888/player/programInfo?channel=*&user=aghubmUzdm1zb3INCxIGTm5Vc2VyGKsEDA
 	 *  http://localhost:8888/player/programInfo?channel=153,158
