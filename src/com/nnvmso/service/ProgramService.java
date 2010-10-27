@@ -85,6 +85,7 @@ public class ProgramService {
 			  iter.remove();
 		  }
 		}
+		pm.close();
 		return programs;
 	}
 	
