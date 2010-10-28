@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.jdo.PersistenceManager;
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -86,14 +87,17 @@ public class PlayerController {
 	 *  http://localhost:8888/player/nnscript?program=566
 	*/
 	@RequestMapping("nnscript")
-	public @ResponseBody String nnScript(@RequestParam(value="program") long programId)
+	public ResponseEntity<String> nnScript(@RequestParam(value="program") long programId)
 	{
 		//!!!!!! fix detached child in programService
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		MsoProgram program = pm.getObjectById(MsoProgram.class, programId);		
 		String script = program.getScript().getScript().getValue();
 		System.out.println(DebugLib.OUT + script);
-		return script;
+		
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.TEXT_PLAIN);
+		return new ResponseEntity<String>(script, headers, HttpStatus.OK);		
 	}
 	
 	/**
@@ -115,7 +119,8 @@ public class PlayerController {
 	 */		
 	@RequestMapping("programInfo")	
 	public ResponseEntity<String> programInfo(@RequestParam(value="channel") String channelIds,
-									        @RequestParam(value="user", required = false) String userKey) {
+									        @RequestParam(value="user", required = false) String userKey,
+									        HttpServletRequest req) {
 		ProgramService programService = new ProgramService();
 		String[] chStrSplit = channelIds.split(",");
 		List<MsoProgram> programs = new ArrayList<MsoProgram>();
@@ -135,14 +140,20 @@ public class PlayerController {
 		}	
 		String output = "";		
 		for (MsoProgram p : programs) {
-			String[] ori = {String.valueOf(p.getChannelId()), String.valueOf(p.getKey().getId()), p.getName(), p.getType(), p.getImageUrl(), p.getWebMFileUrl()};				
+			String file = p.getWebMFileUrl();
+			System.out.println("hostname=" + req.getLocalAddr() + ";" + req.getLocalPort() + ";" + req.getRequestURI());
+			
+			if (p.getType().equals(MsoProgram.TYPE_SLIDESHOW)) {
+				file = "/player/nnscript?program=" + p.getId();
+				//file = "http://localhost:8888/player/nnscript?program=" + p.getId();
+			}
+			String[] ori = {String.valueOf(p.getChannelId()), String.valueOf(p.getKey().getId()), p.getName(), p.getType(), p.getImageUrl(), file};				
 			output = output + PlayerLib.getTabDelimitedStr(ori);
 			output = output + "\n";
 		}		
 		//return output;
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.TEXT_PLAIN);
-		return new ResponseEntity<String>(output, headers, HttpStatus.OK);
-		
+		return new ResponseEntity<String>(output, headers, HttpStatus.OK);		
 	}
 }
