@@ -1,6 +1,33 @@
 <%@ page isELIgnored="false"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<script type="text/javascript">
+$(document).ready(function() {
+  $(".btn-editshow").click(function() {
+    if( !$(this).parents(".action").hasClass("disable")) {
+       programs = "";            
+       $("#"+list+" .checked").parents("li").each(function() {
+       	 programs = programs + $(this).attr("id");
+       	 return;
+       });                         
+       url = "/show/edit/" + programs;	    
+      $(this).attr("href", url);
+    }
+  });                                                                       
 
+  $(".btn-arrange").click(function() {
+  	   programs = "";  	   
+       $("#sortable li").each(function() {
+       	  programs = programs + $(this).attr("id") + ","	           
+       });
+       programs = programs.substring(0, programs.length - 1);            	            
+       url = "/show/ordering/" + programs;       
+       $.post(url, function(data) {       		       
+       });  	 
+  });		
+  
+$("#sortable").sortable();
+})
+</script>
       <div id="onshow-list" class="show-list">
         <ul class="list-title">
           <li class="title-text">On-Air Shows</li>
