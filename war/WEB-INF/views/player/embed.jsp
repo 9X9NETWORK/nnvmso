@@ -1,5 +1,10 @@
 ﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ include file="/WEB-INF/views/layout/header.jsp" %>
+<script type="text/javascript">
+$(document).ready(function() {
+	$("#embed").addClass("on");
+})
+</script>
 
 <form id="embed-form">
   <div class="container">
@@ -11,7 +16,7 @@
           <li><img src="../images/thumb_noImage.jpg" id="msoLogo"></li>
           <li><span class="guide">Recommended upload size under 2MB</span></li>
           <li>
-            <input name="btn-upload" type="image" src="../images/btn_upload.png" id="btn-upload">
+            <input name="btn-upload" type="button" src="/WEB-INF/../images/btn_upload.png" id="btn-upload" value="">
           </li>
         </ul>
         <ul class="form">
@@ -30,12 +35,14 @@
       </div>
       <div id="embedcode">
         <p class="control">
-          <span class="box-title">Embed code:</span>
-          <a href="javascript:;" class="btnblue" id="btn-generateCode">Generate code</a>
+          <!-- <span class="box-title">Embed code:</span> -->
+          <a href="/admin/playerContainer?id=<c:out value="${msoKey}"/>" class="btnblue" id="btn-generateCode">Preview</a>
         </p>
+        <!-- 
         <p class="textareabox">
           <textarea name="embed-code" id="embed-code" cols="10" rows="6" class="textarea"></textarea>
         </p>
+         -->
       </div>
     </div>
 
