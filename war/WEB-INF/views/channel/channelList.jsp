@@ -1,6 +1,10 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ include file="/WEB-INF/views/layout/header.jsp" %>
-
+<script type="text/javascript">
+$(document).ready(function() {
+	$("#ipg").addClass("on");
+})
+</script>
 <div class="container">
   <div id="ipg-content" class="content">
     <ul class="titlebarL">
