@@ -1,15 +1,5 @@
 ﻿// JavaScript Document
 $(document).ready( function(){    		
-  $(".btn-arrange").click(function() {
-  	   programs = "";  	   
-       $("#sortable li").each(function() {
-       	  programs = programs + $(this).attr("id") + ","	           
-       });
-       programs = programs.substring(0, programs.length - 1);            	            
-       url = "/show/ordering/" + programs;       
-       $.post(url, function(data) {       		       
-       });  	 
-  });		
 		
   $("#program-save").click(function() {
      imageUrl = $("#imageUrl").val();
@@ -364,19 +354,7 @@ $(document).ready( function(){
         ListCheck(list);                                                  
       }                                                      
   });
-  
-  $(".btn-editshow").click(function() {
-    if( !$(this).parents(".action").hasClass("disable")) {
-       programs = "";            
-       $("#"+list+" .checked").parents("li").each(function() {
-       	 programs = programs + $(this).attr("id");
-       	 return;
-       });                         
-       url = "/show/edit/" + programs;	    
-      $(this).attr("href", url);
-    }
-  });                                                                       
-  
+    
   $(".btn-delete").live("click", function() {             
     list = $(this).parents(".show-list").attr("id"); //onshow-list
     
