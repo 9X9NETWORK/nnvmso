@@ -121,7 +121,7 @@ $(document).ready(function() {
           <input type="submit" id="btn-createShow" value="">
           </c:if>
     	  <c:if test="${action == 'edit'}">           
-          <a href="/show/list/*" class="btnblue" id="btn-mgnShows">Manage Shows</a>            
+          <a href="/show/list/<c:out value="${channel.id}"/>" class="btnblue" id="btn-mgnShows">Manage Shows</a>            
           <a href="javascript:;" class="btnblue" id="btn-takeOffAir">
             <c:if test="${channel.public == true}">Take Off-Air</c:if>
             <c:if test="${channel.public == false}">Take On-Air</c:if>              
