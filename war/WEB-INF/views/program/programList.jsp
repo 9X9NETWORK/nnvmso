@@ -5,9 +5,9 @@
 
 <script type="text/javascript">
 $(document).ready(function() {
+	$("#shows").addClass("on");
 	url = "/show/create/" + $("#channel-selector").val();
 	$("#btn-newshow").attr("href", url);
-	$("#sortable").sortable();
 })
 
 </script>
@@ -22,7 +22,8 @@ $(document).ready(function() {
           <label for="select channel">Select your channel to manage your shows:</label>
           <select id="channel-selector" class="selector">
             <c:forEach items="${channels}" var="c">
-            <option value="<c:out value="${c.id}"/>" selected><c:out value="${c.name}"></c:out></option>
+            <c:if test="${c.id == currentChannel}"><option value="<c:out value="${c.id}"/>" selected><c:out value="${c.name}"></c:out></option></c:if>            
+            <c:if test="${c.id != currentChannel}"><option value="<c:out value="${c.id}"/>"><c:out value="${c.name}"></c:out></option></c:if>
             </c:forEach>
           </select>
         </li>
@@ -36,8 +37,8 @@ $(document).ready(function() {
 <div class="popup">
   <p class="popup-header">
     <span class="popup-title">History of the Internet</span>
-
-    <a href="javascript:;" id="popup-close"></a>  </p>
+    <a href="javascript:;" id="popup-close"></a>  
+  </p>
   <p class="video">
     <object width="765" height="455"><param name="movie" value="http://www.youtube.com/v/9hIQjrMHTv4?fs=1&amp;hl=en_US"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/9hIQjrMHTv4?fs=1&amp;hl=en_US" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="765" height="455"></embed></object>
   </p>
