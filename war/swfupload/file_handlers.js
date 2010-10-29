@@ -67,17 +67,16 @@ function fileQueueError(file, errorCode, message) {
 
 function uploadProgress(file, bytesLoaded) {
 	$("#s1 .result").empty();
-	$("#s1 .uploading").show().delay(1000).fadeOut();
-	$("#s1 .result").delay(1500).fadeIn();
+	$("#s1 .uploading").show();
 }
 
 function uploadSuccess(file, serverData) {	
 	$("#s1 .result").empty();
 	$("#s1 .result").html('<span class="exciting">Complete:</span><br/>The new show is in the Off-Air Show area now.');
+	$("#s1 .uploading").show().fadeOut();
 	$("#s1 .result").delay(1500).fadeIn();	
 	url = "/aws/contentDrop?bucket=com-nnaws&id=" + $("#pid").val();
-	$.get(url);				
-	
+	$.get(url);
 }
 
 function uploadComplete(file) {
