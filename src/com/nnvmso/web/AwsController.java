@@ -1,0 +1,96 @@
+package com.nnvmso.web;
+
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.Date;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.codehaus.jackson.map.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.google.appengine.repackaged.org.apache.commons.logging.Log;
+import com.google.appengine.repackaged.org.apache.commons.logging.LogFactory;
+import com.nnvmso.lib.DebugLib;
+import com.nnvmso.lib.NnLib;
+import com.nnvmso.model.AwsMessage;
+import com.nnvmso.model.MsoProgram;
+import com.nnvmso.service.ProgramManager;
+
+@Controller
+@RequestMapping("aws")
+public class AwsController {
+	
+	private final ProgramManager programMngr;
+	protected final Log logger = LogFactory.getLog(getClass());		
+	
+	@Autowired
+	public AwsController(ProgramManager programMngr) {
+		this.programMngr = programMngr;
+	}
+	
+	/**
+	 * Notify AWS a file has been delivered
+	 */
+	@RequestMapping(value="contentDrop")
+	public void contentDrop(HttpServletRequest req, HttpServletResponse resp) {
+		
+		System.out.println(DebugLib.OUT + "aws content drop");
+        try {
+    		//prepare data
+        	String bucket = req.getParameter("bucket");
+    		long id = Long.parseLong(req.getParameter("id"));
+    		MsoProgram p = programMngr.findById(id);    		
+    		String token = "";
+    		Date createDate = new Date();
+    		//prepare url fetch to aws api server, http://9x9cloud.tv/api/9x9encode.php	
+        	String awsApiServer = "awsapi.9x9cloud.tv";
+        	String awsApiPort = "80";
+        	String filePath = "/api/9x9encode.php";
+        	if (!DebugLib.NNAWS) {
+        		awsApiServer = "localhost";
+        		awsApiPort = "8888";
+        		filePath = "/hello";
+        	}        	
+    		String urlStr = "http://" + awsApiServer + ":" + awsApiPort + filePath;
+    		logger.info("LOGGING: urlstr = " + urlStr);
+            URL url = new URL(urlStr);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setDoOutput(true);
+            connection.setRequestMethod("POST");
+            OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
+    		AwsMessage msg = new AwsMessage(bucket, NnLib.getKeyStr(p.getKey()), createDate.toString(), token);
+    		msg.setType(p.getType());
+    		ObjectMapper mapper = new ObjectMapper();    		    		
+            mapper.writeValue(writer, msg);
+            System.out.println(DebugLib.OUT + "json:" + mapper.writeValueAsString(msg));
+            writer.close();
+            if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                logger.info("CONNECTION FAILED = " + connection.getResponseCode());
+            }
+        } catch (Exception e) {
+        	logger.info("CONNECTION exception"); 
+        	e.printStackTrace();
+        }
+		
+	}
+	
+	/**
+	 * Receive transcoding status from AWS
+	 */	
+	@RequestMapping("contentUpdate")
+	public @ResponseBody String contentUpdate(@RequestBody AwsMessage msg) {
+		System.out.println(DebugLib.OUT + "aws content update1:" + ";bucketname=" + msg.getBucketName() + ";fileurl=" + msg.getFileUrl() + ";key=" + msg.getKey() );
+		System.out.println(DebugLib.OUT + "aws content update2:" + ";type=" + msg.getType() + ";error=" + msg.getErrorCode() + ";reason=" + msg.getErrorReason());;
+		ProgramManager pService = new ProgramManager();
+		pService.saveViaAws(msg);
+		return "";
+	}
+	
+}
