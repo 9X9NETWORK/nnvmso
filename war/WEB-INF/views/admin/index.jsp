@@ -21,7 +21,7 @@
 <br/>
 <b>programInfo single channel:</b><c:out value="${hostname}"/>/player/programInfo?channel={channelId},{channelId}<br/>
 <b>programInfo single channel:</b><c:out value="${hostname}"/>/player/programInfo?channel={channelId}<br/>
-<br/>
+<b>script query:</b><c:out value="${hostname}"/>/player/nnscript?program={programId}<br/>
 
 <br/>
 <b>login:&nbsp;</b><a href="/mso/login">login</a> &nbsp;aws@9x9.com; foobie<br/>
