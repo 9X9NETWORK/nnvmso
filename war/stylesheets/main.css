@@ -312,7 +312,7 @@ a.disable .tabNum, a.disable:hover .tabNum {
 
 .form .error {
   color: #ff0000;
-  display: none;
+  display: block;
 }
 
 .form li {
