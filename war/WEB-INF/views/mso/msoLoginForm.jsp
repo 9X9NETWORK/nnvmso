@@ -8,15 +8,16 @@
   <p class="titlebar">Welcome to the vMSO Management Portal</p>
   <div class="formholder">
     <ul class="form">
+      <li class="error"><form:errors path="*" /></li>          
       <li>
         <label for="user account">Account:</label>
         <span class="textfieldbox"><form:input path="email" class="textfield"/></span>
-        <span class="error">30 English or 15 Chinese characters only.</span>
+        <span class="error"><form:errors path="email" /></span>          
       </li>
       <li>
         <label for="password">Password:</label>
         <span class="textfieldbox"><form:input path="password" type="password" class="textfield" /></span>
-        <span class="error">30 English or 15 Chinese characters only.</span>
+        <span class="error"><form:errors path="password" /></span>
         <a href="javascript:;" id="btn-forgotpw">Forgot password?</a>
       </li>
       <li>
