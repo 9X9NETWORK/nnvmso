@@ -29,17 +29,16 @@ public class PlayerManager {
 	// ============================================================
 	// c.u.d
 	// ============================================================		
-	public void create(String msoKey, Player player) {
-		this.save(msoKey, player);
+	public void create(Player player, Mso mso) {
+		this.save(player, mso);
 	}
 	
 	//save based on mso key string
-	public void save(String msoKey, Player player) {		
+	public void save(Player player, Mso mso) {		
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Transaction tx = pm.currentTransaction();
 		try {
-			tx.begin();
-			Mso mso = pm.getObjectById(Mso.class, msoKey);					
+			tx.begin();							
 			Player old = mso.getPlayer();
 			if (old != null) {				
 				old.setLogoUrl(player.getLogoUrl());

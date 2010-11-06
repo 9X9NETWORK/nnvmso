@@ -23,18 +23,17 @@ public class InitService {
 		msoMngr.create(aws);
 		//a user
 		NnUser user = new NnUser("u@u.com");
-		user.setMsoKeyStr(NnLib.getKeyStr(a.getKey()));
 		user.setPassword("foobie");
-		userMngr.create(user);
+		userMngr.create(user, a);
 		//a player
 		Player player = new Player();
 		player.setCode(new Text("<h>hello</h>"));
-		PlayerManager playerService = new PlayerManager();		
-		playerService.create(NnLib.getKeyStr(a.getKey()), player);
+		PlayerManager playerService = new PlayerManager();
+		playerService.create(player, a);
 		//a aws channel for testing
 		MsoChannel channel = new MsoChannel("AWS");
 		channel.setImageUrl("/WEB-INF/../images/thumb_noImage.jpg");
 		ChannelManager channelMngr = new ChannelManager();
-		channelMngr.create(aws, channel);
+		channelMngr.create(channel, aws);
 	}
 }

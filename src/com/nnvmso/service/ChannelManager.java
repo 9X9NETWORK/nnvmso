@@ -30,7 +30,6 @@ public class ChannelManager {
 	// ============================================================	
 	public MsoChannel findById(long id) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		System.out.println("------" + id);
 		MsoChannel channel = pm.getObjectById(MsoChannel.class, id);
 		MsoChannel detached = pm.detachCopy(channel);
 		pm.close();
@@ -62,7 +61,7 @@ public class ChannelManager {
 	// ============================================================
 	// c.u.d
 	// ============================================================	
-	public void create(Mso mso, MsoChannel channel) {
+	public void create(MsoChannel channel, Mso mso) {
 		channel.setMsoKey(mso.getKey());
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Query q = pm.newQuery(MsoChannel.class);
@@ -82,7 +81,6 @@ public class ChannelManager {
 				}
 			}			
 		}
-		channel.setPublic(false);
 		channel.setSeq(available);
 		this.save(channel);
 	}
