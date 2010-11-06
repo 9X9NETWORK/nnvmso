@@ -17,21 +17,20 @@ public class Mso implements Serializable {
 	@PrimaryKey
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
 	private Key key;
-		
-	@NotPersistent
-	private String keyStr;
-	
+			
 	@Email
 	@Length(min=5, max=80)
 	@Persistent
 	private String email;
 	
+	@NotEmpty
 	@Persistent
 	private String name;	
 		
 	@Persistent
 	private String intro;
 
+	@Length(min=6, max=20)
 	@NotPersistent
 	private String password;
 	
@@ -72,14 +71,6 @@ public class Mso implements Serializable {
 		this.updateDate = new Date();
 	}
 	
-	public String getKeyStr() {
-		return keyStr;
-	}
-
-	public void setKeyStr(String keyStr) {
-		this.keyStr = keyStr;
-	}
-
 	public Key getKey() {
 		return key;
 	}

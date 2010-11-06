@@ -1,18 +1,12 @@
 package com.nnvmso.model;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
-import javax.jdo.PersistenceManager;
-import javax.jdo.Query;
+import java.io.Serializable;
+import java.util.Date;
 import javax.jdo.annotations.*;
 
+import org.hibernate.validator.constraints.*;
+
 import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
 
 @PersistenceCapable(detachable="true")
 public class NnUser implements Serializable {
@@ -20,24 +14,26 @@ public class NnUser implements Serializable {
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
 	private Key key;
 
+	@Email
+	@Length(min=5, max=80)
 	@Persistent
 	private String email;
 	
+	@NotEmpty
 	@Persistent
 	private String name;	
 	
 	@Persistent
 	private String intro;
 	
+	@NotEmpty
 	@Persistent
 	private Key msoKey;
-	
-	@NotPersistent
-	private String msoKeyStr;
-	
+		
 	@Persistent
 	private String imageUrl;
 
+	@Length(min=6, max=20)
 	@NotPersistent
 	private String password;
 	
@@ -67,7 +63,7 @@ public class NnUser implements Serializable {
 
 	public NnUser(String email) {		
 		this.email = email;
-		this.type = this.TYPE_GENERAL_USER;  
+		this.type = NnUser.TYPE_GENERAL_USER;  
 		this.createDate = new Date();
 		this.updateDate = new Date();
 	}
@@ -167,14 +163,6 @@ public class NnUser implements Serializable {
 
 	public void setImageUrl(String imageUrl) {
 		this.imageUrl = imageUrl;
-	}
-
-	public String getMsoKeyStr() {
-		return msoKeyStr;
-	}
-
-	public void setMsoKeyStr(String msoKeyStr) {
-		this.msoKeyStr = msoKeyStr;
 	}
 
 }
