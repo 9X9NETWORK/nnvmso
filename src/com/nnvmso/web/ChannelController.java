@@ -98,7 +98,8 @@ public class ChannelController {
 		if (channel.getImageUrl().equals("") || channel.getImageUrl() == null) {			
 			channel.setImageUrl("/WEB-INF/../images/thumb_noImage.jpg");
 		}
-		channelMngr.create(mso, channel);
+		channel.setPublic(false);
+		channelMngr.create(channel, mso);
 		status.setComplete();
 		return ("redirect:/channel/edit/" + channel.getKey().getId());
 	}

@@ -96,7 +96,7 @@ public class PlayerController {
 		String script = program.getNnScript().getScript().getValue();		
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.TEXT_PLAIN);
-		return new ResponseEntity<String>(script, headers, HttpStatus.OK);		
+		return new ResponseEntity<String>(script, headers, HttpStatus.OK);
 	}
 	
 	/**

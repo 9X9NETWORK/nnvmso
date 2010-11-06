@@ -58,7 +58,7 @@ public class MsoController {
 		}
 		mso = msoMngr.msoAuthenticated(mso.getEmail(), mso.getPassword());
 		if (mso == null) {
-			result.addError(new ObjectError("required.email", "Invalid credential."));
+			result.addError(new ObjectError("required.credential", "Invalid credential."));
 			return "mso/msoLoginForm";
 		} else {
 			authService.setAuthSession(session, "mso", mso);
