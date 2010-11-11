@@ -20,6 +20,7 @@ import com.nnvmso.lib.PMF;
 import com.nnvmso.model.AwsMessage;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoProgram;
+import com.nnvmso.model.PodcastProgram;
 import com.nnvmso.model.ProgramScript;
 import com.nnvmso.model.Slideshow;
 
@@ -27,7 +28,19 @@ import com.nnvmso.model.Slideshow;
 public class ProgramManager {
 	// ============================================================
 	// find
-	// ============================================================	
+	// ============================================================
+	public void findAllAndSetWhatever() {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		Query query = pm.newQuery(MsoProgram.class);
+		List<MsoProgram> programs = (List<MsoProgram>) query.execute();
+		for (MsoProgram p : programs) {
+			MsoChannel c = pm.getObjectById(MsoChannel.class, p.getChannelKey());
+			p.setChannelId(c.getId());
+		}
+		pm.makePersistentAll(programs);
+		pm.close();		
+	}
+	
 	public MsoProgram findById(long id) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		MsoProgram program = pm.getObjectById(MsoProgram.class, id);
@@ -117,21 +130,40 @@ public class ProgramManager {
 	//!! enforce channelKey
 	public void save(MsoProgram program) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		System.out.println(DebugLib.OUT + program.getKey());
 		program.setUpdateDate(new Date());
 		pm.makePersistent(program);
-		pm.close();						
+		pm.close();
 	}
 	
-	public void saveAll(List<MsoProgram> programs) {
+	public void saveAll(List<MsoProgram> programs, MsoChannel channel) {
+		System.out.println("SAVEALL!!!!" + programs.size());
+		
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		for (MsoProgram p : programs) {
+			System.out.println(DebugLib.OUT + "saveall:" + p.getName());
+			p.setChannelKey(channel.getKey());
 			p.setUpdateDate(new Date());
 		}
 		pm.makePersistentAll(programs);
 		pm.close();						
 	}
-	
+
+	public void saveAllViaPodcast(PodcastProgram podcasts[], MsoChannel channel) {
+		List<MsoProgram> programs = new ArrayList<MsoProgram>();
+		for (PodcastProgram pod : podcasts) {
+			System.out.println(DebugLib.OUT + pod.getTitle());
+			MsoProgram p = new MsoProgram();
+			p.setName(pod.getTitle());
+			p.setIntro(pod.getDescription());
+			p.setType(MsoProgram.TYPE_VIDEO);
+			p.setWebMFileUrl(pod.getEnclosure());
+			p.setMpeg4FileUrl(pod.getEnclosure());
+			p.setPublic(true);
+			programs.add(p);
+		}
+		this.saveAll(programs, channel);
+	}
+
 	//!!!! transaction
 	public void deleteAll(List<MsoProgram> programs) {
     	PersistenceManager pm = PMF.get().getPersistenceManager();
