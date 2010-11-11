@@ -45,6 +45,7 @@ public class MsoManager {
 		query.setFilter("email == '" + email + "'");	
 		List<Mso> results = (List<Mso>) query.execute();		
 		Mso mso = results.get(0);
+		pm.close();
 		return mso;
 	}
 	
