@@ -3,6 +3,7 @@ package com.nnvmso.web;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Date;
 
 import javax.jdo.PersistenceManager;
@@ -23,8 +24,11 @@ import com.nnvmso.lib.DebugLib;
 import com.nnvmso.lib.PMF;
 import com.nnvmso.model.AwsMessage;
 import com.nnvmso.model.MsoProgram;
+import com.nnvmso.model.PodcastChannel;
+import com.nnvmso.model.PodcastProgram;
 import com.nnvmso.model.ProgramScript;
 import com.nnvmso.model.Slideshow;
+import com.nnvmso.service.ChannelManager;
 import com.nnvmso.service.ProgramManager;
 
 @Controller
@@ -34,6 +38,13 @@ public class TestController {
 	public @ResponseBody String nullPointer(NullPointerException e) {
 		System.out.println("enter null pointer");
 		return "/error/nullPointer";
+	}
+
+	@RequestMapping("set")
+	public String settype() {
+		ProgramManager programMngr = new ProgramManager();
+		programMngr.findAllAndSetWhatever();
+		return "hello/hello";		
 	}
 	
 	@RequestMapping("ip")
@@ -103,6 +114,51 @@ public class TestController {
 		return "hello";
 	}
 	
+	@RequestMapping("podcast")
+	public String podcast() {
+		PodcastChannel podcast = new PodcastChannel();
+		podcast.setTitle("title");
+		podcast.setImage("http://image/abc");
+		podcast.setDescription("description");
+		PodcastProgram[] items = new PodcastProgram[2];
+		PodcastProgram p1 = new PodcastProgram();
+		p1.setTitle("item1");
+		p1.setDescription("description1");
+		p1.setEnclosure("http://file1");
+		p1.setImage("http://image1");
+		PodcastProgram p2 = new PodcastProgram();
+		p2.setTitle("item2");
+		p2.setDescription("description2");
+		p2.setEnclosure("http://file2");
+		p2.setImage("http://image2");
+		items[0] = p1;
+		items[1] = p2;
+		podcast.setItems(items);
+		
+		String urlStr = "http://localhost:8888/podcast/create";
+        URL url;
+		try {
+			url = new URL(urlStr);
+	        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+	        connection.setDoOutput(true);
+			connection.setRequestMethod("POST");
+			connection.setRequestProperty("Content-Type", "application/json");
+	        OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
+	        ObjectMapper mapper = new ObjectMapper();
+	        mapper.writeValue(writer, podcast);
+	        System.out.println(DebugLib.OUT + "json:" + mapper.writeValueAsString(podcast));	        
+	        if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {	        	
+	        	System.out.println("response not ok!" + connection.getResponseCode());
+	        }
+	        writer.close();	        
+		} catch (Exception e) {
+			e.printStackTrace();
+		}	
+		
+		
+		return "hello/hello";
+	}	
+
 	//trigger /aws/contentUpdate, simulate 9x9.tv api	
 	@RequestMapping("contentUpdate")
 	public String contentUpdate() {
@@ -115,7 +171,7 @@ public class TestController {
 		String errorCode = "3"; 
 		AwsMessage msg = new AwsMessage(bucket, key, (new Date()).toString(), token);
 		msg.setFileUrl(webMFileUrl);
-
+		
 		String urlStr = "http://localhost:8888/aws/contentUpdate";
         URL url;
 		try {
