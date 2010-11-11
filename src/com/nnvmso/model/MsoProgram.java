@@ -43,7 +43,7 @@ public class MsoProgram implements Serializable {
 	@NotPersistent
 	private short status;
 	
-	@Persistent(defaultFetchGroup = "true")
+	@Persistent//(defaultFetchGroup = "true")
 	private ProgramScript nnScript; 	
 
 	@Persistent

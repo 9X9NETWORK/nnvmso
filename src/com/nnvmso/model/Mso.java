@@ -17,7 +17,7 @@ public class Mso implements Serializable {
 	@PrimaryKey
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
 	private Key key;
-			
+
 	@Email
 	@Length(min=5, max=80)
 	@Persistent

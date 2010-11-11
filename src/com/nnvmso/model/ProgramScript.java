@@ -16,7 +16,7 @@ public class ProgramScript implements Serializable {
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
 	private Key key;
 
-	@Persistent(mappedBy = "script")
+	@Persistent//(mappedBy = "script")
 	private MsoProgram program;
 
 	@Persistent

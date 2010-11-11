@@ -49,7 +49,11 @@ public class MsoChannel implements Serializable {
 	private String langCode;
 	
 	@Persistent
-	private String tag;		
+	private String tag;
+	
+	//!!!!yet another temp column.
+	@Persistent
+	private String podcast;
 	
 	public static short TYPE_MSO = 0; 
 	public static short TYPE_SYSTEM = 1;
@@ -168,6 +172,14 @@ public class MsoChannel implements Serializable {
 
 	public void setProgramSeq(List<Key> programSeq) {
 		this.programSeq = programSeq;
+	}
+
+	public String getPodcast() {
+		return podcast;
+	}
+
+	public void setPodcast(String podcast) {
+		this.podcast = podcast;
 	}
 	
 }
