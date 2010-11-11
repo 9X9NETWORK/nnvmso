@@ -26,6 +26,7 @@ import com.nnvmso.lib.NnLib;
 import com.nnvmso.model.AwsS3Post;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
+import com.nnvmso.model.PodcastFeed;
 import com.nnvmso.service.AuthService;
 import com.nnvmso.service.ChannelManager;
 
@@ -82,7 +83,30 @@ public class ChannelController {
 				
 		return s3; 		
 	}
+
+	@RequestMapping(value="podcast", method=RequestMethod.GET)
+    public String podcastForm(Model model) {
+		MsoChannel channel = new MsoChannel();
+		model.addAttribute("channel", channel);
+		return (viewRoot + "podcastForm");
+    }
+	
+	@RequestMapping(value="podcast", method=RequestMethod.POST)
+	public String podcastSubmit(@ModelAttribute("channel") MsoChannel channel, HttpSession session, SessionStatus status) {		
+		Mso mso = (Mso)auth.getAuthSession(session, "mso");			
+		channel.setImageUrl("/WEB-INF/../images/thumb_noImage.jpg");
+		channel.setPublic(false);
+		MsoChannel saved = channelMngr.create(channel, mso);
+		status.setComplete();
 		
+		PodcastFeed feed = new PodcastFeed();
+		feed.setKey(NnLib.getKeyStr(saved.getKey()));
+		feed.setRss(channel.getPodcast()); 
+		String urlStr = "http://awsapi.9x9cloud.tv/api/podpares.php";
+		NnLib.urlFetch(urlStr, feed);
+		return ("redirect:/channel/edit/" + channel.getKey().getId());
+	}
+	
 	@RequestMapping(value="create", method=RequestMethod.GET)
     public String createForm(Model model) {
 		MsoChannel channel = new MsoChannel();

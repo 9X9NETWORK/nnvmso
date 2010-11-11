@@ -36,7 +36,7 @@ public class EmailController {
         	logger.info("Trying to send an email");
         	System.out.println("Trying to send an email");
             Message msg = new MimeMessage(session);
-            msg.setFrom(new InternetAddress("yiwen@teltel.com", "teltel"));
+            msg.setFrom(new InternetAddress("yiwen.tseng@gmail.com", "teltel"));
             msg.addRecipient(Message.RecipientType.TO,
                              new InternetAddress("yiwen.teltel@gmail.com", "yiwen"));
             msg.setSubject("Transcoding done");

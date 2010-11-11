@@ -39,9 +39,7 @@ public class AwsController {
 	 * Notify AWS a file has been delivered
 	 */
 	@RequestMapping(value="contentDrop")
-	public void contentDrop(HttpServletRequest req, HttpServletResponse resp) {
-		
-		System.out.println(DebugLib.OUT + "aws content drop");
+	public void contentDrop(HttpServletRequest req, HttpServletResponse resp) {		
         try {
     		//prepare data
         	String bucket = req.getParameter("bucket");
@@ -57,7 +55,7 @@ public class AwsController {
         		awsApiServer = "localhost";
         		awsApiPort = "8888";
         		filePath = "/hello";
-        	}        	
+        	} 
     		String urlStr = "http://" + awsApiServer + ":" + awsApiPort + filePath;
     		logger.info("LOGGING: urlstr = " + urlStr);
             URL url = new URL(urlStr);
@@ -77,8 +75,7 @@ public class AwsController {
         } catch (Exception e) {
         	logger.info("CONNECTION exception"); 
         	e.printStackTrace();
-        }
-		
+        }		
 	}
 	
 	/**

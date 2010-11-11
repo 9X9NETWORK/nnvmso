@@ -16,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -24,8 +25,14 @@ import com.nnvmso.lib.DebugLib;
 import com.nnvmso.lib.PMF;
 import com.nnvmso.model.AwsMessage;
 import com.nnvmso.model.MsoProgram;
+<<<<<<< .mine
+import com.nnvmso.model.PodcastChannel;
+import com.nnvmso.model.PodcastFeed;
+import com.nnvmso.model.PodcastProgram;
+=======
 import com.nnvmso.model.PodcastChannel;
 import com.nnvmso.model.PodcastProgram;
+>>>>>>> .r63
 import com.nnvmso.model.ProgramScript;
 import com.nnvmso.model.Slideshow;
 import com.nnvmso.service.ChannelManager;
@@ -38,6 +45,13 @@ public class TestController {
 	public @ResponseBody String nullPointer(NullPointerException e) {
 		System.out.println("enter null pointer");
 		return "/error/nullPointer";
+	}
+		
+	@RequestMapping("rssPost")	
+	public String podcastpost(@RequestBody PodcastFeed feed) {
+		System.out.println(feed.getKey());
+		System.out.println(feed.getRss());
+		return "hello";
 	}
 
 	@RequestMapping("set")

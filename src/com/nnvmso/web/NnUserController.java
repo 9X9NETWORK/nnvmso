@@ -1,5 +1,7 @@
 package com.nnvmso.web;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -49,7 +51,7 @@ public class NnUserController {
 	}	
 	
 	@RequestMapping(value="signup", method=RequestMethod.POST)
-	public String signupSubmit(@ModelAttribute UserSignupForm form, BindingResult result, Model model, SessionStatus status) {
+	public String signupSubmit(@ModelAttribute("form") @Valid UserSignupForm form, BindingResult result, Model model, SessionStatus status) {
 		Mso mso = form.getMso();
 		NnUser user = form.getUser();
 		signupValidator.validate(form, result);
