@@ -30,6 +30,11 @@ import com.nnvmso.service.SubscriptionManager;
 @RequestMapping("player")
 public class PlayerController {
 
+	@RequestMapping("zooatomics")
+	public String zooatomics() {
+		return "player/zooatomics";
+	}
+	
 	@RequestMapping("embed")
 	public String embeded(Model model) {
 		MsoManager service = new MsoManager();
@@ -41,18 +46,18 @@ public class PlayerController {
 	/**
 	 * Get a user's subscribed channels
 	 * 
-	 * Example: http://localhost:8888/player/channelLineup?user=u@u.com
+	 * Example: http://localhost:8888/player/channelLineup?user=aghubmUzdm1zb3INCxIGTm5Vc2VyGKsEDA
 	 *  
-	 * @param  user: email
+	 * @param  user: key
 	 * @return Channel info. 
 	 * 		   Fields are tab delimited.           
 	 * 		   Fields sequence: sequence, ChannelId, ChannelName, ChannelThumbnailUrl 
 	 */				
 	@RequestMapping(value="channelLineup")
-	public ResponseEntity<String> channelLineup(@RequestParam(value="user") String email) {
+	public ResponseEntity<String> channelLineup(@RequestParam(value="user") String userKey) {
 		SubscriptionManager subMngr = new SubscriptionManager();
 		NnUserManager userService = new NnUserManager();
-		NnUser user = userService.findByEmail(email);
+		NnUser user = userService.findByKey(userKey);
 		subMngr.subscribe(user); 
 		List<MsoChannel> channels = subMngr.findSubscribedChannels(user);
 		String output = "";
@@ -74,10 +79,10 @@ public class PlayerController {
 	 * 		   Fields are tab delimited.           
 	 * 		   Fields sequence: msoName, msoIntro, msoThumbnailUrl
 	 */			
-	public @ResponseBody String curatorInfo(@RequestParam(value="curator") String key, 
+	public @ResponseBody String curatorInfo(@RequestParam(value="curator") String msoKey, 
 										    @RequestParam(value="delimited", required=false) String delimited) {		
 		MsoManager msoMngr = new MsoManager();
-		Mso mso = msoMngr.findByKey(key);
+		Mso mso = msoMngr.findByKey(msoKey);
 		String[] ori = {mso.getName(), mso.getIntro(), mso.getImageUrl()};
 		return PlayerLib.getTabDelimitedStr(ori);
 	}
@@ -114,11 +119,12 @@ public class PlayerController {
 	 * @return Program info.
 	 * 		   Each program is separate by carriage return.
 	 *         Fields of data in each program is tab delimited.
-	 * 		   Fields sequence: programKey, programName, programType, programThumbnailUrl, contentFileUrl
-	 */		
+	 * 		   Fields sequence: channelId, programId, programName, programType, programThumbnailUrl, contentFileUrl
+	 */				
+	
 	@RequestMapping("programInfo")	
 	public ResponseEntity<String> programInfo(@RequestParam(value="channel") String channelIds,
-									        @RequestParam(value="user", required = false) String email,
+									        @RequestParam(value="user", required = false) String userKey,
 									        HttpServletRequest req) {
 		ProgramManager programMngr = new ProgramManager();
 		String[] chStrSplit = channelIds.split(",");
@@ -126,7 +132,7 @@ public class PlayerController {
 		if (channelIds.equals("*")) {
 			NnUserManager userService = new NnUserManager();
 			SubscriptionManager sService = new SubscriptionManager();
-			NnUser user = userService.findByEmail(email);
+			NnUser user = userService.findByKey(userKey);
 			programs = sService.findSubscribedPrograms(user); 			
 		} else if (chStrSplit.length > 1) {			
 			programs = programMngr.findByChannelIdsAndIsPublic(channelIds, true);
@@ -142,7 +148,9 @@ public class PlayerController {
 			if (p.getType().equals(MsoProgram.TYPE_SLIDESHOW)) {
 				file = "/player/nnscript?program=" + p.getId();
 			}
-			String[] ori = {String.valueOf(p.getChannelId()), String.valueOf(p.getKey().getId()), p.getName(), p.getType(), p.getImageUrl(), file};				
+			//String[] ori = {String.valueOf(p.getChannelId()), String.valueOf(p.getKey().getId()), p.getName(), p.getType(), p.getImageUrl(), file};
+			
+			String[] ori = {String.valueOf(p.getChannelId()), String.valueOf(p.getKey().getId()), p.getName(), p.getType(), p.getImageUrl(), file};
 			output = output + PlayerLib.getTabDelimitedStr(ori);
 			output = output + "\n";
 		}		
