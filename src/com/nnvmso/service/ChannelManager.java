@@ -17,6 +17,7 @@ import com.nnvmso.lib.*;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoProgram;
+import com.nnvmso.model.PodcastChannel;
 
 @Service
 public class ChannelManager {
@@ -27,7 +28,20 @@ public class ChannelManager {
 
 	// ============================================================
 	// find
-	// ============================================================	
+	// ============================================================
+	public void findAllAndSetWhatever() {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		Query query = pm.newQuery(MsoChannel.class);
+		List<MsoChannel> channels = (List<MsoChannel>) query.execute();
+		for (MsoChannel c : channels) {
+			if (c.getImageUrl().equals("false")) {
+				c.setImageUrl("/WEB-INF/../images/thumb_noImage.jpg");
+			}
+		}
+		pm.makePersistentAll(channels);
+		pm.close();		
+	}
+	
 	public MsoChannel findById(long id) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		MsoChannel channel = pm.getObjectById(MsoChannel.class, id);
@@ -84,7 +98,16 @@ public class ChannelManager {
 		channel.setSeq(available);
 		this.save(channel);
 	}
-
+	
+	public MsoChannel createViaPodcast(PodcastChannel podcast, Mso mso) {
+		MsoChannel channel = new MsoChannel();
+		channel.setName(podcast.getTitle());
+		channel.setIntro(podcast.getDescription());
+		channel.setImageUrl(podcast.getImage());
+		this.create(channel, mso);
+		return channel;
+	}
+	
 	public void save(MsoChannel channel) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		channel.setUpdateDate(new Date());
