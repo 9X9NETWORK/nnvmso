@@ -1,0 +1,5 @@
+This check-in does not guarantee everything's working.
+Most of the time it's partially working, for various demo purpose.
+
+run "http://localhost/admin/init" to get the basic data.
+run "http://localhost/admin/index" to browse apis
