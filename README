@@ -1,5 +1,17 @@
-This check-in does not guarantee everything's working.
+
+nnvmso
+=====
+
+This check-in does not guarantee everything's working. shameful but it's the natual of this project.
 Most of the time it's partially working, for various demo purpose.
 
 run "http://localhost/admin/init" to get the basic data.
-run "http://localhost/admin/index" to browse apis
+run "http://localhost/admin/index" to browse some apis
+
+
+BUILDING 
+==============
+it's based on google-app-angine 1.3.8 sdk
+developed with eclipse helios, Version: Helios Service Release 1, Build id: 20100917-0705
+
+all the extra libs can be found here at https://everest.teltel.com:8443/repos/misc/web/lib
