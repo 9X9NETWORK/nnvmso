@@ -65,11 +65,20 @@ public class SubscriptionManager {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		for (Subscription s : subscriptions) {
 			MsoChannel c = pm.getObjectById(MsoChannel.class, s.getChannelKey());
+			c.setGrid(s.getSeq());
 			channels.add(c);
 		}
 		return channels;		
 	}
 		
+	public void channelSubscribe(NnUser user, MsoChannel channel, short grid) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		Subscription s = new Subscription(user.getKey(), channel.getKey());
+		s.setSeq(grid);
+		pm.makePersistent(s);
+		pm.close();		
+	}
+	
 	public void subscribe(NnUser user) {
 		List<Subscription> subscriptions = this.findAll(user);
 		
