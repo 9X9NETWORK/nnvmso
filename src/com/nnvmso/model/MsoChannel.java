@@ -35,6 +35,9 @@ public class MsoChannel implements Serializable {
 		
 	@Persistent
 	private short seq;
+	
+	@NotPersistent
+	private short grid;
 
 	@Persistent
 	private boolean isPublic;
@@ -58,7 +61,7 @@ public class MsoChannel implements Serializable {
 	public static short TYPE_MSO = 0; 
 	public static short TYPE_SYSTEM = 1;
 	@Persistent
-	private short Type;
+	private short type;
 	
 	@Persistent 
 	private List<Key> programSeq = new ArrayList<Key>();
@@ -70,9 +73,9 @@ public class MsoChannel implements Serializable {
 	
 	public MsoChannel(String name) {
 		this.name = name;
+		this.isPublic = false;
 		this.createDate = new Date();
 		this.updateDate = new Date();
-		this.isPublic = false;
 	}
 
 	public Key getKey() {
@@ -172,6 +175,22 @@ public class MsoChannel implements Serializable {
 
 	public void setProgramSeq(List<Key> programSeq) {
 		this.programSeq = programSeq;
+	}
+
+	public short getGrid() {
+		return grid;
+	}
+
+	public void setGrid(short grid) {
+		this.grid = grid;
+	}
+
+	public short getType() {
+		return type;
+	}
+
+	public void setType(short type) {
+		this.type = type;
 	}
 
 	public String getPodcast() {
