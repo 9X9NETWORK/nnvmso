@@ -52,14 +52,21 @@ public class AdminController {
 		service.init();
 		return "hello/hello";
 	}
+		
+	@RequestMapping(value="createChannels")
+	public String createChannels() {
+		InitService service = new InitService();
+		service.createChannels();
+		return "hello/hello";
+	}
 	
 	@RequestMapping(value="index")
 	public String index(Model model, HttpServletRequest req, HttpServletResponse resp) {
-		Mso mso = msoMngr.findByEmail("a@a.com");
+		Mso mso = msoMngr.findByEmail("default_mso@9x9.com");
 		Mso awsMso = msoMngr.findByEmail("aws@9x9.com");
 		ChannelManager channelMngr = new ChannelManager();
 		MsoChannel c = channelMngr.findByMso(awsMso.getKey()).get(0);
-		NnUser user = userMngr.findByEmail("u@u.com");
+		NnUser user = userMngr.findByEmail("default_user@9x9.com");
 		String hostname = NnLib.getUrlRoot(req);
 		model.addAttribute("hostname", hostname); 
 		model.addAttribute("userKey", NnLib.getKeyStr(user.getKey()));

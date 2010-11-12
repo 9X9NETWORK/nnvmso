@@ -23,9 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.CookieGenerator;
 
-import com.nnvmso.lib.DebugLib;
-import com.nnvmso.lib.NnLib;
-import com.nnvmso.lib.PMF;
+import com.nnvmso.lib.*;
 import com.nnvmso.model.AwsMessage;
 import com.nnvmso.model.MsoProgram;
 import com.nnvmso.model.PodcastChannel;
@@ -45,11 +43,22 @@ public class TestController {
 		return "/error/nullPointer";
 	}
 
+	@RequestMapping("mycookie") 
+	public String mycookie(HttpServletResponse resp, HttpServletRequest req) {
+		CookieHelper.setCookie(resp, "test", "bla");
+		System.out.println("result=" + CookieHelper.readCookie(req, "bla"));		
+		return "hello/hello";
+	}
+	
 	@RequestMapping("cookie")
 	public String cookie(HttpServletResponse resp) {
-		CookieGenerator cookie = new CookieGenerator();		
+		CookieGenerator cookie = new CookieGenerator();
+		System.out.println(cookie.getCookieName());
+		
+		cookie.setCookieDomain("mycookiedomain");
 		cookie.setCookieName("user");
 		cookie.addCookie(resp, "hello");
+		System.out.println(cookie.getCookieName());
 		return "hello/hello";
 	}
 	
@@ -137,7 +146,6 @@ public class TestController {
 	@RequestMapping("podcast")
 	public String podcast() {
 		PodcastChannel podcast = new PodcastChannel();
-		podcast.setKey("aghubmUydm1zb3IQCxIKTXNvQ2hhbm5lbBhODA");
 		podcast.setTitle("title");
 		podcast.setImage("http://image/abc");
 		podcast.setDescription("description");
@@ -156,7 +164,7 @@ public class TestController {
 		items[1] = p2;
 		podcast.setItems(items);
 		
-		String urlStr = "http://localhost:8888/podcast/update";
+		String urlStr = "http://localhost:8888/podcast/create";
         URL url;
 		try {
 			url = new URL(urlStr);
