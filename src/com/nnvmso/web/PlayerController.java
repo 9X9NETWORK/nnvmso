@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.util.CookieGenerator;
 
 import com.nnvmso.lib.NnLib;
 import com.nnvmso.lib.PlayerLib;
@@ -21,6 +23,7 @@ import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoProgram;
 import com.nnvmso.model.NnUser;
+import com.nnvmso.service.ChannelManager;
 import com.nnvmso.service.MsoManager;
 import com.nnvmso.service.NnUserManager;
 import com.nnvmso.service.ProgramManager;
@@ -34,15 +37,91 @@ public class PlayerController {
 	public String zooatomics() {
 		return "player/zooatomics";
 	}
-	
+		
 	@RequestMapping("embed")
 	public String embeded(Model model) {
 		MsoManager service = new MsoManager();
-		Mso mso = service.findByEmail("a@a.com");
+		Mso mso = service.findByEmail("default_mso@9x9.com");
 		model.addAttribute("msoKey", NnLib.getKeyStr(mso.getKey()));
 		return ("player/embed");
 	}
 	
+	@RequestMapping(value="channelBrowse")
+	public ResponseEntity<String> channelBrowse() {
+		ChannelManager channelMngr = new ChannelManager();
+		List<MsoChannel> channels = channelMngr.findAllPublic();
+		String output ="";
+		for (MsoChannel c:channels) {
+			String[] ori = {Short.toString(c.getSeq()), String.valueOf(c.getKey().getId()), c.getName(), c.getImageUrl()};
+			output = output + PlayerLib.getTabDelimitedStr(ori);			
+			output = output + "\n";
+		}
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.TEXT_PLAIN);
+		return new ResponseEntity<String>(output, headers, HttpStatus.OK);
+	}
+
+	@RequestMapping(value="guest_register")
+	public ResponseEntity<String> guestRegister(HttpServletResponse resp) {
+		//register
+		NnUserManager userMngr = new NnUserManager();
+		NnUser user = new NnUser("guest@9x9.com");
+		user.setPassword("guest");
+		MsoManager msoMngr = new MsoManager();
+		msoMngr.findByEmail("default_mso@9x9.com");
+		Mso mso = new Mso();		
+		userMngr.create(user, mso);
+		//subscribe
+		SubscriptionManager sMngr = new SubscriptionManager();
+		ChannelManager cMngr = new ChannelManager();
+		MsoChannel system = cMngr.findSystemChannels().get(0);
+		sMngr.channelSubscribe(user, system, (short)1);
+		//set cookie
+		CookieGenerator cookie = new CookieGenerator();		
+		cookie.setCookieName("user");
+		cookie.addCookie(resp, NnLib.getKeyStr(user.getKey()));
+		//return
+		String output = NnLib.getKeyStr(user.getKey());
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.TEXT_PLAIN);
+		return new ResponseEntity<String>(output, headers, HttpStatus.OK);		
+	}
+	
+	//http://localhost:8888/player/subscribe?user=aghubmUydm1zb3IMCxIGTm5Vc2VyGDkM&channel=51&grid=2
+	@RequestMapping(value="subscribe")
+	public ResponseEntity<String> subscribe(@RequestParam(value="user") String userKey, @RequestParam(value="channel") long channelId, @RequestParam(value="grid") short grid ) {
+		//subscribe	
+		NnUserManager userMngr = new NnUserManager();
+		NnUser user = userMngr.findByKey(userKey);
+		ChannelManager channelMngr = new ChannelManager();
+		MsoChannel channel = channelMngr.findById(channelId);
+		SubscriptionManager sMngr = new SubscriptionManager();
+		sMngr.channelSubscribe(user, channel, grid);
+		//return
+		String output = "OK";
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.TEXT_PLAIN);
+		return new ResponseEntity<String>(output, headers, HttpStatus.OK);		
+	}
+
+	@RequestMapping(value="channelLineup")
+	public ResponseEntity<String> channelLineup(@RequestParam(value="user") String userKey) {
+		SubscriptionManager subMngr = new SubscriptionManager();
+		NnUserManager userService = new NnUserManager();
+		NnUser user = userService.findByKey(userKey);
+		List<MsoChannel> channels = subMngr.findSubscribedChannels(user);
+		String output = "";
+		for (MsoChannel c:channels) {
+			String[] ori = {Short.toString(c.getGrid()), String.valueOf(c.getKey().getId()), c.getName(), c.getImageUrl()};
+			output = output + PlayerLib.getTabDelimitedStr(ori);			
+			output = output + "\n";
+		}				
+		//return
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.TEXT_PLAIN);
+		return new ResponseEntity<String>(output, headers, HttpStatus.OK);
+		
+	}
 	/**
 	 * Get a user's subscribed channels
 	 * 
@@ -53,8 +132,8 @@ public class PlayerController {
 	 * 		   Fields are tab delimited.           
 	 * 		   Fields sequence: sequence, ChannelId, ChannelName, ChannelThumbnailUrl 
 	 */				
-	@RequestMapping(value="channelLineup")
-	public ResponseEntity<String> channelLineup(@RequestParam(value="user") String userKey) {
+	@RequestMapping(value="channelLineupByMso")
+	public ResponseEntity<String> channelLineupByMso(@RequestParam(value="user") String userKey) {
 		SubscriptionManager subMngr = new SubscriptionManager();
 		NnUserManager userService = new NnUserManager();
 		NnUser user = userService.findByKey(userKey);
