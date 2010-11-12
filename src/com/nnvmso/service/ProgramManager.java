@@ -117,9 +117,9 @@ public class ProgramManager {
 	//!!! to force channel id, channel id should be one of the params
 	public void create(MsoProgram program) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
+		System.out.println(DebugLib.OUT + program.getChannelId());
 		MsoChannel c = pm.getObjectById(MsoChannel.class, program.getChannelId()); 
 		program.setChannelKey(c.getKey());
-		program.setPublic(false);
 		List<Key> seq = c.getProgramSeq();		
 		pm.makePersistent(program);
 		seq.add(program.getKey());
@@ -153,7 +153,12 @@ public class ProgramManager {
 		for (PodcastProgram pod : podcasts) {
 			System.out.println(DebugLib.OUT + pod.getTitle());
 			MsoProgram p = new MsoProgram();
+			p.setChannelKey(channel.getKey());
+			p.setChannelId(channel.getId());			
 			p.setName(pod.getTitle());
+			if (pod.getDescription().length() > 500) {
+				pod.setDescription(pod.getDescription().substring(0, 500));
+			}
 			p.setIntro(pod.getDescription());
 			p.setType(MsoProgram.TYPE_VIDEO);
 			p.setWebMFileUrl(pod.getEnclosure());
