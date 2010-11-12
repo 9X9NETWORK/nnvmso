@@ -8,10 +8,12 @@ import javax.jdo.Query;
 
 import org.springframework.stereotype.Service;
 
+import com.nnvmso.lib.DebugLib;
 import com.nnvmso.lib.PMF;
 import com.nnvmso.lib.AuthLib;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
+import com.nnvmso.model.MsoProgram;
 
 @Service
 public class MsoManager {
@@ -64,5 +66,6 @@ public class MsoManager {
 			pm.close();
 		}
 		return mso;
-	}	
+	}
+		
 }
