@@ -30,14 +30,16 @@ public class PodcastController {
 	
 	@RequestMapping("update")
 	public String update(@RequestBody PodcastChannel podcast) {
+		System.out.println("update:" + podcast.getKey());
 		MsoChannel channel = channelMngr.findByKey(podcast.getKey());
+		channel = channelMngr.saveViaPodcast(channel, podcast);
 		programMngr.saveAllViaPodcast(podcast.getItems(), channel);
 		return ""; 
 	}
 
 	@RequestMapping("batch_create")
 	public String batchCreate(@RequestBody PodcastChannel podcast) {
-		Mso mso = msoMngr.findByEmail("a@a.com");
+		Mso mso = msoMngr.findByEmail("default_mso@9x9.com");
 		MsoChannel channel = channelMngr.createViaPodcast(podcast, mso);		
 		programMngr.saveAllViaPodcast(podcast.getItems(), channel);		
 		return "";
