@@ -10,6 +10,7 @@ $(document).ready(function() {
     <ul class="titlebarL">
       <li>IPG of SanLi TV Station<span class="title-note">Channels as of September 28, 2010</span></li>
       <li class="right"><a href="/channel/create/" id="btn-createChannel"></a></li>
+      <li class="right"><a href="/channel/podcast" id="btn-createChannel"></a></li>
       <li class="right"><a href="javascript:;" id="btn-toggle">Hide Off-Air Channels</a></li>
     </ul>
     
