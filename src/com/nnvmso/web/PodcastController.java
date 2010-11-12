@@ -32,7 +32,7 @@ public class PodcastController {
 	public String update(@RequestBody PodcastChannel podcast) {
 		System.out.println("update:" + podcast.getKey());
 		MsoChannel channel = channelMngr.findByKey(podcast.getKey());
-		channel = channelMngr.saveViaPodcast(channel, podcast);
+		channelMngr.saveViaPodcast(channel, podcast);		
 		programMngr.saveAllViaPodcast(podcast.getItems(), channel);
 		return ""; 
 	}
