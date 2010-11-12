@@ -78,14 +78,14 @@ public class MsoProgram implements Serializable {
 	private String webMFileUrl;				
 	
 	public MsoProgram() {
+		this.type = TYPE_VIDEO;
 		this.createDate = new Date();
 		this.updateDate = new Date();		
 	}
 	
 	public MsoProgram(String name) {
 		this.name = name;
-		this.type = TYPE_VIDEO; //!!!!
-		this.isPublic = false;
+		this.type = TYPE_VIDEO;
 		this.createDate = new Date();
 		this.updateDate = new Date();
 	}
