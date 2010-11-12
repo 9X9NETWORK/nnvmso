@@ -28,8 +28,8 @@ public class AuthService {
 			PersistenceManager pm = PMF.get().getPersistenceManager();
 			Query q = pm.newQuery(Mso.class);
 			q.setFilter("email == emailParam");
-			q.declareParameters("String emailParam");
-			List<Mso> results = (List<Mso>)q.execute("a@a.com");
+			q.declareParameters("String emailParam"); 
+			List<Mso> results = (List<Mso>)q.execute("default_mso@9x9.com");
 			session.setAttribute(sessionName, results.get(0));
 		}
 		return session.getAttribute(sessionName);
