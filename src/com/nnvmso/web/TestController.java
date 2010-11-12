@@ -8,6 +8,7 @@ import java.util.Date;
 
 import javax.jdo.PersistenceManager;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.http.HttpHeaders;
@@ -20,19 +21,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.util.CookieGenerator;
 
 import com.nnvmso.lib.DebugLib;
+import com.nnvmso.lib.NnLib;
 import com.nnvmso.lib.PMF;
 import com.nnvmso.model.AwsMessage;
 import com.nnvmso.model.MsoProgram;
-<<<<<<< .mine
 import com.nnvmso.model.PodcastChannel;
 import com.nnvmso.model.PodcastFeed;
 import com.nnvmso.model.PodcastProgram;
-=======
-import com.nnvmso.model.PodcastChannel;
-import com.nnvmso.model.PodcastProgram;
->>>>>>> .r63
 import com.nnvmso.model.ProgramScript;
 import com.nnvmso.model.Slideshow;
 import com.nnvmso.service.ChannelManager;
@@ -46,7 +44,15 @@ public class TestController {
 		System.out.println("enter null pointer");
 		return "/error/nullPointer";
 	}
-		
+
+	@RequestMapping("cookie")
+	public String cookie(HttpServletResponse resp) {
+		CookieGenerator cookie = new CookieGenerator();		
+		cookie.setCookieName("user");
+		cookie.addCookie(resp, "hello");
+		return "hello/hello";
+	}
+	
 	@RequestMapping("rssPost")	
 	public String podcastpost(@RequestBody PodcastFeed feed) {
 		System.out.println(feed.getKey());
@@ -131,6 +137,7 @@ public class TestController {
 	@RequestMapping("podcast")
 	public String podcast() {
 		PodcastChannel podcast = new PodcastChannel();
+		podcast.setKey("aghubmUydm1zb3IQCxIKTXNvQ2hhbm5lbBhODA");
 		podcast.setTitle("title");
 		podcast.setImage("http://image/abc");
 		podcast.setDescription("description");
@@ -149,7 +156,7 @@ public class TestController {
 		items[1] = p2;
 		podcast.setItems(items);
 		
-		String urlStr = "http://localhost:8888/podcast/create";
+		String urlStr = "http://localhost:8888/podcast/update";
         URL url;
 		try {
 			url = new URL(urlStr);
