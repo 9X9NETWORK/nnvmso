@@ -17,8 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.CookieGenerator;
 
-import com.nnvmso.lib.NnLib;
-import com.nnvmso.lib.PlayerLib;
+import com.nnvmso.lib.*;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoProgram;
@@ -34,7 +33,10 @@ import com.nnvmso.service.SubscriptionManager;
 public class PlayerController {
 
 	@RequestMapping("zooatomics")
-	public String zooatomics() {
+	public String zooatomics(HttpServletRequest req, HttpServletResponse resp) {
+		if (CookieHelper.getCookie(req, "platform") == null) {
+			CookieHelper.setCookie(resp, "platform", "gae");
+		}
 		return "player/zooatomics";
 	}
 		
