@@ -5,8 +5,8 @@ nnvmso
 This check-in does not guarantee everything's working. shameful but it's the natual of this project.
 Most of the time it's partially working, for various demo purpose.
 
-run "http://localhost/admin/init" to get the basic data.
-run "http://localhost/admin/index" to browse some apis
+run "http://localhost/admin/init" to initiate necessary data to begin with. check InitService, init() for values. 
+run "http://localhost/admin/index" to browse apis. (not always updated)
 
 
 BUILDING 
