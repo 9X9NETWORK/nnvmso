@@ -42,6 +42,28 @@ public class ChannelManager {
 		pm.close();		
 	}
 
+	public List<MsoChannel> findSystemChannels() {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		Query q = pm.newQuery(MsoChannel.class);		
+		q.setFilter("type == typeParam");
+		q.declareParameters("short typeParam");
+		List<MsoChannel> channels = (List<MsoChannel>) q.execute(MsoChannel.TYPE_SYSTEM);
+		channels.size();
+		pm.close();		
+		return channels;
+	}
+	
+	public List<MsoChannel> findAllPublic() {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		Query q = pm.newQuery(MsoChannel.class);
+		q.setFilter("isPublic == isPublicParam");
+		q.declareParameters("boolean isPublicParam");
+		List<MsoChannel> channels = (List<MsoChannel>) q.execute(true);
+		channels.size();
+		pm.close();		
+		return channels;
+	}
+	
 	public MsoChannel findByKey(String key) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		MsoChannel channel = pm.getObjectById(MsoChannel.class, key);
@@ -108,9 +130,24 @@ public class ChannelManager {
 		return channel;
 	}
 	
+	public MsoChannel saveViaPodcast(MsoChannel channel, PodcastChannel podcast) {
+		channel.setName(podcast.getTitle());
+		if (podcast.getDescription().length() > 500) {
+			podcast.setDescription(podcast.getDescription().substring(0, 500));
+		}
+		channel.setIntro(podcast.getDescription());
+		channel.setImageUrl(podcast.getImage());
+		channel.setPublic(true);
+		this.save(channel);
+		return channel;
+	}
+
 	public MsoChannel createViaPodcast(PodcastChannel podcast, Mso mso) {
 		MsoChannel channel = new MsoChannel();
 		channel.setName(podcast.getTitle());
+		if (podcast.getDescription().length() > 500) {
+			podcast.setDescription(podcast.getDescription().substring(0, 500));
+		}
 		channel.setIntro(podcast.getDescription());
 		channel.setImageUrl(podcast.getImage());
 		this.create(channel, mso);
