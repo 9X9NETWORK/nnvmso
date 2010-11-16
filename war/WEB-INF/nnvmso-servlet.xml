@@ -20,13 +20,12 @@
      <property name="prefix" value="/WEB-INF/views/"></property>
      <property name="suffix" value=".jsp"></property>
   </bean>
-  
-   <bean id="exceptionResolver" class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+   
+  <bean id="exceptionResolver" class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
      <property name="exceptionMappings">
         <props>
            <prop key="java.lang.Exception">/error/exception</prop>
         </props>
      </property>
    </bean>            
-  
 </beans>
