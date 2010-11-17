@@ -26,10 +26,10 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 
 import com.google.appengine.api.datastore.KeyFactory;
+import com.nnvmso.json.AwsS3Post;
 import com.nnvmso.lib.AwsLib;
 import com.nnvmso.lib.DebugLib;
 import com.nnvmso.lib.NnLib;
-import com.nnvmso.model.AwsS3Post;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoProgram;

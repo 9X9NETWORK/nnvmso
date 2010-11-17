@@ -23,30 +23,83 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.CookieGenerator;
 
+import com.nnvmso.json.AwsMessage;
+import com.nnvmso.json.PodcastChannel;
+import com.nnvmso.json.PodcastFeed;
+import com.nnvmso.json.PodcastItem;
+import com.nnvmso.json.PodcastProgram;
+import com.nnvmso.json.Slideshow;
 import com.nnvmso.lib.*;
-import com.nnvmso.model.AwsMessage;
 import com.nnvmso.model.MsoProgram;
-import com.nnvmso.model.PodcastChannel;
-import com.nnvmso.model.PodcastFeed;
-import com.nnvmso.model.PodcastProgram;
 import com.nnvmso.model.ProgramScript;
-import com.nnvmso.model.Slideshow;
 import com.nnvmso.service.ChannelManager;
 import com.nnvmso.service.ProgramManager;
 
 @Controller
 @RequestMapping("test")
 public class TestController {
-	@ExceptionHandler(NullPointerException.class)
-	public @ResponseBody String nullPointer(NullPointerException e) {
-		System.out.println("enter null pointer");
-		return "/error/nullPointer";
+
+	//1. create a podcast from my own portal
+	//2. simulate a channel udpate
+	//3. simulate a program update
+	//4. simulate an enclosure update
+	@RequestMapping("channelUpdate")
+	public String channelUpdate(@RequestParam(value="key") String channelKey) {
+		PodcastChannel c = new PodcastChannel();
+		c.setKey(channelKey);		
+		c.setTitle("channel1");
+		
+		String url = "http://localhost:8888/podcastAPI/channelUpdate";
+		NnLib.urlFetch(url, c);
+		return "";
 	}
 
+	@RequestMapping("itemCreate")
+	public void programUpdate(@RequestParam(value="key") String channelKey) {
+		PodcastProgram program = new PodcastProgram();
+		program.setKey(channelKey);
+		program.setAction(PodcastProgram.ACTION_UPDATE_ITEM);
+		PodcastItem item = new PodcastItem();
+		item.setTitle("item1");
+		item.setDescription("i am item1");
+		item.setEnclosure("mpeg4");
+		program.setItem(item);
+		String url = "http://localhost:8888/podcastAPI/itemUpdate";
+		NnLib.urlFetch(url, program);
+	}
+
+	@RequestMapping("itemModify")
+	public void programModify(@RequestParam(value="key") String itemKey) {
+		PodcastProgram program = new PodcastProgram();		
+		program.setAction(PodcastProgram.ACTION_UPDATE_ENCLOSURE);
+		PodcastItem item = new PodcastItem();
+		item.setItemKey(itemKey);
+		item.setEnclosure("webm");
+		program.setItem(item);
+		String url = "http://localhost:8888/podcastAPI/itemUpdate";
+		NnLib.urlFetch(url, program);
+		System.out.println("back to original modify");		
+	}	
+	
+	@RequestMapping("playerUserLogin")
+	public String playerUserLogin() {
+		return "test/playerUserLogin";
+	}
+	
+	@RequestMapping("playerUserSignup")
+	public String playerUserSignup() {		
+		return "test/playerUserSignup";
+	}
+	
+	@RequestMapping("playerPodcast") 
+	public String playerPodcast() {
+		return "test/playerPodcast";
+	}
+	
 	@RequestMapping("mycookie") 
 	public String mycookie(HttpServletResponse resp, HttpServletRequest req) {
 		CookieHelper.setCookie(resp, "test", "bla");
-		System.out.println("result=" + CookieHelper.readCookie(req, "bla"));		
+		System.out.println("result=" + CookieHelper.getCookie(req, "bla"));		
 		return "hello/hello";
 	}
 	
@@ -95,9 +148,15 @@ public class TestController {
 		return new ResponseEntity<String>(script, headers, HttpStatus.OK);		
 	}
 		
+	@ExceptionHandler(NullPointerException.class)
+	public String nullPointer(NullPointerException e) {
+		System.out.println("enter null pointer");
+		return "hello/hello";
+	}
+	
 	@RequestMapping("nullPointer")
 	public String throwNullPointer() {
-		System.out.println("throws!");
+		System.out.println("null pointer throws!");
 		throw new NullPointerException();
 	}
 	
@@ -143,19 +202,20 @@ public class TestController {
 		return "hello";
 	}
 	
+	/*
 	@RequestMapping("podcast")
 	public String podcast() {
 		PodcastChannel podcast = new PodcastChannel();
 		podcast.setTitle("title");
 		podcast.setImage("http://image/abc");
 		podcast.setDescription("description");
-		PodcastProgram[] items = new PodcastProgram[2];
-		PodcastProgram p1 = new PodcastProgram();
+		PodcastItem[] items = new PodcastItem[2];
+		PodcastItem p1 = new PodcastItem();
 		p1.setTitle("item1");
 		p1.setDescription("description1");
 		p1.setEnclosure("http://file1");
 		p1.setImage("http://image1");
-		PodcastProgram p2 = new PodcastProgram();
+		PodcastItem p2 = new PodcastItem();
 		p2.setTitle("item2");
 		p2.setDescription("description2");
 		p2.setEnclosure("http://file2");
@@ -182,12 +242,11 @@ public class TestController {
 	        writer.close();	        
 		} catch (Exception e) {
 			e.printStackTrace();
-		}	
-		
-		
+		}					
 		return "hello/hello";
 	}	
-
+	*/
+	
 	//trigger /aws/contentUpdate, simulate 9x9.tv api	
 	@RequestMapping("contentUpdate")
 	public String contentUpdate() {

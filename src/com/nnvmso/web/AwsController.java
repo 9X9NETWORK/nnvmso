@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.appengine.repackaged.org.apache.commons.logging.Log;
 import com.google.appengine.repackaged.org.apache.commons.logging.LogFactory;
+import com.nnvmso.json.AwsMessage;
 import com.nnvmso.lib.DebugLib;
 import com.nnvmso.lib.NnLib;
-import com.nnvmso.model.AwsMessage;
 import com.nnvmso.model.MsoProgram;
 import com.nnvmso.service.ProgramManager;
 

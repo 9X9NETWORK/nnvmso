@@ -83,7 +83,7 @@ public class AdminController {
 	}
 	
 	@RequestMapping(value="msoSignup", method=RequestMethod.POST)
-	public String msoSingupSubmit(@Valid Mso mso, BindingResult result) {
+	public String msoSingupSubmit(@Valid Mso mso, BindingResult result, HttpServletRequest req) {
 		if (result.hasErrors()) {
 			return "admin/msoSignupForm";
 		}
