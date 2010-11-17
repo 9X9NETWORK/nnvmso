@@ -13,7 +13,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.geronimo.mail.util.Base64Encoder;
 
-import com.nnvmso.model.AwsS3Post;
+import com.nnvmso.json.AwsS3Post;
 
 public class AwsLib {
 	public static Properties getAwsCredentials() {

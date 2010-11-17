@@ -1,6 +1,6 @@
 package com.nnvmso.lib;
 
-import com.nnvmso.model.Slideshow;
+import com.nnvmso.json.Slideshow;
 
 public class NnScriptLib {
 
