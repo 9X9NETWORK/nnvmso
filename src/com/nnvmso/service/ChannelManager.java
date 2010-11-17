@@ -1,5 +1,7 @@
 package com.nnvmso.service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -13,11 +15,9 @@ import org.springframework.stereotype.Service;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.nnvmso.json.PodcastChannel;
 import com.nnvmso.lib.*;
-import com.nnvmso.model.Mso;
-import com.nnvmso.model.MsoChannel;
-import com.nnvmso.model.MsoProgram;
-import com.nnvmso.model.PodcastChannel;
+import com.nnvmso.model.*;
 
 @Service
 public class ChannelManager {
@@ -42,6 +42,28 @@ public class ChannelManager {
 		pm.close();		
 	}
 
+	public List<MsoChannel> findAllUnsubscribedChannels(NnUser user) {
+		List<MsoChannel> channels = this.findAllPublic();
+		List<Key> keys = new ArrayList<Key>();
+		for (MsoChannel c : channels) {
+			keys.add(c.getKey());
+		}
+		SubscriptionManager sMngr = new SubscriptionManager();		
+		List<Subscription> subs = sMngr.findAll(user);
+		for (Subscription s : subs) {
+			if (keys.contains(s.getChannelKey())) {
+				
+			}
+		}
+		return channels;
+		
+		
+//		q = pm.newQuery(MsoProgram.class, ":p.contains(channelKey)");
+//		List<MsoProgram> programs = (List<MsoProgram>) q.execute(Arrays.asList(channelKeys));		
+//		List<MsoProgram> results = new ArrayList<MsoProgram>(); 
+		
+	}
+	
 	public List<MsoChannel> findSystemChannels() {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Query q = pm.newQuery(MsoChannel.class);		
@@ -131,13 +153,15 @@ public class ChannelManager {
 	}
 	
 	public MsoChannel saveViaPodcast(MsoChannel channel, PodcastChannel podcast) {
+		System.out.println("save via podcast");
 		channel.setName(podcast.getTitle());
-		if (podcast.getDescription().length() > 500) {
+		if (podcast.getDescription()!= null && podcast.getDescription().length() > 500) {
 			podcast.setDescription(podcast.getDescription().substring(0, 500));
 		}
 		channel.setIntro(podcast.getDescription());
 		channel.setImageUrl(podcast.getImage());
 		channel.setPublic(true);
+		System.out.println("right before save");
 		this.save(channel);
 		return channel;
 	}
@@ -145,7 +169,7 @@ public class ChannelManager {
 	public MsoChannel createViaPodcast(PodcastChannel podcast, Mso mso) {
 		MsoChannel channel = new MsoChannel();
 		channel.setName(podcast.getTitle());
-		if (podcast.getDescription().length() > 500) {
+		if (podcast.getDescription()!= null && podcast.getDescription().length() > 500) {
 			podcast.setDescription(podcast.getDescription().substring(0, 500));
 		}
 		channel.setIntro(podcast.getDescription());

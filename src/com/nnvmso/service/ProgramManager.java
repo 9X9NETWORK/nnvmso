@@ -14,21 +14,30 @@ import org.springframework.stereotype.Service;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Text;
+import com.nnvmso.json.AwsMessage;
+import com.nnvmso.json.PodcastItem;
+import com.nnvmso.json.PodcastProgram;
+import com.nnvmso.json.Slideshow;
 import com.nnvmso.lib.DebugLib;
 import com.nnvmso.lib.NnScriptLib;
 import com.nnvmso.lib.PMF;
-import com.nnvmso.model.AwsMessage;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoProgram;
-import com.nnvmso.model.PodcastProgram;
 import com.nnvmso.model.ProgramScript;
-import com.nnvmso.model.Slideshow;
 
 @Service
 public class ProgramManager {
 	// ============================================================
 	// find
 	// ============================================================
+	public MsoProgram findByKey(String key) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		MsoProgram program = pm.getObjectById(MsoProgram.class, key);
+		MsoProgram detached = pm.detachCopy(program);
+		pm.close();
+		return detached;
+	}
+	
 	public void findAllAndSetWhatever() {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Query query = pm.newQuery(MsoProgram.class);
@@ -148,9 +157,38 @@ public class ProgramManager {
 		pm.close();						
 	}
 
-	public void saveAllViaPodcast(PodcastProgram podcasts[], MsoChannel channel) {
+	public void saveViaPodcast(PodcastProgram podcastProgram) {
+		PodcastItem item = podcastProgram.getItem();		
+		MsoProgram p = this.findByKey(item.getItemKey());
+		p.setWebMFileUrl(item.getEnclosure());
+		p.setPublic(true);
+		this.save(p);
+	}
+	
+	public MsoProgram createViaPodcast(PodcastProgram podcastProgram) {
+		MsoChannel channel = new ChannelManager().findByKey(podcastProgram.getKey());
+		MsoProgram p = new MsoProgram();
+		p.setChannelKey(channel.getKey());
+		p.setChannelId(channel.getId());			
+		PodcastItem item = podcastProgram.getItem();
+		p.setName(item.getTitle());
+		if (item.getDescription()!= null && item.getDescription().length() > 500) {
+			item.setDescription(item.getDescription().substring(0, 500));
+		}
+		p.setIntro(item.getDescription());
+		p.setType(MsoProgram.TYPE_VIDEO);
+		p.setMpeg4FileUrl(item.getEnclosure());
+		p.setChannelKey(channel.getKey());
+		p.setChannelId(channel.getKey().getId());
+		p.setPublic(true);
+		this.create(p);
+		return p;
+	}
+	
+	/*
+	public void saveAllViaPodcast(PodcastItem podcasts[], MsoChannel channel) {
 		List<MsoProgram> programs = new ArrayList<MsoProgram>();
-		for (PodcastProgram pod : podcasts) {
+		for (PodcastItem pod : podcasts) {
 			System.out.println(DebugLib.OUT + pod.getTitle());
 			MsoProgram p = new MsoProgram();
 			p.setChannelKey(channel.getKey());
@@ -168,6 +206,7 @@ public class ProgramManager {
 		}
 		this.saveAll(programs, channel);
 	}
+	*/
 
 	//!!!! transaction
 	public void deleteAll(List<MsoProgram> programs) {
