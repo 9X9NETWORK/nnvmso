@@ -161,7 +161,6 @@ public class ChannelManager {
 		channel.setIntro(podcast.getDescription());
 		channel.setImageUrl(podcast.getImage());
 		channel.setPublic(true);
-		System.out.println("right before save");
 		this.save(channel);
 		return channel;
 	}
