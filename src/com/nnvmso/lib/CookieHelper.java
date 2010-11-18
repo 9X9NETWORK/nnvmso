@@ -14,10 +14,12 @@ public class CookieHelper {
 	
 	static public String getCookie(HttpServletRequest req, String cookieName) {
 		Cookie[] cookies = req.getCookies();
-		for (int i = 0; i < cookies.length; i++) {
-			if (cookies[i].getName().equals(cookieName)) {
-				return cookies[i].getValue();
-			}           
+		if (cookies != null) {
+			for (int i = 0; i < cookies.length; i++) {
+				if (cookies[i].getName().equals(cookieName)) {
+					return cookies[i].getValue();
+				}           
+			}
 		}
 		return null;
 	}

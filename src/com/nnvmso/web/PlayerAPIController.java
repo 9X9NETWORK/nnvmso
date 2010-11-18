@@ -136,6 +136,7 @@ public class PlayerAPIController {
 			output = output + PlayerLib.getTabDelimitedStr(ori);			
 			output = output + "\n";
 		}
+		System.out.println("channelBrowse:" + output);
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.TEXT_PLAIN);
 		return new ResponseEntity<String>(output, headers, HttpStatus.OK);
@@ -253,7 +254,7 @@ public class PlayerAPIController {
 	 * @param  user user's unique identifier, it is required for wildcard query 
 	 * @return A string of all the programs' info that met the query criteria. <br/>
 	 * 		   Each program is separate by carriage return. Each program's information is tab delimited.<br/>
-	 * 		   Program info has: channelId, programId, programName, programType, programThumbnailUrl, contentFileUrl
+	 * 		   Program info has: channelId, programId, programName, programType, programThumbnailUrl, url1(mpeg4/slideshow), url2(webm)
 	 */				
 	@RequestMapping("programInfo")	
 	public ResponseEntity<String> programInfo(@RequestParam(value="channel") String channel,
@@ -275,16 +276,18 @@ public class PlayerAPIController {
 		}	
 		String output = "";		
 		for (MsoProgram p : programs) {
-			String file = p.getWebMFileUrl();
+			String url1 = p.getMpeg4FileUrl();
+			String url2 = p.getWebMFileUrl();
 			System.out.println("hostname=" + req.getLocalAddr() + ";" + req.getLocalPort() + ";" + req.getRequestURI());
 			
 			if (p.getType().equals(MsoProgram.TYPE_SLIDESHOW)) {
-				file = "/player/nnscript?program=" + p.getId();
+				url1 = "/player/nnscript?program=" + p.getId();
 			}
-			String[] ori = {String.valueOf(p.getChannelId()), String.valueOf(p.getKey().getId()), p.getName(), p.getType(), p.getImageUrl(), file};
+			String[] ori = {String.valueOf(p.getChannelId()), String.valueOf(p.getKey().getId()), p.getName(), p.getType(), p.getImageUrl(), url1, url2};
 			output = output + PlayerLib.getTabDelimitedStr(ori);
 			output = output + "\n";
-		}		
+		}
+		System.out.println("programInfo:" + output);
 		//return output;
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.TEXT_PLAIN);
@@ -304,7 +307,7 @@ public class PlayerAPIController {
 	 * @return A string of return code and channel id, tab delimited. <br/>
 	 * 	       Failed operation will return return code and error message.
 	 */
-	@RequestMapping(value="podcastRSS", method=RequestMethod.POST)
+	@RequestMapping(value="podcastSubmit", method=RequestMethod.POST)
 	public ResponseEntity<String> podcastSubmit(HttpServletRequest req) {
 		String output = "";
 		if (req.getParameter("podcastRSS") == null || req.getParameter("user") == null || req.getParameter("grid") == null ||
@@ -313,13 +316,15 @@ public class PlayerAPIController {
 		} else {
 			Mso mso = new MsoManager().findByEmail("default_mso@9x9.com");
 			MsoChannel channel = new MsoChannel("podcast");
-			channel.setImageUrl("/WEB-INF/../images/thumb_noImage.jpg");
+			channel.setImageUrl("/WEB-INF/../images/podcastDefault.jpg");
+			channel.setName("Podcast Processing");
 			channel.setPublic(false);
 			MsoChannel saved = new ChannelManager().create(channel, mso);
 
 			PodcastFeed feed = new PodcastFeed();
 			feed.setKey(NnLib.getKeyStr(saved.getKey()));
-			feed.setRss(req.getParameter("podcastRss")); 
+			feed.setRss(req.getParameter("podcastRSS")); 
+			System.out.println("Podcast post from player:" + feed.getRss());
 			String urlStr = "http://awsapi.9x9cloud.tv/dev/podcatcher.php";
 			NnLib.urlFetch(urlStr, feed);
 	
@@ -327,9 +332,9 @@ public class PlayerAPIController {
 			NnUserManager uMngr = new NnUserManager();
 			NnUser user = uMngr.findByKey(req.getParameter("user"));
 			sMngr.channelSubscribe(user, channel, Short.parseShort(req.getParameter("grid")));
-			output = PlayerAPI.CODE_SUCCESS + "\t" + Long.toString(channel.getId());
+			output = PlayerAPI.CODE_SUCCESS + "\t" + Long.toString(channel.getId()) + "\t" + channel.getName() + "\t" + channel.getImageUrl();
 		}
-		
+		System.out.println("player podcast return:" + output);
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.TEXT_PLAIN);
 		return new ResponseEntity<String>(output, headers, HttpStatus.OK);

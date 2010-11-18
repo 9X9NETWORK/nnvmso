@@ -76,10 +76,9 @@ public class InitService {
 		MsoProgram p = new MsoProgram("System Program");
 		p.setChannelId(system.getId());
 		p.setImageUrl("/WEB-INF/../images/logo_9x9.png");
-		p.setMpeg4FileUrl("http://www.youtube.com/watch?v=kPR6dmKYe7U");
-		p.setWebMFileUrl("http://www.youtube.com/watch?v=kPR6dmKYe7U");	
+		p.setMpeg4FileUrl("http://s3.amazonaws.com/mp4_9x9/default.mp4");
+		p.setWebMFileUrl("http://s3.amazonaws.com/webm9x9/default.webm");	
 		p.setPublic(true);
-		pMngr.create(p);
-		
+		pMngr.create(p);		
 	}
 }
