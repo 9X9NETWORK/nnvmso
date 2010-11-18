@@ -61,7 +61,7 @@ public class PodcastAPIController {
 			keys.setKey(podcastProgram.getKey());
 			keys.setItemKey(NnLib.getKeyStr(p.getKey()));			
 		} else {
-			System.out.println("update enclosure:" + podcastProgram.getKey() + ";" + podcastProgram.getItem().getItemKey());
+			System.out.println("update enclosure:" + podcastProgram.getKey() + ";" + podcastProgram.getItemKey());
 			programMngr.saveViaPodcast(podcastProgram);
 		}
 		System.out.println("Finish itemUpdate");
