@@ -5,19 +5,12 @@ package com.nnvmso.json;
  * Receive Podcast Program information from Transcoding Service 
  */
 public class PodcastItem {
-	private String itemKey;
 	private String title;
 	private String description;
 	private String pubDate;
 	private String enclosure;
 	private String type;
 	
-	public String getItemKey() {
-		return itemKey;
-	}
-	public void setItemKey(String itemKey) {
-		this.itemKey = itemKey;
-	}
 	public String getTitle() {
 		return title;
 	}
