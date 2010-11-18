@@ -159,7 +159,7 @@ public class ProgramManager {
 
 	public void saveViaPodcast(PodcastProgram podcastProgram) {
 		PodcastItem item = podcastProgram.getItem();		
-		MsoProgram p = this.findByKey(item.getItemKey());
+		MsoProgram p = this.findByKey(podcastProgram.getItemKey());
 		p.setWebMFileUrl(item.getEnclosure());
 		p.setPublic(true);
 		this.save(p);
