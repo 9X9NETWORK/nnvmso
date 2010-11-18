@@ -9,6 +9,7 @@ public class CookieHelper {
 	//add expiration
 	static public void setCookie(HttpServletResponse resp, String cookieName, String cookieValue) {		
 		Cookie cookie = new Cookie(cookieName, cookieValue);
+		cookie.setPath("/");
 		resp.addCookie(cookie);		
 	}
 	
