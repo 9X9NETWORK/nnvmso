@@ -101,7 +101,7 @@ public class ChannelController {
 		PodcastFeed feed = new PodcastFeed();
 		feed.setKey(NnLib.getKeyStr(saved.getKey()));
 		feed.setRss(channel.getPodcast()); 
-		String urlStr = "http://awsapi.9x9cloud.tv/api/podpares.php";
+		String urlStr = "http://awsapi.9x9cloud.tv/dev/podcatcher.php";
 		NnLib.urlFetch(urlStr, feed);
 		return ("redirect:/channel/edit/" + channel.getKey().getId());
 	}
