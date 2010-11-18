@@ -38,7 +38,7 @@ public class NnLib {
 	        OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
 	        ObjectMapper mapper = new ObjectMapper();
 	        mapper.writeValue(writer, obj);
-	        System.out.println(DebugLib.OUT + "json:" + mapper.writeValueAsString(obj));	        
+	        System.out.println(DebugLib.OUT + "url fetch-json:" + mapper.writeValueAsString(obj));	        
 	        if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {	        	
 	        	System.out.println("response not ok!" + connection.getResponseCode());
 	        }
