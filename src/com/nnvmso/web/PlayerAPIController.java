@@ -21,6 +21,14 @@ import com.nnvmso.lib.*;
 import com.nnvmso.model.*;
 import com.nnvmso.service.*;
 
+/**
+ * <p>Serves for Player.</p>
+ * <p>Url examples: (notice method name is used at the end of URL) <br/> 
+ * http://hostname:port/playerAPI/channelBrowse<br/>
+ * http://hostname:port/podcastAPI/login<br/>
+ * <p/>
+ */
+
 @Controller
 @RequestMapping("playerAPI")
 public class PlayerAPIController {
@@ -36,7 +44,7 @@ public class PlayerAPIController {
 	 * 
 	 * @return A string of a return code and a return message, tab delimited. <br/>
 	 *         If signup succeeds, the return message will be the user key, otherwise it returns error message.<br/>
-	 *         Example: "0	Success", "100	Login Failed".
+	 *         Example: "0	aghubmUydm1zb3IMCxIGTm5Vc2VyGDkM", "100	Login Failed".
 	 */
 	@RequestMapping(value="login", method=RequestMethod.POST)
 	public ResponseEntity<String> login(HttpServletRequest req, HttpServletResponse resp) {
@@ -312,7 +320,7 @@ public class PlayerAPIController {
 			PodcastFeed feed = new PodcastFeed();
 			feed.setKey(NnLib.getKeyStr(saved.getKey()));
 			feed.setRss(req.getParameter("podcastRss")); 
-			String urlStr = "http://awsapi.9x9cloud.tv/api/podpares.php";
+			String urlStr = "http://awsapi.9x9cloud.tv/dev/podcatcher.php";
 			NnLib.urlFetch(urlStr, feed);
 	
 			SubscriptionManager sMngr = new SubscriptionManager();
