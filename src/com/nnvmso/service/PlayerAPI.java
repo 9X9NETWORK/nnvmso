@@ -21,5 +21,6 @@ public class PlayerAPI {
 	
 	public static final String PLAYER_CHANNEL_OR_USER_UNEXISTED = "Channel/User does not exist";
 	public static final String PLAYER_RSS_NOT_VALID = "RSS feed is not valid";
+	public static final String PLAYER_USER_TOKEN_INVALID = "Invalid user token";
 	
 }

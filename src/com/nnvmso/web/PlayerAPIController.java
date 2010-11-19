@@ -31,8 +31,7 @@ import com.nnvmso.service.*;
 
 @Controller
 @RequestMapping("playerAPI")
-public class PlayerAPIController {
-
+public class PlayerAPIController {	
 	/* ==========  CATEGORY: ACCOUNT RELATED ========== */
 	/**
 	 * User login.
@@ -78,8 +77,13 @@ public class PlayerAPIController {
 	@RequestMapping(value="signup", method=RequestMethod.POST)
     public ResponseEntity<String> signup(HttpServletRequest req, HttpServletResponse resp) {
 		String output = "";
-		if (req.getParameter("email") == null || req.getParameter("password") == null || req.getParameter("name") == null ||
-			req.getParameter("email").length() == 0 || req.getParameter("password").length() == 0 || req.getParameter("name").length() == 0) {
+		String email = req.getParameter("email");
+		String password = req.getParameter("password");
+		String name = req.getParameter("name");
+		System.out.println("player signup email=" + email + ";pwd=" + password + ";name=" + name);
+		if (email == null || password == null || name == null ||
+			email.length() == 0 || password.length() == 0 || name.length() == 0 ||
+			email.equals("undefined")) {
 				output = PlayerAPI.CODE_MISSING_PARAMS + "\t" + PlayerAPI.PLAYER_CODE_MISSING_PARAMS;
 		} else { 
 			NnUser newUser = new NnUser(req.getParameter("email"));
@@ -118,6 +122,28 @@ public class PlayerAPIController {
 		return new ResponseEntity<String>(output, headers, HttpStatus.OK);		
 	}
 	
+	/**
+	 * Verify a user token
+	 * 
+	 * @param token user key 
+	 * @return return code and return message, tab delimited. <br/>
+	 *         Example: "0	Success", "4	Invalid user token". 
+	 */
+	@RequestMapping(value="userTokenVerify")	
+	public ResponseEntity<String> userTokenVerify(@RequestParam(value="token") String token, HttpServletResponse resp) {
+		NnUser found = new NnUserManager().findByKey(token);
+		String output = "";
+		if (found == null) {
+			output = PlayerAPI.CODE_ERROR + "\t" + PlayerAPI.PLAYER_USER_TOKEN_INVALID;
+			CookieHelper.deleteCookie(resp, "user");
+		} else {
+			output = PlayerAPI.CODE_SUCCESS + "\t" + PlayerAPI.PLAYER_CODE_SUCCESS;			
+		}
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.TEXT_PLAIN);
+		return new ResponseEntity<String>(output, headers, HttpStatus.OK);				
+	}
+		
 	/* ==========  CATEGORY: CHANNEL BROWSING ========== */		
 	/**
 	 * Browse all the on-air channels.

@@ -6,20 +6,18 @@ import javax.servlet.http.HttpServletResponse;
 
 public class CookieHelper {
 
+	static public void deleteCookie(HttpServletResponse resp, String cookieName) {
+		Cookie cookie = new Cookie(cookieName, "");
+		cookie.setPath("/");
+		cookie.setMaxAge(0);
+		resp.addCookie(cookie);
+	}
+	
 	//add expiration
 	static public void setCookie(HttpServletResponse resp, String cookieName, String cookieValue) {
 		Cookie cookie = new Cookie(cookieName, cookieValue);
 		cookie.setPath("/");
 		resp.addCookie(cookie);		
-	}
-
-	static public void setTestCookie(HttpServletRequest req, HttpServletResponse resp, String cookieName, String cookieValue) {
-		Cookie[] cookies = req.getCookies();
-		System.out.println("before set:" + cookies.length);
-		Cookie cookie = new Cookie(cookieName, cookieValue);
-		resp.addCookie(cookie);		
-		cookies = req.getCookies();
-		System.out.println("after set:" + cookies.length);
 	}
 	
 	static public String getCookie(HttpServletRequest req, String cookieName) {

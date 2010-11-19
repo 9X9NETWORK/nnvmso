@@ -40,6 +40,12 @@ import com.nnvmso.service.ProgramManager;
 @RequestMapping("test")
 public class TestController {
 
+	@RequestMapping("deleteCookie")
+	public String deleteCookie(HttpServletResponse resp) {
+		CookieHelper.deleteCookie(resp, "user");
+		return "hello/hello";
+	}
+	
 	@RequestMapping("validateRss")
 	public String validateRss() {
 		PodcastService service = new PodcastService();

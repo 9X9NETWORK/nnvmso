@@ -3,6 +3,7 @@ package com.nnvmso.service;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.servlet.http.HttpServletResponse;
@@ -61,8 +62,12 @@ public class NnUserManager {
 	}
 	
 	public NnUser findByKey(String key) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();		
-		NnUser user = pm.getObjectById(NnUser.class, key);
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		NnUser user = null;
+		try {
+			user = pm.getObjectById(NnUser.class, key);
+		} catch (JDOObjectNotFoundException e) {
+		}
 		return user;
 	}
 

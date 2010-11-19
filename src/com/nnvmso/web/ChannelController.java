@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
@@ -28,6 +29,7 @@ import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.service.AuthService;
 import com.nnvmso.service.ChannelManager;
+import com.nnvmso.service.PlayerAPI;
 import com.nnvmso.service.PodcastService;
 
 @Controller
@@ -84,9 +86,12 @@ public class ChannelController {
 		return s3; 		
 	}
 
-	@RequestMapping(value="podcast", method=RequestMethod.GET)
-    public String podcastForm(Model model) {
+	@RequestMapping(value="podcast", method=RequestMethod.GET)	
+    public String podcastForm(Model model, @RequestParam(value="error", required=false) String error) {
 		MsoChannel channel = new MsoChannel();
+		if (error != null) {
+			channel.setPodcast("Invalid Podcast RSS");
+		}
 		model.addAttribute("channel", channel);
 		return (viewRoot + "podcastForm");
     }
@@ -96,13 +101,25 @@ public class ChannelController {
 		Mso mso = (Mso)auth.getAuthSession(session, "mso");
 		PodcastService podcastService = new PodcastService();
 		MsoChannel podcastChannel = podcastService.findByPodcast(channel.getPodcast());
-		if (podcastChannel == null) {
-			podcastChannel = podcastService.getDefaultPodcastChannel(channel.getPodcast());
-			podcastChannel = channelMngr.create(podcastChannel, mso);
-			podcastService.submitToTranscodingService(NnLib.getKeyStr(podcastChannel.getKey()), podcastChannel.getPodcast());
+		boolean valid = true;
+		if (podcastChannel == null) {			
+			String podcastInfo[] = podcastService.getPodcastInfo(channel.getPodcast());
+			if (!podcastInfo[0].equals("200") || !podcastInfo[1].contains("xml")) {
+				valid = false;
+			} else {			
+				podcastChannel = podcastService.getDefaultPodcastChannel(channel.getPodcast());
+				podcastChannel = channelMngr.create(podcastChannel, mso);
+				podcastService.submitToTranscodingService(NnLib.getKeyStr(podcastChannel.getKey()), podcastChannel.getPodcast());
+			}
 		}
 		status.setComplete();
-		return ("redirect:/channel/edit/" + podcastChannel.getKey().getId());
+		String redirectUrl = "";
+		if (valid) {
+			redirectUrl = "/channel/edit/" + podcastChannel.getKey().getId();
+		} else {
+			redirectUrl = "/channel/podcast?error=invalidRSS";
+		}
+		return ("redirect:" + redirectUrl);
 	}
 	
 	@RequestMapping(value="create", method=RequestMethod.GET)
