@@ -127,6 +127,7 @@ public class PlayerAPIController {
 	 * 
 	 * @param token user key 
 	 * @return return code and return message, tab delimited. <br/>
+	 * 	       Will delete the user cookie if token is invalid.<br/>
 	 *         Example: "0	Success", "4	Invalid user token". 
 	 */
 	@RequestMapping(value="userTokenVerify")	
