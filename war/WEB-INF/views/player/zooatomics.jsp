@@ -2,7 +2,7 @@
 <head>
 <meta charset="utf-8" />
 
-<link rel="stylesheet" href="http://zoo.atomics.org/video/9x9playerV6/stylesheets/main.css" />
+<link rel="stylesheet" href="http://zoo.atomics.org/video/9x9playerV9/stylesheets/main.css" />
 <link rel="stylesheet" href="http://zoo.atomics.org/video/stylesheets/ipg.css" />
 
 <style>
@@ -67,7 +67,9 @@ var user = "aghubmUydm1zb3IMCxIGTm5Vc2VyGBoM";
 
 $(document).ready (function()
  {
+ log ("HAY");
  setup_ajax_error_handling();
+ log ("HOO");
  //elastic();
  login();
  $(window).resize (function() { elastic(); });
@@ -98,6 +100,9 @@ function log (text)
     {
     if (window.console && console.log)
       console.log (text);
+
+    var loglayer = document.getElementById ("log-layer");
+    loglayer.innerHTML += text + '<br>';
     }
   catch (error)
     {
@@ -125,7 +130,7 @@ function fetch_programs()
 
 function parse_program_data (data)
   {
-  // 0=channel-id 1=program-id 2=program-name 3=program-type 4=program-thumb-url 5=program-url
+  // 0=channel-id 1=program-id 2=program-name 3=program-type 4=program-thumb-url 5=program-url1 6=program-url2
 
     var lines = data.split ('\n');
     log ('number of programs obtained: ' + lines.length);
@@ -136,13 +141,19 @@ function parse_program_data (data)
         var fields = lines[i].split ('\t');
         log ("program line " + i + ": " + fields[0] + ' = ' + lines [i]);
 
+        if (fields [5] == 'null')
+          fields [5] = '';
+
+        if (fields.length <= 6 || (fields.length > 6 && fields [6] == 'null'))
+          fields [6] = '';
+
         if (fields [3] == 'slideshow')
           fields [5] = 'slideshow:' + fields [5];
 
-        if (navigator.userAgent.match (/(GoogleTV|Droid Build)/i))
-          fields[5] = fields[5].replace (/webm$/, 'mp4');
+        //if (navigator.userAgent.match (/(GoogleTV|Droid Build)/i))
+        //fields[5] = fields[5].replace (/webm$/, 'mp4');
 
-        programgrid [fields [1]] = { 'channel': fields[0], 'url': fields[5], 'name': fields[2], 'type': fields[3], 'thumb': fields[4] };
+        programgrid [fields [1]] = { 'channel': fields[0], 'url1': fields[5], 'url2': fields[6], 'name': fields[2], 'type': fields[3], 'thumb': fields[4] };
         }
       else
         log ("ignoring program line " + i + ": " + lines [i]);
@@ -206,6 +217,38 @@ function old_reset_category_dots()
     }
   }
 
+function best_url (program)
+  {
+  var desired;
+
+  if (navigator.userAgent.match (/(GoogleTV|Droid Build)/i))
+    desired = 'mp4';
+
+  else if (navigator.userAgent.match (/(Opera|Chrome|Firefox)/))
+    desired = 'webm';
+
+  else if (navigator.userAgent.match (/(Safari)/))
+    desired = 'mp4';
+
+  ext = new RegExp ('\.' + desired + '$');
+
+  if (programgrid [current_program]['url1'].match (desired))
+    {
+    log ('url1 preference');
+    return programgrid [current_program]['url1'];
+    }
+  else if (programgrid [current_program]['url2'].match (desired))
+    {
+    log ('url2 preference');
+    return programgrid [current_program]['url2'];
+    }
+  else
+    {
+    log ('fallback to url1');
+    return programgrid [current_program]['url1'];
+    }
+  }
+
 function play_first_program_in (chan)
   {
   program_cursor = 1;
@@ -213,7 +256,7 @@ function play_first_program_in (chan)
   current_program = first_program_in (chan);
   log ('playing first program in ' + chan + ': ' + current_program);
 
-  var url = programgrid [current_program]['url'];
+  var url = best_url (current_program)
 
   var v = document.getElementById ("vvv");
   v.src = url;
@@ -225,7 +268,7 @@ function play_program()
   {
   current_program = program_line [program_cursor];
 
-  var url = programgrid [current_program]['url'];
+  var url = best_url (current_program);
 
   var v = document.getElementById ("vvv");
   v.src = url;
@@ -649,7 +692,7 @@ function escape()
     case 'ipg':     layer = $("#ipg-layer");
                     break;
 
-    case 'user':    layer = $("#user-layer");
+    case 'user':    layer = $("#signin-layer");
                     break;
 
     case 'throw':   layer = $("#throw-layer");
@@ -665,7 +708,12 @@ function escape()
     thumbing = saved_thumbing;
 
   else if (thumbing == 'ipg')
+    {
     thumbing = 'channel';
+    }
+
+  $("#mask").hide();
+  $("#log-layer").hide();
   }
 
 function keypress (keycode)
@@ -760,7 +808,7 @@ function keypress (keycode)
 
     case 79:
       /* O */
-      $("#body").css ("background-color", "orange");
+      $("#log-layer").show();
       break;
 
     case 66:
@@ -786,6 +834,7 @@ function switch_to_ipg()
   redraw_ipg();
 
   $("#ipg-layer").css ("opacity", "0");
+  // $("#mask").show();
   $("#ipg-layer").css ("display", "block");
 
   var phase_out_ch =
@@ -834,6 +883,31 @@ function redraw_ipg()
   ipg_cursor = parseInt (channel_line [channel_cursor]);
 
   $("#ipg-" + ipg_cursor).addClass ("on");
+  ipg_metainfo();
+  }
+
+function ipg_metainfo()
+  {
+  if (ipg_cursor in channelgrid)
+    {
+    $("#ch-thumb-img").attr ("src", channelgrid [ipg_cursor]['thumb']);
+    $("#ch-name").html ('<p>' + channelgrid [ipg_cursor]['name'] + '</p>');
+    $("#ep-name").html ('<p>An episode name would go here?</p>');
+    $("#description").html ('<p>A description of something is supposed to go here, but I have nothing to put in this spot.</p>');
+    $("#ch-episodes").html (programs_in_channel (ipg_cursor));
+    $("#ep-number").show();
+    $("#update").show();
+    }
+  else
+    {
+    $("#ch-thumb-img").attr ("src", "http://zoo.atomics.org/video/images-x1/add_channel.png");
+    $("#ch-name").html ('<p></p>');
+    $("#ch-name").html ('<p></p>');
+    $("#ep-name").html ('<p></p>');
+    $("#description").html ('<p></p>');
+    $("#ep-number").hide();
+    $("#update").hide();
+    }
   }
 
 function ipg_right()
@@ -853,6 +927,7 @@ function ipg_right()
   log ("new ipg cursor: " + ipg_cursor);
 
   $("#ipg-" + ipg_cursor).addClass ("on");
+  ipg_metainfo();
   }
 
 function ipg_left()
@@ -872,6 +947,7 @@ function ipg_left()
   log ("new ipg cursor: " + ipg_cursor);
 
   $("#ipg-" + ipg_cursor).addClass ("on");
+  ipg_metainfo();
   }
 
 function ipg_up()
@@ -886,6 +962,7 @@ function ipg_up()
   log ("new ipg cursor: " + ipg_cursor);
 
   $("#ipg-" + ipg_cursor).addClass ("on");
+  ipg_metainfo();
   }
 
 function ipg_down()
@@ -900,6 +977,7 @@ function ipg_down()
   log ("new ipg cursor: " + ipg_cursor);
 
   $("#ipg-" + ipg_cursor).addClass ("on");
+  ipg_metainfo();
   }
 
 function ipg_play()
@@ -1058,13 +1136,25 @@ function server_grid (coord)
 
 function getcookie (id)
   {
+  log ('getcookie: ' + document.cookie);
+
   var fields = document.cookie.split (/; */);
 
   for (var i in fields)
     {
-    var kv = fields[i].split ('=');
-    if (kv [0] == id)
-      return kv [1];
+    try
+      {
+      var kv = fields[i].split ('=');
+      log ('k: ' + kv[0] + ' v: ' + kv[1]);
+      if (kv [0] == id)
+        return kv [1];
+      log ('nope');
+      }
+    catch (err)
+      {
+      // this catch is necessary because of a bug in Google TV
+      log ('some error occurred: ' + err.description);
+      }
     }
 
   return undefined;
@@ -1074,6 +1164,7 @@ function throw_screen()
   {
   saved_thumbing = thumbing;
   thumbing = 'throw';
+  $("#mask").show();
   $("#throw-layer").show();
   }
 
@@ -1081,14 +1172,29 @@ function login_screen()
   {
   saved_thumbing = thumbing;
   thumbing = 'user';
-  $("#user-layer").show();
+  $("#mask").show();
+  $("#signin-layer").show();
   }
 
 function submit_login()
   {
-  log ('login: ' + $("#login").serialize())
+  var things = [];
+  var params = { 'L-email': 'email', 'L-password': 'password' };
 
-  $.post ("/playerAPI/login", $("#login").serialize(), function (data)
+  // this is broken in Opera, appears to be Javascript bug
+  for (var p in params)
+    {
+    var v = $('#' + p).val();
+    log ("value1: " + v);
+    v = encodeURIComponent (v);
+    log ("value2: " + v);
+    things.push ( params [p] + '=' + v );
+    }
+
+  var serialized = things.join ('&');
+  log ('login: ' + serialized);
+  
+  $.post ("/playerAPI/login", serialized, function (data)
     {
     var fields = data.split ('\t');
     user = fields [1];
@@ -1106,8 +1212,23 @@ function submit_login()
 
 function submit_signup()
   {
-  log ('signup: ' + $("#signup").serialize())
-  $.post ("/playerAPI/signup", $("#signup").serialize(), function (data)
+  var things = [];
+  var params = { 'S-name': 'name', 'S-email': 'email', 'S-password': 'password' };
+
+  // this is broken in Opera, appears to be Javascript bug
+  for (var p in params)
+    {
+    var v = $('#' + p).val();
+    log ("value1: " + v);
+    v = encodeURIComponent (v);
+    log ("value2: " + v);
+    things.push ( params [p] + '=' + v );
+    }
+
+  var serialized = things.join ('&');
+  log ('signup: ' + serialized);
+
+  $.post ("/playerAPI/signup", serialized, function (data)
     {
     var fields = data.split ('\t');
     user = fields [1];
@@ -1150,8 +1271,9 @@ function submit_throw()
 
 function login()
   {
+  log ('login')
   var u = getcookie ("user");
-
+  log ('gotcookie')
   if (u)
     {
     log ('user cookie exists');
@@ -1219,6 +1341,8 @@ function browse()
           }
         }
       }
+
+    $("#mask").show();
     $("#browse").html (html);
     $("#browse").show();
 
@@ -1292,6 +1416,7 @@ function continue_acceptance()
 
 
 
+
 </script>
 
 <title>Elastic 9x9 Player</title>
@@ -1300,8 +1425,9 @@ function continue_acceptance()
 
 <body id="body" style="background: black">
 
-<div id="blue" style="background: black; width: 100%; height: 100%; display: block; position: absolute">
+<div id="blue" style="background: black; width: 100%; height: 100%; display: block; position: absolute; color: white">
 One moment...
+
 </div>
 
 <div id="notblue" style="width: 100%; display: none; position: absolute; top: 0; margin: 0; overflow: hidden">
@@ -1310,31 +1436,24 @@ One moment...
 
     <video id="vvv" autoplay="false" preload="metadata" loop="false" height="100%" width="100%" volume="0"></video></div>
 
-  <div id="ipg" style="position: absolute; top: 0; display: none">
-
-    <ul id="iline" class="ipgthumb" style="display: block">
-    </ul>
-  </div>
-
 <div id="ch-layer" style="display: block;">
   <img src="http://zoo.atomics.org/video/images-x1/arrow_up.png" id="arrow-up">
-
   <div id="ch-container">
-
     <img src="http://zoo.atomics.org/video/images-x1/arrow-left.png" id="arrow-left">
     <div id="ch-constrain">
+    <div class="ch-strip">
       <ul id="cg-tabs"><li><span class="dot"></span></li><li class="next"><span class="dot"></span></li><li class="on"><span class="dot"></span></li><li class="next"><span class="dot"></span></li><li><span class="dot"></span></li><li><span class="dot"></span></li><li><span class="dot"></span></li><li class="empty"><span class="dot"></span></li><li class="empty"><span class="dot"></span></li></ul>
-
       <div class="ch-swish" id="ch-swish-1" style="display: block"><ul id="ch-list-1" class="ch-list"></ul></div>
+
       <div class="ch-swish" id="ch-swish-2" style="display: block"><ul id="ch-list-2" class="ch-list"></ul></div>
       <div class="ch-swish" id="ch-swish-3" style="display: block"><ul id="ch-list-3" class="ch-list"></ul></div>
       <div class="ch-swish" id="ch-swish-4" style="display: block"><ul id="ch-list-4" class="ch-list"></ul></div>
-
       <div class="ch-swish" id="ch-swish-5" style="display: block"><ul id="ch-list-5" class="ch-list"></ul></div>
       <div class="ch-swish" id="ch-swish-6" style="display: block"><ul id="ch-list-6" class="ch-list"></ul></div>
       <div class="ch-swish" id="ch-swish-7" style="display: block"><ul id="ch-list-7" class="ch-list"></ul></div>
       <div class="ch-swish" id="ch-swish-8" style="display: block"><ul id="ch-list-8" class="ch-list"></ul></div>
       <div class="ch-swish" id="ch-swish-9" style="display: block"><ul id="ch-list-9" class="ch-list"></ul></div>
+    </div>
 
     </div>
     <img src="http://zoo.atomics.org/video/images-x1/arrow-right.png" id="arrow-right">
@@ -1347,6 +1466,7 @@ One moment...
   <div class="ep-swish" id="ep-swish">
     <ul class="ep-list" id="ep-list"></ul>
   </div>
+
 </div>
 
 <div id="throw-layer" style="display: none; position: absolute; top: 0; background: orange; padding: 20px; z-index: 999; width: 20em">
@@ -1361,6 +1481,7 @@ Postcast URL to throw<br>
 <p><br><p>
 <a href="javascript:submit_throw()">THROW PODCAST</a>
 <br>
+
 <p>
 </form>
 </div>
@@ -1376,6 +1497,7 @@ Postcast URL to throw<br>
 <p>
 E-Mail<br>
 <input type=text size=32 name="email" value="you@example.com" onkeypress="return event.keyCode != 13"></input>
+
 <p>
 Password<br>
 <input type=text size=32 name="password" value="swordfish" onkeypress="return event.keyCode != 13"></input>
@@ -1390,6 +1512,7 @@ Password<br>
 <div style="display:inline-block; background: yellow; width: 20em; border-left: 4px solid black; padding: 20px;">
 <form id="signup">
 <span style="color: red">New Users</span>
+
 <hr width=75% style="margin: auto">
 <br>
 <p>
@@ -1404,6 +1527,7 @@ Password<br>
 
 <input type=text size=32 name="password" value="swordfish" onkeypress="return event.keyCode != 13"></input>
 <p>
+
 Password Verify<br>
 <input type=text size=32 name="password-again" value="swordfish" onkeypress="return event.keyCode != 13"></input>
 <p><br><p>
@@ -1415,32 +1539,70 @@ Password Verify<br>
 
 </div>
 
-
 <div id="ipg-layer" style="display: none">
-
   <div id="ipg-pannel">
     <ul id="info-list">
-      <li id="ch-thumb"><img src="thumb/abc.jpg"></li>
+
+      <li id="ch-thumb"><img id="ch-thumb-img" src=""></li>
       <li id="ch-name"><p>ABC news</p></li>
-      <li id="ep-name"><p>Jay Leno's eclectic car collection</p></li>
-
-      <li id="description"><p>First and foremost, the garage is not a museum. Jay makes his purchases not as.</p></li>
-      <li id="ep-number"><p><span class="hilite">Episodes:</span> 9</p></li>
-
+      <li id="ep-name"><p>An episode name would go here?</p></li>
+      <li id="description"><p>A description of something is supposed to go here, but I have nothing to put in this spot.</p></li>
+      <li id="ep-number"><p><span class="hilite">Episodes: </span><span id="ch-episodes">9</span></p></li>
       <li id="update"><p><span class="hilite">Updated:</span> 11/09/2010</p></li>
+
     </ul>
     <ul id="control-list">
-
       <li><a href="javascript:;" class="btn"><span>Add Channel</span></a></li>
       <li><a href="javascript:;" class="btn"><span>Add Curator</span></a></li>
     </ul>   
   </div>
-
   <div id="ipg-grid"></div>
 </div>
 
-<div id="browse" style="display: none; z-index: 999">
+<div id="signin-layer" style="display: none">
+  <ul id="login-pannel">
+    <li><h2>Returning Users</h2></li>
+    <li>
+      <span>Email:</span>
+      <p class="textfieldbox"><input type="text" id="L-email" class="textfield" value="you@example.com"></p>
+    </li>
+    <li>
+
+      <span>Password:</span>
+      <p class="textfieldbox"><input type="password" id="L-password" class="textfield" value="swordfish"></p>
+    </li>
+    <li><a href="javascript:submit_login()" class="btn"><span>Log in</span></a></li>
+  </ul>
+  
+  <ul id="signup-pannel">
+    <li><h2>New Users</h2></li>
+
+    <li>
+      <span>Name:</span>
+      <p class="textfieldbox"><input type="text" id="S-name" class="textfield"></p>
+    </li>
+    <li>
+      <span>Email:</span>
+      <p class="textfieldbox"><input type="text" name="S-email" class="textfield"></p>
+    </li>
+
+    <li>
+      <span>Password:</span>
+      <p class="textfieldbox"><input type="password" id="S-password" class="textfield"></p>
+    </li>
+    <li>
+      <span>Password verify:</span>
+      <p class="textfieldbox"><input type="password" id="S-password2" class="textfield"></p>
+    </li>
+
+    <li><a href="javascript:submit_signup()" class="btn"><span>Sign up</span></a></li>
+  </ul>
 </div>
+
+<div id="browse" style="display: none; z-index: 999"></div>
+<div id="log-layer" style="position: absolute; left: 0; top: 0; height: 100%; width: 100%; background: white; color: black; text-align: left; padding: 20px; overflow: scroll; z-index: 9999; display: none"></div>
+
+<div id="mask"></div>
 
 </div>
 </body>
