@@ -1,5 +1,7 @@
 package com.nnvmso.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.google.appengine.api.datastore.Text;
@@ -42,7 +44,26 @@ public class InitService {
 		
 	}
 	
+	public void deleteAll() {
+		DbDumper dumper = new DbDumper();
+		//delete player before mso
+		List list = dumper.findAll(Player.class, "createDate");
+		dumper.deleteAll(Player.class, list);
+		//the rest independent entities
+		list = dumper.findAll(Mso.class, "createDate");
+		dumper.deleteAll(Mso.class, list);
+		list = dumper.findAll(NnUser.class, "createDate");
+		dumper.deleteAll(NnUser.class, list);	
+		list = dumper.findAll(MsoChannel.class, "createDate");
+		dumper.deleteAll(MsoChannel.class, list);
+		list = dumper.findAll(MsoProgram.class, "createDate");
+		dumper.deleteAll(MsoProgram.class, list);
+		list = dumper.findAll(Subscription.class, "createDate");
+		dumper.deleteAll(Subscription.class, list);
+	}
+	
 	public void init() {
+		deleteAll();
 		MsoManager msoMngr = new MsoManager();
 		NnUserManager userMngr = new NnUserManager();
 		//two msos

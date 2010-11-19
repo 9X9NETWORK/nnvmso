@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.jdo.Transaction;
@@ -28,7 +29,7 @@ public class ChannelManager {
 
 	// ============================================================
 	// find
-	// ============================================================
+	// ============================================================	
 	public void findAllAndSetWhatever() {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Query query = pm.newQuery(MsoChannel.class);
@@ -41,7 +42,7 @@ public class ChannelManager {
 		pm.makePersistentAll(channels);
 		pm.close();		
 	}
-
+	
 	public List<MsoChannel> findAllUnsubscribedChannels(NnUser user) {
 		List<MsoChannel> channels = this.findAllPublic();
 		List<Key> keys = new ArrayList<Key>();
@@ -96,8 +97,12 @@ public class ChannelManager {
 	
 	public MsoChannel findById(long id) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		MsoChannel channel = pm.getObjectById(MsoChannel.class, id);
-		MsoChannel detached = pm.detachCopy(channel);
+		MsoChannel detached = null;
+		try { 
+			MsoChannel channel = pm.getObjectById(MsoChannel.class, id);
+			detached = pm.detachCopy(channel);
+		} catch (JDOObjectNotFoundException e) {			
+		}
 		pm.close();
 		return detached;
 	}
@@ -151,32 +156,7 @@ public class ChannelManager {
 		this.save(channel);
 		return channel;
 	}
-	
-	public MsoChannel saveViaPodcast(MsoChannel channel, PodcastChannel podcast) {
-		System.out.println("save via podcast");
-		channel.setName(podcast.getTitle());
-		if (podcast.getDescription()!= null && podcast.getDescription().length() > 500) {
-			podcast.setDescription(podcast.getDescription().substring(0, 500));
-		}
-		channel.setIntro(podcast.getDescription());
-		channel.setImageUrl(podcast.getImage());
-		channel.setPublic(true);
-		this.save(channel);
-		return channel;
-	}
-
-	public MsoChannel createViaPodcast(PodcastChannel podcast, Mso mso) {
-		MsoChannel channel = new MsoChannel();
-		channel.setName(podcast.getTitle());
-		if (podcast.getDescription()!= null && podcast.getDescription().length() > 500) {
-			podcast.setDescription(podcast.getDescription().substring(0, 500));
-		}
-		channel.setIntro(podcast.getDescription());
-		channel.setImageUrl(podcast.getImage());
-		this.create(channel, mso);
-		return channel;
-	}
-	
+		
 	public void save(MsoChannel channel) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		channel.setUpdateDate(new Date());

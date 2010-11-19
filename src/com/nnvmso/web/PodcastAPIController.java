@@ -19,6 +19,7 @@ import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoProgram;
 import com.nnvmso.service.ChannelManager;
 import com.nnvmso.service.MsoManager;
+import com.nnvmso.service.PodcastService;
 import com.nnvmso.service.ProgramManager;
 
 /**
@@ -27,7 +28,12 @@ import com.nnvmso.service.ProgramManager;
  * http://hostname:port/podcastAPI/itemUpdate<br/>
  * http://hostname:port/podcastAPI/channelUpdate<br/>
  * <p/>
- *
+ * <p>Flow: <br/>
+ * (1) nnsmvo notify transcoding service a new podcast channel <br/>
+ * (2) transcoding service returns channel metadata via channelUpdate <br/>
+ * (3) transcoding service returns program metadata via itemUpdate. (the episode is ready with MP4 format and basic metadata)<br/>
+ * (4) transcoding service returns additional program metadata via itemUpdate. (webm is supported) <br/> 
+ * </p>
  */
 @Controller
 @RequestMapping("podcastAPI")
@@ -35,34 +41,51 @@ public class PodcastAPIController {
 
 	public static String TRANSCODING_SERVER = "http://awsapi.9x9cloud.tv/api/podpares.php";
 	private ChannelManager channelMngr;
-	private ProgramManager programMngr;
-	private MsoManager msoMngr;
+	private PodcastService podcastService;
 	
 	@Autowired
-	public PodcastAPIController(ChannelManager channelMngr, MsoManager msoMngr, ProgramManager programMngr) {
+	public PodcastAPIController(ChannelManager channelMngr, PodcastService podcastService) {
 		this.channelMngr = channelMngr;
-		this.programMngr = programMngr;
-		this.msoMngr = msoMngr;
+		this.podcastService = podcastService;
 	}
 	
 	/**
 	 * Transcoding Service update Podcast Program information
 	 * 
-	 * @param podcastProgram podcastProgram returns in Json format
-	 * @return keys keys include channel key and item key
+	 * @param podcastProgram podcastProgram returns in Json format <br/>
+	 * {<br/>
+	 * "action":"updateItem",<br/>
+	 * "key":"channel_key_id",<br/>
+	 * "errorCode":0, <br/>
+	 * "errorReason":"error description", <br/>		
+	 * "item": [ <br/>		
+	 *   {<br/>
+	 *     "title":"title", <br/>
+	 *     "description":"description", <br/>
+	 *     "pubDate","pubDate", <br/>
+	 *     "enclosure":"video_url",	<br/>	
+	 *     "type":"mp4",<br/>
+	 *   }<br/>
+	 *} 
+	 * 
+	 * @return keys keys include channel key and item key <br/>
+	 *  {<br/>
+ 	 *     "key":"channel_key_id",<br/>
+ 	 *      "itemkey":"item_key_id",<br/>
+     *  } 
 	 */
 	
 	@RequestMapping("itemUpdate")
 	public @ResponseBody PodcastKeys itemUpdate(@RequestBody PodcastProgram podcastProgram) {
-		PodcastKeys keys = new PodcastKeys();
+		PodcastKeys keys = new PodcastKeys();		
 		if (podcastProgram.getAction().equals(PodcastProgram.ACTION_UPDATE_ITEM)) {
 			System.out.println("update item:" + podcastProgram.getKey());
-			MsoProgram p = programMngr.createViaPodcast(podcastProgram);
+			MsoProgram p = podcastService.createProgramViaPodcast(podcastProgram);
 			keys.setKey(podcastProgram.getKey());
 			keys.setItemKey(NnLib.getKeyStr(p.getKey()));			
 		} else {
 			System.out.println("update enclosure:" + podcastProgram.getKey() + ";" + podcastProgram.getItemKey());
-			programMngr.saveViaPodcast(podcastProgram);
+			podcastService.saveProgramViaPodcast(podcastProgram);
 		}
 		System.out.println("Finish itemUpdate");
 		return keys;
@@ -87,7 +110,7 @@ public class PodcastAPIController {
 	public ResponseEntity<String> channelUpdate(@RequestBody PodcastChannel podcast) {
 		System.out.println("update:" + podcast.getKey());
 		MsoChannel channel = channelMngr.findByKey(podcast.getKey());
-		channelMngr.saveViaPodcast(channel, podcast);
+		podcastService.saveChannelViaPodcast(channel, podcast);
 		System.out.println("finish channelUpdate");
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.TEXT_PLAIN);

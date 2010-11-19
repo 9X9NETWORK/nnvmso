@@ -5,6 +5,7 @@ public class PlayerAPI {
 	public static final int CODE_INFO = 1;
 	public static final int CODE_WARNING = 2;
 	public static final int CODE_FATAL = 3;
+	public static final int CODE_ERROR = 4;	
 	
 	public static final int CODE_LOGIN_FAILED = 100;
 	public static final int CODE_ACCOUNT_EXISTED = 101;
@@ -15,5 +16,10 @@ public class PlayerAPI {
 	public static final String PLAYER_CODE_LOGIN_FAILED = "Login Failed";
 	public static final String PLAYER_CODE_ACCOUNT_EXISTED = "Account Existed";
 	public static final String PLAYER_CODE_FATAL = "Fatal Error";
+	public static final String PLAYER_CODE_ERROR = "Error";
 	public static final String PLAYER_CODE_MISSING_PARAMS = "Missing Params";
+	
+	public static final String PLAYER_CHANNEL_OR_USER_UNEXISTED = "Channel/User does not exist";
+	public static final String PLAYER_RSS_NOT_VALID = "RSS feed is not valid";
+	
 }

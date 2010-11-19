@@ -36,10 +36,10 @@ public class NnUserController {
 		this.subMngr = subMngr;
 	}
 	
-	@RequestMapping(value="subscribe")	
+	@RequestMapping(value="subscribe")
 	public String subscribe(@RequestParam(value="id") String key) {
 		NnUser user = userMngr.findByKey(key);
-		subMngr.subscribe(user);
+		subMngr.msoSubscribe(user);
 		return "hello";
 	}
 	
@@ -62,7 +62,7 @@ public class NnUserController {
 		MsoManager msoMngr = new MsoManager();
 		Mso mymso = msoMngr.findByEmail(mso.getEmail());
 		userMngr.create(user, mymso);
-		subMngr.subscribe(user);
+		subMngr.msoSubscribe(user);
 		
 		status.setComplete();
 		return "redirect:/hello";

@@ -33,12 +33,23 @@ import com.nnvmso.lib.*;
 import com.nnvmso.model.MsoProgram;
 import com.nnvmso.model.ProgramScript;
 import com.nnvmso.service.ChannelManager;
+import com.nnvmso.service.PodcastService;
 import com.nnvmso.service.ProgramManager;
 
 @Controller
 @RequestMapping("test")
 public class TestController {
 
+	@RequestMapping("validateRss")
+	public String validateRss() {
+		PodcastService service = new PodcastService();
+		service.findByPodcast("http://channel9.msdn.com/feeds/rss");
+		//service.validateRSS("http://channel9.msdn.com/feeds/rss");
+		//service.validateRSS("http://www.mevio.com/feeds/geekbrief.xml"); //contenttype=text/xml;charset=utf-8
+		//service.validateRSS("http://m.podshow.com/media/365/episodes/237452/geekbrief-237452-06-25-2010.mp4");
+		return "hello/hello";
+	}
+	
 	//1. create a podcast from my own portal
 	//2. simulate a channel udpate
 	//3. simulate a program update
@@ -50,10 +61,10 @@ public class TestController {
 		c.setTitle("channel1");
 		
 		String url = "http://localhost:8888/podcastAPI/channelUpdate";
-		NnLib.urlFetch(url, c);
+		NnLib.urlPostWithJson(url, c);
 		return "";
 	}
-
+	
 	@RequestMapping("itemCreate")
 	public void programUpdate(@RequestParam(value="key") String channelKey) {
 		PodcastProgram program = new PodcastProgram();
@@ -65,7 +76,7 @@ public class TestController {
 		item.setEnclosure("mpeg4");
 		program.setItem(item);
 		String url = "http://localhost:8888/podcastAPI/itemUpdate";
-		NnLib.urlFetch(url, program);
+		NnLib.urlPostWithJson(url, program);
 	}
 
 	@RequestMapping("itemModify")
@@ -73,11 +84,10 @@ public class TestController {
 		PodcastProgram program = new PodcastProgram();		
 		program.setAction(PodcastProgram.ACTION_UPDATE_ENCLOSURE);
 		PodcastItem item = new PodcastItem();
-		item.setItemKey(itemKey);
 		item.setEnclosure("webm");
 		program.setItem(item);
 		String url = "http://localhost:8888/podcastAPI/itemUpdate";
-		NnLib.urlFetch(url, program);
+		NnLib.urlPostWithJson(url, program);
 		System.out.println("back to original modify");		
 	}	
 	

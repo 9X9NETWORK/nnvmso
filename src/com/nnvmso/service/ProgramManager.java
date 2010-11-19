@@ -156,34 +156,6 @@ public class ProgramManager {
 		pm.makePersistentAll(programs);
 		pm.close();						
 	}
-
-	public void saveViaPodcast(PodcastProgram podcastProgram) {
-		PodcastItem item = podcastProgram.getItem();		
-		MsoProgram p = this.findByKey(podcastProgram.getItemKey());
-		p.setWebMFileUrl(item.getEnclosure());
-		p.setPublic(true);
-		this.save(p);
-	}
-	
-	public MsoProgram createViaPodcast(PodcastProgram podcastProgram) {
-		MsoChannel channel = new ChannelManager().findByKey(podcastProgram.getKey());
-		MsoProgram p = new MsoProgram();
-		p.setChannelKey(channel.getKey());
-		p.setChannelId(channel.getId());			
-		PodcastItem item = podcastProgram.getItem();
-		p.setName(item.getTitle());
-		if (item.getDescription()!= null && item.getDescription().length() > 500) {
-			item.setDescription(item.getDescription().substring(0, 500));
-		}
-		p.setIntro(item.getDescription());
-		p.setType(MsoProgram.TYPE_VIDEO);
-		p.setMpeg4FileUrl(item.getEnclosure());
-		p.setChannelKey(channel.getKey());
-		p.setChannelId(channel.getKey().getId());
-		p.setPublic(true);
-		this.create(p);
-		return p;
-	}
 	
 	/*
 	public void saveAllViaPodcast(PodcastItem podcasts[], MsoChannel channel) {

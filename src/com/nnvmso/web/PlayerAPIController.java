@@ -192,7 +192,7 @@ public class PlayerAPIController {
 	/**
 	 * Get a user's subscribed channels. 
 	 * 
-	 * Example: http://localhost:8888/player/channelLineup?user=aghubmUzdm1zb3INCxIGTm5Vc2VyGKsEDA
+	 * Example: http://localhost:8888/playerAPI/channelLineup?user=aghubmUzdm1zb3INCxIGTm5Vc2VyGKsEDA
 	 *  
 	 * @param  user user's unique key
 	 * @return Channel info. <br/>
@@ -222,7 +222,7 @@ public class PlayerAPIController {
 	/**
 	 * Get program script based on program id.
 	 * 
-	 * <p>Example: http://localhost:8888/player/nnscript?program=566</p>  
+	 * <p>Example: http://localhost:8888/playerAPI/nnscript?program=566</p>  
 	 *  
 	 * @param program program id
 	 * @return 9x9script 
@@ -243,9 +243,9 @@ public class PlayerAPIController {
 	 * 
 	 * <p>
 	 * Examples: <br/>
-	 *  http://localhost:8888/player/programInfo?channel=*&user=aghubmUzdm1zb3INCxIGTm5Vc2VyGKsEDA <br/>
-	 *  http://localhost:8888/player/programInfo?channel=153,158 <br/>
-	 *  http://localhost:8888/player/programInfo?channel=153 <br/>
+	 *  http://localhost:8888/playerAPI/programInfo?channel=*&user=aghubmUzdm1zb3INCxIGTm5Vc2VyGKsEDA <br/>
+	 *  http://localhost:8888/playerAPI/programInfo?channel=153,158 <br/>
+	 *  http://localhost:8888/playerAPI/programInfo?channel=153 <br/>
 	 * </p> 
 	 *  
 	 * @param  channel (1)Could be *, all the programs, e.g. channel=* (user is required for wildcard query). 
@@ -309,30 +309,43 @@ public class PlayerAPIController {
 	 */
 	@RequestMapping(value="podcastSubmit", method=RequestMethod.POST)
 	public ResponseEntity<String> podcastSubmit(HttpServletRequest req) {
+		PodcastService podcastService = new PodcastService();
 		String output = "";
-		if (req.getParameter("podcastRSS") == null || req.getParameter("user") == null || req.getParameter("grid") == null ||
-			req.getParameter("podcastRSS").length() == 0 || req.getParameter("user").length() == 0 || req.getParameter("grid").length() == 0) {
+		boolean valid = true;
+		String rssStr = req.getParameter("podcastRSS");
+		String userStr = req.getParameter("user");
+		String gridStr = req.getParameter("grid");
+		if (rssStr == null || userStr == null || gridStr == null ||
+			rssStr.length() == 0 || userStr.length() == 0 || gridStr.length() == 0) {
 			output = PlayerAPI.CODE_MISSING_PARAMS + "\t" + PlayerAPI.PLAYER_CODE_MISSING_PARAMS;
-		} else {
+			valid = false;
+		}
+		if (valid) {
+			String podcastInfo[] = podcastService.getPodcastInfo(rssStr);			
+			if (!podcastInfo[0].equals("200") || !podcastInfo[1].contains("xml")) {
+				output = PlayerAPI.CODE_ERROR + "\t" + PlayerAPI.PLAYER_RSS_NOT_VALID;
+				valid = false;
+			} else {
+				rssStr = podcastInfo[2];
+			}
+		}
+		if (valid) {
 			Mso mso = new MsoManager().findByEmail("default_mso@9x9.com");
-			MsoChannel channel = new MsoChannel("podcast");
-			channel.setImageUrl("/WEB-INF/../images/podcastDefault.jpg");
-			channel.setName("Podcast Processing");
-			channel.setPublic(false);
-			MsoChannel saved = new ChannelManager().create(channel, mso);
-
-			PodcastFeed feed = new PodcastFeed();
-			feed.setKey(NnLib.getKeyStr(saved.getKey()));
-			feed.setRss(req.getParameter("podcastRSS")); 
-			System.out.println("Podcast post from player:" + feed.getRss());
-			String urlStr = "http://awsapi.9x9cloud.tv/dev/podcatcher.php";
-			NnLib.urlFetch(urlStr, feed);
-	
-			SubscriptionManager sMngr = new SubscriptionManager();
-			NnUserManager uMngr = new NnUserManager();
-			NnUser user = uMngr.findByKey(req.getParameter("user"));
-			sMngr.channelSubscribe(user, channel, Short.parseShort(req.getParameter("grid")));
-			output = PlayerAPI.CODE_SUCCESS + "\t" + Long.toString(channel.getId()) + "\t" + channel.getName() + "\t" + channel.getImageUrl();
+			MsoChannel channel = podcastService.findByPodcast(rssStr);
+			if (channel == null) {
+				//create channel
+				channel = podcastService.getDefaultPodcastChannel(rssStr);
+				MsoChannel saved = new ChannelManager().create(channel, mso);
+				podcastService.submitToTranscodingService(NnLib.getKeyStr(saved.getKey()), rssStr);
+				System.out.println("submit to transcoding service=" + rssStr);
+				//automatically subscribe to this channel
+				SubscriptionManager sMngr = new SubscriptionManager();
+				NnUserManager uMngr = new NnUserManager();
+				NnUser user = uMngr.findByKey(req.getParameter("user"));
+				sMngr.channelSubscribe(user, channel, Short.parseShort(req.getParameter("grid")));
+			}
+			String[] ori = {Integer.toString(PlayerAPI.CODE_SUCCESS), Long.toString(channel.getId()), channel.getName(), channel.getImageUrl()};
+			output = PlayerLib.getTabDelimitedStr(ori);						
 		}
 		System.out.println("player podcast return:" + output);
 		HttpHeaders headers = new HttpHeaders();
@@ -344,7 +357,7 @@ public class PlayerAPIController {
 	/**
 	 * User subscribes a channel on a designated grid location.
 	 * 
-	 * <p>Example: http://localhost:8888/player/subscribe?user=aghubmUydm1zb3IMCxIGTm5Vc2VyGDkM&channel=51&grid=2</p>
+	 * <p>Example: http://localhost:8888/playerAPI/subscribe?user=aghubmUydm1zb3IMCxIGTm5Vc2VyGDkM&channel=51&grid=2</p>
 	 * 
 	 * @param user user's unique identifier
 	 * @param channel channelId
@@ -352,21 +365,56 @@ public class PlayerAPIController {
 	 * @return A string of return code and return message, tab delimited.
 	 */	
 	@RequestMapping(value="subscribe")
-	public ResponseEntity<String> subscribe(@RequestParam(value="user") String user, @RequestParam(value="channel") long channel, @RequestParam(value="grid") short grid ) {
+	public ResponseEntity<String> subscribe(@RequestParam(value="user") String user, @RequestParam(value="channel") long channel, @RequestParam(value="grid") short grid ) {			
 		//subscribe	
 		NnUserManager userMngr = new NnUserManager();
-		NnUser foundUser = userMngr.findByKey(user);
 		ChannelManager channelMngr = new ChannelManager();
-		MsoChannel foundChannel = channelMngr.findById(channel);
 		SubscriptionManager sMngr = new SubscriptionManager();
-		sMngr.channelSubscribe(foundUser, foundChannel, grid);
+		String output = "";
+		
+		NnUser foundUser = userMngr.findByKey(user);
+		MsoChannel foundChannel = channelMngr.findById(channel);
+		if (foundUser != null && foundChannel != null) {
+			sMngr.channelSubscribe(foundUser, foundChannel, grid);
+			output = PlayerAPI.CODE_SUCCESS + "\t" + PlayerAPI.PLAYER_CODE_SUCCESS;
+		} else {
+			output = PlayerAPI.CODE_ERROR + "\t" + PlayerAPI.PLAYER_CHANNEL_OR_USER_UNEXISTED;
+		}
 		//return
-		String output = PlayerAPI.CODE_SUCCESS + "\t" + PlayerAPI.PLAYER_CODE_SUCCESS;
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.TEXT_PLAIN);
 		return new ResponseEntity<String>(output, headers, HttpStatus.OK);		
 	}
 
+	/**
+	 * User unsubscribes a channel
+	 * 
+	 * <p>Example: http://localhost:8888/playerAPI/unsubscribe?user=aghubmUydm1zb3IMCxIGTm5Vc2VyGDkM&channel=51</p>
+	 * 
+	 * @param user user's unique identifier
+	 * @param channel channelId
+	 * @return A string of return code and return message, tab delimited.
+	 */		
+	@RequestMapping(value="unsubscribe")
+	public ResponseEntity<String> unsubscribe(@RequestParam(value="user") String user, @RequestParam(value="channel") long channel) {
+		SubscriptionManager sMngr = new SubscriptionManager();
+		ChannelManager cMngr = new ChannelManager();
+		NnUserManager uMngr = new NnUserManager();
+		String output = "";
+		
+		NnUser u = uMngr.findByKey(user);
+		MsoChannel c = cMngr.findById(channel);
+		if (u != null && c != null) {
+			sMngr.channelUnsubscribe(u, c);
+			output = PlayerAPI.CODE_SUCCESS + "\t" + PlayerAPI.PLAYER_CODE_SUCCESS;
+		} else {
+			output = PlayerAPI.CODE_ERROR + "\t" + PlayerAPI.PLAYER_CHANNEL_OR_USER_UNEXISTED;
+		} 		
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.TEXT_PLAIN);
+		return new ResponseEntity<String>(output, headers, HttpStatus.OK);
+	}
+	
 	/* ==========  CATEGORY: CURATOR RELATED ========== */
 	/**
 	 * Get curator information

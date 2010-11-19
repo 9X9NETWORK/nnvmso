@@ -42,6 +42,15 @@ public class NnUserManager {
 		return user;
 	}
 	
+	public List<NnUser> findAll() {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		String query = "select from " + NnUser.class.getName() + " order by createDate";
+		List<NnUser> users = (List<NnUser>) pm.newQuery(query).execute();
+		users.size(); //touch
+		pm.close();
+		return users;		
+	}
+	
 	public NnUser findByEmail(String email) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();		
 		Query query = pm.newQuery(NnUser.class);
@@ -83,5 +92,5 @@ public class NnUserManager {
 		pm.makePersistent(user);
 		pm.close();
 	}
-		
+
 }

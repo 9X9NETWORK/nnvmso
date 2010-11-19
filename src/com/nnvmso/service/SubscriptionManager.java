@@ -79,7 +79,19 @@ public class SubscriptionManager {
 		pm.close();		
 	}
 	
-	public void subscribe(NnUser user) {
+	public void channelUnsubscribe(NnUser user, MsoChannel channel) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();		
+		Query q = pm.newQuery(Subscription.class);
+		q.setFilter("userKey == userKeyParam && channelKey == channelKeyParam");
+		q.declareParameters(Key.class.getName() + " userKeyParam, " + Key.class.getName() + " channelKeyParam");
+		List<Subscription> s = (List<Subscription>)q.execute(user.getKey(), channel.getKey());
+		if (s != null && s.size() > 0) {
+			pm.deletePersistent(s.get(0));
+		}
+		pm.close();				
+	}
+	
+	public void msoSubscribe(NnUser user) {
 		List<Subscription> subscriptions = this.findAll(user);
 		
 		//retrieve the mso's channels

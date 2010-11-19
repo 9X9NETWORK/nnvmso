@@ -28,6 +28,7 @@ import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.service.AuthService;
 import com.nnvmso.service.ChannelManager;
+import com.nnvmso.service.PodcastService;
 
 @Controller
 @RequestMapping("channel")
@@ -92,18 +93,16 @@ public class ChannelController {
 	
 	@RequestMapping(value="podcast", method=RequestMethod.POST)
 	public String podcastSubmit(@ModelAttribute("channel") MsoChannel channel, HttpSession session, SessionStatus status) {		
-		Mso mso = (Mso)auth.getAuthSession(session, "mso");			
-		channel.setImageUrl("/WEB-INF/../images/thumb_noImage.jpg");
-		channel.setPublic(false);
-		MsoChannel saved = channelMngr.create(channel, mso);
+		Mso mso = (Mso)auth.getAuthSession(session, "mso");
+		PodcastService podcastService = new PodcastService();
+		MsoChannel podcastChannel = podcastService.findByPodcast(channel.getPodcast());
+		if (podcastChannel == null) {
+			podcastChannel = podcastService.getDefaultPodcastChannel(channel.getPodcast());
+			podcastChannel = channelMngr.create(podcastChannel, mso);
+			podcastService.submitToTranscodingService(NnLib.getKeyStr(podcastChannel.getKey()), podcastChannel.getPodcast());
+		}
 		status.setComplete();
-		
-		PodcastFeed feed = new PodcastFeed();
-		feed.setKey(NnLib.getKeyStr(saved.getKey()));
-		feed.setRss(channel.getPodcast()); 
-		String urlStr = "http://awsapi.9x9cloud.tv/dev/podcatcher.php";
-		NnLib.urlFetch(urlStr, feed);
-		return ("redirect:/channel/edit/" + channel.getKey().getId());
+		return ("redirect:/channel/edit/" + podcastChannel.getKey().getId());
 	}
 	
 	@RequestMapping(value="create", method=RequestMethod.GET)
@@ -135,6 +134,7 @@ public class ChannelController {
 		System.out.println("onair size:" + onair.size());
 		System.out.println("offair size:" + offair.size());
 		int others = channelMngr.MAX_MSOCHANNEL_SIZE - onair.size() - offair.size();
+		others = others < 0 ? 0 : others;
 		model.addAttribute("onair", onair);
 		model.addAttribute("offair", offair);
 		model.addAttribute("others", others);

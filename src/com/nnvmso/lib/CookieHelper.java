@@ -7,10 +7,19 @@ import javax.servlet.http.HttpServletResponse;
 public class CookieHelper {
 
 	//add expiration
-	static public void setCookie(HttpServletResponse resp, String cookieName, String cookieValue) {		
+	static public void setCookie(HttpServletResponse resp, String cookieName, String cookieValue) {
 		Cookie cookie = new Cookie(cookieName, cookieValue);
 		cookie.setPath("/");
 		resp.addCookie(cookie);		
+	}
+
+	static public void setTestCookie(HttpServletRequest req, HttpServletResponse resp, String cookieName, String cookieValue) {
+		Cookie[] cookies = req.getCookies();
+		System.out.println("before set:" + cookies.length);
+		Cookie cookie = new Cookie(cookieName, cookieValue);
+		resp.addCookie(cookie);		
+		cookies = req.getCookies();
+		System.out.println("after set:" + cookies.length);
 	}
 	
 	static public String getCookie(HttpServletRequest req, String cookieName) {

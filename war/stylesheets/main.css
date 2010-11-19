@@ -672,6 +672,18 @@ a.disable .tabNum, a.disable:hover .tabNum {
   background-position: 0 -100px;
 }
 
+#btn-createPodcast {
+  margin: 6px 9px 0 0;
+  width: 190px;
+  height: 40px;
+  background: url(../images/btn_importpodcast.png) 0 0 no-repeat;
+  display: block;
+}
+
+#btn-createPodcast:hover {
+  background-position: 0 -100px;
+}
+
 /* Create / Edit Channel */
 
 #newchannel-content .formholder {

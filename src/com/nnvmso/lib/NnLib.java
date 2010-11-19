@@ -26,8 +26,8 @@ public class NnLib {
 		}
 		return "http://" + host + port; 		
 	}
-
-	public static void urlFetch(String urlStr, Object obj) {
+	
+	public static void urlPostWithJson(String urlStr, Object obj) {
         URL url;
 		try {
 			url = new URL(urlStr);
