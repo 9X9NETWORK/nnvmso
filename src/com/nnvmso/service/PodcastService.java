@@ -44,15 +44,13 @@ public class PodcastService {
         int counter = 1;
         while (retry) {
 			try {
+				//http GET
 				url = new URL(urlStr);
 		        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 		        connection.setDoOutput(true);
-				connection.setRequestMethod("GET");
-		        OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
 		        if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
 		        	System.out.println("response not ok!" + connection.getResponseCode());	        	
 		        }
-		        writer.close();
 		        String returnUrl = connection.getURL().toString();
 		        if (returnUrl.equals(urlStr)) {
 		        	retry = false;
@@ -101,7 +99,12 @@ public class PodcastService {
 		PodcastItem item = podcastProgram.getItem();
 		ProgramManager pMngr = new ProgramManager();
 		MsoProgram p = pMngr.findByKey(podcastProgram.getItemKey());
-		p.setWebMFileUrl(item.getEnclosure());
+		if (item.getType().equals(MsoProgram.VIDEO_MPEG4)) {
+			p.setMpeg4FileUrl(item.getEnclosure());
+		}
+		if (item.getType().equals(MsoProgram.VIDEO_WEBM)) {
+			p.setWebMFileUrl(item.getEnclosure());
+		}		
 		p.setPublic(true);
 		pMngr.save(p);
 	}
@@ -119,7 +122,12 @@ public class PodcastService {
 		p.setImageUrl(channel.getImageUrl());
 		p.setIntro(item.getDescription());
 		p.setType(MsoProgram.TYPE_VIDEO);
-		p.setMpeg4FileUrl(item.getEnclosure());
+		if (item.getType().equals(MsoProgram.VIDEO_MPEG4)) {
+			p.setMpeg4FileUrl(item.getEnclosure());
+		}
+		if (item.getType().equals(MsoProgram.VIDEO_WEBM)) {
+			p.setWebMFileUrl(item.getEnclosure());
+		}						
 		p.setChannelKey(channel.getKey());
 		p.setChannelId(channel.getKey().getId());
 		p.setPublic(true);

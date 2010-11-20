@@ -49,7 +49,8 @@ public class TestController {
 	@RequestMapping("validateRss")
 	public String validateRss() {
 		PodcastService service = new PodcastService();
-		service.findByPodcast("http://channel9.msdn.com/feeds/rss");
+		String[] podcastInfo = service.getPodcastInfo("http://podcast.msnbc.com/audio/podcast/MSNBC-MTP-NETCAST-M4V.xml");
+		System.out.println(podcastInfo[0] + ";" + podcastInfo[1] + ";" + podcastInfo[2]);
 		//service.validateRSS("http://channel9.msdn.com/feeds/rss");
 		//service.validateRSS("http://www.mevio.com/feeds/geekbrief.xml"); //contenttype=text/xml;charset=utf-8
 		//service.validateRSS("http://m.podshow.com/media/365/episodes/237452/geekbrief-237452-06-25-2010.mp4");
