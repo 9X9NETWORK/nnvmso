@@ -49,7 +49,7 @@ public class PodcastService {
 		        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 		        connection.setDoOutput(true);
 		        if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-		        	System.out.println("response not ok!" + connection.getResponseCode());	        	
+		        	System.out.println("podcast GET response not ok!" + connection.getResponseCode());	        	
 		        }
 		        String returnUrl = connection.getURL().toString();
 		        if (returnUrl.equals(urlStr)) {
