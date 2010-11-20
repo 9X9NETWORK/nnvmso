@@ -721,7 +721,7 @@ function escape()
     case 'throw':   layer = $("#throw-layer");
                     break;
 
-    case 'browse':  layer = $("#browse");
+    case 'browse':  layer = $("#podcast-layer");
                     break;
     }
 
