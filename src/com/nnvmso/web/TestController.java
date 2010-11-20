@@ -3,10 +3,8 @@ package com.nnvmso.web;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Date;
 
-import javax.jdo.PersistenceManager;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -20,7 +18,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.util.CookieGenerator;
 
 import com.nnvmso.json.AwsMessage;
@@ -31,8 +28,6 @@ import com.nnvmso.json.PodcastProgram;
 import com.nnvmso.json.Slideshow;
 import com.nnvmso.lib.*;
 import com.nnvmso.model.MsoProgram;
-import com.nnvmso.model.ProgramScript;
-import com.nnvmso.service.ChannelManager;
 import com.nnvmso.service.PodcastService;
 import com.nnvmso.service.ProgramManager;
 

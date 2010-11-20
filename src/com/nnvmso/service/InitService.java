@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.google.appengine.api.datastore.Text;
-import com.nnvmso.lib.NnLib;
 import com.nnvmso.model.*;
 
 @Service
