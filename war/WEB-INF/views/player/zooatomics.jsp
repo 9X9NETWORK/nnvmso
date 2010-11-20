@@ -63,13 +63,14 @@ var n_browse = 0;
 var saved_thumbing = '';
 var browse_cursor = 1;
 
+var bubble_timex;
+
 var user = "aghubmUydm1zb3IMCxIGTm5Vc2VyGBoM";
 
 $(document).ready (function()
  {
- log ("HAY");
+ log ('begin execution');
  setup_ajax_error_handling();
- log ("HOO");
  //elastic();
  login();
  $(window).resize (function() { elastic(); });
@@ -107,6 +108,11 @@ function log (text)
   catch (error)
     {
     }
+  }
+
+function log_and_alert (text)
+  {
+  panic (text);
   }
 
 function panic (text)
@@ -256,24 +262,39 @@ function play_first_program_in (chan)
   current_program = first_program_in (chan);
   log ('playing first program in ' + chan + ': ' + current_program);
 
+  play();
+  }
+
+function play()
+  {
   var url = best_url (current_program)
 
   var v = document.getElementById ("vvv");
   v.src = url;
 
   log ('playing: ' + url);
+
+  update_bubble();
+
+  if (bubble_timex)
+    clearTimeout (bubble_timex);
+
+  $("#bubble").show();
+  bubble_timex = setTimeout ('$("#bubble").hide()', 3000);
   }
 
 function play_program()
   {
   current_program = program_line [program_cursor];
+  play();
+  }
 
-  var url = best_url (current_program);
-
-  var v = document.getElementById ("vvv");
-  v.src = url;
-
-  log ('playing: ' + url);
+function update_bubble()
+  {
+  var channel = channel_line [channel_cursor];
+  var program = programgrid [current_program];
+  $("#ch-title").html (channelgrid [channel]['name']);
+  $("#ep-title").html (program ['name']);
   }
 
 function switch_to_channel_thumbs()
@@ -311,7 +332,9 @@ function enter_channel()
       {
       program_line [++n_program_line] = p;
       // html += '<li id="p-li-' + n_program_line + '"><img id="p-th-"' + n_program_line + '" src="' + programgrid [p]['thumb'] + '"></li>';
-      html += '<li class="on"><img src="http://zoo.atomics.org/video/images-x1/bg_ep.png" class="ebg"><img src="' + programgrid [p]['thumb'] + '" class="thumb"></li>';
+      var onoff = n_program_line == program_cursor ? 'class="on" ' : '';
+      onoff = '';
+      html += '<li ' + onoff + 'id="p-li-' + n_program_line + '"><img src="http://zoo.atomics.org/video/images-x1/bg_ep.png" class="ebg"><img src="' + programgrid [p]['thumb'] + '" class="thumb"></li>';
       }
     }
 
@@ -654,7 +677,7 @@ function first_program_in (channel)
   {
   if (! (channel in channelgrid))
     {
-    alert ('channel ' + channel + ' not in channelgrid');
+    log_and_alert ('channel ' + channel + ' not in channelgrid');
     return;
     }
 
@@ -1077,20 +1100,25 @@ function program_left()
 
 function redraw_program_line()
   {
-  return;
-
+  log ('redraw program line');
   for (var i = 1; i <= n_program_line; i++)
     {
-    var li = document.getElementById ("p-li-" + i);
+    var dd = document.getElementById ("p-li-" + i);
     if (i == program_cursor)
       {
-      li.style.borderColor = "orange";
-      li.style.background = "orange";
+      if (!(dd.className == 'on'))
+        {
+        dd.className = 'on';
+        // log ("#" + i + " on");
+        }
       }
     else
       {
-      li.style.borderColor = "green";
-      li.style.background = "green";
+      if (dd.className == 'on')
+        {
+        dd.className = '';
+        // log ("#" + i + " off");
+        }
       }
     }
   }
@@ -1101,23 +1129,23 @@ function setup_ajax_error_handling()
     {
     if (x.status == 0)
       {
-      alert ('No network!');
+      log_and_alert ('No network!');
       }
     else if (x.status == 404)
       {
-      alert ('404 Not Found');
+      log_and_alert ('404 Not Found');
       }
     else if (x.status == 500)
       {
-      alert ('500 Internal Server Error');
+      log_and_alert ('500 Internal Server Error');
       }
     else if (e == 'timeout')
       {
-      alert ('Network request timed out!');
+      log_and_alert ('Network request timed out!');
       }
     else
       {
-      alert ('Unknown error: ' + x.responseText);
+      log_and_alert ('Unknown error: ' + x.responseText);
       }
     }});
   }
@@ -1145,10 +1173,10 @@ function getcookie (id)
     try
       {
       var kv = fields[i].split ('=');
-      log ('k: ' + kv[0] + ' v: ' + kv[1]);
+      // log ('k: ' + kv[0] + ' v: ' + kv[1]);
       if (kv [0] == id)
         return kv [1];
-      log ('nope');
+      // log ('nope');
       }
     catch (err)
       {
@@ -1201,12 +1229,11 @@ function submit_login()
     if (fields [0] == "0")
       {
       escape();
-      log ('logged in as user: ' + user);
-      alert ('logged in!')
+      log_and_alert ('logged in as user: ' + user);
       fetch_programs();
       }
     else
-      alert ("LOGIN FAIL: " + fields [1]);
+      log_and_alert ("LOGIN FAIL: " + fields [1]);
     })
   }
 
@@ -1235,12 +1262,11 @@ function submit_signup()
     if (fields [0] == "0")
       {
       escape();
-      log ('signed up as user: ' + user);
-      alert ('signed up!')
+      log_and_alert ('signed up as user: ' + user);
       fetch_programs();
       }
     else
-      alert ("SIGNUP FAIL: " + fields [1]);
+      log_and_alert ("SIGNUP FAIL: " + fields [1]);
     });
   }
 
@@ -1258,14 +1284,14 @@ function submit_throw()
     if (fields [0] == "0")
       {
       escape();
-      alert ('podcast thrown!')
+      log_and_alert ('podcast thrown!')
       // fields: 0=status 1=channel-id 2=channel-name 3=channel-thumb
       channelgrid [ipg_cursor] = { 'id': fields[1], 'name': fields[2], 'thumb': fields[3] };
       channels_by_id [fields[1]] = ipg_cursor;
       redraw_ipg();
       }
     else
-      alert ("PODCAST THROW FAIL: " + fields [1]);
+      log_and_alert ("PODCAST THROW FAIL: " + fields [1]);
     })
   }
 
@@ -1273,12 +1299,29 @@ function login()
   {
   log ('login')
   var u = getcookie ("user");
-  log ('gotcookie')
+
   if (u)
     {
-    log ('user cookie exists');
-    user = u;
-    fetch_programs();
+    log ('user cookie exists, checking');
+
+    var d = $.get ("/playerAPI/userTokenVerify?token=" + u, function (data)
+      {
+      log ('response to userTokenVerify: ' + data);
+
+      var fields = data.split ('\t');
+
+      if (fields[0] == '0')
+        {
+        log ('user token was valid');
+        user = u;
+        fetch_programs();
+        }
+      else
+        {
+        log_and_alert ('user token was not valid');
+        login();
+        }
+      });
     }
   else
     {
@@ -1323,6 +1366,9 @@ function browse()
 
   var d = $.get (query, function (data)
     {
+    // <li class="on"><img src="thumb/abc.jpg"><span>ABC Entertainment</span></li>
+    // <li><img src="thumb/abc.jpg"><span>ABC Entertainment</span></li>
+
     var lines = data.split ('\n');
     log ('number of browse channels obtained: ' + lines.length);
     for (var i = 0; i < lines.length; i++)
@@ -1336,19 +1382,20 @@ function browse()
           {
           log ('browse ' + fields [1] + ': ' + lines [i]);
           n_browse++;
-          html += '<div id="browse' + n_browse + '" style="color: white"><img src="' + fields[3] + '"><br>' + fields[2] + '</div>';
+          // html += '<div id="browse' + n_browse + '" style="color: white"><img src="' + fields[3] + '"><br>' + fields[2] + '</div>';
+          html += '<li id="pod-' + n_browse + '"><img src="' + fields[3] + '"><span>' + fields [2] + '</span></li>';
           browsables [n_browse] = { 'id': fields [1], 'thumb': fields [3], 'name': fields [2] };
           }
         }
       }
 
     $("#mask").show();
-    $("#browse").html (html);
-    $("#browse").show();
+    $("#podcast-list").html (html);
+    $("#podcast-layer").show();
 
     thumbing = 'browse';
     browse_cursor = 1;
-    $("#browse" + browse_cursor).css ("border-color", "orange");
+    $("#pod-" + browse_cursor).addClass ("on");
     });
   }
 
@@ -1356,9 +1403,9 @@ function browse_up()
   {
   if (browse_cursor > 1)
     {
-    $("#browse" + browse_cursor).css ("border-color", "#555");
+    $("#pod-" + browse_cursor).removeClass ("on");
     browse_cursor--;
-    $("#browse" + browse_cursor).css ("border-color", "orange");
+    $("#pod-" + browse_cursor).addClass ("on");
     log ('browser now at: ' + browsables [browse_cursor]['id']);
     }
   }
@@ -1367,9 +1414,9 @@ function browse_down()
   {
   if (browse_cursor < n_browse)
     {
-    $("#browse" + browse_cursor).css ("border-color", "#555");
+    $("#pod-" + browse_cursor).removeClass ("on");
     browse_cursor++;
-    $("#browse" + browse_cursor).css ("border-color", "orange");
+    $("#pod-" + browse_cursor).addClass ("on");
     log ('browser now at: ' + browsables [browse_cursor]['id']);
     }
   }
@@ -1417,6 +1464,8 @@ function continue_acceptance()
 
 
 
+
+
 </script>
 
 <title>Elastic 9x9 Player</title>
@@ -1436,6 +1485,16 @@ One moment...
 
     <video id="vvv" autoplay="false" preload="metadata" loop="false" height="100%" width="100%" volume="0"></video></div>
 
+<ul id="bubble">
+  <li id="ch-title">CNN News</li>
+  <li id="dash">&#8212;</li>
+  <li id="ep-title" class="on">Jay Leno's eclectic car collection</li>
+  <li id="time">11/09/10</li>
+  <li id="divider">|</li>
+
+  <li id="duration">10:24</li>
+</ul>
+
 <div id="ch-layer" style="display: block;">
   <img src="http://zoo.atomics.org/video/images-x1/arrow_up.png" id="arrow-up">
   <div id="ch-container">
@@ -1443,8 +1502,8 @@ One moment...
     <div id="ch-constrain">
     <div class="ch-strip">
       <ul id="cg-tabs"><li><span class="dot"></span></li><li class="next"><span class="dot"></span></li><li class="on"><span class="dot"></span></li><li class="next"><span class="dot"></span></li><li><span class="dot"></span></li><li><span class="dot"></span></li><li><span class="dot"></span></li><li class="empty"><span class="dot"></span></li><li class="empty"><span class="dot"></span></li></ul>
-      <div class="ch-swish" id="ch-swish-1" style="display: block"><ul id="ch-list-1" class="ch-list"></ul></div>
 
+      <div class="ch-swish" id="ch-swish-1" style="display: block"><ul id="ch-list-1" class="ch-list"></ul></div>
       <div class="ch-swish" id="ch-swish-2" style="display: block"><ul id="ch-list-2" class="ch-list"></ul></div>
       <div class="ch-swish" id="ch-swish-3" style="display: block"><ul id="ch-list-3" class="ch-list"></ul></div>
       <div class="ch-swish" id="ch-swish-4" style="display: block"><ul id="ch-list-4" class="ch-list"></ul></div>
@@ -1453,6 +1512,7 @@ One moment...
       <div class="ch-swish" id="ch-swish-7" style="display: block"><ul id="ch-list-7" class="ch-list"></ul></div>
       <div class="ch-swish" id="ch-swish-8" style="display: block"><ul id="ch-list-8" class="ch-list"></ul></div>
       <div class="ch-swish" id="ch-swish-9" style="display: block"><ul id="ch-list-9" class="ch-list"></ul></div>
+
     </div>
 
     </div>
@@ -1464,9 +1524,9 @@ One moment...
 <div id="ep-layer" style="display: none">
   <img src="http://zoo.atomics.org/video/images-x1/arrow_up.png" id="arrow-up">
   <div class="ep-swish" id="ep-swish">
+
     <ul class="ep-list" id="ep-list"></ul>
   </div>
-
 </div>
 
 <div id="throw-layer" style="display: none; position: absolute; top: 0; background: orange; padding: 20px; z-index: 999; width: 20em">
@@ -1476,7 +1536,9 @@ One moment...
 <hr width=75% style="margin: auto">
 <br>
 <p>
+
 Postcast URL to throw<br>
+
 <input type=text size=32 name="podcastRSS" value="http://" onkeypress="return event.keyCode != 13"></input>
 <p><br><p>
 <a href="javascript:submit_throw()">THROW PODCAST</a>
@@ -1491,7 +1553,9 @@ Postcast URL to throw<br>
 <div style="display:inline-block; background: orange; width: 20em; padding: 20px">
 
 <form id="login">
+
 <span style="color: red">Returning Users</span>
+
 <hr width=75% style="margin: auto">
 <br>
 <p>
@@ -1506,6 +1570,7 @@ Password<br>
 <br>
 
 <p>
+
 </form>
 </div>
 
@@ -1519,6 +1584,7 @@ Password<br>
 Your Name<br>
 <input type=text size=32 name="name" value="Rodney Q. Public" onkeypress="return event.keyCode != 13"></input>
 <p>
+
 Your E-Mail<br>
 
 <input type=text size=32 name="email" value="you@example.com" onkeypress="return event.keyCode != 13"></input>
@@ -1532,7 +1598,9 @@ Password Verify<br>
 <input type=text size=32 name="password-again" value="swordfish" onkeypress="return event.keyCode != 13"></input>
 <p><br><p>
 <a href="javascript:submit_signup()">SIGNUP</a>
+
 <br>
+
 <p>
 </form>
 </div>
@@ -1542,18 +1610,18 @@ Password Verify<br>
 <div id="ipg-layer" style="display: none">
   <div id="ipg-pannel">
     <ul id="info-list">
-
       <li id="ch-thumb"><img id="ch-thumb-img" src=""></li>
       <li id="ch-name"><p>ABC news</p></li>
       <li id="ep-name"><p>An episode name would go here?</p></li>
+
       <li id="description"><p>A description of something is supposed to go here, but I have nothing to put in this spot.</p></li>
       <li id="ep-number"><p><span class="hilite">Episodes: </span><span id="ch-episodes">9</span></p></li>
       <li id="update"><p><span class="hilite">Updated:</span> 11/09/2010</p></li>
-
     </ul>
     <ul id="control-list">
-      <li><a href="javascript:;" class="btn"><span>Add Channel</span></a></li>
-      <li><a href="javascript:;" class="btn"><span>Add Curator</span></a></li>
+      <li><a href="javascript:;" class="btn"><span>Button!</span></a></li>
+
+      <li><a href="javascript:;" class="btn"><span>Button!</span></a></li>
     </ul>   
   </div>
   <div id="ipg-grid"></div>
@@ -1563,40 +1631,51 @@ Password Verify<br>
   <ul id="login-pannel">
     <li><h2>Returning Users</h2></li>
     <li>
+
       <span>Email:</span>
       <p class="textfieldbox"><input type="text" id="L-email" class="textfield" value="you@example.com"></p>
     </li>
     <li>
-
       <span>Password:</span>
       <p class="textfieldbox"><input type="password" id="L-password" class="textfield" value="swordfish"></p>
     </li>
     <li><a href="javascript:submit_login()" class="btn"><span>Log in</span></a></li>
+
   </ul>
-  
   <ul id="signup-pannel">
     <li><h2>New Users</h2></li>
-
     <li>
       <span>Name:</span>
       <p class="textfieldbox"><input type="text" id="S-name" class="textfield"></p>
     </li>
     <li>
-      <span>Email:</span>
-      <p class="textfieldbox"><input type="text" name="S-email" class="textfield"></p>
-    </li>
 
+      <span>Email:</span>
+      <p class="textfieldbox"><input type="text" id="S-email" class="textfield"></p>
+    </li>
     <li>
       <span>Password:</span>
       <p class="textfieldbox"><input type="password" id="S-password" class="textfield"></p>
     </li>
     <li>
+
       <span>Password verify:</span>
       <p class="textfieldbox"><input type="password" id="S-password2" class="textfield"></p>
     </li>
-
     <li><a href="javascript:submit_signup()" class="btn"><span>Sign up</span></a></li>
   </ul>
+</div>
+
+<div id="podcast-layer">
+  <div id="padcast-pannel">
+
+    <label for="podcast input">Enter Podcast URL:</label>
+    <ul id="podcast-input">
+      <li class="textfieldbox"><input name="" type="text" class="textfield"></li>
+      <li><a href="javascript:;" class="btn"><span>Contribute</span></a></li>
+    </ul>
+    <ul id="podcast-list"></ul>
+  </div>
 </div>
 
 <div id="browse" style="display: none; z-index: 999"></div>
