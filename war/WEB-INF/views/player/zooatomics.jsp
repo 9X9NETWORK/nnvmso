@@ -242,10 +242,10 @@ function best_url (program)
   if (navigator.userAgent.match (/(GoogleTV|Droid Build)/i))
     desired = 'mp4';
 
-  else if (navigator.userAgent.match (/(Opera|Chrome|Firefox)/))
+  else if (navigator.userAgent.match (/(Opera|Firefox)/))
     desired = 'webm';
 
-  else if (navigator.userAgent.match (/(Safari)/))
+  else if (navigator.userAgent.match (/(Safari|Chrome)/))
     desired = 'mp4';
 
   ext = new RegExp ('\.' + desired + '$');
@@ -1466,7 +1466,9 @@ function browse()
 
     thumbing = 'browse';
     browse_cursor = 1;
-    $("#pod-" + browse_cursor).addClass ("on");
+
+    if (n_browse > 0)
+      $("#pod-" + browse_cursor).addClass ("on");
 
     document.getElementById("podcastRSS").value = "";
     });
@@ -1476,7 +1478,7 @@ function redraw_browse()
   {
   var html = "";
 
-  for (var i = browse_first; i <= browse_first + 9; i++)
+  for (var i = browse_first; i <= n_browse && i <= browse_first + 9; i++)
     html += '<li id="pod-' + i + '"><img src="' + browsables [i]['thumb'] + '"><span>' + browsables [i]['name'] + '</span></li>';
 
   $("#podcast-list").html (html);
@@ -1484,7 +1486,7 @@ function redraw_browse()
 
 function browse_up()
   {
-  if (browse_cursor > 1)
+  if (n_browse > 0 && browse_cursor > 1)
     {
     if (browse_cursor - 1 < browse_first)
       {
@@ -1500,7 +1502,7 @@ function browse_up()
 
 function browse_down()
   {
-  if (browse_cursor < n_browse)
+  if (n_browse > 0 && browse_cursor < n_browse)
     {
     if (browse_cursor + 1 > browse_first + 9)
       {
@@ -1516,15 +1518,18 @@ function browse_down()
 
 function browse_accept()
   {
-  var new_channel_id = browsables [browse_cursor]['id'];
-
-  log ('browser accepts: ' + new_channel_id +  ' (' + server_grid (ipg_cursor) + ')');
-
-  var cmd = "/playerAPI/subscribe?user=" + user + '&' + "channel=" + new_channel_id + '&' + "grid=" + server_grid (ipg_cursor);
-  var d = $.get (cmd, function (data)
+  if (browse_cursor in browsables)
     {
-    continue_acceptance();
-    });
+    var new_channel_id = browsables [browse_cursor]['id'];
+
+    log ('browser accepts: ' + new_channel_id +  ' (' + server_grid (ipg_cursor) + ')');
+
+    var cmd = "/playerAPI/subscribe?user=" + user + '&' + "channel=" + new_channel_id + '&' + "grid=" + server_grid (ipg_cursor);
+    var d = $.get (cmd, function (data)
+      {
+      continue_acceptance();
+      });
+    }
   }
 
 function continue_acceptance()
