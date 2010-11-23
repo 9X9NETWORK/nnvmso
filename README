@@ -2,12 +2,14 @@
 nnvmso
 =====
 
-This check-in does not guarantee everything's working. shameful but it's the natual of this project.
+This check-in does not guarantee everything's working. shameful but it's the nature of this project.
 Most of the time it's partially working, for various demo purpose.
 
-run "http://localhost/admin/init" to initiate necessary data to begin with. check InitService, init() for values. 
-run "http://localhost/admin/index" to browse apis. (not always updated)
+run "http://localhost/admin/init" to initiate necessary data to begin with. check init() in InitService for init values. 
 
+API document
+=====
+API-related controller has document written in Javadoc format.
 
 BUILDING 
 ==============
