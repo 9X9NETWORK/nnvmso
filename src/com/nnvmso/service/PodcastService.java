@@ -1,6 +1,5 @@
 package com.nnvmso.service;
 
-import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
@@ -99,10 +98,10 @@ public class PodcastService {
 		PodcastItem item = podcastProgram.getItem();
 		ProgramManager pMngr = new ProgramManager();
 		MsoProgram p = pMngr.findByKey(podcastProgram.getItemKey());
-		if (item.getType().equals(MsoProgram.VIDEO_MPEG4)) {
+		if (item.getType() != null && item.getType().equals(MsoProgram.VIDEO_MPEG4)) {
 			p.setMpeg4FileUrl(item.getEnclosure());
 		}
-		if (item.getType().equals(MsoProgram.VIDEO_WEBM)) {
+		if (item.getType() != null && item.getType().equals(MsoProgram.VIDEO_WEBM)) {
 			p.setWebMFileUrl(item.getEnclosure());
 		}		
 		p.setPublic(true);
