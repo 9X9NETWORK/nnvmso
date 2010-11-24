@@ -45,8 +45,7 @@ public class NnLib {
 	        writer.close();	        
 		} catch (Exception e) {
 			e.printStackTrace();
-		}	
-		
+		}
 	}
 	
 }

@@ -22,6 +22,11 @@ import com.nnvmso.model.MsoProgram;
 
 @Service
 public class PodcastService {
+
+	public static String TRANSCODING_SERVER_ALPHA = "http://awsapi.9x9cloud.tv/dev/podcatcher.php";
+	public static String TRANSCODING_SERVER_BETA = "http://awsapi.9x9cloud.tv/beta/podcatcher.php";
+	public static String TRANSCODING_SERVER_TW = "http://awsapi.9x9cloud.tv/tw/podcatcher.php";
+	
 	public MsoChannel findByPodcast(String podcastRss) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();		    	
 		Query q = pm.newQuery(MsoChannel.class);
@@ -104,6 +109,9 @@ public class PodcastService {
 		if (item.getType() != null && item.getType().equals(MsoProgram.VIDEO_WEBM)) {
 			p.setWebMFileUrl(item.getEnclosure());
 		}		
+		if (item.getThumbnail()!= null) {
+			p.setImageUrl(item.getThumbnail());
+		}		
 		p.setPublic(true);
 		pMngr.save(p);
 	}
@@ -148,7 +156,7 @@ public class PodcastService {
 		feed.setKey(key);
 		feed.setRss(rss); 
 		System.out.println("Podcast post from player:" + feed.getRss());
-		String urlStr = "http://awsapi.9x9cloud.tv/dev/podcatcher.php";
+		String urlStr = TRANSCODING_SERVER_BETA;
 		NnLib.urlPostWithJson(urlStr, feed);
 	}
 	

@@ -46,8 +46,11 @@ public class MsoManager {
 		PersistenceManager pm = PMF.get().getPersistenceManager();		
 		Query query = pm.newQuery(Mso.class);
 		query.setFilter("email == '" + email + "'");	
-		List<Mso> results = (List<Mso>) query.execute();		
-		Mso mso = results.get(0);
+		List<Mso> results = (List<Mso>) query.execute();
+		Mso mso = null;
+		if (results.size() > 0) {
+			mso = results.get(0);
+		}
 		pm.close();
 		return mso;
 	}

@@ -99,6 +99,6 @@ public class InitService {
 		p.setMpeg4FileUrl("http://s3.amazonaws.com/mp4_9x9/default.mp4");
 		p.setWebMFileUrl("http://s3.amazonaws.com/webm9x9/default.webm");	
 		p.setPublic(true);
-		pMngr.create(p);		
+		pMngr.create(p);
 	}
 }

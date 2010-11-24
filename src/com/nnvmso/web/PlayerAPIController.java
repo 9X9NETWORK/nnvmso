@@ -79,19 +79,24 @@ public class PlayerAPIController {
 		String email = req.getParameter("email");
 		String password = req.getParameter("password");
 		String name = req.getParameter("name");
-		System.out.println("player signup email=" + email + ";pwd=" + password + ";name=" + name);
+		System.out.println("player signup email=" + email + ";pwd=" + password + ";name=" + name);		
 		if (email == null || password == null || name == null ||
 			email.length() == 0 || password.length() == 0 || name.length() == 0 ||
 			email.equals("undefined")) {
 				output = PlayerAPI.CODE_MISSING_PARAMS + "\t" + PlayerAPI.PLAYER_CODE_MISSING_PARAMS;
 		} else { 
-			NnUser newUser = new NnUser(req.getParameter("email"));
-			newUser.setPassword(req.getParameter("password"));
-			newUser.setName(req.getParameter("name"));		
 			NnUserManager userMngr = new NnUserManager();
-			NnUser user = userMngr.createViaPlayer(newUser);
-			userMngr.setUserCookie(resp, NnLib.getKeyStr(user.getKey()));
-			output = PlayerAPI.CODE_SUCCESS + "\t" + NnLib.getKeyStr(user.getKey());
+			NnUser user = userMngr.findByEmail(email);
+			if (user != null) {
+				output = PlayerAPI.CODE_ERROR + "\t" + PlayerAPI.PLAYER_EMAIL_TAKEN;
+			} else {
+				user = new NnUser(req.getParameter("email"));
+				user.setPassword(req.getParameter("password"));
+				user.setName(req.getParameter("name"));		
+				user = userMngr.createViaPlayer(user);
+				userMngr.setUserCookie(resp, NnLib.getKeyStr(user.getKey()));
+				output = PlayerAPI.CODE_SUCCESS + "\t" + NnLib.getKeyStr(user.getKey());				
+			}
 		}
 		//return
 		HttpHeaders headers = new HttpHeaders();
@@ -122,7 +127,8 @@ public class PlayerAPIController {
 	}
 	
 	/**
-	 * Verify a user token
+	 * Verify a user token <br/>
+	 * Example: http://localhost/playerAPI/userTokenVerify?token=aghubmUzdm1zb3INCxIGTm5Vc2VyGKsEDA
 	 * 
 	 * @param token user key 
 	 * @return return code and return message, tab delimited. <br/>
@@ -150,7 +156,9 @@ public class PlayerAPIController {
 	 * 
 	 * @return A string of all the channels' information. <br/>
 	 * 	       Each channel is \n delimited. Each channel's information is tab delimited.<br/>
-	 *         Channel info has channel id, channel name, channel image url. 
+	 *         Channel info has channel id, channel name, channel image url. <br/>
+	 *         Example: 1	Channel1	http://hostname/images/img.jpg 
+	 *         
 	 */
 	@RequestMapping(value="channelBrowse")
 	public ResponseEntity<String> channelBrowse() {
@@ -195,6 +203,7 @@ public class PlayerAPIController {
 	 * @return A string of all of the user's subscribed channels' information.<br/>
 	 * 	       Each channel is \n delimited. Each channel's information is tab delimited.<br/>  
 	 *         Channel info has grid id, channel id, channel name, channel image url.
+	 *         Example: 1	1	Channel1	http://hostname/images/img.jpg
 	 */
 	@RequestMapping(value="channelLineup")
 	public ResponseEntity<String> channelLineup(@RequestParam(value="user") String user) {
@@ -387,7 +396,7 @@ public class PlayerAPIController {
 	 * 
 	 * @param user user's unique identifier
 	 * @param channel channelId
-	 * @param grid grid location
+	 * @param grid grid location, from 1 to 81
 	 * @return A string of return code and return message, tab delimited.
 	 */	
 	@RequestMapping(value="subscribe")
@@ -397,7 +406,7 @@ public class PlayerAPIController {
 		ChannelManager channelMngr = new ChannelManager();
 		SubscriptionManager sMngr = new SubscriptionManager();
 		String output = "";
-		
+
 		NnUser foundUser = userMngr.findByKey(user);
 		MsoChannel foundChannel = channelMngr.findById(channel);
 		if (foundUser != null && foundChannel != null) {
@@ -443,7 +452,7 @@ public class PlayerAPIController {
 	
 	/* ==========  CATEGORY: CURATOR RELATED ========== */
 	/**
-	 * Get curator information
+	 * NOT IN USE: Get curator information
 	 * 
 	 * @param  curator curator key
 	 * @return curator info

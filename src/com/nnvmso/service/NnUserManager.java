@@ -56,8 +56,11 @@ public class NnUserManager {
 		PersistenceManager pm = PMF.get().getPersistenceManager();		
 		Query query = pm.newQuery(NnUser.class);
 		query.setFilter("email == '" + email + "'");	
-		List<NnUser> results = (List<NnUser>) query.execute();		
-		NnUser user = results.get(0);
+		List<NnUser> results = (List<NnUser>) query.execute();
+		NnUser user = null;
+		if (results.size() > 0) {
+			user = results.get(0);			
+		}
 		return user;
 	}
 	

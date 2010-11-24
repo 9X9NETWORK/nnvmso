@@ -20,7 +20,7 @@ public class PlayerController {
 		}
 		return "player/zooatomics";
 	}
-		
+
 	@RequestMapping("embed")
 	public String embeded(Model model) {
 		MsoManager service = new MsoManager();

@@ -84,8 +84,10 @@ public class TestController {
 	@RequestMapping("itemModify")
 	public void programModify(@RequestParam(value="key") String itemKey) {
 		PodcastProgram program = new PodcastProgram();		
-		program.setAction(PodcastProgram.ACTION_UPDATE_ENCLOSURE);
+		program.setAction(PodcastProgram.ACTION_UPDATE_ENCLOSURE);		
 		PodcastItem item = new PodcastItem();
+		program.setKey("");
+		program.setItemKey(itemKey);
 		item.setEnclosure("webm");
 		program.setItem(item);
 		String url = "http://localhost:8888/podcastAPI/itemUpdate";

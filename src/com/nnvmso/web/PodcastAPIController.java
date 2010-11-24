@@ -1,5 +1,7 @@
 package com.nnvmso.web;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -8,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.nnvmso.json.PodcastChannel;
@@ -36,7 +39,6 @@ import com.nnvmso.service.PodcastService;
 @RequestMapping("podcastAPI")
 public class PodcastAPIController {
 
-	public static String TRANSCODING_SERVER = "http://awsapi.9x9cloud.tv/api/podpares.php";
 	private ChannelManager channelMngr;
 	private PodcastService podcastService;
 	
@@ -71,7 +73,6 @@ public class PodcastAPIController {
  	 *      "itemkey":"item_key_id",<br/>
      *  } 
 	 */
-	
 	@RequestMapping("itemUpdate")
 	public @ResponseBody PodcastKeys itemUpdate(@RequestBody PodcastProgram podcastProgram) {
 		PodcastKeys keys = new PodcastKeys();		
@@ -111,10 +112,18 @@ public class PodcastAPIController {
 		System.out.println("finish channelUpdate");
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.TEXT_PLAIN);
-		return new ResponseEntity<String>("OK", headers, HttpStatus.OK);
-		
+		return new ResponseEntity<String>("OK", headers, HttpStatus.OK);		
 	}
 
+	@RequestMapping("channelDelete")
+	public ResponseEntity<String> channelDelete(@RequestParam(value="channelKey") String channelKey) {
+		ChannelManager cMngr = new ChannelManager();
+		cMngr.findByKey(channelKey);
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.TEXT_PLAIN);
+		return new ResponseEntity<String>("OK", headers, HttpStatus.OK);		 
+	}
+	
 	/*
 	//dysfunction
 	@RequestMapping("batch_create")
