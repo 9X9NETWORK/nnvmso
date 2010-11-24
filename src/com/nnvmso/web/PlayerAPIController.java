@@ -30,7 +30,7 @@ import com.nnvmso.service.*;
 
 @Controller
 @RequestMapping("playerAPI")
-public class PlayerAPIController {	
+public class PlayerAPIController {
 	/* ==========  CATEGORY: ACCOUNT RELATED ========== */
 	/**
 	 * User login.
@@ -57,8 +57,8 @@ public class PlayerAPIController {
 			output = PlayerAPI.CODE_SUCCESS + "\t" + NnLib.getKeyStr(user.getKey());
 		}
 		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.TEXT_PLAIN);
-		return new ResponseEntity<String>(output, headers, HttpStatus.OK);				
+		headers.setContentType(MediaType.valueOf("text/plain;charset=utf-8"));
+		return new ResponseEntity<String>(output, headers, HttpStatus.OK);
 	}
 	
 	/**
@@ -100,7 +100,7 @@ public class PlayerAPIController {
 		}
 		//return
 		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.TEXT_PLAIN);
+		headers.setContentType(MediaType.valueOf("text/plain;charset=utf-8"));
 		return new ResponseEntity<String>(output, headers, HttpStatus.OK);		
 	}
 	
@@ -122,7 +122,7 @@ public class PlayerAPIController {
 		//return
 		String output = PlayerAPI.CODE_SUCCESS + "\t" + NnLib.getKeyStr(user.getKey());
 		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.TEXT_PLAIN);
+		headers.setContentType(MediaType.valueOf("text/plain;charset=utf-8"));
 		return new ResponseEntity<String>(output, headers, HttpStatus.OK);		
 	}
 	
@@ -146,7 +146,7 @@ public class PlayerAPIController {
 			output = PlayerAPI.CODE_SUCCESS + "\t" + PlayerAPI.PLAYER_CODE_SUCCESS;			
 		}
 		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.TEXT_PLAIN);
+		headers.setContentType(MediaType.valueOf("text/plain;charset=utf-8"));
 		return new ResponseEntity<String>(output, headers, HttpStatus.OK);				
 	}
 		
@@ -172,29 +172,9 @@ public class PlayerAPIController {
 		}
 		System.out.println("channelBrowse:" + output);
 		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.TEXT_PLAIN);
+		headers.setContentType(MediaType.valueOf("text/plain;charset=utf-8"));
 		return new ResponseEntity<String>(output, headers, HttpStatus.OK);
 	}
-
-	/*
-	@RequestMapping(value="channelBrowseByUser")
-	public ResponseEntity<String> channelBrowseByUser(@RequestParam String userKey) {
-		NnUserManager userMngr = new NnUserManager();
-		NnUser user = userMngr.findByKey(userKey);
-		
-		ChannelManager channelMngr = new ChannelManager();
-		List<MsoChannel> channels = channelMngr.findAllPublic();
-		String output ="";
-		for (MsoChannel c:channels) {
-			String[] ori = {Short.toString(c.getSeq()), String.valueOf(c.getKey().getId()), c.getName(), c.getImageUrl()};
-			output = output + PlayerLib.getTabDelimitedStr(ori);			
-			output = output + "\n";
-		}
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.TEXT_PLAIN);
-		return new ResponseEntity<String>(output, headers, HttpStatus.OK);
-	}
-	*/
 		
 	/**
 	 * Get all of a user's subscriptions. 
@@ -219,9 +199,8 @@ public class PlayerAPIController {
 		}				
 		//return
 		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.TEXT_PLAIN);
-		return new ResponseEntity<String>(output, headers, HttpStatus.OK);
-		
+		headers.setContentType(MediaType.valueOf("text/plain;charset=utf-8"));
+		return new ResponseEntity<String>(output, headers, HttpStatus.OK);		
 	}
 		
 	/**
@@ -249,7 +228,7 @@ public class PlayerAPIController {
 			output = output + "\n";
 		}
 		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.TEXT_PLAIN);
+		headers.setContentType(MediaType.valueOf("text/plain;charset=utf-8"));
 		return new ResponseEntity<String>(output, headers, HttpStatus.OK);
 	}
 	*/
@@ -269,7 +248,7 @@ public class PlayerAPIController {
 		MsoProgram program = programMngr.findById(programId);		
 		String script = program.getNnScript().getScript().getValue();		
 		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.TEXT_PLAIN);
+		headers.setContentType(MediaType.valueOf("text/plain;charset=utf-8"));
 		return new ResponseEntity<String>(script, headers, HttpStatus.OK);
 	}
 	
@@ -325,7 +304,7 @@ public class PlayerAPIController {
 		System.out.println("programInfo:" + output);
 		//return output;
 		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.TEXT_PLAIN);
+		headers.setContentType(MediaType.valueOf("text/plain;charset=utf-8"));
 		return new ResponseEntity<String>(output, headers, HttpStatus.OK);		
 	}
 	
@@ -384,7 +363,7 @@ public class PlayerAPIController {
 		}
 		System.out.println("player podcast return:" + output);
 		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.TEXT_PLAIN);
+		headers.setContentType(MediaType.valueOf("text/plain;charset=utf-8"));
 		return new ResponseEntity<String>(output, headers, HttpStatus.OK);
 	}
 		
@@ -417,7 +396,7 @@ public class PlayerAPIController {
 		}
 		//return
 		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.TEXT_PLAIN);
+		headers.setContentType(MediaType.valueOf("text/plain;charset=utf-8"));
 		return new ResponseEntity<String>(output, headers, HttpStatus.OK);		
 	}
 
@@ -446,7 +425,7 @@ public class PlayerAPIController {
 			output = PlayerAPI.CODE_ERROR + "\t" + PlayerAPI.PLAYER_CHANNEL_OR_USER_UNEXISTED;
 		} 		
 		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.TEXT_PLAIN);
+		headers.setContentType(MediaType.valueOf("text/plain;charset=utf-8"));
 		return new ResponseEntity<String>(output, headers, HttpStatus.OK);
 	}
 	
