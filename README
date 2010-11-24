@@ -8,7 +8,7 @@ run "http://localhost/admin/init" to initiate necessary data to begin with. chec
 
 deployment 
 =====
-before deploying on different environments, change urlStr in submitToTranscodingService.
+before deploying on different environments, change urlStr in submitToTranscodingService of PodcastService.java.
 in the future it will be changed to use podcast.properties.
 
 API document
