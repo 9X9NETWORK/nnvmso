@@ -51,7 +51,7 @@ public class AwsController {
         	String awsApiServer = "awsapi.9x9cloud.tv";
         	String awsApiPort = "80";
         	String filePath = "/api/9x9encode.php";
-        	if (!DebugLib.NNAWS) {
+        	if (!DebugLib.LOCAL_TEST) {
         		awsApiServer = "localhost";
         		awsApiPort = "8888";
         		filePath = "/hello";
