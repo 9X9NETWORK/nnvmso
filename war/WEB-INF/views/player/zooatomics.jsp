@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <head>
-<meta charset="utf-8" />
+<meta charset="UTF-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
 <link rel="stylesheet" href="http://zoo.atomics.org/video/9x9playerV9/stylesheets/main.css" />
 <link rel="stylesheet" href="http://zoo.atomics.org/video/stylesheets/ipg.css" />
@@ -222,6 +223,7 @@ function activate()
   elastic();
   play_first_program_in (first_channel());
   document.onkeydown=kp;
+  redraw_ipg();
   }
 
 function old_reset_category_dots()
@@ -238,6 +240,12 @@ function old_reset_category_dots()
 function best_url (program)
   {
   var desired;
+
+  if (! (current_program in programgrid))
+    {
+    log ('current program not in programgrid!');
+    return '';
+    }
 
   if (navigator.userAgent.match (/(GoogleTV|Droid Build)/i))
     desired = 'mp4';
@@ -283,10 +291,16 @@ function play()
 
   var v = document.getElementById ("vvv");
   v.src = url;
-  v.addEventListener ('loadstart', function () { $("#loading").show(); }, false);
-  v.addEventListener ('play', function () { $("#loading").hide(); }, false);
 
-  log ('playing: ' + url);
+  $("#loading").show();
+
+  // v.addEventListener ('loadstart', function() { loadstart_callback(); }, false);
+  v.addEventListener ('play', function () { play_callback(); }, false);
+  v.addEventListener ('ended', function () { ended_callback(); }, false);
+
+  try { log ('play'); v.play(); } catch (error) { }
+
+  log ('Playing: ' + url);
 
   update_bubble();
 
@@ -297,6 +311,26 @@ function play()
   bubble_timex = setTimeout ('$("#bubble").hide()', 3000);
   }
 
+function loadstart_callback()
+  {
+  log ('loadstart callback');
+  $("#loading").show();
+  }
+
+function play_callback()
+  {
+  log ('play callback');
+  $("#loading").hide();
+  var v = document.getElementById ("vvv");
+  // v.addEventListener ('ended', function () { channel_right(); }, false);
+  }
+
+function ended_callback()
+  {
+  log ('** ended event fired');
+  channel_right();
+  }
+
 function play_program()
   {
   current_program = program_line [program_cursor];
@@ -305,22 +339,21 @@ function play_program()
 
 function update_bubble()
   {
+  var program_name = 'No programs in this channel';
+
+  if (current_program in programgrid)
+    program_name = programgrid [current_program]['name'];
+
   var channel = channel_line [channel_cursor];
-  var program = programgrid [current_program];
+
   $("#ch-title").html (channelgrid [channel]['name']);
-  $("#ep-title").html (program ['name']);
+  $("#ep-title").html (program_name);
   }
 
 function switch_to_channel_thumbs()
   {
   enter_category (current_category, '');
   thumbing = 'channel';
-  }
-
-function switch_to_program_thumbs()
-  {
-  enter_channel();
-  thumbing = 'program';
   }
 
 function enter_channel()
@@ -331,6 +364,12 @@ function enter_channel()
 
   var channel = channel_line [channel_cursor];
   var real_channel = channelgrid [channel]['id'];
+
+  if (programs_in_channel (channel) < 1)
+    {
+    log ('no programs in channel');
+    return;
+    }
 
   var html = "";
   n_program_line = 0;
@@ -389,6 +428,8 @@ function enter_channel()
   setTimeout ("enter_channel_failsafe()", 500);
 
   redraw_program_line();
+
+  thumbing = 'program';
   }
 
 function enter_channel_failsafe()
@@ -703,7 +744,7 @@ function first_program_in (channel)
       return p;
     }
 
-  panic ('No programs in channel: ' + channel + "(" + real_channel + ")");
+  log ('No programs in channel: ' + channel + "(" + real_channel + ")");
   }
 
 function kp (e)
@@ -821,7 +862,7 @@ function keypress (keycode)
     case 40:
       /* down arrow */
       if (thumbing == 'channel')
-        switch_to_program_thumbs();
+        enter_channel();
       else if (thumbing == 'browse')
         browse_down();
       else if (thumbing == 'ipg')
@@ -877,7 +918,6 @@ function switch_to_ipg()
   redraw_ipg();
 
   $("#ipg-layer").css ("opacity", "0");
-  // $("#mask").show();
   $("#ipg-layer").css ("display", "block");
 
   var phase_out_ch =
@@ -1039,7 +1079,7 @@ function ipg_play()
     return;
     }
 
-  if (programs_in_channel (ipg_cursor) == 0)
+  if (programs_in_channel (ipg_cursor) < 1)
     {
     log_and_alert ('no programs in channel!');
     return;
@@ -1449,7 +1489,7 @@ function browse()
         {
         var fields = lines[i].split ('\t');
         if (fields [1] in channels_by_id)
-          log ('channel ' + fields [1] + ' already in lineup');
+          log ('channel ' + fields [1] + ' already in lineup: ' + fields [2]);
         else
           {
           log ('browse ' + fields [1] + ': ' + lines [i]);
@@ -1458,6 +1498,8 @@ function browse()
           }
         }
       }
+
+    log ('displaying browse');
 
     redraw_browse();
 
@@ -1545,6 +1587,8 @@ function continue_acceptance()
   channelgrid [ipg_cursor] = { 'id': new_channel_id, 'name': name, 'thumb': thumb };
   channels_by_id [new_channel_id] = ipg_cursor;
 
+  redraw_ipg();
+
   /* obtain programs */
 
   log ('obtaining programs for: ' + new_channel_id);
@@ -1555,7 +1599,8 @@ function continue_acceptance()
     {
     parse_program_data (data);
     escape();
-    ipg_play()
+    // for now, stay in IPG
+    // ipg_play()
     });
   }
 
@@ -1598,6 +1643,7 @@ One moment...
     <img src="http://zoo.atomics.org/video/images-x1/arrow-left.png" id="arrow-left">
     <div id="ch-constrain">
       <div class="ch-strip">
+
         <ul id="cg-tabs"><li><span class="dot"></span></li><li class="next"><span class="dot"></span></li><li class="on"><span class="dot"></span></li><li class="next"><span class="dot"></span></li><li><span class="dot"></span></li><li><span class="dot"></span></li><li><span class="dot"></span></li><li class="empty"><span class="dot"></span></li><li class="empty"><span class="dot"></span></li></ul>
 
         <div class="ch-swish" id="ch-swish-1" style="display: block"><ul id="ch-list-1" class="ch-list"></ul></div>
@@ -1607,6 +1653,7 @@ One moment...
         <div class="ch-swish" id="ch-swish-5" style="display: block"><ul id="ch-list-5" class="ch-list"></ul></div>
         <div class="ch-swish" id="ch-swish-6" style="display: block"><ul id="ch-list-6" class="ch-list"></ul></div>
         <div class="ch-swish" id="ch-swish-7" style="display: block"><ul id="ch-list-7" class="ch-list"></ul></div>
+
         <div class="ch-swish" id="ch-swish-8" style="display: block"><ul id="ch-list-8" class="ch-list"></ul></div>
         <div class="ch-swish" id="ch-swish-9" style="display: block"><ul id="ch-list-9" class="ch-list"></ul></div>
 
@@ -1618,6 +1665,7 @@ One moment...
 </div>
 
 <div id="ep-layer" style="display: none">
+
   <img src="http://zoo.atomics.org/video/images-x1/arrow_up.png" id="arrow-up">
   <div class="ep-swish" id="ep-swish">
     <ul class="ep-list" id="ep-list"></ul>
@@ -1625,79 +1673,22 @@ One moment...
   </div>
 </div>
 
-<div id="user-layer" style="display: none; position: absolute; top: 0; background: black; padding: 20px; z-index: 999">
-
-<div style="display:inline-block; background: orange; width: 20em; padding: 20px">
-
-<form id="login">
-
-<span style="color: red">Returning Users</span>
-<hr width=75% style="margin: auto">
-<br>
-<p>
-E-Mail<br>
-
-<input type=text size=32 name="email" value="you@example.com" onkeypress="return event.keyCode != 13"></input>
-
-<p>
-Password<br>
-<input type=text size=32 name="password" value="swordfish" onkeypress="return event.keyCode != 13"></input>
-<p><br><p>
-<a href="javascript:submit_login()">LOGIN</a>
-<br>
-
-<p>
-</form>
-</div>
-
-<div style="display:inline-block; background: yellow; width: 20em; border-left: 4px solid black; padding: 20px;">
-<form id="signup">
-
-<span style="color: red">New Users</span>
-
-<hr width=75% style="margin: auto">
-<br>
-<p>
-Your Name<br>
-<input type=text size=32 name="name" value="Rodney Q. Public" onkeypress="return event.keyCode != 13"></input>
-<p>
-
-Your E-Mail<br>
-
-<input type=text size=32 name="email" value="you@example.com" onkeypress="return event.keyCode != 13"></input>
-<p>
-Password<br>
-
-<input type=text size=32 name="password" value="swordfish" onkeypress="return event.keyCode != 13"></input>
-<p>
-
-Password Verify<br>
-<input type=text size=32 name="password-again" value="swordfish" onkeypress="return event.keyCode != 13"></input>
-<p><br><p>
-<a href="javascript:submit_signup()">SIGNUP</a>
-
-<br>
-<p>
-</form>
-</div>
-
-</div>
-
 <div id="ipg-layer" style="display: none">
   <div id="ipg-pannel">
     <ul id="info-list">
       <li id="ch-thumb"><img id="ch-thumb-img" src=""></li>
+
       <li id="ch-name"><p>ABC news</p></li>
       <li id="ep-name"><p>An episode name would go here?</p></li>
       <li id="description"><p>A description of something is supposed to go here, but I have nothing to put in this spot.</p></li>
 
       <li id="ep-number"><p><span class="hilite">Episodes: </span><span id="ch-episodes">9</span></p></li>
       <li id="update"><p><span class="hilite">Updated:</span> 11/09/2010</p></li>
+
     </ul>
     <ul id="control-list">
       <li><a href="javascript:;" class="btn"><span>Button!</span></a></li>
       <li><a href="javascript:;" class="btn"><span>Button!</span></a></li>
-
     </ul>   
   </div>
   <div id="ipg-grid"></div>
@@ -1712,6 +1703,7 @@ Password Verify<br>
       <p class="textfieldbox"><input type="text" id="L-email" class="textfield" value="you@example.com"></p>
     </li>
     <li>
+
       <span>Password:</span>
       <p class="textfieldbox"><input type="password" id="L-password" class="textfield" value="swordfish"></p>
     </li>
@@ -1720,6 +1712,7 @@ Password Verify<br>
 
   <ul id="signup-pannel">
     <li><h2>New Users</h2></li>
+
     <li>
       <span>Name:</span>
       <p class="textfieldbox"><input type="text" id="S-name" class="textfield"></p>
@@ -1728,6 +1721,7 @@ Password Verify<br>
       <span>Email:</span>
 
       <p class="textfieldbox"><input type="text" id="S-email" class="textfield"></p>
+
     </li>
     <li>
       <span>Password:</span>
@@ -1755,6 +1749,7 @@ Password Verify<br>
 </div>
 
 <div id="browse" style="display: none; z-index: 999"></div>
+
 <div id="log-layer" style="position: absolute; left: 0; top: 0; height: 100%; width: 100%; background: white; color: black; text-align: left; padding: 20px; overflow: scroll; z-index: 9999; display: none"></div>
 
 <div id="mask"></div>
