@@ -3,7 +3,7 @@
 <meta charset="UTF-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
-<link rel="stylesheet" href="http://zoo.atomics.org/video/9x9playerV9/stylesheets/main.css" />
+<link rel="stylesheet" href="http://zoo.atomics.org/video/9x9playerV11/stylesheets/main.css" />
 <link rel="stylesheet" href="http://zoo.atomics.org/video/stylesheets/ipg.css" />
 
 <style>
@@ -33,7 +33,7 @@ var activated = false;
 var current_category = 0;
 var current_program = '';
 
-var thumbing = 'channel';
+var thumbing = '';
 
 var channelgrid = {};
 var channels_by_id = {}
@@ -58,6 +58,9 @@ var bubble_timex;
 var dirty_delay;
 var dirty_channels = [];
 var dirty_timex;
+
+var control_buttons = [ 'btn-rewind', 'btn-play', 'btn-forward', 'volume-constrain', 'btn-close', 'btn-signin' ];
+var control_cursor = 1;
 
 var user = "aghubmUydm1zb3IMCxIGTm5Vc2VyGBoM";
 
@@ -85,8 +88,40 @@ function elastic()
   var vh = $(window).height();
   v.style.height = (vh) + "px";
 
-  var i = document.getElementById ("ipg-layer");
-  i.style.height = vh + "px";
+  // var i = document.getElementById ("ipg-layer");
+  // i.style.height = vh + "px";
+
+  ipg_fixup_margin();
+  ipg_fixup_middle();
+  }
+
+function ipg_fixup_margin()
+  {
+  var gridH = $("#ipg-grid").height();
+  var listH = 0;
+
+  $(".ipg-list").each (function() { listH += $(this).height() + 2; });
+
+  var gap = (gridH - listH) / 8;
+
+  if (gap >= 0)
+    $(".ipg-list").css ("margin-bottom", gap);
+  else
+    $(".ipg-list").css ("margin-bottom", "0");
+
+  $(".ipg-list:last-child").css ("margin-bottom","0");
+  }
+
+function ipg_fixup_middle()
+  {
+  var wh = $(window).height();
+  var lh = $("#ipg-layer").height();
+
+  var margin = (wh - lh) / 2;
+  // log ('align_middle :: wh: ' + wh + ' lh: ' + lh + ' margin: ' + margin);
+
+  $("#ipg-layer").css ("top", margin);
+  $("#podcast-layer").css ("top", margin);
   }
 
 function log (text)
@@ -217,7 +252,6 @@ function fetch_channels()
 function activate()
   {
   activated = true;
-  thumbing = 'channel';
   reset_category_dots();
   enter_category (1, 'b');
   elastic();
@@ -297,6 +331,8 @@ function play()
   // v.addEventListener ('loadstart', function() { loadstart_callback(); }, false);
   v.addEventListener ('play', function () { play_callback(); }, false);
   v.addEventListener ('ended', function () { ended_callback(); }, false);
+  v.addEventListener ('timeupdate', function () { update_progress_bar(); }, false);
+  v.addEventListener ('pause', function () { pause_callback(); }, false);
 
   try { log ('play'); v.play(); } catch (error) { }
 
@@ -323,12 +359,19 @@ function play_callback()
   $("#loading").hide();
   var v = document.getElementById ("vvv");
   // v.addEventListener ('ended', function () { channel_right(); }, false);
+  $("#btn-play").css ("background-image", "url(http://zoo.atomics.org/video/images-x1/btn_pause.svg)");
   }
 
 function ended_callback()
   {
   log ('** ended event fired');
   channel_right();
+  }
+
+function pause_callback()
+  {
+  log ('** pause event fired');
+  $("#btn-play").css ("background-image", "url(http://zoo.atomics.org/video/images-x1/btn_play.svg)");
   }
 
 function play_program()
@@ -410,6 +453,9 @@ function enter_channel()
       top: "-6.1875em" 
       };
 
+    if (thumbing == 'control')
+      $("#control-layer").animateWithCss ({ opacity: "0" }, 500, "ease-in-out", function() { $("#control-layer").hide(); $("#control-layer").css ("opacity", "1"); });
+
     $("#ep-layer").animateWithCss ({ opacity: "1" }, 500, "ease-in-out", function() {});
     $("#ch-layer").animateWithCss ({ opacity: "0" }, 500, "ease-in-out", function() { $("#ch-layer").css ("opacity", "1"); });
 
@@ -434,10 +480,14 @@ function enter_channel()
 
 function enter_channel_failsafe()
   {
-  $("#ep-layer").css ("display", "block");
   $("#ep-layer").css ("opacity", "1");
   $("#ep-swish").css ("top", "0");
   $("#ep-swish").css ("display", "block");
+
+  $("#control-layer").css ("opacity", "1");
+
+  if (thumbing == 'program')
+    $("#ep-layer").css ("display", "block");
   }
 
 var old_cline;
@@ -491,6 +541,9 @@ function enter_category (cat, positioning)
       $("#ep-swish").css ("top", "0em");
       });
     }
+
+  thumbing = 'channel';
+  $("#control-layer").hide();
 
   if (current_category > 0)
     $("#ch-swish-" + current_category).css ("display", "block");
@@ -563,17 +616,17 @@ function enter_category (cat, positioning)
 function enter_category_failsafe()
   {
   $("#ch-layer").css ("opacity", "1");
-  $("#ch-layer").css ("display", "block");
+
   $("#ch-swish-" + current_category).css ("display", "block");
   $("#ch-swish-" + current_category).css ("top", "1.4375em");
+
+  if (thumbing == 'channel')
+    $("#ch-layer").css ("display", "block");
   }
 
 function ch_html (cat)
   {
   var html = "";
-
-  // NEW FORMAT
-  // <li class="on"><img src="thumb/01.jpg"><img src="http://zoo.atomics.org/video/images-x1/arrow_down.png" class="arrow-down"><span class="number">9</span></li>
 
   n_channel_line = 0;
 
@@ -587,11 +640,11 @@ function ch_html (cat)
       // html += '<li id="c-' + current_category + '-li-' + n_channel_line + '"><img id="c-th-' + n_channel_line + '" src="' + channelgrid [chan]['thumb'] + '"></li>';
       html += '<li id="c-' + cat + '-li-' + n_channel_line;
       html += (channel_cursor == n_channel_line) ? '" class="on">' : '">';
-      html += '<img src="' + channelgrid [chan]['thumb'] + '"><img src="http://zoo.atomics.org/video/images-x1/arrow_down.png" class="arrow-down"><span class="number">' + programs_in_channel (chan) + '</span></li>';
+      html += '<img src="' + channelgrid [chan]['thumb'] + '"><img src="http://zoo.atomics.org/video/images-x1/arrow_down.png" class="arrow-down"><p class="number"><span>' + programs_in_channel (chan) + '</span></p></li>';
       log ('channel ' + channelgrid [chan]['id'] + ': ' + channelgrid [chan]['name']);
       }
     else
-      html += '<li><img src="http://zoo.atomics.org/video/images-x1/arrow_down.png" class="arrow-down"><span class="number">9</span></li>';
+      html += '<li><img src="http://zoo.atomics.org/video/images-x1/arrow_down.png" class="arrow-down"></li>';
     }
 
   return html;
@@ -775,14 +828,21 @@ function escape()
 
     case 'browse':  layer = $("#podcast-layer");
                     break;
+
+    case 'control': layer = $("#control-layer");
+                    break;
     }
 
   layer.css ("display", layer.css ("display") == "block" ? "none" : "block");
 
   if (thumbing == 'user' || thumbing == 'browse')
+    {
     thumbing = saved_thumbing;
+    if (thumbing == 'control')
+      $("#control-layer").show();
+    }
 
-  else if (thumbing == 'ipg')
+  else if (thumbing == 'ipg' || thumbing == 'control')
     {
     thumbing = 'channel';
     }
@@ -802,7 +862,7 @@ function keypress (keycode)
   if (thumbing == 'user' && keycode != 27)
     return;
 
-  /* special case, channel browser */
+  /* special case, channel browser + navigation key */
   if (thumbing == 'browse' && keycode != 27 && keycode != 38 && keycode != 40 && keycode != 13)
     return;
 
@@ -825,6 +885,10 @@ function keypress (keycode)
         ipg_play();
       else if (thumbing == 'browse')
         browse_accept();
+      else if (thumbing == 'channel' || thumbing == 'program')
+        switch_to_control_layer();
+      else if (thumbing == 'control')
+        control_enter();
       break;
 
     case 37:
@@ -835,6 +899,8 @@ function keypress (keycode)
         program_left();
       else if (thumbing == 'ipg')
         ipg_left();
+      else if (thumbing == 'control')
+        control_left();
       break;
 
     case 39:
@@ -845,13 +911,15 @@ function keypress (keycode)
         program_right();
       else if (thumbing == 'ipg')
         ipg_right();
+      else if (thumbing == 'control')
+        control_right();
       break;
 
     case 38:
       /* up arrow */
       if (thumbing == 'program')
         switch_to_channel_thumbs();
-      else if (thumbing == 'channel')
+      else if (thumbing == 'channel' || thumbing == 'control')
         switch_to_ipg();
       else if (thumbing == 'browse')
         browse_up();
@@ -861,12 +929,16 @@ function keypress (keycode)
 
     case 40:
       /* down arrow */
-      if (thumbing == 'channel')
+      if (thumbing == 'channel' || thumbing == 'control')
         enter_channel();
       else if (thumbing == 'browse')
         browse_down();
       else if (thumbing == 'ipg')
         ipg_down();
+      break;
+
+    case 67:
+      /* C */
       break;
 
     case 82:
@@ -895,7 +967,6 @@ function keypress (keycode)
 
     case 66:
       /* B */
-      browse();
       break;
 
     case 73:
@@ -912,13 +983,17 @@ function keypress (keycode)
 
 function switch_to_ipg()
   {
-  $("#ipg-layer").css ("display", "none");
+  if (thumbing == 'control')
+    $("#control-layer").animateWithCss ({ opacity: "0" }, 500, "ease-in-out", function() { $("#control-layer").hide(); $("#control-layer").css ("opacity", "1"); });
+
+  $("#ipg-layer").hide();
 
   ipg_cursor = parseInt (channel_line [channel_cursor]);
+
   redraw_ipg();
 
   $("#ipg-layer").css ("opacity", "0");
-  $("#ipg-layer").css ("display", "block");
+  $("#ipg-layer").show();
 
   var phase_out_ch =
     {
@@ -933,6 +1008,7 @@ function switch_to_ipg()
     $("#ch-layer").css ("display", "none");
     $("#ch-layer").css ("bottom", "0");
     $("#ch-layer").css ("opacity", "1");
+    elastic(); /* fixups */
     });
 
   thumbing = 'ipg';
@@ -962,7 +1038,7 @@ function redraw_ipg()
           html += '<li id="ipg-' + y + '' + x + '"><img src="' + channelgrid ["" + y + "" + x]['thumb'] + '"></li>';
         }
       else
-        html += '<li id="ipg-' + y + '' + x + '"><img src="http://zoo.atomics.org/video/images-x1/add_channel.png" class="add-ch"></li>';
+        html += '<li id="ipg-' + y + '' + x + '"></li>';
       }
     html += '</ul>';
     }
@@ -1264,6 +1340,7 @@ function login_screen()
   {
   saved_thumbing = thumbing;
   thumbing = 'user';
+  $("#control-layer").hide();
   $("#mask").show();
   $("#signin-layer").show();
   }
@@ -1604,10 +1681,111 @@ function continue_acceptance()
     });
   }
 
+function physical_offset()
+  {
+  var video = document.getElementById ("vvv");
+  return video.currentTime;
+  }
 
+function physical_length()
+  {
+  var video = document.getElementById ("vvv");
+  return video.duration;
+  }
 
+function physical_pause()
+  {
+  var video = document.getElementById ("vvv");
+  video.pause();
+  }
 
+function physical_play()
+  {
+  var video = document.getElementById ("vvv");
+  video.play();
+  }
 
+function physical_is_paused()
+  {
+  var video = document.getElementById ("vvv");
+  return video.paused
+  }
+
+function update_progress_bar()
+  {
+  var pct = 100 * physical_offset() / physical_length();
+
+  if (pct >= 0)
+    $("#played").css ("width", pct + '%');
+
+  t1 = formatted_time (physical_offset());
+  t2 = formatted_time (physical_length());
+
+  $("#play-time").html (t1 + " / " + t2);
+  }
+
+function formatted_time (t)
+  {
+  var m = Math.floor (t / 60);
+  var s = Math.floor (t) - m * 60;
+  return m + ":" + ("0" + s).substring (("0" + s).length - 2);
+  }
+
+function switch_to_control_layer()
+  {
+  $("#ch-layer").hide();
+  $("#ep-layer").hide();
+  thumbing = 'control';
+  $("#btn-play").css ("background-image", "url(http://zoo.atomics.org/video/images-x1/btn_" + (physical_is_paused() ? "play" : "pause") + ".svg)");
+  $("#control-layer").show();
+  }
+
+function control_left()
+  {
+  $('#' + control_buttons [control_cursor]).removeClass ("on");
+
+  if (control_cursor > 0)
+   control_cursor--;
+  else
+   control_cursor = control_buttons.length - 1;
+
+  $('#' + control_buttons [control_cursor]).addClass ("on");
+  }
+
+function control_right()
+  {
+  $('#' + control_buttons [control_cursor]).removeClass ("on");
+
+  if (control_cursor < control_buttons.length - 1)
+    control_cursor++;
+  else
+    control_cursor = 0;
+
+  $('#' + control_buttons [control_cursor]).addClass ("on");
+  }
+
+function control_enter()
+  {
+  switch (control_buttons [control_cursor])
+    {
+    case 'btn-close':  escape();
+                       break;
+
+    case 'btn-play':   toggle_pause();
+                       break;
+
+    case 'btn-signin': login_screen();
+                       break;
+    }
+  }
+
+function toggle_pause()
+  {
+  if (physical_is_paused())
+    physical_play();
+  else
+    physical_pause();
+  }
 
 </script>
 
@@ -1643,7 +1821,6 @@ One moment...
     <img src="http://zoo.atomics.org/video/images-x1/arrow-left.png" id="arrow-left">
     <div id="ch-constrain">
       <div class="ch-strip">
-
         <ul id="cg-tabs"><li><span class="dot"></span></li><li class="next"><span class="dot"></span></li><li class="on"><span class="dot"></span></li><li class="next"><span class="dot"></span></li><li><span class="dot"></span></li><li><span class="dot"></span></li><li><span class="dot"></span></li><li class="empty"><span class="dot"></span></li><li class="empty"><span class="dot"></span></li></ul>
 
         <div class="ch-swish" id="ch-swish-1" style="display: block"><ul id="ch-list-1" class="ch-list"></ul></div>
@@ -1653,7 +1830,6 @@ One moment...
         <div class="ch-swish" id="ch-swish-5" style="display: block"><ul id="ch-list-5" class="ch-list"></ul></div>
         <div class="ch-swish" id="ch-swish-6" style="display: block"><ul id="ch-list-6" class="ch-list"></ul></div>
         <div class="ch-swish" id="ch-swish-7" style="display: block"><ul id="ch-list-7" class="ch-list"></ul></div>
-
         <div class="ch-swish" id="ch-swish-8" style="display: block"><ul id="ch-list-8" class="ch-list"></ul></div>
         <div class="ch-swish" id="ch-swish-9" style="display: block"><ul id="ch-list-9" class="ch-list"></ul></div>
 
@@ -1665,7 +1841,6 @@ One moment...
 </div>
 
 <div id="ep-layer" style="display: none">
-
   <img src="http://zoo.atomics.org/video/images-x1/arrow_up.png" id="arrow-up">
   <div class="ep-swish" id="ep-swish">
     <ul class="ep-list" id="ep-list"></ul>
@@ -1677,17 +1852,16 @@ One moment...
   <div id="ipg-pannel">
     <ul id="info-list">
       <li id="ch-thumb"><img id="ch-thumb-img" src=""></li>
-
       <li id="ch-name"><p>ABC news</p></li>
       <li id="ep-name"><p>An episode name would go here?</p></li>
-      <li id="description"><p>A description of something is supposed to go here, but I have nothing to put in this spot.</p></li>
 
+      <li id="description"><p>A description of something is supposed to go here, but I have nothing to put in this spot.</p></li>
       <li id="ep-number"><p><span class="hilite">Episodes: </span><span id="ch-episodes">9</span></p></li>
       <li id="update"><p><span class="hilite">Updated:</span> 11/09/2010</p></li>
-
     </ul>
     <ul id="control-list">
       <li><a href="javascript:;" class="btn"><span>Button!</span></a></li>
+
       <li><a href="javascript:;" class="btn"><span>Button!</span></a></li>
     </ul>   
   </div>
@@ -1698,38 +1872,35 @@ One moment...
   <ul id="login-pannel">
     <li><h2>Returning Users</h2></li>
     <li>
-      <span>Email:</span>
 
+      <span>Email:</span>
       <p class="textfieldbox"><input type="text" id="L-email" class="textfield" value="you@example.com"></p>
     </li>
     <li>
-
       <span>Password:</span>
       <p class="textfieldbox"><input type="password" id="L-password" class="textfield" value="swordfish"></p>
     </li>
     <li><a href="javascript:submit_login()" class="btn"><span>Log in</span></a></li>
-  </ul>
 
+  </ul>
   <ul id="signup-pannel">
     <li><h2>New Users</h2></li>
-
     <li>
       <span>Name:</span>
       <p class="textfieldbox"><input type="text" id="S-name" class="textfield"></p>
     </li>
     <li>
+
       <span>Email:</span>
-
       <p class="textfieldbox"><input type="text" id="S-email" class="textfield"></p>
-
     </li>
     <li>
       <span>Password:</span>
       <p class="textfieldbox"><input type="password" id="S-password" class="textfield"></p>
     </li>
     <li>
-      <span>Password verify:</span>
 
+      <span>Password verify:</span>
       <p class="textfieldbox"><input type="password" id="S-password2" class="textfield"></p>
     </li>
     <li><a href="javascript:submit_signup()" class="btn"><span>Sign up</span></a></li>
@@ -1738,8 +1909,8 @@ One moment...
 
 <div id="podcast-layer">
   <div id="padcast-pannel">
-    <label for="podcast input">Enter Podcast URL:</label>
 
+    <label for="podcast input">Enter Podcast URL:</label>
     <ul id="podcast-input">
       <li class="textfieldbox"><form id="throw"><input id="podcastRSS" name="podcastRSS" type="text" class="textfield" value="" size="30" onkeypress="return event.keyCode != 13"></form></li>
       <li><a href="javascript:submit_throw()" class="btn"><span>Contribute</span></a></li>
@@ -1749,6 +1920,34 @@ One moment...
 </div>
 
 <div id="browse" style="display: none; z-index: 999"></div>
+
+
+<div id="control-layer" style="display: none">
+  <div id="msg-up"><p>Press UP to see your programming guide</p></div>
+  <ul id="control-bar">
+    <li id="btn-rewind"></li>
+    <li id="btn-play" class="on"></li>
+    <li id="btn-forward"></li>
+    <li class="divider"></li>
+
+    <li id="btn-volume"></li>
+    <li id="btn-mute"></li>
+    <li id="volume-constrain">
+      <p id="volume-bar"><span id="loud"></span></p>
+      <p id="handler"></p>
+    </li>
+    <li id="btn-close"></li>
+    <li id="btn-signin"></li>
+    <li class="divider right"></li>
+
+    <li id="play-time">00:00 / 00:00</li>
+    <li id="progress-bar">
+      <p id="loaded"></p>
+      <p id="played"></p>
+    </li>
+  </ul>
+  <div id="msg-down"><p>Press DOWN for more episodes</p></div>
+</div>
 
 <div id="log-layer" style="position: absolute; left: 0; top: 0; height: 100%; width: 100%; background: white; color: black; text-align: left; padding: 20px; overflow: scroll; z-index: 9999; display: none"></div>
 
