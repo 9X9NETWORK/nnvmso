@@ -478,8 +478,11 @@ function update_bubble()
   $("#ep-layer-ch-title").html (channel_name);
   $("#ep-layer-ep-title").html (program_name);
 
-  $("#left-row-num").html (previous_category (current_category));
-  $("#right-row-num").html (next_category (current_category));
+  // $("#left-row-num").html (previous_category (current_category));
+  // $("#right-row-num").html (next_category (current_category));
+
+  $("#left-row-num").html (current_category - 1 == 0 ? 9 : current_category - 1);
+  $("#right-row-num").html (current_category + 1 == 10 ? 1 : current_category + 1);
   }
 
 function switch_to_channel_thumbs()
