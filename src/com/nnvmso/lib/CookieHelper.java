@@ -17,6 +17,8 @@ public class CookieHelper {
 	static public void setCookie(HttpServletResponse resp, String cookieName, String cookieValue) {
 		Cookie cookie = new Cookie(cookieName, cookieValue);
 		cookie.setPath("/");
+		// set cookie to expire after one year
+		cookie.setMaxAge(31536000);
 		resp.addCookie(cookie);		
 	}
 	
