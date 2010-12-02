@@ -4,7 +4,6 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
 <link rel="stylesheet" href="http://zoo.atomics.org/video/9x9playerV13/stylesheets/main.css" />
-<link rel="stylesheet" href="http://zoo.atomics.org/video/stylesheets/ipg.css" />
 
 <style>
 
@@ -16,7 +15,7 @@
   position: absolute;
   left: 30.4375em;
   top: 16.4375em;
-  z-index: 16;
+  z-index: 9;
   display: none;
 }
 
@@ -1890,13 +1889,13 @@ function browse()
 
     log ('displaying browse');
 
+    browse_cursor = 1;
     redraw_browse();
     
     $("#mask").show();
     $("#podcast-layer").show();
 
     thumbing = 'browse';
-    browse_cursor = 1;
 
     if (n_browse > 0)
       $("#pod-" + browse_cursor).addClass ("on");
