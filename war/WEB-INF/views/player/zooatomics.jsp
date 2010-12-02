@@ -1876,7 +1876,7 @@ function browse()
           {
           log ('browse ' + fields [1] + ': ' + lines [i]);
           n_browse++;
-          browsables [n_browse] = { 'id': fields [1], 'thumb': fields [3], 'name': fields [2] };
+          browsables [n_browse] = { 'id': fields [1], 'thumb': fields [3], 'name': fields [2], 'count': 0 };
           }
         }
       }
@@ -1884,7 +1884,7 @@ function browse()
     log ('displaying browse');
 
     redraw_browse();
-
+    
     $("#mask").show();
     $("#podcast-layer").show();
 
@@ -1895,6 +1895,9 @@ function browse()
       $("#pod-" + browse_cursor).addClass ("on");
 
     document.getElementById("podcastRSS").value = "";
+
+    /* this is the most optional */
+    fetch_browse_programs();
     });
   }
 
@@ -1903,10 +1906,16 @@ function redraw_browse()
   var html = "";
 
   for (var i = browse_first; i <= n_browse && i <= browse_first + 9; i++)
-    html += '<li id="pod-' + i + '"><img src="' + browsables [i]['thumb'] + '"><span>' + browsables [i]['name'] + '</span></li>';
+    {
+    var count = browsables [i]['count'] > 0 ? ' <span style="color: orange">(' + browsables [i]['count'] + ')</span>' : '';
+    html += '<li id="pod-' + i + '"><img src="' + browsables [i]['thumb'] + '"><span>' + browsables [i]['name'] + '</span>' + count + '</li>';
+    }
 
   $("#podcast-list").html (html);
   $("img").error(function () { $(this).unbind("error").attr("src", "http://zoo.atomics.org/video/images-x1/no_images.png"); });
+
+  if (n_browse > 0)
+    $("#pod-" + browse_cursor).addClass ("on");
   }
 
 function browse_up()
@@ -1985,6 +1994,40 @@ function continue_acceptance()
     escape();
     // for now, stay in IPG
     // ipg_play()
+    });
+  }
+
+function fetch_browse_programs()
+  {
+  log ('obtaining browsable program info');
+
+  var channels = '';
+  for (var i in browsables)
+    {
+    if (channels != '') channels += ',';
+    channels += browsables [i]['id']
+    }
+
+  var query = "/playerAPI/programInfo?channel=" + channels + String.fromCharCode(38) + "user=" + user;
+
+  var d = $.get (query, function (data)
+    {
+    log ('processing browsable program info');
+    var lines = data.split ('\n');
+    for (var i = 0; i < lines.length; i++)
+      {
+      if (lines [i] != '')
+        {
+        log ('  line: ' + lines [i]);
+        var fields = lines[i].split ('\t');
+        for (var b in browsables)
+          {
+          if (browsables [b]['id'] == fields [0])
+            browsables [b]['count']++;
+          }
+        }
+      }
+    redraw_browse();
     });
   }
 
