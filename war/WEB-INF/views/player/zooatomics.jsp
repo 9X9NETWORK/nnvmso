@@ -51,6 +51,7 @@ var ipg_cursor;
 var browsables = {};
 var n_browse = 0;
 var saved_thumbing = '';
+var control_saved_thumbing = '';
 var browse_cursor = 1;
 
 var osd_timex = 0;
@@ -435,12 +436,15 @@ function ended_callback()
     fake_timex = 0;
     }
 
-  if (thumbing == 'channel')
+  var type = thumbing;
+  if (type == 'control') type = control_saved_thumbing;
+
+  if (type == 'channel')
     {
     log ('** ended event fired, moving channel right');
     channel_right();
     }
-  else if (thumbing == 'program')
+  else if (type == 'program')
     {
     log ('** ended event fired, moving program right');
     program_right();
@@ -1714,6 +1718,9 @@ function submit_login()
     user = fields [1];
     if (fields [0] == "0")
       {
+      /* wipe out the current guest account program+channel data */
+      channelgrid = {};
+      programgrid = {};
       escape();
       log_and_alert ('logged in as user: ' + user);
       resume();
@@ -2208,6 +2215,7 @@ function switch_to_control_layer()
   {
   $("#ch-layer").hide();
   $("#ep-layer").hide();
+  control_saved_thumbing = thumbing;
   thumbing = 'control';
   $("#btn-play").css ("background-image", "url(" + root + "btn_" + (physical_is_paused() ? "play" : "pause") + ".svg)");
   $("#control-layer").show();
