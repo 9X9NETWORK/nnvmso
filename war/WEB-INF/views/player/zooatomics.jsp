@@ -349,6 +349,15 @@ function clear_msg_timex()
   $("#msg-layer").hide();
   }
 
+function message (text, duration)
+  {
+  $("#msg-layer").html ('<p>' + text + '</p>');
+  $("#msg-layer").show();
+
+  if (duration > 0)
+    msg_timex = setTimeout ("empty_channel_timeout()", duration);
+  }
+
 function play()
   {
   clear_msg_timex();
@@ -361,8 +370,7 @@ function play()
   if (url == '')
     {
     log ('empty channel, displaying notice for 3 seconds')
-    $("#msg-layer").show();
-    msg_timex = setTimeout ("empty_channel_timeout()", 3000);
+    message ("No programs in this channel", 3000);
     }
 
   fake_timex = 0;
@@ -426,8 +434,19 @@ function ended_callback()
     clearTimeout (fake_timex);
     fake_timex = 0;
     }
-  log ('** ended event fired');
-  channel_right();
+
+  if (thumbing == 'channel')
+    {
+    log ('** ended event fired, moving channel right');
+    channel_right();
+    }
+  else if (thumbing == 'program')
+    {
+    log ('** ended event fired, moving program right');
+    program_right();
+    }
+  else
+    log ('** ended event fired, staying put');
   }
 
 function fake_ended_event()
@@ -961,6 +980,7 @@ function escape()
 
   $("#mask").hide();
   $("#log-layer").hide();
+  $("#msg-layer").hide();
 
   if (thumbing == 'channel' || thumbing == 'program')
     {
@@ -1538,12 +1558,13 @@ function redraw_channel_line()
 function program_right()
   {
   if (program_cursor < n_program_line)
+    {
     program_cursor++;
+    redraw_program_line();
+    play_program();
+    }
   else
-    program_cursor = 1;
-
-  redraw_program_line();
-  play_program();
+    message ('No more programs in this channel', 0);
   }
 
 function program_left()
