@@ -23,7 +23,8 @@ import com.nnvmso.model.MsoProgram;
 @Service
 public class PodcastService {
 
-	public static String TRANSCODING_SERVER_ALPHA = "http://awsapi.9x9cloud.tv/dev/podcatcher.php";
+	public static String TRANSCODING_SERVER_DEV = "http://awsapi.9x9cloud.tv/dev/podcatcher.php";
+	public static String TRANSCODING_SERVER_ALPHA = "http://awsapi.9x9cloud.tv/alpha/podcatcher.php";
 	public static String TRANSCODING_SERVER_BETA = "http://awsapi.9x9cloud.tv/beta/podcatcher.php";
 	public static String TRANSCODING_SERVER_TW = "http://awsapi.9x9cloud.tv/tw/podcatcher.php";
 	
@@ -156,7 +157,7 @@ public class PodcastService {
 		feed.setKey(key);
 		feed.setRss(rss); 
 		System.out.println("Podcast post from player:" + feed.getRss());
-		String urlStr = TRANSCODING_SERVER_BETA;
+		String urlStr = TRANSCODING_SERVER_ALPHA;
 		NnLib.urlPostWithJson(urlStr, feed);
 	}
 	
