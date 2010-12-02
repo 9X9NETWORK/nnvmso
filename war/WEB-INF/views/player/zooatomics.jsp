@@ -54,6 +54,7 @@ var n_browse = 0;
 var saved_thumbing = '';
 var browse_cursor = 1;
 
+var osd_timex = 0;
 var bubble_timex = 0;
 var fake_timex = 0;
 var msg_timex = 0;
@@ -334,7 +335,7 @@ function play_first_program_in (chan)
   play();
   }
 
-function play()
+function clear_msg_timex()
   {
   if (msg_timex != 0)
     {
@@ -342,6 +343,11 @@ function play()
     msg_timex = 0;
     }
   $("#msg-layer").hide();
+  }
+
+function play()
+  {
+  clear_msg_timex();
 
   var url = best_url (current_program)
 
@@ -555,6 +561,7 @@ function enter_channel()
   redraw_program_line();
 
   thumbing = 'program';
+  reset_osd_timex();
   }
 
 function enter_channel_failsafe()
@@ -694,6 +701,7 @@ function enter_category (cat, positioning)
     channel_cursor = n_channel_line;
 
   redraw_channel_line();
+  reset_osd_timex();
   }
 
 function enter_category_failsafe()
@@ -929,7 +937,7 @@ function escape()
 
   layer.css ("display", layer.css ("display") == "block" ? "none" : "block");
 
-  if (thumbing == 'ipg')
+  if (thumbing == 'ipg' || thumbing == 'user')
     resume();
 
   if (thumbing == 'user' || thumbing == 'browse')
@@ -946,6 +954,12 @@ function escape()
 
   $("#mask").hide();
   $("#log-layer").hide();
+
+  if (thumbing == 'channel' || thumbing == 'program')
+    {
+    if (layer.css ("display") == "none")
+      clear_osd_timex();
+    }
   }
 
 function turn_off_ancillaries()
@@ -968,6 +982,30 @@ function keypress (keycode)
   /* special case, channel browser + navigation key */
   if (thumbing == 'browse' && keycode != 27 && keycode != 38 && keycode != 40 && keycode != 13)
     return;
+
+  /* ensure osd is up */
+
+  if (keycode == 37 || keycode == 39 || keycode == 38 || keycode == 40)
+    {
+    if (thumbing == 'channel')
+      {
+      if ($("#ch-layer").css ('display') == 'none')
+        {
+        log ('channel osd was off');
+        extend_ch_layer();
+        return;
+        }
+      }
+    else if (thumbing == 'program')
+      {
+      if ($("#ep-layer").css ('display') == 'none')
+        {
+        log ('program osd was off');
+        extend_ep_layer();
+        return;
+        }
+      }
+    }
 
   switch (keycode)
     {
@@ -1087,10 +1125,46 @@ function keypress (keycode)
     }
   }
 
+function clear_osd_timex()
+  {
+  if (osd_timex != 0)
+    {
+    clearTimeout (osd_timex);
+    osd_timex = 0;
+    }
+  }
+
+function reset_osd_timex()
+  {
+  clear_osd_timex();
+  osd_timex = setTimeout ("osd_timex_expired()", 7000);
+  }
+
+function osd_timex_expired()
+  {
+  osd_timex = 0;
+  log ('osd timex expired');
+  $("#ch-layer").hide();
+  $("#ep-layer").hide();
+  }
+
+function extend_ch_layer()
+  {
+  $("#ch-layer").show();
+  reset_osd_timex();
+  }
+
+function extend_ep_layer()
+  {
+  $("#ep-layer").show();
+  reset_osd_timex();
+  }
+
 function switch_to_ipg()
   {
   log ('ipg');
 
+  clear_msg_timex();
   force_pause();
 
   if (thumbing == 'control')
@@ -1174,6 +1248,7 @@ function redraw_ipg()
     }
 
   $("#ipg-grid").html (html);
+  $("img").error(function () { $(this).unbind("error").attr("src", "http://zoo.atomics.org/video/images-x1/no_images.png"); });
 
   // ipg_cursor = parseInt (channel_line [channel_cursor]);
 
@@ -1565,6 +1640,7 @@ function getcookie (id)
 
 function login_screen()
   {
+  force_pause();
   saved_thumbing = thumbing;
   thumbing = 'user';
   $("#control-layer").hide();
@@ -1598,6 +1674,7 @@ function submit_login()
       {
       escape();
       log_and_alert ('logged in as user: ' + user);
+      resume();
       fetch_programs();
       }
     else
@@ -1631,6 +1708,7 @@ function submit_signup()
       {
       escape();
       log_and_alert ('signed up as user: ' + user);
+      resume();
       fetch_programs();
       }
     else
@@ -1828,6 +1906,7 @@ function redraw_browse()
     html += '<li id="pod-' + i + '"><img src="' + browsables [i]['thumb'] + '"><span>' + browsables [i]['name'] + '</span></li>';
 
   $("#podcast-list").html (html);
+  $("img").error(function () { $(this).unbind("error").attr("src", "http://zoo.atomics.org/video/images-x1/no_images.png"); });
   }
 
 function browse_up()
@@ -1892,6 +1971,7 @@ function continue_acceptance()
   channels_by_id [new_channel_id] = ipg_cursor;
 
   redraw_ipg();
+  elastic();
 
   /* obtain programs */
 
