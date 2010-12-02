@@ -251,6 +251,11 @@ function fetch_channels()
       }
     if (!activated)
       activate();
+    else
+      {
+      redraw_ipg();
+      elastic();
+      }
     });
   }
 
@@ -1018,6 +1023,8 @@ function keypress (keycode)
       /* space */
     case 178:
       /* google TV play/pause */
+      if (thumbing == 'channel' || thumbing == 'program')
+        pause();
       break;
 
     case 13:
@@ -1876,7 +1883,7 @@ function browse()
           {
           log ('browse ' + fields [1] + ': ' + lines [i]);
           n_browse++;
-          browsables [n_browse] = { 'id': fields [1], 'thumb': fields [3], 'name': fields [2], 'count': 0 };
+          browsables [n_browse] = { 'id': fields [1], 'thumb': fields [3], 'name': fields [2], 'count': -1 };
           }
         }
       }
@@ -1907,7 +1914,7 @@ function redraw_browse()
 
   for (var i = browse_first; i <= n_browse && i <= browse_first + 9; i++)
     {
-    var count = browsables [i]['count'] > 0 ? ' <span style="color: orange">(' + browsables [i]['count'] + ')</span>' : '';
+    var count = browsables [i]['count'] >= 0 ? ' <span style="color: orange">(' + browsables [i]['count'] + ')</span>' : '';
     html += '<li id="pod-' + i + '"><img src="' + browsables [i]['thumb'] + '"><span>' + browsables [i]['name'] + '</span>' + count + '</li>';
     }
 
@@ -2006,6 +2013,7 @@ function fetch_browse_programs()
     {
     if (channels != '') channels += ',';
     channels += browsables [i]['id']
+    browsables [i]['count'] = 0;
     }
 
   var query = "/playerAPI/programInfo?channel=" + channels + String.fromCharCode(38) + "user=" + user;
