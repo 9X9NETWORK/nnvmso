@@ -1007,7 +1007,7 @@ function keypress (keycode)
     return;
 
   /* special case, channel browser + navigation key */
-  if (thumbing == 'browse' && keycode != 27 && keycode != 38 && keycode != 40 && keycode != 13)
+  if (thumbing == 'browse' && keycode != 27 && keycode != 38 && keycode != 40 && keycode != 13 && keycode != 33 && keycode != 34)
     return;
 
   /* ensure osd is up */
@@ -1105,6 +1105,18 @@ function keypress (keycode)
         browse_down();
       else if (thumbing == 'ipg')
         ipg_down();
+      break;
+
+    case 33:
+      /* PgUp */
+      if (thumbing == 'browse')
+        browse_page_up();
+      break;
+
+    case 34:
+      /* PgDn */
+      if (thumbing == 'browse')
+        browse_page_down();
       break;
 
     case 67:
@@ -1277,7 +1289,7 @@ function redraw_ipg()
     }
 
   $("#ipg-grid").html (html);
-  $("img").error(function () { $(this).unbind("error").attr("src", "http://zoo.atomics.org/video/images-x1/no_images.png"); });
+  $("#ipg-grid img").error(function () { $(this).unbind("error").attr("src", "http://zoo.atomics.org/video/images-x1/no_images.png"); });
 
   // ipg_cursor = parseInt (channel_line [channel_cursor]);
 
@@ -1938,11 +1950,14 @@ function redraw_browse()
   for (var i = browse_first; i <= n_browse && i <= browse_first + 9; i++)
     {
     var count = browsables [i]['count'] >= 0 ? ' <span style="color: orange">(' + browsables [i]['count'] + ')</span>' : '';
-    html += '<li id="pod-' + i + '"><img src="' + browsables [i]['thumb'] + '"><span>' + browsables [i]['name'] + '</span>' + count + '</li>';
+    var thumb = browsables [i]['thumb'];
+    if (thumb == '' || thumb == 'null' || thumb == 'false')
+      thumb = 'http://zoo.atomics.org/video/images-x1/no_images.png';
+    html += '<li id="pod-' + i + '"><img src="' + thumb + '"><span>' + browsables [i]['name'] + '</span>' + count + '</li>';
     }
 
   $("#podcast-list").html (html);
-  $("img").error(function () { $(this).unbind("error").attr("src", "http://zoo.atomics.org/video/images-x1/no_images.png"); });
+  $("#podcast-list img").error(function () { $(this).unbind("error").attr("src", "http://zoo.atomics.org/video/images-x1/no_images.png"); });
 
   if (n_browse > 0)
     $("#pod-" + browse_cursor).addClass ("on");
@@ -1975,6 +1990,44 @@ function browse_down()
       }
     $("#pod-" + browse_cursor).removeClass ("on");
     browse_cursor++;
+    $("#pod-" + browse_cursor).addClass ("on");
+    // log ('browser now at: ' + browsables [browse_cursor]['id']);
+    }
+  }
+
+function browse_page_up()
+  {
+  if (n_browse > 0 && browse_cursor > 1)
+    {
+    if (browse_cursor - 10 < browse_first)
+      {
+      browse_first -= 10;
+      if (browse_first < 1) browse_first = 1;
+      redraw_browse();
+      }
+
+    $("#pod-" + browse_cursor).removeClass ("on");
+    browse_cursor -= 10;
+    if (browse_cursor < 1) browse_cursor = 1;
+    $("#pod-" + browse_cursor).addClass ("on");
+    // log ('browser now at: ' + browsables [browse_cursor]['id']);
+    }
+  }
+
+function browse_page_down()
+  {
+  if (n_browse > 0 && browse_cursor < n_browse)
+    {
+    if (browse_cursor + 10 > browse_first + 9)
+      {
+      browse_first += 10;
+      if (browse_first > n_browse) browse_first = n_browse - 9;
+      if (browse_first < 1) browse_first = 1;
+      redraw_browse();
+      }
+    $("#pod-" + browse_cursor).removeClass ("on");
+    browse_cursor += 10;
+    if (browse_cursor > n_browse) browse_cursor = n_browse;
     $("#pod-" + browse_cursor).addClass ("on");
     // log ('browser now at: ' + browsables [browse_cursor]['id']);
     }
