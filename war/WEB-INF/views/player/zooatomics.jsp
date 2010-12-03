@@ -1806,7 +1806,16 @@ function dirty()
   {
   log ('dirty!');
 
-  var cmd = "/playerAPI/programInfo?channel=" + dirty_channels.join() + '&' + "user=" + user;
+  dirty_timex = 0;
+  var channels = dirty_channels.join();
+
+  if (channels == '')
+    {
+    log ('dirty(): no dirty channels!');
+    return;
+    }
+
+  var cmd = "/playerAPI/programInfo?channel=" + channels + '&' + "user=" + user;
 
   var d = $.get (cmd, function (data)
     {
@@ -1924,8 +1933,13 @@ function browse()
         else
           {
           log ('browse ' + fields [1] + ': ' + lines [i]);
+
           n_browse++;
-          browsables [n_browse] = { 'id': fields [1], 'thumb': fields [3], 'name': fields [2], 'count': -1 };
+          var count = -1;
+          if (fields.length > 4)
+            count = fields [4];
+
+          browsables [n_browse] = { 'id': fields [1], 'thumb': fields [3], 'name': fields [2], 'count': count };
           }
         }
       }
