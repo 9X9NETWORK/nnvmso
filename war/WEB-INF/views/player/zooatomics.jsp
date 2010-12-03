@@ -2101,6 +2101,9 @@ function fetch_browse_programs()
     browsables [i]['count'] = 0;
     }
 
+  if (channels == '')
+    return;
+
   var query = "/playerAPI/programInfo?channel=" + channels + String.fromCharCode(38) + "user=" + user;
 
   var d = $.get (query, function (data)
