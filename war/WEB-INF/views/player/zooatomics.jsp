@@ -1164,7 +1164,7 @@ function keypress (keycode)
 
     case 85:
       /* U */
-      if (thumbing == 'channel')
+      if (thumbing == 'channel' || thumbing == 'program')
         login_screen();
       break;
     }
@@ -2082,6 +2082,8 @@ function continue_acceptance()
     {
     parse_program_data (data);
     escape();
+    redraw_ipg();
+    elastic();
     // for now, stay in IPG
     // ipg_play()
     });
