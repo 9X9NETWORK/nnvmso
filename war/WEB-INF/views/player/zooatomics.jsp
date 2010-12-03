@@ -2211,6 +2211,9 @@ function update_progress_bar()
 
 function formatted_time (t)
   {
+  if (t == '' || t == NaN || t == undefined)
+    return '--';
+
   var m = Math.floor (t / 60);
   var s = Math.floor (t) - m * 60;
   return m + ":" + ("0" + s).substring (("0" + s).length - 2);
