@@ -166,25 +166,17 @@ public class PlayerAPIController {
 		List<MsoChannel> channels = channelMngr.findAllPublic();
 		String output ="";
 		ProgramManager programMngr = new ProgramManager();
-		SubscriptionManager sService = new SubscriptionManager();
-		NnUserManager userService = new NnUserManager();
 		for (MsoChannel c:channels) {
 			// append program count at the end of the line of each channel
-			String[] chStrSplit = c.getName().split(",");
 			List<MsoProgram> programs = new ArrayList<MsoProgram>();
-			if (chStrSplit.length > 1) {			
-				programs = programMngr.findByChannelIdsAndIsPublic(c.getName(), true);
-			} else {
-				long chId = Integer.parseInt(c.getName());
-				programs = programMngr.findByChannelIdAndIsPublic(chId, true);
-			}	
-
+			programs = programMngr.findByChannelIdAndIsPublic(c.getKey().getId(), true);
 			// don't send the channel if program count is zero
 			int programCount = programs.size();
 			if ( programCount > 0 ) {
 				String[] ori = {Short.toString(c.getSeq()), String.valueOf(c.getKey().getId()), c.getName(), c.getImageUrl(), Integer.toString(programCount)};
 				output = output + PlayerLib.getTabDelimitedStr(ori);			
 				output = output + "\n";
+				System.out.println(output);
 			}
 		}
 		System.out.println("channelBrowse:" + output);
