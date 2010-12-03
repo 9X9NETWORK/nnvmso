@@ -504,8 +504,8 @@ function update_bubble()
   // $("#left-row-num").html (previous_category (current_category));
   // $("#right-row-num").html (next_category (current_category));
 
-  $("#left-row-num").html (current_category - 1 == 0 ? 9 : current_category - 1);
-  $("#right-row-num").html (current_category + 1 == 10 ? 1 : current_category + 1);
+  $("#left-row-num").html (Math.floor (current_category) - 1 == 0 ? 9 : current_category - 1);
+  $("#right-row-num").html (Math.floor (current_category) + 1 == 10 ? 1 : current_category + 1);
   }
 
 function switch_to_channel_thumbs()
@@ -1921,6 +1921,8 @@ function browse()
     // <li class="on"><img src="thumb/abc.jpg"><span>ABC Entertainment</span></li>
     // <li><img src="thumb/abc.jpg"><span>ABC Entertainment</span></li>
 
+    sanity_check_data ('channelBrowse', data);
+
     var lines = data.split ('\n');
     log ('number of browse channels obtained: ' + lines.length);
     for (var i = 0; i < lines.length; i++)
@@ -1958,9 +1960,6 @@ function browse()
       $("#pod-" + browse_cursor).addClass ("on");
 
     document.getElementById("podcastRSS").value = "";
-
-    /* this is the most optional */
-    fetch_browse_programs();
     });
   }
 
@@ -2094,6 +2093,7 @@ function continue_acceptance()
 
   var d = $.get (cmd, function (data)
     {
+    sanity_check_data ('programInfo', data);
     parse_program_data (data);
     escape();
     redraw_ipg();
@@ -2103,42 +2103,19 @@ function continue_acceptance()
     });
   }
 
-function fetch_browse_programs()
+function sanity_check_data (what, data)
   {
-  log ('obtaining browsable program info');
+  log ('sanity check ' + what);
 
-  var channels = '';
-  for (var i in browsables)
+  var lines = data.split ('\n');
+
+  if (lines.length > 9 && lines [0] == '' && lines [1] == '')
     {
-    if (channels != '') channels += ',';
-    channels += browsables [i]['id']
-    browsables [i]['count'] = 0;
+    log_and_alert ('very bad data returned from ' + what + ' API');
+    return true;
     }
 
-  if (channels == '')
-    return;
-
-  var query = "/playerAPI/programInfo?channel=" + channels + String.fromCharCode(38) + "user=" + user;
-
-  var d = $.get (query, function (data)
-    {
-    log ('processing browsable program info');
-    var lines = data.split ('\n');
-    for (var i = 0; i < lines.length; i++)
-      {
-      if (lines [i] != '')
-        {
-        log ('  line: ' + lines [i]);
-        var fields = lines[i].split ('\t');
-        for (var b in browsables)
-          {
-          if (browsables [b]['id'] == fields [0])
-            browsables [b]['count']++;
-          }
-        }
-      }
-    redraw_browse();
-    });
+  return false;
   }
 
 function force_pause()
