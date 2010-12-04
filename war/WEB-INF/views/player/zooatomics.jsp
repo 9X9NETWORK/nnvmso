@@ -23,15 +23,33 @@
 
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 <script type="text/javascript" src="http://zoo.atomics.org/video/cssanim.js"></script>
-
+<script type="text/javascript" src="http://zoo.atomics.org/video/swfobject.js"></script>
+<script type="text/javascript" src="http://zoo.atomics.org/video/flowplayer-3.2.4.min.js"></script>
 
 <script>
+
+/* players */
+
+var current_tube = 'v1';
+
+var ytplayer;
+var yt_video_id;
+
+var jwplayer;
+var jw_video_file;
+var jw_timex = 0;
+var jw_previous_state = '';
+
+var fp_video_file;
+var fp_duration;
+
 
 var activated = false;
 var remembered_pause = false;
 
 var current_category = 0;
 var current_program = '';
+var current_url = '';
 
 var thumbing = '';
 
@@ -54,9 +72,12 @@ var saved_thumbing = '';
 var control_saved_thumbing = '';
 var browse_cursor = 1;
 
+/* timeout for program or channel index */
 var osd_timex = 0;
-var bubble_timex = 0;
+
+/* workaround for Chrome not firing 'ended' video event */
 var fake_timex = 0;
+
 var msg_timex = 0;
 
 var dirty_delay;
@@ -92,6 +113,9 @@ function elastic()
   var v = document.getElementById ("v");
   var vh = $(window).height();
   v.style.height = (vh) + "px";
+
+  var h = document.getElementById ("jw");
+  h.style.height = (vh) + "px";
 
   // var i = document.getElementById ("ipg-layer");
   // i.style.height = vh + "px";
@@ -210,6 +234,9 @@ function parse_program_data (data)
         //if (navigator.userAgent.match (/(GoogleTV|Droid Build)/i))
         //fields[5] = fields[5].replace (/webm$/, 'mp4');
 
+        fields [5] = 'jw:' + fields [5];
+        fields [6] = 'jw:' + fields [6];
+
         programgrid [fields [1]] = { 'channel': fields[0], 'url1': fields[5], 'url2': fields[6], 'name': fields[2], 'type': fields[3], 'thumb': fields[4] };
         }
       else
@@ -302,7 +329,10 @@ function best_url (program)
     return '';
     }
 
-  if (navigator.userAgent.match (/(GoogleTV|Droid Build)/i))
+  if (current_tube == 'jw')
+    desired = 'mp4';
+
+  else if (navigator.userAgent.match (/(GoogleTV|Droid Build)/i))
     desired = 'mp4';
 
   else if (navigator.userAgent.match (/(Opera|Firefox)/))
@@ -363,16 +393,23 @@ function play()
   {
   clear_msg_timex();
 
-  var url = best_url (current_program)
-
-  var v = document.getElementById ("vvv");
-  v.src = url;
+  var url = best_url (current_program);
 
   if (url == '')
     {
     log ('empty channel, displaying notice for 3 seconds')
     message ("No programs in this channel", 3000);
+    return;
     }
+
+  physical_start_play (url);
+  }
+
+
+function start_play_html5 (url)
+  {
+  var v = document.getElementById ("vvv");
+  v.src = url;
 
   fake_timex = 0;
 
@@ -399,13 +436,10 @@ function play()
   log ('Playing: ' + url);
 
   update_bubble();
-
-  // if (bubble_timex)
-  //  clearTimeout (bubble_timex);
-  //
-  // $("#bubble").show();
-  // bubble_timex = setTimeout ('$("#bubble").hide()', 3000);
   }
+
+
+/* html5 video event callbacks */
 
 function notify (text)
   {
@@ -465,6 +499,9 @@ function pause_callback()
   log ('** pause event fired');
   $("#btn-play").css ("background-image", "url(" + root + "btn_play.svg)");
   }
+
+/* end of html5 video event callbacks */
+
 
 function empty_channel_timeout()
   {
@@ -1125,6 +1162,8 @@ function keypress (keycode)
 
     case 67:
       /* C */
+      if (thumbing == 'channel' || thumbing == 'program')
+        switch_to_control_layer();
       break;
 
     case 82:
@@ -1156,6 +1195,10 @@ function keypress (keycode)
 
     case 66:
       /* B */
+      break;
+
+    case 67:
+      /* C */
       break;
 
     case 73:
@@ -1746,7 +1789,7 @@ function submit_signup()
     things.push ( params [p] + '=' + v );
     }
 
-  var serialized = things.join ('&');
+  var serialized = things.join ('&') + '&' + 'user=' + user;
   log ('signup: ' + serialized);
 
   $.post ("/playerAPI/signup", serialized, function (data)
@@ -1755,6 +1798,9 @@ function submit_signup()
     user = fields [1];
     if (fields [0] == "0")
       {
+      /* wipe out the current guest account program+channel data */
+      channelgrid = {};
+      programgrid = {};
       escape();
       log_and_alert ('signed up as user: ' + user);
       resume();
@@ -2118,6 +2164,12 @@ function sanity_check_data (what, data)
   return false;
   }
 
+function tube()
+  {
+  /* will be more complicated when there is preloading */
+  return current_tube;
+  }
+
 function force_pause()
   {
   remembered_pause = physical_is_paused();
@@ -2144,38 +2196,266 @@ function pause()
     physical_pause();
   }
 
+function unhide_player (player)
+  {
+  switch (player)
+    {
+    case "jw":
+
+      $("#v").hide();
+      $("#jw").show();
+      break;
+    }
+  }
+
+function physical_start_play (url)
+  {
+  if (url.match (/youtube\.com/))
+    start_play_yt (url);
+
+  else if (url.match (/^http:/))
+    start_play_html5 (url);
+
+  else if (url.match (/^jw:/))
+    start_play_jw (url);
+
+  else if (url.match (/^fp:/))
+    start_play_fp (url);
+  }
+
+function start_play_yt (url)
+  {
+  yt_video_id = url.match (/v=([^&]+)/)[1];
+  log ('YouTube video: ' + yt_video_id);
+  // setup_yt();
+  }
+
+function start_play_jw (url)
+  {
+  current_tube = 'jw';
+
+  // ugh! don't know actual url until player is chosen
+  url = best_url (current_program);
+
+  jw_video_file = url.replace (/^jw:/, '');
+
+  log ('setting up JW player, video file is: ' + jw_video_file);
+  unhide_player ("jw");
+
+  if (jwplayer)
+    jw_play();
+  else
+    jw_timex = setInterval ("retry_jw_start()", 50);
+  }
+
+function retry_jw_start()
+  {
+  if (jwplayer)
+    {
+    clearTimeout (jw_timex);
+    jw_play();
+    }
+  }
+
+function jw_play()
+  {
+  jwplayer.sendEvent ('LOAD', jw_video_file)
+  jwplayer.sendEvent ('PLAY');
+  jwplayer.addModelListener ('TIME', "update_progress_bar()" );
+  jwplayer.addModelListener ('STATE', "jw_state_change()" );
+  }
+
+function jw_state_change()
+  {
+  var state = jwplayer.getConfig()['state'];
+  var previous = jw_previous_state;
+
+  jw_previous_state = state;
+
+  log ('jwplayer state is: ' + state + ', previous state was: ' + previous);
+
+  if (state == 'IDLE' && previous != 'IDLE')
+    {
+    log ('jw now idle');
+    $("#loading").hide();
+    ended_callback();
+    }
+
+  else if (state == 'BUFFERING')
+    {
+    $("#loading").show();
+    }
+
+  else if (state == 'PLAYING')
+    {
+    $("#loading").hide();
+    }
+  }
+
+function start_play_fp (url)
+  {
+  }
+
 function physical_offset()
   {
-  var video = document.getElementById ("vvv");
-  return video.currentTime;
+  switch (tube())
+    {
+    case "yt":
+
+      if (ytplayer && ytplayer.getCurrentTime)
+        return ytplayer.getCurrentTime();
+      else
+        return 0;
+
+    case "jw":
+
+      if (jwplayer)
+        return jwplayer.getPosition();
+      else
+        return 0;
+
+    case "fp":
+
+      if (flowplayer)
+        {
+        log ("FP OFFSET: " +  flowplayer ("player").getTime());
+        return flowplayer().getTime() * 1000;
+        }
+      else
+        return 0;
+
+    case "v1":
+
+      var video = document.getElementById ("vvv");
+      return video.currentTime;
+    }
   }
 
 function physical_length()
   {
-  var video = document.getElementById ("vvv");
-  return video.duration;
+  switch (tube())
+    {
+    case "yt":
+
+      if (ytplayer && ytplayer.getDuration)
+        return ytplayer.getDuration();
+
+    case "jw":
+
+      if (jwplayer)
+        return jwplayer.getPlaylist()[0]['duration'];
+      else
+        return 1;
+
+    case "fp":
+
+      if (flowplayer && fp_duration)
+        return fp_duration;
+      else
+        return 1;
+
+    case "v1": 
+
+      var video = document.getElementById ("vvv");
+      return video.duration;
+    }
   }
 
 function physical_pause()
   {
-  var video = document.getElementById ("vvv");
-  video.pause();
+  switch (tube())
+    {
+    case "yt":
+
+      if (ytplayer)
+        ytplayer.pauseVideo()
+      break;
+
+    case "jw":
+
+      if (jwplayer)
+        jwplayer.sendEvent ("PLAY", "false");
+      break;
+
+    case "fp":
+
+       if (flowplayer)
+         flowplayer ("player").pause();
+       break;
+
+    case "v1": var video = document.getElementById ("vvv");
+               video.pause();
+               break;
+    }
   }
 
 function physical_play()
   {
-  var video = document.getElementById ("vvv");
-  video.play();
+  switch (tube())
+    {
+    case "yt":
+
+      if (ytplayer)
+        ytplayer.playVideo()
+      break;
+
+    case "jw":
+
+      if (jwplayer)
+        jwplayer.sendEvent ("PLAY", "true");
+      break;
+
+    case "fp":
+
+      if (flowplayer)
+        flowplayer ("player").play();
+      break;
+
+    case "v1":
+
+      var video = document.getElementById ("vvv");
+      video.play();
+      break;
+    }
   }
 
 function physical_is_paused()
   {
-  var video = document.getElementById ("vvv");
-  return video.paused
+  switch (tube())
+    {
+    case "yt":
+
+      if (ytplayer)
+        return ytplayer.getPlayerState() == 2;
+      else
+        return false;
+
+    case "jw":
+
+      if (jwplayer)
+        return jwplayer.getConfig()['state'] == 'PAUSED';
+      else
+        return false;
+
+    case "fp":
+
+      if (flowplayer)
+        return flowplayer ("player").isPaused();
+      else
+        return false;
+
+      break;
+
+    case "v1":
+
+      var video = document.getElementById ("vvv");
+      return video.paused;
+    }
   }
 
 function update_progress_bar()
   {
+  log ('progress');
   var pct = 100 * physical_offset() / physical_length();
 
   if (pct >= 0)
@@ -2193,7 +2473,7 @@ function update_progress_bar()
   if (diff < 1)
     log ('diff: ' + diff);
 
-  if (o2 - o1 < 0.2 && !physical_is_paused() && !fake_timex)
+  if (o2 - o1 < 0.2 && tube() == 'v1' && !physical_is_paused() && !fake_timex)
     {
     log ('end of video reached');
     fake_timex = setTimeout ("fake_ended_event()", 200);
@@ -2207,6 +2487,7 @@ function formatted_time (t)
 
   var m = Math.floor (t / 60);
   var s = Math.floor (t) - m * 60;
+
   return m + ":" + ("0" + s).substring (("0" + s).length - 2);
   }
 
@@ -2259,6 +2540,12 @@ function control_enter()
     }
   }
 
+function playerReady (thePlayer)
+  {
+  log ('jw player ready');
+  jwplayer = document.getElementById (thePlayer.id);
+  }
+
 </script>
 
 <title>Elastic 9x9 Player</title>
@@ -2273,9 +2560,24 @@ One moment...
 
 <div id="notblue" style="width: 100%; display: none; position: absolute; top: 0; margin: 0; overflow: hidden">
 
-  <div id="v" style="display: block; padding: 0">
+  <div id="all-players" style="display: block; padding: 0">
+    <div id="v" style="display: block; padding: 0">
+      <video id="vvv" autoplay="false" preload="metadata" loop="false" height="100%" width="100%" volume="0"></video></div>
 
-    <video id="vvv" autoplay="false" preload="metadata" loop="false" height="100%" width="100%" volume="0"></video></div>
+<div id="jw" style="width: 100%; height: 100%">
+        <embed name="player1" id="player1"
+            type="application/x-shockwave-flash"
+            pluginspage="http://www.macromedia.com/go/getflashplayer"
+            width="100%" height="100%"
+            bgcolor="#FFFFFF"
+            src="http://zoo.atomics.org/video/player.swf"
+            allowfullscreen="true"
+            allowscriptaccess="always"
+            wmode="transparent"
+            flashvars="fullscreen=true&controlbar=none&mute=false&allowscriptaccess=always">
+        </embed>
+</div>
+  </div>
 
 <div id="ch-layer" style="display: block;">
   <img src="http://zoo.atomics.org/video/images-x1/arrow_up.png" id="arrow-up">
