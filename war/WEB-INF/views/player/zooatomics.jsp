@@ -39,6 +39,7 @@ var jwplayer;
 var jw_video_file;
 var jw_timex = 0;
 var jw_previous_state = '';
+var jw_position = 0;
 
 var fp_video_file;
 var fp_duration;
@@ -2232,6 +2233,7 @@ function start_play_yt (url)
 
 function start_play_jw (url)
   {
+  jw_position = 0;
   current_tube = 'jw';
 
   // ugh! don't know actual url until player is chosen
@@ -2261,7 +2263,7 @@ function jw_play()
   {
   jwplayer.sendEvent ('LOAD', jw_video_file)
   jwplayer.sendEvent ('PLAY');
-  jwplayer.addModelListener ('TIME', "update_progress_bar()" );
+  jwplayer.addModelListener ('TIME', 'jw_progress' );
   jwplayer.addModelListener ('STATE', "jw_state_change()" );
   }
 
@@ -2292,6 +2294,12 @@ function jw_state_change()
     }
   }
 
+function jw_progress (event)
+  {
+  jw_position = event ['position'];
+  update_progress_bar();
+  }
+
 function start_play_fp (url)
   {
   }
@@ -2310,7 +2318,7 @@ function physical_offset()
     case "jw":
 
       if (jwplayer)
-        return jwplayer.getPosition();
+        return jw_position;
       else
         return 0;
 
@@ -2574,7 +2582,7 @@ One moment...
             allowfullscreen="true"
             allowscriptaccess="always"
             wmode="transparent"
-            flashvars="fullscreen=true&controlbar=none&mute=false&allowscriptaccess=always">
+            flashvars="fullscreen=true&controlbar=none&mute=false&bufferlength=1&allowscriptaccess=always">
         </embed>
 </div>
   </div>
