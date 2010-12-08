@@ -3,7 +3,7 @@
 <meta charset="UTF-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
-<link rel="stylesheet" href="http://zoo.atomics.org/video/9x9playerV13/stylesheets/main.css" />
+<link rel="stylesheet" href="http://zoo.atomics.org/video/9x9playerV15/stylesheets/main.css" />
 
 <style>
 
@@ -85,11 +85,11 @@ var dirty_delay;
 var dirty_channels = [];
 var dirty_timex;
 
-var control_buttons = [ 'btn-rewind', 'btn-play', 'btn-forward', 'volume-constrain', 'btn-signin', 'btn-close' ];
-var control_cursor = 1;
+var control_buttons = [ 'btn-replay', 'btn-rewind', 'btn-play', 'btn-forward', 'btn-volume', 'btn-facebook', 'btn-screensaver', 'btn-close' ];
+var control_cursor = 2;
 
 var user = "aghubmUydm1zb3IMCxIGTm5Vc2VyGBoM";
-var root = 'http://zoo.atomics.org/video/9x9playerV13/images/';
+var root = 'http://zoo.atomics.org/video/9x9playerV15/images/';
 
 $(document).ready (function()
  {
@@ -103,7 +103,12 @@ $(document).ready (function()
 function elastic()
   {
   log ('elastic');
+  elastic_innards();
+  ShowArrows();
+  }
 
+function elastic_innards()
+  {
   var newWidth = $(window).width() / 16 ;
   var newHeight = $(window).height() / 16;
 
@@ -214,6 +219,8 @@ function parse_program_data (data)
   {
   // 0=channel-id 1=program-id 2=program-name 3=program-type 4=program-thumb-url 5=program-url1 6=program-url2
 
+    var now = new Date();
+
     var lines = data.split ('\n');
     log ('number of programs obtained: ' + lines.length);
     for (var i = 0; i < lines.length; i++)
@@ -229,6 +236,9 @@ function parse_program_data (data)
         if (fields.length <= 6 || (fields.length > 6 && fields [6] == 'null'))
           fields [6] = '';
 
+        if (fields.length <= 7)
+          fields[7] = ''
+
         if (fields [3] == 'slideshow')
           fields [5] = 'slideshow:' + fields [5];
 
@@ -238,7 +248,7 @@ function parse_program_data (data)
         fields [5] = 'jw:' + fields [5];
         fields [6] = 'jw:' + fields [6];
 
-        programgrid [fields [1]] = { 'channel': fields[0], 'url1': fields[5], 'url2': fields[6], 'name': fields[2], 'type': fields[3], 'thumb': fields[4] };
+        programgrid [fields [1]] = { 'channel': fields[0], 'url1': fields[5], 'url2': fields[6], 'name': fields[2], 'type': fields[3], 'thumb': fields[4], 'timestamp': fields [7] };
         }
       else
         log ("ignoring program line " + i + ": " + lines [i]);
@@ -303,7 +313,7 @@ function preload_control_images()
   {
   var html = '';
 
-  for (var i in { 'bg_controlbar':'', 'btn_rewind':'', 'btn_pause':'', 'btn_play':'', 'btn_forward':'', 'btn_volume':'', 'btn_close':'', 'btn_signin':'', 'btn_handler':'', 'bg_msgup':'', 'bg_msgdown':'', 'btn_on':'', 'btn_off':'' })
+  for (var i in { 'bg_controlbar':'', 'btn_rewind':'', 'btn_pause':'', 'btn_play':'', 'btn_forward':'', 'btn_volume':'', 'btn_close':'', 'btn_signin':'', 'btn_handler':'', 'bg_msgup':'', 'bg_msgdown':'', 'btn_on':'', 'btn_off':'', 'btn_facebook':'', 'btn_replay':'', 'btn_screensaver':'', 'bg_ep':'', 'bg_podcastlist':'' })
     html += '<img src="' + root + i + '.svg">';
 
   $("#preload-control-images").html (html);
@@ -331,16 +341,16 @@ function best_url (program)
     }
 
   if (current_tube == 'jw')
-    desired = 'mp4';
+    desired = '(mp4|m4v)';
 
   else if (navigator.userAgent.match (/(GoogleTV|Droid Build)/i))
-    desired = 'mp4';
+    desired = '(mp4|m4v)';
 
   else if (navigator.userAgent.match (/(Opera|Firefox)/))
     desired = 'webm';
 
   else if (navigator.userAgent.match (/(Safari|Chrome)/))
-    desired = 'mp4';
+    desired = '(mp4|m4v)';
 
   ext = new RegExp ('\.' + desired + '$');
 
@@ -575,15 +585,46 @@ function enter_channel()
   // <li><img src="images-x1/bg_ep.png" class="ebg"><img src="thumb/06.jpg" class="thumb"></li>
   // <li class="empty"><img src="images-x1/bg_ep.png" class="ebg"></li>
 
+//  <ul class="ep-list">
+// <li class="on">
+// <img src="thumb/14.jpeg">
+// <p class="timestamp unseen">Today</p>
+// <p class="duration">10:11</p>
+// </li>
+// <li><img src="thumb/06.jpg"><p class="timestamp">Today</p><p class="duration">0:00</p></li><li><img src="thumb/08.jpg"><p class="timestamp">Yesterday</p><p class="duration">10:11</p></li><li><img src="thumb/04.jpg"><p class="timestamp">3 days ago</p><p class="duration">10:11</p></li><li><img src="thumb/13.jpg"><p class="timestamp">1 week ago</p><p class="duration">10:11</p></li><li><img src="thumb/10.jpg"><p class="timestamp">2 weeks ago</p><p class="duration">10:11</p></li><li><img src="thumb/16.jpg"><p class="timestamp">3 weeks ago</p><p class="duration">10:11</p></li><li><img src="thumb/17.jpg"><p class="timestamp">1 month ago</p><p class="duration">10:11</p></li><li class="empty"></li></ul>
+
+  var now = new Date();
+
   for (p in programgrid)
     {
     if (programgrid [p]['channel'] == real_channel)
       {
       program_line [++n_program_line] = p;
+
+      var age = ''
+      if (programgrid [p]['timestamp'] != '')
+        {
+        var d = new Date (Math.floor (programgrid [p]['timestamp']));
+        var minutes = Math.floor ((now.getTime() - d.getTime()) / 1000 / 60);
+        if (minutes > 59)
+          {
+          var hours = Math.floor ((minutes + 1) / 60);
+          age = hours + (hours == 1 ? ' hour' : ' hours');
+          }
+        else
+          age = minutes + (minutes == 1 ? ' minute' : ' minutes');
+        }
+      else
+        age = '(ageless)'
+
       // html += '<li id="p-li-' + n_program_line + '"><img id="p-th-"' + n_program_line + '" src="' + programgrid [p]['thumb'] + '"></li>';
       var onoff = n_program_line == program_cursor ? 'class="on" ' : '';
       onoff = '';
-      html += '<li ' + onoff + 'id="p-li-' + n_program_line + '"><img src="http://zoo.atomics.org/video/images-x1/bg_ep.png" class="ebg"><img src="' + programgrid [p]['thumb'] + '" class="thumb"></li>';
+      html += '<li ' + onoff + 'id="p-li-' + n_program_line + '"><img src="' + programgrid [p]['thumb'] + '">'
+      html += '<p class="timestamp unseen">' + age + '</p><p class="duration">0:00</p></li>';
+
+      if (n_program_line >= 9)
+        break;
       }
     }
 
@@ -597,7 +638,8 @@ function enter_channel()
     var phase_in_pp =
       {
       //opacity: "1",
-      top: "0em"
+      //top: "0em"
+      top: "1.4275em"
       };
 
     var phase_out_cc =
@@ -626,16 +668,18 @@ function enter_channel()
 
   setTimeout ("enter_channel_failsafe()", 500);
 
-  redraw_program_line();
-
   thumbing = 'program';
+
+  redraw_program_line();
+ShowArrows();
+
   reset_osd_timex();
   }
 
 function enter_channel_failsafe()
   {
   $("#ep-layer").css ("opacity", "1");
-  $("#ep-swish").css ("top", "0");
+  $("#ep-swish").css ("top", "1.4275em");
   $("#ep-swish").css ("display", "block");
 
   $("#control-layer").css ("opacity", "1");
@@ -667,7 +711,7 @@ function enter_category (cat, positioning)
     $("#ch-swish-" + current_category).css ("top", "-4.0625em");
     $("#ch-layer").css ("display", "block");
 
-    $("#ep-swish").css ("top", "0em");
+    $("#ep-swish").css ("top", "1.4275em");
 
     var phase_out_pp =
       {
@@ -696,7 +740,7 @@ function enter_category (cat, positioning)
       $("#ep-swish").css ("display", "none");
       //$("#ep-swish").css ("opacity", "1");
       $("#ep-layer").css ("opacity", "1");
-      $("#ep-swish").css ("top", "0em");
+      $("#ep-swish").css ("top", "1.4275em");
       });
     }
 
@@ -769,6 +813,7 @@ function enter_category (cat, positioning)
     channel_cursor = n_channel_line;
 
   redraw_channel_line();
+ShowArrows();
   reset_osd_timex();
   }
 
@@ -786,8 +831,6 @@ function enter_category_failsafe()
 
   turn_off_ancillaries();
   }
-
-// <li class="on"><img src="thumb/01.jpg"><img src="images/arrow_down.png" class="arrow-down"><p class="number"><span>9</span></p></li><li><img src="thumb/02.jpg"><img src="images/arrow_down.png" class="arrow-down"></li><li><img src="thumb/03.png"><img src="images/arrow_down.png" class="arrow-down"></li><li><img src="images/arrow_down.png" class="arrow-down"></li><li><img src="images/arrow_down.png" class="arrow-down"></li><li><img src="images/arrow_down.png" class="arrow-down"></li><li><img src="images/arrow_down.png" class="arrow-down"></li><li><img src="images/arrow_down.png" class="arrow-down"></li><li><img src="images/arrow_down.png" class="arrow-down"></li>
 
 function ch_html (cat)
   {
@@ -810,11 +853,18 @@ function ch_html (cat)
       // html += '<li id="c-' + current_category + '-li-' + n_channel_line + '"><img id="c-th-' + n_channel_line + '" src="' + channelgrid [chan]['thumb'] + '"></li>';
       html += '<li id="c-' + cat + '-li-' + n_channel_line;
       html += (channel_cursor == n_channel_line) ? '" class="on">' : '">';
-      html += '<img src="' + thumbnail + '"><img src="http://zoo.atomics.org/video/images-x1/arrow_down.png" class="arrow-down"><p class="number"><span>' + programs_in_channel (chan) + '</span></p></li>';
+
+      var programs = programs_in_channel (chan);
+      if (programs == 0)
+        programs = "no episodes";
+      else
+        programs += (programs == 1) ? " episode" : " episodes";
+
+      html += '<img src="' + thumbnail + '"><p class="number"><span>' + programs + ' episodes</span></p></li>';
       log ('channel ' + channelgrid [chan]['id'] + ': ' + channelgrid [chan]['name']);
       }
     else
-      html += '<li><img src="http://zoo.atomics.org/video/images-x1/arrow_down.png" class="arrow-down"></li>';
+      html += '<li></li>';
     }
 
   return html;
@@ -822,6 +872,8 @@ function ch_html (cat)
 
 function reset_category_dots (cat)
   {
+  return;
+
   var dotsize;
   var html = "";
 
@@ -840,6 +892,29 @@ function reset_category_dots (cat)
     }
 
   $("#cg-tabs").html (html);
+  }
+
+function ShowArrows()
+  {
+  elastic_innards();
+
+  //log ("+ShowArrows");
+  if (thumbing == 'channel')
+    {
+    pos1 = $(".ch-list li.on").offset();
+    //log ('pos1.left: ' + pos1.left);
+    d1 = ((94-21)/2)* $(window).width()/16/64;
+    l1 = pos1.left + d1;
+    $("#ch-layer .arrow-up, #ch-layer .arrow-down").show().css("left",l1);
+    }
+  else if (thumbing == 'program')
+    {
+    pos2 = $(".ep-list li.on").offset();
+    d2 = ((90-21)/2)* $(window).width()/16/64;
+    l2 = pos2.left + d2;
+    $("#ep-layer .arrow-up").show().css("left",l2);
+    }
+  //log ("-ShowArrows");
   }
 
 function next_channel_square (channel)
@@ -1240,12 +1315,14 @@ function osd_timex_expired()
 function extend_ch_layer()
   {
   $("#ch-layer").show();
+  elastic();
   reset_osd_timex();
   }
 
 function extend_ep_layer()
   {
   $("#ep-layer").show();
+  elastic();
   reset_osd_timex();
   }
 
@@ -1613,6 +1690,8 @@ function redraw_channel_line()
 
   // old way, replace all html inside div:
   // $("#ch-list-" + current_category).html (ch_html (current_category));
+
+  ShowArrows();
   }
 
 function program_right()
@@ -1661,6 +1740,8 @@ function redraw_program_line()
         }
       }
     }
+
+  ShowArrows();
   }
 
 function setup_ajax_error_handling()
@@ -2222,6 +2303,8 @@ function physical_start_play (url)
 
   else if (url.match (/^fp:/))
     start_play_fp (url);
+
+  update_bubble();
   }
 
 function start_play_yt (url)
@@ -2461,6 +2544,47 @@ function physical_is_paused()
     }
   }
 
+function physical_replay()
+  {
+  switch (tube())
+    {
+    case "yt":
+
+      if (ytplayer && ytplayer.seekTo)
+        {
+        ytplayer.seekTo (0, false);
+        ytplayer.playVideo();
+        }
+      break;
+
+    case "jw":
+
+      if (jwplayer && jwplayer.sendEvent)
+        {
+        jwplayer.sendEvent ("SEEK", "0");
+        jwplayer.sendEvent ("PLAY", "true");
+        }
+      break;
+
+    case "fp":
+
+      if (flowplayer)
+        {
+        flowplayer ("player").seek (0);
+        flowplayer ("player").resume();
+        }
+      break;
+
+    default:
+
+      var video = document.getElementById ("vvv");
+      video.currentTime = 0;
+      video.play();
+
+      break;
+    }
+  }
+
 function update_progress_bar()
   {
   log ('progress');
@@ -2545,6 +2669,9 @@ function control_enter()
 
     case 'btn-signin': login_screen();
                        break;
+
+    case 'btn-replay': physical_replay();
+                       break;
     }
   }
 
@@ -2560,7 +2687,7 @@ function playerReady (thePlayer)
 
 </head>
 
-<body id="body" style="background: black">
+<body id="body" style="background: black; overflow: hidden">
 
 <div id="blue" style="background: black; width: 100%; height: 100%; display: block; position: absolute; color: white">
 One moment...
@@ -2587,9 +2714,9 @@ One moment...
 </div>
   </div>
 
-<div id="ch-layer" style="display: block;">
-  <img src="http://zoo.atomics.org/video/images-x1/arrow_up.png" id="arrow-up">
+<div id="ch-layer" style="display: block">
   <div id="ch-container">
+    <div class="arrow-up"></div><div class="arrow-down"></div>
     <div id="left-piece"><span class="rowNum" id="left-row-num">1</span></div>
     <div id="ch-constrain">
       <div class="ch-strip">
@@ -2608,24 +2735,24 @@ One moment...
         <div class="ch-swish" id="ch-swish-8" style="display: block"><ul id="ch-list-8" class="ch-list"></ul></div>
         <div class="ch-swish" id="ch-swish-9" style="display: block"><ul id="ch-list-9" class="ch-list"></ul></div>
       </div>
+      </div>
     </div>
     <div id="right-piece"><span class="rowNum" id="right-row-num">3</span></div>
   </div>
 </div>
 
 <div id="ep-layer">
-  <img src="http://zoo.atomics.org/video/images-x1/arrow_up.png" id="arrow-up">
   <div id="ep-container">
-    <ul id="ep-meta">
-      <li id="ep-layer-ch-title" class="ch-title"></li>
-      <li class="dash">&#8212;</li>
-      <li id="ep-layer-ep-title" class="ep-title"></li>
-      <li class="time">11/09/10</li>
-      <li class="divider">|</li>
-      <li class="duration">10:24</li>
-    </ul>
-    <div class="ep-swish" id="ep-swish">
-      <ul class="ep-list" id="ep-list"></ul>
+    <div class="arrow-up"></div>
+    <div id="ep-constrain">
+      <ul id="ep-meta">
+        <li id="ep-layer-ch-title" class="ch-title"></li>
+        <li class="dash">&#8212;</li>
+        <li id="ep-layer-ep-title" class="ep-title"></li>
+      </ul>
+      <div id="ep-swish" class="ep-swish" style="display: block">
+        <ul class="ep-list" id="ep-list"></ul>
+      </div>
     </div>
   </div>
 </div>
@@ -2647,8 +2774,11 @@ One moment...
     </ul> 
   </div>
   <div id="ipg-grid"></div>
+  <div id="menu">
+    <p id="pop-play"></p><p id="pop-delete"></p>
+  </div>
 </div>
-
+ 
 <div id="signin-layer" style="display: none">
   <ul id="login-pannel">
     <li><h2>Returning Users</h2></li>
@@ -2704,6 +2834,7 @@ One moment...
 
 <div id="preload-control-images" style="display: none"></div>
 
+<!--
 <div id="control-layer" style="display: none">
   <div id="msg-up"><p>Press UP to see your programming guide</p></div>
   <ul id="control-bar">
@@ -2729,6 +2860,42 @@ One moment...
     </li>
   </ul>
   <div id="msg-down"><p>Press DOWN for more episodes</p></div>
+</div>
+-->
+
+<div id="control-layer" style="display: none">
+  <div id="msg-up"><p>Press <span class="enlarge">&uarr;</span> to see your programming guide</p></div> 
+  <ul id="control-bar">
+    <li id="btn-replay"></li>
+    <li id="btn-rewind"></li>
+    <li id="btn-play" class="on"></li>
+    <li id="btn-pause"></li>
+    <li id="btn-forward"></li>
+    <li class="divider"></li>
+    <li id="btn-volume"></li>
+    <li id="volume-constrain" class="on">
+      <ul id="volume-bars">
+        <li></li>
+        <li></li>
+        <li></li>
+        <li class="on"></li>
+        <li class="on"></li>
+        <li class="on"></li>
+        <li class="on"></li>
+      </ul>
+    </li>
+    <li class="divider"></li>
+    <li id="btn-facebook"></li>
+    <li id="btn-screensaver"></li>
+    <li class="divider"></li>
+    <li id="btn-close"></li>
+    <li id="play-time">00:52 / 01:32</li>
+    <li id="progress-bar">
+      <p id="loaded"></p>
+      <p id="played"></p>
+    </li>
+  </ul> 
+  <div id="msg-down"><p>Press <span class="enlarge">&darr;</span> for more episodes</p></div>
 </div>
 
 <div id="msg-layer" style="display: none">
