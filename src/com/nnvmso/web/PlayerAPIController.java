@@ -206,7 +206,7 @@ public class PlayerAPIController {
 				System.out.println(output);
 			}
 		}
-		System.out.println("channelBrowse:" + output);
+		System.out.println("channelBrowse() :\n" + output);
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.valueOf("text/plain;charset=utf-8"));
 		return new ResponseEntity<String>(output, headers, HttpStatus.OK);

@@ -88,7 +88,6 @@ public class ProgramManager {
 		if (c != null) {
 			Query q = pm.newQuery(MsoProgram.class);		
 			q.setFilter("channelKey == channelKeyParam && isPublic == isPublicParam");
-			q.setOrdering("name DESC");
 			q.declareParameters(Key.class.getName() + " channelKeyParam, boolean isPublicParam");
 			programs = (List<MsoProgram>) q.execute(c.getKey(), isPublic);
 			System.out.println(DebugLib.OUT + programs.size());

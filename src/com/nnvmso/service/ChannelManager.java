@@ -79,8 +79,11 @@ public class ChannelManager {
 	public List<MsoChannel> findAllPublic() {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Query q = pm.newQuery(MsoChannel.class);
-		q.setFilter("isPublic == isPublicParam");
-		q.declareParameters("boolean isPublicParam");
+		// @TODO -- GAE return 404 when setFilter is on
+		//          turn it off since we also check program count > 0  
+		// q.setFilter("isPublic == isPublicParam");
+		q.setOrdering("name asc");
+		// q.declareParameters("boolean isPublicParam");
 		List<MsoChannel> channels = (List<MsoChannel>) q.execute(true);
 		channels.size();
 		pm.close();		
