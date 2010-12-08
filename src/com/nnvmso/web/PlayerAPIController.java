@@ -74,7 +74,8 @@ public class PlayerAPIController {
 	 *          Example: "0	aghubmUydm1zb3IMCxIGTm5Vc2VyGDkM", "200	Missing Params".
 	 */
 	@RequestMapping(value="signup", method=RequestMethod.POST)
-    public ResponseEntity<String> signup(HttpServletRequest req, HttpServletResponse resp) {
+    public ResponseEntity<String> signup(@RequestParam(value="user") String userToken, 
+    		HttpServletRequest req, HttpServletResponse resp) {
 		String output = "";
 		String email = req.getParameter("email");
 		String password = req.getParameter("password");
@@ -90,11 +91,20 @@ public class PlayerAPIController {
 			if (user != null) {
 				output = PlayerAPI.CODE_ERROR + "\t" + PlayerAPI.PLAYER_EMAIL_TAKEN;
 			} else {
-				user = new NnUser(req.getParameter("email"));
-				user.setPassword(req.getParameter("password"));
-				user.setName(req.getParameter("name"));		
-				user = userMngr.createViaPlayer(user);
-				userMngr.setUserCookie(resp, NnLib.getKeyStr(user.getKey()));
+				user = new NnUserManager().findByKey(userToken);
+				if (user.getEmail() == "guest@9x9.com" && user.getName() == "guest") {
+					// 1st time signup, reuse previous cookies user 
+					user.setEmail(email);
+					user.setPassword(password);
+					user.setName(name);
+					userMngr.UpdateUser(user);
+				} else {
+					user.setEmail(email);
+					user.setPassword(password);
+					user.setName(name);
+					user = userMngr.createViaPlayer(user);
+					userMngr.setUserCookie(resp, NnLib.getKeyStr(user.getKey()));
+				}
 				output = PlayerAPI.CODE_SUCCESS + "\t" + NnLib.getKeyStr(user.getKey());				
 			}
 		}
@@ -166,17 +176,25 @@ public class PlayerAPIController {
 		List<MsoChannel> channels = channelMngr.findAllPublic();
 		String output ="";
 		ProgramManager programMngr = new ProgramManager();
+		SubscriptionManager sService = new SubscriptionManager();
+		NnUserManager userService = new NnUserManager();
 		for (MsoChannel c:channels) {
 			// append program count at the end of the line of each channel
+			String[] chStrSplit = c.getName().split(",");
 			List<MsoProgram> programs = new ArrayList<MsoProgram>();
-			programs = programMngr.findByChannelIdAndIsPublic(c.getKey().getId(), true);
+			if (chStrSplit.length > 1) {			
+				programs = programMngr.findByChannelIdsAndIsPublic(c.getName(), true);
+			} else {
+				long chId = Integer.parseInt(c.getName());
+				programs = programMngr.findByChannelIdAndIsPublic(chId, true);
+			}	
+
 			// don't send the channel if program count is zero
 			int programCount = programs.size();
 			if ( programCount > 0 ) {
 				String[] ori = {Short.toString(c.getSeq()), String.valueOf(c.getKey().getId()), c.getName(), c.getImageUrl(), Integer.toString(programCount)};
 				output = output + PlayerLib.getTabDelimitedStr(ori);			
 				output = output + "\n";
-				System.out.println(output);
 			}
 		}
 		System.out.println("channelBrowse:" + output);
@@ -306,7 +324,7 @@ public class PlayerAPIController {
 			if (p.getType().equals(MsoProgram.TYPE_SLIDESHOW)) {
 				url1 = "/player/nnscript?program=" + p.getId();
 			}
-			String[] ori = {String.valueOf(p.getChannelId()), String.valueOf(p.getKey().getId()), p.getName(), p.getType(), p.getImageUrl(), url1, url2};
+			String[] ori = {String.valueOf(p.getChannelId()), String.valueOf(p.getKey().getId()), p.getName(), p.getType(), p.getImageUrl(), url1, url2, p.getUpdateDateString()};
 			output = output + PlayerLib.getTabDelimitedStr(ori);
 			output = output + "\n";
 		}
