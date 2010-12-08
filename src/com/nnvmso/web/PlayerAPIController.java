@@ -316,7 +316,8 @@ public class PlayerAPIController {
 			if (p.getType().equals(MsoProgram.TYPE_SLIDESHOW)) {
 				url1 = "/player/nnscript?program=" + p.getId();
 			}
-			String[] ori = {String.valueOf(p.getChannelId()), String.valueOf(p.getKey().getId()), p.getName(), p.getType(), p.getImageUrl(), url1, url2, p.getUpdateDateString()};
+			String[] ori = {String.valueOf(p.getChannelId()), String.valueOf(p.getKey().getId()), p.getName(), 
+					p.getType(), p.getImageUrl(), url1, url2, String.valueOf(p.getUpdateDate().getTime())};
 			output = output + PlayerLib.getTabDelimitedStr(ori);
 			output = output + "\n";
 		}
