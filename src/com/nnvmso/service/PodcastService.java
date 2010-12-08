@@ -117,8 +117,10 @@ public class PodcastService {
 		}		
 		if (item.getThumbnail()!= null) {
 			p.setImageUrl(item.getThumbnail());
-		}		
-		p.setUpdateDate(item.getPubDate());
+		}
+		if (item.getPubDateString() != null) {
+			p.setUpdateDate(item.getPubDate());
+		}
 		p.setPublic(true);
 		pMngr.save(p);
 	}
@@ -165,7 +167,7 @@ public class PodcastService {
 		feed.setRss(rss);
 		feed.setCallback(THIS_HOST);
 		System.out.println("Podcast post from player:" + feed.getRss());
-		String urlStr = TRANSCODING_SERVER_ALPHA;
+		String urlStr = TRANSCODING_SERVER_DEV;
 		NnLib.urlPostWithJson(urlStr, feed);
 	}
 	

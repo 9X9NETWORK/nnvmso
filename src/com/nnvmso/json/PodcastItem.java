@@ -32,14 +32,7 @@ public class PodcastItem {
 		return pubDate;
 	}
 	public Date getPubDate() {
-		SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM d, yyyy hh:mm a");
-		Date theDate = new Date();
-        try {
-        	theDate = dateFormat.parse(pubDate);
-        	System.out.println("PubDate parsed = " + dateFormat.format(theDate));
-        } catch (ParseException e) {
-        	System.out.println("ERROR: exception while parse PubDate = " + dateFormat.format(theDate));
-        }
+		Date theDate = new Date(Long.parseLong(pubDate));
 		return theDate;
 	}
 	public void setPubDate(String pubDate) {

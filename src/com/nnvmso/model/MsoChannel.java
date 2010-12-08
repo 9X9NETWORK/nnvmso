@@ -153,14 +153,7 @@ public class MsoChannel implements Serializable {
 	}
 
 	public void setUpdateDate(String updateDate) {
-		SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM d, yyyy hh:mm a");
-        try {
-        	this.updateDate = dateFormat.parse(updateDate);
-        	System.out.println("UpdateDate parsed = " + dateFormat.format(updateDate));
-        } catch (ParseException e) {
-        	System.out.println("ERROR: exception while parse updateDate = " + dateFormat.format(updateDate));
-        	this.updateDate = new Date();
-        }
+		this.updateDate = new Date(Long.parseLong(updateDate));
 	}
 	
 	public Date getCreateDate() {
