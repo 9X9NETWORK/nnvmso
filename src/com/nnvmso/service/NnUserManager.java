@@ -61,6 +61,7 @@ public class NnUserManager {
 		if (results.size() > 0) {
 			user = results.get(0);			
 		}
+		pm.close();
 		return user;
 	}
 	
@@ -71,6 +72,7 @@ public class NnUserManager {
 			user = pm.getObjectById(NnUser.class, key);
 		} catch (JDOObjectNotFoundException e) {
 		}
+		pm.close();
 		return user;
 	}
 

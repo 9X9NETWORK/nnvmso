@@ -74,13 +74,14 @@ public class PlayerAPIController {
 	 *          Example: "0	aghubmUydm1zb3IMCxIGTm5Vc2VyGDkM", "200	Missing Params".
 	 */
 	@RequestMapping(value="signup", method=RequestMethod.POST)
-    public ResponseEntity<String> signup(@RequestParam(value="user") String userToken, 
-    		HttpServletRequest req, HttpServletResponse resp) {
+    public ResponseEntity<String> signup(HttpServletRequest req, HttpServletResponse resp) {
 		String output = "";
 		String email = req.getParameter("email");
 		String password = req.getParameter("password");
 		String name = req.getParameter("name");
-		System.out.println("player signup email=" + email + ";pwd=" + password + ";name=" + name);		
+		String userToken = req.getParameter("user");
+		System.out.println("signup() : userToken=" + userToken + 
+				"; email=" + email + "; pwd=" + password + "; name=" + name);		
 		if (email == null || password == null || name == null ||
 			email.length() == 0 || password.length() == 0 || name.length() == 0 ||
 			email.equals("undefined")) {
@@ -90,20 +91,34 @@ public class PlayerAPIController {
 			NnUser user = userMngr.findByEmail(email);
 			if (user != null) {
 				output = PlayerAPI.CODE_ERROR + "\t" + PlayerAPI.PLAYER_EMAIL_TAKEN;
+				System.out.println("Signup() : ERROR: " + output);
 			} else {
-				user = new NnUserManager().findByKey(userToken);
-				if (user.getEmail() == "guest@9x9.com" && user.getName() == "guest") {
-					// 1st time signup, reuse previous cookies user 
-					user.setEmail(email);
-					user.setPassword(password);
-					user.setName(name);
-					userMngr.UpdateUser(user);
-				} else {
-					user.setEmail(email);
-					user.setPassword(password);
-					user.setName(name);
+				user = userMngr.findByKey(userToken);
+				if (user == null ) {
+					System.out.println("signup() find by Token: userToken=" + userToken + " NOT FOUND!!!");
+					user = new NnUser(req.getParameter("email"));
+					user.setPassword(req.getParameter("password"));
+					user.setName(req.getParameter("name"));		
 					user = userMngr.createViaPlayer(user);
 					userMngr.setUserCookie(resp, NnLib.getKeyStr(user.getKey()));
+				} else {
+					System.out.println("signup() find by Token: userToken=" + userToken + 
+							"; email=" + user.getEmail() + "; pwd=" + user.getPassword() + "; name=" + user.getName());		
+					if (user.getEmail().equals("guest@9x9.com") && user.getName().equals("guest")) {
+						System.out.println("signup() : 1st time signup after being a guest");
+						// 1st time signup, reuse previous cookies user 
+						user.setEmail(email);
+						user.setPassword(password);
+						user.setName(name);
+						userMngr.UpdateUser(user);
+					} else {
+						System.out.println("signup() : 2nd or more time signup ");
+						user.setEmail(email);
+						user.setPassword(password);
+						user.setName(name);
+						user = userMngr.createViaPlayer(user);
+						userMngr.setUserCookie(resp, NnLib.getKeyStr(user.getKey()));
+					}
 				}
 				output = PlayerAPI.CODE_SUCCESS + "\t" + NnLib.getKeyStr(user.getKey());				
 			}
@@ -147,12 +162,14 @@ public class PlayerAPIController {
 	 */
 	@RequestMapping(value="userTokenVerify")	
 	public ResponseEntity<String> userTokenVerify(@RequestParam(value="token") String token, HttpServletResponse resp) {
+		System.out.println("userTokenVerify() find by Token: userToken=" + token ); 
 		NnUser found = new NnUserManager().findByKey(token);
 		String output = "";
 		if (found == null) {
 			output = PlayerAPI.CODE_ERROR + "\t" + PlayerAPI.PLAYER_USER_TOKEN_INVALID;
 			CookieHelper.deleteCookie(resp, "user");
 		} else {
+			System.out.println("userTokenVerify() user found --" + "email=" + found.getEmail() + "; name=" + found.getName());		
 			output = PlayerAPI.CODE_SUCCESS + "\t" + PlayerAPI.PLAYER_CODE_SUCCESS;			
 		}
 		HttpHeaders headers = new HttpHeaders();
@@ -217,6 +234,7 @@ public class PlayerAPIController {
 			output = output + "\n";
 		}				
 		//return
+		System.out.println(output);
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.valueOf("text/plain;charset=utf-8"));
 		return new ResponseEntity<String>(output, headers, HttpStatus.OK);		
@@ -349,15 +367,18 @@ public class PlayerAPIController {
 		String rssStr = req.getParameter("podcastRSS");
 		String userStr = req.getParameter("user");
 		String gridStr = req.getParameter("grid");
+		System.out.println("podcastSubmit() : userToken=" + userStr + "; podcastRSS=" + rssStr + "; grid=" + gridStr);
 		if (rssStr == null || userStr == null || gridStr == null ||
 			rssStr.length() == 0 || userStr.length() == 0 || gridStr.length() == 0) {
 			output = PlayerAPI.CODE_MISSING_PARAMS + "\t" + PlayerAPI.PLAYER_CODE_MISSING_PARAMS;
+			System.out.println("podcastSubmit() : " + output);
 			valid = false;
 		}
 		if (valid) {
 			String podcastInfo[] = podcastService.getPodcastInfo(rssStr);			
 			if (!podcastInfo[0].equals("200") || !podcastInfo[1].contains("xml")) {
 				output = PlayerAPI.CODE_ERROR + "\t" + PlayerAPI.PLAYER_RSS_NOT_VALID;
+				System.out.println("podcastSubmit() : " + output);
 				valid = false;
 			} else {
 				rssStr = podcastInfo[2];
@@ -400,6 +421,7 @@ public class PlayerAPIController {
 	 */	
 	@RequestMapping(value="subscribe")
 	public ResponseEntity<String> subscribe(@RequestParam(value="user") String user, @RequestParam(value="channel") long channel, @RequestParam(value="grid") short grid ) {			
+		System.out.println("subscribe() : userToken=" + user + "; channel=" + channel + "; grid=" + grid);
 		//subscribe	
 		NnUserManager userMngr = new NnUserManager();
 		ChannelManager channelMngr = new ChannelManager();
@@ -409,6 +431,7 @@ public class PlayerAPIController {
 		NnUser foundUser = userMngr.findByKey(user);
 		MsoChannel foundChannel = channelMngr.findById(channel);
 		if (foundUser != null && foundChannel != null) {
+			System.out.println("subscribe() : user found : userToken=" + user + "; email=" + foundUser.getEmail() + "; ");
 			sMngr.channelSubscribe(foundUser, foundChannel, grid);
 			output = PlayerAPI.CODE_SUCCESS + "\t" + PlayerAPI.PLAYER_CODE_SUCCESS;
 		} else {

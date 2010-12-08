@@ -54,7 +54,7 @@ public class SubscriptionManager {
 			  iter.remove();
 		  }
 		}
-
+		pm.close();
 		return results;
 		//return programs;
 	}
@@ -68,6 +68,7 @@ public class SubscriptionManager {
 			c.setGrid(s.getSeq());
 			channels.add(c);
 		}
+		pm.close();
 		return channels;		
 	}
 		
@@ -75,6 +76,7 @@ public class SubscriptionManager {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Subscription s = new Subscription(user.getKey(), channel.getKey());
 		s.setSeq(grid);
+		System.out.println("channelSubscribe() : userKey=" + user.getKey() + "; channelKey=" + channel.getKey() + "; grid=" + grid);
 		pm.makePersistent(s);
 		pm.close();		
 	}
