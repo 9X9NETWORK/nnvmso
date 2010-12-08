@@ -1,5 +1,9 @@
 package com.nnvmso.json;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Part of PodcastProgram.
  * Receive Podcast Program information from Transcoding Service 
@@ -24,8 +28,19 @@ public class PodcastItem {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	public String getPubDate() {
+	public String getPubDateString() {
 		return pubDate;
+	}
+	public Date getPubDate() {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM d, yyyy hh:mm a");
+		Date theDate = new Date();
+        try {
+        	theDate = dateFormat.parse(pubDate);
+        	System.out.println("PubDate parsed = " + dateFormat.format(theDate));
+        } catch (ParseException e) {
+        	System.out.println("ERROR: exception while parse PubDate = " + dateFormat.format(theDate));
+        }
+		return theDate;
 	}
 	public void setPubDate(String pubDate) {
 		this.pubDate = pubDate;

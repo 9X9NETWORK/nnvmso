@@ -4,6 +4,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.NotPersistent;
@@ -149,6 +152,17 @@ public class MsoChannel implements Serializable {
 		this.updateDate = updateDate;
 	}
 
+	public void setUpdateDate(String updateDate) {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM d, yyyy hh:mm a");
+        try {
+        	this.updateDate = dateFormat.parse(updateDate);
+        	System.out.println("UpdateDate parsed = " + dateFormat.format(updateDate));
+        } catch (ParseException e) {
+        	System.out.println("ERROR: exception while parse updateDate = " + dateFormat.format(updateDate));
+        	this.updateDate = new Date();
+        }
+	}
+	
 	public Date getCreateDate() {
 		return createDate;
 	}

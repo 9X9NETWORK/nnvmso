@@ -19,10 +19,13 @@ import com.nnvmso.lib.PMF;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoProgram;
+import java.util.Date;
 
 @Service
 public class PodcastService {
 
+	public static String THIS_HOST = "alpha.9x9.tv";
+	
 	public static String TRANSCODING_SERVER_DEV = "http://awsapi.9x9cloud.tv/dev/podcatcher.php";
 	public static String TRANSCODING_SERVER_ALPHA = "http://awsapi.9x9cloud.tv/alpha/podcatcher.php";
 	public static String TRANSCODING_SERVER_BETA = "http://awsapi.9x9cloud.tv/beta/podcatcher.php";
@@ -84,6 +87,7 @@ public class PodcastService {
 		channel.setIntro(podcast.getDescription());
 		channel.setImageUrl(podcast.getImage());
 		channel.setPublic(true);
+		channel.setUpdateDate(podcast.getPubDate());
 		new ChannelManager().save(channel);
 		return channel;
 	}
@@ -96,6 +100,7 @@ public class PodcastService {
 		}
 		channel.setIntro(podcast.getDescription());
 		channel.setImageUrl(podcast.getImage());
+		channel.setUpdateDate(podcast.getPubDate());
 		new ChannelManager().create(channel, mso);
 		return channel;
 	}	
@@ -113,6 +118,7 @@ public class PodcastService {
 		if (item.getThumbnail()!= null) {
 			p.setImageUrl(item.getThumbnail());
 		}		
+		p.setUpdateDate(item.getPubDate());
 		p.setPublic(true);
 		pMngr.save(p);
 	}
@@ -136,6 +142,7 @@ public class PodcastService {
 		if (item.getType().equals(MsoProgram.VIDEO_WEBM)) {
 			p.setWebMFileUrl(item.getEnclosure());
 		}						
+		p.setUpdateDate(item.getPubDate());
 		p.setChannelKey(channel.getKey());
 		p.setChannelId(channel.getKey().getId());
 		p.setPublic(true);
@@ -155,7 +162,8 @@ public class PodcastService {
 	public void submitToTranscodingService(String key, String rss) { 
 		PodcastFeed feed = new PodcastFeed();
 		feed.setKey(key);
-		feed.setRss(rss); 
+		feed.setRss(rss);
+		feed.setCallback(THIS_HOST);
 		System.out.println("Podcast post from player:" + feed.getRss());
 		String urlStr = TRANSCODING_SERVER_ALPHA;
 		NnLib.urlPostWithJson(urlStr, feed);

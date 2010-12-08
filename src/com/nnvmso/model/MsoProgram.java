@@ -8,6 +8,10 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 import com.google.appengine.api.datastore.Key;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 @PersistenceCapable(detachable="true")
 public class MsoProgram implements Serializable {
@@ -164,6 +168,13 @@ public class MsoProgram implements Serializable {
 
 	public Date getUpdateDate() {
 		return updateDate;
+	}
+
+	public String getUpdateDateString() {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM d, yyyy hh:mm a");
+        String pubDate = dateFormat.format(updateDate);
+        System.out.println("getUpdateDate() : UDate = " + pubDate);
+		return pubDate;
 	}
 
 	public void setUpdateDate(Date updateDate) {

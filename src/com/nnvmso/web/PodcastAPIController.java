@@ -85,6 +85,7 @@ public class PodcastAPIController {
 			System.out.println("update enclosure:" + podcastProgram.getKey() + ";" + podcastProgram.getItemKey());
 			podcastService.saveProgramViaPodcast(podcastProgram);
 		}
+		//@todo GET error code to decide the reutnring status
 		System.out.println("Finish itemUpdate");
 		return keys;
 	}
@@ -108,10 +109,12 @@ public class PodcastAPIController {
 	public ResponseEntity<String> channelUpdate(@RequestBody PodcastChannel podcast) {
 		System.out.println("update:" + podcast.getKey());
 		MsoChannel channel = channelMngr.findByKey(podcast.getKey());
+		//@todo check error code for status
 		podcastService.saveChannelViaPodcast(channel, podcast);
 		System.out.println("finish channelUpdate");
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.TEXT_PLAIN);
+		//@todo return processing error code back to AWS
 		return new ResponseEntity<String>("OK", headers, HttpStatus.OK);		
 	}
 

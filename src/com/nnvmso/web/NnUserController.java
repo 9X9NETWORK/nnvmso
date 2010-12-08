@@ -60,7 +60,7 @@ public class NnUserController {
 		}
 		MsoManager msoMngr = new MsoManager();
 		Mso mymso = msoMngr.findByEmail(mso.getEmail());
-		userMngr.create(user, mymso);
+		userMngr.save(user, mymso);
 		subMngr.msoSubscribe(user);
 		
 		status.setComplete();

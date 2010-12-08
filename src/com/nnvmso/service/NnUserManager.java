@@ -82,7 +82,7 @@ public class NnUserManager {
 		MsoManager msoMngr = new MsoManager();
 		msoMngr.findByEmail("default_mso@9x9.com");
 		Mso mso = new Mso();		
-		this.create(user, mso);
+		this.save(user, mso);
 		//subscribe default channel
 		SubscriptionManager sMngr = new SubscriptionManager();
 		ChannelManager cMngr = new ChannelManager();
@@ -92,13 +92,20 @@ public class NnUserManager {
 		return user;		
 	}
 	
-	public void create(NnUser user, Mso mso) {
+	public void save(NnUser user, Mso mso) {
 		user.setSalt(AuthLib.generateSalt());
 		user.setCryptedPassword(AuthLib.encryptPassword(user.getPassword(), user.getSalt()));
 		user.setMsoKey(mso.getKey());
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		pm.makePersistent(user);
 		pm.close();
+	}
+	
+	public void UpdateUser(NnUser user) {
+		MsoManager msoMngr = new MsoManager();
+		msoMngr.findByEmail("default_mso@9x9.com");
+		Mso mso = new Mso();		
+		this.save(user, mso);
 	}
 
 }

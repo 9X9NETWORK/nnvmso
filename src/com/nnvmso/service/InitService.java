@@ -75,7 +75,7 @@ public class InitService {
 		//a user
 		NnUser user = new NnUser("default_user@9x9.com");
 		user.setPassword("9x99x9");
-		userMngr.create(user, mso);
+		userMngr.save(user, mso);
 		//a player
 		Player player = new Player();
 		player.setCode(new Text("<h>hello</h>"));
