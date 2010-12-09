@@ -1888,6 +1888,7 @@ function submit_login()
       escape();
       log_and_alert ('logged in as user: ' + user);
       resume();
+      activated = false;
       fetch_programs();
       }
     else
@@ -1915,6 +1916,7 @@ function submit_signup()
 
   $.post ("/playerAPI/signup", serialized, function (data)
     {
+    log ('signup response: ' + data);
     var fields = data.split ('\t');
     user = fields [1];
     if (fields [0] == "0")
@@ -2312,9 +2314,15 @@ function resume()
 function pause()
   {
   if (physical_is_paused())
+    {
     physical_play();
+    $("#btn-play").css ("background-image", "url(" + root + "btn_pause.svg)");
+    }
   else
+    {
     physical_pause();
+    $("#btn-play").css ("background-image", "url(" + root + "btn_play.svg)");
+    }
   }
 
 function unhide_player (player)
@@ -2344,6 +2352,7 @@ function physical_start_play (url)
     start_play_fp (url);
 
   update_bubble();
+  $("#btn-play").css ("background-image", "url(" + root + "btn_pause.svg)");
   }
 
 function start_play_yt (url)
@@ -2397,6 +2406,13 @@ function jw_state_change()
   jw_previous_state = state;
 
   log ('jwplayer state is: ' + state + ', previous state was: ' + previous);
+
+  if (state == 'COMPLETED' && previous != 'COMPLETED')
+    {
+    log ('jw now completed');
+    $("#loading").hide();
+    ended_callback();
+    }
 
   if (state == 'IDLE' && previous != 'IDLE')
     {
@@ -2664,6 +2680,9 @@ function formatted_time (t)
 
 function switch_to_control_layer()
   {
+  $('#' + control_buttons [control_cursor]).removeClass ("on");
+  control_cursor = 2;
+  $('#' + control_buttons [control_cursor]).addClass ("on");
   $("#ch-layer").hide();
   $("#ep-layer").hide();
   control_saved_thumbing = thumbing;
