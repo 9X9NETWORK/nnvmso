@@ -63,6 +63,8 @@ var channel_cursor = 1;
 var programgrid = {};
 var program_line = {};
 var n_program_line = 0;
+var program_cursor = 1;
+var program_first = 1;
 
 var ipg_cursor;
 
@@ -72,6 +74,7 @@ var n_browse = 0;
 var saved_thumbing = '';
 var control_saved_thumbing = '';
 var browse_cursor = 1;
+var max_programs_in_line = 9;
 
 /* timeout for program or channel index */
 var osd_timex = 0;
@@ -552,8 +555,8 @@ function update_bubble()
   // $("#left-row-num").html (previous_category (current_category));
   // $("#right-row-num").html (next_category (current_category));
 
-  $("#left-row-num").html (Math.floor (current_category) - 1 == 0 ? 9 : current_category - 1);
-  $("#right-row-num").html (Math.floor (current_category) + 1 == 10 ? 1 : current_category + 1);
+  $("#left-row-num").html (Math.floor (current_category) - 1 == 0 ? 9 : Math.floor (current_category) - 1);
+  $("#right-row-num").html (Math.floor (current_category) + 1 == 10 ? 1 : Math.floor (current_category) + 1);
   }
 
 function switch_to_channel_thumbs()
@@ -600,69 +603,48 @@ function enter_channel()
     if (programgrid [p]['channel'] == real_channel)
       {
       program_line [++n_program_line] = p;
-
-      var age = ''
-      if (programgrid [p]['timestamp'] != '')
-        {
-        var d = new Date (Math.floor (programgrid [p]['timestamp']));
-        var minutes = Math.floor ((now.getTime() - d.getTime()) / 1000 / 60);
-        if (minutes > 59)
-          {
-          var hours = Math.floor ((minutes + 1) / 60);
-          age = hours + (hours == 1 ? ' hour' : ' hours');
-          }
-        else
-          age = minutes + (minutes == 1 ? ' minute' : ' minutes');
-        }
-      else
-        age = '(ageless)'
-
-      // html += '<li id="p-li-' + n_program_line + '"><img id="p-th-"' + n_program_line + '" src="' + programgrid [p]['thumb'] + '"></li>';
-      var onoff = n_program_line == program_cursor ? 'class="on" ' : '';
-      onoff = '';
-      html += '<li ' + onoff + 'id="p-li-' + n_program_line + '"><img src="' + programgrid [p]['thumb'] + '">'
-      html += '<p class="timestamp unseen">' + age + '</p><p class="duration">0:00</p></li>';
-
-      if (n_program_line >= 9)
-        break;
+      //if (n_program_line >= max_programs_in_line)
+      //  break;
       }
     }
 
-    $("#ep-layer").css ("opacity", "0");
-    $("#ep-layer").css ("display", "block");
+  html = ep_html();
 
-    // $("#ep-swish").css ("opacity", "0");
-    $("#ep-swish").css ("top", "5.125em");
-    $("#ep-swish").css ("display", "block");
+  $("#ep-layer").css ("opacity", "0");
+  $("#ep-layer").css ("display", "block");
 
-    var phase_in_pp =
-      {
-      //opacity: "1",
-      //top: "0em"
-      top: "1.4275em"
-      };
+  // $("#ep-swish").css ("opacity", "0");
+  $("#ep-swish").css ("top", "5.125em");
+  $("#ep-swish").css ("display", "block");
 
-    var phase_out_cc =
-      {
-      //opacity: "0",
-      top: "-6.1875em" 
-      };
+  var phase_in_pp =
+    {
+    //opacity: "1",
+    //top: "0em"
+    top: "1.4275em"
+    };
 
-    if (thumbing == 'control')
-      $("#control-layer").animateWithCss ({ opacity: "0" }, 500, "ease-in-out", function() { $("#control-layer").hide(); $("#control-layer").css ("opacity", "1"); });
+  var phase_out_cc =
+    {
+    //opacity: "0",
+    top: "-6.1875em" 
+    };
 
-    $("#ep-layer").animateWithCss ({ opacity: "1" }, 500, "ease-in-out", function() {});
-    $("#ch-layer").animateWithCss ({ opacity: "0" }, 500, "ease-in-out", function() { $("#ch-layer").css ("opacity", "1"); });
+  if (thumbing == 'control')
+    $("#control-layer").animateWithCss ({ opacity: "0" }, 500, "ease-in-out", function() { $("#control-layer").hide(); $("#control-layer").css ("opacity", "1"); });
 
-    $("#ep-swish").animateWithCss (phase_in_pp, 500, "ease-in-out", function() {});
+  $("#ep-layer").animateWithCss ({ opacity: "1" }, 500, "ease-in-out", function() {});
+  $("#ch-layer").animateWithCss ({ opacity: "0" }, 500, "ease-in-out", function() { $("#ch-layer").css ("opacity", "1"); });
 
-    $("#ch-swish-" + current_category).animateWithCss (phase_out_cc, 500, "ease-in-out", function()
-      {
-      $("#ch-swish-" + current_category).css ("display", "none");
-      $("#ch-swish-" + current_category).css ("top", "1.4375em");
-      //$("#ch-swish-" + current_category).css ("opacity", "1");
-      $("#ch-layer").css ("display", "none");
-      });
+  $("#ep-swish").animateWithCss (phase_in_pp, 500, "ease-in-out", function() {});
+
+  $("#ch-swish-" + current_category).animateWithCss (phase_out_cc, 500, "ease-in-out", function()
+    {
+    $("#ch-swish-" + current_category).css ("display", "none");
+    $("#ch-swish-" + current_category).css ("top", "1.4375em");
+    //$("#ch-swish-" + current_category).css ("opacity", "1");
+    $("#ch-layer").css ("display", "none");
+    });
 
   $("#ep-list").html (html);
 
@@ -671,7 +653,7 @@ function enter_channel()
   thumbing = 'program';
 
   redraw_program_line();
-ShowArrows();
+  ShowArrows();
 
   reset_osd_timex();
   }
@@ -690,6 +672,42 @@ function enter_channel_failsafe()
     $("#ep-layer").show();
     }
   turn_off_ancillaries();
+  ShowArrows();
+  }
+
+function ep_html()
+  {
+  var html = '';
+  var now = new Date();
+
+  for (var i = program_first; i <= n_program_line && i < program_first + max_programs_in_line; i++)
+    {
+    program = programgrid [program_line [i]];
+
+    var age = ''
+    if (program ['timestamp'] != '')
+      {
+      var d = new Date (Math.floor (program ['timestamp']));
+      var minutes = Math.floor ((now.getTime() - d.getTime()) / 1000 / 60);
+      if (minutes > 59)
+        {
+        var hours = Math.floor ((minutes + 1) / 60);
+        age = hours + (hours == 1 ? ' hour' : ' hours');
+        }
+      else
+        age = minutes + (minutes == 1 ? ' minute' : ' minutes');
+      }
+    else
+      age = '(ageless)'
+
+    // html += '<li id="p-li-' + i + '"><img id="p-th-"' + i + '" src="' + program ['thumb'] + '"></li>';
+    var onoff = (i == program_cursor) ? 'class="on" ' : '';
+    onoff = '';
+    html += '<li ' + onoff + 'id="p-li-' + i + '"><img src="' + program ['thumb'] + '">'
+    html += '<p class="timestamp unseen">' + age + '</p><p class="duration">0:00</p></li>';
+    }
+
+  return html;
   }
 
 var old_cline;
@@ -813,7 +831,7 @@ function enter_category (cat, positioning)
     channel_cursor = n_channel_line;
 
   redraw_channel_line();
-ShowArrows();
+  ShowArrows();
   reset_osd_timex();
   }
 
@@ -830,6 +848,7 @@ function enter_category_failsafe()
     }
 
   turn_off_ancillaries();
+  ShowArrows();
   }
 
 function ch_html (cat)
@@ -910,9 +929,12 @@ function ShowArrows()
   else if (thumbing == 'program')
     {
     pos2 = $(".ep-list li.on").offset();
-    d2 = ((90-21)/2)* $(window).width()/16/64;
-    l2 = pos2.left + d2;
-    $("#ep-layer .arrow-up").show().css("left",l2);
+    if (pos2 != null)
+      {
+      d2 = ((90-21)/2)* $(window).width()/16/64;
+      l2 = pos2.left + d2;
+      $("#ep-layer .arrow-up").show().css("left",l2);
+      }
     }
   //log ("-ShowArrows");
   }
@@ -1139,6 +1161,8 @@ function keypress (keycode)
         extend_ch_layer();
         return;
         }
+      else
+        reset_osd_timex();
       }
     else if (thumbing == 'program')
       {
@@ -1148,6 +1172,8 @@ function keypress (keycode)
         extend_ep_layer();
         return;
         }
+      else
+        reset_osd_timex();
       }
     }
 
@@ -1301,7 +1327,7 @@ function clear_osd_timex()
 function reset_osd_timex()
   {
   clear_osd_timex();
-  osd_timex = setTimeout ("osd_timex_expired()", 7000);
+  osd_timex = setTimeout ("osd_timex_expired()", 10000);
   }
 
 function osd_timex_expired()
@@ -1711,7 +1737,7 @@ function program_left()
   if (program_cursor > 1)
     program_cursor--;
   else
-    program_cursor = n_program_line;
+    return;
 
   redraw_program_line();
   play_program();
@@ -1720,7 +1746,20 @@ function program_left()
 function redraw_program_line()
   {
   log ('redraw program line');
-  for (var i = 1; i <= n_program_line; i++)
+
+  if (program_cursor < program_first)
+    {
+    --program_first;
+    $("#ep-list").html (ep_html());
+    }
+  else if (program_cursor >= program_first + max_programs_in_line)
+    {
+    ++program_first;
+    $("#ep-list").html (ep_html());
+    }
+
+  log ('redraw program line');
+  for (var i = program_first; i <= n_program_line && i < program_first + max_programs_in_line; i++)
     {
     var dd = document.getElementById ("p-li-" + i);
     if (i == program_cursor)
