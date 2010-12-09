@@ -61,7 +61,7 @@ var n_channel_line = 0;
 var channel_cursor = 1;
 
 var programgrid = {};
-var program_line = {};
+var program_line = [];
 var n_program_line = 0;
 var program_cursor = 1;
 var program_first = 1;
@@ -567,7 +567,7 @@ function switch_to_channel_thumbs()
 
 function enter_channel()
   {
-  program_line = {};
+  program_line = [];
 
   log ('enter channel');
 
@@ -601,12 +601,13 @@ function enter_channel()
   for (p in programgrid)
     {
     if (programgrid [p]['channel'] == real_channel)
-      {
-      program_line [++n_program_line] = p;
-      //if (n_program_line >= max_programs_in_line)
-      //  break;
-      }
+      program_line [n_program_line++] = p;
     }
+
+  // log ('PX: ' + program_line);
+  program_line = program_line.sort (function (a,b) { return Math.floor (programgrid [b]['timestamp']) - Math.floor (programgrid [a]['timestamp']) });
+  program_line.unshift ('');
+  // log ('PY: ' + program_line);
 
   html = ep_html();
 
@@ -682,7 +683,7 @@ function ep_html()
 
   for (var i = program_first; i <= n_program_line && i < program_first + max_programs_in_line; i++)
     {
-    program = programgrid [program_line [i]];
+    var program = programgrid [program_line [i]];
 
     var age = ''
     if (program ['timestamp'] != '')
@@ -1050,6 +1051,9 @@ function first_channel()
 
 function first_program_in (channel)
   {
+  var programs = [];
+  var n_programs = 0;
+
   if (! (channel in channelgrid))
     {
     log_and_alert ('channel ' + channel + ' not in channelgrid');
@@ -1061,10 +1065,22 @@ function first_program_in (channel)
   for (p in programgrid)
     {
     if (programgrid [p]['channel'] == real_channel)
-      return p;
+      programs [n_programs++] = p;
     }
 
-  log ('No programs in channel: ' + channel + "(" + real_channel + ")");
+  if (programs.length < 1)
+    {
+    log ('No programs in channel: ' + channel + "(" + real_channel + ")");
+    return undefined;
+    }
+
+  // unshift here is to match what is in program_line
+  // log ('AX: ' + programs);
+  programs = programs.sort (function (a,b) { return Math.floor (programgrid [b]['timestamp']) - Math.floor (programgrid [a]['timestamp']) });
+  programs.unshift ('');
+  // log ('AY: ' + programs);
+
+  return programs [1];
   }
 
 function kp (e)
