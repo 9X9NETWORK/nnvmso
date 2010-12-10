@@ -68,6 +68,9 @@ var program_first = 1;
 
 var ipg_cursor;
 
+/* cache this for efficiency */
+var loglayer;
+
 /* browse */
 var browsables = {};
 var n_browse = 0;
@@ -164,13 +167,53 @@ function ipg_fixup_middle()
 
 function log (text)
   {
+  if (text.match (/\n/))
+    {
+    var appendage = '';
+    var lines = text.split ('\n');
+
+    for (var i = 0; i < lines.length; i++)
+      {
+      try
+        {
+        if (window.console && console.log)
+          console.log (lines [i]);
+        }
+      catch (error)
+        {
+        }
+
+      appendage += lines [i] + '<br>';
+      }
+
+    loglayer.innerHTML += appendage;
+    return;
+    }
+
   try
     {
     if (window.console && console.log)
       console.log (text);
 
-    var loglayer = document.getElementById ("log-layer");
+    if (!loglayer)
+      loglayer = document.getElementById ("log-layer");
+
     loglayer.innerHTML += text + '<br>';
+    }
+  catch (error)
+    {
+    }
+  }
+
+function logline (text)
+  {
+  try
+    {
+    if (window.console && console.log)
+      console.log (text);
+
+    if (!loglayer)
+      loglayer = document.getElementById ("log-layer");
     }
   catch (error)
     {
@@ -222,6 +265,7 @@ function parse_program_data (data)
   {
   // 0=channel-id 1=program-id 2=program-name 3=program-type 4=program-thumb-url 5=program-url1 6=program-url2
 
+    var logtext = '';
     var now = new Date();
 
     var lines = data.split ('\n');
@@ -231,10 +275,7 @@ function parse_program_data (data)
       if (lines [i] != '')
         {
         var fields = lines[i].split ('\t');
-        log ("program line " + i + ": " + fields[0] + ' = ' + lines [i]);
-
-        if (fields [5] == 'null')
-          fields [5] = '';
+        logtext += "program line " + i + ": " + fields[0] + ' = ' + lines [i] + '\n';
 
         if (fields.length <= 6 || (fields.length > 6 && fields [6] == 'null'))
           fields [6] = '';
@@ -245,17 +286,14 @@ function parse_program_data (data)
         if (fields [3] == 'slideshow')
           fields [5] = 'slideshow:' + fields [5];
 
-        //if (navigator.userAgent.match (/(GoogleTV|Droid Build)/i))
-        //fields[5] = fields[5].replace (/webm$/, 'mp4');
-
         fields [5] = 'jw:' + fields [5];
         fields [6] = 'jw:' + fields [6];
 
         programgrid [fields [1]] = { 'channel': fields[0], 'url1': fields[5], 'url2': fields[6], 'name': fields[2], 'type': fields[3], 'thumb': fields[4], 'timestamp': fields [7] };
         }
-      else
-        log ("ignoring program line " + i + ": " + lines [i]);
       }
+
+  log (logtext);
   }
 
 function fetch_channels()
@@ -2426,25 +2464,25 @@ function jw_state_change()
   if (state == 'COMPLETED' && previous != 'COMPLETED')
     {
     log ('jw now completed');
-    $("#loading").hide();
+    // $("#loading").hide();
     ended_callback();
     }
 
   if (state == 'IDLE' && previous != 'IDLE')
     {
     log ('jw now idle');
-    $("#loading").hide();
+    // $("#loading").hide();
     ended_callback();
     }
 
   else if (state == 'BUFFERING')
     {
-    $("#loading").show();
+    // $("#loading").show();
     }
 
   else if (state == 'PLAYING')
     {
-    $("#loading").hide();
+    // $("#loading").hide();
     }
   }
 
