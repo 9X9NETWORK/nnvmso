@@ -12,7 +12,7 @@ import com.nnvmso.service.*;
 @Controller
 @RequestMapping("player")
 public class PlayerController {
-		
+	
 	@RequestMapping("zooatomics")
 	public String zooatomics(HttpServletRequest req, HttpServletResponse resp) {		
 		if (CookieHelper.getCookie(req, "platform") == null) {

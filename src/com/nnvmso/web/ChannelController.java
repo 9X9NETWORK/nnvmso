@@ -95,7 +95,7 @@ public class ChannelController {
     }
 	
 	@RequestMapping(value="podcast", method=RequestMethod.POST)
-	public String podcastSubmit(@ModelAttribute("channel") MsoChannel channel, HttpSession session, SessionStatus status) {		
+	public String podcastSubmit(@ModelAttribute("channel") MsoChannel channel, HttpSession session, SessionStatus status, HttpServletRequest req) {		
 		Mso mso = (Mso)auth.getAuthSession(session, "mso");
 		PodcastService podcastService = new PodcastService();
 		MsoChannel podcastChannel = podcastService.findByPodcast(channel.getPodcast());
@@ -107,7 +107,7 @@ public class ChannelController {
 			} else {			
 				podcastChannel = podcastService.getDefaultPodcastChannel(channel.getPodcast());
 				podcastChannel = channelMngr.create(podcastChannel, mso);
-				podcastService.submitToTranscodingService(NnLib.getKeyStr(podcastChannel.getKey()), podcastChannel.getPodcast());
+				podcastService.submitToTranscodingService(NnLib.getKeyStr(podcastChannel.getKey()), podcastChannel.getPodcast(), req);
 			}
 		}
 		status.setComplete();

@@ -52,7 +52,7 @@ public class AdminController {
 		service.init();
 		return "hello/hello";
 	}
-		
+			
 	@RequestMapping(value="createChannels")
 	public String createChannels() {
 		InitService service = new InitService();

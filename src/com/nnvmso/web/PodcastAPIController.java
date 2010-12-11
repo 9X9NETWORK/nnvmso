@@ -13,9 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.nnvmso.json.PodcastChannel;
-import com.nnvmso.json.PodcastKeys;
-import com.nnvmso.json.PodcastProgram;
+import com.nnvmso.json.*;
 import com.nnvmso.lib.NnLib;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoProgram;
@@ -24,7 +22,7 @@ import com.nnvmso.service.PodcastService;
 
 /**
  * <p>Serves for Transcoding Service.</p>
- * <p>Url examples: (notice method name is used at the end of URL) <br/> 
+ * <p>Url examples: (method name is used at the end of URL) <br/> 
  * http://hostname:port/podcastAPI/itemUpdate<br/>
  * http://hostname:port/podcastAPI/channelUpdate<br/>
  * <p/>
@@ -74,20 +72,15 @@ public class PodcastAPIController {
      *  } 
 	 */
 	@RequestMapping("itemUpdate")
-	public @ResponseBody PodcastKeys itemUpdate(@RequestBody PodcastProgram podcastProgram) {
-		PodcastKeys keys = new PodcastKeys();		
-		if (podcastProgram.getAction().equals(PodcastProgram.ACTION_UPDATE_ITEM)) {
-			System.out.println("update item:" + podcastProgram.getKey());
-			MsoProgram p = podcastService.createProgramViaPodcast(podcastProgram);
-			keys.setKey(podcastProgram.getKey());
-			keys.setItemKey(NnLib.getKeyStr(p.getKey()));			
-		} else {
-			System.out.println("update enclosure:" + podcastProgram.getKey() + ";" + podcastProgram.getItemKey());
-			podcastService.saveProgramViaPodcast(podcastProgram);
+	public @ResponseBody PodcastResponse itemUpdate(@RequestBody PodcastProgram podcastProgram) {
+		PodcastResponse resp = new PodcastResponse();				
+		MsoProgram p = podcastService.createProgramViaPodcast(podcastProgram);
+		if (p == null) {
+			resp.setErrorCode(PodcastResponse.ERROR_CODE_FAIL);
+			resp.setErrorCode(PodcastResponse.ERROR_MSG_FAIL);
 		}
-		//@todo GET error code to decide the reutnring status
 		System.out.println("Finish itemUpdate");
-		return keys;
+		return resp;
 	}
 	
 	/**

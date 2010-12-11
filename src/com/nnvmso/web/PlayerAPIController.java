@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,6 +20,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.nnvmso.lib.*;
 import com.nnvmso.model.*;
 import com.nnvmso.service.*;
+
+//!!!!! exception handling, return a better message
 
 /**
  * <p>Serves for Player.</p>
@@ -31,7 +34,21 @@ import com.nnvmso.service.*;
 @Controller
 @RequestMapping("playerAPI")
 public class PlayerAPIController {
+
+	@ExceptionHandler(NullPointerException.class)
+	public String nullPointer(Exception e) {
+		System.out.println("enter null pointer");
+		return "hello/hello";
+	}
+
+	@RequestMapping("nullPointer")
+	public String throwNullPointer() {
+		System.out.println("null pointer throws!");
+		throw new NullPointerException();
+	}
+		
 	/* ==========  CATEGORY: ACCOUNT RELATED ========== */
+	//user info
 	/**
 	 * User login.
 	 * 
@@ -110,7 +127,7 @@ public class PlayerAPIController {
 						user.setEmail(email);
 						user.setPassword(password);
 						user.setName(name);
-						userMngr.UpdateUser(user);
+						userMngr.updateUser(user);
 					} else {
 						System.out.println("signup() : 2nd or more time signup ");
 						user.setEmail(email);
@@ -177,7 +194,8 @@ public class PlayerAPIController {
 		return new ResponseEntity<String>(output, headers, HttpStatus.OK);				
 	}
 		
-	/* ==========  CATEGORY: CHANNEL BROWSING ========== */		
+	/* ==========  CATEGORY: CHANNEL BROWSING ========== */
+	//!!!!! return those user does not have
 	/**
 	 * Browse all the on-air channels.
 	 * 
@@ -298,7 +316,6 @@ public class PlayerAPIController {
 	 *  http://localhost:8888/playerAPI/programInfo?channel=153,158 <br/>
 	 *  http://localhost:8888/playerAPI/programInfo?channel=153 <br/>
 	 * </p> 
-	 *  
 	 * @param  channel (1)Could be *, all the programs, e.g. channel=* (user is required for wildcard query). 
 	 * 		           (2)Could be a channel Id, e.g. channel=1 <br/>
 	 * 		           (3)Could be list of channels, e.g. channels = 34,35,36.
@@ -306,7 +323,8 @@ public class PlayerAPIController {
 	 * @return A string of all the programs' info that met the query criteria. <br/>
 	 * 		   Each program is separate by carriage return. Each program's information is tab delimited.<br/>
 	 * 		   Program info has: channelId, programId, programName, programType, programThumbnailUrl, url1(mpeg4/slideshow), url2(webm)
-	 */				
+	 */
+	 //@todo channel equals star and no user token, return missing param 	
 	@RequestMapping("programInfo")	
 	public ResponseEntity<String> programInfo(@RequestParam(value="channel") String channel,
 									        @RequestParam(value="user", required = false) String user,
@@ -329,13 +347,24 @@ public class PlayerAPIController {
 		for (MsoProgram p : programs) {
 			String url1 = p.getMpeg4FileUrl();
 			String url2 = p.getWebMFileUrl();
+			String url3 = p.getOtherFileUrl();
+			String url4 = p.getAudioFileUrl();
 			System.out.println("hostname=" + req.getLocalAddr() + ";" + req.getLocalPort() + ";" + req.getRequestURI());
 			
 			if (p.getType().equals(MsoProgram.TYPE_SLIDESHOW)) {
 				url1 = "/player/nnscript?program=" + p.getId();
 			}
-			String[] ori = {String.valueOf(p.getChannelId()), String.valueOf(p.getKey().getId()), p.getName(), 
-					p.getType(), p.getImageUrl(), url1, url2, String.valueOf(p.getUpdateDate().getTime())};
+			String[] ori = {String.valueOf(p.getChannelId()), 
+					        String.valueOf(p.getKey().getId()), 
+					        p.getName(), 
+					        p.getType(), 
+					        p.getImageUrl(),
+					        //p.getImageLargeUrl(),
+					        url1, 
+					        url2, 
+					        //url3, 
+					        //url4, 
+					        String.valueOf(p.getUpdateDate().getTime())};
 			output = output + PlayerLib.getTabDelimitedStr(ori);
 			output = output + "\n";
 		}
@@ -354,9 +383,9 @@ public class PlayerAPIController {
 	 * 
 	 * @param podcastRSS a podcast RSS feed
 	 * @param user user's unique identifier
-	 * @param grid grid location
+	 * @param grid grid location //overwrite!!!!
 	 * 
-	 * @return A string of return code and channel id, tab delimited. <br/>
+	 * @return A string of return code and channel id, tab delimited. <br/> !!!!!!!!
 	 * 	       Failed operation will return return code and error message.
 	 */
 	@RequestMapping(value="podcastSubmit", method=RequestMethod.POST)
@@ -391,7 +420,7 @@ public class PlayerAPIController {
 				//create channel
 				channel = podcastService.getDefaultPodcastChannel(rssStr);
 				MsoChannel saved = new ChannelManager().create(channel, mso);
-				podcastService.submitToTranscodingService(NnLib.getKeyStr(saved.getKey()), rssStr);
+				podcastService.submitToTranscodingService(NnLib.getKeyStr(saved.getKey()), rssStr, req);
 				System.out.println("submit to transcoding service=" + rssStr);
 				//automatically subscribe to this channel
 				SubscriptionManager sMngr = new SubscriptionManager();
