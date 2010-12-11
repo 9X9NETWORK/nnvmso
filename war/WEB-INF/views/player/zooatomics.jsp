@@ -19,6 +19,39 @@
   display: none;
 }
 
+#msg-end-of-channel {
+  position: absolute;
+  display: inline-block;
+  left: 16.375em;
+  top: 8.625em;
+  z-index: 20;
+}
+
+#msg-end-of-channel {
+  padding: 1.25em;
+  width: 31.25em;
+  background: #666 url(http://zoo.atomics.org/video/9x9playerV15/bg_msg.svg) 0 0 repeat-x;
+  background-size: auto 100%;
+  border: #444 0.0625em solid;
+  -moz-border-radius: 0.3125em; /* FF1+ */
+  -webkit-border-radius: 0.3125em; /* Saf3+, Chrome */
+  border-radius: 0.3125em; /* Opera 10.5, IE 9 */
+  filter: alpha(Opacity=80); 
+  opacity: 0.8;
+  overflow: hidden;
+  position: absolute;
+  left: 20em;
+  top: 4.625em;
+  width: 20em;
+  z-index: 20;
+  display: none;
+}
+
+#msg-end-of-channel p {
+  font-size: 0.75em;
+  color: #fff;
+  text-align: center;
+}
 </style>
 
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
@@ -268,6 +301,7 @@ function parse_program_data (data)
   log ('number of programs obtained: ' + lines.length);
   for (var i = 0; i < lines.length; i++)
     {
+    // log (lines [i]);
     if (lines [i] != '')
       {
       var fields = lines[i].split ('\t');
@@ -325,12 +359,16 @@ function fetch_channels()
 function activate()
   {
   activated = true;
-  reset_category_dots();
   enter_category (1, 'b');
   elastic();
   play_first_program_in (first_channel());
+  enter_channel();
+  $("#ep-layer").hide();
   document.onkeydown=kp;
   redraw_ipg();
+  switch_to_ipg();
+  $("#notblue").show();
+  $("#blue").hide();
   preload_control_images()
   }
 
@@ -344,24 +382,13 @@ function preload_control_images()
   $("#preload-control-images").html (html);
   }
 
-function old_reset_category_dots()
-  {
-  for (var i = 1; i <= 9; i++)
-    {
-    if (channels_in_category (i) > 0)
-      $("#c" + i).css ("background", "#999");
-    else
-      $("#c" + i).css ("background", "#484848");
-    }
-  }
-
 function best_url (program)
   {
   var desired;
 
-  if (! (current_program in programgrid))
+  if (! (program in programgrid))
     {
-    log ('current program not in programgrid!');
+    log ('program not in programgrid!');
     return '';
     }
 
@@ -379,20 +406,19 @@ function best_url (program)
 
   ext = new RegExp ('\.' + desired + '$');
 
-  if (programgrid [current_program]['url1'].match (desired))
+  if (programgrid [program]['url1'].match (desired))
     {
-    log ('url1 preference');
-    return programgrid [current_program]['url1'];
+    return programgrid [program]['url1'];
     }
-  else if (programgrid [current_program]['url2'].match (desired))
+  else if (programgrid [program]['url2'].match (desired))
     {
-    log ('url2 preference');
-    return programgrid [current_program]['url2'];
+    return programgrid [program]['url2'];
     }
   else
     {
-    log ('fallback to url1');
-    return programgrid [current_program]['url1'];
+    if (programgrid [program]['url1'] == 'null' || programgrid [program]['url1'] == 'jw:null')
+      return '';
+    return programgrid [program]['url1'];
     }
   }
 
@@ -414,12 +440,29 @@ function clear_msg_timex()
     msg_timex = 0;
     }
   $("#msg-layer").hide();
+  $("#msg-end-of-channel").hide();
   }
 
 function message (text, duration)
   {
   $("#msg-layer").html ('<p>' + text + '</p>');
   $("#msg-layer").show();
+
+  if (duration > 0)
+    msg_timex = setTimeout ("empty_channel_timeout()", duration);
+  }
+
+function end_message (duration)
+  {
+  var square = parseInt (channel_line [channel_cursor]);
+
+  var prev = previous_channel_square (square);
+  var next = next_channel_square (square);
+
+  $("#left-tease").attr ("src", channelgrid [prev]['thumb']);
+  $("#right-tease").attr ("src", channelgrid [next]['thumb']);
+
+  $("#msg-end-of-channel").show();
 
   if (duration > 0)
     msg_timex = setTimeout ("empty_channel_timeout()", duration);
@@ -434,7 +477,7 @@ function play()
   if (url == '')
     {
     log ('empty channel, displaying notice for 3 seconds')
-    message ("No programs in this channel", 3000);
+    end_message (10000);
     return;
     }
 
@@ -543,6 +586,7 @@ function empty_channel_timeout()
   {
   msg_timex = 0;
   $("#msg-layer").hide();
+  $("#msg-end-of-channel").hide();
   log ('auto-switching from empty channel');
   channel_right();
   }
@@ -587,7 +631,7 @@ function switch_to_channel_thumbs()
   thumbing = 'channel';
   }
 
-function enter_channel()
+function prepare_channel()
   {
   program_line = [];
 
@@ -602,41 +646,34 @@ function enter_channel()
     return;
     }
 
-  var html = "";
   n_program_line = 0;
-
-  // NEW FORMAT
-  // <li class="on"><img src="images-x1/bg_ep.png" class="ebg"><img src="thumb/14.jpeg" class="thumb"></li>
-  // <li><img src="images-x1/bg_ep.png" class="ebg"><img src="thumb/06.jpg" class="thumb"></li>
-  // <li class="empty"><img src="images-x1/bg_ep.png" class="ebg"></li>
-
-//  <ul class="ep-list">
-// <li class="on">
-// <img src="thumb/14.jpeg">
-// <p class="timestamp unseen">Today</p>
-// <p class="duration">10:11</p>
-// </li>
-// <li><img src="thumb/06.jpg"><p class="timestamp">Today</p><p class="duration">0:00</p></li><li><img src="thumb/08.jpg"><p class="timestamp">Yesterday</p><p class="duration">10:11</p></li><li><img src="thumb/04.jpg"><p class="timestamp">3 days ago</p><p class="duration">10:11</p></li><li><img src="thumb/13.jpg"><p class="timestamp">1 week ago</p><p class="duration">10:11</p></li><li><img src="thumb/10.jpg"><p class="timestamp">2 weeks ago</p><p class="duration">10:11</p></li><li><img src="thumb/16.jpg"><p class="timestamp">3 weeks ago</p><p class="duration">10:11</p></li><li><img src="thumb/17.jpg"><p class="timestamp">1 month ago</p><p class="duration">10:11</p></li><li class="empty"></li></ul>
-
-  var now = new Date();
 
   for (var p in programgrid)
     {
     if (programgrid [p]['channel'] == real_channel)
       program_line [n_program_line++] = p;
+
+    var image = new Image();
+    image.src = programgrid [p]['thumb'];
     }
 
-  // log ('PX: ' + program_line);
   program_line = program_line.sort (function (a,b) { return Math.floor (programgrid [b]['timestamp']) - Math.floor (programgrid [a]['timestamp']) });
   program_line.unshift ('');
-  // log ('PY: ' + program_line);
 
-  html = ep_html();
+  $("#ep-swish").show();
+  $("#ep-layer").show();
+  $("#ep-list").html (ep_html());
+
+  redraw_program_line();
+  }
+
+function enter_channel()
+  {
+  prepare_channel();
 
   $("#ep-layer").css ("opacity", "0");
   $("#ep-layer").css ("display", "block");
 
-  // $("#ep-swish").css ("opacity", "0");
   $("#ep-swish").css ("top", "5.125em");
   $("#ep-swish").css ("display", "block");
 
@@ -669,7 +706,7 @@ function enter_channel()
     $("#ch-layer").css ("display", "none");
     });
 
-  $("#ep-list").html (html);
+  // $("#ep-list").html (html);
 
   setTimeout ("enter_channel_failsafe()", 500);
 
@@ -711,11 +748,17 @@ function ep_html()
     if (program ['timestamp'] != '')
       {
       var d = new Date (Math.floor (program ['timestamp']));
-      var minutes = Math.floor ((now.getTime() - d.getTime()) / 1000 / 60);
+      var minutes = Math.floor ((now.getTime() - d.getTime()) / 60 / 1000);
       if (minutes > 59)
         {
         var hours = Math.floor ((minutes + 1) / 60);
-        age = hours + (hours == 1 ? ' hour' : ' hours');
+        if (hours >= 24)
+          {
+          var days = Math.floor ((hours + 1) / 24);
+          age = days + (days == 1 ? ' day' : ' days');
+          }
+        else
+          age = hours + (hours == 1 ? ' hour' : ' hours');
         }
       else
         age = minutes + (minutes == 1 ? ' minute' : ' minutes');
@@ -839,13 +882,8 @@ function enter_category (cat, positioning)
   $("#ch-list-" + cat).html (html);
   $("#ch-layer").css ("display", "block");
 
-  reset_category_dots();
-
   for (var y = 1; y <= 9; y++)
     $("#ch-swish-" + y).css ("display", y == cat ? "block" : "none");
-
-  $("#notblue").show();
-  $("#blue").hide();
 
   /* position at beginning or ending */
   if (positioning == 'b')
@@ -912,42 +950,19 @@ function ch_html (cat)
   return html;
   }
 
-function reset_category_dots (cat)
-  {
-  return;
-
-  var dotsize;
-  var html = "";
-
-  for (var y = 1; y <= 9; y++)
-    {
-    if (channels_in_category (y) == 0)
-      dotsize = ' class="empty"';
-    else if (y == current_category)
-      dotsize = ' class="on"';
-    else if (y == current_category - 1 || y == current_category + 1)
-      dotsize = ' class="next"';
-    else
-      dotsize = '';
-
-    html += '<li' + dotsize + '><span class="dot"></span></li>';
-    }
-
-  $("#cg-tabs").html (html);
-  }
-
 function ShowArrows()
   {
   elastic_innards();
 
-  //log ("+ShowArrows");
   if (thumbing == 'channel')
     {
     pos1 = $(".ch-list li.on").offset();
-    //log ('pos1.left: ' + pos1.left);
-    d1 = ((94-21)/2)* $(window).width()/16/64;
-    l1 = pos1.left + d1;
-    $("#ch-layer .arrow-up, #ch-layer .arrow-down").show().css("left",l1);
+    if (pos1 != null)
+      {
+      d1 = ((94-21)/2)* $(window).width()/16/64;
+      l1 = pos1.left + d1;
+      $("#ch-layer .arrow-up, #ch-layer .arrow-down").show().css("left",l1);
+      }
     }
   else if (thumbing == 'program')
     {
@@ -959,14 +974,12 @@ function ShowArrows()
       $("#ep-layer .arrow-up").show().css("left",l2);
       }
     }
-  //log ("-ShowArrows");
   }
 
 function next_channel_square (channel)
   {
   for (var i = channel + 1; i <= 99; i++)
     {
-log ("trying: " + i);
     if (i in channelgrid)
       return i;
     }
@@ -1010,7 +1023,8 @@ function programs_in_channel (channel)
 
 function next_category()
   {
-  log ('nxcat');
+  log ('next category');
+
   for (var cat = current_category + 1; cat <= 9; cat++)
     {
     if (channels_in_category (cat) > 0)
@@ -1028,6 +1042,8 @@ function next_category()
 
 function previous_category()
   {
+  log ('previous category');
+
   for (var cat = current_category - 1; cat >= 1; cat--)
     {
     if (channels_in_category (cat) > 0)
@@ -1105,14 +1121,6 @@ function first_program_in (channel)
   return programs [1];
   }
 
-function kp (e)
-  {
-  var ev = e || window.event;
-  log (ev.type + " keycode=" + ev.keyCode);
-
-  keypress (ev.keyCode);
-  }
-
 function escape()
   {
   var layer;
@@ -1152,12 +1160,14 @@ function escape()
 
   else if (thumbing == 'ipg' || thumbing == 'control')
     {
-    thumbing = 'channel';
+    thumbing = 'program';
+    prepare_channel();
     }
 
   $("#mask").hide();
   $("#log-layer").hide();
   $("#msg-layer").hide();
+  $("#msg-end-of-channel").hide();
 
   if (thumbing == 'channel' || thumbing == 'program')
     {
@@ -1170,6 +1180,14 @@ function turn_off_ancillaries()
   {
   for (var v in { 'signin-layer':'', 'control-layer':'', 'podcast-layer':'', 'ipg-layer':'' })
     $("#" + v).hide();
+  }
+
+function kp (e)
+  {
+  var ev = e || window.event;
+  log (ev.type + " keycode=" + ev.keyCode);
+
+  keypress (ev.keyCode);
   }
 
 function keypress (keycode)
@@ -1269,8 +1287,11 @@ function keypress (keycode)
     case 38:
       /* up arrow */
       if (thumbing == 'program')
-        switch_to_channel_thumbs();
-      else if (thumbing == 'channel' || thumbing == 'control')
+        // switch_to_channel_thumbs();
+        switch_to_ipg();
+      else if (thumbing == 'channel')
+        enter_channel();
+      else if (thumbing == 'control')
         switch_to_ipg();
       else if (thumbing == 'browse')
         browse_up();
@@ -1286,6 +1307,8 @@ function keypress (keycode)
         browse_down();
       else if (thumbing == 'ipg')
         ipg_down();
+      else if (thumbing == 'program')
+        switch_to_channel_thumbs();
       break;
 
     case 33:
@@ -1298,12 +1321,6 @@ function keypress (keycode)
       /* PgDn */
       if (thumbing == 'browse')
         browse_page_down();
-      break;
-
-    case 67:
-      /* C */
-      if (thumbing == 'channel' || thumbing == 'program')
-        switch_to_control_layer();
       break;
 
     case 82:
@@ -1339,6 +1356,8 @@ function keypress (keycode)
 
     case 67:
       /* C */
+      // $("#msg-end-of-channel").show();
+      end_message (10000);
       break;
 
     case 73:
@@ -1361,7 +1380,7 @@ function dump_configuration_to_log()
   for (var p in programgrid)
     {
     var program = programgrid [p];
-    log ('#' + p + ' ch:' + program ['channel'] + ' grid:' + channels_by_id [program ['channel']] + ' ' + program ['name'] + ' time:' + program ['timestamp'])
+    log ('#' + p + ' ch:' + program ['channel'] + ' grid:' + channels_by_id [program ['channel']] + ' ' + program ['name'] + ' time:' + program ['timestamp'] + ' url: ' + best_url (p))
     }
   }
 
@@ -1414,8 +1433,8 @@ function switch_to_ipg()
 
   $("#ipg-layer").hide();
 
-  //ipg_cursor = parseInt (channel_line [channel_cursor]);
-  ipg_cursor = -1;
+  ipg_cursor = parseInt (channel_line [channel_cursor]);
+  // ipg_cursor = -1;
 
   redraw_ipg();
 
@@ -1441,7 +1460,7 @@ function switch_to_ipg()
   thumbing = 'ipg';
 
   $("#ipg-signin-btn").removeClass ("on");
-  $("#ipg-return-btn").addClass ("on");
+  $("#ipg-return-btn").removeClass ("on");
   }
 
 function outt()
@@ -1684,7 +1703,8 @@ function ipg_play()
     if (ipg_cursor == -1)
       {
       escape();
-      switch_to_channel_thumbs()
+      switch_to_channel_thumbs();
+      enter_channel();
       }
     else if (ipg_cursor == -2)
       {
@@ -1717,6 +1737,7 @@ function ipg_play()
       $("#ch-layer").css ("display", "block");
       $("#ipg-layer").css ("display", "none");
       play_first_program_in (channel_line [channel_cursor]);
+      enter_channel();
       return;
       }
     }
@@ -1779,7 +1800,7 @@ function program_right()
     play_program();
     }
   else
-    message ('No more programs in this channel', 0);
+    end_message (0);
   }
 
 function program_left()
@@ -2691,7 +2712,7 @@ function physical_replay()
 
 function update_progress_bar()
   {
-  log ('progress');
+  // log ('progress');
   var pct = 100 * physical_offset() / physical_length();
 
   if (pct >= 0)
@@ -3006,6 +3027,24 @@ One moment...
 
 <div id="msg-layer" style="display: none">
   <p>No programs in this channel</p>
+</div>
+
+<div id="msg-end-of-channel" style="display: none">
+  <p>Press <span class="enlarge">&uarr;</span> to see your programming guide</p>
+  <p>&nbsp</p>
+  <p>&nbsp</p>
+  <div style="float: left">
+  <img src="http://zoo.atomics.org/video/9x9playerV15/images/bg_ep.svg" id="left-tease" style="width: 5em; height: 3em">
+  <p>Press <span class="enlarge">&larr;</span> for previous channel</p>
+  </div>
+  <div style="float: right">
+  <img src="http://zoo.atomics.org/video/9x9playerV15/images/bg_ep.svg" id="right-tease" style="width: 5em; height: 3em">
+  <p>Press <span class="enlarge">&rarr;</span> for next channel</p>
+  </div>
+  <br clear=all>
+  <p>&nbsp</p>
+  <p>&nbsp</p>
+  <p>Press <span class="enlarge">&darr;</span> to see all episodes</p>
 </div>
 
 <div id="log-layer" style="position: absolute; left: 0; top: 0; height: 100%; width: 100%; background: white; color: black; text-align: left; padding: 20px; overflow: scroll; z-index: 9999; display: none"></div>
