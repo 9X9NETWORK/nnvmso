@@ -19,6 +19,9 @@ public class MsoProgram implements Serializable {
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
 	private Key key;
 	
+	@Persistent //used as identifier in storage system
+	private String storageId;
+	
 	@NotPersistent
 	private long id;
 	
@@ -34,8 +37,21 @@ public class MsoProgram implements Serializable {
 	@Persistent
 	private String imageUrl;
 	
+	//!!!remove
+	@Persistent
+	private String imageLargeUrl;
+	
 	@Persistent
 	private String mpeg4FileUrl;
+	
+	@Persistent
+	private String webMFileUrl;				
+	
+	@Persistent
+	private String otherFileUrl;
+	
+	@Persistent
+	private String audioFileUrl;
 	
 	@Persistent
 	private String errorCode;
@@ -62,6 +78,7 @@ public class MsoProgram implements Serializable {
 
 	public static String VIDEO_WEBM = "webm";
 	public static String VIDEO_MPEG4 = "mp4";	
+	public static String VIDEO_OTHER = "other";
 	
 	@Persistent
 	private String type;
@@ -77,10 +94,7 @@ public class MsoProgram implements Serializable {
 	
 	//!!!! need housekeeping
 	private long channelId;
-	
-	@Persistent
-	private String webMFileUrl;				
-	
+
 	public MsoProgram() {
 		this.type = TYPE_VIDEO;
 		this.createDate = new Date();
@@ -261,6 +275,38 @@ public class MsoProgram implements Serializable {
 
 	public void setStatus(short status) {		
 		this.status = status;
+	}
+
+	public String getOtherFileUrl() {
+		return otherFileUrl;
+	}
+
+	public void setOtherFileUrl(String otherFileUrl) {
+		this.otherFileUrl = otherFileUrl;
+	}
+
+	public String getStorageId() {
+		return storageId;
+	}
+
+	public void setStorageId(String storageId) {
+		this.storageId = storageId;
+	}
+
+	public String getAudioFileUrl() {
+		return audioFileUrl;
+	}
+
+	public void setAudioFileUrl(String audioFileUrl) {
+		this.audioFileUrl = audioFileUrl;
+	}
+
+	public String getImageLargeUrl() {
+		return imageLargeUrl;
+	}
+
+	public void setImageLargeUrl(String imageLargeUrl) {
+		this.imageLargeUrl = imageLargeUrl;
 	}
 	
 }
