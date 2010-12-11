@@ -128,6 +128,8 @@ function elastic_innards()
 
   var h = document.getElementById ("jw");
   h.style.height = (vh) + "px";
+  var h = document.getElementById ("jw2");
+  h.style.height = (vh) + "px";
 
   // var i = document.getElementById ("ipg-layer");
   // i.style.height = vh + "px";
@@ -167,29 +169,6 @@ function ipg_fixup_middle()
 
 function log (text)
   {
-  if (text.match (/\n/))
-    {
-    var appendage = '';
-    var lines = text.split ('\n');
-
-    for (var i = 0; i < lines.length; i++)
-      {
-      try
-        {
-        if (window.console && console.log)
-          console.log (lines [i]);
-        }
-      catch (error)
-        {
-        }
-
-      appendage += lines [i] + '<br>';
-      }
-
-    loglayer.innerHTML += appendage;
-    return;
-    }
-
   try
     {
     if (window.console && console.log)
@@ -205,19 +184,30 @@ function log (text)
     }
   }
 
-function logline (text)
+function logblob (text)
   {
-  try
-    {
-    if (window.console && console.log)
-      console.log (text);
+  var appendage = '';
+  var lines = text.split ('\n');
 
-    if (!loglayer)
-      loglayer = document.getElementById ("log-layer");
-    }
-  catch (error)
+  for (var i = 0; i < lines.length; i++)
     {
+    try
+      {
+      if (window.console && console.log)
+        console.log (lines [i]);
+      }
+    catch (error)
+      {
+      }
+
+    appendage += lines [i] + '<br>';
     }
+
+  if (!loglayer)
+    loglayer = document.getElementById ("log-layer");
+
+  loglayer.innerHTML += appendage;
+  return;
   }
 
 function log_and_alert (text)
@@ -246,6 +236,11 @@ function init()
     }
 
   setup_ajax_error_handling();
+
+  //var playertext = $("#jw-template").html();
+  //playertext = playertext.replace (/%ID%/g, 'player2');
+  //$("#jw2").html (playertext);
+  //$("#jw2").show();
   }
 
 function fetch_programs()
@@ -268,6 +263,7 @@ function parse_program_data (data)
     var logtext = '';
     var now = new Date();
 
+    log ('splitting')
     var lines = data.split ('\n');
     log ('number of programs obtained: ' + lines.length);
     for (var i = 0; i < lines.length; i++)
@@ -276,24 +272,11 @@ function parse_program_data (data)
         {
         var fields = lines[i].split ('\t');
         logtext += "program line " + i + ": " + fields[0] + ' = ' + lines [i] + '\n';
-
-        if (fields.length <= 6 || (fields.length > 6 && fields [6] == 'null'))
-          fields [6] = '';
-
-        if (fields.length <= 7)
-          fields[7] = ''
-
-        if (fields [3] == 'slideshow')
-          fields [5] = 'slideshow:' + fields [5];
-
-        fields [5] = 'jw:' + fields [5];
-        fields [6] = 'jw:' + fields [6];
-
-        programgrid [fields [1]] = { 'channel': fields[0], 'url1': fields[5], 'url2': fields[6], 'name': fields[2], 'type': fields[3], 'thumb': fields[4], 'timestamp': fields [7] };
+        programgrid [fields [1]] = { 'channel': fields[0], 'type': fields[3], 'url1': 'jw:' + fields[5], 'url2': 'jw:' + fields[6], 'name': fields[2], 'type': fields[3], 'thumb': fields[4], 'timestamp': fields [7] };
         }
       }
 
-  log (logtext);
+  logblob (logtext);
   }
 
 function fetch_channels()
@@ -2154,17 +2137,15 @@ function browse()
         {
         var fields = lines[i].split ('\t');
         if (fields [1] in channels_by_id)
-          log ('channel ' + fields [1] + ' already in lineup: ' + fields [2]);
+          {
+          // log ('channel ' + fields [1] + ' already in lineup: ' + fields [2]);
+          }
         else
           {
-          log ('browse ' + fields [1] + ': ' + lines [i]);
+          // log ('browse ' + fields [1] + ': ' + lines [i]);
 
           n_browse++;
-          var count = -1;
-          if (fields.length > 4)
-            count = fields [4];
-
-          browsables [n_browse] = { 'id': fields [1], 'thumb': fields [3], 'name': fields [2], 'count': count };
+          browsables [n_browse] = { 'id': fields [1], 'thumb': fields [3], 'name': fields [2], 'count': fields [4] };
           }
         }
       }
@@ -2386,7 +2367,7 @@ function unhide_player (player)
     case "jw":
 
       $("#v").hide();
-      $("#jw").show();
+      $("#jw2").show();
       break;
     }
   }
@@ -2446,6 +2427,7 @@ function retry_jw_start()
 
 function jw_play()
   {
+  jwplayer.sendEvent ('STOP');
   jwplayer.sendEvent ('LOAD', jw_video_file)
   jwplayer.sendEvent ('PLAY');
   jwplayer.addModelListener ('TIME', 'jw_progress' );
@@ -2789,7 +2771,8 @@ function control_enter()
 
 function playerReady (thePlayer)
   {
-  log ('jw player ready');
+  log ('jw player ready: ' + thePlayer.id);
+  //  log_and_alert (thePlayer.id);
   jwplayer = document.getElementById (thePlayer.id);
   }
 
@@ -2811,7 +2794,7 @@ One moment...
     <div id="v" style="display: block; padding: 0">
       <video id="vvv" autoplay="false" preload="metadata" loop="false" height="100%" width="100%" volume="0"></video></div>
 
-<div id="jw" style="width: 100%; height: 100%">
+<div id="jw" style="width: 100%; height: 100%; display: none">
         <embed name="player1" id="player1"
             type="application/x-shockwave-flash"
             pluginspage="http://www.macromedia.com/go/getflashplayer"
@@ -2824,7 +2807,34 @@ One moment...
             flashvars="fullscreen=true&controlbar=none&mute=false&bufferlength=1&allowscriptaccess=always">
         </embed>
 </div>
+<div id="jw2" style="width: 100%; height: 100%">
+        <embed name="player2" id="player2"
+            type="application/x-shockwave-flash"
+            pluginspage="http://www.macromedia.com/go/getflashplayer"
+            width="100%" height="100%"
+            bgcolor="#FFFFFF"
+            src="http://zoo.atomics.org/video/player.swf"
+            allowfullscreen="true"
+            allowscriptaccess="always"
+            wmode="transparent"
+            flashvars="fullscreen=true&controlbar=none&mute=false&bufferlength=1&allowscriptaccess=always">
+        </embed>
+</div>
   </div>
+
+<div id="jw-template" style="display: none">
+        <embed name="%ID%" id="%ID%"
+            type="application/x-shockwave-flash"
+            pluginspage="http://www.macromedia.com/go/getflashplayer"
+            width="100%" height="100%"
+            bgcolor="#FFFFFF"
+            src="http://zoo.atomics.org/video/player.swf"
+            allowfullscreen="true"
+            allowscriptaccess="always"
+            wmode="transparent"
+            flashvars="fullscreen=true&controlbar=none&mute=false&bufferlength=1&allowscriptaccess=always">
+        </embed>
+</div>
 
 <div id="ch-layer" style="display: block">
   <div id="ch-container">
