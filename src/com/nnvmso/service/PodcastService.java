@@ -2,10 +2,12 @@ package com.nnvmso.service;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Date;
 import java.util.List;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.stereotype.Service;
 
@@ -19,7 +21,6 @@ import com.nnvmso.lib.PMF;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoProgram;
-import java.util.Date;
 
 @Service
 public class PodcastService {
@@ -104,49 +105,50 @@ public class PodcastService {
 		new ChannelManager().create(channel, mso);
 		return channel;
 	}	
-	
-	public void saveProgramViaPodcast(PodcastProgram podcastProgram) {
-		PodcastItem item = podcastProgram.getItem();
-		ProgramManager pMngr = new ProgramManager();
-		MsoProgram p = pMngr.findByKey(podcastProgram.getItemKey());
-		if (item.getType() != null && item.getType().equals(MsoProgram.VIDEO_MPEG4)) {
-			p.setMpeg4FileUrl(item.getEnclosure());
-		}
-		if (item.getType() != null && item.getType().equals(MsoProgram.VIDEO_WEBM)) {
-			p.setWebMFileUrl(item.getEnclosure());
-		}		
-		if (item.getThumbnail()!= null) {
-			p.setImageUrl(item.getThumbnail());
-		}
-		if (item.getPubDateString() != null) {
-			p.setUpdateDate(item.getPubDate());
-		}
-		p.setPublic(true);
-		pMngr.save(p);
-	}
-	
+			
 	public MsoProgram createProgramViaPodcast(PodcastProgram podcastProgram) {
+		ProgramManager programMngr = new ProgramManager();
+		PodcastItem item = podcastProgram.getItems()[0]; //!!! for now there's only one item
+		MsoProgram p = programMngr.findByStorageId(item.getItemId());
+		if (p != null) { 
+			return p;
+		}		
+		
 		MsoChannel channel = new ChannelManager().findByKey(podcastProgram.getKey());
-		MsoProgram p = new MsoProgram();
+		p = new MsoProgram();
+		
 		p.setChannelKey(channel.getKey());
-		p.setChannelId(channel.getId());			
-		PodcastItem item = podcastProgram.getItem();
+		p.setChannelId(channel.getId());		
 		p.setName(item.getTitle());
 		if (item.getDescription()!= null && item.getDescription().length() > 500) {
 			item.setDescription(item.getDescription().substring(0, 500));
 		}
-		p.setImageUrl(channel.getImageUrl());
 		p.setIntro(item.getDescription());
-		p.setType(MsoProgram.TYPE_VIDEO);
-		if (item.getType().equals(MsoProgram.VIDEO_MPEG4)) {
-			p.setMpeg4FileUrl(item.getEnclosure());
+		if (item.getThumbnail()!= null) {
+			p.setImageUrl(item.getThumbnail());
+		} else {
+			p.setImageUrl(channel.getImageUrl());
 		}
-		if (item.getType().equals(MsoProgram.VIDEO_WEBM)) {
-			p.setWebMFileUrl(item.getEnclosure());
-		}						
-		p.setUpdateDate(item.getPubDate());
-		p.setChannelKey(channel.getKey());
-		p.setChannelId(channel.getKey().getId());
+		if (item.getThumbnail()!= null) {
+			p.setImageLargeUrl(item.getThumbnailLarge());
+		} else {
+			p.setImageUrl(channel.getImageUrl());
+		}		
+		p.setStorageId(item.getItemId());
+		p.setMpeg4FileUrl(item.getMp4());
+		p.setWebMFileUrl(item.getWebm());
+		p.setOtherFileUrl(item.getOther());
+		p.setAudioFileUrl(item.getAudio());
+		if (item.getAudio() != null) {
+			p.setType(MsoProgram.TYPE_AUDIO);
+		} else {
+			p.setType(MsoProgram.TYPE_VIDEO);
+		}
+		if (item.getPubDate() != null) {
+			System.out.println(item.getPubDate());
+			Date theDate = new Date(Long.parseLong(item.getPubDate())*1000);						
+			p.setUpdateDate(theDate);
+		}
 		p.setPublic(true);
 		new ProgramManager().create(p);
 		return p;
@@ -161,11 +163,12 @@ public class PodcastService {
 		return channel;
 	}
 	
-	public void submitToTranscodingService(String key, String rss) { 
+	public void submitToTranscodingService(String channelKey, String rss, HttpServletRequest req) { 
 		PodcastFeed feed = new PodcastFeed();
-		feed.setKey(key);
+		feed.setKey(channelKey);
 		feed.setRss(rss);
-		feed.setCallback(THIS_HOST);
+		String url = NnLib.getUrlRoot(req);
+		feed.setCallback(url);
 		System.out.println("Podcast post from player:" + feed.getRss());
 		String urlStr = TRANSCODING_SERVER_DEV;
 		NnLib.urlPostWithJson(urlStr, feed);

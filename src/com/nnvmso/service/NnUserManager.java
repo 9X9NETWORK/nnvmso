@@ -103,7 +103,7 @@ public class NnUserManager {
 		pm.close();
 	}
 	
-	public void UpdateUser(NnUser user) {
+	public void updateUser(NnUser user) {
 		MsoManager msoMngr = new MsoManager();
 		msoMngr.findByEmail("default_mso@9x9.com");
 		Mso mso = new Mso();		

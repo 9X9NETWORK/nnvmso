@@ -15,12 +15,11 @@ import org.springframework.stereotype.Service;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Text;
 import com.nnvmso.json.AwsMessage;
-import com.nnvmso.json.PodcastItem;
-import com.nnvmso.json.PodcastProgram;
 import com.nnvmso.json.Slideshow;
 import com.nnvmso.lib.DebugLib;
 import com.nnvmso.lib.NnScriptLib;
 import com.nnvmso.lib.PMF;
+import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoProgram;
 import com.nnvmso.model.ProgramScript;
@@ -34,6 +33,19 @@ public class ProgramManager {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		MsoProgram program = pm.getObjectById(MsoProgram.class, key);
 		MsoProgram detached = pm.detachCopy(program);
+		pm.close();
+		return detached;
+	}
+	
+	public MsoProgram findByStorageId(String storageId) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();		
+		Query query = pm.newQuery(MsoProgram.class);
+		query.setFilter("storageId == '" + storageId + "'");	
+		List<MsoProgram> results = (List<MsoProgram>) query.execute();
+		MsoProgram detached = null;
+		if (results.size() > 0) {
+			detached = pm.detachCopy(results.get(0));
+		}
 		pm.close();
 		return detached;
 	}
