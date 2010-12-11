@@ -9,11 +9,17 @@ import java.util.Date;
  * Receive Podcast Program information from Transcoding Service 
  */
 public class PodcastItem {
+	private String itemId;
 	private String title;
 	private String description;	
 	private String pubDate;
+	private String webm;
+	private String mp4;
+	private String other;
+	private String audio;
+	private String duration;
 	private String thumbnail;
-	private String enclosure;
+	private String thumbnailLarge;
 	private String type;
 	
 	public String getTitle() {
@@ -28,21 +34,15 @@ public class PodcastItem {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	public String getPubDateString() {
+	public String getPubDate() {
 		return pubDate;
 	}
-	public Date getPubDate() {
-		Date theDate = new Date(Long.parseLong(pubDate));
-		return theDate;
-	}
+//	public Date getPubDate() {
+//		Date theDate = new Date(Long.parseLong(pubDate));
+//		return theDate;
+//	}
 	public void setPubDate(String pubDate) {
 		this.pubDate = pubDate;
-	}
-	public String getEnclosure() {
-		return enclosure;
-	}
-	public void setEnclosure(String enclosure) {
-		this.enclosure = enclosure;
 	}
 	public String getType() {
 		return type;
@@ -55,5 +55,47 @@ public class PodcastItem {
 	}
 	public void setThumbnail(String thumbnail) {
 		this.thumbnail = thumbnail;
-	}				
+	}
+	public String getItemId() {
+		return itemId;
+	}
+	public void setItemId(String itemId) {
+		this.itemId = itemId;
+	}
+	public String getWebm() {
+		return webm;
+	}
+	public void setWebm(String webm) {
+		this.webm = webm;
+	}
+	public String getMp4() {
+		return mp4;
+	}
+	public void setMp4(String mp4) {
+		this.mp4 = mp4;
+	}
+	public String getOther() {
+		return other;
+	}
+	public void setOther(String other) {
+		this.other = other;
+	}
+	public String getDuration() {
+		return duration;
+	}
+	public void setDuration(String duration) {
+		this.duration = duration;
+	}
+	public String getAudio() {
+		return audio;
+	}
+	public void setAudio(String audio) {
+		this.audio = audio;
+	}
+	public String getThumbnailLarge() {
+		return thumbnailLarge;
+	}
+	public void setThumbnailLarge(String thumbnailLarge) {
+		this.thumbnailLarge = thumbnailLarge;
+	}
 }

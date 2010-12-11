@@ -7,7 +7,7 @@ public class PodcastFeed {
 
 	private String key; //channel key
 	private String rss; //rss feed
-	private String callback; // callback host name
+	private String callback; //callback host name
 	
 	public String getKey() {
 		return key;
