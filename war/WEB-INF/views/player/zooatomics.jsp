@@ -260,23 +260,24 @@ function parse_program_data (data)
   {
   // 0=channel-id 1=program-id 2=program-name 3=program-type 4=program-thumb-url 5=program-url1 6=program-url2
 
-    var logtext = '';
-    var now = new Date();
+  var logtext = '';
+  var now = new Date();
 
-    log ('splitting')
-    var lines = data.split ('\n');
-    log ('number of programs obtained: ' + lines.length);
-    for (var i = 0; i < lines.length; i++)
+  log ('splitting')
+  var lines = data.split ('\n');
+  log ('number of programs obtained: ' + lines.length);
+  for (var i = 0; i < lines.length; i++)
+    {
+    if (lines [i] != '')
       {
-      if (lines [i] != '')
-        {
-        var fields = lines[i].split ('\t');
-        logtext += "program line " + i + ": " + fields[0] + ' = ' + lines [i] + '\n';
-        programgrid [fields [1]] = { 'channel': fields[0], 'type': fields[3], 'url1': 'jw:' + fields[5], 'url2': 'jw:' + fields[6], 'name': fields[2], 'type': fields[3], 'thumb': fields[4], 'timestamp': fields [7] };
-        }
+      var fields = lines[i].split ('\t');
+      // logtext += "program line " + i + ": " + fields[0] + ' = ' + lines [i] + '\n';
+      programgrid [fields [1]] = { 'channel': fields[0], 'type': fields[3], 'url1': 'jw:' + fields[5], 'url2': 'jw:' + fields[6], 'name': fields[2], 'type': fields[3], 'thumb': fields[4], 'timestamp': fields [7] };
       }
+    }
 
-  logblob (logtext);
+  log ('finished parsing program data');
+  // logblob (logtext);
   }
 
 function fetch_channels()
@@ -619,7 +620,7 @@ function enter_channel()
 
   var now = new Date();
 
-  for (p in programgrid)
+  for (var p in programgrid)
     {
     if (programgrid [p]['channel'] == real_channel)
       program_line [n_program_line++] = p;
@@ -1342,6 +1343,8 @@ function keypress (keycode)
 
     case 73:
       /* I */
+      if (thumbing == 'channel' || thumbing == 'program')
+        dump_configuration_to_log();
       break;
 
     case 85:
@@ -1349,6 +1352,16 @@ function keypress (keycode)
       if (thumbing == 'channel' || thumbing == 'program')
         login_screen();
       break;
+    }
+  }
+
+function dump_configuration_to_log()
+  {
+  log ('PROGRAMS');
+  for (var p in programgrid)
+    {
+    var program = programgrid [p];
+    log ('#' + p + ' ch:' + program ['channel'] + ' grid:' + channels_by_id [program ['channel']] + ' ' + program ['name'] + ' time:' + program ['timestamp'])
     }
   }
 
@@ -2955,35 +2968,6 @@ One moment...
 <div id="browse" style="display: none; z-index: 999"></div>
 
 <div id="preload-control-images" style="display: none"></div>
-
-<!--
-<div id="control-layer" style="display: none">
-  <div id="msg-up"><p>Press UP to see your programming guide</p></div>
-  <ul id="control-bar">
-    <li id="btn-rewind"></li>
-    <li id="btn-play" class="on"></li>
-    <li id="btn-forward"></li>
-    <li class="divider"></li>
-
-    <li id="btn-volume"></li>
-    <li id="btn-mute"></li>
-    <li id="volume-constrain">
-      <p id="volume-bar"><span id="loud"></span></p>
-      <p id="handler"></p>
-    </li>
-    <li id="btn-close"></li>
-    <li id="btn-signin"></li>
-    <li class="divider right"></li>
-
-    <li id="play-time">00:00 / 00:00</li>
-    <li id="progress-bar">
-      <p id="loaded"></p>
-      <p id="played"></p>
-    </li>
-  </ul>
-  <div id="msg-down"><p>Press DOWN for more episodes</p></div>
-</div>
--->
 
 <div id="control-layer" style="display: none">
   <div id="msg-up"><p>Press <span class="enlarge">&uarr;</span> to see your programming guide</p></div> 
