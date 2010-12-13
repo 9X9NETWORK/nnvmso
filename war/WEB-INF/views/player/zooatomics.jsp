@@ -291,7 +291,12 @@ function fetch_programs()
 
 function parse_program_data (data)
   {
-  // 0=channel-id 1=program-id 2=program-name 3=program-type 4=program-thumb-url 5=program-url1 6=program-url2
+  // 0=channel-id 1=program-id 2=program-name 3=program-type 4=program-thumb-url 5=program-snapshot-url 6=program-url1 7=program-url2 8=program-url3 9=program-url4 10=timestamp
+
+       // channelId, programId, programName, programType, programThumbnailUrl, programLargeThumbnailUrl,
+       // url1(mpeg4/slideshow), url2(webm), url3(flv more likely), url4(audio), timestamp
+
+
 
   var logtext = '';
   var now = new Date();
@@ -306,7 +311,10 @@ function parse_program_data (data)
       {
       var fields = lines[i].split ('\t');
       // logtext += "program line " + i + ": " + fields[0] + ' = ' + lines [i] + '\n';
-      programgrid [fields [1]] = { 'channel': fields[0], 'type': fields[3], 'url1': 'jw:' + fields[5], 'url2': 'jw:' + fields[6], 'name': fields[2], 'type': fields[3], 'thumb': fields[4], 'timestamp': fields [7] };
+      programgrid [fields [1]] = { 'channel': fields[0], 'type': fields[3], 'url1': 'jw:' + fields[6], 
+                   'url2': 'jw:' + fields[7], 'url3': 'jw:' + fields[8], 'url4': 'jw:' + fields[9], 
+                   'name': fields[2], 'type': fields[3], 'thumb': fields[4], 
+                   'snapshot': fields[5], 'timestamp': fields[10] };
       }
     }
 
@@ -414,6 +422,14 @@ function best_url (program)
     {
     return programgrid [program]['url2'];
     }
+  else if (programgrid [program]['url3'].match (desired))
+    {
+    return programgrid [program]['url3'];
+    }
+  else if (programgrid [program]['url4'].match (desired))
+    {
+    return programgrid [program]['url4'];
+    }
   else
     {
     if (programgrid [program]['url1'] == 'null' || programgrid [program]['url1'] == 'jw:null')
@@ -452,8 +468,18 @@ function message (text, duration)
     msg_timex = setTimeout ("empty_channel_timeout()", duration);
   }
 
+function hide_layers()
+  {
+  $("#ch-layer").hide();
+  $("#ep-layer").hide();
+  $("#control-layer").hide();
+  $("#msg-layer").hide();
+  }
+
 function end_message (duration)
   {
+  hide_layers();
+
   var square = parseInt (channel_line [channel_cursor]);
 
   var prev = previous_channel_square (square);
@@ -466,6 +492,8 @@ function end_message (duration)
 
   if (duration > 0)
     msg_timex = setTimeout ("empty_channel_timeout()", duration);
+
+  thumbing = 'end';
   }
 
 function play()
@@ -481,9 +509,9 @@ function play()
     return;
     }
 
+  log ('Playing ' + current_program + ': ' + programgrid [current_program]['name']);
   physical_start_play (url);
   }
-
 
 function start_play_html5 (url)
   {
@@ -894,6 +922,8 @@ function enter_category (cat, positioning)
   redraw_channel_line();
   ShowArrows();
   reset_osd_timex();
+
+  prepare_channel();
   }
 
 function enter_category_failsafe()
@@ -1144,6 +1174,8 @@ function escape()
 
     case 'control': layer = $("#control-layer");
                     break;
+
+    case 'end':     return;
     }
 
   layer.css ("display", layer.css ("display") == "block" ? "none" : "block");
@@ -1264,6 +1296,12 @@ function keypress (keycode)
       /* left arrow */
       if (thumbing == 'channel')
         channel_left();
+      else if (thumbing == 'end')
+        {
+        $("#msg-end-of-channel").hide();
+        channel_left();
+        thumbing = 'program';
+        }
       else if (thumbing == 'program')
         program_left();
       else if (thumbing == 'ipg')
@@ -1276,6 +1314,12 @@ function keypress (keycode)
       /* right arrow */
       if (thumbing == 'channel')
         channel_right();
+      else if (thumbing == 'end')
+        {
+        $("#msg-end-of-channel").hide();
+        channel_right();
+        thumbing = 'program';
+        }
       else if (thumbing == 'program')
         program_right();
       else if (thumbing == 'ipg')
@@ -1289,6 +1333,11 @@ function keypress (keycode)
       if (thumbing == 'program')
         // switch_to_channel_thumbs();
         switch_to_ipg();
+      else if (thumbing == 'end')
+        {
+        $("#msg-end-of-channel").hide();
+        switch_to_ipg();
+        }
       else if (thumbing == 'channel')
         enter_channel();
       else if (thumbing == 'control')
@@ -1303,6 +1352,12 @@ function keypress (keycode)
       /* down arrow */
       if (thumbing == 'channel' || thumbing == 'control')
         enter_channel();
+      else if (thumbing == 'end')
+        {
+        $("#msg-end-of-channel").hide();
+        enter_channel();
+        thumbing = 'program';
+        }
       else if (thumbing == 'browse')
         browse_down();
       else if (thumbing == 'ipg')
@@ -1370,6 +1425,11 @@ function keypress (keycode)
       /* U */
       if (thumbing == 'channel' || thumbing == 'program')
         login_screen();
+      break;
+
+    case 88:
+      /* X */
+      physical_stop();
       break;
     }
   }
@@ -1751,6 +1811,8 @@ function channel_right()
     enter_category (next_category(), 'b');
 
   redraw_channel_line();
+  prepare_channel();
+
   play_first_program_in (channel_line [channel_cursor]);
   }
 
@@ -1762,6 +1824,8 @@ function channel_left()
     enter_category (previous_category(), 'e');
 
   redraw_channel_line();
+  prepare_channel();
+
   play_first_program_in (channel_line [channel_cursor]);
   }
 
@@ -2461,11 +2525,27 @@ function retry_jw_start()
 
 function jw_play()
   {
-  jwplayer.sendEvent ('STOP');
+  log ("jw STOP");
+  // jwplayer.sendEvent ('STOP');
+  physical_stop();
+  log ("jw LOAD " + jw_video_file);
   jwplayer.sendEvent ('LOAD', jw_video_file)
+  log ("jw PLAY");
   jwplayer.sendEvent ('PLAY');
+  jw_previous_state = '';
   jwplayer.addModelListener ('TIME', 'jw_progress' );
   jwplayer.addModelListener ('STATE', "jw_state_change()" );
+  }
+
+function physical_stop()
+  {
+  switch (tube())
+    {
+    case "jw": log ('jw STOP');
+               try { jwplayer.removeModelListener ('STATE'); } catch (error) {};
+               jwplayer.sendEvent ('STOP');
+               break;
+    }
   }
 
 function jw_state_change()
@@ -2480,6 +2560,9 @@ function jw_state_change()
   if (state == 'COMPLETED' && previous != 'COMPLETED')
     {
     log ('jw now completed');
+    log ("jw STOP");
+    //jwplayer.sendEvent ('STOP');
+    physical_stop();
     // $("#loading").hide();
     ended_callback();
     }
@@ -2487,6 +2570,9 @@ function jw_state_change()
   if (state == 'IDLE' && previous != 'IDLE')
     {
     log ('jw now idle');
+    log ("jw STOP");
+    //jwplayer.sendEvent ('STOP');
+    physical_stop();
     // $("#loading").hide();
     ended_callback();
     }
@@ -2853,6 +2939,7 @@ One moment...
             wmode="transparent"
             flashvars="fullscreen=true&controlbar=none&mute=false&bufferlength=1&allowscriptaccess=always">
         </embed>
+
 </div>
   </div>
 
@@ -2873,7 +2960,9 @@ One moment...
 <div id="ch-layer" style="display: block">
   <div id="ch-container">
     <div class="arrow-up"></div><div class="arrow-down"></div>
+
     <div id="left-piece"><span class="rowNum" id="left-row-num">1</span></div>
+
     <div id="ch-constrain">
       <div class="ch-strip">
         <ul id="ch-meta">
@@ -2881,54 +2970,67 @@ One moment...
           <li class="dash">&#8212;</li>
           <li id="ch-layer-ep-title" class="ep-title"></li>
         </ul>
+
         <div class="ch-swish" id="ch-swish-1" style="display: block"><ul id="ch-list-1" class="ch-list"></ul></div>
         <div class="ch-swish" id="ch-swish-2" style="display: block"><ul id="ch-list-2" class="ch-list"></ul></div>
+
         <div class="ch-swish" id="ch-swish-3" style="display: block"><ul id="ch-list-3" class="ch-list"></ul></div>
         <div class="ch-swish" id="ch-swish-4" style="display: block"><ul id="ch-list-4" class="ch-list"></ul></div>
         <div class="ch-swish" id="ch-swish-5" style="display: block"><ul id="ch-list-5" class="ch-list"></ul></div>
         <div class="ch-swish" id="ch-swish-6" style="display: block"><ul id="ch-list-6" class="ch-list"></ul></div>
         <div class="ch-swish" id="ch-swish-7" style="display: block"><ul id="ch-list-7" class="ch-list"></ul></div>
         <div class="ch-swish" id="ch-swish-8" style="display: block"><ul id="ch-list-8" class="ch-list"></ul></div>
+
         <div class="ch-swish" id="ch-swish-9" style="display: block"><ul id="ch-list-9" class="ch-list"></ul></div>
       </div>
       </div>
+
     </div>
     <div id="right-piece"><span class="rowNum" id="right-row-num">3</span></div>
   </div>
 </div>
 
 <div id="ep-layer">
+
   <div id="ep-container">
     <div class="arrow-up"></div>
     <div id="ep-constrain">
       <ul id="ep-meta">
+
         <li id="ep-layer-ch-title" class="ch-title"></li>
         <li class="dash">&#8212;</li>
         <li id="ep-layer-ep-title" class="ep-title"></li>
       </ul>
+
       <div id="ep-swish" class="ep-swish" style="display: block">
         <ul class="ep-list" id="ep-list"></ul>
       </div>
     </div>
   </div>
+
 </div>
 
 <div id="ipg-layer" style="display: none">
   <div id="ipg-pannel">
     <ul id="info-list">
+
       <li id="ch-thumb"><img id="ch-thumb-img" src=""></li>
       <li id="ch-name"><p>ABC news</p></li>
       <li id="ep-name"><p>An episode name would go here?</p></li>
 
       <li id="description"><p>A description of something is supposed to go here, but I have nothing to put in this spot.</p></li>
+
       <li id="ep-number"><p><span class="hilite">Episodes: </span><span id="ch-episodes">9</span></p></li>
+
       <li id="update"><p><span class="hilite">Updated:</span> 11/09/2010</p></li>
     </ul>
     <ul id="control-list">
       <li><a id="ipg-signin-btn" href="javascript:;" class="btn">Sign in / Sign up</a></li>
       <li><a id="ipg-return-btn" href="javascript:;" class="btn">Return to Channel Mode</a></li>
+
     </ul> 
   </div>
+
   <div id="ipg-grid"></div>
   <div id="menu">
     <p id="pop-play"></p><p id="pop-delete"></p>
@@ -2938,6 +3040,7 @@ One moment...
 <div id="signin-layer" style="display: none">
   <ul id="login-pannel">
     <li><h2>Returning Users</h2></li>
+
     <li>
 
       <span>Email:</span>
@@ -2946,6 +3049,7 @@ One moment...
     <li>
       <span>Password:</span>
       <p class="textfieldbox"><input type="password" id="L-password" class="textfield" value="swordfish"></p>
+
     </li>
     <li><a href="javascript:submit_login()" class="btn"><span>Log in</span></a></li>
 
@@ -2954,6 +3058,7 @@ One moment...
     <li><h2>New Users</h2></li>
     <li>
       <span>Name:</span>
+
       <p class="textfieldbox"><input type="text" id="S-name" class="textfield"></p>
     </li>
     <li>
@@ -2962,7 +3067,9 @@ One moment...
       <p class="textfieldbox"><input type="text" id="S-email" class="textfield"></p>
     </li>
     <li>
+
       <span>Password:</span>
+
       <p class="textfieldbox"><input type="password" id="S-password" class="textfield"></p>
     </li>
     <li>
@@ -2970,7 +3077,9 @@ One moment...
       <span>Password verify:</span>
       <p class="textfieldbox"><input type="password" id="S-password2" class="textfield"></p>
     </li>
+
     <li><a href="javascript:submit_signup()" class="btn"><span>Sign up</span></a></li>
+
   </ul>
 </div>
 
@@ -2979,8 +3088,10 @@ One moment...
 
     <label for="podcast input">Enter Podcast URL:</label>
     <ul id="podcast-input">
+
       <li class="textfieldbox"><form id="throw"><input id="podcastRSS" name="podcastRSS" type="text" class="textfield" value="" size="30" onkeypress="return event.keyCode != 13"></form></li>
       <li><a href="javascript:submit_throw()" class="btn"><span>Contribute</span></a></li>
+
     </ul>
     <ul id="podcast-list"></ul>
   </div>
@@ -2993,34 +3104,42 @@ One moment...
 <div id="control-layer" style="display: none">
   <div id="msg-up"><p>Press <span class="enlarge">&uarr;</span> to see your programming guide</p></div> 
   <ul id="control-bar">
+
     <li id="btn-replay"></li>
     <li id="btn-rewind"></li>
     <li id="btn-play" class="on"></li>
     <li id="btn-pause"></li>
+
     <li id="btn-forward"></li>
     <li class="divider"></li>
     <li id="btn-volume"></li>
     <li id="volume-constrain" class="on">
       <ul id="volume-bars">
+
         <li></li>
         <li></li>
         <li></li>
+
         <li class="on"></li>
         <li class="on"></li>
         <li class="on"></li>
         <li class="on"></li>
       </ul>
     </li>
+
     <li class="divider"></li>
     <li id="btn-facebook"></li>
+
     <li id="btn-screensaver"></li>
     <li class="divider"></li>
     <li id="btn-close"></li>
     <li id="play-time">00:52 / 01:32</li>
     <li id="progress-bar">
       <p id="loaded"></p>
+
       <p id="played"></p>
     </li>
+
   </ul> 
   <div id="msg-down"><p>Press <span class="enlarge">&darr;</span> for more episodes</p></div>
 </div>
@@ -3031,20 +3150,25 @@ One moment...
 
 <div id="msg-end-of-channel" style="display: none">
   <p>Press <span class="enlarge">&uarr;</span> to see your programming guide</p>
+
   <p>&nbsp</p>
   <p>&nbsp</p>
   <div style="float: left">
   <img src="http://zoo.atomics.org/video/9x9playerV15/images/bg_ep.svg" id="left-tease" style="width: 5em; height: 3em">
   <p>Press <span class="enlarge">&larr;</span> for previous channel</p>
+
   </div>
   <div style="float: right">
+
   <img src="http://zoo.atomics.org/video/9x9playerV15/images/bg_ep.svg" id="right-tease" style="width: 5em; height: 3em">
   <p>Press <span class="enlarge">&rarr;</span> for next channel</p>
   </div>
   <br clear=all>
   <p>&nbsp</p>
+
   <p>&nbsp</p>
   <p>Press <span class="enlarge">&darr;</span> to see all episodes</p>
+
 </div>
 
 <div id="log-layer" style="position: absolute; left: 0; top: 0; height: 100%; width: 100%; background: white; color: black; text-align: left; padding: 20px; overflow: scroll; z-index: 9999; display: none"></div>
