@@ -252,6 +252,7 @@ public class PlayerAPIController {
 	/**
 	 * Get "new" program list. Current "new" definition: A channel's latest 3 shows.
 	 * 
+	 * @param user user's unique identifier 
 	 * @return A string of new program list.<br/>
 	 * 	       Each program is \n delimited.<br/>  
 	 *         Example: 1\n2\n3\n
