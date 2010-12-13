@@ -22,6 +22,7 @@ import com.nnvmso.lib.PMF;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoProgram;
+import com.nnvmso.model.NnUser;
 import com.nnvmso.model.ProgramScript;
 
 @Service
@@ -29,9 +30,9 @@ public class ProgramManager {
 	// ============================================================
 	// find
 	// ============================================================
-	public List<MsoProgram> findNew() {
-		ChannelManager channelMngr = new ChannelManager();
-		List<MsoChannel> channels = channelMngr.findAllPublic();
+	public List<MsoProgram> findNew(NnUser user) {
+		SubscriptionManager sMngr = new SubscriptionManager();
+		List<MsoChannel> channels = sMngr.findSubscribedChannels(user);				
 		System.out.println("channel size=" + channels.size());
 		List<MsoProgram> newPrograms = new ArrayList<MsoProgram>();
 		for (MsoChannel c : channels) {
