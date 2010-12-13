@@ -1,5 +1,6 @@
 package com.nnvmso.web;
 
+import java.nio.BufferOverflowException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -41,18 +41,6 @@ import net.sf.jsr107cache.CacheManager;
 @RequestMapping("playerAPI")
 public class PlayerAPIController {
 
-	@ExceptionHandler(NullPointerException.class)
-	public String nullPointer(NullPointerException e) {
-		System.out.println("enter null pointer");
-		return "hello/hello";
-	}
-
-	@RequestMapping("nullPointer")
-	public String throwNullPointer() {
-		System.out.println("null pointer throws!");
-		throw new NullPointerException();
-	}
-		
 	/* ==========  CATEGORY: ACCOUNT RELATED ========== */
 	//user info
 	/**
@@ -69,19 +57,23 @@ public class PlayerAPIController {
 	 */
 	@RequestMapping(value="login", method=RequestMethod.POST)
 	public ResponseEntity<String> login(HttpServletRequest req, HttpServletResponse resp) {
-		String email = req.getParameter("email");
-		String pwd = req.getParameter("password");
-		NnUser user = new NnUserManager().nnUserAuthenticated(email, pwd);
 		String output = "";
-		if (user == null) {
-			output = PlayerAPI.CODE_LOGIN_FAILED + "\t" + PlayerAPI.PLAYER_CODE_LOGIN_FAILED;
-		} else {
-			new NnUserManager().setUserCookie(resp, NnLib.getKeyStr(user.getKey()));
-			output = PlayerAPI.CODE_SUCCESS + "\t" + NnLib.getKeyStr(user.getKey());
+		try {
+			String email = req.getParameter("email");
+			String pwd = req.getParameter("password");
+			NnUser user = new NnUserManager().nnUserAuthenticated(email, pwd);
+			if (user == null) {
+				output = PlayerAPI.CODE_LOGIN_FAILED + "\t" + PlayerAPI.PLAYER_CODE_LOGIN_FAILED;
+			} else {
+				new NnUserManager().setUserCookie(resp, NnLib.getKeyStr(user.getKey()));
+				output = PlayerAPI.CODE_SUCCESS + "\t" + NnLib.getKeyStr(user.getKey());
+			}
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.valueOf("text/plain;charset=utf-8"));
+		} catch (Exception e) {
+			output = PlayerAPI.CODE_ERROR + "\t" + PlayerAPI.PLAYER_CODE_ERROR;						
 		}
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.valueOf("text/plain;charset=utf-8"));
-		return new ResponseEntity<String>(output, headers, HttpStatus.OK);
+		return PlayerLib.outputReturn(output);
 	}
 	
 	/**
@@ -265,12 +257,18 @@ public class PlayerAPIController {
 	 *         Example: 1\n2\n3\n
 	 */
 	@RequestMapping(value="whatsNew") 
-	public ResponseEntity<String> whatsNew() {
+	public ResponseEntity<String> whatsNew(@RequestParam(value="user") String user) {
+		NnUserManager userService = new NnUserManager();
 		ProgramManager programMngr = new ProgramManager();
-		List<MsoProgram> programs = programMngr.findNew();
+		NnUser foundUser = userService.findByKey(user);
 		String output = "";
-		for (MsoProgram p : programs) {
-			output = output + p.getId() + "\n";			
+		if (foundUser == null) {
+			output = PlayerAPI.CODE_ERROR + "\t" + PlayerAPI.PLAYER_USER_TOKEN_INVALID;			
+		} else {
+			List<MsoProgram> programs = programMngr.findNew(foundUser);
+			for (MsoProgram p : programs) {
+				output = output + p.getId() + "\n";			
+			}
 		}
 		return PlayerLib.outputReturn(output);
 	}
