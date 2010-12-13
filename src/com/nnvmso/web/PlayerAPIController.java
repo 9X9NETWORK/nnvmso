@@ -36,7 +36,7 @@ import com.nnvmso.service.*;
 public class PlayerAPIController {
 
 	@ExceptionHandler(NullPointerException.class)
-	public String nullPointer(Exception e) {
+	public String nullPointer(NullPointerException e) {
 		System.out.println("enter null pointer");
 		return "hello/hello";
 	}
@@ -229,7 +229,25 @@ public class PlayerAPIController {
 		headers.setContentType(MediaType.valueOf("text/plain;charset=utf-8"));
 		return new ResponseEntity<String>(output, headers, HttpStatus.OK);
 	}
-		
+	
+	/**
+	 * Get "new" program list. Current "new" definition: A channel's latest 3 shows.
+	 * 
+	 * @return A string of new program list.<br/>
+	 * 	       Each program is \n delimited.<br/>  
+	 *         Example: 1\n2\n3\n
+	 */
+	@RequestMapping(value="whatsNew")
+	public ResponseEntity<String> whatsNew() {
+		ProgramManager programMngr = new ProgramManager();
+		List<MsoProgram> programs = programMngr.findNew();
+		String output = "";
+		for (MsoProgram p : programs) {
+			output = output + p.getId() + "\n";			
+		}
+		return PlayerLib.outputReturn(output);
+	}
+	
 	/**
 	 * Get all of a user's subscriptions. 
 	 * 
@@ -257,37 +275,7 @@ public class PlayerAPIController {
 		headers.setContentType(MediaType.valueOf("text/plain;charset=utf-8"));
 		return new ResponseEntity<String>(output, headers, HttpStatus.OK);		
 	}
-		
-	/**
-	 * Get a user's subscribed channels. 
-	 * 
-	 * Example: http://localhost:8888/playerAPI/channelLineup?user=aghubmUzdm1zb3INCxIGTm5Vc2VyGKsEDA
-	 *  
-	 * @param  user user's unique key
-	 * @return Channel info. <br/>
-	 * 		   Fields are tab delimited. <br/>
-	 * 		   Return sequence are: sequence, ChannelId, ChannelName, ChannelThumbnailUrl. <br/> 
-	 */
-	/*
-	@RequestMapping(value="channelLineupByMso")
-	public ResponseEntity<String> channelLineupByMso(@RequestParam(value="user") String user) {
-		SubscriptionManager subMngr = new SubscriptionManager();
-		NnUserManager userService = new NnUserManager();
-		NnUser found = userService.findByKey(user);
-		subMngr.subscribe(found); 
-		List<MsoChannel> channels = subMngr.findSubscribedChannels(found);
-		String output = "";
-		for (MsoChannel c:channels) {
-			String[] ori = {Short.toString(c.getSeq()), String.valueOf(c.getKey().getId()), c.getName(), c.getImageUrl()};
-			output = output + PlayerLib.getTabDelimitedStr(ori);			
-			output = output + "\n";
-		}
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.valueOf("text/plain;charset=utf-8"));
-		return new ResponseEntity<String>(output, headers, HttpStatus.OK);
-	}
-	*/
-		
+				
 	/**
 	 * Get program script based on program id.
 	 * 
@@ -322,7 +310,9 @@ public class PlayerAPIController {
 	 * @param  user user's unique identifier, it is required for wildcard query 
 	 * @return A string of all the programs' info that met the query criteria. <br/>
 	 * 		   Each program is separate by carriage return. Each program's information is tab delimited.<br/>
-	 * 		   Program info has: channelId, programId, programName, programType, programThumbnailUrl, url1(mpeg4/slideshow), url2(webm)
+	 *   Program info has: <br/>
+	 *              channelId, programId, programName, programType, programThumbnailUrl, programLargeThumbnailUrl, <br/>
+	 *              url1(mpeg4/slideshow), url2(webm), url3(flv more likely), url4(audio), timestamp
 	 */
 	 //@todo channel equals star and no user token, return missing param 	
 	@RequestMapping("programInfo")	
@@ -366,9 +356,9 @@ public class PlayerAPIController {
 					        //url4, 
 					        String.valueOf(p.getUpdateDate().getTime())};
 			output = output + PlayerLib.getTabDelimitedStr(ori);
+			output = output.replaceAll("null", "");
 			output = output + "\n";
 		}
-		System.out.println("programInfo:" + output);
 		//return output;
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.valueOf("text/plain;charset=utf-8"));
