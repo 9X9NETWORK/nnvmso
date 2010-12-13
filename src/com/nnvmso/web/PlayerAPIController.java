@@ -21,6 +21,12 @@ import com.nnvmso.lib.*;
 import com.nnvmso.model.*;
 import com.nnvmso.service.*;
 
+import java.util.Collections;
+import net.sf.jsr107cache.Cache;
+import net.sf.jsr107cache.CacheException;
+import net.sf.jsr107cache.CacheFactory;
+import net.sf.jsr107cache.CacheManager;
+
 //!!!!! exception handling, return a better message
 
 /**
@@ -211,12 +217,33 @@ public class PlayerAPIController {
 		List<MsoChannel> channels = channelMngr.findAllPublic();
 		String output ="";
 		ProgramManager programMngr = new ProgramManager();
+		
+		Cache cache = null;
+		
+        try {
+            CacheFactory cacheFactory = CacheManager.getInstance().getCacheFactory();
+            cache = cacheFactory.createCache(Collections.emptyMap());
+        } catch (CacheException e) {
+            // ...
+        }		
+        
 		for (MsoChannel c:channels) {
-			// append program count at the end of the line of each channel
-			List<MsoProgram> programs = new ArrayList<MsoProgram>();
-			programs = programMngr.findByChannelIdAndIsPublic(c.getKey().getId(), true);
-			// don't send the channel if program count is zero
-			int programCount = programs.size();
+			Object programCountObj;
+			int programCount = 0;
+			if (cache != null ) {
+				programCountObj = cache.get( c.getKey() );
+				if ( programCountObj == null ) {
+					// append program count at the end of the line of each channel
+					List<MsoProgram> programs = new ArrayList<MsoProgram>();
+					programs = programMngr.findByChannelIdAndIsPublic(c.getKey().getId(), true);
+					// don't send the channel if program count is zero
+					programCount = programs.size();
+					cache.put(c.getKey(), (Object)programCount);
+				}
+				else {
+					programCount = Integer.parseInt( programCountObj.toString() );
+				}
+			}
 			if ( programCount > 0 ) {
 				String[] ori = {Short.toString(c.getSeq()), String.valueOf(c.getKey().getId()), c.getName(), c.getImageUrl(), Integer.toString(programCount)};
 				output = output + PlayerLib.getTabDelimitedStr(ori);			
