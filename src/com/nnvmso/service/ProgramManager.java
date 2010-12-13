@@ -29,6 +29,30 @@ public class ProgramManager {
 	// ============================================================
 	// find
 	// ============================================================
+	public List<MsoProgram> findNew() {
+		ChannelManager channelMngr = new ChannelManager();
+		List<MsoChannel> channels = channelMngr.findAllPublic();
+		System.out.println("channel size=" + channels.size());
+		List<MsoProgram> newPrograms = new ArrayList<MsoProgram>();
+		for (MsoChannel c : channels) {
+			PersistenceManager pm = PMF.get().getPersistenceManager();
+			Query query = pm.newQuery(MsoProgram.class);
+			query.setFilter("channelKey == channelKeyParam");
+			query.declareParameters(Key.class.getName() + " channelKeyParam");
+	    	query.setOrdering("updateDate desc");	    				
+	    	List<MsoProgram> results = (List<MsoProgram>) query.execute(c.getKey());
+			int recentSize = 3;
+			for (int i=0; i<results.size(); i++) {
+				if (i == recentSize) {break;}
+				System.out.println("new program=" + results.get(i).getId() + " in channel " + c.getId() + " and its date is " + c.getUpdateDate());
+				if (c.getType() != MsoChannel.TYPE_SYSTEM) {
+					newPrograms.add(results.get(i));
+				}												
+			}
+		}
+		return newPrograms;
+	}
+	
 	public MsoProgram findByKey(String key) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		MsoProgram program = pm.getObjectById(MsoProgram.class, key);

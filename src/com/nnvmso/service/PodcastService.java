@@ -169,7 +169,6 @@ public class PodcastService {
 		feed.setRss(rss);
 		String url = NnLib.getUrlRoot(req);
 		feed.setCallback(url);
-		System.out.println("Podcast post from player:" + feed.getRss());
 		String urlStr = TRANSCODING_SERVER_DEV;
 		NnLib.urlPostWithJson(urlStr, feed);
 	}
