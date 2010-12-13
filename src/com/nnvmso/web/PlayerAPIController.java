@@ -237,7 +237,7 @@ public class PlayerAPIController {
 	 * 	       Each program is \n delimited.<br/>  
 	 *         Example: 1\n2\n3\n
 	 */
-	@RequestMapping(value="whatsNew")
+	@RequestMapping(value="whatsNew") 
 	public ResponseEntity<String> whatsNew() {
 		ProgramManager programMngr = new ProgramManager();
 		List<MsoProgram> programs = programMngr.findNew();
@@ -349,11 +349,11 @@ public class PlayerAPIController {
 					        p.getName(), 
 					        p.getType(), 
 					        p.getImageUrl(),
-					        //p.getImageLargeUrl(),
+					        p.getImageLargeUrl(),
 					        url1, 
 					        url2, 
-					        //url3, 
-					        //url4, 
+					        url3, 
+					        url4, 
 					        String.valueOf(p.getUpdateDate().getTime())};
 			output = output + PlayerLib.getTabDelimitedStr(ori);
 			output = output.replaceAll("null", "");
