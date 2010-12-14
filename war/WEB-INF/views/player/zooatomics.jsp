@@ -1287,7 +1287,10 @@ function keypress (keycode)
     {
     case 27:
       /* esc */
-      escape();
+      if (thumbing == 'whatsnew')
+        exit_whats_new();
+      else
+        escape();
       break;
 
     case 32:
@@ -1473,40 +1476,22 @@ function switch_to_whats_new()
 
   log ('whats new');
 
+  hide_layers();
+  force_pause();
+  $("body").css ("background-image", "url(" + root + "bg.jpg)");
+
   thumbing = 'whatsnew';
   var bad_thumbnail = '<img src="http://zoo.atomics.org/video/images-x1/no_images.png">';
-  hide_layers();
 
   var query = "/playerAPI/whatsNew?user=" + user;
-
-  var html = '';
-
-  for (var y = 1; y <= 9; y++)
-    {
-    html += '<ul class="new-list">';
-
-    for (var x = 1; x <= 9; x++)
-      {
-      if ("" + y + "" + x in channelgrid)
-        {
-        var thumb = channelgrid ["" + y + "" + x]['thumb'];
-        if (thumb == '' || thumb == 'null' || thumb == 'false')
-          html += '<li>' + bad_thumbnail + '</li>';
-        else
-          html += '<li><img src="' + channelgrid ["" + y + "" + x]['thumb'] + '"></li>';
-        }
-      else
-        html += '<li></li>';
-      }
-    html += '</ul>';
-    }
-
-  $("#new-layer").html (html);
 
   var d = $.get (query, function (data)
     {
     var lines = data.split ('\n');
     log ('number of new programs obtained: ' + lines.length);
+
+    wn = {};
+
     for (var i = 0; i < lines.length; i++)
       {
       var program = lines [i].trim();
@@ -1514,19 +1499,66 @@ function switch_to_whats_new()
         {
         if (program in programgrid)
           {
-          var channel = channels_by_id [programgrid [program]['channel']]
-          log ('whatsnew ' + program + ' (ch: ' + channel + '): ' + programgrid [program]['name']);
-          whatsnew.push ({ 'channel': channel, 'grid': channels_by_id [program ['channel']], 'episodes': [ program ]});
+          var real_channel = programgrid [program]['channel'];
+
+          if (! (real_channel in wn))
+            wn [real_channel] = [];
+
+          wn [real_channel].push (program);
+
+          //log ('whatsnew ' + program + ' (ch: ' + real_channel + '): ' + programgrid [program]['name']);
           }
         else
           log ('program ' + program + ' not in a subscribed channel');
         }
       }
 
+    for (var channel in wn)
+      {
+      var grid = channels_by_id [channel];
+      log ('whatsnew :: ch:' + channel + ' grid: ' + grid + ' episodes:' + wn [channel].join());
+      whatsnew.push ({ 'channel': channel, 'grid': grid, 'episodes': wn [channel] });
+      }
+
     log ('what is new?');
+
+    var html = '';
+
+    for (var y = 1; y <= 9; y++)
+      {
+      html += '<ul class="new-list">';
+
+      for (var x = 1; x <= 9; x++)
+        {
+        if ("" + y + "" + x in channelgrid)
+          {
+          var thumb = channelgrid ["" + y + "" + x]['thumb'];
+          var real_channel = channelgrid ["" + y + "" + x]['id'];
+
+          if (! (real_channel in wn))
+            html += '<li></li>';
+          else if (thumb == '' || thumb == 'null' || thumb == 'false')
+            html += '<li>' + bad_thumbnail + '</li>';
+          else
+            html += '<li><img src="' + channelgrid ["" + y + "" + x]['thumb'] + '"></li>';
+          }
+        else
+          html += '<li></li>';
+        }
+      html += '</ul>';
+      }
+
+    $("#new-layer").html (html);
+
     $("#new-layer").show();
     WhatIsNew();
     });
+  }
+
+function exit_whats_new()
+  {
+  StopWhatsNew();
+  $("body").css ("background-image", "none");
   }
 
 function clear_osd_timex()
