@@ -539,6 +539,8 @@ function play()
   if (url == '')
     {
     log ('empty channel, displaying notice for 3 seconds')
+    $("#ep-layer").hide();
+    $("#ch-layer").hide();
     end_message (10000);
     return;
     }
@@ -741,6 +743,8 @@ function prepare_channel()
 
 function enter_channel()
   {
+  $("#epend-layer").hide();
+
   prepare_channel();
 
   $("#ep-layer").css ("opacity", "0");
@@ -2067,7 +2071,10 @@ function program_right()
     play_program();
     }
   else
+    {
+    physical_stop();
     end_message (0);
+    }
   }
 
 function program_left()
@@ -2770,7 +2777,7 @@ function physical_stop()
     {
     case "jw": log ('jw STOP');
                try { jwplayer.removeModelListener ('STATE'); } catch (error) {};
-               jwplayer.sendEvent ('STOP');
+               try { jwplayer.sendEvent ('STOP'); } catch (error) {};
                break;
     }
   }
