@@ -377,6 +377,7 @@ function activate()
 log ('activate0');
   //play_first_program_in (first_channel());
   program_cursor = 1;
+  program_first = 1;
   current_program = first_program_in (first_channel());
 
 log ('activate2');
@@ -456,6 +457,9 @@ function best_url (program)
 function play_first_program_in (chan)
   {
   program_cursor = 1;
+  program_first = 1;
+
+  prepare_channel();
 
   current_program = first_program_in (chan);
   log ('playing first program in ' + chan + ': ' + current_program);
@@ -701,7 +705,7 @@ function prepare_channel()
   program_line = [];
 
   var channel = channel_line [channel_cursor];
-  log ('enter channel ' + channel);
+  log ('prepare channel ' + channel);
 
   if (channelgrid.length == 0)
     {
@@ -782,8 +786,6 @@ function enter_channel()
     $("#ch-layer").css ("display", "none");
     });
 
-  // $("#ep-list").html (html);
-
   setTimeout ("enter_channel_failsafe()", 500);
 
   thumbing = 'program';
@@ -796,6 +798,8 @@ function enter_channel()
 
 function enter_channel_failsafe()
   {
+  // prepare_channel();
+
   $("#ep-layer").css ("opacity", "1");
   $("#ep-swish").css ("top", "1.4275em");
   $("#ep-swish").css ("display", "block");
@@ -816,10 +820,11 @@ function ep_html()
   var html = '';
   var now = new Date();
 
+  log ('(program html) program_first: ' + program_first + ' n_program_line: ' + n_program_line);
   for (var i = program_first; i <= n_program_line && i < program_first + max_programs_in_line; i++)
     {
+    log ('--> program ' + i);
     var program = programgrid [program_line [i]];
-
     var age = ageof (program ['timestamp']);
 
     // html += '<li id="p-li-' + i + '"><img id="p-th-"' + i + '" src="' + program ['thumb'] + '"></li>';
@@ -829,6 +834,7 @@ function ep_html()
     html += '<p class="timestamp unseen">' + age + '</p><p class="duration">0:00</p></li>';
     }
 
+  log ('PROGRAM HTML: ' + html);
   return html;
   }
 
@@ -1458,6 +1464,8 @@ function keypress (keycode)
         redraw_ipg();
         elastic();
         }
+      else if (thumbing == 'program')
+        prepare_channel();
       break;
 
     case 49:
@@ -2092,12 +2100,13 @@ function redraw_program_line()
   {
   log ('redraw program line');
 
-  if (program_cursor < program_first)
+  while (program_cursor < program_first)
     {
     --program_first;
     $("#ep-list").html (ep_html());
     }
-  else if (program_cursor >= program_first + max_programs_in_line)
+
+  while (program_cursor >= program_first + max_programs_in_line)
     {
     ++program_first;
     $("#ep-list").html (ep_html());
