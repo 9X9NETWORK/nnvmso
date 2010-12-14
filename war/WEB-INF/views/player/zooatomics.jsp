@@ -1227,7 +1227,7 @@ function escape()
       $("#control-layer").show();
     }
 
-  else if (thumbing == 'ipg' || thumbing == 'control')
+  else if (thumbing == 'ipg' || thumbing == 'control' || thumbing == 'channel')
     {
     thumbing = 'program';
     prepare_channel();
@@ -1416,6 +1416,12 @@ function keypress (keycode)
       /* PgDn */
       if (thumbing == 'browse')
         browse_page_down();
+      break;
+
+    case 46:
+      /* Del */
+      if (thumbing == 'ipg')
+        unsubscribe_channel();
       break;
 
     case 82:
@@ -1608,8 +1614,15 @@ function osd_timex_expired()
   {
   osd_timex = 0;
   log ('osd timex expired');
+
   $("#ch-layer").hide();
   $("#ep-layer").hide();
+
+  if (thumbing == 'channel')
+    {
+    thumbing = 'program';
+    prepare_channel();
+    }
   }
 
 function extend_ch_layer()
@@ -2549,6 +2562,23 @@ function continue_acceptance()
     // for now, stay in IPG
     // ipg_play()
     });
+  }
+
+function unsubscribe_channel()
+  {
+  if (ipg_cursor in channelgrid)
+    {
+    var grid = server_grid (ipg_cursor);
+    var channel = channelgrid [ipg_cursor]['id'];
+
+    var cmd = "/playerAPI/unsubscribe?user=" + user + '&' + "channel=" + channel + '&' + "grid=" + grid;
+    var d = $.get (cmd, function (data)
+      {
+      delete (channelgrid [ipg_cursor]);
+      redraw_ipg();
+      elastic();
+      });
+    }
   }
 
 function sanity_check_data (what, data)
