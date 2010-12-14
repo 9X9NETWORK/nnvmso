@@ -3,7 +3,7 @@
 <meta charset="UTF-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
-<link rel="stylesheet" href="http://zoo.atomics.org/video/9x9playerV15/stylesheets/main.css" />
+<link rel="stylesheet" href="http://zoo.atomics.org/video/9x9playerV17a/stylesheets/main.css" />
 
 <style>
 
@@ -30,7 +30,7 @@
 #msg-end-of-channel {
   padding: 1.25em;
   width: 31.25em;
-  background: #666 url(http://zoo.atomics.org/video/9x9playerV15/bg_msg.svg) 0 0 repeat-x;
+  background: #666 url(http://zoo.atomics.org/video/9x9playerV17a/bg_msg.svg) 0 0 repeat-x;
   background-size: auto 100%;
   border: #444 0.0625em solid;
   -moz-border-radius: 0.3125em; /* FF1+ */
@@ -58,6 +58,7 @@
 <script type="text/javascript" src="http://zoo.atomics.org/video/cssanim.js"></script>
 <script type="text/javascript" src="http://zoo.atomics.org/video/swfobject.js"></script>
 <script type="text/javascript" src="http://zoo.atomics.org/video/flowplayer-3.2.4.min.js"></script>
+<script type="text/javascript" src="http://zoo.atomics.org/video/9x9playerV17a/javascripts/whatsnew.js"></script>
 
 <script>
 
@@ -112,6 +113,9 @@ var control_saved_thumbing = '';
 var browse_cursor = 1;
 var max_programs_in_line = 9;
 
+/* what's new */
+whatsnew = [];
+
 /* timeout for program or channel index */
 var osd_timex = 0;
 
@@ -128,7 +132,7 @@ var control_buttons = [ 'btn-replay', 'btn-rewind', 'btn-play', 'btn-forward', '
 var control_cursor = 2;
 
 var user = "aghubmUydm1zb3IMCxIGTm5Vc2VyGBoM";
-var root = 'http://zoo.atomics.org/video/9x9playerV15/images/';
+var root = 'http://zoo.atomics.org/video/9x9playerV17a/images/';
 
 $(document).ready (function()
  {
@@ -144,6 +148,11 @@ function elastic()
   log ('elastic');
   elastic_innards();
   ShowArrows();
+  if (thumbing == 'whatsnew')
+    {
+    GetAnchor();
+    GetFilmPos2();
+    }
   }
 
 function elastic_innards()
@@ -296,6 +305,7 @@ function parse_program_data (data)
        // channelId, programId, programName, programType, programThumbnailUrl, programLargeThumbnailUrl,
        // url1(mpeg4/slideshow), url2(webm), url3(flv more likely), url4(audio), timestamp
 
+//1679	1680	System Program	video	/WEB-INF/../images/logo_9x9.png	http://s3.amazonaws.com/mp4_9x9/default.mp4	http://s3.amazonaws.com/webm9x9/default.webm	1292037210436
 
 
   var logtext = '';
@@ -314,7 +324,7 @@ function parse_program_data (data)
       programgrid [fields [1]] = { 'channel': fields[0], 'type': fields[3], 'url1': 'jw:' + fields[6], 
                    'url2': 'jw:' + fields[7], 'url3': 'jw:' + fields[8], 'url4': 'jw:' + fields[9], 
                    'name': fields[2], 'type': fields[3], 'thumb': fields[4], 
-                   'snapshot': fields[5], 'timestamp': fields[10] };
+                   'snapshot': fields[5], 'timestamp': fields[10], 'screenshot': fields[4], 'age': 'Today', 'duration': '2:22' };
       }
     }
 
@@ -369,11 +379,18 @@ function activate()
   activated = true;
   enter_category (1, 'b');
   elastic();
-  play_first_program_in (first_channel());
+log ('activate0');
+  //play_first_program_in (first_channel());
+  program_cursor = 1;
+  current_program = first_program_in (first_channel());
+log ('activate2');
   enter_channel();
+log ('activate3');
   $("#ep-layer").hide();
   document.onkeydown=kp;
   redraw_ipg();
+
+  log ('activate: ipg');
   switch_to_ipg();
   $("#notblue").show();
   $("#blue").hide();
@@ -401,7 +418,7 @@ function best_url (program)
     }
 
   if (current_tube == 'jw')
-    desired = '(mp4|m4v)';
+    desired = '(mp4|m4v|flv)';
 
   else if (navigator.userAgent.match (/(GoogleTV|Droid Build)/i))
     desired = '(mp4|m4v)';
@@ -432,7 +449,7 @@ function best_url (program)
     }
   else
     {
-    if (programgrid [program]['url1'] == 'null' || programgrid [program]['url1'] == 'jw:null')
+    if (programgrid [program]['url1'].match (/(null|jw:null|jw:)/))
       return '';
     return programgrid [program]['url1'];
     }
@@ -580,12 +597,13 @@ function ended_callback()
   var type = thumbing;
   if (type == 'control') type = control_saved_thumbing;
 
-  if (type == 'channel')
-    {
-    log ('** ended event fired, moving channel right');
-    channel_right();
-    }
-  else if (type == 'program')
+  // if (type == 'channel')
+  //  {
+  //  log ('** ended event fired, moving channel right');
+  //  channel_right();
+  //  }
+
+  if (type == 'program' || type == 'channel')
     {
     log ('** ended event fired, moving program right');
     program_right();
@@ -663,9 +681,9 @@ function prepare_channel()
   {
   program_line = [];
 
-  log ('enter channel');
-
   var channel = channel_line [channel_cursor];
+  log ('enter channel ' + channel);
+
   var real_channel = channelgrid [channel]['id'];
 
   if (programs_in_channel (channel) < 1)
@@ -1427,6 +1445,11 @@ function keypress (keycode)
         login_screen();
       break;
 
+    case 87:
+      /* W */
+      switch_to_whats_new();
+      break;
+
     case 88:
       /* X */
       physical_stop();
@@ -1442,6 +1465,68 @@ function dump_configuration_to_log()
     var program = programgrid [p];
     log ('#' + p + ' ch:' + program ['channel'] + ' grid:' + channels_by_id [program ['channel']] + ' ' + program ['name'] + ' time:' + program ['timestamp'] + ' url: ' + best_url (p))
     }
+  }
+
+function switch_to_whats_new()
+  {
+  whatsnew = [];
+
+  log ('whats new');
+
+  thumbing = 'whatsnew';
+  var bad_thumbnail = '<img src="http://zoo.atomics.org/video/images-x1/no_images.png">';
+  hide_layers();
+
+  var query = "/playerAPI/whatsNew?user=" + user;
+
+  var html = '';
+
+  for (var y = 1; y <= 9; y++)
+    {
+    html += '<ul class="new-list">';
+
+    for (var x = 1; x <= 9; x++)
+      {
+      if ("" + y + "" + x in channelgrid)
+        {
+        var thumb = channelgrid ["" + y + "" + x]['thumb'];
+        if (thumb == '' || thumb == 'null' || thumb == 'false')
+          html += '<li>' + bad_thumbnail + '</li>';
+        else
+          html += '<li><img src="' + channelgrid ["" + y + "" + x]['thumb'] + '"></li>';
+        }
+      else
+        html += '<li></li>';
+      }
+    html += '</ul>';
+    }
+
+  $("#new-layer").html (html);
+
+  var d = $.get (query, function (data)
+    {
+    var lines = data.split ('\n');
+    log ('number of new programs obtained: ' + lines.length);
+    for (var i = 0; i < lines.length; i++)
+      {
+      var program = lines [i].trim();
+      if (program != '')
+        {
+        if (program in programgrid)
+          {
+          var channel = channels_by_id [programgrid [program]['channel']]
+          log ('whatsnew ' + program + ' (ch: ' + channel + '): ' + programgrid [program]['name']);
+          whatsnew.push ({ 'channel': channel, 'grid': channels_by_id [program ['channel']], 'episodes': [ program ]});
+          }
+        else
+          log ('program ' + program + ' not in a subscribed channel');
+        }
+      }
+
+    log ('what is new?');
+    $("#new-layer").show();
+    WhatIsNew();
+    });
   }
 
 function clear_osd_timex()
@@ -1739,6 +1824,7 @@ function ipg_down()
     {
     escape();
     switch_to_channel_thumbs()
+    enter_channel();
     return;
     }
 
@@ -1756,7 +1842,7 @@ function ipg_down()
 
 function ipg_play()
   {
-  //alert ("play: " + (""+ipg_cursor).substring (0, 1) + "-" + (""+ipg_cursor).substring (1,2));
+  log ('ipg play: ' + ipg_cursor);
 
   if (ipg_cursor < 0)
     {
@@ -3036,7 +3122,10 @@ One moment...
     <p id="pop-play"></p><p id="pop-delete"></p>
   </div>
 </div>
- 
+
+<div id="new-layer" style="display: none">
+</div>
+
 <div id="signin-layer" style="display: none">
   <ul id="login-pannel">
     <li><h2>Returning Users</h2></li>
@@ -3154,13 +3243,13 @@ One moment...
   <p>&nbsp</p>
   <p>&nbsp</p>
   <div style="float: left">
-  <img src="http://zoo.atomics.org/video/9x9playerV15/images/bg_ep.svg" id="left-tease" style="width: 5em; height: 3em">
+  <img src="http://zoo.atomics.org/video/9x9playerV17a/images/bg_ep.svg" id="left-tease" style="width: 5em; height: 3em">
   <p>Press <span class="enlarge">&larr;</span> for previous channel</p>
 
   </div>
   <div style="float: right">
 
-  <img src="http://zoo.atomics.org/video/9x9playerV15/images/bg_ep.svg" id="right-tease" style="width: 5em; height: 3em">
+  <img src="http://zoo.atomics.org/video/9x9playerV17a/images/bg_ep.svg" id="right-tease" style="width: 5em; height: 3em">
   <p>Press <span class="enlarge">&rarr;</span> for next channel</p>
   </div>
   <br clear=all>
