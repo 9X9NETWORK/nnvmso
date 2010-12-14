@@ -3,7 +3,7 @@
 <meta charset="UTF-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
-<link rel="stylesheet" href="http://zoo.atomics.org/video/9x9playerV17a/stylesheets/main.css" />
+<link rel="stylesheet" href="http://zoo.atomics.org/video/9x9playerV18/stylesheets/main.css" />
 
 <style>
 
@@ -19,46 +19,14 @@
   display: none;
 }
 
-#msg-end-of-channel {
-  position: absolute;
-  display: inline-block;
-  left: 16.375em;
-  top: 8.625em;
-  z-index: 20;
-}
 
-#msg-end-of-channel {
-  padding: 1.25em;
-  width: 31.25em;
-  background: #666 url(http://zoo.atomics.org/video/9x9playerV17a/bg_msg.svg) 0 0 repeat-x;
-  background-size: auto 100%;
-  border: #444 0.0625em solid;
-  -moz-border-radius: 0.3125em; /* FF1+ */
-  -webkit-border-radius: 0.3125em; /* Saf3+, Chrome */
-  border-radius: 0.3125em; /* Opera 10.5, IE 9 */
-  filter: alpha(Opacity=80); 
-  opacity: 0.8;
-  overflow: hidden;
-  position: absolute;
-  left: 20em;
-  top: 4.625em;
-  width: 20em;
-  z-index: 20;
-  display: none;
-}
-
-#msg-end-of-channel p {
-  font-size: 0.75em;
-  color: #fff;
-  text-align: center;
-}
 </style>
 
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 <script type="text/javascript" src="http://zoo.atomics.org/video/cssanim.js"></script>
 <script type="text/javascript" src="http://zoo.atomics.org/video/swfobject.js"></script>
 <script type="text/javascript" src="http://zoo.atomics.org/video/flowplayer-3.2.4.min.js"></script>
-<script type="text/javascript" src="http://zoo.atomics.org/video/9x9playerV17a/javascripts/whatsnew.js"></script>
+<script type="text/javascript" src="http://zoo.atomics.org/video/9x9playerV18/javascripts/whatsnew.js"></script>
 
 <script>
 
@@ -70,7 +38,7 @@ var ytplayer;
 var yt_video_id;
 
 var jwplayer;
-var jw_video_file;
+var jw_video_file = 'nothing.flv';
 var jw_timex = 0;
 var jw_previous_state = '';
 var jw_position = 0;
@@ -101,6 +69,7 @@ var program_cursor = 1;
 var program_first = 1;
 
 var ipg_cursor;
+var ipg_timex = 0;
 
 /* cache this for efficiency */
 var loglayer;
@@ -122,7 +91,11 @@ var osd_timex = 0;
 /* workaround for Chrome not firing 'ended' video event */
 var fake_timex = 0;
 
+/* timeout for msg-layer */
 var msg_timex = 0;
+
+/* when end message enters whatsnew after 20 seconds */
+var edge_of_world_timex = 0;
 
 var dirty_delay;
 var dirty_channels = [];
@@ -132,7 +105,7 @@ var control_buttons = [ 'btn-replay', 'btn-rewind', 'btn-play', 'btn-forward', '
 var control_cursor = 2;
 
 var user = "aghubmUydm1zb3IMCxIGTm5Vc2VyGBoM";
-var root = 'http://zoo.atomics.org/video/9x9playerV17a/images/';
+var root = 'http://zoo.atomics.org/video/9x9playerV18/images/';
 
 $(document).ready (function()
  {
@@ -180,6 +153,18 @@ function elastic_innards()
   ipg_fixup_middle();
 
   whatsnew_fixup_middle();
+  episode_end_layer_fixup();
+
+  if (thumbing == 'ipg')
+    extend_ipg_timex();
+  }
+
+function episode_end_layer_fixup()
+  {
+  var wh = $(window).height();
+  var eh = $("#epend-layer").height();
+  var et = (wh-eh)/2;
+  $("#epend-layer").css("top",et);
   }
 
 function ipg_fixup_margin()
@@ -393,6 +378,7 @@ log ('activate0');
   //play_first_program_in (first_channel());
   program_cursor = 1;
   current_program = first_program_in (first_channel());
+
 log ('activate2');
   enter_channel();
 log ('activate3');
@@ -405,6 +391,8 @@ log ('activate3');
   $("#notblue").show();
   $("#blue").hide();
   preload_control_images()
+
+  jw_play_nothing();
   }
 
 function preload_control_images()
@@ -482,8 +470,13 @@ function clear_msg_timex()
     clearTimeout (msg_timex);
     msg_timex = 0;
     }
+  if (edge_of_world_timex != 0)
+    {
+    clearTimeout (edge_of_world_timex);
+    edge_of_world_timex = 0;
+    }
   $("#msg-layer").hide();
-  $("#msg-end-of-channel").hide();
+  $("#epend-layer").hide();
   }
 
 function message (text, duration)
@@ -501,6 +494,8 @@ function hide_layers()
   $("#ep-layer").hide();
   $("#control-layer").hide();
   $("#msg-layer").hide();
+  $("#msg-layer").hide();
+  $("#epend-layer").hide();
   }
 
 function end_message (duration)
@@ -515,12 +510,24 @@ function end_message (duration)
   $("#left-tease").attr ("src", channelgrid [prev]['thumb']);
   $("#right-tease").attr ("src", channelgrid [next]['thumb']);
 
-  $("#msg-end-of-channel").show();
+  $("#epend-layer").show();
 
   if (duration > 0)
     msg_timex = setTimeout ("empty_channel_timeout()", duration);
 
+  edge_of_world_timex = setTimeout ("edge_of_world_idle()", 20000);
+
   thumbing = 'end';
+  }
+
+function edge_of_world_idle()
+  {
+  edge_of_world_timex = 0;
+  if (thumbing == 'end')
+    {
+    escape();
+    switch_to_whats_new();
+    }
   }
 
 function play()
@@ -642,7 +649,7 @@ function empty_channel_timeout()
   {
   msg_timex = 0;
   $("#msg-layer").hide();
-  $("#msg-end-of-channel").hide();
+  $("#epend-layer").hide();
   log ('auto-switching from empty channel');
   channel_right();
   }
@@ -694,7 +701,16 @@ function prepare_channel()
   var channel = channel_line [channel_cursor];
   log ('enter channel ' + channel);
 
-  var real_channel = channelgrid [channel]['id'];
+  if (channelgrid.length == 0)
+    {
+    alert ('You have no channels');
+    return;
+    }
+
+  if (channel in channelgrid)
+    var real_channel = channelgrid [channel]['id'];
+  else
+    log ('not in channelgrid: ' + channel);
 
   if (programs_in_channel (channel) < 1)
     {
@@ -1077,12 +1093,16 @@ function channels_in_category (cat)
 function programs_in_channel (channel)
   {
   var num_programs = 0;
-  var real_channel = channelgrid [channel]['id'];
 
-  for (p in programgrid)
+  if (channel in channelgrid)
     {
-    if (programgrid [p]['channel'] == real_channel)
-      num_programs++;
+    var real_channel = channelgrid [channel]['id'];
+
+    for (p in programgrid)
+      {
+      if (programgrid [p]['channel'] == real_channel)
+        num_programs++;
+      }
     }
 
   return num_programs;
@@ -1236,7 +1256,7 @@ function escape()
   $("#mask").hide();
   $("#log-layer").hide();
   $("#msg-layer").hide();
-  $("#msg-end-of-channel").hide();
+  $("#epend-layer").hide();
 
   if (thumbing == 'channel' || thumbing == 'program')
     {
@@ -1273,6 +1293,9 @@ function keypress (keycode)
   /* special case, channel browser + navigation key */
   if (thumbing == 'browse' && keycode != 27 && keycode != 38 && keycode != 40 && keycode != 13 && keycode != 33 && keycode != 34)
     return;
+
+  if (thumbing == 'ipg')
+    extend_ipg_timex();
 
   /* ensure osd is up */
 
@@ -1338,7 +1361,7 @@ function keypress (keycode)
         channel_left();
       else if (thumbing == 'end')
         {
-        $("#msg-end-of-channel").hide();
+        $("#epend-layer").hide();
         channel_left();
         thumbing = 'program';
         }
@@ -1356,7 +1379,7 @@ function keypress (keycode)
         channel_right();
       else if (thumbing == 'end')
         {
-        $("#msg-end-of-channel").hide();
+        $("#epend-layer").hide();
         channel_right();
         thumbing = 'program';
         }
@@ -1375,7 +1398,7 @@ function keypress (keycode)
         switch_to_ipg();
       else if (thumbing == 'end')
         {
-        $("#msg-end-of-channel").hide();
+        $("#epend-layer").hide();
         switch_to_ipg();
         }
       else if (thumbing == 'channel')
@@ -1394,7 +1417,7 @@ function keypress (keycode)
         enter_channel();
       else if (thumbing == 'end')
         {
-        $("#msg-end-of-channel").hide();
+        $("#epend-layer").hide();
         enter_channel();
         thumbing = 'program';
         }
@@ -1457,7 +1480,7 @@ function keypress (keycode)
 
     case 67:
       /* C */
-      // $("#msg-end-of-channel").show();
+      // $("#epend-layer").show();
       end_message (10000);
       break;
 
@@ -1552,7 +1575,7 @@ function switch_to_whats_new()
 
     log ('what is new?');
 
-    var html = '';
+    var html = '<p id="whatsnew-title">What\'s New</p>';
 
     for (var y = 1; y <= 9; y++)
       {
@@ -1654,6 +1677,9 @@ function switch_to_ipg()
   ipg_cursor = parseInt (channel_line [channel_cursor]);
   // ipg_cursor = -1;
 
+  if (! (ipg_cursor in channelgrid))
+    ipg_cursor = '11';
+
   redraw_ipg();
 
   $("#ipg-layer").css ("opacity", "0");
@@ -1692,6 +1718,24 @@ function ipg_failsafe()
   $("#ipg-layer").css ("opacity", "1");
   $("#ipg-layer").show();
   elastic();
+  extend_ipg_timex();
+  }
+
+function ipg_idle()
+  {
+  ipg_timex = 0;
+  if (thumbing == 'ipg')
+    {
+    escape();
+    switch_to_whats_new();
+    }
+  }
+
+function extend_ipg_timex()
+  {
+  if (ipg_timex)
+    clearTimeout (ipg_timex);
+  ipg_timex = setTimeout ("ipg_idle()", 20000);
   }
 
 function redraw_ipg()
@@ -2713,6 +2757,13 @@ function jw_play()
   jwplayer.addModelListener ('STATE', "jw_state_change()" );
   }
 
+function jw_play_nothing()
+  {
+  jw_video_file = "nothing.flv";
+  log ("jw LOAD " + jw_video_file);
+  jwplayer.sendEvent ('LOAD', jw_video_file)
+  }
+
 function physical_stop()
   {
   switch (tube())
@@ -3070,6 +3121,7 @@ function playerReady (thePlayer)
   log ('jw player ready: ' + thePlayer.id);
   //  log_and_alert (thePlayer.id);
   jwplayer = document.getElementById (thePlayer.id);
+  jwplayer.sendEvent ('LOAD', 'nothing.flv');
   }
 
 </script>
@@ -3205,6 +3257,7 @@ One moment...
       <li><a id="ipg-return-btn" href="javascript:;" class="btn">Return to Channel Mode</a></li>
 
     </ul> 
+    <img src="http://zoo.atomics.org/video/9x9playerV18/images/logo.png" id="logo">
   </div>
 
   <div id="ipg-grid"></div>
@@ -3327,28 +3380,13 @@ One moment...
   <p>No programs in this channel</p>
 </div>
 
-<div id="msg-end-of-channel" style="display: none">
-  <p>Press <span class="enlarge">&uarr;</span> to see your programming guide</p>
-
-  <p>&nbsp</p>
-  <p>&nbsp</p>
-  <div style="float: left">
-  <img src="http://zoo.atomics.org/video/9x9playerV17a/images/bg_ep.svg" id="left-tease" style="width: 5em; height: 3em">
-  <p>Press <span class="enlarge">&larr;</span> for previous channel</p>
-
-  </div>
-  <div style="float: right">
-
-  <img src="http://zoo.atomics.org/video/9x9playerV17a/images/bg_ep.svg" id="right-tease" style="width: 5em; height: 3em">
-  <p>Press <span class="enlarge">&rarr;</span> for next channel</p>
-  </div>
-  <br clear=all>
-  <p>&nbsp</p>
-
-  <p>&nbsp</p>
-  <p>Press <span class="enlarge">&darr;</span> to see all episodes</p>
-
+<div id="epend-layer" style="display: none">
+  <div id="go-up">Press <span class="enlarge">&uarr;</span> to go to the IPG</div>
+  <div id="go-down">Press <span class="enlarge">&darr;</span> to see all episodes</div>
+  <div id="go-left"><img src="" id="left-tease">Press <span class="enlarge">&larr;</span> to watch previous channel</div>
+  <div id="go-right"><img src="" id="right-tease">Press <span class="enlarge">&rarr;</span> to watch next channel</div>
 </div>
+
 
 <div id="log-layer" style="position: absolute; left: 0; top: 0; height: 100%; width: 100%; background: white; color: black; text-align: left; padding: 20px; overflow: scroll; z-index: 9999; display: none"></div>
 
