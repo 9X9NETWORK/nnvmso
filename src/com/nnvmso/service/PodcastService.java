@@ -106,52 +106,68 @@ public class PodcastService {
 		return channel;
 	}	
 			
-	public MsoProgram createProgramViaPodcast(PodcastProgram podcastProgram) {
+	public MsoProgram updateProgramViaPodcast(PodcastProgram podcastProgram) {
 		ProgramManager programMngr = new ProgramManager();
 		PodcastItem item = podcastProgram.getItems()[0]; //!!! for now there's only one item
-		MsoProgram p = programMngr.findByStorageId(item.getItemId());
-		if (p != null) { 
-			return p;
-		}		
-		
+		MsoProgram program = programMngr.findByStorageId(item.getItemId());
 		MsoChannel channel = new ChannelManager().findByKey(podcastProgram.getKey());
-		p = new MsoProgram();
-		
-		p.setChannelKey(channel.getKey());
-		p.setChannelId(channel.getId());		
-		p.setName(item.getTitle());
+		boolean isNew = false;
+		if (program == null) {
+			isNew = true;
+			program = new MsoProgram();			
+			program.setChannelKey(channel.getKey());
+			program.setChannelId(channel.getId());		
+		}
+		if (item.getTitle() != null) {
+			program.setName(item.getTitle());
+		}
 		if (item.getDescription()!= null && item.getDescription().length() > 500) {
 			item.setDescription(item.getDescription().substring(0, 500));
 		}
-		p.setIntro(item.getDescription());
+		program.setIntro(item.getDescription());
 		if (item.getThumbnail()!= null) {
-			p.setImageUrl(item.getThumbnail());
+			program.setImageUrl(item.getThumbnail());
 		} else {
-			p.setImageUrl(channel.getImageUrl());
+			program.setImageUrl(channel.getImageUrl());
 		}
 		if (item.getThumbnail()!= null) {
-			p.setImageLargeUrl(item.getThumbnailLarge());
+			program.setImageLargeUrl(item.getThumbnailLarge());
 		} else {
-			p.setImageUrl(channel.getImageUrl());
+			program.setImageUrl(channel.getImageUrl());
 		}		
-		p.setStorageId(item.getItemId());
-		p.setMpeg4FileUrl(item.getMp4());
-		p.setWebMFileUrl(item.getWebm());
-		p.setOtherFileUrl(item.getOther());
-		p.setAudioFileUrl(item.getAudio());
+		program.setStorageId(item.getItemId());
+		if (item.getMp4() != null) {			
+			program.setMpeg4FileUrl(item.getMp4());
+		}
+		if (item.getWebm() != null) {
+			program.setWebMFileUrl(item.getWebm());
+		}
+		if (item.getOther() != null) {
+			program.setOtherFileUrl(item.getOther());
+		}
 		if (item.getAudio() != null) {
-			p.setType(MsoProgram.TYPE_AUDIO);
+			program.setAudioFileUrl(item.getAudio());			
+		}
+		if (item.getDuration() != null) {
+			program.setDuration(item.getDuration());
+		}
+		if (item.getAudio() != null) {
+			program.setType(MsoProgram.TYPE_AUDIO);
 		} else {
-			p.setType(MsoProgram.TYPE_VIDEO);
+			program.setType(MsoProgram.TYPE_VIDEO);
 		}
 		if (item.getPubDate() != null) {
 			System.out.println(item.getPubDate());
 			Date theDate = new Date(Long.parseLong(item.getPubDate())*1000);						
-			p.setUpdateDate(theDate);
+			program.setUpdateDate(theDate);
 		}
-		p.setPublic(true);
-		new ProgramManager().create(p);
-		return p;
+		program.setPublic(true);
+		if (isNew) {
+			new ProgramManager().create(program);
+		} else {
+			new ProgramManager().save(program);
+		}
+		return program;
 	}
 		
 	public MsoChannel getDefaultPodcastChannel(String rssStr) {
