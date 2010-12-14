@@ -210,6 +210,7 @@ public class PlayerAPIController {
 		String output ="";
 		ProgramManager programMngr = new ProgramManager();
 		
+		/*
 		Cache cache = null;
 		
         try {
@@ -218,9 +219,11 @@ public class PlayerAPIController {
         } catch (CacheException e) {
             // ...
         }		
-        
+        */
+		
 		for (MsoChannel c:channels) {
-			Object programCountObj;
+			/*
+			Object programCountObj = null;
 			int programCount = 0;
 			if (cache != null ) {
 				programCountObj = cache.get( c.getKey() );
@@ -236,8 +239,10 @@ public class PlayerAPIController {
 					programCount = Integer.parseInt( programCountObj.toString() );
 				}
 			}
-			if ( programCount > 0 ) {
-				String[] ori = {Short.toString(c.getSeq()), String.valueOf(c.getKey().getId()), c.getName(), c.getImageUrl(), Integer.toString(programCount)};
+			*/
+			if ( c.getProgramCount() > 0 ) {
+				String[] ori = {Short.toString(c.getSeq()), String.valueOf(c.getKey().getId()), 
+						c.getName(), c.getImageUrl(), Integer.toString(c.getProgramCount())};
 				output = output + PlayerLib.getTabDelimitedStr(ori);			
 				output = output + "\n";
 				System.out.println(output);

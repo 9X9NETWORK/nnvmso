@@ -56,6 +56,9 @@ public class MsoChannel implements Serializable {
 	
 	@Persistent
 	private String tag;
+
+	@Persistent
+	private int programCount;
 	
 	//!!!!yet another temp column.
 	@Persistent
@@ -200,6 +203,14 @@ public class MsoChannel implements Serializable {
 		this.type = type;
 	}
 
+	public int getProgramCount() {
+		return programCount;
+	}
+
+	public void setProgramCount(int count) {
+		this.programCount = count;
+	}
+	
 	public String getPodcast() {
 		return podcast;
 	}

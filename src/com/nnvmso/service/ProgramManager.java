@@ -169,6 +169,8 @@ public class ProgramManager {
 		List<Key> seq = c.getProgramSeq();		
 		pm.makePersistent(program);
 		seq.add(program.getKey());
+		int count = c.getProgramCount() + 1;
+		c.setProgramCount(count);
 		pm.makePersistent(c);
 		pm.close();		
 	}
