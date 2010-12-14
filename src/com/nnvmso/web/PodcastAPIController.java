@@ -74,7 +74,7 @@ public class PodcastAPIController {
 	@RequestMapping("itemUpdate")
 	public @ResponseBody PodcastResponse itemUpdate(@RequestBody PodcastProgram podcastProgram) {
 		PodcastResponse resp = new PodcastResponse();				
-		MsoProgram p = podcastService.createProgramViaPodcast(podcastProgram);
+		MsoProgram p = podcastService.updateProgramViaPodcast(podcastProgram);
 		if (p == null) {
 			resp.setErrorCode(PodcastResponse.ERROR_CODE_FAIL);
 			resp.setErrorCode(PodcastResponse.ERROR_MSG_FAIL);
