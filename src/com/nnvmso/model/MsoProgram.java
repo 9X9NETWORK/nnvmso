@@ -67,7 +67,7 @@ public class MsoProgram implements Serializable {
 	private ProgramScript nnScript; 	
 
 	@Persistent
-	private long duration;
+	private String duration;
 	
 	@Persistent
 	private boolean isPublic; 
@@ -246,11 +246,12 @@ public class MsoProgram implements Serializable {
 		this.id = id;
 	}
 
-	public long getDuration() {
+
+	public String getDuration() {
 		return duration;
 	}
 
-	public void setDuration(long duration) {
+	public void setDuration(String duration) {
 		this.duration = duration;
 	}
 
