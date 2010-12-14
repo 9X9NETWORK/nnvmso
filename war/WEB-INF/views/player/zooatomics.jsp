@@ -178,6 +178,8 @@ function elastic_innards()
 
   ipg_fixup_margin();
   ipg_fixup_middle();
+
+  whatsnew_fixup_middle();
   }
 
 function ipg_fixup_margin()
@@ -207,6 +209,14 @@ function ipg_fixup_middle()
 
   $("#ipg-layer").css ("top", margin);
   $("#podcast-layer").css ("top", margin);
+  }
+
+function whatsnew_fixup_middle()
+  {
+  var wh = $(window).height();
+  var nh = $("#new-layer").height();
+  var nt = (wh-nh)/2;
+  $("#new-layer").css("top",nt);
   }
 
 function log (text)
@@ -401,7 +411,7 @@ function preload_control_images()
   {
   var html = '';
 
-  for (var i in { 'bg_controlbar':'', 'btn_rewind':'', 'btn_pause':'', 'btn_play':'', 'btn_forward':'', 'btn_volume':'', 'btn_close':'', 'btn_signin':'', 'btn_handler':'', 'bg_msgup':'', 'bg_msgdown':'', 'btn_on':'', 'btn_off':'', 'btn_facebook':'', 'btn_replay':'', 'btn_screensaver':'', 'bg_ep':'', 'bg_podcastlist':'' })
+  for (var i in { 'bg_controlbar':'', 'btn_rewind':'', 'btn_pause':'', 'btn_play':'', 'btn_forward':'', 'btn_volume':'', 'btn_close':'', 'btn_signin':'', 'btn_handler':'', 'bg_msgup':'', 'bg_msgdown':'', 'btn_on':'', 'btn_off':'', 'btn_facebook':'', 'btn_replay':'', 'btn_screensaver':'', 'bg_ep':'', 'bg_podcastlist':'', 'bg_film':'' })
     html += '<img src="' + root + i + '.svg">';
 
   $("#preload-control-images").html (html);
@@ -790,27 +800,7 @@ function ep_html()
     {
     var program = programgrid [program_line [i]];
 
-    var age = ''
-    if (program ['timestamp'] != '')
-      {
-      var d = new Date (Math.floor (program ['timestamp']));
-      var minutes = Math.floor ((now.getTime() - d.getTime()) / 60 / 1000);
-      if (minutes > 59)
-        {
-        var hours = Math.floor ((minutes + 1) / 60);
-        if (hours >= 24)
-          {
-          var days = Math.floor ((hours + 1) / 24);
-          age = days + (days == 1 ? ' day' : ' days');
-          }
-        else
-          age = hours + (hours == 1 ? ' hour' : ' hours');
-        }
-      else
-        age = minutes + (minutes == 1 ? ' minute' : ' minutes');
-      }
-    else
-      age = '(ageless)'
+    var age = ageof (program ['timestamp']);
 
     // html += '<li id="p-li-' + i + '"><img id="p-th-"' + i + '" src="' + program ['thumb'] + '"></li>';
     var onoff = (i == program_cursor) ? 'class="on" ' : '';
@@ -820,6 +810,35 @@ function ep_html()
     }
 
   return html;
+  }
+
+function ageof (timestamp)
+  {
+  var age = '';
+  var now = new Date();
+
+  if (timestamp != '')
+    {
+    var d = new Date (Math.floor (timestamp));
+    var minutes = Math.floor ((now.getTime() - d.getTime()) / 60 / 1000);
+    if (minutes > 59)
+      {
+      var hours = Math.floor ((minutes + 1) / 60);
+      if (hours >= 24)
+        {
+        var days = Math.floor ((hours + 1) / 24);
+        age = days + (days == 1 ? ' day' : ' days');
+        }
+      else
+        age = hours + (hours == 1 ? ' hour' : ' hours');
+      }
+    else
+      age = minutes + (minutes == 1 ? ' minute' : ' minutes');
+    }
+  else
+    age = '(ageless)'
+
+  return age;
   }
 
 var old_cline;
@@ -1482,6 +1501,7 @@ function switch_to_whats_new()
 
   thumbing = 'whatsnew';
   var bad_thumbnail = '<img src="http://zoo.atomics.org/video/images-x1/no_images.png">';
+  var desc = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, ...";
 
   var query = "/playerAPI/whatsNew?user=" + user;
 
@@ -1505,6 +1525,10 @@ function switch_to_whats_new()
             wn [real_channel] = [];
 
           wn [real_channel].push (program);
+
+          /* fakes */
+          programgrid [program]['desc'] = desc;
+          programgrid [program]['age'] = ageof (programgrid [program]['timestamp']);
 
           //log ('whatsnew ' + program + ' (ch: ' + real_channel + '): ' + programgrid [program]['name']);
           }
@@ -1551,6 +1575,8 @@ function switch_to_whats_new()
     $("#new-layer").html (html);
 
     $("#new-layer").show();
+    elastic();
+
     WhatIsNew();
     });
   }
@@ -1559,6 +1585,8 @@ function exit_whats_new()
   {
   StopWhatsNew();
   $("body").css ("background-image", "none");
+  thumbing = 'program';
+  enter_channel();
   }
 
 function clear_osd_timex()
@@ -1662,10 +1690,10 @@ function redraw_ipg()
 
   for (var y = 1; y <= 9; y++)
     {
-    if (y >= 8)
-      html += '<ul class="ipg-list private" id="row-' + y + '">';
-    else
-      html += '<ul class="ipg-list" id="row-' + y + '">';
+    //if (y >= 8)
+    //  html += '<ul class="ipg-list private" id="row-' + y + '">';
+    // else
+    html += '<ul class="ipg-list" id="row-' + y + '">';
 
     html += '<li class="rowNum"><span>' + y + '</span></li>';
 
