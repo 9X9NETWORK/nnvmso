@@ -4,6 +4,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -31,6 +32,8 @@ public class PodcastService {
 	public static String TRANSCODING_SERVER_ALPHA = "http://awsapi.9x9cloud.tv/alpha/podcatcher.php";
 	public static String TRANSCODING_SERVER_BETA = "http://awsapi.9x9cloud.tv/beta/podcatcher.php";
 	public static String TRANSCODING_SERVER_TW = "http://awsapi.9x9cloud.tv/tw/podcatcher.php";
+
+	protected static final Logger log = Logger.getLogger(PodcastService.class.getName()); 
 	
 	public MsoChannel findByPodcast(String podcastRss) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();		    	
@@ -183,9 +186,25 @@ public class PodcastService {
 		PodcastFeed feed = new PodcastFeed();
 		feed.setKey(channelKey);
 		feed.setRss(rss);
-		String url = NnLib.getUrlRoot(req);
-		feed.setCallback(url);
-		String urlStr = TRANSCODING_SERVER_ALPHA;
+		
+		String urlStr = "";
+		String callBackUrl = "";
+		
+		String stage = "DEV"; 
+		//String stage = "ALPHA";
+		//String stage = "BETA";
+		
+		if (stage.equals("DEV")) {
+			feed.setCallback("http://209.133.58.79:8888");
+			urlStr = TRANSCODING_SERVER_DEV;
+		} else if (stage.equals("ALPHA")) {
+			feed.setCallback("http://9x9tvalpha.appspot.com");
+			urlStr = TRANSCODING_SERVER_ALPHA;
+		} else {
+			feed.setCallback("http://9x9tvbeta.appspot.com");
+			urlStr = TRANSCODING_SERVER_BETA;			
+		}			
+		log.info("LOGGING: callbackUrl = " + feed.getCallback());		
 		NnLib.urlPostWithJson(urlStr, feed);
 	}
 	
