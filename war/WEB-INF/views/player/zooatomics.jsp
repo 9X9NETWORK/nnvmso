@@ -1346,6 +1346,8 @@ function keypress (keycode)
         switch_to_control_layer();
       else if (thumbing == 'control')
         control_enter();
+      else if (thumbing == 'whatsnew')
+        whatsnew_enter()
       break;
 
     case 37:
@@ -1364,6 +1366,8 @@ function keypress (keycode)
         ipg_left();
       else if (thumbing == 'control')
         control_left();
+      else if (thumbing == 'whatsnew')
+        PrevEp();
       break;
 
     case 39:
@@ -1382,6 +1386,8 @@ function keypress (keycode)
         ipg_right();
       else if (thumbing == 'control')
         control_right();
+      else if (thumbing == 'whatsnew')
+        NextEp();
       break;
 
     case 38:
@@ -1621,6 +1627,32 @@ function exit_whats_new()
   $("#all-players").show();
   enter_channel();
   }
+
+function whatsnew_enter()
+  {
+  StopWhatsNew();
+  $("body").removeClass ("on");
+  $("#all-players").show();
+
+  var grid = whatsnew [i]['grid'];
+  var episode = whatsnew [i]['episodes'][n];
+  var channel = whatsnew [i]['channel'];
+
+  enter_category ((""+grid).substring (0, 1));
+
+  for (var c in channel_line)
+    {
+    if (channel_line [c] == grid)
+      {
+      channel_cursor = c;
+      redraw_channel_line()
+      enter_channel();
+      /* select episode, but for now, play first */
+      play_first_program_in (channel_line [channel_cursor]);
+      return;
+      }
+    }
+   }
 
 function clear_osd_timex()
   {
