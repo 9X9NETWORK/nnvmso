@@ -1,6 +1,5 @@
 package com.nnvmso.web;
 
-import java.nio.BufferOverflowException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,8 +27,6 @@ import net.sf.jsr107cache.CacheException;
 import net.sf.jsr107cache.CacheFactory;
 import net.sf.jsr107cache.CacheManager;
 
-//!!!!! exception handling, return a better message
-
 /**
  * <p>Serves for Player.</p>
  * <p>Url examples: (notice method name is used at the end of URL) <br/> 
@@ -40,7 +38,7 @@ import net.sf.jsr107cache.CacheManager;
 @Controller
 @RequestMapping("playerAPI")
 public class PlayerAPIController {
-
+	
 	/* ==========  CATEGORY: ACCOUNT RELATED ========== */
 	//user info
 	/**
@@ -69,13 +67,13 @@ public class PlayerAPIController {
 				output = PlayerAPI.CODE_SUCCESS + "\t" + NnLib.getKeyStr(user.getKey());
 			}
 			HttpHeaders headers = new HttpHeaders();
-			headers.setContentType(MediaType.valueOf("text/plain;charset=utf-8"));
+			headers.setContentType(MediaType.valueOf("text/plain;charset=utf-8"));			
 		} catch (Exception e) {
 			output = PlayerAPI.CODE_ERROR + "\t" + PlayerAPI.PLAYER_CODE_ERROR;						
 		}
 		return PlayerLib.outputReturn(output);
 	}
-	
+
 	/**
 	 *  User signup.
 	 *  
@@ -286,7 +284,7 @@ public class PlayerAPIController {
 	 * @return A string of all of the user's subscribed channels' information.<br/>
 	 * 	       Each channel is \n delimited. Each channel's information is tab delimited.<br/>  
 	 *         Channel info has grid id, channel id, channel name, channel image url.
-	 *         Example: 1	1	Channel1	http://hostname/images/img.jpg
+	 *         Example: 1	1	Channel1	http://hostname/images/img.jpg (program count) (type) (status)
 	 */
 	@RequestMapping(value="channelLineup")
 	public ResponseEntity<String> channelLineup(@RequestParam(value="user") String user) {
@@ -296,7 +294,10 @@ public class PlayerAPIController {
 		List<MsoChannel> channels = subMngr.findSubscribedChannels(foundUser);
 		String output = "";
 		for (MsoChannel c:channels) {
-			String[] ori = {Short.toString(c.getGrid()), String.valueOf(c.getKey().getId()), c.getName(), c.getImageUrl()};
+			String[] ori = {Short.toString(c.getGrid()), 
+						    String.valueOf(c.getKey().getId()),
+						    c.getName(),
+						    c.getImageUrl()};						    
 			output = output + PlayerLib.getTabDelimitedStr(ori);			
 			output = output + "\n";
 		}				
@@ -309,7 +310,7 @@ public class PlayerAPIController {
 				
 	/**
 	 * Get program script based on program id.
-	 * 
+	 * 	
 	 * <p>Example: http://localhost:8888/playerAPI/nnscript?program=566</p>  
 	 *  
 	 * @param program program id
@@ -318,12 +319,15 @@ public class PlayerAPIController {
 	@RequestMapping("nnscript")
 	public ResponseEntity<String> nnScript(@RequestParam(value="program") long programId)
 	{
-		ProgramManager programMngr = new ProgramManager();
-		MsoProgram program = programMngr.findById(programId);		
-		String script = program.getNnScript().getScript().getValue();		
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.valueOf("text/plain;charset=utf-8"));
-		return new ResponseEntity<String>(script, headers, HttpStatus.OK);
+		String output = "";
+		try {
+			ProgramManager programMngr = new ProgramManager();
+			MsoProgram program = programMngr.findById(programId);		
+			output = program.getNnScript().getScript().getValue();		
+		} catch (Exception e){
+			output = PlayerAPI.CODE_ERROR + "\t" + PlayerAPI.PLAYER_CODE_ERROR;						
+		}
+		return PlayerLib.outputReturn(output);
 	}
 	
 	/**
@@ -342,14 +346,17 @@ public class PlayerAPIController {
 	 * @return A string of all the programs' info that met the query criteria. <br/>
 	 * 		   Each program is separate by carriage return. Each program's information is tab delimited.<br/>
 	 *   Program info has: <br/>
-	 *              channelId, programId, programName, programType, programThumbnailUrl, programLargeThumbnailUrl, <br/>
-	 *              url1(mpeg4/slideshow), url2(webm), url3(flv more likely), url4(audio), timestamp
+	 *              channelId, programId, programName, description(max length=256),<br/>
+	 *              programType, duration, <br/>
+	 *              programThumbnailUrl, programLargeThumbnailUrl, <br/>
+	 *              url1(mpeg4/slideshow), url2(webm), url3(flv more likely), url4(audio), <br/> 
+	 *              timestamp
 	 */
 	 //@todo channel equals star and no user token, return missing param 	
 	@RequestMapping("programInfo")	
 	public ResponseEntity<String> programInfo(@RequestParam(value="channel") String channel,
-									        @RequestParam(value="user", required = false) String user,
-									        HttpServletRequest req) {
+									          @RequestParam(value="user", required = false) String user,
+									          HttpServletRequest req) {
 		ProgramManager programMngr = new ProgramManager();
 		String[] chStrSplit = channel.split(",");
 		List<MsoProgram> programs = new ArrayList<MsoProgram>();
@@ -358,7 +365,7 @@ public class PlayerAPIController {
 			SubscriptionManager sService = new SubscriptionManager();
 			NnUser found = userService.findByKey(user);
 			programs = sService.findSubscribedPrograms(found);
-		} else if (chStrSplit.length > 1) {			
+		} else if (chStrSplit.length > 1) {
 			programs = programMngr.findByChannelIdsAndIsPublic(channel, true);
 		} else {
 			long chId = Integer.parseInt(channel);
@@ -375,10 +382,17 @@ public class PlayerAPIController {
 			if (p.getType().equals(MsoProgram.TYPE_SLIDESHOW)) {
 				url1 = "/player/nnscript?program=" + p.getId();
 			}
+			
+			String intro = p.getIntro();
+			int introLenth = (intro.length() > 256 ? 256 : intro.length()); 
+			intro = intro.substring(0, introLenth);
+			
 			String[] ori = {String.valueOf(p.getChannelId()), 
 					        String.valueOf(p.getKey().getId()), 
 					        p.getName(), 
+					        intro,
 					        p.getType(), 
+					        p.getDuration(),
 					        p.getImageUrl(),
 					        p.getImageLargeUrl(),
 					        url1, 
