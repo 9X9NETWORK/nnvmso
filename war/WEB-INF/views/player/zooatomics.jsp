@@ -2288,6 +2288,12 @@ function submit_throw()
   var serialized = $("#throw").serialize() + '&' + 'user=' + user + '&' + 'grid=' + server_grid (ipg_cursor);
   log ('throw: ' + serialized);
 
+  if ($("#podcastRSS") == '')
+    {
+    log ('blank podcastRSS submitted, ignoring');
+    return;
+    }
+
   $.post ("/playerAPI/podcastSubmit", serialized, function (data)
     {
     var fields = data.split ('\t');
