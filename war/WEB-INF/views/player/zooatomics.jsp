@@ -124,10 +124,10 @@ function elastic_innards()
   var vh = $(window).height();
   v.style.height = (vh) + "px";
 
-  var h = document.getElementById ("jw");
-  h.style.height = (vh) + "px";
-  var h = document.getElementById ("jw2");
-  h.style.height = (vh) + "px";
+  // var h = document.getElementById ("jw");
+  // h.style.height = (vh) + "px";
+  // var h = document.getElementById ("jw2");
+  // h.style.height = (vh) + "px";
   var h = document.getElementById ("fp");
   h.style.height = (vh) + "px";
 
@@ -714,8 +714,8 @@ function prepare_channel()
     if (programgrid [p]['channel'] == real_channel)
       program_line [n_program_line++] = p;
 
-    var image = new Image();
-    image.src = programgrid [p]['thumb'];
+    // var image = new Image();
+    // image.src = programgrid [p]['thumb'];
     }
 
   program_line = program_line.sort (function (a,b) { return Math.floor (programgrid [b]['timestamp']) - Math.floor (programgrid [a]['timestamp']) });
@@ -2068,8 +2068,8 @@ function program_right()
     {
     program_cursor++;
     redraw_program_line();
-    // play_program();
     physical_stop();
+    if (tube() == 'fp') play_program();
     }
   else
     {
@@ -2283,16 +2283,16 @@ function submit_signup()
 
 function submit_throw()
   {
-  /* always called from IPG, use ipg_cursor */
-
-  var serialized = $("#throw").serialize() + '&' + 'user=' + user + '&' + 'grid=' + server_grid (ipg_cursor);
-  log ('throw: ' + serialized);
-
   if ($("#podcastRSS") == '')
     {
     log ('blank podcastRSS submitted, ignoring');
     return;
     }
+
+  /* always called from IPG, use ipg_cursor */
+
+  var serialized = $("#throw").serialize() + '&' + 'user=' + user + '&' + 'grid=' + server_grid (ipg_cursor);
+  log ('throw: ' + serialized);
 
   $.post ("/playerAPI/podcastSubmit", serialized, function (data)
     {
@@ -2798,6 +2798,11 @@ function physical_stop()
                try { jwplayer.removeModelListener ('STATE'); } catch (error) {};
                try { jwplayer.sendEvent ('STOP'); } catch (error) {};
                break;
+
+    case "fp": log ('fp STOP');
+               if (flowplayer)
+                 flowplayer ("player").stop();
+               break;
     }
   }
 
@@ -2860,7 +2865,7 @@ function start_play_fp (url)
 
   log ("FP STREAM: " + fp_video_file);
 
-  flowplayer ("player", {src: 'http://zoo.atomics.org/video/flowplayer-3.2.5.swf', wmode: 'transparent'}, { clip: { onFinish: function() { fp_ended(); }, onStart: fp_onstart, bufferLength: 1, autoPlay: true }, plugins: { controls: null }});
+  flowplayer ("player", {src: 'http://zoo.atomics.org/video/flowplayer-3.2.5.swf', wmode: 'transparent'}, { clip: { onFinish: fp_ended, onStart: fp_onstart, bufferLength: 1, autoPlay: true, scaling: 'fit' }, plugins: { controls: null }});
   flowplayer ("player").play (fp_video_file);
   }
 
@@ -3211,7 +3216,7 @@ One moment...
             flashvars="fullscreen=true&controlbar=none&mute=false&bufferlength=1&allowscriptaccess=always">
         </embed>
 </div>
-<div id="jw2" style="width: 100%; height: 100%">
+<!--div id="jw2" style="width: 100%; height: 100%">
         <embed name="player2" id="player2"
             type="application/x-shockwave-flash"
             pluginspage="http://www.macromedia.com/go/getflashplayer"
@@ -3224,10 +3229,9 @@ One moment...
             flashvars="fullscreen=true&controlbar=none&mute=false&bufferlength=1&allowscriptaccess=always">
         </embed>
 
-</div>
-  </div>
+</div-->
 
-<div id="jw-template" style="display: none">
+<!--div id="jw-template" style="display: none">
         <embed name="%ID%" id="%ID%"
             type="application/x-shockwave-flash"
             pluginspage="http://www.macromedia.com/go/getflashplayer"
@@ -3239,7 +3243,9 @@ One moment...
             wmode="transparent"
             flashvars="fullscreen=true&controlbar=none&mute=false&bufferlength=1&allowscriptaccess=always">
         </embed>
-</div>
+</div-->
+
+  </div>
 
 <div id="ch-layer" style="display: block">
   <div id="ch-container">
