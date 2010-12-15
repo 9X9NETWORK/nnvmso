@@ -87,8 +87,15 @@ public class PodcastService {
 		channel.setName(podcast.getTitle());
 		if (podcast.getDescription()!= null && podcast.getDescription().length() > 500) {
 			podcast.setDescription(podcast.getDescription().substring(0, 500));
-		}		
-		channel.setIntro(podcast.getDescription());
+		}
+		String intro = podcast.getDescription();
+		if (intro != null) {
+			intro = intro.replaceAll("\t", " ");
+			intro = intro.replaceAll("\n", " ");
+		} else {
+			intro = "";
+		}
+		channel.setIntro(intro);
 		channel.setImageUrl(podcast.getImage());
 		channel.setPublic(true);
 		channel.setUpdateDate(podcast.getPubDate());
