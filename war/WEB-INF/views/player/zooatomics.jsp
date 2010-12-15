@@ -3,30 +3,13 @@
 <meta charset="UTF-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
-<link rel="stylesheet" href="http://zoo.atomics.org/video/9x9playerV18/stylesheets/main.css" />
-
-<style>
-
-#loading {
-  width: 3.125em;
-  height: 3.125em;
-  background: url(http://zoo.atomics.org/video/images-x1/loading.gif) 0 0 no-repeat;
-  background-size: 100%;
-  position: absolute;
-  left: 30.4375em;
-  top: 16.4375em;
-  z-index: 9;
-  display: none;
-}
-
-
-</style>
+<link rel="stylesheet" href="http://zoo.atomics.org/video/9x9playerV19/stylesheets/main.css" />
 
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 <script type="text/javascript" src="http://zoo.atomics.org/video/cssanim.js"></script>
 <script type="text/javascript" src="http://zoo.atomics.org/video/swfobject.js"></script>
 <script type="text/javascript" src="http://zoo.atomics.org/video/flowplayer-3.2.4.min.js"></script>
-<script type="text/javascript" src="http://zoo.atomics.org/video/9x9playerV18/javascripts/whatsnew.js"></script>
+<script type="text/javascript" src="http://zoo.atomics.org/video/9x9playerV19/javascripts/whatsnew.js"></script>
 
 <script>
 
@@ -105,7 +88,7 @@ var control_buttons = [ 'btn-replay', 'btn-rewind', 'btn-play', 'btn-forward', '
 var control_cursor = 2;
 
 var user = "aghubmUydm1zb3IMCxIGTm5Vc2VyGBoM";
-var root = 'http://zoo.atomics.org/video/9x9playerV18/images/';
+var root = 'http://zoo.atomics.org/video/9x9playerV19/images/';
 
 $(document).ready (function()
  {
@@ -120,7 +103,7 @@ function elastic()
   {
   log ('elastic');
   elastic_innards();
-  ShowArrows();
+  // ShowArrows();
   if (thumbing == 'whatsnew')
     {
     GetAnchor();
@@ -144,6 +127,8 @@ function elastic_innards()
   var h = document.getElementById ("jw");
   h.style.height = (vh) + "px";
   var h = document.getElementById ("jw2");
+  h.style.height = (vh) + "px";
+  var h = document.getElementById ("fp");
   h.style.height = (vh) + "px";
 
   // var i = document.getElementById ("ipg-layer");
@@ -295,13 +280,11 @@ function fetch_programs()
 
 function parse_program_data (data)
   {
-  // 0=channel-id 1=program-id 2=program-name 3=program-type 4=program-thumb-url 5=program-snapshot-url 6=program-url1 7=program-url2 8=program-url3 9=program-url4 10=timestamp
-
-       // channelId, programId, programName, programType, programThumbnailUrl, programLargeThumbnailUrl,
-       // url1(mpeg4/slideshow), url2(webm), url3(flv more likely), url4(audio), timestamp
-
-//1679	1680	System Program	video	/WEB-INF/../images/logo_9x9.png	http://s3.amazonaws.com/mp4_9x9/default.mp4	http://s3.amazonaws.com/webm9x9/default.webm	1292037210436
-
+  // 0=channelId, 1=programId, 2=programName, 3=description(max length=256),
+  // 4=programType, 5=duration,
+  // 6=programThumbnailUrl, 7=programLargeThumbnailUrl,
+  // 8=url1(mpeg4/slideshow), 9=url2(webm), 10=url3(flv more likely), 11=url4(audio),
+  // 12=timestamp
 
   var logtext = '';
   var now = new Date();
@@ -316,10 +299,10 @@ function parse_program_data (data)
       {
       var fields = lines[i].split ('\t');
       // logtext += "program line " + i + ": " + fields[0] + ' = ' + lines [i] + '\n';
-      programgrid [fields [1]] = { 'channel': fields[0], 'type': fields[3], 'url1': 'jw:' + fields[6], 
-                   'url2': 'jw:' + fields[7], 'url3': 'jw:' + fields[8], 'url4': 'jw:' + fields[9], 
-                   'name': fields[2], 'type': fields[3], 'thumb': fields[4], 
-                   'snapshot': fields[5], 'timestamp': fields[10], 'screenshot': fields[4], 'age': 'Today', 'duration': '2:22' };
+      programgrid [fields [1]] = { 'channel': fields[0], 'type': fields[3], 'url1': 'fp:' + fields[8], 
+                   'url2': 'fp:' + fields[9], 'url3': 'fp:' + fields[10], 'url4': 'fp:' + fields[11], 
+                   'name': fields[2], 'desc': fields [3], 'type': fields[4], 'thumb': fields[6], 
+                   'snapshot': fields[7], 'timestamp': fields[12], 'duration': fields[5] };
       }
     }
 
@@ -416,7 +399,7 @@ function best_url (program)
     return '';
     }
 
-  if (current_tube == 'jw')
+  if (current_tube == 'jw' || current_tube == 'fp')
     desired = '(mp4|m4v|flv)';
 
   else if (navigator.userAgent.match (/(GoogleTV|Droid Build)/i))
@@ -448,7 +431,7 @@ function best_url (program)
     }
   else
     {
-    if (programgrid [program]['url1'].match (/(null|jw:null|jw:)/))
+    if (programgrid [program]['url1'].match (/(null|jw:null|jw:|fp:null|fp:)/))
       return '';
     return programgrid [program]['url1'];
     }
@@ -519,7 +502,7 @@ function end_message (duration)
   if (duration > 0)
     msg_timex = setTimeout ("empty_channel_timeout()", duration);
 
-  edge_of_world_timex = setTimeout ("edge_of_world_idle()", 20000);
+  edge_of_world_timex = setTimeout ("edge_of_world_idle()", 45000);
 
   thumbing = 'end';
   }
@@ -791,7 +774,7 @@ function enter_channel()
   thumbing = 'program';
 
   redraw_program_line();
-  ShowArrows();
+  // ShowArrows();
 
   reset_osd_timex();
   }
@@ -812,7 +795,7 @@ function enter_channel_failsafe()
     $("#ep-layer").show();
     }
   turn_off_ancillaries();
-  ShowArrows();
+  // ShowArrows();
   }
 
 function ep_html()
@@ -862,9 +845,9 @@ function ageof (timestamp)
       age = minutes + (minutes == 1 ? ' minute' : ' minutes');
     }
   else
-    age = '(ageless)'
+    age = 'long'
 
-  return age;
+  return age + ' ago';
   }
 
 var old_cline;
@@ -983,7 +966,7 @@ function enter_category (cat, positioning)
     channel_cursor = n_channel_line;
 
   redraw_channel_line();
-  ShowArrows();
+  // ShowArrows();
   reset_osd_timex();
 
   prepare_channel();
@@ -1002,7 +985,7 @@ function enter_category_failsafe()
     }
 
   turn_off_ancillaries();
-  ShowArrows();
+  // ShowArrows();
   }
 
 function ch_html (cat)
@@ -1538,7 +1521,6 @@ function switch_to_whats_new()
 
   hide_layers();
   force_pause();
-  $("body").css ("background-image", "url(" + root + "bg.jpg)");
 
   thumbing = 'whatsnew';
   var bad_thumbnail = '<img src="http://zoo.atomics.org/video/images-x1/no_images.png">';
@@ -1570,6 +1552,11 @@ function switch_to_whats_new()
           /* fakes */
           programgrid [program]['desc'] = desc;
           programgrid [program]['age'] = ageof (programgrid [program]['timestamp']);
+
+          if (programgrid [program]['snapshot'] != '')
+            programgrid [program]['screenshot'] = programgrid [program]['snapshot'];
+          else
+            programgrid [program]['screenshot'] = programgrid [program]['thumb']
 
           //log ('whatsnew ' + program + ' (ch: ' + real_channel + '): ' + programgrid [program]['name']);
           }
@@ -1615,18 +1602,23 @@ function switch_to_whats_new()
 
     $("#new-layer").html (html);
 
-    $("#new-layer").show();
-    elastic();
+    $("body").addClass ("on");
+    // $("body").css ("background-image", "url(" + root + "bg.jpg)");
 
-    WhatIsNew();
+    //$("#new-layer").show();
+    elastic();
+    $("#all-players").hide();
+    PlayWhatsNew();
     });
   }
 
 function exit_whats_new()
   {
   StopWhatsNew();
-  $("body").css ("background-image", "none");
+  $("body").removeClass ("on");
+  //$("body").css ("background-image", "none");
   thumbing = 'program';
+  $("#all-players").show();
   enter_channel();
   }
 
@@ -1747,7 +1739,7 @@ function extend_ipg_timex()
   {
   if (ipg_timex)
     clearTimeout (ipg_timex);
-  ipg_timex = setTimeout ("ipg_idle()", 20000);
+  ipg_timex = setTimeout ("ipg_idle()", 45000);
   }
 
 function redraw_ipg()
@@ -2067,7 +2059,7 @@ function redraw_channel_line()
   // old way, replace all html inside div:
   // $("#ch-list-" + current_category).html (ch_html (current_category));
 
-  ShowArrows();
+  // ShowArrows();
   }
 
 function program_right()
@@ -2076,7 +2068,8 @@ function program_right()
     {
     program_cursor++;
     redraw_program_line();
-    play_program();
+    // play_program();
+    physical_stop();
     }
   else
     {
@@ -2134,7 +2127,7 @@ function redraw_program_line()
       }
     }
 
-  ShowArrows();
+  // ShowArrows();
   }
 
 function setup_ajax_error_handling()
@@ -2696,12 +2689,22 @@ function pause()
 
 function unhide_player (player)
   {
+  log ('unhide: ' + player);
+
   switch (player)
     {
     case "jw":
 
       $("#v").hide();
+      $("#fp").hide();
       $("#jw2").show();
+      break;
+
+    case "fp":
+
+      $("#v").hide();
+      $("#jw2").hide();
+      $("#fp").show();
       break;
     }
   }
@@ -2775,6 +2778,7 @@ function jw_play()
 
 function jw_play_nothing()
   {
+return;
   jw_video_file = "nothing.flv";
   log ("jw LOAD " + jw_video_file);
   jwplayer.sendEvent ('LOAD', jw_video_file)
@@ -2839,6 +2843,32 @@ function jw_progress (event)
 
 function start_play_fp (url)
   {
+  jw_position = 0;
+  current_tube = 'fp';
+
+  // ugh! don't know actual url until player is chosen
+  url = best_url (current_program);
+
+  fp_video_file = url.replace (/^fp:/, '');
+  unhide_player ("fp");
+
+  log ("FP STREAM: " + fp_video_file);
+
+  flowplayer ("player", {src: 'http://zoo.atomics.org/video/flowplayer-3.2.5.swf', wmode: 'transparent'}, { clip: { onFinish: function() { fp_ended(); }, onStart: fp_onstart, bufferLength: 1, autoPlay: true }, plugins: { controls: null }});
+  flowplayer ("player").play (fp_video_file);
+  }
+
+function fp_onstart()
+  {
+  log ('fp onstart')
+  var fd = parseInt (this.getClip().fullDuration, 10);
+  fp_duration = fd * 1000;
+  }
+
+function fp_ended()
+  {
+  log ('fp ended');
+  ended_callback();
   }
 
 function physical_offset()
@@ -3134,8 +3164,8 @@ function control_enter()
 
 function playerReady (thePlayer)
   {
+return;
   log ('jw player ready: ' + thePlayer.id);
-  //  log_and_alert (thePlayer.id);
   jwplayer = document.getElementById (thePlayer.id);
   jwplayer.sendEvent ('LOAD', 'nothing.flv');
   }
@@ -3157,6 +3187,10 @@ One moment...
   <div id="all-players" style="display: block; padding: 0">
     <div id="v" style="display: block; padding: 0">
       <video id="vvv" autoplay="false" preload="metadata" loop="false" height="100%" width="100%" volume="0"></video></div>
+
+<div id="fp" style="width: 100%; height: 100%; display: none">
+  <a href="http://e1h13.simplecdn.net/flowplayer/flowplayer.flv" style="display:block;width:100%;height:100%" id="player"></a>
+</div>
 
 <div id="jw" style="width: 100%; height: 100%; display: none">
         <embed name="player1" id="player1"
@@ -3273,7 +3307,7 @@ One moment...
       <li><a id="ipg-return-btn" href="javascript:;" class="btn">Return to Channel Mode</a></li>
 
     </ul> 
-    <img src="http://zoo.atomics.org/video/9x9playerV18/images/logo.png" id="logo">
+    <img src="http://zoo.atomics.org/video/9x9playerV19/images/logo.png" id="logo">
   </div>
 
   <div id="ipg-grid"></div>
