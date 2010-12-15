@@ -388,8 +388,8 @@ public class PlayerAPIController {
 			if (intro != null) {
 				int introLenth = (intro.length() > 256 ? 256 : intro.length()); 
 				intro = intro.substring(0, introLenth);
-				intro = intro.replaceAll("\t", " ");
-				intro = intro.replaceAll("\n", " ");				
+				intro = intro.replaceAll("\t", " ");				
+				intro = intro.replaceAll("\r", " ");
 			} else {
 				intro = "";
 			}
