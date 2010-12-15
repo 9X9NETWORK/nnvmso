@@ -238,6 +238,7 @@ public class PlayerAPIController {
 				}
 			}
 			*/
+			
 			if ( c.getProgramCount() > 0 ) {
 				String[] ori = {Short.toString(c.getSeq()), String.valueOf(c.getKey().getId()), 
 						c.getName(), c.getImageUrl(), Integer.toString(c.getProgramCount())};
@@ -383,10 +384,12 @@ public class PlayerAPIController {
 				url1 = "/player/nnscript?program=" + p.getId();
 			}
 			
-			String intro = p.getIntro();
+			String intro = p.getIntro();			
 			if (intro != null) {
 				int introLenth = (intro.length() > 256 ? 256 : intro.length()); 
 				intro = intro.substring(0, introLenth);
+				intro = intro.replaceAll("\t", " ");
+				intro = intro.replaceAll("\n", " ");				
 			} else {
 				intro = "";
 			}
