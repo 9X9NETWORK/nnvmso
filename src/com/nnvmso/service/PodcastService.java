@@ -91,7 +91,7 @@ public class PodcastService {
 		String intro = podcast.getDescription();
 		if (intro != null) {
 			intro = intro.replaceAll("\t", " ");
-			intro = intro.replaceAll("\n", " ");
+			intro = intro.replaceAll("\r", " ");
 		} else {
 			intro = "";
 		}
