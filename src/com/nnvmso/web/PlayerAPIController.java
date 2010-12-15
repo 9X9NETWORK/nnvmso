@@ -343,14 +343,14 @@ public class PlayerAPIController {
 	 * 		           (2)Could be a channel Id, e.g. channel=1 <br/>
 	 * 		           (3)Could be list of channels, e.g. channels = 34,35,36.
 	 * @param  user user's unique identifier, it is required for wildcard query 
-	 * @return A string of all the programs' info that met the query criteria. <br/>
-	 * 		   Each program is separate by carriage return. Each program's information is tab delimited.<br/>
-	 *   Program info has: <br/>
+	 * @return <p>A string of all the programs' info that met the query criteria. </p>
+	 * 		   <p>Each program is separate by carriage return. Each program's information is tab delimited.</p>
+	 *   <p>Program info has: <br/>
 	 *              channelId, programId, programName, description(max length=256),<br/>
 	 *              programType, duration, <br/>
 	 *              programThumbnailUrl, programLargeThumbnailUrl, <br/>
 	 *              url1(mpeg4/slideshow), url2(webm), url3(flv more likely), url4(audio), <br/> 
-	 *              timestamp
+	 *              timestamp</p>
 	 */
 	 //@todo channel equals star and no user token, return missing param 	
 	@RequestMapping("programInfo")	
@@ -384,8 +384,12 @@ public class PlayerAPIController {
 			}
 			
 			String intro = p.getIntro();
-			int introLenth = (intro.length() > 256 ? 256 : intro.length()); 
-			intro = intro.substring(0, introLenth);
+			if (intro != null) {
+				int introLenth = (intro.length() > 256 ? 256 : intro.length()); 
+				intro = intro.substring(0, introLenth);
+			} else {
+				intro = "";
+			}
 			
 			String[] ori = {String.valueOf(p.getChannelId()), 
 					        String.valueOf(p.getKey().getId()), 
