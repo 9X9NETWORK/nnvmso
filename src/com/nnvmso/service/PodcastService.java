@@ -30,7 +30,7 @@ import com.nnvmso.model.MsoProgram;
 public class PodcastService {
 	protected static final Logger log = Logger.getLogger(PodcastService.class.getName());	
 	
-	private Properties getTranscodingServer() {
+	public Properties getTranscodingServer() {
 		Properties pro = new Properties();
 		try {
 			pro.load(AwsLib.class.getClassLoader().getResourceAsStream("podcast.properties"));
@@ -97,8 +97,7 @@ public class PodcastService {
 		if (intro != null) {
 			intro = intro.replaceAll("\t", " ");
 			intro = intro.replaceAll("\r", " ");
-		} else {
-			intro = "";
+			intro = intro.replaceAll("\n", " ");
 		}
 		channel.setIntro(intro);
 		channel.setImageUrl(podcast.getImage());
@@ -150,12 +149,14 @@ public class PodcastService {
 		String intro = item.getDescription();
 		if (intro != null && intro.length() > 500) {
 			intro = intro.replaceAll("\t", " ");
+			intro = intro.replaceAll("\n", " ");
 			intro = intro.replaceAll("\r", " ");
 			item.setDescription(item.getDescription().substring(0, 500));
-		} else {
-			intro = "";
 		}
 		program.setIntro(intro);
+		
+		System.out.println("ori intro=" + item.getDescription() + "intro string=" + intro + ";program intro=" + program.getIntro());
+		
 		if (item.getThumbnail()!= null) {
 			program.setImageUrl(item.getThumbnail());
 		} else {
@@ -217,7 +218,9 @@ public class PodcastService {
 		Properties pro = this.getTranscodingServer();
 		String transcodingServer = pro.getProperty(pro.getProperty("current"));
 		feed.setCallback(NnLib.getUrlRoot(req));
+		log.info("LOGGING: current is " + pro.getProperty("current"));
 		if (pro.getProperty("current").equals("dev")) {
+			log.info("LOGGING: set callback url to dev_callback");
 			feed.setCallback(pro.getProperty("dev_callback"));
 		}		
 		log.info("LOGGING: podcast callbackUrl = " + feed.getCallback() + "; transcoding server = " + transcodingServer);
