@@ -1387,7 +1387,8 @@ function keypress (keycode)
         {
         $("#epend-layer").hide();
         channel_left();
-        thumbing = 'program';
+        $("#ch-layer").hide();
+        enter_channel();
         }
       else if (thumbing == 'program')
         program_left();
@@ -1407,7 +1408,8 @@ function keypress (keycode)
         {
         $("#epend-layer").hide();
         channel_right();
-        thumbing = 'program';
+        $("#ch-layer").hide();
+        enter_channel();
         }
       else if (thumbing == 'program')
         program_right();
