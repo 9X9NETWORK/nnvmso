@@ -82,6 +82,7 @@ public class PodcastAPIController {
 	 */
 	@RequestMapping("itemUpdate")
 	public @ResponseBody PodcastResponse itemUpdate(@RequestBody PodcastProgram podcastProgram) {
+		logger.info("itemUpdate in");
 		PodcastResponse resp = new PodcastResponse();				
 		MsoProgram p = podcastService.updateProgramViaPodcast(podcastProgram);
 		if (p == null) {

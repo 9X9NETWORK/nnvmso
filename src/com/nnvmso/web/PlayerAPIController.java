@@ -286,11 +286,11 @@ public class PlayerAPIController {
 	 * @param user user's unique identifier
 	 * @return <p>A string of all of the user's subscribed channels' information.</p>
 	 * 	       <p>Each channel is \n delimited. Each channel's information is tab delimited.</p>  
-	 *         <p>Channel info: 
-	 *         <blockquote> grid id, channel id, </blockquote> 
-	 *         <blockquote> channel name, channel description, channel image url, </blockquote>
-	 *         <blockquote> program count, type(SYSTEM|PODCAST), status</blockquote>
-	 *         <blockquote> Example: 1	1	Channel1	http://hostname/images/img.jpg	3	SYSTEM 0</blockquote>
+	 *         <p>Channel info has following fields: 
+	 *         <blockquote> grid id, channel id,  <br/>
+	 *         channel name, channel description, channel image url, <br/>
+	 *         program count, type(SYSTEM|PODCAST), status</blockquote>
+	 *         <p> Example: 1	1	Channel1	http://hostname/images/img.jpg	3	SYSTEM 0</p>
 	 *         </p>
 	 */
 	@RequestMapping(value="channelLineup")
