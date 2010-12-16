@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.stereotype.Service;
 
@@ -12,16 +13,47 @@ import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Text;
+import com.nnvmso.lib.NnLib;
 import com.nnvmso.lib.PMF;
 import com.nnvmso.model.*;
 
 @Service
 public class InitService {
+	public void createPodcastChannels(HttpServletRequest req) {
+		PodcastService service = new PodcastService();
+		Mso mso = new MsoManager().findByEmail("default_mso@9x9.com");		
+
+		String rss1 = "http://www.mevio.com/feeds/geekbrief.xml";
+		MsoChannel channel1 = service.getDefaultPodcastChannel(rss1);
+		MsoChannel saved1 = new ChannelManager().create(channel1, mso);
+		service.submitToTranscodingService(NnLib.getKeyStr(saved1.getKey()), rss1, req);
+		
+		String rss2 = "http://feeds.feedburner.com/TheBigD";
+		MsoChannel channel2 = service.getDefaultPodcastChannel(rss2);
+		MsoChannel saved2 = new ChannelManager().create(channel2, mso);
+		service.submitToTranscodingService(NnLib.getKeyStr(saved2.getKey()), rss2, req);				
+
+		String rss3 = "http://shortfilms.libsyn.com/rss";
+		MsoChannel channel3 = service.getDefaultPodcastChannel(rss3);
+		MsoChannel saved3 = new ChannelManager().create(channel3, mso);
+		service.submitToTranscodingService(NnLib.getKeyStr(saved3.getKey()), rss3, req);				
+
+		String rss4 = "http://soreallife.libsyn.com/rss";
+		MsoChannel channel4 = service.getDefaultPodcastChannel(rss4);
+		MsoChannel saved4 = new ChannelManager().create(channel4, mso);
+		service.submitToTranscodingService(NnLib.getKeyStr(saved4.getKey()), rss4, req);				
+
+		String rss5 = "http://feeds.pbs.org/pbs/frontlineworld";
+		MsoChannel channel5 = service.getDefaultPodcastChannel(rss5);
+		MsoChannel saved5 = new ChannelManager().create(channel5, mso);
+		service.submitToTranscodingService(NnLib.getKeyStr(saved5.getKey()), rss5, req);				
+		
+		
+	}
 	public void createChannels() {
 		MsoManager msoMngr = new MsoManager();
 		ChannelManager channelMngr = new ChannelManager();
-		Mso mso = msoMngr.findByEmail("default_mso@9x9.com");
-		
+		Mso mso = msoMngr.findByEmail("default_mso@9x9.com");		
 		MsoChannel c1 = new MsoChannel("Fox News");
 		c1.setImageUrl("http://zoo.atomics.org/video/thumbnails/bee-gees-stayin-alive.jpg");
 		c1.setType(MsoChannel.TYPE_MSO);
