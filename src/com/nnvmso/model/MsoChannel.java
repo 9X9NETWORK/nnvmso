@@ -4,9 +4,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.NotPersistent;
@@ -46,12 +43,6 @@ public class MsoChannel implements Serializable {
 	private boolean isPublic;
 		
 	@Persistent
-	private Date createDate;
-	
-	@Persistent
-	private Date updateDate;
-	
-	@Persistent
 	private String langCode;
 	
 	@Persistent
@@ -65,12 +56,22 @@ public class MsoChannel implements Serializable {
 	private String podcast;
 	
 	public static short TYPE_MSO = 0; 
-	public static short TYPE_SYSTEM = 1;
+	public static short TYPE_SYSTEM = 1;	
+	public static short TYPE_PODCAST = 2;
 	@Persistent
 	private short type;
 	
+	@Persistent
+	private int status;
+		
 	@Persistent 
 	private List<Key> programSeq = new ArrayList<Key>();
+	
+	@Persistent
+	private Date createDate;
+	
+	@Persistent
+	private Date updateDate;	
 	
 	public MsoChannel() {
 		this.createDate = new Date();
@@ -217,6 +218,14 @@ public class MsoChannel implements Serializable {
 
 	public void setPodcast(String podcast) {
 		this.podcast = podcast;
+	}
+
+	public int getStatus() {
+		return status;
+	}
+
+	public void setStatus(int status) {
+		this.status = status;
 	}
 	
 }
