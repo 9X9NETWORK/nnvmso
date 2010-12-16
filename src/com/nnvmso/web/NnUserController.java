@@ -1,11 +1,14 @@
 package com.nnvmso.web;
 
+import java.util.logging.Logger;
+
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -13,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.support.SessionStatus;
 
 import com.nnvmso.form.UserSignupForm;
+import com.nnvmso.lib.NnLib;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.NnUser;
 import com.nnvmso.service.MsoManager;
@@ -24,6 +28,8 @@ import com.nnvmso.validator.NnUserSignupValidator;
 @RequestMapping("user")
 public class NnUserController {
 		
+	protected static final Logger logger = Logger.getLogger(NnUserController.class.getName());
+	
 	private final NnUserManager userMngr;
 	private final SubscriptionManager subMngr;
 	private final NnUserSignupValidator signupValidator;
@@ -34,6 +40,12 @@ public class NnUserController {
 		this.userMngr = userMngr;
 		this.subMngr = subMngr;
 	}
+	
+	@ExceptionHandler(Exception.class)
+	public String exception(Exception e) {
+		NnLib.logException(e);
+		return "error/exception";				
+	}		
 	
 	@RequestMapping(value="subscribe")
 	public String subscribe(@RequestParam(value="id") String key) {

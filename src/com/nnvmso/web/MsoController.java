@@ -1,10 +1,13 @@
 package com.nnvmso.web;
 
+import java.util.logging.Logger;
+
 import javax.servlet.http.*;
 
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -14,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.nnvmso.lib.NnLib;
 import com.nnvmso.model.Mso;
 import com.nnvmso.service.AuthService;
 import com.nnvmso.service.MsoManager;
@@ -24,6 +28,8 @@ import com.nnvmso.validator.LoginValidator;
 @SessionAttributes("mso")
 public class MsoController {
 
+	protected static final Logger logger = Logger.getLogger(MsoController.class.getName());
+	
 	private final MsoManager msoMngr;
 	private final AuthService authService;
 	private final LoginValidator loginValidator;
@@ -36,6 +42,12 @@ public class MsoController {
 		this.loginValidator = loginValidator;
 	}
 
+	@ExceptionHandler(Exception.class)
+	public String exception(Exception e) {
+		NnLib.logException(e);
+		return "error/exception";				
+	}		
+	
 	@RequestMapping(value = "")
 	public String index() {
 		return "mso/index";

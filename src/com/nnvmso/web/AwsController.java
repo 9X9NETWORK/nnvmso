@@ -4,6 +4,7 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Date;
+import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -11,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -27,14 +29,21 @@ import com.nnvmso.service.ProgramManager;
 @RequestMapping("aws")
 public class AwsController {
 	
+	protected static final Logger logger = Logger.getLogger(AwsController.class.getName());
+
 	private final ProgramManager programMngr;
-	protected final Log logger = LogFactory.getLog(getClass());		
-	
+		
 	@Autowired
 	public AwsController(ProgramManager programMngr) {
 		this.programMngr = programMngr;
 	}
 	
+	@ExceptionHandler(Exception.class)
+	public String exception(Exception e) {
+		NnLib.logException(e);
+		return "error/exception";				
+	}		
+
 	/**
 	 * Notify AWS a file has been delivered
 	 */

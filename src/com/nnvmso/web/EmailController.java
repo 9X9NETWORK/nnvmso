@@ -4,11 +4,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.google.appengine.repackaged.org.apache.commons.logging.Log;
-import com.google.appengine.repackaged.org.apache.commons.logging.LogFactory;
-
 import java.io.UnsupportedEncodingException;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -22,7 +20,7 @@ import javax.mail.internet.MimeMessage;
 @RequestMapping("email")
 public class EmailController {
 
-	protected final Log logger = LogFactory.getLog(getClass());
+	protected static final Logger logger = Logger.getLogger(EmailController.class.getName());
 	
 	@RequestMapping("send")
 	public @ResponseBody String send() {

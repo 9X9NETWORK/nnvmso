@@ -1,9 +1,12 @@
 package com.nnvmso.web;
 
+import java.util.logging.Logger;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import com.nnvmso.lib.*;
 import com.nnvmso.model.*;
@@ -12,6 +15,14 @@ import com.nnvmso.service.*;
 @Controller
 @RequestMapping("player")
 public class PlayerController {
+
+	protected static final Logger logger = Logger.getLogger(PlayerController.class.getName());
+	
+	@ExceptionHandler(Exception.class)
+	public String exception(Exception e) {
+		NnLib.logException(e);
+		return "error/exception";				
+	}		
 	
 	@RequestMapping("zooatomics")
 	public String zooatomics(HttpServletRequest req, HttpServletResponse resp) {		

@@ -2,11 +2,13 @@ package com.nnvmso.web;
 
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import javax.servlet.http.*;
 
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,6 +36,9 @@ import com.nnvmso.service.PodcastService;
 @RequestMapping("channel")
 @SessionAttributes("channel")
 public class ChannelController {
+
+	protected static final Logger logger = Logger.getLogger(ChannelController.class.getName());		
+	
 	private final AuthService auth;
 	private final ChannelManager channelMngr;
 	private final String viewRoot = "channel/";
@@ -43,6 +48,12 @@ public class ChannelController {
 		this.auth = auth;
 		this.channelMngr = channelMngr;
 	}	
+
+	@ExceptionHandler(Exception.class)
+	public String exception(Exception e) {
+		NnLib.logException(e);
+		return "error/exception";				
+	}		
 	
 	/*
 	 * upload thumbnail 

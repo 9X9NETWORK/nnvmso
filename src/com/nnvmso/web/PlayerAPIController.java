@@ -21,11 +21,7 @@ import com.nnvmso.lib.*;
 import com.nnvmso.model.*;
 import com.nnvmso.service.*;
 
-import java.util.Collections;
-import net.sf.jsr107cache.Cache;
-import net.sf.jsr107cache.CacheException;
-import net.sf.jsr107cache.CacheFactory;
-import net.sf.jsr107cache.CacheManager;
+import java.util.logging.Logger;
 
 /**
  * <p>Serves for Player.</p>
@@ -34,10 +30,16 @@ import net.sf.jsr107cache.CacheManager;
  * http://hostname:port/podcastAPI/login<br/>
  * <p/>
  */
-
 @Controller
 @RequestMapping("playerAPI")
 public class PlayerAPIController {
+	protected static final Logger logger = Logger.getLogger(PlayerAPIController.class.getName());
+	
+	@ExceptionHandler(Exception.class)
+	public String exception(Exception e) {
+		NnLib.logException(e);
+		return "error/exception";				
+	}		
 	
 	/* ==========  CATEGORY: ACCOUNT RELATED ========== */
 	//user info
@@ -282,10 +284,14 @@ public class PlayerAPIController {
 	 * Get all of a user's subscriptions. 
 	 * 
 	 * @param user user's unique identifier
-	 * @return A string of all of the user's subscribed channels' information.<br/>
-	 * 	       Each channel is \n delimited. Each channel's information is tab delimited.<br/>  
-	 *         Channel info has grid id, channel id, channel name, channel image url.
-	 *         Example: 1	1	Channel1	http://hostname/images/img.jpg (program count) (type) (status)
+	 * @return <p>A string of all of the user's subscribed channels' information.</p>
+	 * 	       <p>Each channel is \n delimited. Each channel's information is tab delimited.</p>  
+	 *         <p>Channel info: 
+	 *         <blockquote> grid id, channel id, </blockquote> 
+	 *         <blockquote> channel name, channel description, channel image url, </blockquote>
+	 *         <blockquote> program count, type(SYSTEM|PODCAST), status</blockquote>
+	 *         <blockquote> Example: 1	1	Channel1	http://hostname/images/img.jpg	3	SYSTEM 0</blockquote>
+	 *         </p>
 	 */
 	@RequestMapping(value="channelLineup")
 	public ResponseEntity<String> channelLineup(@RequestParam(value="user") String user) {
@@ -293,12 +299,33 @@ public class PlayerAPIController {
 		NnUserManager userService = new NnUserManager();
 		NnUser foundUser = userService.findByKey(user);
 		List<MsoChannel> channels = subMngr.findSubscribedChannels(foundUser);
-		String output = "";
-		for (MsoChannel c:channels) {
+		String output = "";		
+		for (MsoChannel c : channels) {
+			String intro = c.getIntro();
+			if (intro != null) {
+				int introLenth = (intro.length() > 256 ? 256 : intro.length()); 
+				intro = intro.substring(0, introLenth);				
+				intro.replaceAll("\t", " ");
+				intro.replaceAll("\r", " ");
+				intro.replaceAll("\n", " ");
+			} else {
+				intro = "";
+			}
+			String type = "";
+			if (c.getType() == MsoChannel.TYPE_SYSTEM) {
+				type = "SYSTEM";
+			} else {
+				type = "PODCAST";
+			}
 			String[] ori = {Short.toString(c.getGrid()), 
 						    String.valueOf(c.getKey().getId()),
 						    c.getName(),
-						    c.getImageUrl()};						    
+						    intro,
+						    c.getImageUrl(),
+						    String.valueOf(c.getProgramCount()),
+						    type,
+						    String.valueOf(c.getStatus())
+						    };
 			output = output + PlayerLib.getTabDelimitedStr(ori);			
 			output = output + "\n";
 		}				
@@ -354,7 +381,7 @@ public class PlayerAPIController {
 	 *              timestamp</p>
 	 */
 	 //@todo channel equals star and no user token, return missing param 	
-	@RequestMapping("programInfo")	
+	@RequestMapping("programInfo")
 	public ResponseEntity<String> programInfo(@RequestParam(value="channel") String channel,
 									          @RequestParam(value="user", required = false) String user,
 									          HttpServletRequest req) {
@@ -390,6 +417,7 @@ public class PlayerAPIController {
 				intro = intro.substring(0, introLenth);
 				intro = intro.replaceAll("\t", " ");				
 				intro = intro.replaceAll("\r", " ");
+				intro = intro.replaceAll("\n", " ");
 			} else {
 				intro = "";
 			}

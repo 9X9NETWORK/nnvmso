@@ -1,6 +1,6 @@
 package com.nnvmso.web;
 
-import javax.servlet.http.HttpServletResponse;
+ import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,6 +38,8 @@ import com.nnvmso.service.PodcastService;
 @RequestMapping("podcastAPI")
 public class PodcastAPIController {
 
+	protected static final Logger logger = Logger.getLogger(PodcastAPIController.class.getName());
+	
 	private ChannelManager channelMngr;
 	private PodcastService podcastService;
 	
@@ -45,6 +48,12 @@ public class PodcastAPIController {
 		this.channelMngr = channelMngr;
 		this.podcastService = podcastService;
 	}
+	
+	@ExceptionHandler(Exception.class)
+	public String exception(Exception e) {
+		NnLib.logException(e);
+		return "error/exception";				
+	}		
 	
 	/**
 	 * Transcoding Service update Podcast Program information

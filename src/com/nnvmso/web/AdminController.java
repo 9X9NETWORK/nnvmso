@@ -1,15 +1,18 @@
 package com.nnvmso.web;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -28,6 +31,7 @@ import com.nnvmso.service.ChannelManager;
 import com.nnvmso.service.InitService;
 import com.nnvmso.service.MsoManager;
 import com.nnvmso.service.NnUserManager;
+import com.nnvmso.service.PlayerAPI;
 import com.nnvmso.service.PlayerManager;
 
 @Controller
@@ -35,15 +39,30 @@ import com.nnvmso.service.PlayerManager;
 @SessionAttributes("{player}")
 public class AdminController {
 
+	protected static final Logger logger = Logger.getLogger(AdminController.class.getName());
+	
 	public final MsoManager msoMngr;
 	public final PlayerManager playerMngr;
 	public final NnUserManager userMngr;
+	
+	@ExceptionHandler(Exception.class)
+	public String exception(Exception e) {
+		NnLib.logException(e);
+		return "error/exception";				
+	}	
 	
 	@Autowired
 	public AdminController(MsoManager msoMngr, PlayerManager playerMngr, NnUserManager userMngr) {
 		this.msoMngr = msoMngr;
 		this.playerMngr = playerMngr;
 		this.userMngr = userMngr;
+	}	
+
+	@RequestMapping(value="alter")
+	public String alterInit() {
+		InitService service = new InitService();
+		service.alterInit();
+		return "hello/hello";
 	}	
 	
 	@RequestMapping(value="init")

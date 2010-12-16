@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.TimeZone;
+import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -17,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,6 +45,8 @@ import com.nnvmso.service.ProgramManager;
 @RequestMapping("show")
 @SessionAttributes("program")
 public class ProgramController {
+	protected static final Logger logger = Logger.getLogger(ProgramController.class.getName());
+	
 	private final ProgramManager programMngr;
 	private final AuthService authService;
 	private final ChannelManager channelService;
@@ -56,6 +60,12 @@ public class ProgramController {
 		this.channelService = channelService;
 	}
 
+	@ExceptionHandler(Exception.class)
+	public String exception(Exception e) {
+		NnLib.logException(e);
+		return "error/exception";				
+	}		
+	
 	/*
 	 * upload thumbnail
 	 */
