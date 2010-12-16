@@ -14,11 +14,10 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
-import com.nnvmso.web.TestController;
 
 public class NnLib {
 	
-	protected final static Logger logger = Logger.getLogger(TestController.class.getName());
+	protected final static Logger logger = Logger.getLogger(NnLib.class.getName());
 	
 	public static String getKeyStr(Key key) {
 		return KeyFactory.keyToString(key);
