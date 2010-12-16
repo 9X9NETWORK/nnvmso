@@ -3,13 +3,13 @@
 <meta charset="UTF-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
-<link rel="stylesheet" href="http://zoo.atomics.org/video/9x9playerV19/stylesheets/main.css" />
+<link rel="stylesheet" href="http://zoo.atomics.org/video/9x9playerV20/stylesheets/main.css" />
 
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 <script type="text/javascript" src="http://zoo.atomics.org/video/cssanim.js"></script>
 <script type="text/javascript" src="http://zoo.atomics.org/video/swfobject.js"></script>
 <script type="text/javascript" src="http://zoo.atomics.org/video/flowplayer-3.2.4.min.js"></script>
-<script type="text/javascript" src="http://zoo.atomics.org/video/9x9playerV19/javascripts/whatsnew.js"></script>
+<script type="text/javascript" src="http://zoo.atomics.org/video/9x9playerV20/javascripts/whatsnew.js"></script>
 
 <script>
 
@@ -28,7 +28,7 @@ var jw_position = 0;
 
 var fp_video_file;
 var fp_duration;
-
+var fp_timex = 0;
 
 var activated = false;
 var remembered_pause = false;
@@ -88,7 +88,7 @@ var control_buttons = [ 'btn-replay', 'btn-rewind', 'btn-play', 'btn-forward', '
 var control_cursor = 2;
 
 var user = "aghubmUydm1zb3IMCxIGTm5Vc2VyGBoM";
-var root = 'http://zoo.atomics.org/video/9x9playerV19/images/';
+var root = 'http://zoo.atomics.org/video/9x9playerV20/images/';
 
 $(document).ready (function()
  {
@@ -978,6 +978,8 @@ function enter_category (cat, positioning)
   var html = ch_html (cat);
 
   $("#ch-list-" + cat).html (html);
+  $("#row-number").html ('<p>' + cat + '</p>');
+
   $("#ch-layer").css ("display", "block");
 
   for (var y = 1; y <= 9; y++)
@@ -1439,7 +1441,7 @@ function keypress (keycode)
 
     case 40:
       /* down arrow */
-      if (thumbing == 'channel' || thumbing == 'control')
+      if (thumbing == 'control')
         enter_channel();
       else if (thumbing == 'end')
         {
@@ -1665,6 +1667,7 @@ function whatsnew_enter()
   var episode = whatsnew [i]['episodes'][n];
   var channel = whatsnew [i]['channel'];
 
+  log ('whatsnew enter: want to play episode ' + episode + ' in channel ' + channel + ' at grid location ' + grid)
   enter_category ((""+grid).substring (0, 1));
 
   for (var c in channel_line)
@@ -1675,7 +1678,17 @@ function whatsnew_enter()
       redraw_channel_line()
       enter_channel();
       /* select episode, but for now, play first */
-      play_first_program_in (channel_line [channel_cursor]);
+      for (var p = 1; p <= n_program_line; p++)
+        if (episode == program_line [p])
+          {
+          program_first = 1;
+          program_cursor = p;
+          current_program = episode;
+          prepare_channel();
+          play();
+          return;
+          }
+      log ('episode ' + episode + ' not found in channel ' + grid);
       return;
       }
     }
@@ -1756,11 +1769,19 @@ function switch_to_ipg()
 
   setTimeout ("outt()", 500);
 
-  $("#ch-layer").animateWithCss (phase_out_ch, 500, "ease-in-out", function()
+  if (false)
+    $("#ch-layer").animateWithCss (phase_out_ch, 500, "ease-in-out", function()
+      {
+      $("#ch-layer").css ("display", "none");
+      $("#ch-layer").css ("bottom", "0");
+      $("#ch-layer").css ("opacity", "1");
+      elastic(); /* fixups */
+      });
+
+  $("#ep-layer").animateWithCss ({ opacity: 0 }, 500, "ease-in-out", function()
     {
-    $("#ch-layer").css ("display", "none");
-    $("#ch-layer").css ("bottom", "0");
-    $("#ch-layer").css ("opacity", "1");
+    $("#ep-layer").css ("display", "none");
+    $("#ep-layer").css ("opacity", "1");
     elastic(); /* fixups */
     });
 
@@ -2942,21 +2963,50 @@ function start_play_fp (url)
 
   log ("FP STREAM: " + fp_video_file);
 
-  flowplayer ("player", {src: 'http://zoo.atomics.org/video/flowplayer-3.2.5.swf', wmode: 'transparent'}, { canvas: { backgroundColor: '#000000', backgroundGradient: 'none' }, clip: { onFinish: fp_ended, onStart: fp_onstart, bufferLength: 1, autoPlay: true, scaling: 'fit' }, plugins: { controls: null }, play: null });
+  flowplayer ("player",
+      {src: 'http://zoo.atomics.org/video/flowplayer-3.2.5.swf', wmode: 'transparent', allowfullscreen: 'false' }, 
+      { canvas: { backgroundColor: '#000000', backgroundGradient: 'none', linkUrl: '' },
+      clip: { onFinish: fp_ended, onStart: fp_onstart, bufferLength: 1, autoPlay: true, scaling: 'fit' }, 
+      plugins: { controls: null },
+      play: null, onBeforeKeypress: fpkp });
+
   flowplayer ("player").play (fp_video_file);
+  }
+
+function fpkp()
+  {
+  log ('fpkp');
+  return false;
   }
 
 function fp_onstart()
   {
   log ('fp onstart')
+
   var fd = parseInt (this.getClip().fullDuration, 10);
   fp_duration = fd * 1000;
+
+  /* flowplayer provides no progress/tick event */
+
+  fp_timex = setInterval ("fp_tick()", 333);
+  update_progress_bar();
   }
 
 function fp_ended()
   {
   log ('fp ended');
   ended_callback();
+  clearTimeout (fp_timex);
+  }
+
+function fp_tick()
+  {
+  update_progress_bar();
+
+  /* cancel ticking if player stopped */
+
+  if (flowplayer ("player").getState() == 1)
+    clearTimeout (fp_timex);
   }
 
 function physical_offset()
@@ -2981,8 +3031,8 @@ function physical_offset()
 
       if (flowplayer)
         {
-        log ("FP OFFSET: " +  flowplayer ("player").getTime());
-        return flowplayer().getTime() * 1000;
+        // log ("FP OFFSET: " +  flowplayer ("player").getTime());
+        return flowplayer ("player").getTime();
         }
       else
         return 0;
@@ -3013,7 +3063,7 @@ function physical_length()
     case "fp":
 
       if (flowplayer && fp_duration)
-        return fp_duration;
+        return fp_duration / 1000;
       else
         return 1;
 
@@ -3258,6 +3308,13 @@ return;
   jwplayer.sendEvent ('LOAD', 'nothing.flv');
   }
 
+function noop (e)
+  {
+  log ('video mouse down');
+  /* undo the pause damage done by flowplayer */
+  // flowplayer ("player").pause();
+  }
+
 </script>
 
 <title>Elastic 9x9 Player</title>
@@ -3277,7 +3334,7 @@ One moment...
       <video id="vvv" autoplay="false" preload="metadata" loop="false" height="100%" width="100%" volume="0"></video></div>
 
 <div id="fp" style="width: 100%; height: 100%; display: none">
-  <a href="" style="display:block;width:100%;height:100%" id="player"></a>
+  <a href="" style="display:block;width:100%;height:100%" id="player" onClick="noop(this)"></a>
 </div>
 
 <div id="jw" style="width: 100%; height: 100%; display: none">
@@ -3324,81 +3381,64 @@ One moment...
 
   </div>
 
-<div id="ch-layer" style="display: block">
+<div id="ch-layer" style="display: none">
   <div id="ch-container">
     <div class="arrow-up"></div><div class="arrow-down"></div>
-
-    <div id="left-piece"><span class="rowNum" id="left-row-num">1</span></div>
-
     <div id="ch-constrain">
       <div class="ch-strip">
+        <div id="row-number"><p></p></div>
         <ul id="ch-meta">
           <li id="ch-layer-ch-title" class="ch-title"></li>
           <li class="dash">&#8212;</li>
           <li id="ch-layer-ep-title" class="ep-title"></li>
         </ul>
-
         <div class="ch-swish" id="ch-swish-1" style="display: block"><ul id="ch-list-1" class="ch-list"></ul></div>
         <div class="ch-swish" id="ch-swish-2" style="display: block"><ul id="ch-list-2" class="ch-list"></ul></div>
-
         <div class="ch-swish" id="ch-swish-3" style="display: block"><ul id="ch-list-3" class="ch-list"></ul></div>
         <div class="ch-swish" id="ch-swish-4" style="display: block"><ul id="ch-list-4" class="ch-list"></ul></div>
         <div class="ch-swish" id="ch-swish-5" style="display: block"><ul id="ch-list-5" class="ch-list"></ul></div>
         <div class="ch-swish" id="ch-swish-6" style="display: block"><ul id="ch-list-6" class="ch-list"></ul></div>
         <div class="ch-swish" id="ch-swish-7" style="display: block"><ul id="ch-list-7" class="ch-list"></ul></div>
         <div class="ch-swish" id="ch-swish-8" style="display: block"><ul id="ch-list-8" class="ch-list"></ul></div>
-
         <div class="ch-swish" id="ch-swish-9" style="display: block"><ul id="ch-list-9" class="ch-list"></ul></div>
       </div>
       </div>
-
     </div>
-    <div id="right-piece"><span class="rowNum" id="right-row-num">3</span></div>
   </div>
 </div>
 
 <div id="ep-layer">
-
   <div id="ep-container">
     <div class="arrow-up"></div>
     <div id="ep-constrain">
       <ul id="ep-meta">
-
         <li id="ep-layer-ch-title" class="ch-title"></li>
         <li class="dash">&#8212;</li>
         <li id="ep-layer-ep-title" class="ep-title"></li>
       </ul>
-
       <div id="ep-swish" class="ep-swish" style="display: block">
         <ul class="ep-list" id="ep-list"></ul>
       </div>
     </div>
   </div>
-
 </div>
 
 <div id="ipg-layer" style="display: none">
   <div id="ipg-pannel">
     <ul id="info-list">
-
       <li id="ch-thumb"><img id="ch-thumb-img" src=""></li>
       <li id="ch-name"><p>ABC news</p></li>
       <li id="ep-name"><p>An episode name would go here?</p></li>
-
       <li id="description"><p>A description of something is supposed to go here, but I have nothing to put in this spot.</p></li>
-
       <li id="ep-number"><p><span class="hilite">Episodes: </span><span id="ch-episodes">9</span></p></li>
-
       <li id="update"><p><span class="hilite">Updated:</span> 11/09/2010</p></li>
     </ul>
     <ul id="control-list">
       <li><a id="ipg-signin-btn" href="javascript:;" class="btn">Sign in / Sign up</a></li>
       <li><a id="ipg-return-btn" href="javascript:;" class="btn">Return to Channel Mode</a></li>
-
     </ul> 
-    <img src="http://zoo.atomics.org/video/9x9playerV19/images/logo.png" id="logo">
+    <img src="http://zoo.atomics.org/video/9x9playerV20/images/logo.png" id="logo">
   </div>
-
   <div id="ipg-grid"></div>
   <div id="menu">
     <p id="pop-play"></p><p id="pop-delete"></p>
@@ -3411,58 +3451,44 @@ One moment...
 <div id="signin-layer" style="display: none">
   <ul id="login-pannel">
     <li><h2>Returning Users</h2></li>
-
     <li>
-
       <span>Email:</span>
       <p class="textfieldbox"><input type="text" id="L-email" class="textfield" value="you@example.com"></p>
     </li>
     <li>
       <span>Password:</span>
       <p class="textfieldbox"><input type="password" id="L-password" class="textfield" value="swordfish"></p>
-
     </li>
     <li><a href="javascript:submit_login()" class="btn"><span>Log in</span></a></li>
-
   </ul>
   <ul id="signup-pannel">
     <li><h2>New Users</h2></li>
     <li>
       <span>Name:</span>
-
       <p class="textfieldbox"><input type="text" id="S-name" class="textfield"></p>
     </li>
     <li>
-
       <span>Email:</span>
       <p class="textfieldbox"><input type="text" id="S-email" class="textfield"></p>
     </li>
     <li>
-
       <span>Password:</span>
-
       <p class="textfieldbox"><input type="password" id="S-password" class="textfield"></p>
     </li>
     <li>
-
       <span>Password verify:</span>
       <p class="textfieldbox"><input type="password" id="S-password2" class="textfield"></p>
     </li>
-
     <li><a href="javascript:submit_signup()" class="btn"><span>Sign up</span></a></li>
-
   </ul>
 </div>
 
 <div id="podcast-layer">
   <div id="padcast-pannel">
-
     <label for="podcast input">Enter Podcast URL:</label>
     <ul id="podcast-input">
-
       <li class="textfieldbox"><form id="throw"><input id="podcastRSS" name="podcastRSS" type="text" class="textfield" value="" size="30" onkeypress="return event.keyCode != 13"></form></li>
       <li><a href="javascript:submit_throw()" class="btn"><span>Contribute</span></a></li>
-
     </ul>
     <ul id="podcast-list"></ul>
   </div>
@@ -3475,42 +3501,34 @@ One moment...
 <div id="control-layer" style="display: none">
   <div id="msg-up"><p>Press <span class="enlarge">&uarr;</span> to see your programming guide</p></div> 
   <ul id="control-bar">
-
     <li id="btn-replay"></li>
     <li id="btn-rewind"></li>
     <li id="btn-play" class="on"></li>
     <li id="btn-pause"></li>
-
     <li id="btn-forward"></li>
     <li class="divider"></li>
     <li id="btn-volume"></li>
     <li id="volume-constrain" class="on">
       <ul id="volume-bars">
-
         <li></li>
         <li></li>
         <li></li>
-
         <li class="on"></li>
         <li class="on"></li>
         <li class="on"></li>
         <li class="on"></li>
       </ul>
     </li>
-
     <li class="divider"></li>
     <li id="btn-facebook"></li>
-
     <li id="btn-screensaver"></li>
     <li class="divider"></li>
     <li id="btn-close"></li>
     <li id="play-time">00:52 / 01:32</li>
     <li id="progress-bar">
       <p id="loaded"></p>
-
       <p id="played"></p>
     </li>
-
   </ul> 
   <div id="msg-down"><p>Press <span class="enlarge">&darr;</span> for more episodes</p></div>
 </div>
@@ -3525,7 +3543,6 @@ One moment...
   <div id="go-left"><img src="" id="left-tease">Press <span class="enlarge">&larr;</span> to watch previous channel</div>
   <div id="go-right"><img src="" id="right-tease">Press <span class="enlarge">&rarr;</span> to watch next channel</div>
 </div>
-
 
 <div id="log-layer" style="position: absolute; left: 0; top: 0; height: 100%; width: 100%; background: white; color: black; text-align: left; padding: 20px; overflow: scroll; z-index: 9999; display: none"></div>
 
