@@ -316,8 +316,9 @@ function fetch_channels()
 
   var query = "/playerAPI/channelLineup?user=" + user;
 
-  // 1  570     Channel One     /thumb/01.jpg
-  // 0=grid-location 1=channel-id 2=channel-name 3=channel-thumb
+  // 0=grid id, 1=channel id,
+  // 2=channel name, 3=channel description, 4=channel image url,
+  // 5=program count, 6=type(SYSTEM|PODCAST), 7=status
 
   var d = $.get (query, function (data)
     {
@@ -336,7 +337,7 @@ function fetch_channels()
         {
         var fields = lines[i].split ('\t');
         log ("channel line " + i + ": " + conv [fields[0]] + ' = ' + lines [i]);
-        channelgrid [conv [fields[0]]] = { 'id': fields[1], 'name': fields[2], 'thumb': fields[3], 'desc': fields [4] };
+        channelgrid [conv [fields[0]]] = { 'id': fields[1], 'name': fields[2], 'desc': fields[3], 'thumb': fields[4], 'count': fields[5], 'type': fields[6], 'status': fields[7] };
         channels_by_id [fields[1]] = conv [fields[0]];
         }
       else
@@ -1259,6 +1260,9 @@ function escape()
 
   layer.css ("display", layer.css ("display") == "block" ? "none" : "block");
 
+  if (thumbing == 'ipg')
+    clearTimeout (ipg_timex);
+
   if (thumbing == 'ipg' || thumbing == 'user')
     resume();
 
@@ -1800,7 +1804,7 @@ function extend_ipg_timex()
   {
   if (ipg_timex)
     clearTimeout (ipg_timex);
-  ipg_timex = setTimeout ("ipg_idle()", 45000);
+  ipg_timex = setTimeout ("ipg_idle()", 65000);
   }
 
 function redraw_ipg()
@@ -2044,11 +2048,14 @@ function ipg_play()
       {
       login_screen();
       }
+
+    clearTimeout (ipg_timex);
     return;
     }
 
   if (! (ipg_cursor in channelgrid))
     {
+    clearTimeout (ipg_timex);
     browse();
     return;
     }
@@ -2059,6 +2066,8 @@ function ipg_play()
     return;
     }
 
+
+  clearTimeout (ipg_timex);
   enter_category ((""+ipg_cursor).substring (0, 1));
 
   for (var c in channel_line)
@@ -2696,6 +2705,12 @@ function unsubscribe_channel()
     {
     var grid = server_grid (ipg_cursor);
     var channel = channelgrid [ipg_cursor]['id'];
+
+    if (channelgrid [ipg_cursor]['type'] == 'SYSTEM')
+      {
+      alert ('Cannot unsubscribe a system channel');
+      return;
+      }
 
     var cmd = "/playerAPI/unsubscribe?user=" + user + '&' + "channel=" + channel + '&' + "grid=" + grid;
     var d = $.get (cmd, function (data)
