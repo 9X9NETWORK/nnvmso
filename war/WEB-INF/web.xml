@@ -4,6 +4,9 @@ xmlns="http://java.sun.com/xml/ns/javaee"
 xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
 xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
 http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
+  <!-- 
+    spring dispatcher 
+  -->	
   <servlet>
     <servlet-name>nnvmso</servlet-name>
     <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
@@ -12,13 +15,38 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
   <servlet-mapping>
     <servlet-name>nnvmso</servlet-name>
     <url-pattern>/</url-pattern>
-  </servlet-mapping>
-
+  </servlet-mapping>  
+  <!-- 
+    remote api 
+  -->
+  <servlet>
+  	<servlet-name>remoteapi</servlet-name>
+  	<servlet-class>com.google.apphosting.utils.remoteapi.RemoteApiServlet</servlet-class>
+  </servlet>  
+  <servlet-mapping>
+  	<servlet-name>remoteapi</servlet-name>
+  	<url-pattern>/remote_api</url-pattern>
+  </servlet-mapping>  
+  <security-constraint>
+  	<web-resource-collection>
+  		<web-resource-name>remoteapi</web-resource-name>
+  		<url-pattern>/remote_api</url-pattern>
+  	</web-resource-collection>
+  	<auth-constraint>
+  		<role-name>admin</role-name>
+  	</auth-constraint>
+  </security-constraint>  
+  <!-- 
+    error handling 
+  -->
   <error-page>
     <error-code>404</error-code>
-    <location>/error/not-found</location>
+    <location>/not-found</location>
   </error-page> 
 
+  <!-- 
+    tld config 
+  -->
   <jsp-config>
     <taglib>
       <taglib-uri>/spring</taglib-uri>
