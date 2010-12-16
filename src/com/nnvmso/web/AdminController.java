@@ -71,7 +71,14 @@ public class AdminController {
 		service.init();
 		return "hello/hello";
 	}
-			
+
+	@RequestMapping(value="createPodcasts")
+	public String createPodcasts(HttpServletRequest req) {
+		InitService service = new InitService();
+		service.createPodcastChannels(req);
+		return "hello/hello";
+	}
+	
 	@RequestMapping(value="createChannels")
 	public String createChannels() {
 		InitService service = new InitService();
