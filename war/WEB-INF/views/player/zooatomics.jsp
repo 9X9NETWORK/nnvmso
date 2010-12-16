@@ -1554,12 +1554,8 @@ function switch_to_whats_new()
   {
   whatsnew = [];
 
+
   log ('whats new');
-
-  hide_layers();
-  force_pause();
-
-  thumbing = 'whatsnew';
   var bad_thumbnail = '<img src="http://zoo.atomics.org/video/images-x1/no_images.png">';
 
   var query = "/playerAPI/whatsNew?user=" + user;
@@ -1569,7 +1565,8 @@ function switch_to_whats_new()
     var lines = data.split ('\n');
     log ('number of new programs obtained: ' + lines.length);
 
-    wn = {};
+    var wn = {};
+    var wn_count = 0;
 
     for (var i = 0; i < lines.length; i++)
       {
@@ -1581,7 +1578,10 @@ function switch_to_whats_new()
           var real_channel = programgrid [program]['channel'];
 
           if (! (real_channel in wn))
+            {
+            wn_count++;
             wn [real_channel] = [];
+            }
 
           wn [real_channel].push (program);
 
@@ -1599,6 +1599,17 @@ function switch_to_whats_new()
           log ('program ' + program + ' not in a subscribed channel');
         }
       }
+
+    if (wn_count == 0)
+      {
+      log ('nothing new');
+      return;
+      }
+
+    thumbing = 'whatsnew';
+
+    hide_layers();
+    force_pause();
 
     for (var channel in wn)
       {
@@ -1653,9 +1664,8 @@ function exit_whats_new()
   $("body").removeClass ("on");
   //$("body").css ("background-image", "none");
   thumbing = 'program';
-  $("#all-players").show();
-  enter_channel();
   switch_to_ipg();
+  $("#all-players").show();
   }
 
 function whatsnew_enter()
