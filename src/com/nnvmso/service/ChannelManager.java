@@ -1,7 +1,6 @@
 package com.nnvmso.service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -10,13 +9,10 @@ import java.util.Set;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
-import javax.jdo.Transaction;
 
 import org.springframework.stereotype.Service;
 
 import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
-import com.nnvmso.json.PodcastChannel;
 import com.nnvmso.lib.*;
 import com.nnvmso.model.*;
 
@@ -35,9 +31,7 @@ public class ChannelManager {
 		Query query = pm.newQuery(MsoChannel.class);
 		List<MsoChannel> channels = (List<MsoChannel>) query.execute();
 		for (MsoChannel c : channels) {
-			if (c.getImageUrl().equals("false")) {
-				c.setImageUrl("/WEB-INF/../images/thumb_noImage.jpg");
-			}
+			c.setPublic(true);
 		}
 		pm.makePersistentAll(channels);
 		pm.close();		

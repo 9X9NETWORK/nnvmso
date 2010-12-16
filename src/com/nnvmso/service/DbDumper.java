@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import com.google.appengine.api.datastore.Key;
 import com.nnvmso.lib.PMF;
-import com.nnvmso.model.Mso;
 
 @Service
 public class DbDumper {

@@ -19,7 +19,6 @@ import com.nnvmso.json.Slideshow;
 import com.nnvmso.lib.DebugLib;
 import com.nnvmso.lib.NnScriptLib;
 import com.nnvmso.lib.PMF;
-import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoProgram;
 import com.nnvmso.model.NnUser;
@@ -53,6 +52,30 @@ public class ProgramManager {
 		}
 		return newPrograms;
 	}
+
+	public List<MsoProgram> findNotNew(NnUser user) {
+		SubscriptionManager sMngr = new SubscriptionManager();
+		List<MsoChannel> channels = sMngr.findSubscribedChannels(user);				
+		System.out.println("channel size=" + channels.size());
+		List<MsoProgram> newPrograms = new ArrayList<MsoProgram>();
+		for (MsoChannel c : channels) {
+			PersistenceManager pm = PMF.get().getPersistenceManager();
+			Query query = pm.newQuery(MsoProgram.class);
+			query.setFilter("channelKey == channelKeyParam");
+			query.declareParameters(Key.class.getName() + " channelKeyParam");	    				
+	    	List<MsoProgram> results = (List<MsoProgram>) query.execute(c.getKey());
+			int recentSize = 3;
+			for (int i=0; i<results.size(); i++) {
+				if (i == recentSize) {break;}
+				System.out.println("new program=" + results.get(i).getId() + " in channel " + c.getId() + " and its date is " + c.getUpdateDate());
+				if (c.getType() != MsoChannel.TYPE_SYSTEM) {
+					newPrograms.add(results.get(i));
+				}												
+			}
+		}
+		return newPrograms;
+	}
+
 	
 	public MsoProgram findByKey(String key) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();

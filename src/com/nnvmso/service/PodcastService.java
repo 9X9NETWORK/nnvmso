@@ -1,9 +1,11 @@
 package com.nnvmso.service;
 
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
@@ -17,6 +19,7 @@ import com.nnvmso.json.PodcastChannel;
 import com.nnvmso.json.PodcastFeed;
 import com.nnvmso.json.PodcastItem;
 import com.nnvmso.json.PodcastProgram;
+import com.nnvmso.lib.AwsLib;
 import com.nnvmso.lib.NnLib;
 import com.nnvmso.lib.PMF;
 import com.nnvmso.model.Mso;
@@ -25,15 +28,17 @@ import com.nnvmso.model.MsoProgram;
 
 @Service
 public class PodcastService {
-
-	public static String THIS_HOST = "alpha.9x9.tv";
+	protected static final Logger log = Logger.getLogger(PodcastService.class.getName());	
 	
-	public static String TRANSCODING_SERVER_DEV = "http://awsapi.9x9cloud.tv/dev/podcatcher.php";
-	public static String TRANSCODING_SERVER_ALPHA = "http://awsapi.9x9cloud.tv/alpha/podcatcher.php";
-	public static String TRANSCODING_SERVER_BETA = "http://awsapi.9x9cloud.tv/beta/podcatcher.php";
-	public static String TRANSCODING_SERVER_TW = "http://awsapi.9x9cloud.tv/tw/podcatcher.php";
-
-	protected static final Logger log = Logger.getLogger(PodcastService.class.getName()); 
+	private Properties getTranscodingServer() {
+		Properties pro = new Properties();
+		try {
+			pro.load(AwsLib.class.getClassLoader().getResourceAsStream("podcast.properties"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return pro;
+	}
 	
 	public MsoChannel findByPodcast(String podcastRss) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();		    	
@@ -112,12 +117,14 @@ public class PodcastService {
 		channel.setIntro(podcast.getDescription());
 		channel.setImageUrl(podcast.getImage());
 		channel.setUpdateDate(podcast.getPubDate());
+		channel.setType(MsoChannel.TYPE_PODCAST);
 		new ChannelManager().create(channel, mso);
 		return channel;
 	}	
 			
 	public MsoProgram updateProgramViaPodcast(PodcastProgram podcastProgram) {
 		ProgramManager programMngr = new ProgramManager();
+		ChannelManager channelMngr = new ChannelManager();
 		PodcastItem item = podcastProgram.getItems()[0]; //!!! for now there's only one item
 		MsoProgram program = programMngr.findByStorageId(item.getItemId());
 		MsoChannel channel = new ChannelManager().findByKey(podcastProgram.getKey());
@@ -126,15 +133,29 @@ public class PodcastService {
 			isNew = true;
 			program = new MsoProgram();			
 			program.setChannelKey(channel.getKey());
-			program.setChannelId(channel.getId());		
+			program.setChannelId(channel.getId());
 		}
+		int status = Integer.parseInt(podcastProgram.getErrorCode());
+		System.out.println("status=" + status);
+		channel.setStatus(status);
+		channelMngr.save(channel);
+		
+		if (status != 0) {
+			return program;
+		}
+		
 		if (item.getTitle() != null) {
 			program.setName(item.getTitle());
 		}
-		if (item.getDescription()!= null && item.getDescription().length() > 500) {
+		String intro = item.getDescription();
+		if (intro != null && intro.length() > 500) {
+			intro = intro.replaceAll("\t", " ");
+			intro = intro.replaceAll("\r", " ");
 			item.setDescription(item.getDescription().substring(0, 500));
+		} else {
+			intro = "";
 		}
-		program.setIntro(item.getDescription());
+		program.setIntro(intro);
 		if (item.getThumbnail()!= null) {
 			program.setImageUrl(item.getThumbnail());
 		} else {
@@ -193,26 +214,14 @@ public class PodcastService {
 		PodcastFeed feed = new PodcastFeed();
 		feed.setKey(channelKey);
 		feed.setRss(rss);
-		
-		String urlStr = "";
-		String callBackUrl = "";
-		
-		String stage = "DEV"; 
-		//String stage = "ALPHA";
-		//String stage = "BETA";
-		
-		if (stage.equals("DEV")) {
-			feed.setCallback("http://209.133.58.79:8888");
-			urlStr = TRANSCODING_SERVER_DEV;
-		} else if (stage.equals("ALPHA")) {
-			feed.setCallback("http://9x9tvalpha.appspot.com");
-			urlStr = TRANSCODING_SERVER_ALPHA;
-		} else {
-			feed.setCallback("http://9x9tvbeta.appspot.com");
-			urlStr = TRANSCODING_SERVER_BETA;			
-		}			
-		log.info("LOGGING: callbackUrl = " + feed.getCallback());		
-		NnLib.urlPostWithJson(urlStr, feed);
+		Properties pro = this.getTranscodingServer();
+		String transcodingServer = pro.getProperty(pro.getProperty("current"));
+		feed.setCallback(NnLib.getUrlRoot(req));
+		if (pro.getProperty("current").equals("dev")) {
+			feed.setCallback(pro.getProperty("dev_callback"));
+		}		
+		log.info("LOGGING: podcast callbackUrl = " + feed.getCallback() + "; transcoding server = " + transcodingServer);
+		NnLib.urlPostWithJson(transcodingServer, feed);
 	}
 	
 }

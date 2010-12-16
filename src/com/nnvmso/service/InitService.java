@@ -1,10 +1,18 @@
 package com.nnvmso.service;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 
 import org.springframework.stereotype.Service;
 
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.Text;
+import com.nnvmso.lib.PMF;
 import com.nnvmso.model.*;
 
 @Service
@@ -39,6 +47,10 @@ public class InitService {
 		p1.setMpeg4FileUrl("http://zoo.atomics.org/video/jukebox/bee-gees-stayin-alive.webm");
 		p1.setWebMFileUrl("http://zoo.atomics.org/video/jukebox/bee-gees-stayin-alive.webm");	
 		p1.setPublic(true);
+		
+		c1.setProgramCount(2);
+		c2.setProgramCount(3);
+		
 		pMngr.create(p1);
 		
 	}
@@ -61,8 +73,7 @@ public class InitService {
 		dumper.deleteAll(Subscription.class, list);
 	}
 	
-	public void init() {
-		deleteAll();
+	private void createInitialData() {
 		MsoManager msoMngr = new MsoManager();
 		NnUserManager userMngr = new NnUserManager();
 		//two msos
@@ -99,6 +110,33 @@ public class InitService {
 		p.setMpeg4FileUrl("http://s3.amazonaws.com/mp4_9x9/default.mp4");
 		p.setWebMFileUrl("http://s3.amazonaws.com/webm9x9/default.webm");	
 		p.setPublic(true);
-		pMngr.create(p);
+		pMngr.create(p);		
+	}
+	
+	public void alter() {
+		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+		//get all the keys
+		PersistenceManager pm = PMF.get().getPersistenceManager();		    	
+		Query q = pm.newQuery(MsoChannel.class);
+		List<MsoChannel> channels = (List<MsoChannel>) q.execute();		
+		List<Key> keys = new ArrayList<Key>();
+		for (MsoChannel c : channels) {
+			keys.add(c.getKey());
+		}
+		pm.close();
+		datastore.delete(keys);		
+		
+		System.out.println("channel size=" + channels.size());
+		deleteAll();
+	}
+	
+	public void alterInit() {
+		alter();
+		createInitialData();
+	}
+	
+	public void init() {
+		deleteAll();
+		createInitialData();
 	}
 }

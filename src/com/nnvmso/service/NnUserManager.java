@@ -9,7 +9,6 @@ import javax.jdo.Query;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.stereotype.Service;
-import org.springframework.web.util.CookieGenerator;
 
 import com.nnvmso.lib.*;
 import com.nnvmso.model.Mso;

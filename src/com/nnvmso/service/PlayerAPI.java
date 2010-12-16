@@ -21,5 +21,6 @@ public class PlayerAPI {
 	public static final String PLAYER_RSS_NOT_VALID = "RSS feed is not valid";
 	public static final String PLAYER_USER_TOKEN_INVALID = "Invalid user token";
 	public static final String PLAYER_EMAIL_TAKEN = "This email is already registered";
+
 	
 }
