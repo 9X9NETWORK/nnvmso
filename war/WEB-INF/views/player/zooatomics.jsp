@@ -1655,6 +1655,7 @@ function exit_whats_new()
   thumbing = 'program';
   $("#all-players").show();
   enter_channel();
+  switch_to_ipg();
   }
 
 function whatsnew_enter()
