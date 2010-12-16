@@ -336,7 +336,7 @@ function fetch_channels()
         {
         var fields = lines[i].split ('\t');
         log ("channel line " + i + ": " + conv [fields[0]] + ' = ' + lines [i]);
-        channelgrid [conv [fields[0]]] = { 'id': fields[1], 'name': fields[2], 'thumb': fields[3] };
+        channelgrid [conv [fields[0]]] = { 'id': fields[1], 'name': fields[2], 'thumb': fields[3], 'desc': fields [4] };
         channels_by_id [fields[1]] = conv [fields[0]];
         }
       else
@@ -808,17 +808,34 @@ function ep_html()
     {
     log ('--> program ' + i);
     var program = programgrid [program_line [i]];
+
     var age = ageof (program ['timestamp']);
+    var duration = durationof (program ['duration']);
 
     // html += '<li id="p-li-' + i + '"><img id="p-th-"' + i + '" src="' + program ['thumb'] + '"></li>';
     var onoff = (i == program_cursor) ? 'class="on" ' : '';
     onoff = '';
+
     html += '<li ' + onoff + 'id="p-li-' + i + '"><img src="' + program ['thumb'] + '">'
-    html += '<p class="timestamp unseen">' + age + '</p><p class="duration">0:00</p></li>';
+    html += '<p class="timestamp unseen">' + age + '</p><p class="duration">' + duration + '</p></li>';
     }
 
   log ('PROGRAM HTML: ' + html);
   return html;
+  }
+
+function durationof (duration)
+  {
+  if (duration == '' || duration == 'null' || duration == undefined)
+    return '0:00';
+
+  if (duration.match (/^00:\d\d:\d\d/))
+    duration = duration.replace (/^00:/, '');
+
+  if (duration.match (/\.\d\d$/))
+    duration = duration.replace (/\.\d\d$/, '');
+
+  return duration;
   }
 
 function ageof (timestamp)
@@ -836,7 +853,19 @@ function ageof (timestamp)
       if (hours >= 24)
         {
         var days = Math.floor ((hours + 1) / 24);
-        age = days + (days == 1 ? ' day' : ' days');
+        if (days > 30)
+          {
+          var months = Math.floor ((days + 1) / 30);
+          if (months > 12)
+            {
+            var years = Math.floor ((months + 1) / 12);
+            age = years + (years == 1 ? ' year' : ' years');
+            }
+          else
+            age = months + (months == 1 ? ' month' : ' months');
+          }
+        else
+          age = days + (days == 1 ? ' day' : ' days');
         }
       else
         age = hours + (hours == 1 ? ' hour' : ' hours');
@@ -1832,8 +1861,14 @@ function ipg_metainfo()
 
     $("#ch-thumb-img").attr ("src", thumbnail);
     $("#ch-name").html ('<p>' + name + '</p>');
-    $("#ep-name").html ('<p>An episode name would go here?</p>');
-    $("#description").html ('<p>A description of something is supposed to go here, but I have nothing to put in this spot.</p>');
+    // $("#ep-name").html ('<p>An episode name would go here?</p>');
+    $("#ep-name").html ('');
+
+    var desc = channelgrid [ipg_cursor]['desc'];
+    if (desc == '' || desc == undefined || desc == 'null')
+      desc = '[no description]';
+
+    $("#description").html ('<p>' + desc + '</p>');
     $("#ch-episodes").html (programs_in_channel (ipg_cursor));
     $("#ep-number").show();
     $("#update").show();
@@ -2666,6 +2701,7 @@ function unsubscribe_channel()
     var d = $.get (cmd, function (data)
       {
       delete (channelgrid [ipg_cursor]);
+      delete (channels_by_id [channel]);
       redraw_ipg();
       elastic();
       });
