@@ -1561,7 +1561,6 @@ function switch_to_whats_new()
 
   thumbing = 'whatsnew';
   var bad_thumbnail = '<img src="http://zoo.atomics.org/video/images-x1/no_images.png">';
-  var desc = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, ...";
 
   var query = "/playerAPI/whatsNew?user=" + user;
 
@@ -1587,7 +1586,6 @@ function switch_to_whats_new()
           wn [real_channel].push (program);
 
           /* fakes */
-          programgrid [program]['desc'] = desc;
           programgrid [program]['age'] = ageof (programgrid [program]['timestamp']);
 
           if (programgrid [program]['snapshot'] != '')
