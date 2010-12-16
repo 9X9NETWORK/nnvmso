@@ -258,11 +258,6 @@ function init()
     }
 
   setup_ajax_error_handling();
-
-  //var playertext = $("#jw-template").html();
-  //playertext = playertext.replace (/%ID%/g, 'player2');
-  //$("#jw2").html (playertext);
-  //$("#jw2").show();
   }
 
 function fetch_programs()
@@ -298,7 +293,6 @@ function parse_program_data (data)
     if (lines [i] != '')
       {
       var fields = lines[i].split ('\t');
-      // logtext += "program line " + i + ": " + fields[0] + ' = ' + lines [i] + '\n';
       programgrid [fields [1]] = { 'channel': fields[0], 'type': fields[3], 'url1': 'fp:' + fields[8], 
                    'url2': 'fp:' + fields[9], 'url3': 'fp:' + fields[10], 'url4': 'fp:' + fields[11], 
                    'name': fields[2], 'desc': fields [3], 'type': fields[4], 'thumb': fields[6], 
@@ -358,21 +352,21 @@ function activate()
   activated = true;
   enter_category (1, 'b');
   elastic();
-log ('activate0');
+
   //play_first_program_in (first_channel());
   program_cursor = 1;
   program_first = 1;
   current_program = first_program_in (first_channel());
 
-log ('activate2');
   enter_channel();
-log ('activate3');
+
   $("#ep-layer").hide();
   document.onkeydown=kp;
   redraw_ipg();
 
   log ('activate: ipg');
   switch_to_ipg();
+
   $("#notblue").show();
   $("#blue").hide();
   preload_control_images()
@@ -3283,7 +3277,7 @@ One moment...
       <video id="vvv" autoplay="false" preload="metadata" loop="false" height="100%" width="100%" volume="0"></video></div>
 
 <div id="fp" style="width: 100%; height: 100%; display: none">
-  <a href="http://e1h13.simplecdn.net/flowplayer/flowplayer.flv" style="display:block;width:100%;height:100%" id="player"></a>
+  <a href="" style="display:block;width:100%;height:100%" id="player"></a>
 </div>
 
 <div id="jw" style="width: 100%; height: 100%; display: none">
