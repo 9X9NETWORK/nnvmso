@@ -19,7 +19,7 @@ import com.nnvmso.model.*;
 @Service
 public class ChannelManager {
 
-	public final short MAX_CHANNEL_SIZE = 81;
+	public final short MAX_CHANNEL_SIZE = 99;
 	public final short MAX_MSOCHANNEL_SIZE = 77;
 	public final short SYSTEM_CHANNEL_SIZE = 4;
 
@@ -69,7 +69,7 @@ public class ChannelManager {
 		pm.close();		
 		return channels;
 	}
-	
+		
 	public List<MsoChannel> findAllPublic() {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Query q = pm.newQuery(MsoChannel.class);

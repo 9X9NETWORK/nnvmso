@@ -138,7 +138,8 @@ public class InitService {
 		ProgramManager pMngr = new ProgramManager();
 		MsoProgram p = new MsoProgram("System Program");
 		p.setChannelId(system.getId());
-		p.setImageUrl("/WEB-INF/../images/logo_9x9.png");
+		p.setIntro("Welcome to 9x9");
+		p.setImageUrl("/WEB-INF/../images/logo_9x9.png");		
 		p.setMpeg4FileUrl("http://s3.amazonaws.com/mp4_9x9/default.mp4");
 		p.setWebMFileUrl("http://s3.amazonaws.com/webm9x9/default.webm");	
 		p.setPublic(true);
