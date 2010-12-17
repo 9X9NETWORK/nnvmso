@@ -26,9 +26,11 @@ var jw_timex = 0;
 var jw_previous_state = '';
 var jw_position = 0;
 
-var fp_video_file;
-var fp_duration;
-var fp_timex = 0;
+var fp_player = 'player1';
+var fp_preloaded = '';
+
+var fp = {  player1: { file: '', duration: 0, timex: 0, mute: false },
+            player2: { file: '', duration: 0, timex: 0, mute: false }  };
 
 var activated = false;
 var remembered_pause = false;
@@ -53,6 +55,7 @@ var program_first = 1;
 
 var ipg_cursor;
 var ipg_timex = 0;
+var ipg_preload_timex = 0;
 
 /* cache this for efficiency */
 var loglayer;
@@ -128,7 +131,11 @@ function elastic_innards()
   // h.style.height = (vh) + "px";
   // var h = document.getElementById ("jw2");
   // h.style.height = (vh) + "px";
-  var h = document.getElementById ("fp");
+  var h = document.getElementById ("fp1");
+  h.style.height = (vh) + "px";
+  var h = document.getElementById ("fp2");
+  h.style.height = (vh) + "px";
+  var h = document.getElementById ("blackground");
   h.style.height = (vh) + "px";
 
   // var i = document.getElementById ("ipg-layer");
@@ -372,6 +379,7 @@ function activate()
   preload_control_images()
 
   jw_play_nothing();
+  // start_fp_players();
 
   $("body").focus();
   }
@@ -721,6 +729,7 @@ function prepare_channel()
   $("#ep-swish").show();
   $("#ep-layer").show();
   $("#ep-list").html (ep_html());
+  $("#ep-list img").error(function () { $(this).unbind("error").attr("src", "http://zoo.atomics.org/video/images-x1/no_images.png"); });
 
   redraw_program_line();
   }
@@ -882,6 +891,35 @@ var new_cline;
 function enter_category (cat, positioning)
   {
   log ('enter category: ' + cat + ', thumbing: ' + thumbing);
+
+  /* temporary code, if channel mode is removed */
+  if (true)
+    {
+    channel_line = {};
+
+    $("#control-layer").hide();
+    $("#ch-list-" + cat).html (ch_html (cat));
+    $("#row-number").html ('<p>' + cat + '</p>');
+
+    current_category = cat;
+
+    for (var y = 1; y <= 9; y++)
+      $("#ch-swish-" + y).css ("display", y == cat ? "block" : "none");
+
+    /* position at beginning or ending */
+    if (positioning == 'b')
+      channel_cursor = 1;
+    else if (positioning == 'e')
+      channel_cursor = n_channel_line;
+
+    redraw_channel_line();
+    prepare_channel();
+
+    thumbing = 'channel';
+
+    turn_off_ancillaries();
+    return;
+    }
 
   channel_line = {};
 
@@ -1259,7 +1297,10 @@ function escape()
   layer.css ("display", layer.css ("display") == "block" ? "none" : "block");
 
   if (thumbing == 'ipg')
+    {
     clearTimeout (ipg_timex);
+    $("#blackground").hide();
+    }
 
   if (thumbing == 'ipg' || thumbing == 'user')
     resume();
@@ -1475,6 +1516,12 @@ function keypress (keycode)
         browse_page_down();
       break;
 
+    case 45:
+      /* Ins */
+      if (thumbing == 'ipg')
+        ipg_preload (ipg_cursor);
+      break;
+
     case 46:
       /* Del */
       if (thumbing == 'ipg')
@@ -1503,6 +1550,11 @@ function keypress (keycode)
     case 57:
       /* 1, 2, 3... */
       enter_category (keycode - 48, 'b');
+      break;
+
+    case 71:
+      /* G */
+      ipg_preload_play()
       break;
 
     case 79:
@@ -1803,6 +1855,7 @@ function switch_to_ipg()
     });
 
   thumbing = 'ipg';
+  stop_preload();
 
   $("#ipg-signin-btn").removeClass ("on");
   $("#ipg-return-btn").removeClass ("on");
@@ -1816,6 +1869,8 @@ function outt()
 
 function ipg_failsafe()
   {
+  log ('ipg failsafe');
+  $("#blackground").show();
   $("#ipg-layer").css ("opacity", "1");
   $("#ipg-layer").show();
   elastic();
@@ -1932,6 +1987,34 @@ function ipg_metainfo()
     }
   }
 
+function stop_preload()
+  {
+  clearTimeout (ipg_preload_timex);
+
+  if (fp_preloaded != '')
+    {
+    fp [fp_preloaded]['mute'] = false;
+
+    flowplayer (fp_preloaded).stop();
+    flowplayer (fp_preloaded).unmute();
+
+    log ('cleared preload: ' + fp_preloaded);
+    fp_preloaded = '';
+    }
+  }
+
+function start_preload_timer()
+  {
+  if (thumbing == 'ipg' && ipg_cursor in channelgrid)
+    ipg_preload_timex = setTimeout ("preload_this_square()", 3000);
+  }
+
+function preload_this_square()
+  {
+  if (thumbing == 'ipg' && ipg_cursor in channelgrid)
+    ipg_preload (ipg_cursor);
+  }
+
 function ipg_right()
   {
   log ("IPG RIGHT: old ipg cursor: " + ipg_cursor);
@@ -1960,6 +2043,9 @@ function ipg_right()
 
   $("#ipg-" + ipg_cursor).addClass ("on");
   ipg_metainfo();
+
+  stop_preload();
+  start_preload_timer();
   }
 
 function ipg_left()
@@ -1992,6 +2078,9 @@ function ipg_left()
 
   $("#ipg-" + ipg_cursor).addClass ("on");
   ipg_metainfo();
+
+  stop_preload();
+  start_preload_timer();
   }
 
 function ipg_up()
@@ -2025,6 +2114,9 @@ function ipg_up()
 
   $("#ipg-" + ipg_cursor).addClass ("on");
   ipg_metainfo();
+
+  stop_preload();
+  start_preload_timer();
   }
 
 function ipg_down()
@@ -2044,6 +2136,8 @@ function ipg_down()
       {
       escape();
       switch_to_channel_thumbs()
+      enter_channel();
+      $("#blackground").hide();
       return;
       }
     }
@@ -2052,6 +2146,7 @@ function ipg_down()
     escape();
     switch_to_channel_thumbs()
     enter_channel();
+    $("#blackground").hide();
     return;
     }
 
@@ -2065,6 +2160,9 @@ function ipg_down()
 
   $("#ipg-" + ipg_cursor).addClass ("on");
   ipg_metainfo();
+
+  stop_preload();
+  start_preload_timer();
   }
 
 function ipg_play()
@@ -2078,6 +2176,7 @@ function ipg_play()
       escape();
       switch_to_channel_thumbs();
       enter_channel();
+      $("#blackground").hide();
       }
     else if (ipg_cursor == -2)
       {
@@ -2101,6 +2200,11 @@ function ipg_play()
     return;
     }
 
+  if (fp_preloaded != '')
+    {
+    ipg_preload_play();
+    return;
+    }
 
   clearTimeout (ipg_timex);
   enter_category ((""+ipg_cursor).substring (0, 1));
@@ -2114,6 +2218,7 @@ function ipg_play()
       thumbing = 'channel';
       $("#ch-layer").css ("display", "block");
       $("#ipg-layer").css ("display", "none");
+      $("#blackground").hide();
       play_first_program_in (channel_line [channel_cursor]);
       enter_channel();
       return;
@@ -2208,12 +2313,14 @@ function redraw_program_line()
     {
     --program_first;
     $("#ep-list").html (ep_html());
+    $("#ep-list img").error(function () { $(this).unbind("error").attr("src", "http://zoo.atomics.org/video/images-x1/no_images.png"); });
     }
 
   while (program_cursor >= program_first + max_programs_in_line)
     {
     ++program_first;
     $("#ep-list").html (ep_html());
+    $("#ep-list img").error(function () { $(this).unbind("error").attr("src", "http://zoo.atomics.org/video/images-x1/no_images.png"); });
     }
 
   log ('redraw program line');
@@ -2820,7 +2927,8 @@ function unhide_player (player)
     case "jw":
 
       $("#v").hide();
-      $("#fp").hide();
+      $("#fp1").hide();
+      $("#fp2").hide();
       $("#jw2").show();
       break;
 
@@ -2828,7 +2936,18 @@ function unhide_player (player)
 
       $("#v").hide();
       $("#jw2").hide();
-      $("#fp").show();
+
+      if (fp_player == 'player1')
+        {
+        $("#fp1").show();
+        $("#fp2").hide();
+        }
+      else
+        {
+        $("#fp1").hide();
+        $("#fp2").show();
+        }
+
       break;
     }
   }
@@ -2919,7 +3038,7 @@ function physical_stop()
 
     case "fp": log ('fp STOP');
                if (flowplayer)
-                 flowplayer ("player").stop();
+                 flowplayer (fp_player).stop();
                break;
     }
   }
@@ -2970,27 +3089,126 @@ function jw_progress (event)
   update_progress_bar();
   }
 
-function start_play_fp (url)
+function ipg_preload (grid)
   {
-  jw_position = 0;
-  current_tube = 'fp';
+  var program = first_program_in (grid);
 
-  // ugh! don't know actual url until player is chosen
-  url = best_url (current_program);
+  if (current_tube != 'fp')
+    {
+    log ('preload: flowplayer was not active');
+    current_tube = 'fp';
+    fp_player = 'player1';
+    }
 
-  fp_video_file = url.replace (/^fp:/, '');
-  unhide_player ("fp");
+  fp_preloaded = fp_player == 'player1' ? 'player2' : 'player1';
 
-  log ("FP STREAM: " + fp_video_file);
+  var vh = $(window).height();
+  if (fp_preloaded == 'player1')
+    {
+    $("#fp1").show();
+    $("#fp2").hide();
+    var h = document.getElementById ("fp1");
+    h.style.height = (vh) + "px";
+    }
+  else
+    {
+    $("#fp1").hide();
+    $("#fp2").show();
+    var h = document.getElementById ("fp2");
+    h.style.height = (vh) + "px";
+    }
 
-  flowplayer ("player",
+  flowplayer (fp_preloaded,
       {src: 'http://zoo.atomics.org/video/flowplayer-3.2.5.swf', wmode: 'transparent', allowfullscreen: 'false' }, 
       { canvas: { backgroundColor: '#000000', backgroundGradient: 'none', linkUrl: '' },
       clip: { onFinish: fp_ended, onStart: fp_onstart, bufferLength: 1, autoPlay: true, scaling: 'fit' }, 
       plugins: { controls: null },
       play: null, onBeforeKeypress: fpkp });
 
-  flowplayer ("player").play (fp_video_file);
+  var url = best_url (program);
+  url = url.replace (/^fp:/, '');
+
+  fp [fp_preloaded]['file'] = url;
+  log ('preload ' + fp_preloaded + ' url: ' + url);
+
+  fp [fp_preloaded]['mute'] = true;
+
+  flowplayer (fp_preloaded).stop();
+  flowplayer (fp_preloaded).mute();
+
+  flowplayer (fp_preloaded).play (url);
+  flowplayer (fp_preloaded).mute();
+  }
+
+function ipg_preload_play()
+  {
+  if (fp_preloaded == '')
+    {
+    log ('no preload running');
+    return;
+    }
+
+  log ('PRELOAD PLAY: ' + fp_preloaded);
+
+  clearTimeout (ipg_timex);
+
+  fp_player = fp_preloaded;
+  fp_preloaded = '';
+
+  flowplayer (fp_player).seek (0);
+  flowplayer (fp_player).unmute();
+  fp [fp_player]['mute'] = false;
+
+  //$("#ipg-layer").hide();
+  unhide_player ("fp");
+  //$("#fp1").hide();
+  //$("#fp2").css ({ opacity: 100, display: 'block' });
+
+  enter_category ((""+ipg_cursor).substring (0, 1));
+
+  for (var c in channel_line)
+    {
+    if (channel_line [c] == ipg_cursor)
+      {
+      channel_cursor = c;
+      redraw_channel_line()
+      thumbing = 'channel';
+      // $("#ch-layer").css ("display", "block");
+      $("#ipg-layer").css ("display", "none");
+      $("#blackground").hide();
+      // play_first_program_in (channel_line [channel_cursor]);
+      enter_channel();
+      log ('EXIT PRELOAD PLAY');
+      return;
+      }
+    }
+  }
+
+function start_play_fp (url)
+  {
+  current_tube = 'fp';
+  fp_player = 'player1';
+
+  // ugh! don't know actual url until player is chosen
+  url = best_url (current_program);
+  url = url.replace (/^fp:/, '');
+
+  fp [fp_player]['file'] = url;
+  unhide_player ("fp");
+
+  log ("FP STREAM: " + fp [fp_player]['file']);
+
+  flowplayer (fp_player,
+      {src: 'http://zoo.atomics.org/video/flowplayer-3.2.5.swf', wmode: 'transparent', allowfullscreen: 'false' }, 
+      { canvas: { backgroundColor: '#000000', backgroundGradient: 'none', linkUrl: '' },
+      clip: { onFinish: fp_ended, onStart: fp_onstart, bufferLength: 1, autoPlay: true, scaling: 'fit' }, 
+      plugins: { controls: null },
+      play: null, onBeforeKeypress: fpkp });
+
+  fp [fp_player]['mute'] = false;
+
+  flowplayer (fp_player).unmute();
+  flowplayer (fp_player).play (url);
   }
 
 function fpkp()
@@ -3001,32 +3219,44 @@ function fpkp()
 
 function fp_onstart()
   {
-  log ('fp onstart')
+  var id = this.id();
+  log ('fp ' + id + ' onstart')
 
   var fd = parseInt (this.getClip().fullDuration, 10);
-  fp_duration = fd * 1000;
+  fp [id]['duration'] = fd * 1000;
+
+  if (fp [id]['mute'])
+    flowplayer (id).mute();
+  else
+    flowplayer (id).unmute();
 
   /* flowplayer provides no progress/tick event */
 
-  fp_timex = setInterval ("fp_tick()", 333);
-  update_progress_bar();
+  var cmd = 'fp_tick("' + id + '")';
+  log ('cmd: ' + cmd);
+  fp [id]['timex'] = setInterval (cmd, 333);
+
+  if (id == fp_player)
+    update_progress_bar();
   }
 
 function fp_ended()
   {
-  log ('fp ended');
+  var id = this.id();
+  log ('fp ' + id + ' ended');
   ended_callback();
-  clearTimeout (fp_timex);
+  clearTimeout (fp [id]['timex']);
   }
 
-function fp_tick()
+function fp_tick (id)
   {
-  update_progress_bar();
+  if (id == fp_player)
+    update_progress_bar();
 
   /* cancel ticking if player stopped */
 
-  if (flowplayer ("player").getState() == 1)
-    clearTimeout (fp_timex);
+  if (flowplayer (id).getState() == 1)
+    clearTimeout (fp [id]['timex']);
   }
 
 function physical_offset()
@@ -3051,8 +3281,8 @@ function physical_offset()
 
       if (flowplayer)
         {
-        // log ("FP OFFSET: " +  flowplayer ("player").getTime());
-        return flowplayer ("player").getTime();
+        // log ("FP OFFSET: " +  flowplayer (fp_player).getTime());
+        return flowplayer (fp_player).getTime();
         }
       else
         return 0;
@@ -3082,8 +3312,8 @@ function physical_length()
 
     case "fp":
 
-      if (flowplayer && fp_duration)
-        return fp_duration / 1000;
+      if (flowplayer && fp[fp_player]['duration'])
+        return fp [fp_player]['duration'] / 1000;
       else
         return 1;
 
@@ -3113,7 +3343,7 @@ function physical_pause()
     case "fp":
 
        if (flowplayer)
-         flowplayer ("player").pause();
+         flowplayer (fp_player).pause();
        break;
 
     case "v1": var video = document.getElementById ("vvv");
@@ -3141,7 +3371,7 @@ function physical_play()
     case "fp":
 
       if (flowplayer)
-        flowplayer ("player").play();
+        flowplayer (fp_player).play();
       break;
 
     case "v1":
@@ -3173,7 +3403,7 @@ function physical_is_paused()
     case "fp":
 
       if (flowplayer)
-        return flowplayer ("player").isPaused();
+        return flowplayer (fp_player).isPaused();
       else
         return false;
 
@@ -3212,8 +3442,8 @@ function physical_replay()
 
       if (flowplayer)
         {
-        flowplayer ("player").seek (0);
-        flowplayer ("player").resume();
+        flowplayer (fp_player).seek (0);
+        flowplayer (fp_player).resume();
         }
       break;
 
@@ -3332,7 +3562,7 @@ function noop (e)
   {
   log ('video mouse down');
   /* undo the pause damage done by flowplayer */
-  // flowplayer ("player").pause();
+  // flowplayer (fp_player).pause();
   }
 
 </script>
@@ -3353,8 +3583,15 @@ One moment...
     <div id="v" style="display: block; padding: 0">
       <video id="vvv" autoplay="false" preload="metadata" loop="false" height="100%" width="100%" volume="0"></video></div>
 
-<div id="fp" style="width: 100%; height: 100%; display: none">
-  <a href="" style="display:block;width:100%;height:100%" id="player" onClick="noop(this)"></a>
+<div id="blackground" style="width: 100%; height: 100%; z-index: 2; background: black; display: none">
+</div>
+
+<div id="fp1" style="width: 100%; height: 100%; z-index: 1">
+  <a href="" style="display:block;width:100%;height:100%" id="player1" onClick="noop(this)"></a>
+</div>
+
+<div id="fp2" style="width: 100%; height: 100%; z-index: 1">
+  <a href="" style="display:block;width:100%;height:100%" id="player2" onClick="noop(this)"></a>
 </div>
 
 <div id="jw" style="width: 100%; height: 100%; display: none">
