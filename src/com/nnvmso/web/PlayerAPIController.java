@@ -398,7 +398,7 @@ public class PlayerAPIController {
 		} else {
 			long chId = Integer.parseInt(channel);
 			programs = programMngr.findByChannelIdAndIsPublic(chId, true);
-		}	
+		}
 		String output = "";		
 		for (MsoProgram p : programs) {
 			String url1 = p.getMpeg4FileUrl();
