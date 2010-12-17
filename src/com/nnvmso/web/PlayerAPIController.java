@@ -246,7 +246,6 @@ public class PlayerAPIController {
 						c.getName(), c.getImageUrl(), Integer.toString(c.getProgramCount())};
 				output = output + PlayerLib.getTabDelimitedStr(ori);			
 				output = output + "\n";
-				System.out.println(output);
 			}
 		}
 		System.out.println("channelBrowse() :\n" + output);
@@ -405,12 +404,9 @@ public class PlayerAPIController {
 			String url2 = p.getWebMFileUrl();
 			String url3 = p.getOtherFileUrl();
 			String url4 = p.getAudioFileUrl();
-			System.out.println("hostname=" + req.getLocalAddr() + ";" + req.getLocalPort() + ";" + req.getRequestURI());
-			
 			if (p.getType().equals(MsoProgram.TYPE_SLIDESHOW)) {
 				url1 = "/player/nnscript?program=" + p.getId();
-			}
-			
+			}			
 			String intro = p.getIntro();			
 			if (intro != null) {
 				int introLenth = (intro.length() > 256 ? 256 : intro.length()); 
