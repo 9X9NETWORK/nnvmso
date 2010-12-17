@@ -3,13 +3,13 @@
 <meta charset="UTF-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
-<link rel="stylesheet" href="http://zoo.atomics.org/video/9x9playerV20/stylesheets/main.css" />
+<link rel="stylesheet" href="http://zoo.atomics.org/video/9x9playerV21/stylesheets/main.css" />
 
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 <script type="text/javascript" src="http://zoo.atomics.org/video/cssanim.js"></script>
 <script type="text/javascript" src="http://zoo.atomics.org/video/swfobject.js"></script>
 <script type="text/javascript" src="http://zoo.atomics.org/video/flowplayer-3.2.4.min.js"></script>
-<script type="text/javascript" src="http://zoo.atomics.org/video/9x9playerV20/javascripts/whatsnew.js"></script>
+<script type="text/javascript" src="http://zoo.atomics.org/video/9x9playerV21/javascripts/whatsnew.js"></script>
 
 <script>
 
@@ -88,7 +88,7 @@ var control_buttons = [ 'btn-replay', 'btn-rewind', 'btn-play', 'btn-forward', '
 var control_cursor = 2;
 
 var user = "aghubmUydm1zb3IMCxIGTm5Vc2VyGBoM";
-var root = 'http://zoo.atomics.org/video/9x9playerV20/images/';
+var root = 'http://zoo.atomics.org/video/9x9playerV21/images/';
 
 $(document).ready (function()
  {
@@ -372,6 +372,8 @@ function activate()
   preload_control_images()
 
   jw_play_nothing();
+
+  $("body").focus();
   }
 
 function preload_control_images()
@@ -1456,7 +1458,9 @@ function keypress (keycode)
       else if (thumbing == 'ipg')
         ipg_down();
       else if (thumbing == 'program')
-        switch_to_channel_thumbs();
+        {
+        // switch_to_channel_thumbs();
+        }
       break;
 
     case 33:
@@ -1585,8 +1589,9 @@ function switch_to_whats_new()
 
           wn [real_channel].push (program);
 
-          /* fakes */
+          /* fixups */
           programgrid [program]['age'] = ageof (programgrid [program]['timestamp']);
+          programgrid [program]['duration'] = durationof (programgrid [program]['duration']);
 
           if (programgrid [program]['snapshot'] != '')
             programgrid [program]['screenshot'] = programgrid [program]['snapshot'];
@@ -1754,7 +1759,8 @@ function switch_to_ipg()
   log ('ipg');
 
   clear_msg_timex();
-  force_pause();
+  // force_pause();
+  physical_stop();
 
   if (thumbing == 'control')
     $("#control-layer").animateWithCss ({ opacity: "0" }, 500, "ease-in-out", function() { $("#control-layer").hide(); $("#control-layer").css ("opacity", "1"); });
@@ -1874,6 +1880,9 @@ function redraw_ipg()
     $("#ipg-" + ipg_cursor).addClass ("on");
 
   ipg_metainfo();
+
+  ipg_fixup_margin();
+  ipg_fixup_middle();
   }
 
 function ipg_metainfo()
@@ -1895,8 +1904,8 @@ function ipg_metainfo()
     $("#ep-name").html ('');
 
     var desc = channelgrid [ipg_cursor]['desc'];
-    if (desc == '' || desc == undefined || desc == 'null')
-      desc = '[no description]';
+    if (desc == undefined || desc == 'null')
+      desc = '';
 
     $("#description").html ('<p>' + desc + '</p>');
     $("#ch-episodes").html (programs_in_channel (ipg_cursor));
@@ -3328,7 +3337,7 @@ function noop (e)
 
 </script>
 
-<title>Elastic 9x9 Player</title>
+<title>9x9.tv</title>
 
 </head>
 
@@ -3446,14 +3455,15 @@ One moment...
     </ul>
     <ul id="control-list">
       <li><a id="ipg-signin-btn" href="javascript:;" class="btn">Sign in / Sign up</a></li>
-      <li><a id="ipg-return-btn" href="javascript:;" class="btn">Return to Channel Mode</a></li>
+      <li><a id="ipg-return-btn" href="javascript:;" class="btn">Resume watching</a></li>
     </ul> 
-    <img src="http://zoo.atomics.org/video/9x9playerV20/images/logo.png" id="logo">
+    <img src="http://zoo.atomics.org/video/9x9playerV21/images/logo.png" id="logo">
   </div>
   <div id="ipg-grid"></div>
   <div id="menu">
     <p id="pop-play"></p><p id="pop-delete"></p>
   </div>
+  <div id="watermark">I&thinsp;P&thinsp;G</div>
 </div>
 
 <div id="new-layer" style="display: none">
