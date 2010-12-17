@@ -210,19 +210,27 @@ public class PodcastService {
 		channel.setPublic(false);
 		return channel;
 	}
-	
-	public void submitToTranscodingService(String channelKey, String rss, HttpServletRequest req) { 
+
+	public void submitToTranscodingService(String channelKey, String rss, HttpServletRequest req) {		
 		PodcastFeed feed = new PodcastFeed();
 		feed.setKey(channelKey);
-		feed.setRss(rss);
+		feed.setRss(rss);		
 		Properties pro = this.getTranscodingServer();
-		String transcodingServer = pro.getProperty(pro.getProperty("current"));
-		feed.setCallback(NnLib.getUrlRoot(req));
-		log.info("LOGGING: current is " + pro.getProperty("current"));
-		if (pro.getProperty("current").equals("dev")) {
+		String url = NnLib.getUrlRoot(req);
+		String env = "";
+		if (url.contains("9x9tvalpha")) {
+			env = "alpha";
+		} else if (url.contains("9x9tvbeta")){
+			env = "beta";
+		} else {
+			env = "dev";
+		}
+		feed.setCallback(url);
+		if (env.equals("dev")) {
 			log.info("LOGGING: set callback url to dev_callback");
 			feed.setCallback(pro.getProperty("dev_callback"));
-		}		
+		}
+		String transcodingServer = pro.getProperty(env);
 		log.info("LOGGING: podcast callbackUrl = " + feed.getCallback() + "; transcoding server = " + transcodingServer);
 		NnLib.urlPostWithJson(transcodingServer, feed);
 	}

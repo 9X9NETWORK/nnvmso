@@ -52,30 +52,6 @@ public class ProgramManager {
 		}
 		return newPrograms;
 	}
-
-	public List<MsoProgram> findNotNew(NnUser user) {
-		SubscriptionManager sMngr = new SubscriptionManager();
-		List<MsoChannel> channels = sMngr.findSubscribedChannels(user);				
-		System.out.println("channel size=" + channels.size());
-		List<MsoProgram> newPrograms = new ArrayList<MsoProgram>();
-		for (MsoChannel c : channels) {
-			PersistenceManager pm = PMF.get().getPersistenceManager();
-			Query query = pm.newQuery(MsoProgram.class);
-			query.setFilter("channelKey == channelKeyParam");
-			query.declareParameters(Key.class.getName() + " channelKeyParam");	    				
-	    	List<MsoProgram> results = (List<MsoProgram>) query.execute(c.getKey());
-			int recentSize = 3;
-			for (int i=0; i<results.size(); i++) {
-				if (i == recentSize) {break;}
-				System.out.println("new program=" + results.get(i).getId() + " in channel " + c.getId() + " and its date is " + c.getUpdateDate());
-				if (c.getType() != MsoChannel.TYPE_SYSTEM) {
-					newPrograms.add(results.get(i));
-				}												
-			}
-		}
-		return newPrograms;
-	}
-
 	
 	public MsoProgram findByKey(String key) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
@@ -96,6 +72,15 @@ public class ProgramManager {
 		}
 		pm.close();
 		return detached;
+	}
+	
+	public List<MsoProgram> findAll() {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		Query q = pm.newQuery(MsoProgram.class);
+		List<MsoProgram> programs = (List<MsoProgram>)q.execute();
+		List<MsoProgram> detached = (List<MsoProgram>)pm.detachCopyAll(programs);
+		pm.close();
+		return detached;		
 	}
 	
 	public void findAllAndSetWhatever() {
