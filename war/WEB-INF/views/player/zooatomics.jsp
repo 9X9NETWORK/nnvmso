@@ -3054,7 +3054,7 @@ function start_play_fp (url)
   log ("FP STREAM: " + fp_video_file);
 
   flowplayer ("player",
-      {src: 'http://zoo.atomics.org/video/flowplayer-3.2.5.swf', wmode: 'transparent', allowfullscreen: 'false' }, 
+      {src: 'http://zoo.atomics.org/video/fc/flowplayer.commercial-3.2.5.swf', wmode: 'transparent', allowfullscreen: 'false' }, 
       { canvas: { backgroundColor: '#000000', backgroundGradient: 'none', linkUrl: '' },
       clip: { onFinish: fp_ended, onStart: fp_onstart, bufferLength: 1, autoPlay: true, scaling: 'fit' }, 
       plugins: { controls: null },
