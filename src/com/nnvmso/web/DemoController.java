@@ -78,7 +78,8 @@ public class DemoController {
 	@RequestMapping("replaceFileUrls")
 	public ResponseEntity<String> replaceWithSGFileUrl(
 			@RequestParam(value="host", required=false) String host, 
-			@RequestParam(value="sg", required=false) String sg, 
+			@RequestParam(value="sg", required=false) String sg,
+			@RequestParam(value="box", required=false) String box,
 			@RequestParam(value="channelKey", required = false)String channelKey) {
 		
 		List<MsoProgram> programs = new ArrayList<MsoProgram>();
@@ -95,6 +96,9 @@ public class DemoController {
 		String regex = "^http://.*?/";		
 		for (MsoProgram p : programs) {	
 			String newHost = "http://" + host + "/";
+			if (box != null) {
+				newHost = "http://" + host + "//media0/part0/idownloader/";
+			}
 			String flvFileUrl = p.getOtherFileUrl();
 			if (flvFileUrl != null) {
 				if (host!=null) {
