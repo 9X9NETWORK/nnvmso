@@ -1647,12 +1647,20 @@ function switch_to_whats_new()
     hide_layers();
     force_pause();
 
-    for (var channel in wn)
-      {
-      var grid = channels_by_id [channel];
-      log ('whatsnew :: ch:' + channel + ' grid: ' + grid + ' episodes:' + wn [channel].join());
-      whatsnew.push ({ 'channel': channel, 'grid': grid, 'episodes': wn [channel] });
-      }
+    for (var y = 1; y <= 9; y++)
+      for (var x = 1; x <= 9; x++)
+        {
+        if (("" + y + "" + x) in channelgrid)
+          {
+          var channel = channelgrid ["" + y + "" + x]['id'];
+          if (channel in wn)
+            {
+            var grid = channels_by_id [channel];
+            log ('whatsnew :: ch:' + channel + ' grid: ' + grid + ' episodes:' + wn [channel].join());
+            whatsnew.push ({ 'channel': channel, 'grid': grid, 'episodes': wn [channel] });
+            }
+          }
+        }
 
     log ('what is new?');
 
