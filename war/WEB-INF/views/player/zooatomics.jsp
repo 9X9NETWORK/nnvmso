@@ -260,6 +260,21 @@ function init()
   setup_ajax_error_handling();
   }
 
+function fetch_programs_in (channel)
+  {
+  log ('obtaining programs for ' + channel);
+
+  var query = "/playerAPI/programInfo?channel=" + channel + String.fromCharCode(38) + "user=" + user;
+
+  var d = $.get (query, function (data)
+    {
+    parse_program_data (data);
+
+    if (thumbing == 'ipg')
+      ipg_metainfo();
+    });
+  }
+
 function fetch_programs()
   {
   log ('obtaining programs');
@@ -1948,7 +1963,14 @@ function ipg_metainfo()
 
     var n_eps = programs_in_channel (ipg_cursor);
     if (n_eps != channelgrid [ipg_cursor]['count'])
+      {
       n_eps = channelgrid [ipg_cursor]['count'] + ' [' + n_eps + ']';
+      if (! ('refetched' in channelgrid [ipg_cursor]))
+        {
+        channelgrid [ipg_cursor]['refetched'] = true;
+        fetch_programs_in (channelgrid [ipg_cursor]['id']);
+        }
+      }
 
     $("#ch-episodes").html (n_eps);
     $("#ep-number").show();
