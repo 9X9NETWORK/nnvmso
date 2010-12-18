@@ -2826,6 +2826,12 @@ function sanity_check_data (what, data)
   {
   log ('sanity check ' + what);
 
+  if (data.match (/\!DOCTYPE/))
+    {
+    log_and_alert ('sanity check: a !DOCTYPE was found in results from ' + what + ' API');
+    return false;
+    }
+
   var lines = data.split ('\n');
 
   if (lines.length > 9 && lines [0] == '' && lines [1] == '')
