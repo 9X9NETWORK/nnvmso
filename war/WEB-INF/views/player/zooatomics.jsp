@@ -283,7 +283,11 @@ function fetch_programs()
 
   var d = $.get (query, function (data)
     {
-    parse_program_data (data);
+    if (sanity_check_data ('programInfo', data))
+      parse_program_data (data);
+    else
+      log ('*** programInfo: DATA RETURNED BY SERVER FAILS SANITY CHECK');
+
     fetch_channels();
     });
   }
@@ -681,12 +685,6 @@ function update_bubble()
 
   $("#ep-layer-ch-title").html (channel_name);
   $("#ep-layer-ep-title").html (program_name);
-
-  // $("#left-row-num").html (previous_category (current_category));
-  // $("#right-row-num").html (next_category (current_category));
-
-  // $("#left-row-num").html (Math.floor (current_category) - 1 == 0 ? 9 : Math.floor (current_category) - 1);
-  // $("#right-row-num").html (Math.floor (current_category) + 1 == 10 ? 1 : Math.floor (current_category) + 1);
   }
 
 function switch_to_channel_thumbs()
@@ -2833,10 +2831,10 @@ function sanity_check_data (what, data)
   if (lines.length > 9 && lines [0] == '' && lines [1] == '')
     {
     log_and_alert ('very bad data returned from ' + what + ' API');
-    return true;
+    return false;
     }
 
-  return false;
+  return true;
   }
 
 function tube()
