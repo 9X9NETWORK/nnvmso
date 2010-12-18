@@ -1882,7 +1882,6 @@ function redraw_ipg()
   {
   var html = "";
   
-  //var bad_thumbnail = '<span style="position: absolute; top: 0; left: 0; padding: 5px; font-size: 0.6em; text-align: left; color: white">BAD<br>THUMBNAIL</span>';
   var bad_thumbnail = '<img src="http://zoo.atomics.org/video/images-x1/no_images.png">';
 
   for (var y = 1; y <= 9; y++)
@@ -1939,7 +1938,6 @@ function ipg_metainfo()
 
     $("#ch-thumb-img").attr ("src", thumbnail);
     $("#ch-name").html ('<p>' + name + '</p>');
-    // $("#ep-name").html ('<p>An episode name would go here?</p>');
     $("#ep-name").html ('');
 
     var desc = channelgrid [ipg_cursor]['desc'];
@@ -1947,7 +1945,12 @@ function ipg_metainfo()
       desc = '';
 
     $("#description").html ('<p>' + desc + '</p>');
-    $("#ch-episodes").html (programs_in_channel (ipg_cursor));
+
+    var n_eps = programs_in_channel (ipg_cursor);
+    if (n_eps != channelgrid [ipg_cursor]['count'])
+      n_eps = channelgrid [ipg_cursor]['count'] + ' [' + n_eps + ']';
+
+    $("#ch-episodes").html (n_eps);
     $("#ep-number").show();
     $("#update").show();
     }
