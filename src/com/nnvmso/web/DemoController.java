@@ -93,11 +93,11 @@ public class DemoController {
 				return PlayerLib.outputReturn("Channel not found");
 			}
 		}
-		String regex = "^http://.*?/";		
+		String regex = "^http://.*?/*?/9x9";
 		for (MsoProgram p : programs) {	
 			String newHost = "http://" + host + "/";
 			if (box != null) {
-				newHost = "http://" + host + "//media0/part0/idownloader/";
+				newHost = "http://" + "192.168.1.1:5000" + "/media0/part0/idownloader/9x9";
 			}
 			String flvFileUrl = p.getOtherFileUrl();
 			if (flvFileUrl != null) {
