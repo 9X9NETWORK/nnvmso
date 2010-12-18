@@ -670,8 +670,8 @@ function update_bubble()
   // $("#left-row-num").html (previous_category (current_category));
   // $("#right-row-num").html (next_category (current_category));
 
-  $("#left-row-num").html (Math.floor (current_category) - 1 == 0 ? 9 : Math.floor (current_category) - 1);
-  $("#right-row-num").html (Math.floor (current_category) + 1 == 10 ? 1 : Math.floor (current_category) + 1);
+  // $("#left-row-num").html (Math.floor (current_category) - 1 == 0 ? 9 : Math.floor (current_category) - 1);
+  // $("#right-row-num").html (Math.floor (current_category) + 1 == 10 ? 1 : Math.floor (current_category) + 1);
   }
 
 function switch_to_channel_thumbs()
@@ -723,6 +723,7 @@ function prepare_channel()
   $("#ep-list").html (ep_html());
   $("#ep-list img").error(function () { $(this).unbind("error").attr("src", "http://zoo.atomics.org/video/images-x1/no_images.png"); });
 
+  update_bubble();
   redraw_program_line();
   }
 
@@ -883,6 +884,35 @@ var new_cline;
 function enter_category (cat, positioning)
   {
   log ('enter category: ' + cat + ', thumbing: ' + thumbing);
+
+  /* temporary code, if channel mode is removed */
+  if (true)
+    {
+    channel_line = {};
+
+    $("#control-layer").hide();
+    $("#ch-list-" + cat).html (ch_html (cat));
+    $("#row-number").html ('<p>' + cat + '</p>');
+
+    current_category = cat;
+
+    for (var y = 1; y <= 9; y++)
+      $("#ch-swish-" + y).css ("display", y == cat ? "block" : "none");
+
+    /* position at beginning or ending */
+    if (positioning == 'b')
+      channel_cursor = 1;
+    else if (positioning == 'e')
+      channel_cursor = n_channel_line;
+
+    redraw_channel_line();
+    prepare_channel();
+
+    thumbing = 'channel';
+
+    turn_off_ancillaries();
+    return;
+    }
 
   channel_line = {};
 
