@@ -2080,7 +2080,10 @@ function ipg_up()
     if (ipg_cursor > 19)
       ipg_cursor -= 10;
     else
-      ipg_cursor += 80;
+      {
+      // disabled wraparound for now
+      // ipg_cursor += 80;
+      }
     }
 
   log ("new ipg cursor: " + ipg_cursor);
@@ -2111,10 +2114,11 @@ function ipg_down()
     }
   else if (ipg_cursor > 90)
     {
-    escape();
-    switch_to_channel_thumbs()
-    enter_channel();
-    return;
+    // disable this for now
+    // escape();
+    // switch_to_channel_thumbs()
+    // enter_channel();
+    // return;
     }
 
   $("#ipg-" + ipg_cursor).removeClass ("on");
@@ -2122,7 +2126,10 @@ function ipg_down()
   if (ipg_cursor < 90)
     ipg_cursor += 10;
   else
-    ipg_cursor -= 80;
+    {
+    // Disabled wraparound for now
+    // ipg_cursor -= 80;
+    }
   log ("new ipg cursor: " + ipg_cursor);
 
   $("#ipg-" + ipg_cursor).addClass ("on");
@@ -2600,6 +2607,7 @@ function browse()
   {
   n_browse = 0;
   browse_first = 1;
+  browsables = {};
 
   saved_thumbing = thumbing;
 
