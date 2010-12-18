@@ -2828,7 +2828,7 @@ function sanity_check_data (what, data)
 
   if (data.match (/\!DOCTYPE/))
     {
-    log_and_alert ('sanity check: a !DOCTYPE was found in results from ' + what + ' API');
+    log ('sanity check: a !DOCTYPE was found in results from ' + what + ' API');
     return false;
     }
 
@@ -3058,7 +3058,8 @@ function start_play_fp (url)
       { canvas: { backgroundColor: '#000000', backgroundGradient: 'none', linkUrl: '' },
       clip: { onFinish: fp_ended, onStart: fp_onstart, bufferLength: 1, autoPlay: true, scaling: 'fit' }, 
       plugins: { controls: null },
-      play: null, onBeforeKeypress: fpkp });
+      play: null, onBeforeKeypress: fpkp,
+      key: '#$28fdb189bf3c28cb3b1' });
 
   flowplayer ("player").play (fp_video_file);
   }
