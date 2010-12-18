@@ -44,7 +44,6 @@ public class ProgramManager {
 			int recentSize = 3;
 			for (int i=0; i<results.size(); i++) {
 				if (i == recentSize) {break;}
-				System.out.println("new program=" + results.get(i).getId() + " in channel " + c.getId() + " and its date is " + c.getUpdateDate());
 				if (c.getType() != MsoChannel.TYPE_SYSTEM) {
 					newPrograms.add(results.get(i));
 				}												
