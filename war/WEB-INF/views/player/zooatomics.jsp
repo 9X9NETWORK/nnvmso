@@ -721,6 +721,7 @@ function prepare_channel()
   $("#ep-swish").show();
   $("#ep-layer").show();
   $("#ep-list").html (ep_html());
+  $("#ep-list img").error(function () { $(this).unbind("error").attr("src", "http://zoo.atomics.org/video/images-x1/no_images.png"); });
 
   redraw_program_line();
   }
@@ -2208,12 +2209,14 @@ function redraw_program_line()
     {
     --program_first;
     $("#ep-list").html (ep_html());
+    $("#ep-list img").error(function () { $(this).unbind("error").attr("src", "http://zoo.atomics.org/video/images-x1/no_images.png"); });
     }
 
   while (program_cursor >= program_first + max_programs_in_line)
     {
     ++program_first;
     $("#ep-list").html (ep_html());
+    $("#ep-list img").error(function () { $(this).unbind("error").attr("src", "http://zoo.atomics.org/video/images-x1/no_images.png"); });
     }
 
   log ('redraw program line');
@@ -3341,7 +3344,7 @@ function noop (e)
 
 </head>
 
-<body id="body" style="background: black; overflow: hidden">
+<body id="body" style="overflow: hidden">
 
 <div id="blue" style="background: black; width: 100%; height: 100%; display: block; position: absolute; color: white">
 One moment...
