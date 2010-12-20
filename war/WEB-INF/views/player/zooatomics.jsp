@@ -332,6 +332,7 @@ function fetch_channels()
   // 0=grid id, 1=channel id,
   // 2=channel name, 3=channel description, 4=channel image url,
   // 5=program count, 6=type(SYSTEM|PODCAST), 7=status
+  // 0=1	1=3523	2=System Channel	3=	4=/WEB-INF/../images/logo_9x9.png	5=1	6=SYSTEM	7=0
 
   var d = $.get (query, function (data)
     {
@@ -1959,20 +1960,37 @@ function ipg_metainfo()
 
     $("#description").html ('<p>' + desc + '</p>');
 
+    var display_eps;
     var n_eps = programs_in_channel (ipg_cursor);
-    if (n_eps != channelgrid [ipg_cursor]['count'])
+
+    if (channelgrid [ipg_cursor]['count'] == undefined)
       {
-      n_eps = channelgrid [ipg_cursor]['count'] + ' [' + n_eps + ']';
+      /* brackets quietly indicate a data inconsistency */
+      display_eps = '[' + n_eps + ']';
+      }
+    else if (n_eps != channelgrid [ipg_cursor]['count'])
+      {
+      display_eps = channelgrid [ipg_cursor]['count'] + ' [' + n_eps + ']';
       if (! ('refetched' in channelgrid [ipg_cursor]))
         {
         channelgrid [ipg_cursor]['refetched'] = true;
         fetch_programs_in (channelgrid [ipg_cursor]['id']);
         }
       }
+    else
+      display_eps = n_eps;
 
-    $("#ch-episodes").html (n_eps);
+    if (n_eps > 0)
+      {
+      var first = first_program_in (ipg_cursor);
+      $("#update-date").html (ageof (programgrid [first]['timestamp']));
+      $("#update").show();
+      }
+    else
+      $("#update").hide();
+
+    $("#ch-episodes").html (display_eps);
     $("#ep-number").show();
-    $("#update").show();
     }
   else
     {
@@ -2491,6 +2509,7 @@ function submit_throw()
       }
     else
       log_and_alert ("PODCAST THROW FAIL: " + fields [1]);
+    $("#podcastRSS").html ('');
     })
   }
 
@@ -2524,6 +2543,8 @@ function dirty()
   var d = $.get (cmd, function (data)
     {
     parse_program_data (data);
+
+    /* once program data is returned, remove those channels from dirty list */
 
     var lines = data.split();
     for (var i = 0; i < lines.length; i++)
@@ -3530,7 +3551,7 @@ One moment...
       <li id="ep-name"><p>An episode name would go here?</p></li>
       <li id="description"><p>A description of something is supposed to go here, but I have nothing to put in this spot.</p></li>
       <li id="ep-number"><p><span class="hilite">Episodes: </span><span id="ch-episodes">9</span></p></li>
-      <li id="update"><p><span class="hilite">Updated:</span> 11/09/2010</p></li>
+      <li id="update"><p><span class="hilite">Updated:</span> <span id="update-date"></span></p></li>
     </ul>
     <ul id="control-list">
       <li><a id="ipg-signin-btn" href="javascript:;" class="btn">Sign in / Sign up</a></li>
