@@ -927,6 +927,7 @@ function enter_category (cat, positioning)
     {
     channel_line = {};
 
+    $("#ipg-layer").hide();
     $("#control-layer").hide();
     $("#ch-list-" + cat).html (ch_html (cat));
     $("#row-number").html ('<p>' + cat + '</p>');
@@ -2157,8 +2158,8 @@ function ipg_down()
       }
     else if (ipg_cursor == -1)
       {
-      escape();
-      switch_to_channel_thumbs()
+      // escape();
+      // switch_to_channel_thumbs()
       return;
       }
     }
@@ -2220,6 +2221,7 @@ function ipg_play()
     return;
     }
 
+  $("#ipg-layer").hide();
 
   clearTimeout (ipg_timex);
   enter_category ((""+ipg_cursor).substring (0, 1));
@@ -2231,14 +2233,15 @@ function ipg_play()
       channel_cursor = c;
       redraw_channel_line()
       thumbing = 'channel';
-      $("#ch-layer").css ("display", "block");
-      $("#ipg-layer").css ("display", "none");
+      $("#ch-layer").hide();
       $("#body").removeClass ("on");
       play_first_program_in (channel_line [channel_cursor]);
       enter_channel();
       return;
       }
     }
+
+  log_and_alert ('ipg_play: no channel');
   }
 
 function channel_right()
@@ -3405,6 +3408,8 @@ function switch_to_control_layer()
   $('#' + control_buttons [control_cursor]).addClass ("on");
   $("#ch-layer").hide();
   $("#ep-layer").hide();
+  $("#ipg-layer").hide();
+  $("#new-layer").hide();
   control_saved_thumbing = thumbing;
   thumbing = 'control';
   $("#btn-play").css ("background-image", "url(" + root + "btn_" + (physical_is_paused() ? "play" : "pause") + ".svg)");
