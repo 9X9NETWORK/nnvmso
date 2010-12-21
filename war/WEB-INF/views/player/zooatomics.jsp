@@ -367,8 +367,21 @@ function fetch_channels()
     });
   }
 
+function browser_support()
+  {
+  if (jQuery.browser.msie && jQuery.browser.version != '9.0')
+    {
+    $("#blue").html ('<p>&nbsp;<p>&nbsp;<p>Please use the Chrome browser for this application:<p>&nbsp; &nbsp;<a href="http://www.google.com/chrome">www.google.com/chrome</a><p>');
+    return false;
+    }
+  return true;
+  }
+
 function activate()
   {
+  if (!browser_support())
+    return;
+
   activated = true;
   enter_category (1, 'b');
   elastic();
@@ -746,6 +759,16 @@ function enter_channel()
   $("#epend-layer").hide();
 
   prepare_channel();
+
+  if (jQuery.browser.msie && jQuery.browser.version == '8.0')
+    {
+    $("#control-layer").hide();
+    $("#ch-layer").hide();
+    $("#ep-layer").show();
+    thumbing = 'program';
+    enter_channel_failsafe();
+    return;
+    }
 
   $("#ep-layer").css ("opacity", "0");
   $("#ep-layer").css ("display", "block");
@@ -1326,6 +1349,7 @@ function escape()
   $("#log-layer").hide();
   $("#msg-layer").hide();
   $("#epend-layer").hide();
+  $("#body").removeClass ("on");
 
   if (thumbing == 'channel' || thumbing == 'program')
     {
@@ -1815,19 +1839,26 @@ function switch_to_ipg()
   // force_pause();
   physical_stop();
 
-  if (thumbing == 'control')
-    $("#control-layer").animateWithCss ({ opacity: "0" }, 500, "ease-in-out", function() { $("#control-layer").hide(); $("#control-layer").css ("opacity", "1"); });
-
-  $("#ipg-layer").hide();
-
   ipg_cursor = parseInt (channel_line [channel_cursor]);
-  // ipg_cursor = -1;
 
   if (! (ipg_cursor in channelgrid))
     ipg_cursor = '11';
 
   redraw_ipg();
 
+  if (jQuery.browser.msie && jQuery.browser.version == '8.0')
+    {
+    $("#control-layer").hide();
+    $("#ipg-layer").hide();
+    ipg_failsafe();
+    thumbing = 'ipg';
+    return;
+    }
+
+  if (thumbing == 'control')
+    $("#control-layer").animateWithCss ({ opacity: "0" }, 500, "ease-in-out", function() { $("#control-layer").hide(); $("#control-layer").css ("opacity", "1"); });
+
+  $("#ipg-layer").hide();
   $("#ipg-layer").css ("opacity", "0");
   $("#ipg-layer").show();
 
@@ -1871,6 +1902,7 @@ function ipg_failsafe()
   {
   $("#ipg-layer").css ("opacity", "1");
   $("#ipg-layer").show();
+  $("#body").addClass ("on");
   elastic();
   extend_ipg_timex();
   }
@@ -2201,6 +2233,7 @@ function ipg_play()
       thumbing = 'channel';
       $("#ch-layer").css ("display", "block");
       $("#ipg-layer").css ("display", "none");
+      $("#body").removeClass ("on");
       play_first_program_in (channel_line [channel_cursor]);
       enter_channel();
       return;
