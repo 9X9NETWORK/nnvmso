@@ -1,5 +1,7 @@
 package com.nnvmso.web;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -7,8 +9,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import net.sf.jsr107cache.Cache;
+import net.sf.jsr107cache.CacheException;
+import net.sf.jsr107cache.CacheFactory;
+import net.sf.jsr107cache.CacheManager;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -25,6 +31,7 @@ import com.nnvmso.form.PlayerCreateForm;
 import com.nnvmso.lib.NnLib;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
+import com.nnvmso.model.MsoProgram;
 import com.nnvmso.model.NnUser;
 import com.nnvmso.model.Player;
 import com.nnvmso.service.ChannelManager;
@@ -33,6 +40,7 @@ import com.nnvmso.service.MsoManager;
 import com.nnvmso.service.NnUserManager;
 import com.nnvmso.service.PlayerAPI;
 import com.nnvmso.service.PlayerManager;
+import com.nnvmso.service.ProgramManager;
 
 @Controller
 @RequestMapping("admin")
@@ -44,6 +52,8 @@ public class AdminController {
 	public final MsoManager msoMngr;
 	public final PlayerManager playerMngr;
 	public final NnUserManager userMngr;
+	public final ChannelManager channelMngr;
+	public final ProgramManager programMngr;
 	
 	@ExceptionHandler(Exception.class)
 	public String exception(Exception e) {
@@ -52,18 +62,38 @@ public class AdminController {
 	}	
 	
 	@Autowired
-	public AdminController(MsoManager msoMngr, PlayerManager playerMngr, NnUserManager userMngr) {
-		this.msoMngr = msoMngr;
+	public AdminController(MsoManager msoMngr, PlayerManager playerMngr, NnUserManager userMngr, ChannelManager channelMngr, ProgramManager programMngr) {
+		this.msoMngr = msoMngr;		
 		this.playerMngr = playerMngr;
 		this.userMngr = userMngr;
+		this.channelMngr = channelMngr;
+		this.programMngr = programMngr;
 	}	
 
-	@RequestMapping(value="alter")
-	public String alterInit() {
-		InitService service = new InitService();
-		service.alterInit();
+	@RequestMapping(value="cacheProgram")
+	public String cache() {
+		Cache cache = null;		
+        try {
+            CacheFactory cacheFactory = CacheManager.getInstance().getCacheFactory();
+            cache = cacheFactory.createCache(Collections.emptyMap());
+        } catch (CacheException e) {
+            // ...
+        }        
+		List<MsoChannel> channels = new ArrayList<MsoChannel>();
+		List<MsoProgram> programs = new ArrayList<MsoProgram>();		
+		channels = channelMngr.findAllPublic();		
+        PlayerAPI tool = new PlayerAPI(); 
+		for (MsoChannel c : channels) {
+			if (cache.get(c.getKey().getId()) == null) {
+				programs = programMngr.findByChannelIdAndIsPublic(c.getId(), true);
+				String info = tool.composeProgramInfoStr(programs);
+				cache.put(c.getKey().getId(), info);				
+			} else {
+				System.out.println("in the cache:" + cache.get(c.getKey().getId()));
+			}
+		}		
 		return "hello/hello";
-	}	
+	}
 	
 	@RequestMapping(value="init")
 	public String init() {
@@ -141,7 +171,6 @@ public class AdminController {
 	
 	@RequestMapping(value="playerEdit", method=RequestMethod.GET)
 	public String editForm(@RequestParam(value="id") String msoKey, Model model) {
-		Player player = playerMngr.findByMsoKey(msoKey);
 		PlayerCreateForm form = new PlayerCreateForm();
 		Mso mso = msoMngr.findByKey(msoKey);
 		form.setMso(mso);

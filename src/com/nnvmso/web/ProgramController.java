@@ -30,7 +30,6 @@ import org.springframework.web.bind.support.SessionStatus;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.nnvmso.json.AwsS3Post;
 import com.nnvmso.lib.AwsLib;
-import com.nnvmso.lib.DebugLib;
 import com.nnvmso.lib.NnLib;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
@@ -118,7 +117,6 @@ public class ProgramController {
 	public @ResponseBody
 	AwsS3Post fileUpload(@PathVariable long channelId, Model model,
 			HttpServletRequest req) {
-		System.out.println(DebugLib.OUT + "fileupload");
 		// filename, type, create content
 		String fileFullName = req.getParameter("filename");
 		int dot = fileFullName.lastIndexOf(".");
@@ -240,7 +238,6 @@ public class ProgramController {
 		System.out.println("programid=" + programId);
 		MsoProgram program = programMngr.findById(programId);
 		String fileUrl = req.getParameter("fileUrl");
-		System.out.println(DebugLib.OUT + fileUrl);
 		if (fileUrl != null) {
 			System.out.println("enter here");
 			program.setWebMFileUrl(fileUrl);

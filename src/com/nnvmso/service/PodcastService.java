@@ -3,6 +3,7 @@ package com.nnvmso.service;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -11,6 +12,11 @@ import java.util.logging.Logger;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.servlet.http.HttpServletRequest;
+
+import net.sf.jsr107cache.Cache;
+import net.sf.jsr107cache.CacheException;
+import net.sf.jsr107cache.CacheFactory;
+import net.sf.jsr107cache.CacheManager;
 
 import org.springframework.stereotype.Service;
 
@@ -45,6 +51,7 @@ public class PodcastService {
 		Query q = pm.newQuery(MsoChannel.class);
 		q.setFilter("podcast == podcastParam");
 		q.declareParameters(Key.class.getName() + " podcastParam");
+		@SuppressWarnings("unchecked")
 		List<MsoChannel> channels = (List<MsoChannel>) q.execute(podcastRss);
 		System.out.println(channels.size());
 		pm.close();
@@ -133,6 +140,17 @@ public class PodcastService {
 			program = new MsoProgram();			
 			program.setChannelKey(channel.getKey());
 			program.setChannelId(channel.getId());
+		} else {
+			Cache cache = null;		
+	        try {
+	            CacheFactory cacheFactory = CacheManager.getInstance().getCacheFactory();
+	            cache = cacheFactory.createCache(Collections.emptyMap());
+	        } catch (CacheException e) {
+	            // ...
+	        }        
+	        if (cache.get(program.getChannelKey().getId()) != null) {
+	        	cache.remove(program.getChannelKey().getId());
+	        }
 		}
 		int status = Integer.parseInt(podcastProgram.getErrorCode());
 		System.out.println("status=" + status);

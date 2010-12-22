@@ -24,7 +24,6 @@ import org.springframework.stereotype.Controller;
 
 import com.nnvmso.json.AwsS3Post;
 import com.nnvmso.lib.AwsLib;
-import com.nnvmso.lib.DebugLib;
 import com.nnvmso.lib.NnLib;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
@@ -142,7 +141,6 @@ public class ChannelController {
 	@RequestMapping(value="create", method=RequestMethod.POST)
 	public String createSubmit(@ModelAttribute("channel") MsoChannel channel, HttpSession session, SessionStatus status) {		
 		Mso mso = (Mso)auth.getAuthSession(session, "mso");
-		System.out.println(DebugLib.OUT + "controller: " + mso.getEmail());
 		if (channel.getImageUrl().equals("") || channel.getImageUrl() == null) {			
 			channel.setImageUrl("/WEB-INF/../images/thumb_noImage.jpg");
 		}
@@ -189,7 +187,6 @@ public class ChannelController {
 	@RequestMapping(value="detail/{channelId}")
 	public String detail(@PathVariable long channelId, Model model) {
 		MsoChannel channel = channelMngr.findById(channelId);
-		System.out.println(DebugLib.OUT + channelId);
 		model.addAttribute("channel", channel);
 		return "channel/info_bubble";
 	}

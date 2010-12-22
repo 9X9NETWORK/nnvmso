@@ -1,16 +1,18 @@
 package com.nnvmso.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 import com.google.appengine.api.datastore.Key;
-
-@SuppressWarnings("serial")
+ 
 @PersistenceCapable(detachable="true")
-public class Subscription implements Serializable {
+public class IPG implements Serializable {
 	@PrimaryKey
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
 	private Key key;
@@ -19,24 +21,20 @@ public class Subscription implements Serializable {
 	private Key userKey;
 	
 	@Persistent
-	private Key channelKey;
-
+	private List<Key> channelKeys = new ArrayList<Key>();
+	
+	@Persistent
+	private List<Short> grids = new ArrayList<Short>();
+	
+	@Persistent
+	private boolean shared; 
+	
 	@Persistent
 	private Date createDate;
 	
 	@Persistent
-	private short seq;
-	
-	@Persistent
 	private Date updateDate;
-	
-	public Subscription(Key userKey, Key channelKey) {
-		this.userKey = userKey;
-		this.channelKey = channelKey;
-		this.createDate = new Date();
-		this.updateDate = new Date();
-	}
-
+		
 	public Key getKey() {
 		return key;
 	}
@@ -53,14 +51,6 @@ public class Subscription implements Serializable {
 		this.userKey = userKey;
 	}
 
-	public Key getChannelKey() {
-		return channelKey;
-	}
-
-	public void setChannelKey(Key channelKey) {
-		this.channelKey = channelKey;
-	}
-
 	public Date getCreateDate() {
 		return createDate;
 	}
@@ -69,12 +59,28 @@ public class Subscription implements Serializable {
 		this.createDate = createDate;
 	}
 
-	public short getSeq() {
-		return seq;
+	public List<Key> getChannelKeys() {
+		return channelKeys;
 	}
 
-	public void setSeq(short seq) {
-		this.seq = seq;
+	public void setChannelKeys(List<Key> channelKeys) {
+		this.channelKeys = channelKeys;
+	}
+
+	public boolean isShared() {
+		return shared;
+	}
+
+	public void setShared(boolean shared) {
+		this.shared = shared;
+	}
+
+	public List<Short> getGrids() {
+		return grids;
+	}
+
+	public void setGrid(List<Short> grids) {
+		this.grids = grids;
 	}
 
 	public Date getUpdateDate() {
@@ -83,6 +89,6 @@ public class Subscription implements Serializable {
 
 	public void setUpdateDate(Date updateDate) {
 		this.updateDate = updateDate;
-	}
+	}	
 	
 }

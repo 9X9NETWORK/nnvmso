@@ -28,7 +28,8 @@ public class NnUserManager {
 	public NnUser nnUserAuthenticated(String email, String password) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();		
 		Query query = pm.newQuery(NnUser.class);
-		query.setFilter("email == '" + email + "'");		
+		query.setFilter("email == '" + email + "'");	
+		@SuppressWarnings("unchecked")
 		List<NnUser> results = (List<NnUser>) query.execute();
 		NnUser user = null;
 		if (results.size() > 0) {
@@ -45,6 +46,7 @@ public class NnUserManager {
 	public List<NnUser> findAll() {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		String query = "select from " + NnUser.class.getName() + " order by createDate";
+		@SuppressWarnings("unchecked")
 		List<NnUser> users = (List<NnUser>) pm.newQuery(query).execute();
 		users.size(); //touch
 		pm.close();
@@ -55,6 +57,7 @@ public class NnUserManager {
 		PersistenceManager pm = PMF.get().getPersistenceManager();		
 		Query query = pm.newQuery(NnUser.class);
 		query.setFilter("email == '" + email + "'");	
+		@SuppressWarnings("unchecked")
 		List<NnUser> results = (List<NnUser>) query.execute();
 		NnUser user = null;
 		if (results.size() > 0) {

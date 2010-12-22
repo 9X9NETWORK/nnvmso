@@ -25,6 +25,7 @@ public class MsoManager {
 	public List<Mso> findAll() {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		String query = "select from " + Mso.class.getName() + " order by createDate";
+		@SuppressWarnings("unchecked")
 		List<Mso> msos = (List<Mso>) pm.newQuery(query).execute();
 		msos.size(); //touch
 		pm.close();
@@ -42,6 +43,7 @@ public class MsoManager {
 		PersistenceManager pm = PMF.get().getPersistenceManager();		
 		Query query = pm.newQuery(Mso.class);
 		query.setFilter("email == '" + email + "'");	
+		@SuppressWarnings("unchecked")
 		List<Mso> results = (List<Mso>) query.execute();
 		Mso mso = null;
 		if (results.size() > 0) {
@@ -54,7 +56,8 @@ public class MsoManager {
 	public Mso msoAuthenticated(String email, String password) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();		
 		Query query = pm.newQuery(Mso.class);
-		query.setFilter("email == '" + email + "'");		
+		query.setFilter("email == '" + email + "'");	
+		@SuppressWarnings("unchecked")
 		List<Mso> results = (List<Mso>) query.execute();
 		Mso mso = null;
 		if (results.size() > 0) {

@@ -17,8 +17,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.google.appengine.repackaged.org.apache.commons.logging.Log;
-import com.google.appengine.repackaged.org.apache.commons.logging.LogFactory;
 import com.nnvmso.json.AwsMessage;
 import com.nnvmso.lib.DebugLib;
 import com.nnvmso.lib.NnLib;
@@ -76,7 +74,7 @@ public class AwsController {
     		msg.setType(p.getType());
     		ObjectMapper mapper = new ObjectMapper();    		    		
             mapper.writeValue(writer, msg);
-            System.out.println(DebugLib.OUT + "json:" + mapper.writeValueAsString(msg));
+            logger.info("json:" + mapper.writeValueAsString(msg));
             writer.close();
             if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
                 logger.info("CONNECTION FAILED = " + connection.getResponseCode());
@@ -92,8 +90,8 @@ public class AwsController {
 	 */	
 	@RequestMapping("contentUpdate")
 	public @ResponseBody String contentUpdate(@RequestBody AwsMessage msg) {
-		System.out.println(DebugLib.OUT + "aws content update1:" + ";bucketname=" + msg.getBucketName() + ";fileurl=" + msg.getFileUrl() + ";key=" + msg.getKey() );
-		System.out.println(DebugLib.OUT + "aws content update2:" + ";type=" + msg.getType() + ";error=" + msg.getErrorCode() + ";reason=" + msg.getErrorReason());;
+		logger.info("aws content update1:" + ";bucketname=" + msg.getBucketName() + ";fileurl=" + msg.getFileUrl() + ";key=" + msg.getKey());
+		logger.info("aws content update2:" + ";type=" + msg.getType() + ";error=" + msg.getErrorCode() + ";reason=" + msg.getErrorReason());
 		ProgramManager pService = new ProgramManager();
 		pService.saveViaAws(msg);
 		return "";

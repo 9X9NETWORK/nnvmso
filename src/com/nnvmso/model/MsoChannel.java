@@ -71,7 +71,7 @@ public class MsoChannel implements Serializable {
 	private Date createDate;
 	
 	@Persistent
-	private Date updateDate;	
+	private Date updateDate;
 	
 	public MsoChannel() {
 		this.createDate = new Date();

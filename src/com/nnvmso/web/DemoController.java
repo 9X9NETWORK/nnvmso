@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.nnvmso.lib.NnLib;
-import com.nnvmso.lib.PlayerLib;
+import com.nnvmso.lib.APILib;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoProgram;
 import com.nnvmso.service.ChannelManager;
@@ -46,7 +46,7 @@ public class DemoController {
 			if (c != null) {
 				programs = programMngr.findByChannel(c);
 			} else {
-				return PlayerLib.outputReturn("Channel not found");
+				return APILib.outputReturn("Channel not found");
 			}
 		}
 		String output = "";
@@ -59,7 +59,7 @@ public class DemoController {
 			output = output + "\n";
 		}		
 		
-		return PlayerLib.outputReturn(output);
+		return APILib.outputReturn(output);
 	}
 		
 	private String getDelimitedStr(String[] ori) {
@@ -90,7 +90,7 @@ public class DemoController {
 			if (c != null) {
 				programs = programMngr.findByChannel(c);
 			} else {
-				return PlayerLib.outputReturn("Channel not found");
+				return APILib.outputReturn("Channel not found");
 			}
 		}
 		String regex = "^http://.*?/*?/9x9";
@@ -126,7 +126,7 @@ public class DemoController {
 			programMngr.save(p);
 		}
 		String output = "success, " + programs.size() + " program is modified.";		
-		return PlayerLib.outputReturn(output);
+		return APILib.outputReturn(output);
 	}
 	
 }

@@ -1,10 +1,16 @@
 package com.nnvmso.web;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import net.sf.jsr107cache.Cache;
+import net.sf.jsr107cache.CacheException;
+import net.sf.jsr107cache.CacheFactory;
+import net.sf.jsr107cache.CacheManager;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -73,7 +79,7 @@ public class PlayerAPIController {
 		} catch (Exception e) {
 			output = PlayerAPI.CODE_ERROR + "\t" + PlayerAPI.PLAYER_CODE_ERROR;						
 		}
-		return PlayerLib.outputReturn(output);
+		return APILib.outputReturn(output);
 	}
 
 	/**
@@ -244,7 +250,7 @@ public class PlayerAPIController {
 			if ( c.getProgramCount() > 0 ) {
 				String[] ori = {Short.toString(c.getSeq()), String.valueOf(c.getKey().getId()), 
 						c.getName(), c.getImageUrl(), Integer.toString(c.getProgramCount())};
-				output = output + PlayerLib.getTabDelimitedStr(ori);			
+				output = output + APILib.getTabDelimitedStr(ori);			
 				output = output + "\n";
 			}
 		}
@@ -276,7 +282,7 @@ public class PlayerAPIController {
 				output = output + p.getId() + "\n";			
 			}
 		}
-		return PlayerLib.outputReturn(output);
+		return APILib.outputReturn(output);
 	}
 	
 	/**
@@ -325,7 +331,7 @@ public class PlayerAPIController {
 						    type,
 						    String.valueOf(c.getStatus())
 						    };
-			output = output + PlayerLib.getTabDelimitedStr(ori);			
+			output = output + APILib.getTabDelimitedStr(ori);			
 			output = output + "\n";
 		}				
 		//return
@@ -354,7 +360,7 @@ public class PlayerAPIController {
 		} catch (Exception e){
 			output = PlayerAPI.CODE_ERROR + "\t" + PlayerAPI.PLAYER_CODE_ERROR;						
 		}
-		return PlayerLib.outputReturn(output);
+		return APILib.outputReturn(output);
 	}
 	
 	/**
@@ -379,7 +385,8 @@ public class PlayerAPIController {
 	 *              url1(mpeg4/slideshow), url2(webm), url3(flv more likely), url4(audio), <br/> 
 	 *              timestamp</p>
 	 */
-	 //@todo channel equals star and no user token, return missing param 	
+	 //@todo channel equals star and no user token, return missing param
+ 	 //@todo clean up cache messy code	
 	@RequestMapping("programInfo")
 	public ResponseEntity<String> programInfo(@RequestParam(value="channel") String channel,
 									          @RequestParam(value="user", required = false) String user,
@@ -387,58 +394,65 @@ public class PlayerAPIController {
 		ProgramManager programMngr = new ProgramManager();
 		String[] chStrSplit = channel.split(",");
 		List<MsoProgram> programs = new ArrayList<MsoProgram>();
+		Cache cache = null;		
+        try {
+            CacheFactory cacheFactory = CacheManager.getInstance().getCacheFactory();
+            cache = cacheFactory.createCache(Collections.emptyMap());
+        } catch (CacheException e) {
+            // ...
+        }
+		String output = "";
+		PlayerAPI tool = new PlayerAPI();		
 		if (channel.equals("*")) {
 			NnUserManager userService = new NnUserManager();
 			SubscriptionManager sService = new SubscriptionManager();
 			NnUser found = userService.findByKey(user);
-			programs = sService.findSubscribedPrograms(found);
+			List<MsoChannel> channels = sService.findSubscribedChannels(found);
+			String newChannelStr = "";
+			for (MsoChannel c : channels) {
+				String info = (String)cache.get(c.getKey().getId());
+				if (info != null) {
+					output = output + info;
+					logger.info("Found from cache" + output);
+				} else {
+					newChannelStr = newChannelStr + c.getId() + ",";
+				}
+			}
+			if (newChannelStr.length() > 1) {
+				System.out.println(newChannelStr);
+				programs = programMngr.findByChannelIdsAndIsPublic(newChannelStr, true);				
+				output = output + tool.composeProgramInfoStr(programs);
+				tool.addToProgramInfoCache(programs);
+			}			
 		} else if (chStrSplit.length > 1) {
-			programs = programMngr.findByChannelIdsAndIsPublic(channel, true);
+			System.out.println("debug: length > 1");
+			String newChannelStr = "";
+			for (int i=0; i<chStrSplit.length; i++) {
+				String info = (String)cache.get(chStrSplit[i]); 
+				if (info == null) {
+					newChannelStr = newChannelStr + chStrSplit[i] + ",";
+					System.out.println(newChannelStr);
+				} else { 
+					output = output + info;
+					logger.info("Found from cache" + output);
+				}
+			}			
+			if (newChannelStr.length() > 1) {
+				programs = programMngr.findByChannelIdsAndIsPublic(newChannelStr, true);
+				output = output + tool.composeProgramInfoStr(programs);
+			}
 		} else {
 			long chId = Integer.parseInt(channel);
-			programs = programMngr.findByChannelIdAndIsPublic(chId, true);
-		}
-		String output = "";		
-		for (MsoProgram p : programs) {
-			String url1 = p.getMpeg4FileUrl();
-			String url2 = p.getWebMFileUrl();
-			String url3 = p.getOtherFileUrl();
-			String url4 = p.getAudioFileUrl();
-			if (p.getType().equals(MsoProgram.TYPE_SLIDESHOW)) {
-				url1 = "/player/nnscript?program=" + p.getId();
-			}			
-			String intro = p.getIntro();			
-			if (intro != null) {
-				int introLenth = (intro.length() > 256 ? 256 : intro.length()); 
-				intro = intro.substring(0, introLenth);
-				intro = intro.replaceAll("\t", " ");				
-				intro = intro.replaceAll("\r", " ");
-				intro = intro.replaceAll("\n", " ");
+			String info = (String)cache.get(chId);
+			if (info == null) {
+				programs = programMngr.findByChannelIdAndIsPublic(chId, true);
+				output =  tool.composeProgramInfoStr(programs);
 			} else {
-				intro = "";
-			}
-			
-			String[] ori = {String.valueOf(p.getChannelId()), 
-					        String.valueOf(p.getKey().getId()), 
-					        p.getName(), 
-					        intro,
-					        p.getType(), 
-					        p.getDuration(),
-					        p.getImageUrl(),
-					        p.getImageLargeUrl(),
-					        url1, 
-					        url2, 
-					        url3, 
-					        url4, 
-					        String.valueOf(p.getUpdateDate().getTime())};
-			output = output + PlayerLib.getTabDelimitedStr(ori);
-			output = output.replaceAll("null", "");
-			output = output + "\n";
-		}
-		//return output;
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.valueOf("text/plain;charset=utf-8"));
-		return new ResponseEntity<String>(output, headers, HttpStatus.OK);		
+				output = info;
+				logger.info("Found from cache: " + output);
+			}			
+		}		
+		return APILib.outputReturn(output);
 	}
 	
 	/* ==========  CATEGORY: CHANNEL CREATE ========== */	
@@ -495,7 +509,7 @@ public class PlayerAPIController {
 				sMngr.channelSubscribe(user, channel, Short.parseShort(req.getParameter("grid")));
 			}
 			String[] ori = {Integer.toString(PlayerAPI.CODE_SUCCESS), Long.toString(channel.getId()), channel.getName(), channel.getImageUrl()};
-			output = PlayerLib.getTabDelimitedStr(ori);						
+			output = APILib.getTabDelimitedStr(ori);						
 		}
 		System.out.println("player podcast return:" + output);
 		HttpHeaders headers = new HttpHeaders();
@@ -581,7 +595,7 @@ public class PlayerAPIController {
 		MsoManager msoMngr = new MsoManager();
 		Mso found = msoMngr.findByKey(curator);
 		String[] ori = {found.getName(), found.getIntro(), found.getImageUrl()};
-		return PlayerLib.getTabDelimitedStr(ori);
+		return APILib.getTabDelimitedStr(ori);
 	}
 	
 }

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.nnvmso.lib.NnLib;
-import com.nnvmso.lib.PlayerLib;
+import com.nnvmso.lib.APILib;
 import com.nnvmso.model.*;
 import com.nnvmso.service.*;
 
@@ -38,11 +38,12 @@ public class BoxAPIController {
 	}		
 	
 	/**
-	 * <p>Replace all the webMFileUrl and mpeg4FileUrl with the passing ip address.
-	 *    If channel param is not seen, the api will do global replacements.</p>
-	 * <p> For example, http://s3.aws.com/9x9cache/1.web will be placed with http://<host>/9x9cache/1.web</p>
+	 * <p>Replace all the webMFileUrl and mpeg4FileUrl with the present ip address.
+	 *    If channel param is not present, it will do global replacements.</p>
+	 *         
+	 * <p> For example, "http://s3.aws.com/9x9cache/1.webm" will be placed by "http://<host>/9x9cache/1.webm"</p>
 	 * 
-	 * <p>Example:
+	 * <p>Usage:
 	 *    <blockquote>
 	 *      http://localhost:8888/box/replaceFileUrl?ip=192.168.1.1 <br/>
 	 *    	http://localhost:8888/box/replaceFileUrl?ip=192.168.1.1&channel=295
@@ -50,7 +51,7 @@ public class BoxAPIController {
 	 * </p> 
 	 * 
 	 * @param host host name
-	 * @param channel channel id
+	 * @param channel channel id, this is optional
 	 * @return 
 	 */
 	@RequestMapping("replaceFileUrl")
@@ -63,11 +64,11 @@ public class BoxAPIController {
 			if (c != null) {
 				programs = programMngr.findByChannel(c);
 			} else {
-				return PlayerLib.outputReturn("Channel not found");
+				return APILib.outputReturn("Channel not found");
 			}
 		}
 		String regex = "^http://.*?/";
-		for (MsoProgram p : programs) {
+		for (MsoProgram p : programs) {	
 			String toBeReplaced = "http://" + host + "/";
 			String webMFileUrl = p.getWebMFileUrl();
 			if (webMFileUrl != null) {								
@@ -81,7 +82,42 @@ public class BoxAPIController {
 			programMngr.save(p);
 		}
 		String output = "success, " + programs.size() + " program is modified.";		
-		return PlayerLib.outputReturn(output);
+		return APILib.outputReturn(output);
 	}
 
+	@RequestMapping("replaceWithSGFileUrl")
+	public ResponseEntity<String> replaceWithSGFileUrl(@RequestParam(value="host") String host, @RequestParam(value="channel", required = false)String channel) {
+		List<MsoProgram> programs = new ArrayList<MsoProgram>();
+		if (channel == null) {	
+			programs = programMngr.findAll(); 
+		} else {
+			MsoChannel c = channelMngr.findById(Long.parseLong(channel));
+			if (c != null) {
+				programs = programMngr.findByChannel(c);
+			} else {
+				return APILib.outputReturn("Channel not found");
+			}
+		}
+		String regex = "^http://.*?/";
+		for (MsoProgram p : programs) {	
+			String toBeReplaced = "http://" + host + "/";
+			String webMFileUrl = p.getWebMFileUrl();
+			if (webMFileUrl != null) {
+				webMFileUrl.replaceAll(regex, toBeReplaced);
+				webMFileUrl = webMFileUrl.replaceFirst("/9x9cache", "/sg9x9cache");
+				webMFileUrl = webMFileUrl.replaceFirst("/9x9cache", "/sg9x9pod");
+				p.setWebMFileUrl(webMFileUrl.replaceAll(regex, toBeReplaced));
+			}
+			String mpeg4FileUrl = p.getMpeg4FileUrl(); 
+			if (mpeg4FileUrl != null){
+				p.setMpeg4FileUrl(mpeg4FileUrl.replaceAll(regex, toBeReplaced));
+			}
+			
+			System.out.println(p.getWebMFileUrl() + ";" + p.getMpeg4FileUrl());
+			programMngr.save(p);
+		}
+		String output = "success, " + programs.size() + " program is modified.";		
+		return APILib.outputReturn(output);
+	}
+	
 }

@@ -1,6 +1,7 @@
 package com.nnvmso.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -29,6 +30,7 @@ public class ChannelManager {
 	public void findAllAndSetWhatever() {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Query query = pm.newQuery(MsoChannel.class);
+		@SuppressWarnings("unchecked")
 		List<MsoChannel> channels = (List<MsoChannel>) query.execute();
 		for (MsoChannel c : channels) {
 			c.setPublic(true);
@@ -64,6 +66,7 @@ public class ChannelManager {
 		Query q = pm.newQuery(MsoChannel.class);		
 		q.setFilter("type == typeParam");
 		q.declareParameters("short typeParam");
+		@SuppressWarnings("unchecked")
 		List<MsoChannel> channels = (List<MsoChannel>) q.execute(MsoChannel.TYPE_SYSTEM);
 		channels.size();
 		pm.close();		
@@ -78,6 +81,7 @@ public class ChannelManager {
 		// q.setFilter("isPublic == isPublicParam");
 		q.setOrdering("name asc");
 		// q.declareParameters("boolean isPublicParam");
+		@SuppressWarnings("unchecked")
 		List<MsoChannel> channels = (List<MsoChannel>) q.execute(true);
 		channels.size();
 		pm.close();		
@@ -104,24 +108,35 @@ public class ChannelManager {
 		return detached;
 	}
 
+	public List<MsoChannel> findByKeys(List<Key> channelKeys) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		Query query = pm.newQuery(MsoChannel.class, ":p.contains(key)");
+		@SuppressWarnings("unchecked")
+		List<MsoChannel> channels= new ArrayList<MsoChannel>((List<MsoChannel>) query.execute(channelKeys));
+		pm.close();
+		return channels;
+	}
+
 	public List<MsoChannel> findByMso(Key msoKey) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();		    	
+		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Query q = pm.newQuery(MsoChannel.class);
 		q.setFilter("msoKey == msoKeyParam");
 		q.declareParameters(Key.class.getName() + " msoKeyParam");
+		@SuppressWarnings("unchecked")
 		List<MsoChannel> channels = (List<MsoChannel>) q.execute(msoKey);
 		channels.size();
 		pm.close();
 		return channels;
 	}
-		
+
 	public List<MsoChannel> findByIsPublic(Key msoKey, boolean isPublic) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();		    	
 		Query q = pm.newQuery(MsoChannel.class);
 		q.setFilter("msoKey == msoKeyParam && isPublic == isPublicParam");
 		q.declareParameters(Key.class.getName() + " msoKeyParam, boolean isPublicParam");
+		@SuppressWarnings("unchecked")
 		List<MsoChannel> channels = (List<MsoChannel>) q.execute(msoKey, isPublic);
-		System.out.println(DebugLib.OUT + channels.size());
+		channels.size(); //touch
 		pm.close();
 		return channels;		
 	}	
@@ -135,6 +150,7 @@ public class ChannelManager {
 		Query q = pm.newQuery(MsoChannel.class);
 		q.setFilter("msoKey == msoKeyParam");
 		q.declareParameters(Key.class.getName() + " msoKeyParam");
+		@SuppressWarnings("unchecked")
 		List<MsoChannel> channels = (List<MsoChannel>)q.execute(mso.getKey());
 		short available = 1;
 		if (channels.size() != 0) {
@@ -171,10 +187,6 @@ public class ChannelManager {
 		ProgramManager pService = new ProgramManager();
 		List<MsoProgram> programs = pService.findByChannel(channel);
     	PersistenceManager pm = PMF.get().getPersistenceManager();
-    	for (MsoProgram p : programs) {
-        	System.out.println(DebugLib.OUT + p.getKey());    		
-    	}
-    	System.out.println(DebugLib.OUT + channel.getKey());
 		pm.deletePersistentAll(programs);
 		pm.deletePersistent(channel);   
     	pm.close();    			

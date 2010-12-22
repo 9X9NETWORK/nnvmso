@@ -2,6 +2,7 @@ package com.nnvmso.service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -9,6 +10,11 @@ import java.util.Set;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+
+import net.sf.jsr107cache.Cache;
+import net.sf.jsr107cache.CacheException;
+import net.sf.jsr107cache.CacheFactory;
+import net.sf.jsr107cache.CacheManager;
 
 import org.springframework.stereotype.Service;
 
@@ -26,11 +32,12 @@ public class SubscriptionManager {
 		Query q = pm.newQuery(Subscription.class);
 		q.setFilter("userKey == userKeyParam");
 		q.declareParameters(Key.class.getName() + " userKeyParam");
+		@SuppressWarnings("unchecked")
 		List<Subscription> subscriptions = (List<Subscription>)q.execute(user.getKey());
 		subscriptions.size();//touch
 		pm.close();
 		return subscriptions;
-	}
+	}	
 	
 	public List<MsoProgram> findSubscribedPrograms(NnUser user) {
 		List<Subscription> subscriptions = this.findAll(user);
@@ -43,9 +50,12 @@ public class SubscriptionManager {
 			channelKeys[i] = s.getChannelKey();
 			i++;
 		}
+		
+		List<MsoProgram> results = new ArrayList<MsoProgram>(); 		
 		q = pm.newQuery(MsoProgram.class, ":p.contains(channelKey)");
-		List<MsoProgram> programs = (List<MsoProgram>) q.execute(Arrays.asList(channelKeys));		
-		List<MsoProgram> results = new ArrayList<MsoProgram>(); 
+		//q.setRange(0, 1);
+		@SuppressWarnings("unchecked")		
+		List<MsoProgram> programs = (List<MsoProgram>) q.execute(Arrays.asList(channelKeys));
 		results.addAll(programs);
 		Iterator<MsoProgram> iter = results.iterator();
 		while(iter.hasNext()) {
@@ -58,7 +68,7 @@ public class SubscriptionManager {
 		return results;
 		//return programs;
 	}
-	
+		
 	public List<MsoChannel> findSubscribedChannels(NnUser user) {
 		List<Subscription> subscriptions = this.findAll(user);
 		List<MsoChannel> channels = new ArrayList<MsoChannel>();
@@ -86,6 +96,7 @@ public class SubscriptionManager {
 		Query q = pm.newQuery(Subscription.class);
 		q.setFilter("userKey == userKeyParam && channelKey == channelKeyParam");
 		q.declareParameters(Key.class.getName() + " userKeyParam, " + Key.class.getName() + " channelKeyParam");
+		@SuppressWarnings("unchecked")
 		List<Subscription> s = (List<Subscription>)q.execute(user.getKey(), channel.getKey());
 		if (s != null && s.size() > 0) {
 			pm.deletePersistent(s.get(0));
@@ -102,6 +113,7 @@ public class SubscriptionManager {
 		q.setFilter("msoKey==msoKeyParam");
 		q.declareParameters(Key.class.getName() + " msoKeyParam");
 		q.setOrdering("seq asc");
+		@SuppressWarnings("unchecked")
 		List<MsoChannel> channels = (List<MsoChannel>)q.execute(user.getMsoKey());
 		//ensure user channel's uniqueness
 		Set<Key> sUniqueSet = new HashSet<Key>();				

@@ -63,7 +63,8 @@ public class InitService {
 		MsoProgram p = new MsoProgram("news1");
 		p.setChannelId(c1.getId());
 		p.setImageUrl("http://zoo.atomics.org/video/thumbnails/bee-gees-stayin-alive.jpg");
-		p.setMpeg4FileUrl("http://zoo.atomics.org/video/jukebox/bee-gees-stayin-alive.webm");
+		p.setMpeg4FileUrl("http://s3.amazonaws.com/9x9cache/77596bb85e359f0a67d48506f99e163cbba28cf5_1261426036.mp4");
+		p.setOtherFileUrl("http://s3.amazonaws.com/9x9pod/77596bb85e359f0a67d48506f99e163cbba28cf5_1261426036.mp4");
 		p.setWebMFileUrl("http://zoo.atomics.org/video/jukebox/bee-gees-stayin-alive.webm");	
 		p.setPublic(true);
 		pMngr.create(p);
@@ -73,17 +74,25 @@ public class InitService {
 		c2.setType(MsoChannel.TYPE_MSO);
 		c2.setPublic(true);
 		channelMngr.create(c2, mso);
-		MsoProgram p1 = new MsoProgram("news1");
+		MsoProgram p1 = new MsoProgram("news2");
 		p1.setChannelId(c2.getId());
 		p1.setImageUrl("http://zoo.atomics.org/video/thumbnails/bee-gees-stayin-alive.jpg");
-		p1.setMpeg4FileUrl("http://zoo.atomics.org/video/jukebox/bee-gees-stayin-alive.webm");
-		p1.setWebMFileUrl("http://zoo.atomics.org/video/jukebox/bee-gees-stayin-alive.webm");	
+		p1.setMpeg4FileUrl("http://s3.amazonaws.com/9x9cache/77596bb85e359f0a67d48506f99e163cbba28cf5_1261426036p1.mp4");
+		p1.setOtherFileUrl("http://s3.amazonaws.com/9x9pod/77596bb85e359f0a67d48506f99e163cbba28cf5_1261426036p1.mp4");
 		p1.setPublic(true);
+
+		MsoProgram p2 = new MsoProgram("news3");
+		p2.setChannelId(c2.getId());
+		p2.setImageUrl("http://zoo.atomics.org/video/thumbnails/bee-gees-stayin-alive.jpg");
+		p2.setMpeg4FileUrl("http://s3.amazonaws.com/9x9cache/77596bb85e359f0a67d48506f99e163cbba28cf5_1261426036p1.mp4");
+		p2.setOtherFileUrl("http://s3.amazonaws.com/9x9pod/77596bb85e359f0a67d48506f99e163cbba28cf5_1261426036p1.mp4");
+		p2.setPublic(true);
 		
 		c1.setProgramCount(2);
 		c2.setProgramCount(3);
 		
 		pMngr.create(p1);
+		pMngr.create(p2);
 		
 	}
 	
@@ -145,29 +154,7 @@ public class InitService {
 		p.setPublic(true);
 		pMngr.create(p);		
 	}
-	
-	public void alter() {
-		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-		//get all the keys
-		PersistenceManager pm = PMF.get().getPersistenceManager();		    	
-		Query q = pm.newQuery(MsoChannel.class);
-		List<MsoChannel> channels = (List<MsoChannel>) q.execute();		
-		List<Key> keys = new ArrayList<Key>();
-		for (MsoChannel c : channels) {
-			keys.add(c.getKey());
-		}
-		pm.close();
-		datastore.delete(keys);		
-		
-		System.out.println("channel size=" + channels.size());
-		deleteAll();
-	}
-	
-	public void alterInit() {
-		alter();
-		createInitialData();
-	}
-	
+			
 	public void init() {
 		deleteAll();
 		createInitialData();

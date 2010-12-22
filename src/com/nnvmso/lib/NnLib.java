@@ -3,7 +3,6 @@ package com.nnvmso.lib;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Date;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,8 +40,7 @@ public class NnLib {
 			detail = detail + elm.toString() + "\n";			
 		}
 		logger.severe("exception:" + e.toString());
-		logger.severe("exception stacktrace:\n" + detail);
-		String now = (new Date()).toString();		
+		logger.severe("exception stacktrace:\n" + detail);		
 	}
 	
 	public static void urlPostWithJson(String urlStr, Object obj) {
@@ -56,7 +54,7 @@ public class NnLib {
 	        OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
 	        ObjectMapper mapper = new ObjectMapper();
 	        mapper.writeValue(writer, obj);
-	        System.out.println(DebugLib.OUT + "url fetch-json:" + mapper.writeValueAsString(obj));	        
+	        logger.info("url fetch-json:" + mapper.writeValueAsString(obj));	        
 	        if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {	        	
 	        	System.out.println("response not ok!" + connection.getResponseCode());
 	        }

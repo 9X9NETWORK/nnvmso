@@ -4,6 +4,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.nnvmso.lib.NnLib;
+
 import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -25,7 +27,6 @@ public class EmailController {
 	@RequestMapping("send")
 	public @ResponseBody String send() {
 		Properties props = new Properties();
-        //Session session = Session.getDefaultInstance(props, null);
 		Session session = Session.getInstance(props);
 		
 		String msgBody = "Transcoding is finished.";
@@ -34,21 +35,14 @@ public class EmailController {
         	logger.info("Trying to send an email");
         	System.out.println("Trying to send an email");
             Message msg = new MimeMessage(session);
-            msg.setFrom(new InternetAddress("yiwen.tseng@gmail.com", "teltel"));
+            msg.setFrom(new InternetAddress("nncloudtv@gmail.com", "9x9cloudtv"));
             msg.addRecipient(Message.RecipientType.TO,
-                             new InternetAddress("yiwen.teltel@gmail.com", "yiwen"));
+                             new InternetAddress("nncloudtv@gmail.com", "9x9cloudtv"));
             msg.setSubject("Transcoding done");
             msg.setText(msgBody);
             Transport.send(msg);
-        } catch (AddressException e) {
-        	System.out.println("exception1");
-        	logger.info("AddressException = " + e.toString());
-        } catch (MessagingException e) {
-        	System.out.println("exception2");
-        	logger.info("MessagingException = " + e.toString());
-        } catch (UnsupportedEncodingException e) {
-        	System.out.println("exception3");
-        	logger.info("UnsupportedEncodingException = " + e.toString());
+        } catch (Exception e) {
+        	NnLib.logException(e);
 		}	
         return "sent";
 	}

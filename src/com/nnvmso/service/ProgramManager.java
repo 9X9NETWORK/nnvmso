@@ -2,6 +2,7 @@ package com.nnvmso.service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -9,6 +10,11 @@ import java.util.List;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.jdo.Transaction;
+
+import net.sf.jsr107cache.Cache;
+import net.sf.jsr107cache.CacheException;
+import net.sf.jsr107cache.CacheFactory;
+import net.sf.jsr107cache.CacheManager;
 
 import org.springframework.stereotype.Service;
 
@@ -39,14 +45,15 @@ public class ProgramManager {
 			Query query = pm.newQuery(MsoProgram.class);
 			query.setFilter("channelKey == channelKeyParam");
 			query.declareParameters(Key.class.getName() + " channelKeyParam");
-	    	query.setOrdering("updateDate desc");	    				
+	    	query.setOrdering("updateDate desc");	   
+	    	@SuppressWarnings("unchecked")
 	    	List<MsoProgram> results = (List<MsoProgram>) query.execute(c.getKey());
 			int recentSize = 3;
 			for (int i=0; i<results.size(); i++) {
 				if (i == recentSize) {break;}
 				if (c.getType() != MsoChannel.TYPE_SYSTEM) {
 					newPrograms.add(results.get(i));
-				}												
+				}
 			}
 		}
 		return newPrograms;
@@ -63,7 +70,8 @@ public class ProgramManager {
 	public MsoProgram findByStorageId(String storageId) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();		
 		Query query = pm.newQuery(MsoProgram.class);
-		query.setFilter("storageId == '" + storageId + "'");	
+		query.setFilter("storageId == '" + storageId + "'");
+		@SuppressWarnings("unchecked")
 		List<MsoProgram> results = (List<MsoProgram>) query.execute();
 		MsoProgram detached = null;
 		if (results.size() > 0) {
@@ -76,6 +84,7 @@ public class ProgramManager {
 	public List<MsoProgram> findAll() {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Query q = pm.newQuery(MsoProgram.class);
+		@SuppressWarnings("unchecked")
 		List<MsoProgram> programs = (List<MsoProgram>)q.execute();
 		List<MsoProgram> detached = (List<MsoProgram>)pm.detachCopyAll(programs);
 		pm.close();
@@ -85,6 +94,7 @@ public class ProgramManager {
 	public void findAllAndSetWhatever() {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Query query = pm.newQuery(MsoProgram.class);
+		@SuppressWarnings("unchecked")
 		List<MsoProgram> programs = (List<MsoProgram>) query.execute();
 		for (MsoProgram p : programs) {
 			MsoChannel c = pm.getObjectById(MsoChannel.class, p.getChannelKey());
@@ -117,15 +127,15 @@ public class ProgramManager {
 		Query q = pm.newQuery(MsoProgram.class);
 		q.setFilter("channelKey == channelKeyParam");
 		q.declareParameters(Key.class.getName() + " channelKeyParam");
+		@SuppressWarnings("unchecked")
 		List<MsoProgram> programs = (List<MsoProgram>) q.execute(channel.getKey());
 		programs.size();
 		List<MsoProgram> detached = (List<MsoProgram>)pm.detachCopyAll(programs);
 		pm.close();
 		return detached;
 	}	
-		
-	public List<MsoProgram> findByChannelIdAndIsPublic(long channelId, boolean isPublic) {
-		System.out.println(DebugLib.OUT + "channelId=" + channelId);
+
+	public List<MsoProgram> findByChannelIdAndIsPublic(long channelId, boolean isPublic) {			
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		MsoChannel c = pm.getObjectById(MsoChannel.class, channelId);
 		List<MsoProgram> programs;
@@ -134,7 +144,7 @@ public class ProgramManager {
 			q.setFilter("channelKey == channelKeyParam && isPublic == isPublicParam");
 			q.declareParameters(Key.class.getName() + " channelKeyParam, boolean isPublicParam");
 			programs = (List<MsoProgram>) q.execute(c.getKey(), isPublic);
-			System.out.println(DebugLib.OUT + programs.size());
+			programs.size();
 		} else {
 			programs = new ArrayList<MsoProgram>();
 		}
@@ -151,7 +161,8 @@ public class ProgramManager {
 			channelKeys[i] = c.getKey();
 		}
 		Query q = pm.newQuery(MsoProgram.class, ":p.contains(channelKey)");
-		List<MsoProgram> programs = new ArrayList((List<MsoProgram>) q.execute(Arrays.asList(channelKeys)));
+		@SuppressWarnings("unchecked")
+		List<MsoProgram> programs = new ArrayList<MsoProgram>((List<MsoProgram>) q.execute(Arrays.asList(channelKeys)));
 		Iterator<MsoProgram> iter = programs.iterator();
 		while(iter.hasNext()) {
 		  MsoProgram p = iter.next();
@@ -170,7 +181,6 @@ public class ProgramManager {
 	//!!! to force channel id, channel id should be one of the params
 	public void create(MsoProgram program) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		System.out.println(DebugLib.OUT + program.getChannelId());
 		MsoChannel c = pm.getObjectById(MsoChannel.class, program.getChannelId()); 
 		program.setChannelKey(c.getKey());
 		List<Key> seq = c.getProgramSeq();		
@@ -195,7 +205,6 @@ public class ProgramManager {
 		
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		for (MsoProgram p : programs) {
-			System.out.println(DebugLib.OUT + "saveall:" + p.getName());
 			p.setChannelKey(channel.getKey());
 			p.setUpdateDate(new Date());
 		}
@@ -276,16 +285,12 @@ public class ProgramManager {
 	   MsoProgram p = pm.getObjectById(MsoProgram.class, msg.getKey());	   
 	   
 	   if (msg.getType().equals(MsoProgram.VIDEO_WEBM)) {
-		   System.out.println(DebugLib.OUT + MsoProgram.VIDEO_WEBM);
 		   p.setWebMFileUrl(msg.getFileUrl());
 	   } 
 	   if (msg.getType().equals(MsoProgram.VIDEO_MPEG4)) {
-		   System.out.println(DebugLib.OUT + MsoProgram.VIDEO_MPEG4);
 		   p.setMpeg4FileUrl(msg.getFileUrl());
 	   } 
-	   System.out.println(DebugLib.OUT + "type is =" + msg.getType());
 	   if (msg.getType().equals(MsoProgram.TYPE_SLIDESHOW)) {
-		   System.out.println(DebugLib.OUT + "enter slideshow!!!!!");
 		   Slideshow slide = new Slideshow();
 		   slide.setSlides(msg.getSlideshow().getSlides());
 		   slide.setAudios(msg.getSlideshow().getAudios());
@@ -293,16 +298,13 @@ public class ProgramManager {
 		   String scriptStr = NnScriptLib.generateSlideScript(slide, msg.getFileUrl());
 		   ProgramScript oldScript = p.getNnScript();
 		   if (p.getNnScript() != null) {			   
-			   System.out.println(DebugLib.OUT + "old script");
 			   oldScript.setScript(new Text(scriptStr));
 		   } else {
-			   System.out.println(DebugLib.OUT + "new script");
 			   ProgramScript script = new ProgramScript();
 			   script.setScript(new Text(scriptStr));
 			   p.setNnScript(script);
 			   script.setProgram(p);			   
 		   }
-		   System.out.println(DebugLib.OUT + scriptStr);
 	   }
 	   p.setErrorCode(msg.getErrorCode());
 	   Transaction tx = pm.currentTransaction();
