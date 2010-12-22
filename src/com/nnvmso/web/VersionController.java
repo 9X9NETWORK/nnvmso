@@ -5,6 +5,7 @@ import java.util.Date;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.nnvmso.lib.APILib;
 
@@ -13,11 +14,11 @@ import com.nnvmso.lib.APILib;
 public class VersionController {
 
 	@RequestMapping("current")
-	public ResponseEntity<String> current() {
-		String version = "1";
+	public @ResponseBody String current() {
+		String version = "12";
 		String date = (new Date()).toString();
 		version = version + " - " + date;
-		return APILib.outputReturn(version);		
-	}
-	
+		return version;
+		//return APILib.outputReturn(version);		
+	}	
 }
