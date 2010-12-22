@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.nnvmso.lib.PlayerLib;
+import com.nnvmso.lib.APILib;
 
 @Controller
 @RequestMapping("version")
@@ -17,7 +17,7 @@ public class VersionController {
 		String version = "1";
 		String date = (new Date()).toString();
 		version = version + " - " + date;
-		return PlayerLib.outputReturn(version);		
+		return APILib.outputReturn(version);		
 	}
 	
 }
