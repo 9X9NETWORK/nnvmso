@@ -1588,8 +1588,6 @@ function keypress (keycode)
 
     case 67:
       /* C */
-      // $("#epend-layer").show();
-      end_message (10000);
       break;
 
     case 73:
@@ -1849,6 +1847,8 @@ function switch_to_ipg()
   log ('ipg');
 
   clear_msg_timex();
+  clear_osd_timex()
+
   // force_pause();
   physical_stop();
   setTimeout ("delayed_video_stop()", 5000);
