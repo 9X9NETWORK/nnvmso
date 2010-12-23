@@ -1832,6 +1832,16 @@ function extend_ep_layer()
   reset_osd_timex();
   }
 
+function delayed_video_stop()
+  {
+  log ('delayed video stop: ' + thumbing);
+  if (thumbing == 'ipg' && current_tube == 'fp')
+    {
+    try { log ('flowplayer state: ' + flowplayer("player").getState()); } catch (error) {};
+    physical_stop();
+    }
+  }
+
 function switch_to_ipg()
   {
   log ('ipg');
@@ -1839,7 +1849,7 @@ function switch_to_ipg()
   clear_msg_timex();
   // force_pause();
   physical_stop();
-  setTimeout ("if (thumbing == 'ipg') { log ('additional stop'); physical_stop(); }", 5000);
+  setTimeout ("delayed_video_stop()", 5000);
 
   ipg_cursor = parseInt (channel_line [channel_cursor]);
 
