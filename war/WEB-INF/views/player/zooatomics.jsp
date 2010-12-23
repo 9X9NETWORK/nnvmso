@@ -1839,6 +1839,7 @@ function switch_to_ipg()
   clear_msg_timex();
   // force_pause();
   physical_stop();
+  setTimeout ("if (thumbing == 'ipg') { log ('additional stop'); physical_stop(); }", 5000);
 
   ipg_cursor = parseInt (channel_line [channel_cursor]);
 
