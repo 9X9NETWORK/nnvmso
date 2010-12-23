@@ -15,7 +15,7 @@
 
 /* players */
 
-var current_tube = 'v1';
+var current_tube = '';
 
 var ytplayer;
 var yt_video_id;
@@ -568,6 +568,8 @@ function play()
 
 function start_play_html5 (url)
   {
+  current_tube = 'v1';
+
   var v = document.getElementById ("vvv");
   v.src = url;
 
@@ -1858,6 +1860,9 @@ function switch_to_ipg()
 
   redraw_ipg();
 
+  $("#ipg-signin-btn").removeClass ("on");
+  $("#ipg-return-btn").removeClass ("on");
+
   if (jQuery.browser.msie && jQuery.browser.version == '8.0')
     {
     $("#control-layer").hide();
@@ -1899,9 +1904,6 @@ function switch_to_ipg()
     });
 
   thumbing = 'ipg';
-
-  $("#ipg-signin-btn").removeClass ("on");
-  $("#ipg-return-btn").removeClass ("on");
   }
 
 function outt()
@@ -2198,6 +2200,25 @@ function ipg_down()
   ipg_metainfo();
   }
 
+function ipg_resume()
+  {
+  /* this may have received focus */
+  $('#ipg-return-btn').blur();
+
+  if (current_tube == '')
+    {
+    log_and_alert ('nothing was playing');
+    return
+    }
+
+  escape();
+  switch_to_channel_thumbs();
+  enter_channel();
+
+  if (current_tube == 'fp')
+    flowplayer ("player").play();
+  }
+
 function ipg_play()
   {
   log ('ipg play: ' + ipg_cursor);
@@ -2206,9 +2227,7 @@ function ipg_play()
     {
     if (ipg_cursor == -1)
       {
-      escape();
-      switch_to_channel_thumbs();
-      enter_channel();
+      ipg_resume();
       }
     else if (ipg_cursor == -2)
       {
@@ -2444,9 +2463,13 @@ function getcookie (id)
 
 function login_screen()
   {
+  /* this may have received focus */
+  $('#ipg-signin-btn').blur()
+
   force_pause();
   saved_thumbing = thumbing;
   thumbing = 'user';
+
   $("#control-layer").hide();
   $("#mask").show();
   $("#signin-layer").show();
@@ -3603,8 +3626,8 @@ One moment...
       <li id="update"><p><span class="hilite">Updated:</span> <span id="update-date"></span></p></li>
     </ul>
     <ul id="control-list">
-      <li><a id="ipg-signin-btn" href="javascript:;" class="btn">Sign in / Sign up</a></li>
-      <li><a id="ipg-return-btn" href="javascript:;" class="btn">Resume watching</a></li>
+      <li><a id="ipg-signin-btn" href="javascript:login_screen()" class="btn">Sign in / Sign up</a></li>
+      <li><a id="ipg-return-btn" href="javascript:ipg_resume()" class="btn">Resume watching</a></li>
     </ul> 
     <img src="http://zoo.atomics.org/video/9x9playerV21/images/logo.png" id="logo">
   </div>
