@@ -6,11 +6,6 @@ Most of the time it's partially working, for various demo purpose.
 
 run "http://localhost/admin/init" to initiate necessary data to begin with. check init() in InitService for init values.
 
-deployment 
-=====
-before deploying on different environments, change urlStr in submitToTranscodingService of PodcastService.java.
-in the future it will be changed to use podcast.properties.
-
 API document
 =====
 API-related controller has document written in Javadoc format.
