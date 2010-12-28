@@ -41,6 +41,9 @@ import java.util.logging.Logger;
 public class PlayerAPIController {
 	protected static final Logger logger = Logger.getLogger(PlayerAPIController.class.getName());
 	
+	/**
+	 * To be ignored  
+	 */
 	@ExceptionHandler(Exception.class)
 	public String exception(Exception e) {
 		NnLib.logException(e);
@@ -153,7 +156,7 @@ public class PlayerAPIController {
 	 * Register a guest account. 
 	 * If ipg is provided, guest is automatically subscribed to all the channels in the ipg. 
 	 * 
-	 * @param ipg ipgId, it is optional
+	 * @param ipg ipg identifier, it is optional
 	 * @return A string of return code and a user key, tab delimited.
 	 * 	       Failed operation will return return code and error message.<br/>
 	 * 	       Example: "0	aghubmUydm1zb3IMCxIGTm5Vc2VyGDkM", "3	Fatal Error".
