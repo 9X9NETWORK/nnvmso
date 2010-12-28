@@ -14,6 +14,7 @@ import com.nnvmso.lib.*;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.NnUser;
+import com.nnvmso.model.Ipg;
 
 @Service
 public class NnUserManager {
@@ -94,6 +95,26 @@ public class NnUserManager {
 		sMngr.channelSubscribe(user, system, (short)1);
 		//return
 		return user;		
+	}
+	
+	// ============================================================
+	// c.u.d <--- What does this mean ?
+	// ============================================================
+	// Use IPG parameter instead of system IPG
+	public NnUser createViaPlayer(NnUser user, Ipg ipg) {
+		//find user's mso
+		MsoManager msoMngr = new MsoManager();
+		msoMngr.findByEmail("default_mso@9x9.com");
+		Mso mso = new Mso();
+		this.save(user, mso);
+		//subscribe IPG channel
+		IpgManager ipgMngr = new IpgManager();
+		SubscriptionManager sMngr = new SubscriptionManager();
+		List<MsoChannel> ipgChannels = ipgMngr.findIpgChannels(ipg);
+		for (MsoChannel c : ipgChannels)
+			sMngr.channelSubscribe(user, c, c.getGrid());
+		//return
+		return user;
 	}
 	
 	public void save(NnUser user, Mso mso) {
