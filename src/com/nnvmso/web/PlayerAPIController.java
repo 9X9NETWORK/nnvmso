@@ -2,7 +2,6 @@ package com.nnvmso.web;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -102,28 +101,14 @@ public class PlayerAPIController {
 		String password = req.getParameter("password");
 		String name = req.getParameter("name");
 		String userToken = req.getParameter("user");
-		String ipgToken = req.getParameter("ipg");
 		System.out.println("signup() : userToken=" + userToken + 
-				"; email=" + email + "; pwd=" + password + "; name=" + name +
-				"; ipgToken=" + ipgToken);
+				"; email=" + email + "; pwd=" + password + "; name=" + name);
+				
 		if (email == null || password == null || name == null ||
 			email.length() == 0 || password.length() == 0 || name.length() == 0 ||
 			email.equals("undefined")) {
 				output = PlayerAPI.CODE_MISSING_PARAMS + "\t" + PlayerAPI.PLAYER_CODE_MISSING_PARAMS;
 		} else { 
-			// check if ipgToken is valid
-			Ipg ipg = null;
-			if (ipgToken != null) {
-				IpgManager ipgMngr = new IpgManager();
-				ipg = ipgMngr.findById(Long.decode(ipgToken));
-				if (ipg == null) {
-					output = PlayerAPI.CODE_ERROR + "\t" + PlayerAPI.PLAYER_IPG_ID_INVALID;
-					System.out.println("Signup() : ERROR: " + output);
-					HttpHeaders headers = new HttpHeaders();
-					headers.setContentType(MediaType.valueOf("text/plain;charset=utf-8"));
-					return new ResponseEntity<String>(output, headers, HttpStatus.OK);
-				}
-			}
 			NnUserManager userMngr = new NnUserManager();
 			NnUser user = userMngr.findByEmail(email);
 			if (user != null) {
@@ -136,10 +121,7 @@ public class PlayerAPIController {
 					user = new NnUser(req.getParameter("email"));
 					user.setPassword(req.getParameter("password"));
 					user.setName(req.getParameter("name"));		
-					if (ipgToken != null && ipg != null)
-						user = userMngr.createViaPlayer(user, ipg);
-					else
-						user = userMngr.createViaPlayer(user);
+					user = userMngr.createViaPlayer(user);
 					userMngr.setUserCookie(resp, NnLib.getKeyStr(user.getKey()));
 				} else {
 					System.out.println("signup() find by Token: userToken=" + userToken + 
@@ -164,9 +146,7 @@ public class PlayerAPIController {
 			}
 		}
 		//return
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.valueOf("text/plain;charset=utf-8"));
-		return new ResponseEntity<String>(output, headers, HttpStatus.OK);		
+		return APILib.outputReturn(output);
 	}
 	
 	/**
@@ -177,15 +157,28 @@ public class PlayerAPIController {
 	 * 	       Example: "0	aghubmUydm1zb3IMCxIGTm5Vc2VyGDkM", "3	Fatal Error".
 	 */
 	@RequestMapping(value="guestRegister")
-	public ResponseEntity<String> guestRegister(HttpServletResponse resp) {
+	public ResponseEntity<String> guestRegister(@RequestParam(value="ipg", required = false) String ipg, HttpServletResponse resp) {
 		NnUser guest = new NnUser("guest@9x9.com");
 		guest.setPassword("guest");
 		guest.setName("guest");
+		
 		NnUserManager userMngr = new NnUserManager();
-		NnUser user = userMngr.createViaPlayer(guest);		
+		NnUser user = null;
+		String output = "";
+		Ipg theIpg = null;
+		if (ipg != null) {
+			IpgManager ipgMngr = new IpgManager();
+			theIpg = ipgMngr.findById(Long.decode(ipg));
+			if (theIpg == null) {
+				output = PlayerAPI.CODE_ERROR + "\t" + PlayerAPI.PLAYER_IPG_ID_INVALID;
+				System.out.println("Signup() : ERROR: " + output);
+				return APILib.outputReturn(output);
+			} 
+		}
+		user = userMngr.createViaPlayer(guest, theIpg);
 		userMngr.setUserCookie(resp, NnLib.getKeyStr(user.getKey()));
 		//return
-		String output = PlayerAPI.CODE_SUCCESS + "\t" + NnLib.getKeyStr(user.getKey());
+		output = PlayerAPI.CODE_SUCCESS + "\t" + NnLib.getKeyStr(user.getKey());
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.valueOf("text/plain;charset=utf-8"));
 		return new ResponseEntity<String>(output, headers, HttpStatus.OK);		
@@ -226,30 +219,24 @@ public class PlayerAPIController {
 	public ResponseEntity<String> saveIpg(@RequestParam(value="user") String user) {
 		
 		System.out.println("saveIpg(" + user + ")");
-		String output;
-		
+		String output;		
 		NnUserManager userService = new NnUserManager();
 		NnUser foundUser = userService.findByKey(user);
 		if (foundUser == null) {
 			output = PlayerAPI.CODE_ERROR + "\t" + PlayerAPI.PLAYER_CHANNEL_OR_USER_UNEXISTED;
-			HttpHeaders headers = new HttpHeaders();
-			headers.setContentType(MediaType.valueOf("text/plain;charset=utf-8"));
-			return new ResponseEntity<String>(output, headers, HttpStatus.OK);
-		}
-		
+			return APILib.outputReturn(output);
+		}		
 		Ipg ipg = new Ipg(foundUser);
 		IpgManager ipgMngr = new IpgManager();
 		ipgMngr.save(ipg);
 		
 		String[] ori = {Integer.toString(PlayerAPI.CODE_SUCCESS), Long.toString(ipg.getId())};
-		output = PlayerLib.getTabDelimitedStr(ori);
+		output = APILib.getTabDelimitedStr(ori);
 		
 		//ipgMngr.findByUser(foundUser);
 		
 		System.out.println("saveIpg() returns:" + output);
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.valueOf("text/plain;charset=utf-8"));
-		return new ResponseEntity<String>(output, headers, HttpStatus.OK);
+		return APILib.outputReturn(output);
 	}
 	
 	/**
@@ -271,38 +258,13 @@ public class PlayerAPIController {
 			return new ResponseEntity<String>(output, headers, HttpStatus.OK);
 		}
 		List<MsoChannel> channels = ipgMngr.findIpgChannels(ipg);
+		PlayerAPI tool = new PlayerAPI();
 		for (MsoChannel c : channels) {
-			String intro = c.getIntro();
-			if (intro != null) {
-				int introLenth = (intro.length() > 256 ? 256 : intro.length());
-				intro = intro.substring(0, introLenth);
-				intro.replaceAll("\t", " ");
-				intro.replaceAll("\r", " ");
-				intro.replaceAll("\n", " ");
-			} else {
-				intro = "";
-			}
-			String type = "";
-			if (c.getType() == MsoChannel.TYPE_SYSTEM) {
-				type = "SYSTEM";
-			} else {
-				type = "PODCAST";
-			}
-			String[] ori = {
-				Short.toString(c.getGrid()),
-				String.valueOf(c.getKey().getId()),
-				c.getName(),
-				intro,
-				c.getImageUrl(),
-				String.valueOf(c.getProgramCount()),
-				type,
-				String.valueOf(c.getStatus())};
-			output += PlayerLib.getTabDelimitedStr(ori) + "\n";
+			output = output + tool.composeChannelLineupStr(c);
+			output = output + "\n";			
 		}
 		System.out.println(output);
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.valueOf("text/plain;charset=utf-8"));
-		return new ResponseEntity<String>(output, headers, HttpStatus.OK);
+		return APILib.outputReturn(output);
 	}
 	
 	/* ==========  CATEGORY: CHANNEL BROWSING ========== */
@@ -320,9 +282,7 @@ public class PlayerAPIController {
 	public ResponseEntity<String> channelBrowse() {
 		ChannelManager channelMngr = new ChannelManager();
 		List<MsoChannel> channels = channelMngr.findAllPublic();
-		String output ="";
-		ProgramManager programMngr = new ProgramManager();
-		
+		String output ="";		
 		for (MsoChannel c:channels) {			
 			if ( c.getProgramCount() > 0 ) {
 				String[] ori = {Short.toString(c.getSeq()), String.valueOf(c.getKey().getId()), 
