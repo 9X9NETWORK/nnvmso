@@ -216,37 +216,7 @@ public class PlayerAPIController {
 		String output ="";
 		ProgramManager programMngr = new ProgramManager();
 		
-		/*
-		Cache cache = null;
-		
-        try {
-            CacheFactory cacheFactory = CacheManager.getInstance().getCacheFactory();
-            cache = cacheFactory.createCache(Collections.emptyMap());
-        } catch (CacheException e) {
-            // ...
-        }		
-        */
-		
-		for (MsoChannel c:channels) {
-			/*
-			Object programCountObj = null;
-			int programCount = 0;
-			if (cache != null ) {
-				programCountObj = cache.get( c.getKey() );
-				if ( programCountObj == null ) {
-					// append program count at the end of the line of each channel
-					List<MsoProgram> programs = new ArrayList<MsoProgram>();
-					programs = programMngr.findByChannelIdAndIsPublic(c.getKey().getId(), true);
-					// don't send the channel if program count is zero
-					programCount = programs.size();
-					cache.put(c.getKey(), (Object)programCount);
-				}
-				else {
-					programCount = Integer.parseInt( programCountObj.toString() );
-				}
-			}
-			*/
-			
+		for (MsoChannel c:channels) {			
 			if ( c.getProgramCount() > 0 ) {
 				String[] ori = {Short.toString(c.getSeq()), String.valueOf(c.getKey().getId()), 
 						c.getName(), c.getImageUrl(), Integer.toString(c.getProgramCount())};
@@ -304,41 +274,15 @@ public class PlayerAPIController {
 		NnUserManager userService = new NnUserManager();
 		NnUser foundUser = userService.findByKey(user);
 		List<MsoChannel> channels = subMngr.findSubscribedChannels(foundUser);
-		String output = "";		
+		String output = "";
+		PlayerAPI tool = new PlayerAPI();
 		for (MsoChannel c : channels) {
-			String intro = c.getIntro();
-			if (intro != null) {
-				int introLenth = (intro.length() > 256 ? 256 : intro.length()); 
-				intro = intro.substring(0, introLenth);				
-				intro.replaceAll("\t", " ");
-				intro.replaceAll("\r", " ");
-				intro.replaceAll("\n", " ");
-			} else {
-				intro = "";
-			}
-			String type = "";
-			if (c.getType() == MsoChannel.TYPE_SYSTEM) {
-				type = "SYSTEM";
-			} else {
-				type = "PODCAST";
-			}
-			String[] ori = {Short.toString(c.getGrid()), 
-						    String.valueOf(c.getKey().getId()),
-						    c.getName(),
-						    intro,
-						    c.getImageUrl(),
-						    String.valueOf(c.getProgramCount()),
-						    type,
-						    String.valueOf(c.getStatus())
-						    };
-			output = output + APILib.getTabDelimitedStr(ori);			
+			output = output + tool.composeChannelLineupStr(c);
 			output = output + "\n";
 		}				
 		//return
 		System.out.println(output);
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.valueOf("text/plain;charset=utf-8"));
-		return new ResponseEntity<String>(output, headers, HttpStatus.OK);		
+		return APILib.outputReturn(output);
 	}
 				
 	/**
@@ -386,7 +330,7 @@ public class PlayerAPIController {
 	 *              timestamp</p>
 	 */
 	 //@todo channel equals star and no user token, return missing param
- 	 //@todo clean up cache messy code	
+ 	 //@todo rewrite cache, maybe just cache program entities, use protobuf to calculate entity size
 	@RequestMapping("programInfo")
 	public ResponseEntity<String> programInfo(@RequestParam(value="channel") String channel,
 									          @RequestParam(value="user", required = false) String user,
@@ -425,13 +369,12 @@ public class PlayerAPIController {
 				tool.addToProgramInfoCache(programs);
 			}			
 		} else if (chStrSplit.length > 1) {
-			System.out.println("debug: length > 1");
 			String newChannelStr = "";
 			for (int i=0; i<chStrSplit.length; i++) {
-				String info = (String)cache.get(chStrSplit[i]); 
+				System.out.println("key to get cache: " + chStrSplit[i]);
+				String info = (String)cache.get(Long.valueOf(chStrSplit[i])); 
 				if (info == null) {
 					newChannelStr = newChannelStr + chStrSplit[i] + ",";
-					System.out.println(newChannelStr);
 				} else { 
 					output = output + info;
 					logger.info("Found from cache" + output);
@@ -440,6 +383,7 @@ public class PlayerAPIController {
 			if (newChannelStr.length() > 1) {
 				programs = programMngr.findByChannelIdsAndIsPublic(newChannelStr, true);
 				output = output + tool.composeProgramInfoStr(programs);
+				tool.addToProgramInfoCache(programs);
 			}
 		} else {
 			long chId = Integer.parseInt(channel);
@@ -447,6 +391,7 @@ public class PlayerAPIController {
 			if (info == null) {
 				programs = programMngr.findByChannelIdAndIsPublic(chId, true);
 				output =  tool.composeProgramInfoStr(programs);
+				tool.addToProgramInfoCache(programs);
 			} else {
 				output = info;
 				logger.info("Found from cache: " + output);
