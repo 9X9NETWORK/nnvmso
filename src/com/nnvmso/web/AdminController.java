@@ -70,8 +70,31 @@ public class AdminController {
 		this.programMngr = programMngr;
 	}	
 
+	@RequestMapping(value="cacheChannelLineup")
+	public @ResponseBody String cacheChannel() {
+		
+		Cache cache = null;		
+        try {
+            CacheFactory cacheFactory = CacheManager.getInstance().getCacheFactory();
+            cache = cacheFactory.createCache(Collections.emptyMap());
+        } catch (CacheException e) {
+            // ...
+        }        
+		List<MsoChannel> channels = new ArrayList<MsoChannel>();		
+		channels = channelMngr.findAllPublic();		 
+		for (MsoChannel c : channels) {			
+			if (cache.get(c.getKey()) == null) {				
+				cache.put(c.getKey(), c);				
+			} else {
+				MsoChannel cached = (MsoChannel)cache.get(c.getKey());
+				System.out.println("in the cache:" + cached.getName());
+			}
+		}				
+		return "cache channel";
+	}
+	
 	@RequestMapping(value="cacheProgram")
-	public String cache() {
+	public String cacheProgram() {
 		Cache cache = null;		
         try {
             CacheFactory cacheFactory = CacheManager.getInstance().getCacheFactory();
