@@ -98,7 +98,7 @@ public class NnUserManager {
 	}
 	
 	// ============================================================
-	// c.u.d <--- What does this mean ?
+	// c.u.d
 	// ============================================================
 	// Use IPG parameter instead of system IPG
 	public NnUser createViaPlayer(NnUser user, Ipg ipg) {
@@ -107,13 +107,19 @@ public class NnUserManager {
 		msoMngr.findByEmail("default_mso@9x9.com");
 		Mso mso = new Mso();
 		this.save(user, mso);
-		//subscribe IPG channel
-		IpgManager ipgMngr = new IpgManager();
-		SubscriptionManager sMngr = new SubscriptionManager();
-		List<MsoChannel> ipgChannels = ipgMngr.findIpgChannels(ipg);
-		for (MsoChannel c : ipgChannels)
-			sMngr.channelSubscribe(user, c, c.getGrid());
-		//return
+		if (ipg == null) {
+			//subscribe default channel
+			SubscriptionManager sMngr = new SubscriptionManager();
+			ChannelManager cMngr = new ChannelManager();
+			MsoChannel system = cMngr.findSystemChannels().get(0);
+			sMngr.channelSubscribe(user, system, (short)1);
+		} else {
+			IpgManager ipgMngr = new IpgManager();
+			SubscriptionManager sMngr = new SubscriptionManager();
+			List<MsoChannel> ipgChannels = ipgMngr.findIpgChannels(ipg);
+			for (MsoChannel c : ipgChannels)
+				sMngr.channelSubscribe(user, c, c.getGrid());			
+		}
 		return user;
 	}
 	
