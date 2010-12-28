@@ -3,6 +3,7 @@ package com.nnvmso.service;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -149,7 +150,11 @@ public class PodcastService {
 	            // ...
 	        }        
 	        if (cache.get(program.getChannelKey().getId()) != null) {
-	        	cache.remove(program.getChannelKey().getId());
+	        	PlayerAPI tool = new PlayerAPI();	      
+	        	List<MsoProgram> list = new ArrayList<MsoProgram>();
+	        	list.add(program);
+				String info = tool.composeProgramInfoStr(list);
+				cache.put(program.getChannelKey().getId(), info);
 	        }
 		}
 		int status = Integer.parseInt(podcastProgram.getErrorCode());
