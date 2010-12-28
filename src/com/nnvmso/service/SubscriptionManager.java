@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
@@ -70,13 +71,30 @@ public class SubscriptionManager {
 	}
 		
 	public List<MsoChannel> findSubscribedChannels(NnUser user) {
+		Cache cache = null;		
+        try {
+            CacheFactory cacheFactory = CacheManager.getInstance().getCacheFactory();
+            cache = cacheFactory.createCache(Collections.emptyMap());
+        } catch (CacheException e) {
+            // ...
+        }        
+
 		List<Subscription> subscriptions = this.findAll(user);
 		List<MsoChannel> channels = new ArrayList<MsoChannel>();
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		for (Subscription s : subscriptions) {
-			MsoChannel c = pm.getObjectById(MsoChannel.class, s.getChannelKey());
-			c.setGrid(s.getSeq());
-			channels.add(c);
+			try {								
+				MsoChannel c = (MsoChannel)cache.get(s.getChannelKey());				
+				if (c == null) {				
+					c = pm.getObjectById(MsoChannel.class, s.getChannelKey());
+					cache.put(c.getKey(), c);				
+				} else {
+					System.out.println("Found from cache(" + c.getKey().getId() +"):" + c.getName());
+				}
+				c.setGrid(s.getSeq());
+				channels.add(c);
+			} catch (JDOObjectNotFoundException e) {
+			}			
 		}
 		pm.close();
 		return channels;		
