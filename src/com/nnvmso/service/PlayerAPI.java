@@ -47,16 +47,14 @@ public class PlayerAPI {
 		List<MsoProgram> channelPrograms = new ArrayList<MsoProgram>();
 		long tempId = 0;
 
-		System.out.println("program size=" + programs.size());
 		for (int i=0; i<programs.size(); i++) {
 			MsoProgram p = programs.get(i);
-			System.out.println("Debug:" + tempId + ";" + p.getChannelKey().getId() + ";" + i + ";" + (programs.size()-1) + "\n");
 			if ((tempId != 0 && p.getChannelKey().getId() != tempId) || (i == programs.size()-1)) {
 				if (i == programs.size()-1) {
 					channelPrograms.add(programs.get(i));
 				}
 				String info = this.composeProgramInfoStr(channelPrograms);	    		
-				System.out.println("add to cache :\n" + channelPrograms.get(0).getChannelKey().getId() + ";" + info);
+				System.out.println("add to cache (" + channelPrograms.get(0).getChannelKey().getId() + ")\n" + info);
 				cache.put(channelPrograms.get(0).getChannelKey().getId(), info);
 				channelPrograms.clear();				
 			}
@@ -67,6 +65,35 @@ public class PlayerAPI {
 			}						
 		}
 	}	
+	
+	public String composeChannelLineupStr(MsoChannel c) {
+		String intro = c.getIntro();
+		if (intro != null) {
+			int introLenth = (intro.length() > 256 ? 256 : intro.length()); 
+			intro = intro.substring(0, introLenth);				
+			intro.replaceAll("\\s", " ");
+		} else {
+			intro = "";
+		}
+		String type = "";
+		if (c.getType() == MsoChannel.TYPE_SYSTEM) {
+			type = "SYSTEM";
+		} else {
+			type = "PODCAST";
+		}
+		String[] ori = {Short.toString(c.getGrid()), 
+					    String.valueOf(c.getKey().getId()),
+					    c.getName(),
+					    intro,
+					    c.getImageUrl(),
+					    String.valueOf(c.getProgramCount()),
+					    type,
+					    String.valueOf(c.getStatus())
+					    };
+		String output = APILib.getTabDelimitedStr(ori);
+		return output;
+		
+	}
 	
 	public String composeProgramInfoStr(List<MsoProgram> programs) {
 		String output = "";		
@@ -82,9 +109,7 @@ public class PlayerAPI {
 			if (intro != null) {
 				int introLenth = (intro.length() > 256 ? 256 : intro.length()); 
 				intro = intro.substring(0, introLenth);
-				intro = intro.replaceAll("\t", " ");				
-				intro = intro.replaceAll("\r", " ");
-				intro = intro.replaceAll("\n", " ");
+				intro = intro.replaceAll("\\s", " ");				
 			} else {
 				intro = "";
 			}
