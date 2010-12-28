@@ -150,8 +150,10 @@ public class PlayerAPIController {
 	}
 	
 	/**
-	 * Register a guest account
+	 * Register a guest account. 
+	 * If ipg is provided, guest is automatically subscribed to all the channels in the ipg. 
 	 * 
+	 * @param ipg ipgId, it is optional
 	 * @return A string of return code and a user key, tab delimited.
 	 * 	       Failed operation will return return code and error message.<br/>
 	 * 	       Example: "0	aghubmUydm1zb3IMCxIGTm5Vc2VyGDkM", "3	Fatal Error".
@@ -205,9 +207,7 @@ public class PlayerAPIController {
 			System.out.println("userTokenVerify() user found --" + "email=" + found.getEmail() + "; name=" + found.getName());		
 			output = PlayerAPI.CODE_SUCCESS + "\t" + PlayerAPI.PLAYER_CODE_SUCCESS;			
 		}
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.valueOf("text/plain;charset=utf-8"));
-		return new ResponseEntity<String>(output, headers, HttpStatus.OK);				
+		return APILib.outputReturn(output);
 	}
 	/**
 	 * Save User IPG (snapshot)
@@ -231,10 +231,8 @@ public class PlayerAPIController {
 		ipgMngr.save(ipg);
 		
 		String[] ori = {Integer.toString(PlayerAPI.CODE_SUCCESS), Long.toString(ipg.getId())};
-		output = APILib.getTabDelimitedStr(ori);
-		
-		//ipgMngr.findByUser(foundUser);
-		
+		output = APILib.getTabDelimitedStr(ori);		
+		//ipgMngr.findByUser(foundUser);		
 		System.out.println("saveIpg() returns:" + output);
 		return APILib.outputReturn(output);
 	}
