@@ -53,6 +53,7 @@ var program_first = 1;
 
 var ipg_cursor;
 var ipg_timex = 0;
+var ipg_delayed_stop_timex = 0;
 
 /* cache this for efficiency */
 var loglayer;
@@ -1330,7 +1331,10 @@ function escape()
   layer.css ("display", layer.css ("display") == "block" ? "none" : "block");
 
   if (thumbing == 'ipg')
+    {
     clearTimeout (ipg_timex);
+    clearTimeout (ipg_delayed_stop_timex);
+    }
 
   if (thumbing == 'ipg' || thumbing == 'user')
     resume();
@@ -1851,7 +1855,7 @@ function switch_to_ipg()
 
   // force_pause();
   physical_stop();
-  setTimeout ("delayed_video_stop()", 5000);
+  ipg_delayed_stop_timex = setTimeout ("delayed_video_stop()", 5000);
 
   ipg_cursor = parseInt (channel_line [channel_cursor]);
 
@@ -2211,6 +2215,9 @@ function ipg_resume()
     return
     }
 
+  clearTimeout (ipg_timex);
+  clearTimeout (ipg_delayed_stop_timex);
+
   escape();
   switch_to_channel_thumbs();
   enter_channel();
@@ -2254,6 +2261,8 @@ function ipg_play()
   $("#ipg-layer").hide();
 
   clearTimeout (ipg_timex);
+  clearTimeout (ipg_delayed_stop_timex);
+
   enter_category ((""+ipg_cursor).substring (0, 1));
 
   for (var c in channel_line)
