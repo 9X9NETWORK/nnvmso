@@ -556,7 +556,7 @@ function play()
 
   if (url == '')
     {
-    log ('empty channel, displaying notice for 3 seconds')
+    log ('current program ' + current_program + ' has no URL, assuming empty channel, displaying notice for 3 seconds')
     $("#ep-layer").hide();
     $("#ch-layer").hide();
     end_message (10000);
@@ -2257,6 +2257,9 @@ function ipg_play()
     log_and_alert ('no programs in channel!');
     return;
     }
+
+  if (current_tube == '')
+    current_tube = 'fp';
 
   $("#ipg-layer").hide();
 
