@@ -1,11 +1,19 @@
+<%@ page import="java.text.SimpleDateFormat" %>
+<%@ page import="java.util.Date" %>
 <!DOCTYPE html>
 <head>
 <meta charset="UTF-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
+<!-- FB Sharing meta data -->
+<meta name="title" content="My 9x9 Channel Guide <%= (new SimpleDateFormat("MM.dd.yyyy")).format(new Date()) %>" />
+<meta name="description" content="My 9x9 Channel Guide. Easily browse your favorite video podcasts on the 9x9 Player! Podcasts automatically download and update for you, bringing up to 81 channels of new videos daily." />
+<link rel="image_src" href="http://www.cksinfo.com/clipart/toys/abc-blocks.png" />
+
 <link rel="stylesheet" href="http://zoo.atomics.org/video/9x9playerV21/stylesheets/main.css" />
 
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+<script type="text/javascript" src="http://static.ak.fbcdn.net/connect/en_US/core.debug.js"></script>
 <script type="text/javascript" src="http://zoo.atomics.org/video/cssanim.js"></script>
 <script type="text/javascript" src="http://zoo.atomics.org/video/swfobject.js"></script>
 <script type="text/javascript" src="http://zoo.atomics.org/video/flowplayer-3.2.4.min.js"></script>
@@ -88,14 +96,20 @@ var dirty_timex;
 var control_buttons = [ 'btn-replay', 'btn-rewind', 'btn-play', 'btn-forward', 'btn-volume', 'btn-facebook', 'btn-screensaver', 'btn-close' ];
 var control_cursor = 2;
 
-var user = "aghubmUydm1zb3IMCxIGTm5Vc2VyGBoM";
+var user = '';
+
+/* if we entered via a shared IPG, and have not upconverted */
+var via_shared_ipg = false;
+
+/* reduced functionality if there is a valid user but he is visiting a shared ipg */
+var readonly_ipg = false;
+
 var root = 'http://zoo.atomics.org/video/9x9playerV21/images/';
 
 $(document).ready (function()
  {
  log ('begin execution');
  init();
- //elastic();
  login();
  $(window).resize (function() { elastic(); });
  });
@@ -104,7 +118,6 @@ function elastic()
   {
   log ('elastic');
   elastic_innards();
-  // ShowArrows();
   if (thumbing == 'whatsnew')
     {
     GetAnchor();
@@ -259,13 +272,44 @@ function init()
     }
 
   setup_ajax_error_handling();
+
+  if (started_from_shared_ipg())
+    via_shared_ipg = true;
+
+  /* Initialize FB Javascript SDK */
+
+  FB.init (
+    {
+    appId: '110847978946712',
+    status: false, // check login status
+    cookie: false, // enable cookies to allow the server to access the session
+    xfbml: false   // parse XFBML
+    });
+  }
+
+function started_from_shared_ipg()
+  {
+  var pathname = location.pathname;
+  var split = pathname.split ('/');
+  return (split.length == 3 && split[2].match(/^[0-9]+$/));
+  }
+
+function get_ipg_id()
+  {
+  var split = location.pathname.split ('/');
+  return split[2];
+  }
+
+function user_or_ipg()
+  {
+  return readonly_ipg ? 'ipg=' + get_ipg_id() : 'user=' + user;
   }
 
 function fetch_programs_in (channel)
   {
   log ('obtaining programs for ' + channel);
 
-  var query = "/playerAPI/programInfo?channel=" + channel + String.fromCharCode(38) + "user=" + user;
+  var query = "/playerAPI/programInfo?channel=" + channel + '&' + user_or_ipg();
 
   var d = $.get (query, function (data)
     {
@@ -280,7 +324,7 @@ function fetch_programs()
   {
   log ('obtaining programs');
 
-  var query = "/playerAPI/programInfo?channel=*" + String.fromCharCode(38) + "user=" + user;
+  var query = "/playerAPI/programInfo?channel=*" + '&' + user_or_ipg();
 
   var d = $.get (query, function (data)
     {
@@ -328,7 +372,12 @@ function fetch_channels()
   {
   log ('obtaining channels');
 
-  var query = "/playerAPI/channelLineup?user=" + user;
+  var query;
+
+  if (readonly_ipg)
+    query = "/playerAPI/loadIpg?ipg=" + get_ipg_id();
+  else
+    query = "/playerAPI/channelLineup?user=" + user;
 
   // 0=grid id, 1=channel id,
   // 2=channel name, 3=channel description, 4=channel image url,
@@ -813,8 +862,6 @@ function enter_channel()
   thumbing = 'program';
 
   redraw_program_line();
-  // ShowArrows();
-
   reset_osd_timex();
   }
 
@@ -833,8 +880,8 @@ function enter_channel_failsafe()
     $("#ch-layer").hide();
     $("#ep-layer").show();
     }
+
   turn_off_ancillaries();
-  // ShowArrows();
   }
 
 function ep_html()
@@ -1066,7 +1113,6 @@ function enter_category (cat, positioning)
     channel_cursor = n_channel_line;
 
   redraw_channel_line();
-  // ShowArrows();
   reset_osd_timex();
 
   prepare_channel();
@@ -1085,7 +1131,6 @@ function enter_category_failsafe()
     }
 
   turn_off_ancillaries();
-  // ShowArrows();
   }
 
 function ch_html (cat)
@@ -1124,32 +1169,6 @@ function ch_html (cat)
     }
 
   return html;
-  }
-
-function ShowArrows()
-  {
-  elastic_innards();
-
-  if (thumbing == 'channel')
-    {
-    pos1 = $(".ch-list li.on").offset();
-    if (pos1 != null)
-      {
-      d1 = ((94-21)/2)* $(window).width()/16/64;
-      l1 = pos1.left + d1;
-      $("#ch-layer .arrow-up, #ch-layer .arrow-down").show().css("left",l1);
-      }
-    }
-  else if (thumbing == 'program')
-    {
-    pos2 = $(".ep-list li.on").offset();
-    if (pos2 != null)
-      {
-      d2 = ((90-21)/2)* $(window).width()/16/64;
-      l2 = pos2.left + d2;
-      $("#ep-layer .arrow-up").show().css("left",l2);
-      }
-    }
   }
 
 function next_channel_square (channel)
@@ -1293,10 +1312,8 @@ function first_program_in (channel)
     }
 
   // unshift here is to match what is in program_line
-  // log ('AX: ' + programs);
   programs = programs.sort (function (a,b) { return Math.floor (programgrid [b]['timestamp']) - Math.floor (programgrid [a]['timestamp']) });
   programs.unshift ('');
-  // log ('AY: ' + programs);
 
   return programs [1];
   }
@@ -2052,7 +2069,10 @@ function ipg_metainfo()
     else
       {
       $("#ch-thumb-img").attr ("src", "http://zoo.atomics.org/video/images-x1/default_channel.png");
-      $("#ch-name").html ('<p>Add Channel</p>');
+      if (readonly_ipg)
+        $("#ch-name").html ('<p></p>');
+      else
+        $("#ch-name").html ('<p>Add Channel</p>');
       }
 
     $("#ep-name").html ('<p></p>');
@@ -2195,7 +2215,7 @@ function ipg_down()
     ipg_cursor += 10;
   else
     {
-    // Disabled wraparound for now
+    // disabled wraparound for now
     // ipg_cursor -= 80;
     }
   log ("new ipg cursor: " + ipg_cursor);
@@ -2247,6 +2267,11 @@ function ipg_play()
 
   if (! (ipg_cursor in channelgrid))
     {
+    if (readonly_ipg)
+      {
+      log_and_alert ('You cannot add channels while viewing a shared IPG');
+      return;
+      }
     clearTimeout (ipg_timex);
     browse();
     return;
@@ -2330,12 +2355,8 @@ function redraw_channel_line()
       }
     }
 
-  //log ('redrawn: ' + $("#ch-list-" + current_category).html());
-
   // old way, replace all html inside div:
   // $("#ch-list-" + current_category).html (ch_html (current_category));
-
-  // ShowArrows();
   }
 
 function program_right()
@@ -2404,8 +2425,6 @@ function redraw_program_line()
         }
       }
     }
-
-  // ShowArrows();
   }
 
 function setup_ajax_error_handling()
@@ -2511,6 +2530,12 @@ function submit_login()
     user = fields [1];
     if (fields [0] == "0")
       {
+      if (readonly_ipg)
+        {
+        /* this user has now upconverted */
+        readonly_ipg = false;
+        via_shared_ipg = false;
+        }
       /* wipe out the current guest account program+channel data */
       channelgrid = {};
       programgrid = {};
@@ -2550,6 +2575,12 @@ function submit_signup()
     user = fields [1];
     if (fields [0] == "0")
       {
+      if (readonly_ipg)
+        {
+        /* this user has now upconverted */
+        readonly_ipg = false;
+        via_shared_ipg = false;
+        }
       /* wipe out the current guest account program+channel data */
       channelgrid = {};
       programgrid = {};
@@ -2669,6 +2700,8 @@ function login()
         {
         log ('user token was valid');
         user = u;
+        if (via_shared_ipg)
+          readonly_ipg = true;
         fetch_programs();
         }
       else
@@ -2682,7 +2715,12 @@ function login()
     {
     log ('user cookie does not exist, obtaining one');
 
-    var d = $.get ("/playerAPI/guestRegister", function (data)
+    if (via_shared_ipg)
+      log ('jumpstarting from this ipg: ' + get_ipg_id());
+
+    args = via_shared_ipg ? '?ipg=' + get_ipg_id() : '';
+
+    var d = $.get ("/playerAPI/guestRegister" + args, function (data)
       {
       log ('response to guestRegister: ' + data);
       var u = getcookie ("user");
@@ -2698,6 +2736,7 @@ function login()
         {
         log ('user cookie now exists');
         user = u;
+        via_shared_ipg = false;
         fetch_programs();
         }
       else
@@ -2895,7 +2934,7 @@ function continue_acceptance()
 
   log ('obtaining programs for: ' + new_channel_id);
 
-  var cmd = "/playerAPI/programInfo?channel=" + new_channel_id + '&' + "user=" + user;
+  var cmd = "/playerAPI/programInfo?channel=" + new_channel_id;
 
   var d = $.get (cmd, function (data)
     {
@@ -2904,13 +2943,17 @@ function continue_acceptance()
     escape();
     redraw_ipg();
     elastic();
-    // for now, stay in IPG
-    // ipg_play()
     });
   }
 
 function unsubscribe_channel()
   {
+  if (readonly_ipg)
+    {
+    log_and_alert ('You cannot unsubscribe channels in a shared IPG');
+    return;
+    }
+
   if (ipg_cursor in channelgrid)
     {
     var grid = server_grid (ipg_cursor);
@@ -2918,7 +2961,7 @@ function unsubscribe_channel()
 
     if (channelgrid [ipg_cursor]['type'] == 'SYSTEM')
       {
-      alert ('Cannot unsubscribe a system channel');
+      log_and_alert ('Cannot unsubscribe a system channel');
       return;
       }
 
@@ -3490,23 +3533,46 @@ function control_enter()
   {
   switch (control_buttons [control_cursor])
     {
-    case 'btn-close':  escape();
-                       break;
+    case 'btn-close':    escape();
+                         break;
 
-    case 'btn-play':   pause();
-                       break;
+    case 'btn-play':     pause();
+                         break;
 
-    case 'btn-signin': login_screen();
-                       break;
+    case 'btn-signin':   login_screen();
+                         break;
 
-    case 'btn-replay': physical_replay();
-                       break;
+    case 'btn-replay':   physical_replay();
+                         break;
+
+    case 'btn-facebook': facebook_share();
+                         break;
     }
+  }
+
+function facebook_share()
+  {
+  log ("facebook share");
+
+  if (!confirm ("You will be sharing the Public section of your Guide with your facebook friends .."))
+    return;
+
+  var query = "/playerAPI/saveIpg?user=" + user;
+  var d = $.get (query, function (data)
+    {
+    log ('saveIpg returned: ' + data);
+
+    var fields = data.split ('\t');
+    if (fields[0] == "0")
+      {
+      FB.ui ({ method: "stream.share", u: location.protocol + "//" + location.host + "/share/" + fields[1] });
+      }
+    });
   }
 
 function playerReady (thePlayer)
   {
-return;
+  return;
   log ('jw player ready: ' + thePlayer.id);
   jwplayer = document.getElementById (thePlayer.id);
   jwplayer.sendEvent ('LOAD', 'nothing.flv');
