@@ -1672,6 +1672,12 @@ function switch_to_whats_new()
           {
           var real_channel = programgrid [program]['channel'];
 
+          if (! (real_channel in channels_by_id))
+            {
+            log ('program ' + program + ' is known but channel ' + real_channel + ' is not!');
+            continue;
+            }
+
           if (! (real_channel in wn))
             {
             wn_count++;
