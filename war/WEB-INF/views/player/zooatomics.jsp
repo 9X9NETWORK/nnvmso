@@ -34,9 +34,10 @@ var jw_timex = 0;
 var jw_previous_state = '';
 var jw_position = 0;
 
-var fp_video_file;
-var fp_duration;
-var fp_timex = 0;
+var fp_player = 'player1';
+
+var fp = {  player1: { file: '', duration: 0, timex: 0, mute: false },
+            player2: { file: '', duration: 0, timex: 0, mute: false }  };
 
 var activated = false;
 var remembered_pause = false;
@@ -142,7 +143,9 @@ function elastic_innards()
   // h.style.height = (vh) + "px";
   // var h = document.getElementById ("jw2");
   // h.style.height = (vh) + "px";
-  var h = document.getElementById ("fp");
+  var h = document.getElementById ("fp1");
+  h.style.height = (vh) + "px";
+  var h = document.getElementById ("fp2");
   h.style.height = (vh) + "px";
 
   // var i = document.getElementById ("ipg-layer");
@@ -1866,7 +1869,7 @@ function delayed_video_stop()
   log ('delayed video stop: ' + thumbing);
   if (thumbing == 'ipg' && current_tube == 'fp')
     {
-    try { log ('flowplayer state: ' + flowplayer("player").getState()); } catch (error) {};
+    try { log ('flowplayer state: ' + flowplayer(fp_player).getState()); } catch (error) {};
     physical_stop();
     }
   }
@@ -2248,7 +2251,7 @@ function ipg_resume()
   enter_channel();
 
   if (current_tube == 'fp')
-    flowplayer ("player").play();
+    flowplayer (fp_player).play();
   }
 
 function ipg_play()
@@ -2630,6 +2633,8 @@ function submit_throw()
     $("#podcastRSS").html ('');
     })
   }
+
+/* podcast channels submitted by the user, which must be polled */
 
 function add_dirty_channel (channel)
   {
@@ -3057,7 +3062,21 @@ function unhide_player (player)
 
       $("#v").hide();
       $("#jw2").hide();
-      $("#fp").show();
+
+      if (fp_player == 'player1')
+        {
+        $("#fp2").css ("visibility", "hidden");
+        $("#fp1").css ("visibility", "visible");
+        }
+      else
+        {
+        $("#fp1").css ("visibility", "hidden");
+        $("#fp2").css ("visibility", "visible");
+        }
+
+      $("#fp1").show();
+      $("#fp2").show();
+
       break;
     }
   }
@@ -3148,7 +3167,7 @@ function physical_stop()
 
     case "fp": log ('fp STOP');
                if (flowplayer)
-                 flowplayer ("player").stop();
+                 flowplayer (fp_player).stop();
                break;
     }
   }
@@ -3201,18 +3220,19 @@ function jw_progress (event)
 
 function start_play_fp (url)
   {
-  jw_position = 0;
+  fp_player = 'player1';
   current_tube = 'fp';
 
   // ugh! don't know actual url until player is chosen
   url = best_url (current_program);
 
-  fp_video_file = url.replace (/^fp:/, '');
+  url  = url.replace (/^fp:/, '');
+  fp [fp_player]['file'] = url;
+
   unhide_player ("fp");
+  log ("FP STREAM: " + url);
 
-  log ("FP STREAM: " + fp_video_file);
-
-  flowplayer ("player",
+  flowplayer (fp_player,
       {src: 'http://zoo.atomics.org/video/fc/flowplayer.commercial-3.2.5.swf', wmode: 'transparent', allowfullscreen: 'false' }, 
       { canvas: { backgroundColor: '#000000', backgroundGradient: 'none', linkUrl: '' },
       clip: { onFinish: fp_ended, onStart: fp_onstart, bufferLength: 1, autoPlay: true, scaling: 'fit' }, 
@@ -3220,7 +3240,10 @@ function start_play_fp (url)
       play: null, onBeforeKeypress: fpkp,
       key: '#$28fdb189bf3c28cb3b1' });
 
-  flowplayer ("player").play (fp_video_file);
+  fp [fp_player]['mute'] = false;
+
+  flowplayer (fp_player).unmute();
+  flowplayer (fp_player).play (url);
   }
 
 function fpkp()
@@ -3231,32 +3254,44 @@ function fpkp()
 
 function fp_onstart()
   {
-  log ('fp onstart')
+  var id = this.id();
+  log ('fp ' + id + ' onstart')
 
   var fd = parseInt (this.getClip().fullDuration, 10);
-  fp_duration = fd * 1000;
+  fp [id]['duration'] = fd * 1000;
+
+  if (fp [id]['mute'])
+    flowplayer (id).mute();
+  else
+    flowplayer (id).unmute();
 
   /* flowplayer provides no progress/tick event */
 
-  fp_timex = setInterval ("fp_tick()", 333);
-  update_progress_bar();
+  var cmd = 'fp_tick("' + id + '")';
+  log ('cmd: ' + cmd);
+  fp [id]['timex'] = setInterval (cmd, 333);
+
+  if (id == fp_player)
+    update_progress_bar();
   }
 
 function fp_ended()
   {
-  log ('fp ended');
+  var id = this.id();
+  log ('fp ' + id + ' ended');
   ended_callback();
-  clearTimeout (fp_timex);
+  clearTimeout (fp [id]['timex']);
   }
 
-function fp_tick()
+function fp_tick (id)
   {
-  update_progress_bar();
+  if (id == fp_player)
+    update_progress_bar();
 
   /* cancel ticking if player stopped */
 
-  if (flowplayer ("player").getState() == 1)
-    clearTimeout (fp_timex);
+  if (flowplayer (id).getState() == 1)
+    clearTimeout (fp [id]['timex']);
   }
 
 function physical_offset()
@@ -3280,10 +3315,7 @@ function physical_offset()
     case "fp":
 
       if (flowplayer)
-        {
-        // log ("FP OFFSET: " +  flowplayer ("player").getTime());
-        return flowplayer ("player").getTime();
-        }
+        return flowplayer (fp_player).getTime();
       else
         return 0;
 
@@ -3312,8 +3344,8 @@ function physical_length()
 
     case "fp":
 
-      if (flowplayer && fp_duration)
-        return fp_duration / 1000;
+      if (flowplayer && fp[fp_player]['duration'])
+        return fp [fp_player]['duration'] / 1000;
       else
         return 1;
 
@@ -3343,7 +3375,7 @@ function physical_pause()
     case "fp":
 
        if (flowplayer)
-         flowplayer ("player").pause();
+         flowplayer (fp_player).pause();
        break;
 
     case "v1": var video = document.getElementById ("vvv");
@@ -3371,7 +3403,7 @@ function physical_play()
     case "fp":
 
       if (flowplayer)
-        flowplayer ("player").play();
+        flowplayer (fp_player).play();
       break;
 
     case "v1":
@@ -3403,7 +3435,7 @@ function physical_is_paused()
     case "fp":
 
       if (flowplayer)
-        return flowplayer ("player").isPaused();
+        return flowplayer (fp_player).isPaused();
       else
         return false;
 
@@ -3442,8 +3474,8 @@ function physical_replay()
 
       if (flowplayer)
         {
-        flowplayer ("player").seek (0);
-        flowplayer ("player").resume();
+        flowplayer (fp_player).seek (0);
+        flowplayer (fp_player).resume();
         }
       break;
 
@@ -3587,7 +3619,7 @@ function noop (e)
   {
   log ('video mouse down');
   /* undo the pause damage done by flowplayer */
-  // flowplayer ("player").pause();
+  // flowplayer (fp_player).pause();
   }
 
 </script>
@@ -3608,9 +3640,15 @@ One moment...
     <div id="v" style="display: block; padding: 0">
       <video id="vvv" autoplay="false" preload="metadata" loop="false" height="100%" width="100%" volume="0"></video></div>
 
-<div id="fp" style="width: 100%; height: 100%; display: none">
-  <a href="" style="display:block;width:100%;height:100%" id="player" onClick="noop(this)"></a>
+
+<div id="fp1" style="width: 100%; height: 100%; z-index: 1; visibility: hidden; position: absolute; left: 0; top: 0">
+  <a href="" style="display:block;width:100%;height:100%" id="player1" onClick="noop(this)"></a>
 </div>
+
+<div id="fp2" style="width: 100%; height: 100%; z-index: 2; visibility: hidden; position: relative; left: 0; top: 0">
+  <a href="" style="display:block;width:100%;height:100%" id="player2" onClick="noop(this)"></a>
+</div>
+
 
 <div id="jw" style="width: 100%; height: 100%; display: none">
         <embed name="player1" id="player1"
