@@ -3630,6 +3630,14 @@ function noop (e)
 
 <body id="body" style="overflow: hidden">
 
+<div id="fp1" style="width: 100%; height: 100%; z-index: 1; visibility: hidden; position: absolute; left: 0; top: 0">
+  <a href="" style="display:block;width:100%;height:100%" id="player1" onClick="noop(this)"></a>
+</div>
+
+<div id="fp2" style="width: 100%; height: 100%; z-index: 2; visibility: hidden; position: absolute; left: 0; top: 0">
+  <a href="" style="display:block;width:100%;height:100%" id="player2" onClick="noop(this)"></a>
+</div>
+
 <div id="blue" style="background: black; width: 100%; height: 100%; display: block; position: absolute; color: white">
 One moment...
 </div>
@@ -3639,16 +3647,6 @@ One moment...
   <div id="all-players" style="display: block; padding: 0">
     <div id="v" style="display: block; padding: 0">
       <video id="vvv" autoplay="false" preload="metadata" loop="false" height="100%" width="100%" volume="0"></video></div>
-
-
-<div id="fp1" style="width: 100%; height: 100%; z-index: 1; visibility: hidden; position: absolute; left: 0; top: 0">
-  <a href="" style="display:block;width:100%;height:100%" id="player1" onClick="noop(this)"></a>
-</div>
-
-<div id="fp2" style="width: 100%; height: 100%; z-index: 2; visibility: hidden; position: relative; left: 0; top: 0">
-  <a href="" style="display:block;width:100%;height:100%" id="player2" onClick="noop(this)"></a>
-</div>
-
 
 <div id="jw" style="width: 100%; height: 100%; display: none">
         <embed name="player1" id="player1"
