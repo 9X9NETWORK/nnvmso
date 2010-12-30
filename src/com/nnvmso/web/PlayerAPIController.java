@@ -424,6 +424,7 @@ public class PlayerAPIController {
 			IpgManager ipgMngr = new IpgManager();
 			Ipg ipg = ipgMngr.findById(ipgId);
 			programs = ipgMngr.findIpgPrograms(ipg);
+			output = output + tool.composeProgramInfoStr(programs);
 			System.out.println("ipg program count: " + programs.size());
 		} else if (channel.equals("*")) {
 			NnUserManager userService = new NnUserManager();
