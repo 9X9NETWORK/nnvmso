@@ -591,10 +591,7 @@ function edge_of_world_idle()
   {
   edge_of_world_timex = 0;
   if (thumbing == 'end')
-    {
-    escape();
     switch_to_whats_new();
-    }
   }
 
 function play()
@@ -1698,7 +1695,7 @@ function switch_to_whats_new()
           //log ('whatsnew ' + program + ' (ch: ' + real_channel + '): ' + programgrid [program]['name']);
           }
         else
-          log ('program ' + program + ' not in a subscribed channel');
+          log ('program ' + program + ' not known');
         }
       }
 
@@ -1708,8 +1705,8 @@ function switch_to_whats_new()
       return;
       }
 
+    escape();
     thumbing = 'whatsnew';
-
     hide_layers();
     force_pause();
 
@@ -1761,7 +1758,6 @@ function switch_to_whats_new()
     $("body").addClass ("on");
     // $("body").css ("background-image", "url(" + root + "bg.jpg)");
 
-    //$("#new-layer").show();
     elastic();
     $("#all-players").hide();
     PlayWhatsNew();
@@ -1952,10 +1948,7 @@ function ipg_idle()
   {
   ipg_timex = 0;
   if (thumbing == 'ipg')
-    {
-    escape();
     switch_to_whats_new();
-    }
   }
 
 function extend_ipg_timex()
