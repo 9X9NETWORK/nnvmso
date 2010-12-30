@@ -1687,6 +1687,12 @@ function switch_to_whats_new()
           programgrid [program]['age'] = ageof (programgrid [program]['timestamp']);
           programgrid [program]['duration'] = durationof (programgrid [program]['duration']);
 
+          if (programgrid [program]['thumb'].match (/^(null|false)$/))
+            programgrid [program]['thumb'] = '';
+
+          if (programgrid [program]['snapshot'].match (/^(null|false)$/))
+            programgrid [program]['snapshot'] = '';
+
           if (programgrid [program]['snapshot'] != '')
             programgrid [program]['screenshot'] = programgrid [program]['snapshot'];
           else
