@@ -1595,7 +1595,7 @@ function keypress (keycode)
     case 56:
     case 57:
       /* 1, 2, 3... */
-      enter_category (keycode - 48, 'b');
+      // enter_category (keycode - 48, 'b');
       break;
 
     case 79:
