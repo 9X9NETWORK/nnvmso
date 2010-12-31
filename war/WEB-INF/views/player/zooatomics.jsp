@@ -453,7 +453,7 @@ function activate()
   log ('activate: ipg');
   switch_to_ipg();
 
-  $("#notblue").show();
+  //$("#notblue").show();
   $("#blue").hide();
   preload_control_images()
 
@@ -1895,11 +1895,13 @@ function switch_to_ipg()
   $("#ipg-signin-btn").removeClass ("on");
   $("#ipg-return-btn").removeClass ("on");
 
-  if (jQuery.browser.msie && jQuery.browser.version == '8.0')
+  if (jQuery.browser.msie && (jQuery.browser.version == '7.0' || jQuery.browser.version == '8.0'))
     {
     $("#control-layer").hide();
-    $("#ipg-layer").hide();
-    ipg_failsafe();
+    $("#ipg-layer").show();
+    $("#body").addClass ("on");
+    elastic();
+    extend_ipg_timex();
     thumbing = 'ipg';
     return;
     }
@@ -3642,9 +3644,9 @@ function noop (e)
 One moment...
 </div>
 
-<div id="notblue" style="width: 100%; display: none; position: absolute; top: 0; margin: 0; overflow: hidden">
+<!--div id="notblue" style="width: 100%; display: none; position: absolute; top: 0; margin: 0; overflow: hidden"-->
 
-  <div id="all-players" style="display: block; padding: 0">
+  <div id="all-players" style="display: block; padding: 0; display: none">
     <div id="v" style="display: block; padding: 0">
       <video id="vvv" autoplay="false" preload="metadata" loop="false" height="100%" width="100%" volume="0"></video></div>
 
@@ -3861,6 +3863,6 @@ One moment...
 <div id="mask"></div>
 <div id="loading"></div>
 
-</div>
+<!--/div-->
 </body>
 </html>
