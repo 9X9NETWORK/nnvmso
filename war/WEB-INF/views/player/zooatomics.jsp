@@ -1333,6 +1333,9 @@ function escape()
   {
   var layer;
 
+  if (thumbing == 'browse-wait')
+    return;
+
   switch (thumbing)
     {
     case 'program': layer = $("#ep-layer");
@@ -2845,6 +2848,7 @@ function browse()
   browsables = {};
 
   saved_thumbing = thumbing;
+  thumbing = 'browse-wait';
 
   // why doesn't this work?
   document.getElementById("podcastRSS").value = "";
