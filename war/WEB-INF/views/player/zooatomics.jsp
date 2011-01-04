@@ -943,7 +943,11 @@ function ageof (timestamp)
   if (timestamp != '')
     {
     var d = new Date (Math.floor (timestamp));
+
     var minutes = Math.floor ((now.getTime() - d.getTime()) / 60 / 1000);
+    var ago_or_hence = minutes < 0 ? "hence" : "ago";
+    minutes = Math.abs (minutes);
+
     if (minutes > 59)
       {
       var hours = Math.floor ((minutes + 1) / 60);
@@ -973,7 +977,7 @@ function ageof (timestamp)
   else
     age = 'long'
 
-  return age + ' ago';
+  return age + ' ' + ago_or_hence;
   }
 
 var old_cline;
