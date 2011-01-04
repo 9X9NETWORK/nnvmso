@@ -1747,10 +1747,7 @@ function switch_to_whats_new()
       return;
       }
 
-    escape();
-    thumbing = 'whatsnew';
-    hide_layers();
-    force_pause();
+    whatsnew = [];
 
     for (var y = 1; y <= 9; y++)
       for (var x = 1; x <= 9; x++)
@@ -1766,6 +1763,21 @@ function switch_to_whats_new()
             }
           }
         }
+
+    if (whatsnew.length == 0)
+      {
+      log ('nothing new...');
+      return;
+      }
+    else
+      {
+      log ('channels with new things: ' + whatsnew.length);
+      }
+
+    escape();
+    thumbing = 'whatsnew';
+    hide_layers();
+    force_pause();
 
     log ('what is new?');
 
@@ -3612,7 +3624,7 @@ function physical_pause()
     case "fp":
 
        if (flowplayer)
-         flowplayer (fp_player).pause();
+         try { flowplayer (fp_player).pause(); } catch (error) {};
        break;
 
     case "v1": var video = document.getElementById ("vvv");
@@ -3640,7 +3652,7 @@ function physical_play()
     case "fp":
 
       if (flowplayer)
-        flowplayer (fp_player).play();
+        try { flowplayer (fp_player).play(); } catch (error) {};
       break;
 
     case "v1":
@@ -3672,7 +3684,16 @@ function physical_is_paused()
     case "fp":
 
       if (flowplayer)
-        return flowplayer (fp_player).isPaused();
+        {
+        try
+          {
+          return flowplayer (fp_player).isPaused();
+          }
+        catch (error)
+          {
+          return false;
+          }
+        }
       else
         return false;
 
