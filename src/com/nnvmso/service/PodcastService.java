@@ -3,7 +3,6 @@ package com.nnvmso.service;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -103,9 +102,7 @@ public class PodcastService {
 		}
 		String intro = podcast.getDescription();
 		if (intro != null) {
-			intro = intro.replaceAll("\t", " ");
-			intro = intro.replaceAll("\r", " ");
-			intro = intro.replaceAll("\n", " ");
+			intro = intro.replaceAll("\\s", " ");
 		}
 		channel.setIntro(intro);
 		channel.setImageUrl(podcast.getImage());
@@ -150,11 +147,7 @@ public class PodcastService {
 	            // ...
 	        }        
 	        if (cache.get(program.getChannelKey().getId()) != null) {
-	        	PlayerAPI tool = new PlayerAPI();	      
-	        	List<MsoProgram> list = new ArrayList<MsoProgram>();
-	        	list.add(program);
-				String info = tool.composeProgramInfoStr(list);
-				cache.put(program.getChannelKey().getId(), info);
+	        	cache.remove(program.getChannelKey().getId());
 	        }
 		}
 		int status = Integer.parseInt(podcastProgram.getErrorCode());
@@ -171,12 +164,11 @@ public class PodcastService {
 		}
 		String intro = item.getDescription();
 		if (intro != null && intro.length() > 500) {
-			intro = intro.replaceAll("\t", " ");
-			intro = intro.replaceAll("\n", " ");
-			intro = intro.replaceAll("\r", " ");
+			intro = intro.replaceAll("\\s", " "); 
 			item.setDescription(item.getDescription().substring(0, 500));
 		}
-		program.setIntro(intro);
+		//!!!!
+		program.setIntro(item.getDescription().substring(0, 500));
 		
 		System.out.println("ori intro=" + item.getDescription() + "intro string=" + intro + ";program intro=" + program.getIntro());
 		
