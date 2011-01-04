@@ -1590,6 +1590,8 @@ function keypress (keycode)
       //   ipg_preload (ipg_cursor);
       break;
 
+    case 8:
+      /* Backspace */
     case 46:
       /* Del */
       if (thumbing == 'ipg')
