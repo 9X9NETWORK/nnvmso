@@ -36,6 +36,7 @@ var jw_position = 0;
 
 var fp_player = 'player1';
 var fp_preloaded = '';
+var start_preload = 0;
 
 var fp = {  player1: { file: '', duration: 0, timex: 0, mute: false },
             player2: { file: '', duration: 0, timex: 0, mute: false }  };
@@ -65,6 +66,8 @@ var ipg_cursor;
 var ipg_timex = 0;
 var ipg_delayed_stop_timex = 0;
 var ipg_preload_timex = 0;
+
+var clips_played = 0;
 
 /* cache this for efficiency */
 var loglayer;
@@ -614,8 +617,10 @@ function play()
     return;
     }
 
-  log ('Playing ' + current_program + ': ' + programgrid [current_program]['name']);
+  log ('Playing ' + current_program + ': ' + programgrid [current_program]['name'] + ' :: ' + url);
   physical_start_play (url);
+
+  clips_played++;
   }
 
 function start_play_html5 (url)
@@ -1360,7 +1365,7 @@ function escape()
     }
 
   if (thumbing == 'ipg' || thumbing == 'user')
-    resume();
+    { /* resume(); */ }
 
   if (thumbing == 'user' || thumbing == 'browse')
     {
@@ -1454,6 +1459,8 @@ function keypress (keycode)
       /* esc */
       if (thumbing == 'whatsnew')
         exit_whats_new();
+      else if (thumbing == 'ipg' && clips_played == 0)
+        { /* do nothing */ }
       else
         escape();
       break;
@@ -2135,8 +2142,8 @@ function start_preload_timer()
   {
   if (thumbing == 'ipg' && ipg_cursor in channelgrid)
     {
-    ipg_preload_timex = setTimeout ("preload_this_square()", 3000);
-    $("#preload").html ('Timer');
+    ipg_preload_timex = setTimeout ("preload_this_square()", 1000);
+    $("#preload").html ('Timer...');
     }
   }
 
@@ -2302,6 +2309,8 @@ function ipg_down()
 
 function ipg_resume()
   {
+  log ('ipg resume');
+
   /* this may have received focus */
   $('#ipg-return-btn').blur();
 
@@ -2319,9 +2328,7 @@ function ipg_resume()
   enter_channel();
 
   stop_preload();
-
-  if (current_tube == 'fp')
-    flowplayer (fp_player).play();
+  play_program();
   }
 
 function ipg_play()
@@ -3243,7 +3250,7 @@ function physical_stop()
 
     case "fp": log ('fp STOP');
                if (flowplayer)
-                 flowplayer (fp_player).stop();
+                 try { flowplayer (fp_player).stop(); } catch (error) {};
                break;
     }
   }
@@ -3320,25 +3327,36 @@ function ipg_preload (grid)
     $("#fp2").css ("visibility", "visible");
     }
 
+  try { flowplayer (fp_preloaded).unload(); } catch (error) {};
+
+  try { log ('preload state: ' + flowplayer (fp_preloaded).getState()); } catch (error) {};
+
   flowplayer (fp_preloaded,
       {src: 'http://zoo.atomics.org/video/flowplayer-3.2.5.swf', wmode: 'transparent', allowfullscreen: 'false', allowscriptaccess: 'always' }, 
       { canvas: { backgroundColor: '#000000', backgroundGradient: 'none', linkUrl: '' },
       clip: { onFinish: fp_ended, onStart: fp_onstart, onBegin: fp_onbegin, bufferLength: 1, autoPlay: true, scaling: 'fit' }, 
       plugins: { controls: null },
-      play: null, onBeforeKeypress: fpkp,
+      play: null, onBeforeKeypress: fpkp, onLoad: fp_onpreload,
       onError: function (in_code, in_msg) { log ("ERROR! " + in_code + " TEXT: " + in_msg); } });
 
-  $("#preload").html ('Waiting...');
+  start_preload = new Date();
+  $("#preload").html ('Starting...');
 
   var url = best_url (program);
   url = url.replace (/^fp:/, '');
 
   fp [fp_preloaded]['file'] = url;
-  log ('preload ' + fp_preloaded + ' url: ' + url);
-
   fp [fp_preloaded]['mute'] = true;
+  }
 
-  flowplayer (fp_preloaded).stop();
+function fp_onpreload()
+  {
+  var url = fp [fp_preloaded]['file'];
+
+  log ('onpreload ' + fp_preloaded + ' url: ' + url);
+  $("#preload").html ('Waiting...');
+
+  // flowplayer (fp_preloaded).stop();
   flowplayer (fp_preloaded).mute();
 
   flowplayer (fp_preloaded).play (url);
@@ -3384,6 +3402,7 @@ function ipg_preload_play()
       // $("#blackground").hide();
       // play_first_program_in (channel_line [channel_cursor]);
       enter_channel();
+      clips_played++;
       log ('EXIT PRELOAD PLAY');
       return;
       }
@@ -3404,18 +3423,28 @@ function start_play_fp (url)
   unhide_player ("fp");
   log ("FP STREAM: " + url);
 
+  try { flowplayer (fp_player).unload(); } catch (error) {};
+
   flowplayer (fp_player,
       {src: 'http://zoo.atomics.org/video/fc/flowplayer.commercial-3.2.5.swf', wmode: 'transparent', allowfullscreen: 'false', allowscriptaccess: 'always' }, 
       { canvas: { backgroundColor: '#000000', backgroundGradient: 'none', linkUrl: '' },
       clip: { onFinish: fp_ended, onStart: fp_onstart, bufferLength: 1, autoPlay: true, scaling: 'fit' }, 
       plugins: { controls: null },
-      play: null, onBeforeKeypress: fpkp,
+      play: null, onBeforeKeypress: fpkp, onLoad: fp_onload,
       key: '#$28fdb189bf3c28cb3b1' });
 
   fp [fp_player]['mute'] = false;
 
+  // flowplayer (fp_player).unmute();
+  // flowplayer (fp_player).play (url);
+  }
+
+function fp_onload()
+  {
+  log ('fp onload');
+  unhide_player ("fp");
   flowplayer (fp_player).unmute();
-  flowplayer (fp_player).play (url);
+  flowplayer (fp_player).play (fp [fp_player]['file']);
   }
 
 function fpkp()
@@ -3438,7 +3467,9 @@ function fp_onbegin()
     try { flowplayer (id).unmute(); } catch (error) {};
     }
 
-  $("#preload").html ('Preloaded');
+  var now = new Date();
+  var waited = Math.round ((now.getTime() - start_preload.getTime()) / 100) / 10;
+  $("#preload").html ('Preloaded ' + waited + 's');
   }
 
 function fp_onstart()
