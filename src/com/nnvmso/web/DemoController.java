@@ -35,6 +35,20 @@ public class DemoController {
 		NnLib.logException(e);
 		return "error/exception";				
 	}		
+
+	@RequestMapping("channelList")
+	public ResponseEntity<String> channelList() {
+		List<MsoChannel> channels = channelMngr.findAllPublic();
+		String output ="";		
+		for (MsoChannel c:channels) {			
+			if ( c.getProgramCount() > 0 ) {
+				String[] ori = {NnLib.getKeyStr(c.getKey()), c.getPodcast()}; 						
+				output = output + APILib.getTabDelimitedStr(ori);			
+				output = output + "\n";
+			}
+		}
+		return APILib.outputReturn(output);
+	}
 	
 	@RequestMapping("programList")
 	public ResponseEntity<String> programList(@RequestParam(value="channelKey", required = false)String channelKey) {
