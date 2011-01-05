@@ -1367,8 +1367,14 @@ function escape()
 
   if (thumbing == 'ipg')
     {
-    clearTimeout (ipg_timex);
-    clearTimeout (ipg_delayed_stop_timex);
+    try
+      {
+      clearTimeout (ipg_timex);
+      clearTimeout (ipg_delayed_stop_timex);
+      }
+    catch (error)
+      {
+      }
     }
 
   if (thumbing == 'ipg' || thumbing == 'user')
@@ -1775,9 +1781,10 @@ function switch_to_whats_new()
       }
 
     try { force_pause(); } catch (error) { log ('exception in force_pause!'); };
-    thumbing = 'whatsnew';
+
     escape();
     hide_layers();
+    thumbing = 'whatsnew';
 
     log ('what is new?');
 
