@@ -1774,10 +1774,10 @@ function switch_to_whats_new()
       log ('channels with new things: ' + whatsnew.length);
       }
 
-    escape();
+    try { force_pause(); } catch (error) { log ('exception in force_pause!'); };
     thumbing = 'whatsnew';
+    escape();
     hide_layers();
-    force_pause();
 
     log ('what is new?');
 
