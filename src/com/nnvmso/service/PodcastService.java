@@ -98,7 +98,7 @@ public class PodcastService {
 		System.out.println("save via podcast");
 		channel.setName(podcast.getTitle());
 		if (podcast.getDescription()!= null && podcast.getDescription().length() > 500) {
-			podcast.setDescription(podcast.getDescription().substring(0, 500));
+			podcast.setDescription(podcast.getDescription().substring(0, 499));
 		}
 		String intro = podcast.getDescription();
 		if (intro != null) {
@@ -116,7 +116,7 @@ public class PodcastService {
 		MsoChannel channel = new MsoChannel();
 		channel.setName(podcast.getTitle());
 		if (podcast.getDescription()!= null && podcast.getDescription().length() > 500) {
-			podcast.setDescription(podcast.getDescription().substring(0, 500));
+			podcast.setDescription(podcast.getDescription().substring(0, 499));
 		}
 		channel.setIntro(podcast.getDescription());
 		channel.setImageUrl(podcast.getImage());
@@ -164,11 +164,11 @@ public class PodcastService {
 		}
 		String intro = item.getDescription();
 		if (intro != null && intro.length() > 500) {
-			intro = intro.replaceAll("\\s", " "); 
-			item.setDescription(item.getDescription().substring(0, 499));
+			intro = item.getDescription().substring(0, 499);
+			intro = intro.replaceAll("\\s", " "); 			
+			item.setDescription(intro);
 		}
-		//!!!!
-		program.setIntro(item.getDescription().substring(0, 499));
+		program.setIntro(item.getDescription());
 		
 		System.out.println("ori intro=" + item.getDescription() + "intro string=" + intro + ";program intro=" + program.getIntro());
 		
