@@ -165,10 +165,10 @@ public class PodcastService {
 		String intro = item.getDescription();
 		if (intro != null && intro.length() > 500) {
 			intro = intro.replaceAll("\\s", " "); 
-			item.setDescription(item.getDescription().substring(0, 500));
+			item.setDescription(item.getDescription().substring(0, 499));
 		}
 		//!!!!
-		program.setIntro(item.getDescription().substring(0, 500));
+		program.setIntro(item.getDescription().substring(0, 499));
 		
 		System.out.println("ori intro=" + item.getDescription() + "intro string=" + intro + ";program intro=" + program.getIntro());
 		
