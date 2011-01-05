@@ -83,7 +83,7 @@ public class AdminController {
 		List<MsoChannel> channels = new ArrayList<MsoChannel>();		
 		channels = channelMngr.findAllPublic();		 
 		for (MsoChannel c : channels) {			
-			if (cache.get(c.getKey()) == null) {				
+			if (cache.get(c.getKey()) == null) {
 				cache.put(c.getKey(), c);				
 			} else {
 				MsoChannel cached = (MsoChannel)cache.get(c.getKey());
@@ -107,14 +107,10 @@ public class AdminController {
 		channels = channelMngr.findAllPublic();		
         PlayerAPI tool = new PlayerAPI(); 
 		for (MsoChannel c : channels) {
-			if (cache.get(c.getKey().getId()) == null) {
-				programs = programMngr.findByChannelIdAndIsPublic(c.getId(), true);
-				String info = tool.composeProgramInfoStr(programs);
-				cache.put(c.getKey().getId(), info);				
-			} else {
-				System.out.println("in the cache:" + cache.get(c.getKey().getId()));
-			}
-		}		
+			programs = programMngr.findByChannelIdAndIsPublic(c.getId(), true);
+			String info = tool.composeProgramInfoStr(programs);
+			cache.put(c.getKey().getId(), info);
+		}
 		return "hello/hello";
 	}
 	
