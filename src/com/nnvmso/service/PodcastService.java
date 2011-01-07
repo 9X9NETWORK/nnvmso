@@ -233,9 +233,9 @@ public class PodcastService {
 		Properties pro = this.getTranscodingServer();
 		String url = NnLib.getUrlRoot(req);
 		String env = "";
-		if (url.contains("9x9tvalpha")) {
+		if (url.contains("alpha")) {
 			env = "alpha";
-		} else if (url.contains("9x9tvbeta")){
+		} else if (url.contains("beta")){
 			env = "beta";
 		} else {
 			env = "dev";
