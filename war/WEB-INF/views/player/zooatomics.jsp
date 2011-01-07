@@ -1313,7 +1313,7 @@ function first_program_in (channel)
 
   if (! (channel in channelgrid))
     {
-    log_and_alert ('channel ' + channel + ' not in channelgrid');
+    log ('channel ' + channel + ' not in channelgrid');
     return;
     }
 
@@ -2597,6 +2597,9 @@ function setup_ajax_error_handling()
   {
   $.ajaxSetup ({ error: function (x, e)
     {
+    $("#loading").hide();
+    $("#msg-layer").hide();
+
     if (x.status == 0)
       {
       log_and_alert ('No network!');
@@ -2932,8 +2935,15 @@ function browse()
   // 1  570     Channel One     /thumb/01.jpg
   // 0=grid-location(ignore) 1=channel-id 2=channel-name 3=channel-thumb
 
+  //$("#loading").show();
+  $("#msg-layer").html ('<p>One moment...</p>');
+  $("#msg-layer").show();
+
   var d = $.get (query, function (data)
     {
+    //$("#loading").hide();
+    $("#msg-layer").hide();
+
     // <li class="on"><img src="thumb/abc.jpg"><span>ABC Entertainment</span></li>
     // <li><img src="thumb/abc.jpg"><span>ABC Entertainment</span></li>
 
@@ -4271,7 +4281,7 @@ One moment...
 <div id="log-layer" style="position: absolute; left: 0; top: 0; height: 100%; width: 100%; background: white; color: black; text-align: left; padding: 20px; overflow: scroll; z-index: 9999; display: none"></div>
 
 <div id="mask"></div>
-<div id="loading"></div>
+<div id="loading"><img src="http://zoo.atomics.org/video/9x9playerV23/images/loading.gif"></div>
 
 <!--/div-->
 </body>
