@@ -3456,7 +3456,7 @@ function ipg_preload (grid)
       plugins: { controls: null },
       play: null, onBeforeKeypress: fpkp, onLoad: fp_onpreload,
       onError: function (in_code, in_msg) { log ("ERROR! " + in_code + " TEXT: " + in_msg); },
-      key: '#$28fdb189bf3c28cb3b1' });
+      key: '#$f469b88194323deb943' });
 
   start_preload = new Date();
   $("#preload").html ('Starting...');
@@ -3550,7 +3550,7 @@ function start_play_fp (url)
       clip: { onFinish: fp_ended, onStart: fp_onstart, bufferLength: 1, autoPlay: true, scaling: 'fit' }, 
       plugins: { controls: null },
       play: null, onBeforeKeypress: fpkp, onLoad: fp_onload,
-      key: '#$28fdb189bf3c28cb3b1' });
+      key: '#$f469b88194323deb943' });
 
   fp [fp_player]['mute'] = false;
 
