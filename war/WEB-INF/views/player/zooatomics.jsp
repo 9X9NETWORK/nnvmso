@@ -2448,7 +2448,11 @@ function ipg_play()
     if (channel_line [c] == ipg_cursor)
       {
       channel_cursor = c;
+
+      current_program = first_program_in (ipg_cursor);
+      update_bubble();
       redraw_channel_line()
+
       thumbing = 'channel';
       $("#ch-layer").hide();
       $("#body").removeClass ("on");
