@@ -2377,6 +2377,13 @@ function ipg_click (id)
       $("#ipg-" + ipg_cursor).removeClass ("on");
       $("#ipg-" + id).addClass ("on");
       ipg_cursor = id;
+
+      ipg_metainfo();
+      current_program = first_program_in (id);
+      update_bubble();
+
+      stop_preload();
+      start_preload_timer();
       }
     else
       ipg_play();
@@ -3394,7 +3401,7 @@ function ipg_preload (grid)
 
   if (programs_in_channel (grid) < 1)
     {
-    log_and_alert ('no programs in channel ' + grid + ' to preload');
+    log ('no programs in channel ' + grid + ' to preload');
     return;
     }
 
@@ -3425,7 +3432,7 @@ function ipg_preload (grid)
   try { log ('preload state: ' + flowplayer (fp_preloaded).getState()); } catch (error) {};
 
   flowplayer (fp_preloaded,
-      {src: 'http://zoo.atomics.org/video/flowplayer-3.2.5.swf', wmode: 'transparent', allowfullscreen: 'false', allowscriptaccess: 'always' }, 
+      {src: 'http://zoo.atomics.org/video/fc/flowplayer.commercial-3.2.5.swf', wmode: 'transparent', allowfullscreen: 'false', allowscriptaccess: 'always' }, 
       { canvas: { backgroundColor: '#000000', backgroundGradient: 'none', linkUrl: '' },
       clip: { onFinish: fp_ended, onStart: fp_onstart, onBegin: fp_onbegin, bufferLength: 1, autoPlay: true, scaling: 'fit' }, 
       plugins: { controls: null },
