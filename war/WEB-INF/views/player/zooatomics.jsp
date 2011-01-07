@@ -784,7 +784,10 @@ function prepare_channel()
   if (channel in channelgrid)
     var real_channel = channelgrid [channel]['id'];
   else
+    {
     log ('not in channelgrid: ' + channel);
+    return;
+    }
 
   if (programs_in_channel (channel) < 1)
     {
