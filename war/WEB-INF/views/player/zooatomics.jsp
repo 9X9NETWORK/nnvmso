@@ -2448,6 +2448,7 @@ function ipg_play()
     if (channel_line [c] == ipg_cursor)
       {
       channel_cursor = c;
+      enter_channel();
 
       current_program = first_program_in (ipg_cursor);
       update_bubble();
@@ -3497,6 +3498,9 @@ function ipg_preload_play()
     if (channel_line [c] == ipg_cursor)
       {
       channel_cursor = c;
+      enter_channel();
+      current_program = first_program_in (ipg_cursor);
+      update_bubble();
       redraw_channel_line()
       thumbing = 'channel';
       $("#ipg-layer").css ("display", "none");
