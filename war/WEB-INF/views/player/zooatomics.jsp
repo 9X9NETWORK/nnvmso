@@ -578,6 +578,7 @@ function end_message (duration)
   log ('end!');
 
   hide_layers();
+  $("#loading").hide();
 
   var square = parseInt (channel_line [channel_cursor]);
 
