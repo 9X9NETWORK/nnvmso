@@ -3669,6 +3669,17 @@ function fp_tick (id)
     clearTimeout (fp [id]['timex']);
   }
 
+function physical_seek (offset)
+  {
+  switch (tube())
+    {
+    case "fp":
+      if (flowplayer)
+        flowplayer (fp_player).seek (offset);
+      break;
+    }
+  }
+
 function physical_offset()
   {
   switch (tube())
@@ -3997,7 +4008,45 @@ function control_enter()
 
     case 'btn-screensaver': switch_to_whats_new();
                             break;
+
+    case 'btn-rewind':      rewind();
+                            break;
+
+    case 'btn-forward':     fast_forward();
+                            break;
     }
+  }
+
+function rewind()
+  {
+  var offset = physical_offset();
+  var duration = physical_length();
+
+  log ('rewind, offset is ' + offset + ', duration is ' + duration);
+
+  offset -= 10;
+
+  if (offset < 0)
+    offset = 0;
+
+  log ('seeking ' + offset);
+  physical_seek (offset);
+  }
+
+function fast_forward()
+  {
+  var offset = physical_offset();
+  var duration = physical_length();
+
+  log ('fast forward, offset is ' + offset + ', duration is ' + duration);
+
+  offset += 10;
+
+  if (offset > duration)
+    offset = duration;
+
+  log ('seeking ' + offset);
+  physical_seek (offset);
   }
 
 function facebook_share()
