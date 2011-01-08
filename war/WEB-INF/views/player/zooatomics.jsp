@@ -427,7 +427,7 @@ function fetch_channels()
 
 function browser_support()
   {
-  if (jQuery.browser.msie && jQuery.browser.version != '9.0')
+  if (jQuery.browser.msie && !jQuery.browser.version.match (/^[789]/))
     {
     $("#blue").html ('<p>&nbsp;<p>&nbsp;<p>Please use the Chrome browser for this application:<p>&nbsp; &nbsp;<a href="http://www.google.com/chrome">www.google.com/chrome</a><p>');
     return false;
@@ -1959,6 +1959,7 @@ function switch_to_ipg()
   if (jQuery.browser.msie && (jQuery.browser.version == '7.0' || jQuery.browser.version == '8.0'))
     {
     $("#control-layer").hide();
+    $("#ep-layer").hide();
     $("#ipg-layer").show();
     $("#body").addClass ("on");
     elastic();
@@ -3522,7 +3523,35 @@ function ipg_preload_play()
       program_first = 1;
       enter_channel();
       clips_played++;
-      log ('EXIT PRELOAD PLAY');
+
+      try
+        {
+        log ('EXIT PRELOAD PLAY, player ' + fp_player + ', state ' + flowplayer (fp_player).getState());
+        }
+      catch (error)
+        {
+        log ('EXIT PRELOAD PLAY, state unknown');
+        }
+
+      try
+        {
+        var state = flowplayer (fp_player).getState();
+        if (state == -1)
+          {
+          log ('*** flowplayer was unloaded, trying over');
+          stop_preload();
+          ipg_play();
+          }
+        else if (state == 1)
+          {
+          log ('*** flowplayer was unexpectedly idle, restarting with: ' + fp [fp_player]['file']);
+          flowplayer (fp_player).play (fp [fp_player]['file']);
+          }
+        }
+      catch (error)
+        {
+        }
+
       return;
       }
     }
