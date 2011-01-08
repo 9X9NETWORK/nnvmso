@@ -575,6 +575,8 @@ function hide_layers()
 
 function end_message (duration)
   {
+  log ('end!');
+
   hide_layers();
 
   var square = parseInt (channel_line [channel_cursor]);
@@ -907,7 +909,6 @@ function ep_html()
   log ('(program html) program_first: ' + program_first + ' n_program_line: ' + n_program_line);
   for (var i = program_first; i <= n_program_line && i < program_first + max_programs_in_line; i++)
     {
-    log ('--> program ' + i);
     var program = programgrid [program_line [i]];
 
     var age = ageof (program ['timestamp']);
@@ -1955,6 +1956,7 @@ function switch_to_ipg()
   $("#ipg-return-btn").removeClass ("on");
 
   stop_preload();
+  $("#loading").hide();
 
   if (jQuery.browser.msie && (jQuery.browser.version == '7.0' || jQuery.browser.version == '8.0'))
     {
@@ -3144,6 +3146,7 @@ function continue_acceptance()
     escape();
     redraw_ipg();
     elastic();
+    start_preload_timer();
     });
   }
 
@@ -3453,7 +3456,7 @@ function ipg_preload (grid)
   flowplayer (fp_preloaded,
       {src: 'http://zoo.atomics.org/video/fc/flowplayer.commercial-3.2.5.swf', wmode: 'transparent', allowfullscreen: 'false', allowscriptaccess: 'always' }, 
       { canvas: { backgroundColor: '#000000', backgroundGradient: 'none', linkUrl: '' },
-      clip: { onFinish: fp_ended, onStart: fp_onstart, onBegin: fp_onbegin, bufferLength: 1, autoPlay: true, scaling: 'fit' }, 
+      clip: { onFinish: fp_ended, onStart: fp_onstart, onBegin: fp_onbegin, bufferLength: 1, autoPlay: true, scaling: 'fit', onBufferEmpty: fp_buffering, onBufferFull: fp_notbuffering }, 
       plugins: { controls: null },
       play: null, onBeforeKeypress: fpkp, onLoad: fp_onpreload,
       onError: function (in_code, in_msg) { log ("ERROR! " + in_code + " TEXT: " + in_msg); },
@@ -3467,6 +3470,22 @@ function ipg_preload (grid)
 
   fp [fp_preloaded]['file'] = url;
   fp [fp_preloaded]['mute'] = true;
+  }
+
+function fp_buffering()
+  {
+  var id = this.id();
+  log ('fp ' + id + ' buffering')
+  if (id == fp_player)
+    $("#loading").show();
+  }
+
+function fp_notbuffering()
+  {
+  var id = this.id();
+  log ('fp ' + id + ' no longer buffering')
+  if (id == fp_player)
+    $("#loading").hide();
   }
 
 function fp_onpreload()
@@ -3539,13 +3558,19 @@ function ipg_preload_play()
         if (state == -1)
           {
           log ('*** flowplayer was unloaded, trying over');
+          $("#loading").show();
           stop_preload();
           ipg_play();
           }
         else if (state == 1)
           {
           log ('*** flowplayer was unexpectedly idle, restarting with: ' + fp [fp_player]['file']);
+          $("#loading").show();
           flowplayer (fp_player).play (fp [fp_player]['file']);
+          }
+        else if (state == 2)
+          {
+          $("#loading").show();
           }
         }
       catch (error)
@@ -3573,10 +3598,12 @@ function start_play_fp (url)
 
   try { flowplayer (fp_player).unload(); } catch (error) {};
 
+  $("#loading").show();
+
   flowplayer (fp_player,
       {src: 'http://zoo.atomics.org/video/fc/flowplayer.commercial-3.2.5.swf', wmode: 'transparent', allowfullscreen: 'false', allowscriptaccess: 'always' }, 
       { canvas: { backgroundColor: '#000000', backgroundGradient: 'none', linkUrl: '' },
-      clip: { onFinish: fp_ended, onStart: fp_onstart, bufferLength: 1, autoPlay: true, scaling: 'fit' }, 
+      clip: { onFinish: fp_ended, onStart: fp_onstart, bufferLength: 1, autoPlay: true, scaling: 'fit', onBufferEmpty: fp_buffering, onBufferFull: fp_notbuffering }, 
       plugins: { controls: null },
       play: null, onBeforeKeypress: fpkp, onLoad: fp_onload,
       key: '#$f469b88194323deb943' });
@@ -3618,6 +3645,7 @@ function fp_onbegin()
   var now = new Date();
   var waited = Math.round ((now.getTime() - start_preload.getTime()) / 100) / 10;
   $("#preload").html ('Preloaded ' + waited + 's');
+  $("#loading").hide();
   }
 
 function fp_onstart()
