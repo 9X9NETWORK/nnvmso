@@ -1246,13 +1246,13 @@ function next_category()
   {
   log ('next category');
 
-  for (var cat = current_category + 1; cat <= 9; cat++)
+  for (var cat = parseInt (current_category) + 1; cat <= 9; cat++)
     {
     if (channels_in_category (cat) > 0)
       return cat;
     }
 
-  for (var cat = 1; cat < current_category; cat++)
+  for (var cat = 1; cat < parseInt (current_category); cat++)
     {
     if (channels_in_category (cat) > 0)
       return cat;
@@ -2478,8 +2478,10 @@ function channel_right()
   if (channel_cursor < n_channel_line)
     channel_cursor++;
   else
+    {
+    log ('channel_right: current category: ' + current_category + ', next category: ' + next_category());
     enter_category (next_category(), 'b');
-
+    }
   redraw_channel_line();
   prepare_channel();
 
