@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 
-import com.nnvmso.form.PlayerCreateForm;
 import com.nnvmso.lib.NnLib;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
@@ -172,37 +171,6 @@ public class AdminController {
 		System.out.println(msos.size());
 		model.addAttribute("msos", msos);
 		return ("admin/msoList");
-	}
-
-	@RequestMapping(value="playerCreate", method=RequestMethod.GET)
-	public String playerCreateForm(Model model) {	    			
-		PlayerCreateForm form = new PlayerCreateForm();
-		model.addAttribute("form", form);		
-		return ("admin/playerForm");		
-	}
-	
-	@RequestMapping(value="playerCreate", method = RequestMethod.POST)
-	public String playerCreatSubmit(@ModelAttribute PlayerCreateForm form, SessionStatus status) {		
-		playerMngr.create(form.getPlayer(), form.getMso());
-		status.setComplete();
-		return "redirect:/admin/playerEdit?id=" + NnLib.getKeyStr(form.getMso().getKey());
-	}	
-	
-	@RequestMapping(value="playerEdit", method=RequestMethod.GET)
-	public String editForm(@RequestParam(value="id") String msoKey, Model model) {
-		PlayerCreateForm form = new PlayerCreateForm();
-		Mso mso = msoMngr.findByKey(msoKey);
-		form.setMso(mso);
-		form.setPlayer(mso.getPlayer());
-		model.addAttribute("form", form); 
-		return ("admin/playerForm");
-	}
-	
-	@RequestMapping(value="playerEdit", method=RequestMethod.POST)
-	public String onEditSubmit(@RequestParam(value="id") String msoKey, @ModelAttribute("form") PlayerCreateForm form, BindingResult result, SessionStatus status) {
-		playerMngr.save(form.getPlayer(), form.getMso());
-		status.setComplete();
-		return "hello/hello";
 	}
 	
 	@RequestMapping("playerContainer")
