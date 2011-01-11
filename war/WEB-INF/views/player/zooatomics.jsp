@@ -142,6 +142,7 @@ function elastic_innards()
 
   var v = document.getElementById ("v");
   var vh = $(window).height();
+  var vw = $(window).width();
   v.style.height = (vh) + "px";
 
   // var h = document.getElementById ("jw");
@@ -152,6 +153,9 @@ function elastic_innards()
   h.style.height = (vh) + "px";
   var h = document.getElementById ("fp2");
   h.style.height = (vh) + "px";
+  var h = document.getElementById ("yt1");
+  h.style.height = (vh) + "px";
+  h.style.width = (vw) + "px";
 
   // var i = document.getElementById ("ipg-layer");
   // i.style.height = vh + "px";
@@ -365,6 +369,10 @@ function parse_program_data (data)
     if (lines [i] != '')
       {
       var fields = lines[i].split ('\t');
+      //fields [8] = 'http://www.youtube.com/watch?v=PeAFCIvqNxc';
+      //fields [9] = fields [8];
+      //fields [10] = fields [8];
+      //fields [11] = fields [8];
       programgrid [fields [1]] = { 'channel': fields[0], 'type': fields[3], 'url1': 'fp:' + fields[8], 
                    'url2': 'fp:' + fields[9], 'url3': 'fp:' + fields[10], 'url4': 'fp:' + fields[11], 
                    'name': fields[2], 'desc': fields [3], 'type': fields[4], 'thumb': fields[6], 
@@ -441,7 +449,7 @@ function activate()
     return;
 
   activated = true;
-  enter_category (1, 'b');
+  enter_category (first_category(), 'b');
   elastic();
 
   //play_first_program_in (first_channel());
@@ -519,9 +527,12 @@ function best_url (program)
     }
   else
     {
-    if (programgrid [program]['url1'].match (/(null|jw:null|jw:|fp:null|fp:)/))
-      return '';
-    return programgrid [program]['url1'];
+    for (var f in { url1:'', url2:'', url3:'', url4:'' })
+      {
+      if (! (programgrid [program][f].match (/^(|null|jw:null|jw:|fp:null|fp:)$/)))
+        return programgrid [program][f];
+      }
+    return '';
     }
   }
 
@@ -1240,6 +1251,15 @@ function programs_in_channel (channel)
     }
 
   return num_programs;
+  }
+
+function first_category()
+  {
+  for (var cat = 1; cat <= 9; cat++)
+    {
+    if (channels_in_category (cat) > 0)
+      return cat;
+    }
   }
 
 function next_category()
@@ -2165,7 +2185,13 @@ function stop_preload()
   {
   clearTimeout (ipg_preload_timex);
 
-  if (fp_preloaded != '')
+  if (fp_preloaded == 'yt')
+    {
+    ytplayer.stopVideo();
+    ytplayer.unMute();
+    log ('cleared preload: ' + fp_preloaded);
+    }
+  else if (fp_preloaded != '')
     {
     fp [fp_preloaded]['mute'] = false;
 
@@ -2173,9 +2199,9 @@ function stop_preload()
     flowplayer (fp_preloaded).unmute();
 
     log ('cleared preload: ' + fp_preloaded);
-    fp_preloaded = '';
     }
 
+  fp_preloaded = '';
   $("#preload").html ('None');
   }
 
@@ -2543,7 +2569,7 @@ function program_right()
     program_cursor++;
     redraw_program_line();
     physical_stop();
-    if (tube() == 'fp') play_program();
+    if (tube() == 'fp' || tube() == 'yt') play_program();
     }
   else
     {
@@ -3255,7 +3281,8 @@ function unhide_player (player)
     case "jw":
 
       $("#v").hide();
-      $("#fp").hide();
+      $("#fp1").hide();
+      $("#fp2").hide();
       $("#jw2").show();
       break;
 
@@ -3263,6 +3290,7 @@ function unhide_player (player)
 
       $("#v").hide();
       $("#jw2").hide();
+      $("#yt1").hide();
 
       if (fp_player == 'player1')
         {
@@ -3278,6 +3306,15 @@ function unhide_player (player)
       $("#fp1").show();
       $("#fp2").show();
 
+      break;
+
+    case "yt":
+
+      $("#v").hide();
+      $("#fp1").hide();
+      $("#fp2").hide();
+      $("#yt1").show();
+      $("#yt1").css ("visibility", "visible");
       break;
     }
   }
@@ -3305,7 +3342,7 @@ function start_play_yt (url)
   {
   yt_video_id = url.match (/v=([^&]+)/)[1];
   log ('YouTube video: ' + yt_video_id);
-  // setup_yt();
+  setup_yt();
   }
 
 function start_play_jw (url)
@@ -3320,6 +3357,7 @@ function start_play_jw (url)
 
   log ('setting up JW player, video file is: ' + jw_video_file);
   unhide_player ("jw");
+  $("#yt1").css ("visibility", "visible");
 
   if (jwplayer)
     jw_play();
@@ -3371,6 +3409,12 @@ function physical_stop()
                if (flowplayer)
                  try { flowplayer (fp_player).stop(); } catch (error) {};
                break;
+
+    case "yt": log ('yt STOP');
+               if (ytplayer)
+                 ytplayer.stopVideo();
+               break;
+
     }
   }
 
@@ -3420,6 +3464,13 @@ function jw_progress (event)
   update_progress_bar();
   }
 
+function preload_yt (program)
+  {
+  url = best_url (program);
+  fp_preloaded = 'yt';
+  start_play_yt (url)
+  }
+
 function ipg_preload (grid)
   {
   log ('preload: grid ' + grid)
@@ -3432,10 +3483,19 @@ function ipg_preload (grid)
 
   var program = first_program_in (grid);
 
+  if (best_url (program).match (/youtube\.com/))
+    {
+    current_tube = 'yt';
+    preload_yt (program);
+    $("#preload").html ('Start YT...');
+    return;
+    }
+
   if (current_tube != 'fp')
     {
     log ('preload: flowplayer was not active');
     current_tube = 'fp';
+    unhide_player ("fp");
     fp_player = 'player1';
     }
 
@@ -3454,7 +3514,7 @@ function ipg_preload (grid)
 
   try { flowplayer (fp_preloaded).unload(); } catch (error) {};
 
-  try { log ('preload state: ' + flowplayer (fp_preloaded).getState()); } catch (error) {};
+  try { log ('flowplayer preload state: ' + flowplayer (fp_preloaded).getState()); } catch (error) {};
 
   flowplayer (fp_preloaded,
       {src: 'http://zoo.atomics.org/video/fc/flowplayer.commercial-3.2.5.swf', wmode: 'transparent', allowfullscreen: 'false', allowscriptaccess: 'always' }, 
@@ -3516,16 +3576,26 @@ function ipg_preload_play()
   clearTimeout (ipg_timex);
   clearTimeout (ipg_delayed_stop_timex);
 
-  fp_player = fp_preloaded;
-  fp_preloaded = '';
+  if (fp_preloaded == 'yt')
+    {
+    fp_preloaded = '';
+    ytplayer.seekTo (0);
+    $("#yt1").css ("visibility", "visible");
+    ytplayer.playVideo();
+    }
+  else
+    {
+    fp_player = fp_preloaded;
+    fp_preloaded = '';
 
-  log ('PRELOAD PLAY: ' + fp_player);
+    log ('PRELOAD PLAY: ' + fp_player);
 
-  try { flowplayer (fp_player).seek (0); } catch (error) {};
-  try { flowplayer (fp_player).unmute(); } catch (error) {};
+    try { flowplayer (fp_player).seek (0); } catch (error) {};
+    try { flowplayer (fp_player).unmute(); } catch (error) {};
 
-  fp [fp_player]['mute'] = false;
-  unhide_player ("fp");
+    fp [fp_player]['mute'] = false;
+    unhide_player ("fp");
+    }
 
   enter_category ((""+ipg_cursor).substring (0, 1));
 
@@ -3548,36 +3618,42 @@ function ipg_preload_play()
 
       try
         {
-        log ('EXIT PRELOAD PLAY, player ' + fp_player + ', state ' + flowplayer (fp_player).getState());
+        if (tube() == 'yt')
+          log ('EXIT PRELOAD PLAY, player ' + fp_player);
+        else
+          log ('EXIT PRELOAD PLAY, player ' + fp_player + ', state ' + flowplayer (fp_player).getState());
         }
       catch (error)
         {
         log ('EXIT PRELOAD PLAY, state unknown');
         }
 
-      try
+      if (tube() == 'fp')
         {
-        var state = flowplayer (fp_player).getState();
-        if (state == -1)
+        try
           {
-          log ('*** flowplayer was unloaded, trying over');
-          $("#loading").show();
-          stop_preload();
-          ipg_play();
+          var state = flowplayer (fp_player).getState();
+          if (state == -1)
+            {
+            log ('*** flowplayer was unloaded, trying over');
+            $("#loading").show();
+            stop_preload();
+            ipg_play();
+            }
+          else if (state == 1)
+            {
+            log ('*** flowplayer was unexpectedly idle, restarting with: ' + fp [fp_player]['file']);
+            $("#loading").show();
+            flowplayer (fp_player).play (fp [fp_player]['file']);
+            }
+          else if (state == 2)
+            {
+            $("#loading").show();
+            }
           }
-        else if (state == 1)
+        catch (error)
           {
-          log ('*** flowplayer was unexpectedly idle, restarting with: ' + fp [fp_player]['file']);
-          $("#loading").show();
-          flowplayer (fp_player).play (fp [fp_player]['file']);
           }
-        else if (state == 2)
-          {
-          $("#loading").show();
-          }
-        }
-      catch (error)
-        {
         }
 
       return;
@@ -3698,6 +3774,67 @@ function fp_tick (id)
 
   if (flowplayer (id).getState() == 1)
     clearTimeout (fp [id]['timex']);
+  }
+
+function setup_yt()
+  {
+  log ('setting up youtube');
+  unhide_player ("yt");
+
+  current_tube = 'yt';
+
+  if (!ytplayer)
+    {
+    try { ytplayer.setSize ($(window).width(), $(window).height()) } catch (error) {};
+
+    var params = { allowScriptAccess: "always", wmode: "transparent" };
+    var atts = { id: "myytplayer" };
+    var url = "http://www.youtube.com/apiplayer?version=3&enablejsapi=1";
+
+    swfobject.embedSWF (url, "ytapiplayer", "100%", "100%", "8", null, null, params, atts);
+    }
+  else
+    play_yt();
+  }
+
+function onYouTubePlayerReady (playerId)
+  {
+  ytplayer = document.getElementById ("myytplayer");
+  log ("yt ready, id is: " + playerId);
+  try { ytplayer.setSize ($(window).width(), $(window).height()) } catch (error) {};
+  play_yt();
+  }
+
+function play_yt()
+  {
+  if (ytplayer && yt_video_id)
+    {
+    log ('yt PLAY');
+
+    if (fp_preloaded == 'yt')
+      { try { ytplayer.mute(); } catch (error) {}; }
+    else
+      { try { ytplayer.unMute(); } catch (error) {}; }
+
+    $("#yt1").css ("visibility", "visible");
+
+    try { ytplayer.addEventListener ('onStateChange', 'yt_state'); } catch (error) {};
+    ytplayer.loadVideoById (yt_video_id, 0, "medium"); // was hd720
+    }
+  else
+    alert ("ytplayer not ready");
+  }
+
+function yt_state (state)
+  {
+  // unstarted (-1), ended (0), playing (1), paused (2), buffering (3), video cued (5).
+  log ('yt state: ' + state);
+  if (fp_preloaded == 'yt' && state == 1)
+    {
+    ytplayer.pauseVideo();
+    $("#yt1").css ("visibility", "hidden");
+    $("#preload").html ('YT Preloaded');
+    }
   }
 
 function physical_seek (offset)
@@ -4161,6 +4298,12 @@ function noop (e)
   <a href="" style="display:block;width:100%;height:100%" id="player2" onClick="noop(this)"></a>
 </div>
 
+<div id="yt1" style="width: 100%; height: 100%; z-index: 1; visibility: visible; position: absolute; left: 0; top: 0">
+  <div id="ytapiplayer">
+    <!-- You need Flash player 8+ and JavaScript enabled to view this video.-->
+  </div>
+</div>
+
 <div id="blue" style="background: black; width: 100%; height: 100%; display: block; position: absolute; color: white">
 One moment...
 </div>
@@ -4197,20 +4340,6 @@ One moment...
             flashvars="fullscreen=true&controlbar=none&mute=false&bufferlength=1&allowscriptaccess=always">
         </embed>
 
-</div-->
-
-<!--div id="jw-template" style="display: none">
-        <embed name="%ID%" id="%ID%"
-            type="application/x-shockwave-flash"
-            pluginspage="http://www.macromedia.com/go/getflashplayer"
-            width="100%" height="100%"
-            bgcolor="#FFFFFF"
-            src="http://zoo.atomics.org/video/player.swf"
-            allowfullscreen="true"
-            allowscriptaccess="always"
-            wmode="transparent"
-            flashvars="fullscreen=true&controlbar=none&mute=false&bufferlength=1&allowscriptaccess=always">
-        </embed>
 </div-->
 
   </div>
