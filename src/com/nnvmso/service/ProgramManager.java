@@ -28,7 +28,6 @@ import com.nnvmso.lib.PMF;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoProgram;
 import com.nnvmso.model.NnUser;
-import com.nnvmso.model.ProgramScript;
 
 @Service
 public class ProgramManager {
@@ -116,7 +115,6 @@ public class ProgramManager {
 	public MsoProgram findGroupById(long id) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		MsoProgram program = pm.getObjectById(MsoProgram.class, id);
-		program.getNnScript();
 		MsoProgram detached = pm.detachCopy(program);
 		pm.close();
 		return detached;
@@ -296,15 +294,6 @@ public class ProgramManager {
 		   slide.setAudios(msg.getSlideshow().getAudios());
 		   slide.setSlideinfo(msg.getSlideshow().getSlideinfo());
 		   String scriptStr = NnScriptLib.generateSlideScript(slide, msg.getFileUrl());
-		   ProgramScript oldScript = p.getNnScript();
-		   if (p.getNnScript() != null) {			   
-			   oldScript.setScript(new Text(scriptStr));
-		   } else {
-			   ProgramScript script = new ProgramScript();
-			   script.setScript(new Text(scriptStr));
-			   p.setNnScript(script);
-			   script.setProgram(p);			   
-		   }
 	   }
 	   p.setErrorCode(msg.getErrorCode());
 	   Transaction tx = pm.currentTransaction();
