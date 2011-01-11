@@ -367,8 +367,7 @@ public class PlayerAPIController {
 		String output = "";
 		try {
 			ProgramManager programMngr = new ProgramManager();
-			MsoProgram program = programMngr.findById(programId);		
-			output = program.getNnScript().getScript().getValue();		
+			MsoProgram program = programMngr.findById(programId);				
 		} catch (Exception e){
 			output = PlayerAPI.CODE_ERROR + "\t" + PlayerAPI.PLAYER_CODE_ERROR;						
 		}
