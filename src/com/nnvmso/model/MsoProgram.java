@@ -63,9 +63,6 @@ public class MsoProgram implements Serializable {
 	@NotPersistent
 	private short status;
 	
-	@Persistent//(defaultFetchGroup = "true")
-	private ProgramScript nnScript; 	
-
 	@Persistent
 	private String duration;
 	
@@ -146,14 +143,6 @@ public class MsoProgram implements Serializable {
 
 	public void setWebMFileUrl(String webMFileUrl) {
 		this.webMFileUrl = webMFileUrl;
-	}
-
-	public ProgramScript getNnScript() {
-		return nnScript;
-	}
-
-	public void setNnScript(ProgramScript nnScript) {
-		this.nnScript = nnScript;
 	}
 
 	public String getType() {
@@ -262,9 +251,6 @@ public class MsoProgram implements Serializable {
 				status = STATUS_PROCESSING;
 			}
 		} else {
-			if (this.getNnScript() == null) {
-				status = STATUS_PROCESSING;
-			}
 		}
 		if (errorCode != null) {
 			if (!errorCode.equals("0")) {
