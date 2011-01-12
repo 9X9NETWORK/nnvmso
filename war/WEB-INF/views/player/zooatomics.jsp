@@ -3484,6 +3484,7 @@ function ipg_preload (grid)
   if (programs_in_channel (grid) < 1)
     {
     log ('no programs in channel ' + grid + ' to preload');
+    $("#preload").html ('No programs');
     return;
     }
 
@@ -3586,6 +3587,7 @@ function ipg_preload_play()
     {
     fp_preloaded = '';
     ytplayer.seekTo (0);
+    ytplayer.unMute();
     $("#yt1").css ("visibility", "visible");
     ytplayer.playVideo();
     }
