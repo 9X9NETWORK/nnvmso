@@ -359,22 +359,13 @@ function parse_program_data (data)
   // 8=url1(mpeg4/slideshow), 9=url2(webm), 10=url3(flv more likely), 11=url4(audio),
   // 12=timestamp
 
-  var logtext = '';
-  var now = new Date();
-
-  log ('splitting')
   var lines = data.split ('\n');
   log ('number of programs obtained: ' + lines.length);
   for (var i = 0; i < lines.length; i++)
     {
-    // log (lines [i]);
     if (lines [i] != '')
       {
       var fields = lines[i].split ('\t');
-      //fields [8] = 'http://www.youtube.com/watch?v=PeAFCIvqNxc';
-      //fields [9] = fields [8];
-      //fields [10] = fields [8];
-      //fields [11] = fields [8];
       programgrid [fields [1]] = { 'channel': fields[0], 'type': fields[3], 'url1': 'fp:' + fields[8], 
                    'url2': 'fp:' + fields[9], 'url3': 'fp:' + fields[10], 'url4': 'fp:' + fields[11], 
                    'name': fields[2], 'desc': fields [3], 'type': fields[4], 'thumb': fields[6], 
@@ -383,7 +374,6 @@ function parse_program_data (data)
     }
 
   log ('finished parsing program data');
-  // logblob (logtext);
   }
 
 function fetch_channels()
@@ -578,7 +568,6 @@ function message (text, duration)
 
 function hide_layers()
   {
-  $("#ch-layer").hide();
   $("#ep-layer").hide();
   $("#control-layer").hide();
   $("#msg-layer").hide();
@@ -628,7 +617,6 @@ function play()
     {
     log ('current program ' + current_program + ' has no URL, assuming empty channel, displaying notice for 3 seconds')
     $("#ep-layer").hide();
-    $("#ch-layer").hide();
     end_message (10000);
     return;
     }
@@ -709,12 +697,6 @@ function ended_callback()
   var type = thumbing;
   if (type == 'control') type = control_saved_thumbing;
 
-  // if (type == 'channel')
-  //  {
-  //  log ('** ended event fired, moving channel right');
-  //  channel_right();
-  //  }
-
   if (type == 'program' || type == 'channel')
     {
     log ('** ended event fired, moving program right (cursor at ' + program_cursor + ')');
@@ -771,17 +753,8 @@ function update_bubble()
   var channel_name = channelgrid [channel]['name'];
   if (channel_name.match (/^\s*$/)) { channel_name = '[no channel name]'; }
 
-  $("#ch-layer-ch-title").html (channel_name);
-  $("#ch-layer-ep-title").html (program_name);
-
   $("#ep-layer-ch-title").html (channel_name);
   $("#ep-layer-ep-title").html (program_name);
-  }
-
-function switch_to_channel_thumbs()
-  {
-  enter_category (current_category, '');
-  thumbing = 'channel';
   }
 
 function prepare_channel()
@@ -841,10 +814,10 @@ function enter_channel()
 
   prepare_channel();
 
-  if (jQuery.browser.msie && jQuery.browser.version == '8.0')
+  //if (jQuery.browser.msie && jQuery.browser.version == '8.0')
+  if (true)
     {
     $("#control-layer").hide();
-    $("#ch-layer").hide();
     $("#ep-layer").show();
     thumbing = 'program';
     enter_channel_failsafe();
@@ -874,17 +847,7 @@ function enter_channel()
     $("#control-layer").animateWithCss ({ opacity: "0" }, 500, "ease-in-out", function() { $("#control-layer").hide(); $("#control-layer").css ("opacity", "1"); });
 
   $("#ep-layer").animateWithCss ({ opacity: "1" }, 500, "ease-in-out", function() {});
-  $("#ch-layer").animateWithCss ({ opacity: "0" }, 500, "ease-in-out", function() { $("#ch-layer").css ("opacity", "1"); });
-
   $("#ep-swish").animateWithCss (phase_in_pp, 500, "ease-in-out", function() {});
-
-  $("#ch-swish-" + current_category).animateWithCss (phase_out_cc, 500, "ease-in-out", function()
-    {
-    $("#ch-swish-" + current_category).css ("display", "none");
-    $("#ch-swish-" + current_category).css ("top", "1.4375em");
-    //$("#ch-swish-" + current_category).css ("opacity", "1");
-    $("#ch-layer").css ("display", "none");
-    });
 
   setTimeout ("enter_channel_failsafe()", 500);
 
@@ -905,10 +868,7 @@ function enter_channel_failsafe()
   $("#control-layer").css ("opacity", "1");
 
   if (thumbing == 'program')
-    {
-    $("#ch-layer").hide();
     $("#ep-layer").show();
-    }
 
   turn_off_ancillaries();
   }
@@ -1036,136 +996,6 @@ function enter_category (cat, positioning)
     turn_off_ancillaries();
     return;
     }
-
-  channel_line = {};
-
-  if (thumbing == 'program')
-    {
-    var ch = $("#ch-swish-" + current_category);
-    var ep = $("#ep-swish");
-
-    $("#ch-swish-" + current_category).css ("display", "block");
-    $("#ch-layer").css ("opacity", "0");
-    $("#ch-swish-" + current_category).css ("top", "-4.0625em");
-    $("#ch-layer").css ("display", "block");
-
-    $("#ep-swish").css ("top", "1.4275em");
-
-    var phase_out_pp =
-      {
-      //opacity: "0",
-      top: "5.125em"
-      };
-
-    var phase_in_cc =
-      {
-      //opacity: "1",
-      top: "1.4375em" 
-      };
-
-    log ('animating channel to category ' + current_category);
-
-    // GAH! Why do I have to put this in a timer to get the animation to work?
-    // $("#ch-swish-" + current_category).animateWithCss (phase_in_cc, 500, "ease-in-out", function() {});
-    //
-    setTimeout ("$('#ch-swish-' + current_category).animateWithCss ({ top: '1.4375em' }, 500, 'ease-in-out', function() {});", 0);
-
-    setTimeout ("$('#ch-layer').animateWithCss ({ opacity: '1' }, 600, 'ease-in-out', function() {});", 0);
-    setTimeout ("$('#ep-layer').animateWithCss ({ opacity: '0' }, 500, 'ease-in-out', function() { $('#ep-layer').css ('display', 'none'); $('#ep-layer').css ('opacity', '1'); });", 0);
-
-    ep.animateWithCss (phase_out_pp, 500, "ease-in-out", function()
-      {
-      $("#ep-swish").css ("display", "none");
-      //$("#ep-swish").css ("opacity", "1");
-      $("#ep-layer").css ("opacity", "1");
-      $("#ep-swish").css ("top", "1.4275em");
-      });
-    }
-
-  thumbing = 'channel';
-  $("#control-layer").hide();
-
-  if (current_category > 0)
-    $("#ch-swish-" + current_category).css ("display", "block");
-
-  if (current_category > 0 && cat != current_category)
-    {
-    old_cline = $("#ch-swish-" + current_category);
-    new_cline = $("#ch-swish-" + cat);
-
-    new_cline.css ("opacity", "0");
-    new_cline.css ("display", "block");
-
-    var phase_out =
-      {
-      opacity: "0",
-      // left: positioning == 'b' ? "-45em" : "45em"
-      };
-
-    var phase_in =
-      {
-      opacity: "1"
-      };
-
-    old_cline.animateWithCss (phase_out, 1000, "ease-in-out", function()
-      {
-      old_cline.css ("display", "none");
-      old_cline.css ("opacity", "1");
-      // old_cline.css ("left", "0px");
-      });
-
-    new_cline.animateWithCss (phase_in, 700, "ease-in-out", function()
-      {
-      });
-    }
-
-  setTimeout ("enter_category_failsafe()", 700);
-
-  $("#ch-list-" + cat).html ("");
-
-  if (cat != current_category)
-    {
-    current_category = cat;
-    log ('setting new category: ' + cat);
-    }
-  else
-    log ('already in category: ' + cat);
-
-  var html = ch_html (cat);
-
-  $("#ch-list-" + cat).html (html);
-  $("#row-number").html ('<p>' + cat + '</p>');
-
-  $("#ch-layer").css ("display", "block");
-
-  for (var y = 1; y <= 9; y++)
-    $("#ch-swish-" + y).css ("display", y == cat ? "block" : "none");
-
-  /* position at beginning or ending */
-  if (positioning == 'b')
-    channel_cursor = 1;
-  else if (positioning == 'e')
-    channel_cursor = n_channel_line;
-
-  redraw_channel_line();
-  reset_osd_timex();
-
-  prepare_channel();
-  }
-
-function enter_category_failsafe()
-  {
-  $("#ch-swish-" + current_category).css ("top", "1.4375em");
-  $("#ch-swish-" + current_category).css ("display", "block");
-
-  if (thumbing == 'channel')
-    {
-    $("#ep-layer").hide();
-    $("#ch-layer").css ("display", "block");
-    $("#ch-layer").css ("opacity", "1");
-    }
-
-  turn_off_ancillaries();
   }
 
 function ch_html (cat)
@@ -1374,8 +1204,7 @@ function escape()
     case 'program': layer = $("#ep-layer");
                     break;
 
-    case 'channel': layer = $("#ch-layer");
-                    break;
+    case 'channel': return;
 
     case 'ipg':     layer = $("#ipg-layer");
                     break;
@@ -1471,18 +1300,7 @@ function keypress (keycode)
 
   if (keycode == 37 || keycode == 39 || keycode == 38 || keycode == 40)
     {
-    if (thumbing == 'channel')
-      {
-      if ($("#ch-layer").css ('display') == 'none')
-        {
-        log ('channel osd was off');
-        extend_ch_layer();
-        return;
-        }
-      else
-        reset_osd_timex();
-      }
-    else if (thumbing == 'program')
+    if (thumbing == 'program')
       {
       if ($("#ep-layer").css ('display') == 'none')
         {
@@ -1531,13 +1349,10 @@ function keypress (keycode)
 
     case 37:
       /* left arrow */
-      if (thumbing == 'channel')
-        channel_left();
-      else if (thumbing == 'end')
+      if (thumbing == 'end')
         {
         $("#epend-layer").hide();
         channel_left();
-        $("#ch-layer").hide();
         enter_channel();
         }
       else if (thumbing == 'program')
@@ -1552,13 +1367,10 @@ function keypress (keycode)
 
     case 39:
       /* right arrow */
-      if (thumbing == 'channel')
-        channel_right();
-      else if (thumbing == 'end')
+      if (thumbing == 'end')
         {
         $("#epend-layer").hide();
         channel_right();
-        $("#ch-layer").hide();
         enter_channel();
         }
       else if (thumbing == 'program')
@@ -1574,7 +1386,6 @@ function keypress (keycode)
     case 38:
       /* up arrow */
       if (thumbing == 'program')
-        // switch_to_channel_thumbs();
         switch_to_ipg();
       else if (thumbing == 'end')
         {
@@ -1605,10 +1416,6 @@ function keypress (keycode)
         browse_down();
       else if (thumbing == 'ipg')
         ipg_down();
-      else if (thumbing == 'program')
-        {
-        // switch_to_channel_thumbs();
-        }
       break;
 
     case 33:
@@ -1660,12 +1467,10 @@ function keypress (keycode)
     case 56:
     case 57:
       /* 1, 2, 3... */
-      // enter_category (keycode - 48, 'b');
       break;
 
     case 71:
       /* G */
-      // ipg_preload_play()
       break;
 
     case 79:
@@ -1718,7 +1523,6 @@ function dump_configuration_to_log()
 function switch_to_whats_new()
   {
   whatsnew = [];
-
 
   log ('whats new');
   var bad_thumbnail = '<img src="http://zoo.atomics.org/video/images-x1/no_images.png">';
@@ -1784,8 +1588,6 @@ function switch_to_whats_new()
       return;
       }
 
-    whatsnew = [];
-
     for (var y = 1; y <= 9; y++)
       for (var x = 1; x <= 9; x++)
         {
@@ -1848,7 +1650,6 @@ function switch_to_whats_new()
     $("#new-layer").html (html);
 
     $("body").addClass ("on");
-    // $("body").css ("background-image", "url(" + root + "bg.jpg)");
 
     elastic();
     $("#all-players").hide();
@@ -1923,7 +1724,6 @@ function osd_timex_expired()
   osd_timex = 0;
   log ('osd timex expired');
 
-  $("#ch-layer").hide();
   $("#ep-layer").hide();
 
   if (thumbing == 'channel')
@@ -1931,13 +1731,6 @@ function osd_timex_expired()
     thumbing = 'program';
     prepare_channel();
     }
-  }
-
-function extend_ch_layer()
-  {
-  $("#ch-layer").show();
-  elastic();
-  reset_osd_timex();
   }
 
 function extend_ep_layer()
@@ -2009,15 +1802,6 @@ function switch_to_ipg()
 
   setTimeout ("outt()", 500);
 
-  if (false)
-    $("#ch-layer").animateWithCss (phase_out_ch, 500, "ease-in-out", function()
-      {
-      $("#ch-layer").css ("display", "none");
-      $("#ch-layer").css ("bottom", "0");
-      $("#ch-layer").css ("opacity", "1");
-      elastic(); /* fixups */
-      });
-
   $("#ep-layer").animateWithCss ({ opacity: 0 }, 500, "ease-in-out", function()
     {
     $("#ep-layer").css ("display", "none");
@@ -2064,14 +1848,9 @@ function redraw_ipg()
   
   var bad_thumbnail = '<img src="http://zoo.atomics.org/video/images-x1/no_images.png">';
 
-
   for (var y = 1; y <= 9; y++)
     {
-    //if (y >= 8)
-    //  html += '<ul class="ipg-list private" id="row-' + y + '">';
-    // else
     html += '<ul class="ipg-list" id="row-' + y + '">';
-
     html += '<li class="rowNum"><span>' + y + '</span></li>';
 
     for (var x = 1; x <= 9; x++)
@@ -2087,6 +1866,7 @@ function redraw_ipg()
       else
         html += '<li class="clickable" id="ipg-' + y + '' + x + '"><img src="' + root + 'add_channel.png" class="add-ch"></li>';
       }
+
     html += '</ul>';
     }
 
@@ -2344,8 +2124,6 @@ function ipg_down()
       }
     else if (ipg_cursor == -1)
       {
-      // escape();
-      // switch_to_channel_thumbs()
       return;
       }
     }
@@ -2353,7 +2131,7 @@ function ipg_down()
     {
     // disable this for now
     // escape();
-    // switch_to_channel_thumbs()
+    // enter_category (current_category, '');
     // enter_channel();
     // return;
     }
@@ -2393,7 +2171,7 @@ function ipg_resume()
   clearTimeout (ipg_delayed_stop_timex);
 
   escape();
-  switch_to_channel_thumbs();
+  enter_category (current_category, '');
   enter_channel();
 
   stop_preload();
@@ -2490,7 +2268,6 @@ function ipg_play()
       redraw_channel_line()
 
       thumbing = 'channel';
-      $("#ch-layer").hide();
       $("#body").removeClass ("on");
       play_first_program_in (channel_line [channel_cursor]);
       enter_channel();
@@ -4162,7 +3939,6 @@ function switch_to_control_layer()
   $('#btn-pause').addClass ("on");
   $('#btn-play').addClass ("on");
 
-  $("#ch-layer").hide();
   $("#ep-layer").hide();
   $("#ipg-layer").hide();
   $("#new-layer").hide();
@@ -4408,32 +4184,6 @@ One moment...
 </div-->
 
   </div>
-
-<div id="ch-layer" style="display: none">
-  <div id="ch-container">
-    <div class="arrow-up"></div><div class="arrow-down"></div>
-    <div id="ch-constrain">
-      <div class="ch-strip">
-        <div id="row-number"><p></p></div>
-        <ul id="ch-meta">
-          <li id="ch-layer-ch-title" class="ch-title"></li>
-          <li class="dash">&#8212;</li>
-          <li id="ch-layer-ep-title" class="ep-title"></li>
-        </ul>
-        <div class="ch-swish" id="ch-swish-1" style="display: block"><ul id="ch-list-1" class="ch-list"></ul></div>
-        <div class="ch-swish" id="ch-swish-2" style="display: block"><ul id="ch-list-2" class="ch-list"></ul></div>
-        <div class="ch-swish" id="ch-swish-3" style="display: block"><ul id="ch-list-3" class="ch-list"></ul></div>
-        <div class="ch-swish" id="ch-swish-4" style="display: block"><ul id="ch-list-4" class="ch-list"></ul></div>
-        <div class="ch-swish" id="ch-swish-5" style="display: block"><ul id="ch-list-5" class="ch-list"></ul></div>
-        <div class="ch-swish" id="ch-swish-6" style="display: block"><ul id="ch-list-6" class="ch-list"></ul></div>
-        <div class="ch-swish" id="ch-swish-7" style="display: block"><ul id="ch-list-7" class="ch-list"></ul></div>
-        <div class="ch-swish" id="ch-swish-8" style="display: block"><ul id="ch-list-8" class="ch-list"></ul></div>
-        <div class="ch-swish" id="ch-swish-9" style="display: block"><ul id="ch-list-9" class="ch-list"></ul></div>
-      </div>
-      </div>
-    </div>
-  </div>
-</div>
 
 <div id="ep-layer">
   <div id="ep-container">
