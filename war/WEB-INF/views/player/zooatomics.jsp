@@ -2810,6 +2810,7 @@ function submit_throw()
 
   $.post ("/playerAPI/podcastSubmit", serialized, function (data)
     {
+    sanity_check_data ('podcastSubmit', data);
     var fields = data.split ('\t');
     if (fields [0] == "0")
       {
@@ -2895,6 +2896,11 @@ function login()
 
     var d = $.get ("/playerAPI/userTokenVerify?token=" + u, function (data)
       {
+      if (!sanity_check_data ('userTokenVerify', data))
+        {
+        // xyz
+        }
+
       log ('response to userTokenVerify: ' + data);
 
       var fields = data.split ('\t');
