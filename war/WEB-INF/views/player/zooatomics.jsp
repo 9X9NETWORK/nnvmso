@@ -27,6 +27,8 @@ var current_tube = '';
 
 var ytplayer;
 var yt_video_id;
+var yt_timex = 0;
+var yt_previous_state = -2;
 
 var jwplayer;
 var jw_video_file = 'nothing.flv';
@@ -715,7 +717,7 @@ function ended_callback()
 
   if (type == 'program' || type == 'channel')
     {
-    log ('** ended event fired, moving program right');
+    log ('** ended event fired, moving program right (cursor at ' + program_cursor + ')');
     program_right();
     }
   else
@@ -918,7 +920,7 @@ function ep_html()
 
   var bad_thumbnail = 'http://zoo.atomics.org/video/images-x1/no_images.png';
 
-  log ('(program html) program_first: ' + program_first + ' n_program_line: ' + n_program_line);
+  log ('(program html) program_first: ' + program_first + ' n_program_line: ' + n_program_line + ' program_cursor: ' + program_cursor);
   for (var i = program_first; i <= n_program_line && i < program_first + max_programs_in_line; i++)
     {
     var program = programgrid [program_line [i]];
@@ -2564,6 +2566,8 @@ function ep_click (id)
 
 function program_right()
   {
+  log ('program right');
+
   if (program_cursor < n_program_line)
     {
     program_cursor++;
@@ -2580,6 +2584,8 @@ function program_right()
 
 function program_left()
   {
+  log ('program left');
+
   if (program_cursor > 1)
     program_cursor--;
   else
@@ -3572,6 +3578,24 @@ function fp_onpreload()
   flowplayer (fp_preloaded).mute();
   }
 
+function yt_tick()
+  {
+  // log ('yt_tick');
+
+  if (tube() == "yt")
+    update_progress_bar();
+
+  /* cancel ticking if player stopped */
+
+  var state = ytplayer.getPlayerState();
+
+  if (state == -1 || state == 0)
+    {
+    log ('yt_tick, STATE IS: ' + state);
+    clearTimeout (yt_timex);
+    }
+  }
+
 function ipg_preload_play()
   {
   if (fp_preloaded == '')
@@ -3585,11 +3609,14 @@ function ipg_preload_play()
 
   if (fp_preloaded == 'yt')
     {
+    log ('starting preloaded YouTube video');
     fp_preloaded = '';
-    ytplayer.seekTo (0);
-    ytplayer.unMute();
+    try { ytplayer.seekTo (0); } catch (error) {};
+    try { ytplayer.unMute(); } catch (error) {};
     $("#yt1").css ("visibility", "visible");
-    ytplayer.playVideo();
+    try { ytplayer.playVideo(); } catch (error) {};
+    clearTimeout (yt_timex);
+    yt_timex = setInterval ("yt_tick()", 333);
     }
   else
     {
@@ -3795,7 +3822,7 @@ function setup_yt()
     {
     try { ytplayer.setSize ($(window).width(), $(window).height()) } catch (error) {};
 
-    var params = { allowScriptAccess: "always", wmode: "transparent" };
+    var params = { allowScriptAccess: "always", wmode: "transparent", disablekb: "1" };
     var atts = { id: "myytplayer" };
     var url = "http://www.youtube.com/apiplayer?version=3&enablejsapi=1";
 
@@ -3822,12 +3849,18 @@ function play_yt()
     if (fp_preloaded == 'yt')
       { try { ytplayer.mute(); } catch (error) {}; }
     else
-      { try { ytplayer.unMute(); } catch (error) {}; }
+      {
+      try { ytplayer.unMute(); } catch (error) {};
+      clearTimeout (yt_timex);
+      yt_timex = setInterval ("yt_tick()", 333);
+      }
 
     $("#yt1").css ("visibility", "visible");
 
     try { ytplayer.addEventListener ('onStateChange', 'yt_state'); } catch (error) {};
-    ytplayer.loadVideoById (yt_video_id, 0, "medium"); // was hd720
+
+    /* small | medium | large | hd720 | hd1080 */
+    try { ytplayer.loadVideoById (yt_video_id, 0, "medium"); } catch (error) {};
     }
   else
     alert ("ytplayer not ready");
@@ -3843,6 +3876,23 @@ function yt_state (state)
     $("#yt1").css ("visibility", "hidden");
     $("#preload").html ('YT Preloaded');
     }
+
+  if (fp_preloaded != 'yt' && (state == 1 || state == 2 || state == 3) && yt_previous_state != state)
+    {
+    log ('restarting yt timex');
+    clearTimeout (yt_timex);
+    yt_timex = setInterval ("yt_tick()", 333);
+    }
+  else if (fp_preloaded != 'yt' && state == 0 && (yt_previous_state == 1 || yt_previous_state == 2 || yt_previous_state == 3))
+    {
+    /* change this as soon as possible */
+    yt_previous_state = state;
+    log ('yt eof');
+    ended_callback();
+    return;
+    }
+
+  yt_previous_state = state;
   }
 
 function physical_seek (offset)
@@ -3852,6 +3902,11 @@ function physical_seek (offset)
     case "fp":
       if (flowplayer)
         flowplayer (fp_player).seek (offset);
+      break;
+
+    case "yt":
+      if (ytplayer)
+        try { ytplayer.seekTo (offset); } catch (error) {};
       break;
     }
   }
@@ -3894,8 +3949,10 @@ function physical_length()
     {
     case "yt":
 
+      var duration = 1;
       if (ytplayer && ytplayer.getDuration)
-        return ytplayer.getDuration();
+        try { duration = ytplayer.getDuration(); } catch (error) {};
+      return duration;
 
     case "jw":
 
