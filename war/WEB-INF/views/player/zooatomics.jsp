@@ -1087,13 +1087,13 @@ function previous_category()
   {
   log ('previous category');
 
-  for (var cat = current_category - 1; cat >= 1; cat--)
+  for (var cat = parseInt (current_category) - 1; cat >= 1; cat--)
     {
     if (channels_in_category (cat) > 0)
       return cat;
     }
 
-  for (var cat = 9; cat > current_category; cat--)
+  for (var cat = 9; cat > parseInt (current_category); cat--)
     {
     if (channels_in_category (cat) > 0)
       return cat;
