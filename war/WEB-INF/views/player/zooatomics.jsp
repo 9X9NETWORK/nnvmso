@@ -818,43 +818,13 @@ function enter_channel()
   if (true)
     {
     $("#control-layer").hide();
+    redraw_program_line();
     $("#ep-layer").show();
     thumbing = 'program';
     enter_channel_failsafe();
+    reset_osd_timex();
     return;
     }
-
-  $("#ep-layer").css ("opacity", "0");
-  $("#ep-layer").css ("display", "block");
-
-  $("#ep-swish").css ("top", "5.125em");
-  $("#ep-swish").css ("display", "block");
-
-  var phase_in_pp =
-    {
-    //opacity: "1",
-    //top: "0em"
-    top: "1.4275em"
-    };
-
-  var phase_out_cc =
-    {
-    //opacity: "0",
-    top: "-6.1875em" 
-    };
-
-  if (thumbing == 'control')
-    $("#control-layer").animateWithCss ({ opacity: "0" }, 500, "ease-in-out", function() { $("#control-layer").hide(); $("#control-layer").css ("opacity", "1"); });
-
-  $("#ep-layer").animateWithCss ({ opacity: "1" }, 500, "ease-in-out", function() {});
-  $("#ep-swish").animateWithCss (phase_in_pp, 500, "ease-in-out", function() {});
-
-  setTimeout ("enter_channel_failsafe()", 500);
-
-  thumbing = 'program';
-
-  redraw_program_line();
-  reset_osd_timex();
   }
 
 function enter_channel_failsafe()
@@ -1619,6 +1589,8 @@ function switch_to_whats_new()
     hide_layers();
     thumbing = 'whatsnew';
 
+    stop_preload();
+
     log ('what is new?');
 
     var html = '<p id="whatsnew-title">What\'s New</p>';
@@ -1664,14 +1636,14 @@ function exit_whats_new()
   //$("body").css ("background-image", "none");
   thumbing = 'program';
   switch_to_ipg();
-  $("#all-players").show();
+  // $("#all-players").show();
   }
 
 function whatsnew_enter()
   {
   StopWhatsNew();
   $("body").removeClass ("on");
-  $("#all-players").show();
+  // $("#all-players").show();
 
   var grid = whatsnew [i]['grid'];
   var episode = whatsnew [i]['episodes'][n];
@@ -3364,9 +3336,10 @@ function yt_tick()
 
   /* cancel ticking if player stopped */
 
-  var state = ytplayer.getPlayerState();
+  var state = -2;
+  try { state = ytplayer.getPlayerState(); } catch (error) {};
 
-  if (state == -1 || state == 0)
+  if (state == -2 || state == -1 || state == 0)
     {
     log ('yt_tick, STATE IS: ' + state);
     clearTimeout (yt_timex);
@@ -4080,20 +4053,35 @@ function facebook_share()
 
 function state()
   {
-  if (flowplayer)
+  if (tube() == "yt")
+    {
+    yt_player_state();
+    }
+  else if (flowplayer)
     {
     log ('current player: ' + fp_player);
-    player_state ('player1');
-    player_state ('player2');
+    fp_player_state ('player1');
+    fp_player_state ('player2');
     }
   else
     log ('flowplayer is not active!');
 
-  log ('layers :: fp1: ' + $("#fp1").css ("display") + ' ' + $("#fp1").css ("visibility") + ', fp2: ' + $("#fp2").css ("display") + ' ' + $("#fp2").css ("visibility"));
+  log ('layers :: fp1: ' + $("#fp1").css ("display") + ' ' + $("#fp1").css ("visibility") + ', fp2: ' + 
+                           $("#fp2").css ("display") + ' ' + $("#fp2").css ("visibility") + ', yt1: ' +
+                           $("#yt1").css ("display") + ' ' + $("#yt1").css ("visibility"));
   return '';
   }
 
-function player_state (player)
+function yt_player_state()
+  {
+  var yt_state = -2;
+  var states = { '-2': 'fail', '-1': 'unstarted', '0': 'ended', '1': 'playing', '2': 'paused', '3': 'buffering', '5': 'cued' };
+
+  try { yt_state = ytplayer.getPlayerState(); } catch (error) {};
+  log ('youtube state: ' + states [yt_state]);
+  }
+
+function fp_player_state (player)
   {
   var fp_state;
 
@@ -4151,7 +4139,7 @@ One moment...
 
 <!--div id="notblue" style="width: 100%; display: none; position: absolute; top: 0; margin: 0; overflow: hidden"-->
 
-  <div id="all-players" style="display: block; padding: 0; display: none">
+  <div id="all-players" style="display: none; padding: 0; display: none">
     <div id="v" style="display: block; padding: 0">
       <video id="vvv" autoplay="false" preload="metadata" loop="false" height="100%" width="100%" volume="0"></video></div>
 
