@@ -2,21 +2,26 @@
 <%@ page import="java.util.Date" %>
 <!DOCTYPE html>
 <head>
+
 <meta charset="UTF-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+<!-- $Revision: 0 $ -->
 
 <!-- FB Sharing meta data -->
 <meta name="title" content="My 9x9 Channel Guide <%= (new SimpleDateFormat("MM.dd.yyyy")).format(new Date()) %>" />
 <meta name="description" content="My 9x9 Channel Guide. Easily browse your favorite video podcasts on the 9x9 Player! Podcasts automatically download and update for you, bringing up to 81 channels of new videos daily." />
 <link rel="image_src" href="http://www.cksinfo.com/clipart/toys/abc-blocks.png" />
 
-<link rel="stylesheet" href="http://zoo.atomics.org/video/9x9playerV23/stylesheets/main.css" />
+<!--link rel="stylesheet" href="http://zoo.atomics.org/video/9x9playerV23/stylesheets/main.css" /-->
+<!--link rel="stylesheet" href="/WEB-INFO/../stylesheets/foo.css" /-->
+<link rel="stylesheet" href="http://zoo.atomics.org/video/9x9playerV23/stylesheets/main-x.css" />
 
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 <script type="text/javascript" src="http://static.ak.fbcdn.net/connect/en_US/core.debug.js"></script>
-<script type="text/javascript" src="http://zoo.atomics.org/video/cssanim.js"></script>
 <script type="text/javascript" src="http://zoo.atomics.org/video/swfobject.js"></script>
 <script type="text/javascript" src="http://zoo.atomics.org/video/flowplayer-3.2.4.min.js"></script>
+<script type="text/javascript" src="http://zoo.atomics.org/video/cssanim.js"></script>
 <script type="text/javascript" src="http://zoo.atomics.org/video/9x9playerV23/javascripts/whatsnew.js"></script>
 
 <script>
@@ -509,6 +514,9 @@ function best_url (program)
   else if (navigator.userAgent.match (/(Safari|Chrome)/))
     desired = '(mp4|m4v)';
 
+  else
+    desired = '(mp4|m4v)';
+
   ext = new RegExp ('\.' + desired + '$');
 
   if (programgrid [program]['url1'].match (desired))
@@ -841,13 +849,16 @@ function enter_channel()
 
   prepare_channel();
 
-  if (jQuery.browser.msie && jQuery.browser.version == '8.0')
+  //if (jQuery.browser.msie && jQuery.browser.version == '8.0')
+  if (true)
     {
     $("#control-layer").hide();
     $("#ch-layer").hide();
+    redraw_program_line();
     $("#ep-layer").show();
     thumbing = 'program';
     enter_channel_failsafe();
+    reset_osd_timex();
     return;
     }
 
@@ -898,11 +909,11 @@ function enter_channel_failsafe()
   {
   // prepare_channel();
 
-  $("#ep-layer").css ("opacity", "1");
+  // $("#ep-layer").css ("opacity", "1");
   $("#ep-swish").css ("top", "1.4275em");
   $("#ep-swish").css ("display", "block");
 
-  $("#control-layer").css ("opacity", "1");
+  // $("#control-layer").css ("opacity", "1");
 
   if (thumbing == 'program')
     {
@@ -1287,13 +1298,13 @@ function previous_category()
   {
   log ('previous category');
 
-  for (var cat = current_category - 1; cat >= 1; cat--)
+  for (var cat = parseInt (current_category) - 1; cat >= 1; cat--)
     {
     if (channels_in_category (cat) > 0)
       return cat;
     }
 
-  for (var cat = 9; cat > current_category; cat--)
+  for (var cat = 9; cat > parseInt (current_category); cat--)
     {
     if (channels_in_category (cat) > 0)
       return cat;
@@ -1735,7 +1746,7 @@ function switch_to_whats_new()
 
     for (var i = 0; i < lines.length; i++)
       {
-      var program = lines [i].trim();
+      var program = lines [i].replace (/\s+$/, '');
       if (program != '')
         {
         if (program in programgrid)
@@ -1817,6 +1828,8 @@ function switch_to_whats_new()
     hide_layers();
     thumbing = 'whatsnew';
 
+    stop_preload();
+
     log ('what is new?');
 
     var html = '<p id="whatsnew-title">What\'s New</p>';
@@ -1863,14 +1876,14 @@ function exit_whats_new()
   //$("body").css ("background-image", "none");
   thumbing = 'program';
   switch_to_ipg();
-  $("#all-players").show();
+  // $("#all-players").show();
   }
 
 function whatsnew_enter()
   {
   StopWhatsNew();
   $("body").removeClass ("on");
-  $("#all-players").show();
+  // $("#all-players").show();
 
   var grid = whatsnew [i]['grid'];
   var episode = whatsnew [i]['episodes'][n];
@@ -2189,8 +2202,8 @@ function stop_preload()
 
   if (fp_preloaded == 'yt')
     {
-    ytplayer.stopVideo();
-    ytplayer.unMute();
+    try { ytplayer.stopVideo(); } catch (error) {};
+    try { ytplayer.unMute(); } catch (error) {};
     log ('cleared preload: ' + fp_preloaded);
     }
   else if (fp_preloaded != '')
@@ -3587,9 +3600,10 @@ function yt_tick()
 
   /* cancel ticking if player stopped */
 
-  var state = ytplayer.getPlayerState();
+  var state = -2;
+  try { state = ytplayer.getPlayerState(); } catch (error) {};
 
-  if (state == -1 || state == 0)
+  if (state == -2 || state == -1 || state == 0)
     {
     log ('yt_tick, STATE IS: ' + state);
     clearTimeout (yt_timex);
@@ -4304,20 +4318,35 @@ function facebook_share()
 
 function state()
   {
-  if (flowplayer)
+  if (tube() == "yt")
+    {
+    yt_player_state();
+    }
+  else if (flowplayer)
     {
     log ('current player: ' + fp_player);
-    player_state ('player1');
-    player_state ('player2');
+    fp_player_state ('player1');
+    fp_player_state ('player2');
     }
   else
     log ('flowplayer is not active!');
 
-  log ('layers :: fp1: ' + $("#fp1").css ("display") + ' ' + $("#fp1").css ("visibility") + ', fp2: ' + $("#fp2").css ("display") + ' ' + $("#fp2").css ("visibility"));
+  log ('layers :: fp1: ' + $("#fp1").css ("display") + ' ' + $("#fp1").css ("visibility") + ', fp2: ' + 
+                           $("#fp2").css ("display") + ' ' + $("#fp2").css ("visibility") + ', yt1: ' +
+                           $("#yt1").css ("display") + ' ' + $("#yt1").css ("visibility"));
   return '';
   }
 
-function player_state (player)
+function yt_player_state()
+  {
+  var yt_state = -2;
+  var states = { '-2': 'fail', '-1': 'unstarted', '0': 'ended', '1': 'playing', '2': 'paused', '3': 'buffering', '5': 'cued' };
+
+  try { yt_state = ytplayer.getPlayerState(); } catch (error) {};
+  log ('youtube state: ' + states [yt_state]);
+  }
+
+function fp_player_state (player)
   {
   var fp_state;
 
@@ -4375,7 +4404,7 @@ One moment...
 
 <!--div id="notblue" style="width: 100%; display: none; position: absolute; top: 0; margin: 0; overflow: hidden"-->
 
-  <div id="all-players" style="display: block; padding: 0; display: none">
+  <div id="all-players" style="display: none; padding: 0; display: none">
     <div id="v" style="display: block; padding: 0">
       <video id="vvv" autoplay="false" preload="metadata" loop="false" height="100%" width="100%" volume="0"></video></div>
 
