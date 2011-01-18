@@ -1109,7 +1109,7 @@ function enter_category (cat, positioning)
 
     var phase_out =
       {
-      opacity: "0",
+      opacity: "0"
       // left: positioning == 'b' ? "-45em" : "45em"
       };
 
