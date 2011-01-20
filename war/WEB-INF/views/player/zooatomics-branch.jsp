@@ -15,6 +15,7 @@
 
 <!--link rel="stylesheet" href="http://zoo.atomics.org/video/9x9playerV23/stylesheets/main.css" /-->
 <!--link rel="stylesheet" href="/WEB-INFO/../stylesheets/foo.css" /-->
+
 <link rel="stylesheet" href="http://zoo.atomics.org/video/9x9playerV23/stylesheets/main-x.css" />
 
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
@@ -79,6 +80,7 @@ var clips_played = 0;
 /* cache this for efficiency */
 var loglayer;
 
+
 /* browse */
 var browsables = {};
 var n_browse = 0;
@@ -140,38 +142,33 @@ function elastic()
 
 function elastic_innards()
   {
-  var newWidth = $(window).width() / 16 ;
+  var newWidth  = $(window).width()  / 16;
   var newHeight = $(window).height() / 16;
 
-  var oriWidth = 64;
-  var times = newWidth / oriWidth * 100 + "%";
-  $("body").css("font-size",times);
+  var xtimes = newWidth  / 64 * 100;
+  var ytimes = newHeight / 36 * 100;
 
-  var v = document.getElementById ("v");
+  $("body").css ("font-size", ((xtimes >= ytimes) ? ytimes : xtimes) + "%");
+
   var vh = $(window).height();
   var vw = $(window).width();
-  v.style.height = (vh) + "px";
 
-  // var h = document.getElementById ("jw");
-  // h.style.height = (vh) + "px";
-  // var h = document.getElementById ("jw2");
-  // h.style.height = (vh) + "px";
+  var h = document.getElementById ("v");
+  h.style.height = vh + "px";
   var h = document.getElementById ("fp1");
-  h.style.height = (vh) + "px";
+  h.style.height = vh + "px";
   var h = document.getElementById ("fp2");
-  h.style.height = (vh) + "px";
+  h.style.height = vh + "px";
   var h = document.getElementById ("yt1");
-  h.style.height = (vh) + "px";
-  h.style.width = (vw) + "px";
-
-  // var i = document.getElementById ("ipg-layer");
-  // i.style.height = vh + "px";
+  h.style.height = vh + "px";
+  h.style.width = vw + "px";
 
   ipg_fixup_margin();
   ipg_fixup_middle();
 
   whatsnew_fixup_middle();
   episode_end_layer_fixup();
+  align_center();
 
   if (thumbing == 'ipg')
     extend_ipg_timex();
@@ -220,6 +217,17 @@ function whatsnew_fixup_middle()
   var nh = $("#new-layer").height();
   var nt = (wh-nh)/2;
   $("#new-layer").css("top",nt);
+  }
+
+function align_center()
+  {
+  var ww = $(window).width();
+
+  $("#ipg-layer").css   ("left", (ww - $("#ipg-layer").width())   / 2);
+  $("#new-layer").css   ("left", (ww - $("#new-layer").width())   / 2);
+  $("#ep-layer").css    ("left", (ww - $("#ep-layer").width())    / 2);
+  $("#epend-layer").css ("left", (ww - $("#epend-layer").width()) / 2);
+  $("#loading").css     ("left", (ww - $("#loading").width())     / 2);
   }
 
 function log (text)
@@ -4405,6 +4413,7 @@ One moment...
 <!--div id="notblue" style="width: 100%; display: none; position: absolute; top: 0; margin: 0; overflow: hidden"-->
 
   <div id="all-players" style="display: none; padding: 0; display: none">
+
     <div id="v" style="display: block; padding: 0">
       <video id="vvv" autoplay="false" preload="metadata" loop="false" height="100%" width="100%" volume="0"></video></div>
 
@@ -4439,6 +4448,7 @@ One moment...
   </div>
 
 <div id="ch-layer" style="display: none">
+
   <div id="ch-container">
     <div class="arrow-up"></div><div class="arrow-down"></div>
     <div id="ch-constrain">
@@ -4448,6 +4458,7 @@ One moment...
           <li id="ch-layer-ch-title" class="ch-title"></li>
           <li class="dash">&#8212;</li>
           <li id="ch-layer-ep-title" class="ep-title"></li>
+
         </ul>
         <div class="ch-swish" id="ch-swish-1" style="display: block"><ul id="ch-list-1" class="ch-list"></ul></div>
         <div class="ch-swish" id="ch-swish-2" style="display: block"><ul id="ch-list-2" class="ch-list"></ul></div>
@@ -4457,6 +4468,7 @@ One moment...
         <div class="ch-swish" id="ch-swish-6" style="display: block"><ul id="ch-list-6" class="ch-list"></ul></div>
         <div class="ch-swish" id="ch-swish-7" style="display: block"><ul id="ch-list-7" class="ch-list"></ul></div>
         <div class="ch-swish" id="ch-swish-8" style="display: block"><ul id="ch-list-8" class="ch-list"></ul></div>
+
         <div class="ch-swish" id="ch-swish-9" style="display: block"><ul id="ch-list-9" class="ch-list"></ul></div>
       </div>
       </div>
@@ -4467,6 +4479,7 @@ One moment...
 <div id="ep-layer">
   <div id="ep-container">
     <div class="arrow-up"></div>
+
     <div id="ep-constrain">
       <ul id="ep-meta">
         <li id="ep-layer-ch-title" class="ch-title"></li>
@@ -4476,6 +4489,7 @@ One moment...
       <div id="ep-swish" class="ep-swish" style="display: block">
         <ul class="ep-list" id="ep-list"></ul>
       </div>
+
     </div>
   </div>
 </div>
@@ -4486,11 +4500,13 @@ One moment...
       <li id="ch-thumb"><img id="ch-thumb-img" src=""></li>
       <li id="ch-name"><p>ABC news</p></li>
       <li id="ep-name"><p>An episode name would go here?</p></li>
+
       <li id="description"><p>A description of something is supposed to go here, but I have nothing to put in this spot.</p></li>
       <li id="ep-number"><p><span class="hilite">Episodes: </span><span id="ch-episodes">9</span></p></li>
       <li id="update"><p><span class="hilite">Updated:</span> <span id="update-date"></span></p></li>
       <li id="preloading"><p><span class="hilite">Preload:</span> <span id="preload"></span></p></li>
     </ul>
+
     <ul id="control-list">
       <li><a id="ipg-signin-btn" href="javascript:login_screen()" class="btn">Sign in / Sign up</a></li>
       <li><a id="ipg-return-btn" href="javascript:ipg_resume()" class="btn">Resume watching</a></li>
@@ -4499,6 +4515,7 @@ One moment...
   </div>
   <div id="ipg-grid"></div>
   <div id="menu">
+
     <p id="pop-play"></p><p id="pop-delete"></p>
   </div>
   <!--div id="watermark">I&thinsp;P&thinsp;G</div-->
@@ -4510,6 +4527,7 @@ One moment...
 <div id="signin-layer" style="display: none">
   <ul id="login-pannel">
     <li><h2>Returning Users</h2></li>
+
     <li>
       <span>Email:</span>
       <p class="textfieldbox"><input type="text" id="L-email" class="textfield" value="you@example.com"></p>
@@ -4518,6 +4536,7 @@ One moment...
       <span>Password:</span>
       <p class="textfieldbox"><input type="password" id="L-password" class="textfield" value="swordfish"></p>
     </li>
+
     <li><a href="javascript:submit_login()" class="btn"><span>Log in</span></a></li>
   </ul>
   <ul id="signup-pannel">
@@ -4525,6 +4544,7 @@ One moment...
     <li>
       <span>Name:</span>
       <p class="textfieldbox"><input type="text" id="S-name" class="textfield"></p>
+
     </li>
     <li>
       <span>Email:</span>
@@ -4533,6 +4553,7 @@ One moment...
     <li>
       <span>Password:</span>
       <p class="textfieldbox"><input type="password" id="S-password" class="textfield"></p>
+
     </li>
     <li>
       <span>Password verify:</span>
@@ -4550,6 +4571,7 @@ One moment...
       <li><a href="javascript:submit_throw()" class="btn"><span>Contribute</span></a></li>
     </ul>
     <ul id="podcast-list"></ul>
+
   </div>
 </div>
 
@@ -4561,6 +4583,7 @@ One moment...
   <div id="msg-up">
     <p>Press <span class="enlarge">&uarr;</span> to see your IPG</p>
   </div>
+
   <div id="controler">
     <img src="http://zoo.atomics.org/video/9x9playerV23/images/bg_controler.png" id="controler-bg">
     <ul id="control-bar">
@@ -4570,6 +4593,7 @@ One moment...
       <li id="btn-pause"><img src="http://zoo.atomics.org/video/9x9playerV23/images/btn_pause.png"></li>
       <li id="btn-forward"><img src="http://zoo.atomics.org/video/9x9playerV23/images/btn_forward.png"></li>
       <li class="divider"></li>
+
       <li id="btn-volume"><img src="http://zoo.atomics.org/video/9x9playerV23/images/btn_volume.png"></li>
       <li id="volume-constrain" class="on">
         <ul id="volume-bars">
@@ -4579,6 +4603,7 @@ One moment...
           <li class="on"></li>
           <li class="on"></li>
           <li class="on"></li>
+
           <li class="on"></li>
         </ul>
       </li>
@@ -4588,6 +4613,7 @@ One moment...
       <li class="divider"></li>
       <li id="btn-close"><img src="http://zoo.atomics.org/video/9x9playerV23/images/btn_close.png"></li>
       <li id="play-time">-- / --</li>
+
       <li id="progress-bar">
         <p id="loaded"></p>
         <p id="played"></p>
@@ -4596,6 +4622,7 @@ One moment...
   </div>
   <div id="msg-down">
     <p>Press <span class="enlarge">&darr;</span> for more episodes</p>
+
   </div>
 </div>
 
@@ -4606,6 +4633,7 @@ One moment...
 <div id="epend-layer" style="display: none">
   <div id="go-up">Press <span class="enlarge">&uarr;</span> to go to the IPG</div>
   <div id="go-down">Press <span class="enlarge">&darr;</span> to see all episodes</div>
+
   <div id="go-left"><img src="" id="left-tease">Press <span class="enlarge">&larr;</span> to watch previous channel</div>
   <div id="go-right"><img src="" id="right-tease">Press <span class="enlarge">&rarr;</span> to watch next channel</div>
 </div>
