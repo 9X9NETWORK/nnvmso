@@ -5,19 +5,25 @@
 <meta charset="UTF-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
+<!-- $Revision$ -->
+
 <!-- FB Sharing meta data -->
 <meta name="title" content="My 9x9 Channel Guide <%= (new SimpleDateFormat("MM.dd.yyyy")).format(new Date()) %>" />
 <meta name="description" content="My 9x9 Channel Guide. Easily browse your favorite video podcasts on the 9x9 Player! Podcasts automatically download and update for you, bringing up to 81 channels of new videos daily." />
 <link rel="image_src" href="http://www.cksinfo.com/clipart/toys/abc-blocks.png" />
 
-<link rel="stylesheet" href="http://zoo.atomics.org/video/9x9playerV23/stylesheets/main.css" />
+<link rel="stylesheet" href="http://zoo.atomics.org/video/9x9playerV27/stylesheets/main.css" />
 
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.8/jquery-ui.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.8/i18n/jquery-ui-i18n.min.js"></script>
+
 <script type="text/javascript" src="http://static.ak.fbcdn.net/connect/en_US/core.debug.js"></script>
 <script type="text/javascript" src="http://zoo.atomics.org/video/cssanim.js"></script>
-<script type="text/javascript" src="http://zoo.atomics.org/video/swfobject.js"></script>
+<!--script type="text/javascript" src="http://zoo.atomics.org/video/swfobject.js"></script-->
+<script type="text/javascript" src="http://zoo.atomics.org/video/9x9playerV27/javascripts/jquery.swfobject.1-1-1.min.js"></script>
 <script type="text/javascript" src="http://zoo.atomics.org/video/flowplayer-3.2.4.min.js"></script>
-<script type="text/javascript" src="http://zoo.atomics.org/video/9x9playerV23/javascripts/whatsnew.js"></script>
+<script type="text/javascript" src="http://zoo.atomics.org/video/9x9playerV27/javascripts/whatsnew.js"></script>
 
 <script>
 
@@ -43,6 +49,8 @@ var start_preload = 0;
 var fp = {  player1: { file: '', duration: 0, timex: 0, mute: false },
             player2: { file: '', duration: 0, timex: 0, mute: false }  };
 
+var language = 'en';
+
 var activated = false;
 var remembered_pause = false;
 
@@ -51,6 +59,7 @@ var current_program = '';
 var current_url = '';
 
 var thumbing = '';
+var dragging = false;
 
 var channelgrid = {};
 var channels_by_id = {}
@@ -68,6 +77,7 @@ var ipg_cursor;
 var ipg_timex = 0;
 var ipg_delayed_stop_timex = 0;
 var ipg_preload_timex = 0;
+var ipg_mode = '';
 
 var clips_played = 0;
 
@@ -75,7 +85,12 @@ var clips_played = 0;
 var loglayer;
 
 /* browse */
+var browser_x;
+var browser_y;
+var browse_content = {};
 var browsables = {};
+var browser_cat = 0;
+var browser_cat_cursor = 1;
 var n_browse = 0;
 var saved_thumbing = '';
 var control_saved_thumbing = '';
@@ -112,13 +127,13 @@ var via_shared_ipg = false;
 /* reduced functionality if there is a valid user but he is visiting a shared ipg */
 var readonly_ipg = false;
 
-var root = 'http://zoo.atomics.org/video/9x9playerV23/images/';
+var root = 'http://zoo.atomics.org/video/9x9playerV27/images/';
 
 $(document).ready (function()
  {
  log ('begin execution');
  init();
- login();
+ pre_login();
  $(window).resize (function() { elastic(); });
  });
 
@@ -126,47 +141,38 @@ function elastic()
   {
   log ('elastic');
   elastic_innards();
-  if (thumbing == 'whatsnew')
-    {
-    GetAnchor();
-    GetFilmPos2();
-    }
   }
 
 function elastic_innards()
   {
-  var newWidth = $(window).width() / 16 ;
+  var newWidth  = $(window).width()  / 16;
   var newHeight = $(window).height() / 16;
 
-  var oriWidth = 64;
-  var times = newWidth / oriWidth * 100 + "%";
-  $("body").css("font-size",times);
+  var xtimes = newWidth  / 64 * 100;
+  var ytimes = newHeight / 36 * 100;
 
-  var v = document.getElementById ("v");
+  $("body").css ("font-size", ((xtimes >= ytimes) ? ytimes : xtimes) + "%");
+
   var vh = $(window).height();
   var vw = $(window).width();
-  v.style.height = (vh) + "px";
 
-  // var h = document.getElementById ("jw");
-  // h.style.height = (vh) + "px";
-  // var h = document.getElementById ("jw2");
-  // h.style.height = (vh) + "px";
+  var h = document.getElementById ("v");
+  h.style.height = vh + "px";
   var h = document.getElementById ("fp1");
-  h.style.height = (vh) + "px";
+  h.style.height = vh + "px";
   var h = document.getElementById ("fp2");
-  h.style.height = (vh) + "px";
+  h.style.height = vh + "px";
   var h = document.getElementById ("yt1");
-  h.style.height = (vh) + "px";
-  h.style.width = (vw) + "px";
-
-  // var i = document.getElementById ("ipg-layer");
-  // i.style.height = vh + "px";
+  h.style.height = vh + "px";
+  h.style.width = vw + "px";
 
   ipg_fixup_margin();
   ipg_fixup_middle();
 
   whatsnew_fixup_middle();
   episode_end_layer_fixup();
+  dir_waiting_fixup();
+  align_center();
 
   if (thumbing == 'ipg')
     extend_ipg_timex();
@@ -199,22 +205,39 @@ function ipg_fixup_margin()
 
 function ipg_fixup_middle()
   {
-  var wh = $(window).height();
-  var lh = $("#ipg-layer").height();
-
-  var margin = (wh - lh) / 2;
-  // log ('align_middle :: wh: ' + wh + ' lh: ' + lh + ' margin: ' + margin);
-
-  $("#ipg-layer").css ("top", margin);
-  $("#podcast-layer").css ("top", margin);
+  try { $("#ipg-holder").css ("top", ($(window).height() - $("#ipg-holder").height()) / 2); } catch (error) {};
+  try { $("#dir-holder").css ("top", ($(window).height() - $("#dir-holder").height()) / 2); } catch (error) {};
+  try { $("#list-holder").css ("top", ($("#ipg-grid").height() - $("#list-holder").height()) / 2); } catch (error) {};
   }
 
 function whatsnew_fixup_middle()
   {
+  try { $("#new-holder").css ("top", ($(window).height() - $("#new-holder").height()) / 2); } catch (error) {};
+  }
+
+function dir_waiting_fixup()
+  {
+  var offset = $(".content-panel").offset();
+  $("#dir-waiting").css ({ "left": offset.left, "top": offset.top });
+  }
+
+function align_center()
+  {
+  var ww = $(window).width();
   var wh = $(window).height();
-  var nh = $("#new-layer").height();
-  var nt = (wh-nh)/2;
-  $("#new-layer").css("top",nt);
+
+  $("#ipg-holder").css  ("left", (ww - $("#ipg-holder").width())  / 2);
+  $("#dir-holder").css  ("left", (ww - $("#dir-holder").width())  / 2);
+  $("#new-holder").css  ("left", (ww - $("#new-holder").width())  / 2);
+  $("#ep-layer").css    ("left", (ww - $("#ep-layer").width())    / 2);
+  $("#epend-layer").css ("left", (ww - $("#epend-layer").width()) / 2);
+  $("#msg-layer").css   ("left", (ww - $("#msg-layer").width())   / 2);
+  $("#waiting").css     ("left", (ww - $("#waiting").width())     / 2);
+//$("#ipg-hit").css     ("left", (ww - $("#ipg-hit").width())     / 2);
+//$("#ep-hit").css      ("left", (ww - $("#ep-hit").width())      / 2);
+//$("#error-layer").css ("left", (ww - $("#error-layer").width()) / 2);
+
+  $("#splash").css      ("top",  (wh - $("#splash").height())     / 2);
   }
 
 function log (text)
@@ -360,20 +383,34 @@ function parse_program_data (data)
   // 12=timestamp
 
   var lines = data.split ('\n');
-  log ('number of programs obtained: ' + lines.length);
-  for (var i = 0; i < lines.length; i++)
-    {
-    if (lines [i] != '')
-      {
-      var fields = lines[i].split ('\t');
-      programgrid [fields [1]] = { 'channel': fields[0], 'type': fields[3], 'url1': 'fp:' + fields[8], 
-                   'url2': 'fp:' + fields[9], 'url3': 'fp:' + fields[10], 'url4': 'fp:' + fields[11], 
-                   'name': fields[2], 'desc': fields [3], 'type': fields[4], 'thumb': fields[6], 
-                   'snapshot': fields[7], 'timestamp': fields[12], 'duration': fields[5] };
-      }
-    }
 
-  log ('finished parsing program data');
+  log ('number of programs obtained: ' + lines.length);
+
+  if (lines.length > 0)
+    {
+    var fields = lines[0].split ('\t');
+    if (fields [0] != '0')
+      {
+      log_and_alert ('server error: ' + lines [0]);
+      return;
+      }
+
+    for (var i = 1; i < lines.length; i++)
+      {
+      if (lines [i] != '')
+        {
+        var fields = lines[i].split ('\t');
+        programgrid [fields [1]] = { 'channel': fields[0], 'type': fields[3], 'url1': 'fp:' + fields[8], 
+                     'url2': 'fp:' + fields[9], 'url3': 'fp:' + fields[10], 'url4': 'fp:' + fields[11], 
+                     'name': fields[2], 'desc': fields [3], 'type': fields[4], 'thumb': fields[6], 
+                     'snapshot': fields[7], 'timestamp': fields[12], 'duration': fields[5] };
+        }
+      }
+
+    log ('finished parsing program data');
+    }
+  else
+    log_and_alert ('server returned nothing');
   }
 
 function fetch_channels()
@@ -403,7 +440,15 @@ function fetch_channels()
 
     var lines = data.split ('\n');
     log ('number of channels obtained: ' + lines.length);
-    for (var i = 0; i < lines.length; i++)
+
+    var fields = lines[0].split ('\t');
+    if (fields [0] != '0')
+      {
+      log_and_alert ('server error: ' + lines [0]);
+      return;
+      }
+
+    for (var i = 1; i < lines.length; i++)
       {
       if (lines [i] != '')
         {
@@ -437,6 +482,10 @@ function browser_support()
 
 function activate()
   {
+  log ('activate');
+
+  $("#opening").hide();
+
   if (!browser_support())
     return;
 
@@ -471,7 +520,7 @@ function preload_control_images()
   {
   var html = '';
 
-  for (var i in { 'bg_controler':'', 'btn_rewind':'', 'btn_pause':'', 'btn_play':'', 'btn_forward':'', 'btn_volume':'', 'btn_close':'', 'btn_on':'', 'btn_off':'', 'btn_facebook':'', 'btn_replay':'', 'btn_screensaver':'', 'bg_ep':'', 'bg_podcastlist':'', 'bg_film':'' })
+  for (var i in { 'bg_controler':'', 'btn_rewind':'', 'btn_pause':'', 'btn_play':'', 'btn_forward':'', 'btn_volume':'', 'btn_close':'', 'btn_on':'', 'btn_off':'', 'btn_facebook':'', 'btn_replay':'', 'btn_screensaver':'', 'bg_ep':'', 'bg_film':'' })
     html += '<img src="' + root + i + '.png">';
 
   $("#preload-control-images").html (html);
@@ -750,10 +799,16 @@ function update_bubble()
 
   var channel = channel_line [channel_cursor];
 
-  var channel_name = channelgrid [channel]['name'];
-  if (channel_name.match (/^\s*$/)) { channel_name = '[no channel name]'; }
+  if (channel in channelgrid)
+    {
+    var channel_name = channelgrid [channel]['name'];
+    if (channel_name.match (/^\s*$/)) { channel_name = '[no channel name]'; }
 
-  $("#ep-layer-ch-title").html (channel_name);
+    $("#ep-layer-ch-title").html (channel_name);
+    }
+  else
+    $("#ep-layer-ch-title").html ('');
+
   $("#ep-layer-ep-title").html (program_name);
   }
 
@@ -803,6 +858,9 @@ function prepare_channel()
   $("#ep-list").html (ep_html());
   $("#ep-list img").error(function () { $(this).unbind("error").attr("src", "http://zoo.atomics.org/video/images-x1/no_images.png"); });
   $("#ep-list .clickable").bind ('click', function() { ep_click ($(this).attr('id')); });
+
+  if (thumbing == 'ipg' && ipg_mode == 'episodes')
+    $("#ep-list .clickable").bind ('hover', function() { ipg_episode_over ($(this).attr('id')); });
 
   update_bubble();
   redraw_program_line();
@@ -864,8 +922,7 @@ function ep_html()
     if (thumbnail == '' || thumbnail == 'null' || thumbnail == 'false')
       thumbnail = bad_thumbnail;
 
-    html += '<li class="' + classes + '" id="p-li-' + i + '"><img src="' + root + 'bg_ep.png" class="bg-ep"><img src="' + thumbnail + '">'
-    html += '<p class="timestamp unseen">' + age + '</p><p class="duration">' + duration + '</p></li>';
+    html += '<li class="' + classes + '" id="p-li-' + i + '"><img src="' + root + 'bg_ep_off.png" class="bg-ep"><img src="' + thumbnail + '" class="thumbnail"></li>'
     }
 
   return html;
@@ -1169,6 +1226,12 @@ function escape()
   if (thumbing == 'browse-wait')
     return;
 
+  if (thumbing == 'ipg' && ipg_mode == 'episodes')
+    {
+    ipg_exit_episode_mode();
+    return;
+    }
+
   switch (thumbing)
     {
     case 'program': layer = $("#ep-layer");
@@ -1182,7 +1245,7 @@ function escape()
     case 'user':    layer = $("#signin-layer");
                     break;
 
-    case 'browse':  layer = $("#podcast-layer");
+    case 'browse':  layer = $("#ch-directory");
                     break;
 
     case 'control': layer = $("#control-layer");
@@ -1260,7 +1323,7 @@ function keypress (keycode)
     return;
 
   /* special case, channel browser + navigation key */
-  if (thumbing == 'browse' && keycode != 27 && keycode != 38 && keycode != 40 && keycode != 13 && keycode != 33 && keycode != 34)
+  if (thumbing == 'browse' && keycode != 27 && keycode != 37 && keycode != 38 && keycode != 39 && keycode != 40 && keycode != 13 && keycode != 33 && keycode != 34)
     return;
 
   if (thumbing == 'ipg')
@@ -1289,6 +1352,8 @@ function keypress (keycode)
       /* esc */
       if (thumbing == 'whatsnew')
         exit_whats_new();
+      else if (thumbing == 'ipg' && ipg_mode == 'episodes')
+        escape();
       else if (thumbing == 'ipg' && clips_played == 0)
         { /* do nothing */ }
       else
@@ -1308,7 +1373,7 @@ function keypress (keycode)
       if (thumbing == 'ipg')
         ipg_play();
       else if (thumbing == 'browse')
-        browse_accept();
+        browse_enter ($("#content-" + browser_x + '-' + browser_y).attr ("data-id"));
       else if (thumbing == 'channel' || thumbing == 'program')
         switch_to_control_layer();
       else if (thumbing == 'control')
@@ -1333,6 +1398,8 @@ function keypress (keycode)
         control_left();
       else if (thumbing == 'whatsnew')
         PrevEp();
+      else if (thumbing == 'browse')
+        browse_left();
       break;
 
     case 39:
@@ -1351,6 +1418,8 @@ function keypress (keycode)
         control_right();
       else if (thumbing == 'whatsnew')
         NextEp();
+      else if (thumbing == 'browse')
+        browse_right();
       break;
 
     case 38:
@@ -1502,14 +1571,22 @@ function switch_to_whats_new()
   var d = $.get (query, function (data)
     {
     var lines = data.split ('\n');
+
+    var fields = lines[0].split ('\t');
+    if (fields [0] != '0')
+      {
+      log ('[whatsNew] server error: ' + lines [0]);
+      return;
+      }
+
     log ('number of new programs obtained: ' + lines.length);
 
     var wn = {};
     var wn_count = 0;
 
-    for (var i = 0; i < lines.length; i++)
+    for (var i = 1; i < lines.length; i++)
       {
-      var program = lines [i].trim();
+      var program = lines [i].replace (/\s+$/, '');
       if (program != '')
         {
         if (program in programgrid)
@@ -1619,7 +1696,7 @@ function switch_to_whats_new()
       html += '</ul>';
       }
 
-    $("#new-layer").html (html);
+    $("#new-holder").html (html);
 
     $("body").addClass ("on");
 
@@ -1715,7 +1792,7 @@ function extend_ep_layer()
 function delayed_video_stop()
   {
   log ('delayed video stop: ' + thumbing);
-  if (thumbing == 'ipg' && current_tube == 'fp')
+  if ((thumbing == 'ipg' || thumbing == 'browse' || thumbing == 'browse-wait') && current_tube == 'fp')
     {
     try { log ('flowplayer state: ' + flowplayer(fp_player).getState()); } catch (error) {};
     physical_stop();
@@ -1746,10 +1823,12 @@ function switch_to_ipg()
   stop_preload();
   $("#loading").hide();
 
-  if (jQuery.browser.msie && (jQuery.browser.version == '7.0' || jQuery.browser.version == '8.0'))
+  //if (jQuery.browser.msie && (jQuery.browser.version == '7.0' || jQuery.browser.version == '8.0'))
+  if (true)
     {
     $("#control-layer").hide();
-    $("#ep-layer").hide();
+    // $("#ep-layer").hide();
+    ipg_program_tip();
     $("#ipg-layer").show();
     $("#body").addClass ("on");
     elastic();
@@ -1823,7 +1902,6 @@ function redraw_ipg()
   for (var y = 1; y <= 9; y++)
     {
     html += '<ul class="ipg-list" id="row-' + y + '">';
-    html += '<li class="rowNum"><span>' + y + '</span></li>';
 
     for (var x = 1; x <= 9; x++)
       {
@@ -1831,20 +1909,36 @@ function redraw_ipg()
         {
         var thumb = channelgrid ["" + y + "" + x]['thumb'];
         if (thumb == '' || thumb == 'null' || thumb == 'false')
-          html += '<li class="clickable" id="ipg-' + y + '' + x + '">' + bad_thumbnail + '</li>';
+          html += '<li class="clickable draggable" id="ipg-' + y + '' + x + '">' + bad_thumbnail + '</li>';
         else
-          html += '<li class="clickable" id="ipg-' + y + '' + x + '"><img src="' + channelgrid ["" + y + "" + x]['thumb'] + '"></li>';
+          html += '<li class="clickable draggable" id="ipg-' + y + '' + x + '"><img src="' + channelgrid ["" + y + "" + x]['thumb'] + '"></li>';
         }
       else
-        html += '<li class="clickable" id="ipg-' + y + '' + x + '"><img src="' + root + 'add_channel.png" class="add-ch"></li>';
+        html += '<li class="clickable droppable" id="ipg-' + y + '' + x + '"><img src="' + root + 'add_channel.png" class="add-ch"></li>';
       }
 
     html += '</ul>';
     }
 
-  $("#ipg-grid").html (html);
-  $("#ipg-grid img").error(function () { $(this).unbind("error").attr("src", "http://zoo.atomics.org/video/images-x1/no_images.png"); });
-  $("#ipg-grid .clickable").bind ('click', function () { ipg_click ($(this).attr ('id')); });
+  $("#list-holder").html (html);
+  $("#list-holder img").error(function () { $(this).unbind("error").attr("src", "http://zoo.atomics.org/video/images-x1/no_images.png"); });
+  $("#list-holder .clickable").bind ('click', function () { ipg_click ($(this).attr ('id')); });
+
+  $(function()
+    {
+    $( "#list-holder .draggable" ).draggable({ zIndex: 9999, opacity: 1 });
+    $( "#list-holder .droppable" ).droppable
+         ({
+             revert: "invalid",
+             activate: function() { if (!dragging) { dragging = true; log ('dragstart'); } },
+             deactivate: function() { setTimeout ("drag_cleanup()", 200); },
+             accept: ".draggable",
+             activeClass: "ui-state-hover",
+             hoverClass: "ui-state-active",
+             drop: function (event, ui)
+                      { setTimeout ('move_channel ("' + ui.draggable.attr('id') + '", "' + $(this).attr('id') + '")', 20); }
+         });
+    });
 
   // ipg_cursor = parseInt (channel_line [channel_cursor]);
 
@@ -1855,6 +1949,41 @@ function redraw_ipg()
 
   ipg_fixup_margin();
   ipg_fixup_middle();
+  }
+
+function drag_cleanup()
+  {
+  if (dragging)
+    {
+    dragging = false;
+    log ('drag cleanup');
+    redraw_ipg();
+    elastic();
+    }
+  }
+
+function move_channel (src, dst)
+  {
+  dragging = false;
+
+  stop_preload();
+
+  src = src.replace (/^ipg-/, '');
+  dst = dst.replace (/^ipg-/, '');
+
+  log ('MOVE CHANNEL: ' + src + ' TO ' + dst + ' (id: ' + channelgrid [src] + ')');
+
+  channelgrid [dst] = channelgrid [src];
+  channels_by_id [channelgrid [dst]['id']] = dst;
+
+  ipg_cursor = dst;
+
+  delete (channelgrid [src]);
+
+  redraw_ipg();
+  elastic();
+
+  start_preload_timer();
   }
 
 function ipg_metainfo()
@@ -1941,8 +2070,8 @@ function stop_preload()
 
   if (fp_preloaded == 'yt')
     {
-    ytplayer.stopVideo();
-    ytplayer.unMute();
+    try { ytplayer.stopVideo(); } catch (error) {};
+    try { ytplayer.unMute(); } catch (error) {};
     log ('cleared preload: ' + fp_preloaded);
     }
   else if (fp_preloaded != '')
@@ -1974,9 +2103,43 @@ function preload_this_square()
     ipg_preload (ipg_cursor);
   }
 
+
+function ipg_exit_episode_mode()
+  {
+  log ('ipg mode: episodes -> tip');
+  $("#ipg-content").removeClass ("fade");
+  ipg_program_tip();
+  ipg_mode = 'tip';
+  }
+
+function ipg_sync()
+  {
+  if (ipg_cursor in channelgrid)
+    {
+    ipg_set_channel (ipg_cursor);
+    ipg_program_index();
+    $("#ipg-content").addClass("fade");
+    $("#ep-list .clickable").bind ('click', function() { ep_click ($(this).attr('id')); });
+    ipg_mode = 'episodes';
+    }
+  else
+    {
+    ipg_program_tip();
+    $("#ipg-content").removeClass("fade");
+    ipg_mode = 'tip';
+    }
+  }
+
 function ipg_right()
   {
   log ("IPG RIGHT: old ipg cursor: " + ipg_cursor);
+
+  if (ipg_mode == 'episodes')
+    {
+    physical_mute();
+    program_right();
+    return;
+    }
 
   if (ipg_cursor < 0)
     {
@@ -1990,12 +2153,12 @@ function ipg_right()
 
     // ipg_cursor = next_channel_square (ipg_cursor)
 
-    if (ipg_cursor == 99)
+    if (parseInt (ipg_cursor) == 99)
       ipg_cursor = 11;
-    else if (ipg_cursor % 10 == 9)
-      ipg_cursor += 2; /* 39 -> 41 */
+    else if (parseInt (ipg_cursor) % 10 == 9)
+      ipg_cursor = parseInt (ipg_cursor) + 2; /* 39 -> 41 */
     else
-      ipg_cursor++;
+      ipg_cursor = parseInt (ipg_cursor) + 1;
     }
 
   log ("new ipg cursor: " + ipg_cursor);
@@ -2005,11 +2168,19 @@ function ipg_right()
 
   stop_preload();
   start_preload_timer();
+
+  ipg_program_tip();
   }
 
 function ipg_left()
   {
   log ("IPG LEFT: old ipg cursor: " + ipg_cursor);
+
+  if (ipg_mode == 'episodes')
+    {
+    program_left();
+    return;
+    }
 
   if (ipg_cursor < 0)
     return;
@@ -2018,7 +2189,7 @@ function ipg_left()
 
   // ipg_cursor = previous_channel_square (ipg_cursor)
 
-  if (ipg_cursor % 10 == 1)
+  if (parseInt (ipg_cursor) % 10 == 1)
     {
     log ('switching to ipg left panel');
     ipg_cursor = -2;
@@ -2026,12 +2197,12 @@ function ipg_left()
     return;
     }
 
-  if (ipg_cursor == 11)
+  if (parseInt (ipg_cursor) == 11)
     ipg_cursor = 99;
-  else if (ipg_cursor % 10 == 1)
-    ipg_cursor -= 2; /* 41 -> 39 */
+  else if (parseInt (ipg_cursor) % 10 == 1)
+    ipg_cursor = parseInt (ipg_cursor) - 2; /* 41 -> 39 */
   else
-    ipg_cursor--;
+    ipg_cursor = parseInt (ipg_cursor) - 1;
 
   log ("new ipg cursor: " + ipg_cursor);
 
@@ -2040,11 +2211,19 @@ function ipg_left()
 
   stop_preload();
   start_preload_timer();
+
+  ipg_program_tip();
   }
 
 function ipg_up()
   {
   log ("IPG UP: old ipg cursor: " + ipg_cursor);
+
+  if (ipg_mode == 'episodes')
+    {
+    ipg_exit_episode_mode();
+    return;
+    }
 
   if (ipg_cursor == -1)
     {
@@ -2063,8 +2242,8 @@ function ipg_up()
     {
     $("#ipg-" + ipg_cursor).removeClass ("on");
 
-    if (ipg_cursor > 19)
-      ipg_cursor -= 10;
+    if (parseInt (ipg_cursor) > 19)
+      ipg_cursor = parseInt (ipg_cursor) - 10;
     else
       {
       // disabled wraparound for now
@@ -2079,11 +2258,16 @@ function ipg_up()
 
   stop_preload();
   start_preload_timer();
+
+  ipg_program_tip();
   }
 
 function ipg_down()
   {
   log ("IPG DOWN: old ipg cursor: " + ipg_cursor);
+
+  if (ipg_mode == 'episodes')
+    return;
 
   if (ipg_cursor < 0)
     {
@@ -2110,8 +2294,8 @@ function ipg_down()
 
   $("#ipg-" + ipg_cursor).removeClass ("on");
 
-  if (ipg_cursor < 90)
-    ipg_cursor += 10;
+  if (parseInt (ipg_cursor) < 90)
+    ipg_cursor = parseInt (ipg_cursor) + 10;
   else
     {
     // disabled wraparound for now
@@ -2124,6 +2308,8 @@ function ipg_down()
 
   stop_preload();
   start_preload_timer();
+
+  ipg_program_tip();
   }
 
 function ipg_resume()
@@ -2150,18 +2336,106 @@ function ipg_resume()
   play_program();
   }
 
+function ipg_set_channel (grid)
+  {
+  enter_category (Math.floor (grid/10), '');
+
+  program_cursor = 1;
+  program_first = 1;
+
+  current_program = first_program_in (grid);
+
+  for (var c in channel_line)
+    if (channel_line [c] == grid)
+      {
+      channel_cursor = c;
+      enter_channel();
+      /* and then yucky fixups (temporary) */
+      thumbing = 'ipg';
+      $("#ipg-layer").show();
+      clear_osd_timex();
+      return;
+      }
+
+  log_and_alert ('was unable to enter channel: ' + grid);
+  }
+
+function ipg_program_tip()
+  {
+  $("#ep-container").hide();
+  $("#ep-tip").show();
+  $("#ep-layer").show();
+  $("#ipg-content").removeClass ("fade");
+  $("#ep-panel").attr ("src", root + '/ep_panel_off.png');
+
+  ipg_mode = 'tip';
+
+  if (ipg_cursor in channelgrid && !channelgrid [ipg_cursor]['thumbcache'])
+    {
+    channelgrid [ipg_cursor]['thumbcache'] = 1;
+    setTimeout ("ipg_episode_thumbs(" + ipg_cursor + ")", 400);
+    }
+  }
+
+function ipg_episode_thumbs (id)
+  {
+  if (thumbing == 'ipg' && ipg_cursor == id)
+    {
+    if (channelgrid [id]['thumbcache'] == 2)
+      {
+      /* thumbs presently being loaded */
+      return;
+      }
+
+    channelgrid [id]['thumbcache'] = 2;
+
+    log ('preload episode thumbs');
+    ipg_set_channel (id);
+
+    for (var p in program_line)
+      {
+      if (program_line [p] in programgrid)
+        {
+        var image = new Image();
+        image.src = programgrid [program_line[p]]['thumb'];
+        }
+      }
+    }
+  }
+
+function ipg_program_index()
+  {
+  $("#ep-list").html (ep_html());
+  $("#ep-layer").show();
+  $("#ep-tip").hide();
+  $("#ep-container").show(); //.fadeIn()
+  $("#ep-panel").attr ("src", root + '/ep_panel_on.png');
+  }
+
 function ipg_click (id)
   {
+  if (dragging)
+    {
+    log ('eating apparent false click');
+    return;
+    }
+  else
+    log ('CLICK');
+
   if (thumbing == 'ipg')
     {
     id = id.replace (/^ipg-/, '');
     log ('ipg_click: ' + id);
 
-    if (ipg_cursor != id)
+    var previous_cursor = ipg_cursor;
+    ipg_cursor = id;
+
+    ipg_sync();
+
+    if (ipg_cursor != previous_cursor)
       {
-      $("#ipg-" + ipg_cursor).removeClass ("on");
+      $("#ipg-" + previous_cursor).removeClass ("on");
       $("#ipg-" + id).addClass ("on");
-      ipg_cursor = id;
 
       ipg_metainfo();
       current_program = first_program_in (id);
@@ -2171,7 +2445,10 @@ function ipg_click (id)
       start_preload_timer();
       }
     else
+      {
+      log ('PLAY. ipg cursor: ' + ipg_cursor + ', id: ' + id);
       ipg_play();
+      }
     }
   }
 
@@ -2206,9 +2483,32 @@ function ipg_play()
     return;
     }
 
+  if (ipg_mode == 'tip')
+    {
+    ipg_mode = 'episodes';
+    ipg_sync();
+    return;
+    }
+
   if (programs_in_channel (ipg_cursor) < 1)
     {
     log_and_alert ('no programs in channel!');
+    return;
+    }
+
+  clearTimeout (ipg_timex);
+  clearTimeout (ipg_delayed_stop_timex);
+
+//xyz
+  if (ipg_mode == 'episodes' && program_cursor != 1)
+    {
+    physical_seek (0);
+    physical_unmute();
+    physical_play();
+    unhide_player (current_tube);
+    $("#ipg-layer").hide();
+    thumbing = 'program';
+    stop_all_other_players();
     return;
     }
 
@@ -2223,8 +2523,7 @@ function ipg_play()
 
   $("#ipg-layer").hide();
 
-  clearTimeout (ipg_timex);
-  clearTimeout (ipg_delayed_stop_timex);
+
 
   enter_category ((""+ipg_cursor).substring (0, 1));
 
@@ -2302,15 +2601,25 @@ function redraw_channel_line()
 
 function ep_click (id)
   {
-  if (thumbing == 'program')
+log ("EP CLICK");
+  if (thumbing == 'program' || thumbing == 'ipg')
     {
     id = id.replace (/^p-li-/, '');
     log ('ep_click: ' + id);
     program_cursor = id;
     redraw_program_line();
     physical_stop();
+    if (thumbing == 'ipg')
+      {
+      thumbing = 'program';
+      $("#ipg-layer").hide();
+      }
     if (tube() == 'fp') play_program();
     }
+  }
+
+function ipg_episode_hover (id)
+  {
   }
 
 function program_right()
@@ -2496,7 +2805,17 @@ function submit_login()
       channelgrid = {};
       programgrid = {};
       escape();
-      log_and_alert ('logged in as user: ' + user);
+
+      if (fields.length >= 3)
+        {
+        //log_and_alert ('logged in as user: ' + fields [2]);
+        $("#user").html (fields [2]);
+        }
+      else
+        {
+        //log_and_alert ('logged in as user: ' + user);
+        }
+
       resume();
       activated = false;
       fetch_programs();
@@ -2541,7 +2860,17 @@ function submit_signup()
       channelgrid = {};
       programgrid = {};
       escape();
-      log_and_alert ('signed up as user: ' + user);
+
+      if (fields.length >= 3)
+        {
+        //log_and_alert ('signed up as user: ' + fields [2]);
+        $("#user").html (fields [2]);
+        }
+      else
+        {
+        //log_and_alert ('signed up as user: ' + user);
+        }
+
       resume();
       fetch_programs();
       }
@@ -2559,17 +2888,33 @@ function submit_throw()
     }
 
   /* always called from IPG, use ipg_cursor */
+  var categories = '';
 
-  var serialized = $("#throw").serialize() + '&' + 'user=' + user + '&' + 'grid=' + server_grid (ipg_cursor);
+  $("#cate-list .selected").each (function()
+    {
+    var id = $(this).attr("id").replace (/^addcat-/, '');
+    if (categories != '')
+      { categories += ','; }
+    categories += browsables [id];
+    });
+//xxzz
+  var url = encodeURIComponent ($("#submit-url").val());
+
+  // $("#throw").serialize()
+  var serialized =  'url=' + url + '&' + 'user=' + user + '&' + 'grid=' + server_grid (ipg_cursor) + '&' + 'langCode=' + language + '&' + 'category=' + categories;
   log ('throw: ' + serialized);
 
-  $.post ("/playerAPI/podcastSubmit", serialized, function (data)
+  $("#feedback").html ('<p>Please wait...</p>');
+  $("#feedback").show();
+
+  $.post ("/playerAPI/channelSubmit", serialized, function (data)
     {
     sanity_check_data ('podcastSubmit', data);
     var fields = data.split ('\t');
     if (fields [0] == "0")
       {
-      escape();
+      $("#feedback").html ('<p>Successful!</p>');
+      //escape();
       log_and_alert ('podcast thrown!')
       // fields: 0=status 1=channel-id 2=channel-name 3=channel-thumb
       channelgrid [ipg_cursor] = { 'id': fields[1], 'name': fields[2], 'thumb': fields[3] };
@@ -2578,7 +2923,10 @@ function submit_throw()
       add_dirty_channel (fields[1]);
       }
     else
-      log_and_alert ("PODCAST THROW FAIL: " + fields [1]);
+      {
+      $("#feedback").html ('<p>FAILED: ' + fields[1] + '</p>');
+      //log_and_alert ("PODCAST THROW FAIL: " + fields [1]);
+      }
     $("#podcastRSS").html ('');
     })
   }
@@ -2618,8 +2966,8 @@ function dirty()
 
     /* once program data is returned, remove those channels from dirty list */
 
-    var lines = data.split();
-    for (var i = 0; i < lines.length; i++)
+    var lines = data.split ('\n');
+    for (var i = 1; i < lines.length; i++)
       {
       if (lines [i] != '')
         {
@@ -2638,6 +2986,53 @@ function dirty()
     log ('next dirty check: ' + dirty_delay + ' seconds');
     dirty_timex = setTimeout ("dirty()", dirty_delay * 1000);
     }
+  }
+
+function pre_login()
+  {
+  // key	agg5eDl0dmRldnIKCxIDTXNvGOg-DA
+  // name	9x9
+  // loglUrl	/WEB-INF/../images/logo_9x9.png
+  // jingleUrl	/WEB-INF/../videos/logo2.swf
+  // preferredLangCode	en
+
+  log ('pre_login');
+
+  var d = $.get ("/playerAPI/brandInfo", function (data)
+    {
+    var lines = data.split ('\n');
+    var fields = lines[0].split ('\t');
+    if (fields[0] == '0')
+      {
+      for (var i = 1; i < lines.length; i++)
+        {
+        var fields = lines[i].split ('\t');
+        if (fields[0] == 'loglUrl')
+          {
+          log ('logo: ' + fields[1]);
+          $("#logo").attr ('src', fields[1]);
+          }
+        else if (fields[0] == 'jingleUrl')
+          {
+          log ('jingle: ' + fields[1]);
+          //$("#opening").css ("display", "block");
+          //$("#opening").css("z-index", "99999");
+          $("#blue").hide();
+          $("#splash").flash({ swf: fields[1], width: "100%", height: "100%", wmode: 'transparent' });
+          }
+        else if (fields[0] == 'preferredLangCode')
+          {
+          log ('language: ' + fields[1]);
+          language = fields[1];
+          }
+        }
+      login();
+      }
+    else
+      {
+      alert ('[brandInfo] failure!');
+      }
+    });
   }
 
 function login()
@@ -2709,7 +3104,306 @@ function login()
     }
   }
 
+function calculate_empties()
+  {
+  var n = 0;
+
+  for (var y = 1; y <= 9; y++)
+    for (var x = 1; x <= 9; x++)
+      if (! (["" + y + "" + x] in channelgrid))
+        n++;
+
+  var text;
+
+  if (n == 1)
+    text = 'You still have one empty channel';
+  else if (n == 81)
+    text = 'You have no empty channels!'
+  else
+    text = 'You still have ' + n + ' empty channels';
+
+  $("#ch-vacancy").html (text);
+  }
+
 function browse()
+  {
+  log ('channel directory browse');
+
+  saved_thumbing = thumbing;
+  thumbing = 'browse-wait';
+  browsables = [];
+  browser_cat_cursor = 1;
+
+  $("#msg-layer").html ('<p>One moment...</p>');
+  $("#msg-layer").show();
+
+  var query = "/playerAPI/categoryBrowse?langCode=en";
+  var d = $.get (query, function (data)
+    {
+    $("#msg-layer").hide();
+    sanity_check_data ('categoryBrowse', data);
+
+    calculate_empties();
+    $("#ch-directory").show();
+    elastic();
+
+    thumbing = 'browse';
+
+    var html = '';
+    var add_html = '';
+
+    var first_category;
+
+    var lines = data.split ('\n');
+
+    var fields = lines[0].split ('\t');
+    if (fields [0] != '0')
+      {
+      log_and_alert ('[categoryBrowse] server error: ' + lines [0]);
+      return;
+      }
+
+    for (var i = 1; i < lines.length; i++)
+      {
+      if (lines [i] != '')
+        {
+        var fields = lines[i].split ('\t');
+        var xclass = (i == 1) ? ' class="selected"' : '';
+        if (i == 1) first_category = fields[0];
+        html += '<li id="cat-' + i + '"' + xclass + '><p>' + fields[1] + '<span class="arrow">&raquo;</span></li>';
+        add_html += '<li id="addcat-' + i + '"><img id="img-addcat-' + i + '" src="' + root + 'check_off.png"><span>' + fields[1] + '</span></li>';
+        browsables [i] = fields[0];
+        }
+      }
+
+    $("#ch-catlist").html (html);
+    $("#cate-list").html (add_html);
+
+    $("#main-panel li").bind ('click', function () { browse_click (1, $(this).attr ('id')); });
+    $("#ch-catlist li").bind ('click', function () { browse_click (2, $(this).attr ('id')); });
+    $("#cate-list  li").bind ('click', function () { browse_click (5, $(this).attr ('id')); });
+
+    browse_set_cursor (2, 1);
+    });
+  }
+
+function browse_set_cursor (x, y)
+  {
+  log ('browse set cursor: ' + x + ', ' + y);
+
+  if (!browser_x || !browser_y)
+    {
+    browser_x = x;
+    browser_y = y;
+    browse_category (browsables [browser_y]);
+    return;
+    }
+
+  if ((browser_x && x != browser_x) || (browser_y && y != browser_y))
+    {
+    if (browser_x == 1)
+      $("#main-" + browser_y).removeClass ("on");
+
+    else if (browser_x == 2)
+      $("#cat-" + browser_y).removeClass ("on");
+
+    else if (browser_x == 3 || browser_x == 4)
+      $("#content-" + browser_x + '-' + browser_y).removeClass ("on");
+    }
+
+  if (x == 1)
+    $("#main-" + y).addClass ("on");
+
+  else if (x == 2)
+    $("#cat-" + y).addClass ("on");
+
+  else if (x == 3 || x == 4)
+    $("#content-" + x + '-' + y).addClass ("on");
+
+  browser_x = x;
+  browser_y = y;
+
+  if (browser_x == 1)
+    {
+    if (browser_y == 1)
+      {
+      $("#add-panel").hide();
+      $("#category-panel").show();
+      }
+    else if (browser_y == 2)
+      {
+      $("#category-panel").hide();
+      $("#add-panel").show();
+      }
+    }
+
+  if (browser_x == 2 && browser_cat != browsables [browser_y])
+    {
+    log ('  selected category, cursor: ' + browser_cat_cursor + ', new: ' + browser_y);
+    $("#cat-" + browser_cat_cursor).removeClass ("selected");
+    browser_cat_cursor = browser_y;
+    $("#cat-" + browser_cat_cursor).addClass ("selected");
+    browse_category (browsables [browser_y]);
+    }
+  }
+
+function browse_left()
+  {
+  if (browser_x > 1)
+    {
+    if (browser_x == 3)
+      browse_set_cursor (parseInt (browser_x) - 1, browser_cat_cursor);
+    else
+      browse_set_cursor (parseInt (browser_x) - 1, browser_y);
+    }
+  }
+
+function browse_right()
+  {
+  if (browser_x < 4)
+    {
+    if (browser_x == 1)
+      browse_set_cursor (parseInt (browser_x) + 1, browser_cat_cursor);
+    else
+      browse_set_cursor (parseInt (browser_x) + 1, browser_y);
+    }
+  }
+
+function browse_up()
+  {
+  if (browser_y > 1)
+    {
+    browse_set_cursor (browser_x, parseInt (browser_y) - 1);
+    }
+  }
+
+function browse_down()
+  {
+  if (true)
+    {
+    browse_set_cursor (browser_x, parseInt (browser_y) + 1);
+    }
+  }
+
+function browse_click (column, id)
+  {
+  log ('browse click :: ' + column + ', ' + id);
+
+  if (column == 1)
+    {
+    id = id.replace (/^main-/, '');
+    browse_set_cursor (1, id);
+    }
+  if (column == 2)
+    {
+    id = id.replace (/^cat-/, '');
+    browse_set_cursor (2, id);
+    $("#cat-" + id).addClass ("selected");
+    }
+  else if (column == 3)
+    {
+    id = id.replace (/^content-/, '');
+    log ('browse_click: ' + id);
+    if ($("#content-" + id).hasClass ("on"))
+      {
+      log ('wants to subscribe to: ' + $("#content-" + id).attr ("data-id"));
+      browse_accept ($("#content-" + id).attr ("data-id"));
+      }
+    else
+      {
+      /* move cursor here */
+      var fields = id.split ('-');
+      browse_set_cursor (fields [0], fields [1]);
+      }
+    }
+  else if (column == 5)
+    {
+    if ($("#" + id).hasClass ("selected"))
+      {
+      $("#" + id).removeClass ("selected");
+      $("#img-" + id).attr ('src', root + 'check_off.png');
+      }
+    else
+      {
+      $("#" + id).addClass ("selected");
+      $("#img-" + id).attr ('src', root + 'check_on.png');
+      }
+    }
+  }
+
+function browse_category (category_id)
+  {
+  dir_waiting_fixup()
+  $("#dir-waiting").show();
+
+  $("#content-list").html ('');
+
+  browser_cat = category_id;
+
+  var query = "/playerAPI/channelBrowse?category=" + category_id;
+
+  var d = $.get (query, function (data)
+    {
+    $("#dir-waiting").hide();
+    sanity_check_data ('channelBrowse', data);
+
+    browse_content = {};
+
+    // 0=sequence-number 1=channel-id 2=channel-name 3=thumbnail 4=count
+
+    var html = '';
+    var n_count = 0;
+
+    var lines = data.split ('\n');
+
+    var fields = lines[0].split ('\t');
+    if (fields [0] != '0')
+      {
+      log_and_alert ('[channelBrowse] server error: ' + lines [0]);
+      return;
+      }
+
+
+    /* remove the status code */
+    lines.shift();
+
+    for (var i = 0; i < lines.length; i++)
+      {
+      if (lines [i] != '')
+        {
+        var fields = lines[i].split ('\t');
+
+        var y = (i % 2 == 0) ? 1 + i/2 : 1 + (i-1)/2;
+        var x = 3 + (i % 2);
+
+        browse_content [fields[1]] = { 'name': fields[2], 'thumb': fields[3], 'count': fields[4] };
+
+        html += '<li id="content-' + x + '-' + y + '" data-id="' + fields[1] + '"><img src=' + fields[3] + ' class="thumbnail">';
+        html += '<p class="chdir-title">' + fields[2] + '</p>';
+
+        var eps = (fields[4] == 1) ? (fields[4] + ' episode') : (fields[4] + ' episodes');
+
+        html += '<p class="chdir-meta">' + eps + '<br>0 subscribers</p>';
+        html += '<div class="msgbar">';
+
+        if (fields[1] in channels_by_id)
+          html += '<p class="status">Subscribed</p></div></li>';
+        else
+          html += '<p class="tip">Press ENTER to subscribe</p></div></li>';
+
+        if (i == 7) break;
+        }
+      }
+
+    $("#content-list").html (html);
+    $("#content-list li").bind ('click', function () { browse_click (3, $(this).attr ('id')); });
+
+    browse_set_cursor (browser_x, browser_y);
+    });
+
+  }
+
+function old_browse()
   {
   n_browse = 0;
   browse_first = 1;
@@ -2769,7 +3463,7 @@ function browse()
     redraw_browse();
     
     $("#mask").show();
-    $("#podcast-layer").show();
+    $("#ch-directory").show();
 
     thumbing = 'browse';
 
@@ -2780,7 +3474,7 @@ function browse()
     });
   }
 
-function redraw_browse()
+function old_redraw_browse()
   {
   var html = "";
 
@@ -2802,7 +3496,7 @@ function redraw_browse()
   $("#podcast-list li").bind ('click', function() { browse_click ($(this).attr('id')); });
   }
 
-function browse_up()
+function old_browse_up()
   {
   if (n_browse > 0 && browse_cursor > 1)
     {
@@ -2818,7 +3512,7 @@ function browse_up()
     }
   }
 
-function browse_down()
+function old_browse_down()
   {
   if (n_browse > 0 && browse_cursor < n_browse)
     {
@@ -2834,7 +3528,7 @@ function browse_down()
     }
   }
 
-function browse_page_up()
+function old_browse_page_up()
   {
   if (n_browse > 0 && browse_cursor > 1)
     {
@@ -2853,7 +3547,7 @@ function browse_page_up()
     }
   }
 
-function browse_page_down()
+function old_browse_page_down()
   {
   if (n_browse > 0 && browse_cursor < n_browse)
     {
@@ -2872,7 +3566,7 @@ function browse_page_down()
     }
   }
 
-function browse_click (id)
+function old_browse_click (id)
   {
   if (thumbing == 'browse')
     {
@@ -2889,7 +3583,31 @@ function browse_click (id)
     }
   }
 
-function browse_accept()
+function browse_enter (id)
+  {
+  if (id)
+    browse_accept (id);
+  }
+
+function browse_accept (channel)
+  {
+  if (channel in channels_by_id)
+    {
+    log ('wants to unsubscribe: ' + channel);
+    }
+  else
+    {
+    log ('subscribe: ' + channel +  ' (at ' + server_grid (ipg_cursor) + ')');
+
+    var cmd = "/playerAPI/subscribe?user=" + user + '&' + "channel=" + channel + '&' + "grid=" + server_grid (ipg_cursor);
+    var d = $.get (cmd, function (data)
+      {
+      continue_acceptance (channel);
+      });
+    }
+  }
+
+function old_browse_accept()
   {
   if (browse_cursor in browsables)
     {
@@ -2905,19 +3623,18 @@ function browse_accept()
     }
   }
 
-function continue_acceptance()
+function continue_acceptance (new_channel_id)
   {
-  log ('continuing');
-
+  log ('accepting new channel ' + new_channel_id);
   stop_preload();
 
   /* insert channel */
 
-  var name = browsables [browse_cursor]['name'];
-  var thumb = browsables [browse_cursor]['thumb'];
-  var new_channel_id = browsables [browse_cursor]['id'];
+  var name  = browse_content [new_channel_id]['name'];
+  var thumb = browse_content [new_channel_id]['thumb'];
+  var count = browse_content [new_channel_id]['count'];
 
-  channelgrid [ipg_cursor] = { 'id': new_channel_id, 'name': name, 'thumb': thumb };
+  channelgrid [ipg_cursor] = { 'id': new_channel_id, 'name': name, 'thumb': thumb, 'count': count };
   channels_by_id [new_channel_id] = ipg_cursor;
 
   redraw_ipg();
@@ -3179,6 +3896,44 @@ function physical_stop()
     }
   }
 
+function physical_mute()
+  {
+  switch (tube())
+    {
+    case "jw": break;
+
+    case "fp": log ('fp MUTE');
+               if (flowplayer)
+                 try { flowplayer (fp_player).mute(); } catch (error) {};
+               fp [fp_player]['mute'] = true;
+               break;
+
+    case "yt": log ('yt STOP');
+               if (ytplayer)
+                 try { ytplayer.mute(); } catch (error) {};
+               break;
+    }
+  }
+
+function physical_unmute()
+  {
+  switch (tube())
+    {
+    case "jw": break;
+
+    case "fp": log ('fp UNMUTE');
+               if (flowplayer)
+                 try { flowplayer (fp_player).unmute(); } catch (error) {};
+               fp [fp_player]['mute'] = false;
+               break;
+
+    case "yt": log ('yt STOP');
+               if (ytplayer)
+                 try { ytplayer.unMute(); } catch (error) {};
+               break;
+    }
+  }
+
 function jw_state_change()
   {
   var state = jwplayer.getConfig()['state'];
@@ -3267,11 +4022,13 @@ function ipg_preload (grid)
     {
     $("#fp1").css ("visibility", "visible");
     $("#fp2").css ("visibility", "hidden");
+    try { flowplayer ("player2").stop(); } catch (error) {};
     }
   else
     {
     $("#fp1").css ("visibility", "hidden");
     $("#fp2").css ("visibility", "visible");
+    try { flowplayer ("player1").stop(); } catch (error) {};
     }
 
   try { flowplayer (fp_preloaded).unload(); } catch (error) {};
@@ -3309,8 +4066,15 @@ function fp_notbuffering()
   {
   var id = this.id();
   log ('fp ' + id + ' no longer buffering')
+
   if (id == fp_player)
     $("#loading").hide();
+
+  // if (id == fp_preloaded)
+  //  {
+  //  log ('pausing preload');
+  //  flowplayer (fp_preloaded).pause();
+  //  }
   }
 
 function fp_onpreload()
@@ -3346,6 +4110,18 @@ function yt_tick()
     }
   }
 
+function stop_all_other_players()
+  {
+  if (current_tube != 'fp' || fp_player != 'player1')
+    try { flowplayer ('player1').stop(); } catch (error) {};
+
+  if (current_tube != 'fp' || fp_player != 'player2')
+    try { flowplayer ('player2').stop(); } catch (error) {};
+
+  if (current_tube != 'yt')
+    try { ytplayer.stopVideo(); } catch (error) {};
+  }
+
 function ipg_preload_play()
   {
   if (fp_preloaded == '')
@@ -3361,6 +4137,7 @@ function ipg_preload_play()
     {
     log ('starting preloaded YouTube video');
     fp_preloaded = '';
+    current_tube = 'yt';
     try { ytplayer.seekTo (0); } catch (error) {};
     try { ytplayer.unMute(); } catch (error) {};
     $("#yt1").css ("visibility", "visible");
@@ -3370,17 +4147,29 @@ function ipg_preload_play()
     }
   else
     {
+    current_tube = 'fp';
     fp_player = fp_preloaded;
     fp_preloaded = '';
 
     log ('PRELOAD PLAY: ' + fp_player);
 
+    try { log (fp_player + ' pre1state: ' + flowplayer (fp_player).getState()); } catch (error) {};
+
     try { flowplayer (fp_player).seek (0); } catch (error) {};
-    try { flowplayer (fp_player).unmute(); } catch (error) {};
+
+    try { log (fp_player + ' pre2state: ' + flowplayer (fp_player).getState()); } catch (error) {};
+
+    unhide_player ("fp");
+
+    try { log (fp_player + ' pre3state: ' + flowplayer (fp_player).getState()); } catch (error) {};
 
     fp [fp_player]['mute'] = false;
-    unhide_player ("fp");
+    try { flowplayer (fp_player).unmute(); } catch (error) {};
+
+    try { log (fp_player + ' pre4state: ' + flowplayer (fp_player).getState()); } catch (error) {};
     }
+
+  stop_all_other_players();
 
   enter_category ((""+ipg_cursor).substring (0, 1));
 
@@ -3472,7 +4261,9 @@ function start_play_fp (url)
       play: null, onBeforeKeypress: fpkp, onLoad: fp_onload,
       key: '#$f469b88194323deb943' });
 
-  fp [fp_player]['mute'] = false;
+  /* hack */
+  if (thumbing != 'ipg' || ipg_mode != 'episodes')
+    fp [fp_player]['mute'] = false;
 
   // flowplayer (fp_player).unmute();
   // flowplayer (fp_player).play (url);
@@ -3521,9 +4312,9 @@ function fp_onstart()
   fp [id]['duration'] = fd * 1000;
 
   if (fp [id]['mute'])
-    flowplayer (id).mute();
+    { try { flowplayer (id).mute(); } catch (error) {}; }
   else
-    flowplayer (id).unmute();
+    { try { flowplayer (id).unmute(); } catch (error) {}; }
 
   /* flowplayer provides no progress/tick event */
 
@@ -3608,6 +4399,7 @@ function play_yt()
     $("#yt1").css ("visibility", "visible");
 
     try { ytplayer.addEventListener ('onStateChange', 'yt_state'); } catch (error) {};
+    try { ytplayer.addEventListener ('onError', 'yt_error'); } catch (error) {};
 
     /* small | medium | large | hd720 | hd1080 */
     try { ytplayer.loadVideoById (yt_video_id, 0, "medium"); } catch (error) {};
@@ -3643,6 +4435,34 @@ function yt_state (state)
     }
 
   yt_previous_state = state;
+  }
+
+function yt_error (code)
+  {
+  var errtext;
+
+  var errors = { 100: 'Video not found', 101: 'Embedding not allowed', 150: 'Video not found' };
+
+  if (code in errors)
+    errtext = 'YouTube error ' + code + ': ' + errors [code];
+  else
+    errtext = 'YouTube unknown error: ' + code;
+
+  if (fp_preloaded != 'yt' && (thumbing == 'program' || thumbing == 'channel'))
+    {
+    log (errtext);
+    $("#msg-layer").html ('<p>' + errtext + '</p>');
+    $("#msg-layer").show();
+    msg_timex = setTimeout ("yt_error_timeout()", 3000);
+    }
+  else
+    log (errtext);
+  }
+
+function yt_error_timeout()
+  {
+  clear_msg_timex();
+  program_right();
   }
 
 function physical_seek (offset)
@@ -3884,7 +4704,7 @@ function update_progress_bar()
   $("#play-time").html (t1 + " / " + t2);
 
   var diff = o2 - o1;
-  if (diff < 1)
+  if (diff > 0 && diff < 1)
     log ('diff: ' + diff);
 
   if (o2 - o1 < 0.2 && tube() == 'v1' && !physical_is_paused() && !fake_timex)
@@ -4059,7 +4879,7 @@ function state()
     }
   else if (flowplayer)
     {
-    log ('current player: ' + fp_player);
+    log ('current player: ' + fp_player + ', preloaded: ' + fp_preloaded);
     fp_player_state ('player1');
     fp_player_state ('player2');
     }
@@ -4083,12 +4903,12 @@ function yt_player_state()
 
 function fp_player_state (player)
   {
-  var fp_state;
+  var fp_state = -2;
 
   var star = (player == fp_player ? '* ' : '  ') + player + ' ';
-  var states = { '-1': 'unloaded', '0': 'loaded', '1': 'unstarted', '2': 'buffering', '3': 'playing', '4': 'paused', '5': 'ended' };
+  var states = { '-2': 'none', '-1': 'unloaded', '0': 'loaded', '1': 'unstarted', '2': 'buffering', '3': 'playing', '4': 'paused', '5': 'ended' };
 
-  try { fp_state = flowplayer (player).getState(); } catch (error) { fp_state = ''; };
+  try { fp_state = flowplayer (player).getState(); } catch (error) {};
 
   log (star + 'flowplayer state: ' + fp_state + ' == "' + states [fp_state] + '"');
   log (star + 'url: ' + fp [player]['file']);
@@ -4173,47 +4993,112 @@ One moment...
 
   </div>
 
-<div id="ep-layer">
+<div id="ep-layer" style="display: none">
+  <img src="http://zoo.atomics.org/video/9x9playerV27/images/ep_panel_off.png" id="ep-panel">
+  <div id="ep-tip"><p><span class="hilite">Press ENTER key</span> or <span class="hilite">click</span> on the highlighted channel icon in your IPG to see channel episodes.</p></div>
   <div id="ep-container">
-    <div class="arrow-up"></div>
-    <div id="ep-constrain">
-      <ul id="ep-meta">
-        <li id="ep-layer-ch-title" class="ch-title"></li>
-        <li class="dash">&#8212;</li>
-        <li id="ep-layer-ep-title" class="ep-title"></li>
-      </ul>
-      <div id="ep-swish" class="ep-swish" style="display: block">
-        <ul class="ep-list" id="ep-list"></ul>
-      </div>
+    <div class="ep-swish" style="display: block">
+      <ul class="ep-list" id="ep-list"></ul>
     </div>
+    <div id="ep-meta"><p><span class="ch-title" id="ep-layer-ch-title">ABC news</span> - <span class="ep-title" id="ep-layer-ep-title">Jay Leno's eclectic car collection</span> - <span class="age">Today</span> - <span class="duration">10:10</span></p></div>
   </div>
 </div>
 
 <div id="ipg-layer" style="display: none">
-  <div id="ipg-pannel">
-    <ul id="info-list">
-      <li id="ch-thumb"><img id="ch-thumb-img" src=""></li>
-      <li id="ch-name"><p>ABC news</p></li>
-      <li id="ep-name"><p>An episode name would go here?</p></li>
-      <li id="description"><p>A description of something is supposed to go here, but I have nothing to put in this spot.</p></li>
-      <li id="ep-number"><p><span class="hilite">Episodes: </span><span id="ch-episodes">9</span></p></li>
-      <li id="update"><p><span class="hilite">Updated:</span> <span id="update-date"></span></p></li>
-      <li id="preloading"><p><span class="hilite">Preload:</span> <span id="preload"></span></p></li>
+  <div id="ipg-holder">
+    <div id="header">
+      <img src="http://zoo.atomics.org/video/9x9playerV27/images/logo.png" id="logo">
+      <p id="user-name">Hello, <span id="user">Guest</span></p>  
+      <ul id="control-list"><li><a href="javascript:login_screen()" class="btn" id="btn-signin"><span>Sign in / Sign up</span></a></li><li><a href="javascript:;" class="btn" id="btn-signout"><span>Sign out</span></a></li><li><a href="javascript:;" class="btn"><span>Resume Watching</span></a></li></ul>
+    </div>
+    <div id="ipg-content">
+      <ul id="info-list">
+        <li id="ch-name"></li>
+        <!--li id="ch-mtype">
+          <img src="images/icon_audio.png">
+        </li-->
+        <li id="ep-name"></li>
+        <li id="description"></li>
+        <li id="ep-number">
+          <p><span class="hilite">Episodes:</span> <span id="ch-episodes">0</span></p>
+        </li>
+        <li id="update">
+          <p><span class="hilite">Updated:</span> <span id="update-date"></span></p>
+        </li>
+        <li id="preloading"><p><span class="hilite">Preload:</span> <span id="preload"></span></p></li>
+      </ul>
+      <div id="ipg-grid">
+        <p id="watermark"><img src="http://zoo.atomics.org/video/9x9playerV27/images/watermark.png"></p>
+        <div id="list-holder">
+        </div>
+      </div>     
+    </div>
+  </div>
+</div>
+
+<div id="ch-directory">
+  <div id="dir-holder">
+  <div id="main-panel">
+    <ul>
+      <!--<li id="featured"><p>Featured</p><span class="arrow">&raquo;</span></li>-->
+      <li id="main-1" class="selected"><p>Category</p><span class="arrow">&raquo;</span></li>
+      <!--<li id="most"><p>Most subscribed</p><span class="arrow">&raquo;</span></li>
+      <li id="search"><p>Search</p><span class="arrow">&raquo;</span></li>-->
+      <li id="main-2"><p>Add RSS / YouTube</p><span class="arrow">&raquo;</span></li>
     </ul>
-    <ul id="control-list">
-      <li><a id="ipg-signin-btn" href="javascript:login_screen()" class="btn">Sign in / Sign up</a></li>
-      <li><a id="ipg-return-btn" href="javascript:ipg_resume()" class="btn">Resume watching</a></li>
-    </ul> 
-    <img src="http://zoo.atomics.org/video/9x9playerV23/images/logo.png" id="logo">
+    <a href="javascript:;" class="btn" id="btn-returnIPG">Return to IPG</a>
   </div>
-  <div id="ipg-grid"></div>
-  <div id="menu">
-    <p id="pop-play"></p><p id="pop-delete"></p>
+    <div class="br-panel" id="category-panel">
+    <div class="sub-panel">
+      <p class="page-up"><img src="http://zoo.atomics.org/video/9x9playerV27/images/arrow_up.png"></p>
+      <div class="sub-holder">
+        <ul id="ch-catlist"></ul>
+      </div>
+      <p class="page-down"><img src="http://zoo.atomics.org/video/9x9playerV27/images/arrow_down.png"></p>
+    </div>
+    <div class="content-panel">
+      <p class="page-up"><img src="http://zoo.atomics.org/video/9x9playerV27/images/arrow_up.png"></p>
+      <div class="content-holder">
+        <ul id="content-list"></ul>
+      </div>
+      <p id="ch-vacancy"></p>
+      <!--a href="javascript:;" class="btn" id="btn-subscribeAll">Subscribe all</a-->
+      <p class="page-down"><img src="http://zoo.atomics.org/video/9x9playerV27/images/arrow_down.png"></p>
+    </div>
   </div>
-  <!--div id="watermark">I&thinsp;P&thinsp;G</div-->
+  
+  <div class="op-panel" id="search-panel">
+    <div class="input-area">
+      <label for="search input">Enter search term:</label>
+        <ul class="search-input">
+          <li class="textfieldbox"><input name="" type="text" class="textfield"></li>
+          <li><a href="javascript:;" class="btn">Go</a></li>
+        </ul>
+    </div>
+    <p class="page-up"><img src="http://zoo.atomics.org/video/9x9playerV27/images/arrow_up.png"></p>
+    <p class="page-down"><img src="http://zoo.atomics.org/video/9x9playerV27/images/arrow_down.png"></p>
+  </div>
+  
+  <div class="op-panel" id="add-panel">
+    <div class="input-area">
+      <label for="RSS/YouTube input">Contribute a Podcast / YouTube URL:</label>
+      <ul class="url-input">
+        <li class="textfieldbox"><input name="" type="text" class="textfield" id="submit-url"></li>
+      </ul>
+    </div>
+    <div class="cate-selector">
+      <p>Channel category:</p>
+      <ul class="cate-list" id="cate-list"></ul>
+    </div>
+    <div id="feedback" class="success"><p></p></div>
+    <a href="javascript:submit_throw()" class="btn">Go</a>
+  </div>
+  </div>
 </div>
 
 <div id="new-layer" style="display: none">
+  <div id="new-holder">
+  </div>
 </div>
 
 <div id="signin-layer" style="display: none">
@@ -4251,17 +5136,6 @@ One moment...
   </ul>
 </div>
 
-<div id="podcast-layer">
-  <div id="padcast-pannel">
-    <label for="podcast input">Enter Podcast URL:</label>
-    <ul id="podcast-input">
-      <li class="textfieldbox"><form id="throw"><input id="podcastRSS" name="podcastRSS" type="text" class="textfield" value="" size="30" onkeypress="return event.keyCode != 13"></form></li>
-      <li><a href="javascript:submit_throw()" class="btn"><span>Contribute</span></a></li>
-    </ul>
-    <ul id="podcast-list"></ul>
-  </div>
-</div>
-
 <div id="browse" style="display: none; z-index: 999"></div>
 
 <div id="preload-control-images" style="display: none"></div>
@@ -4271,15 +5145,15 @@ One moment...
     <p>Press <span class="enlarge">&uarr;</span> to see your IPG</p>
   </div>
   <div id="controler">
-    <img src="http://zoo.atomics.org/video/9x9playerV23/images/bg_controler.png" id="controler-bg">
+    <img src="http://zoo.atomics.org/video/9x9playerV27/images/bg_controler.png" id="controler-bg">
     <ul id="control-bar">
-      <li id="btn-replay"><img src="http://zoo.atomics.org/video/9x9playerV23/images/btn_replay.png"></li>
-      <li id="btn-rewind"><img src="http://zoo.atomics.org/video/9x9playerV23/images/btn_rewind.png"></li>
-      <li id="btn-play" style="display: none"><img src="http://zoo.atomics.org/video/9x9playerV23/images/btn_play.png"></li>
-      <li id="btn-pause"><img src="http://zoo.atomics.org/video/9x9playerV23/images/btn_pause.png"></li>
-      <li id="btn-forward"><img src="http://zoo.atomics.org/video/9x9playerV23/images/btn_forward.png"></li>
+      <li id="btn-replay"><img src="http://zoo.atomics.org/video/9x9playerV27/images/btn_replay.png"></li>
+      <li id="btn-rewind"><img src="http://zoo.atomics.org/video/9x9playerV27/images/btn_rewind.png"></li>
+      <li id="btn-play" style="display: none"><img src="http://zoo.atomics.org/video/9x9playerV27/images/btn_play.png"></li>
+      <li id="btn-pause"><img src="http://zoo.atomics.org/video/9x9playerV27/images/btn_pause.png"></li>
+      <li id="btn-forward"><img src="http://zoo.atomics.org/video/9x9playerV27/images/btn_forward.png"></li>
       <li class="divider"></li>
-      <li id="btn-volume"><img src="http://zoo.atomics.org/video/9x9playerV23/images/btn_volume.png"></li>
+      <li id="btn-volume"><img src="http://zoo.atomics.org/video/9x9playerV27/images/btn_volume.png"></li>
       <li id="volume-constrain" class="on">
         <ul id="volume-bars">
           <li></li>
@@ -4292,10 +5166,10 @@ One moment...
         </ul>
       </li>
       <li class="divider"></li>
-      <li id="btn-facebook"><img src="http://zoo.atomics.org/video/9x9playerV23/images/btn_facebook.png"></li>
-      <li id="btn-screensaver"><img src="http://zoo.atomics.org/video/9x9playerV23/images/btn_screensaver.png"></li>
+      <li id="btn-facebook"><img src="http://zoo.atomics.org/video/9x9playerV27/images/btn_facebook.png"></li>
+      <li id="btn-screensaver"><img src="http://zoo.atomics.org/video/9x9playerV27/images/btn_screensaver.png"></li>
       <li class="divider"></li>
-      <li id="btn-close"><img src="http://zoo.atomics.org/video/9x9playerV23/images/btn_close.png"></li>
+      <li id="btn-close"><img src="http://zoo.atomics.org/video/9x9playerV27/images/btn_close.png"></li>
       <li id="play-time">-- / --</li>
       <li id="progress-bar">
         <p id="loaded"></p>
@@ -4305,6 +5179,27 @@ One moment...
   </div>
   <div id="msg-down">
     <p>Press <span class="enlarge">&darr;</span> for more episodes</p>
+  </div>
+</div>
+
+<div id="waiting">
+  <div class="waiting-holder">
+    <img src="http://zoo.atomics.org/video/9x9playerV27/images/loading.gif">
+    <p>One moment...</p>
+  </div>
+</div>
+
+<div id="buffering">
+  <div class="waiting-holder">
+    <img src="http://zoo.atomics.org/video/9x9playerV27/images/loading.gif">
+    <p>Buffering...</p>
+  </div>
+</div>
+
+<div id="dir-waiting">
+  <div class="waiting-holder">
+    <img src="http://zoo.atomics.org/video/9x9playerV27/images/loading.gif">
+    <p>One moment...</p>
   </div>
 </div>
 
@@ -4319,10 +5214,14 @@ One moment...
   <div id="go-right"><img src="" id="right-tease">Press <span class="enlarge">&rarr;</span> to watch next channel</div>
 </div>
 
+<div id="opening" style="display: block">
+  <div class="opening-holder" id="splash"></div>
+</div>
+
 <div id="log-layer" style="position: absolute; left: 0; top: 0; height: 100%; width: 100%; background: white; color: black; text-align: left; padding: 20px; overflow: scroll; z-index: 9999; display: none"></div>
 
 <div id="mask"></div>
-<div id="loading"><img src="http://zoo.atomics.org/video/9x9playerV23/images/loading.gif"></div>
+<div id="loading"><img src="http://zoo.atomics.org/video/9x9playerV27/images/loading.gif"></div>
 
 <!--/div-->
 </body>
