@@ -3639,20 +3639,34 @@ function browse_category (category_id)
       return;
       }
 
+    var category = parseInt (lines[1]);
+
+    if (category != browser_cat)
+      {
+      log ('ignoring obsolete information for category: ' + category + ' (category is now ' + browser_cat + ')');
+      return;
+      }
 
     /* remove the status code line */
+    lines.shift();
     lines.shift();
 
     for (var i = 0; i < lines.length; i++)
       {
       if (lines [i] != '')
         {
-        n_browse_list++;
+
 
         var fields = lines[i].split ('\t');
+log ('BROWSE: ' + fields[1]);
 
-        browse_content [fields[1]] = { 'name': fields[2], 'thumb': fields[3], 'count': fields[4] };
-        browse_list [n_browse_list] = { 'id': fields[1], 'name': fields[2], 'thumb': fields[3], 'count': fields[4] };
+        if (parseInt (fields[1]) > 0)
+          {
+          n_browse_list++;
+
+          browse_content [fields[1]] = { 'name': fields[2], 'thumb': fields[3], 'count': fields[4] };
+          browse_list [n_browse_list] = { 'id': fields[1], 'name': fields[2], 'thumb': fields[3], 'count': fields[4] };
+          }
         }
       }
 
