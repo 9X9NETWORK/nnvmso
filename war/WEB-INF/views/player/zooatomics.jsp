@@ -12,7 +12,7 @@
 <meta name="description" content="My 9x9 Channel Guide. Easily browse your favorite video podcasts on the 9x9 Player! Podcasts automatically download and update for you, bringing up to 81 channels of new videos daily." />
 <link rel="image_src" href="http://www.cksinfo.com/clipart/toys/abc-blocks.png" />
 
-<link rel="stylesheet" href="http://zoo.atomics.org/video/9x9playerV27/stylesheets/main.css" />
+<link rel="stylesheet" href="http://zoo.atomics.org/video/9x9playerV29/stylesheets/main.css" />
 
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.8/jquery-ui.min.js"></script>
@@ -20,10 +20,10 @@
 
 <script type="text/javascript" src="http://static.ak.fbcdn.net/connect/en_US/core.debug.js"></script>
 <script type="text/javascript" src="http://zoo.atomics.org/video/cssanim.js"></script>
-<!--script type="text/javascript" src="http://zoo.atomics.org/video/swfobject.js"></script-->
-<script type="text/javascript" src="http://zoo.atomics.org/video/9x9playerV27/javascripts/jquery.swfobject.1-1-1.min.js"></script>
+<script type="text/javascript" src="http://zoo.atomics.org/video/swfobject.js"></script>
+<script type="text/javascript" src="http://zoo.atomics.org/video/9x9playerV29/javascripts/jquery.swfobject.1-1-1.min.js"></script>
 <script type="text/javascript" src="http://zoo.atomics.org/video/flowplayer-3.2.4.min.js"></script>
-<script type="text/javascript" src="http://zoo.atomics.org/video/9x9playerV27/javascripts/whatsnew.js"></script>
+<script type="text/javascript" src="http://zoo.atomics.org/video/9x9playerV29/javascripts/whatsnew.js"></script>
 
 <script>
 
@@ -87,10 +87,16 @@ var loglayer;
 /* browse */
 var browser_x;
 var browser_y;
+var browser_mode = 'category';
 var browse_content = {};
+var browse_list = {};
+var n_browse_list = 0;
+var browse_list_first = 1;
 var browsables = {};
 var browser_cat = 0;
 var browser_cat_cursor = 1;
+var browser_first_cat = 1;
+var max_browse = 16;
 var n_browse = 0;
 var saved_thumbing = '';
 var control_saved_thumbing = '';
@@ -120,6 +126,7 @@ var control_buttons = [ 'btn-replay', 'btn-rewind', 'btn-play', 'btn-forward', '
 var control_cursor = 2;
 
 var user = '';
+var username = '';
 
 /* if we entered via a shared IPG, and have not upconverted */
 var via_shared_ipg = false;
@@ -127,7 +134,7 @@ var via_shared_ipg = false;
 /* reduced functionality if there is a valid user but he is visiting a shared ipg */
 var readonly_ipg = false;
 
-var root = 'http://zoo.atomics.org/video/9x9playerV27/images/';
+var root = 'http://zoo.atomics.org/video/9x9playerV29/images/';
 
 $(document).ready (function()
  {
@@ -424,11 +431,6 @@ function fetch_channels()
   else
     query = "/playerAPI/channelLineup?user=" + user;
 
-  // 0=grid id, 1=channel id,
-  // 2=channel name, 3=channel description, 4=channel image url,
-  // 5=program count, 6=type(SYSTEM|PODCAST), 7=status
-  // 0=1	1=3523	2=System Channel	3=	4=/WEB-INF/../images/logo_9x9.png	5=1	6=SYSTEM	7=0
-
   var d = $.get (query, function (data)
     {
     var n = 0;
@@ -626,10 +628,13 @@ function hide_layers()
 
 function end_message (duration)
   {
-  log ('end!');
-
-  hide_layers();
   $("#loading").hide();
+
+  if (thumbing != 'program' && thumbing != 'channel' && thumbing != 'control')
+    return;
+
+  log ('end!');
+  hide_layers();
 
   var square = parseInt (channel_line [channel_cursor]);
 
@@ -860,7 +865,7 @@ function prepare_channel()
   $("#ep-list .clickable").bind ('click', function() { ep_click ($(this).attr('id')); });
 
   if (thumbing == 'ipg' && ipg_mode == 'episodes')
-    $("#ep-list .clickable").bind ('hover', function() { ipg_episode_over ($(this).attr('id')); });
+    $("#ep-list .clickable").hover (ipg_episode_hover_in, ipg_episode_hover_out);
 
   update_bubble();
   redraw_program_line();
@@ -946,13 +951,14 @@ function ageof (timestamp)
   {
   var age = '';
   var now = new Date();
+  var ago_or_hence = 'ago';
 
   if (timestamp != '')
     {
     var d = new Date (Math.floor (timestamp));
 
     var minutes = Math.floor ((now.getTime() - d.getTime()) / 60 / 1000);
-    var ago_or_hence = minutes < 0 ? "hence" : "ago";
+    ago_or_hence = minutes < 0 ? "hence" : "ago";
     minutes = Math.abs (minutes);
 
     if (minutes > 59)
@@ -1373,7 +1379,7 @@ function keypress (keycode)
       if (thumbing == 'ipg')
         ipg_play();
       else if (thumbing == 'browse')
-        browse_enter ($("#content-" + browser_x + '-' + browser_y).attr ("data-id"));
+        browse_enter();
       else if (thumbing == 'channel' || thumbing == 'program')
         switch_to_control_layer();
       else if (thumbing == 'control')
@@ -2120,6 +2126,7 @@ function ipg_sync()
     ipg_program_index();
     $("#ipg-content").addClass("fade");
     $("#ep-list .clickable").bind ('click', function() { ep_click ($(this).attr('id')); });
+    $("#ep-list .clickable").hover (ipg_episode_hover_in, ipg_episode_hover_out);
     ipg_mode = 'episodes';
     }
   else
@@ -2502,6 +2509,7 @@ function ipg_play()
 //xyz
   if (ipg_mode == 'episodes' && program_cursor != 1)
     {
+    fp_preloaded = '';
     physical_seek (0);
     physical_unmute();
     physical_play();
@@ -2618,8 +2626,29 @@ log ("EP CLICK");
     }
   }
 
-function ipg_episode_hover (id)
+function ipg_episode_hover_in()
   {
+  $(this).addClass ("hover");
+  $("#p-li-" + program_cursor).removeClass ("on");
+
+  var id = $(this).attr('id').replace (/^p-li-/, '');
+  var program = programgrid [program_line [id]];
+
+  $("#ep-layer-ep-title").html (program ['name']);
+  $("#ep-age").html (ageof (program ['timestamp']));
+  $("#ep-duration").html (durationof (program ['duration']));
+  }
+
+function ipg_episode_hover_out()
+  {
+  $(this).removeClass ("hover");
+  $("#p-li-" + program_cursor).addClass ("on");
+
+  var program = programgrid [program_line [program_cursor]];
+
+  $("#ep-layer-ep-title").html (program ['name']);
+  $("#ep-age").html (ageof (program ['timestamp']));
+  $("#ep-duration").html (durationof (program ['duration']));
   }
 
 function program_right()
@@ -2791,33 +2820,33 @@ function submit_login()
   
   $.post ("/playerAPI/login", serialized, function (data)
     {
-    var fields = data.split ('\t');
-    user = fields [1];
+    var lines = data.split ('\n');
+    var fields = lines[0].split ('\t');
+
     if (fields [0] == "0")
       {
+      var fields = lines[1].split ('\t');
+
+      user = fields [1];
+      username = fields [2];
+      $("#user").html (username);
+      log ('[explicit login] welcome ' + username + ', AKA ' + user);
+
       if (readonly_ipg)
         {
         /* this user has now upconverted */
         readonly_ipg = false;
         via_shared_ipg = false;
         }
+
       /* wipe out the current guest account program+channel data */
       channelgrid = {};
       programgrid = {};
       escape();
 
-      if (fields.length >= 3)
-        {
-        //log_and_alert ('logged in as user: ' + fields [2]);
-        $("#user").html (fields [2]);
-        }
-      else
-        {
-        //log_and_alert ('logged in as user: ' + user);
-        }
-
       resume();
       activated = false;
+
       fetch_programs();
       }
     else
@@ -2846,16 +2875,26 @@ function submit_signup()
   $.post ("/playerAPI/signup", serialized, function (data)
     {
     log ('signup response: ' + data);
-    var fields = data.split ('\t');
-    user = fields [1];
+
+    var lines = data.split ('\n');
+    var fields = lines[0].split ('\t');
+
     if (fields [0] == "0")
       {
+      fields = lines[1].split ('\t');
+
+      user = fields [1];
+      username = fields [2];
+      $("#user").html (username);
+      log ('[login via signup] welcome ' + username + ', AKA ' + user);
+
       if (readonly_ipg)
         {
         /* this user has now upconverted */
         readonly_ipg = false;
         via_shared_ipg = false;
         }
+
       /* wipe out the current guest account program+channel data */
       channelgrid = {};
       programgrid = {};
@@ -2864,7 +2903,8 @@ function submit_signup()
       if (fields.length >= 3)
         {
         //log_and_alert ('signed up as user: ' + fields [2]);
-        $("#user").html (fields [2]);
+        username = fields [2];
+        $("#user").html (username);
         }
       else
         {
@@ -2895,7 +2935,7 @@ function submit_throw()
     var id = $(this).attr("id").replace (/^addcat-/, '');
     if (categories != '')
       { categories += ','; }
-    categories += browsables [id];
+    categories += browsables [id]['category'];
     });
 //xxzz
   var url = encodeURIComponent ($("#submit-url").val());
@@ -2910,17 +2950,20 @@ function submit_throw()
   $.post ("/playerAPI/channelSubmit", serialized, function (data)
     {
     sanity_check_data ('podcastSubmit', data);
-    var fields = data.split ('\t');
+    var lines = data.split ('\n');
+    var fields = lines[0].split ('\t');
     if (fields [0] == "0")
       {
       $("#feedback").html ('<p>Successful!</p>');
       //escape();
-      log_and_alert ('podcast thrown!')
-      // fields: 0=status 1=channel-id 2=channel-name 3=channel-thumb
-      channelgrid [ipg_cursor] = { 'id': fields[1], 'name': fields[2], 'thumb': fields[3] };
-      channels_by_id [fields[1]] = ipg_cursor;
+      log ('podcast thrown successfully!')
+      log ('channelSubmit returned: ' + lines[1]);
+      fields = lines[1].split('\t');
+      // fields: 0=channel-id 1=channel-name 2=channel-thumb
+      channelgrid [ipg_cursor] = { 'id': fields[0], 'name': fields[1], 'thumb': fields[2] };
+      channels_by_id [fields[0]] = ipg_cursor;
       redraw_ipg();
-      add_dirty_channel (fields[1]);
+      add_dirty_channel (fields[0]);
       }
     else
       {
@@ -3040,6 +3083,7 @@ function login()
   log ('login')
   var u = getcookie ("user");
 
+  // "response to userTokenVerify: 0\tsuccess\n 0\tagg5eDl0dmRldnINCxIGTm5Vc2VyGLc_DA\tGuest\t8040"
   if (u)
     {
     log ('user cookie exists, checking');
@@ -3053,14 +3097,22 @@ function login()
 
       log ('response to userTokenVerify: ' + data);
 
-      var fields = data.split ('\t');
+      var lines = data.split ('\n');
+      var fields = lines[0].split ('\t');
 
       if (fields[0] == '0')
         {
         log ('user token was valid');
+        fields = lines[1].split ('\t');
+
         user = u;
+        username = fields[2];
+        $("#user").html (username);
+        log ('[login via cookie] welcome ' + username + ', AKA ' + user);
+
         if (via_shared_ipg)
           readonly_ipg = true;
+
         fetch_programs();
         }
       else
@@ -3133,6 +3185,8 @@ function browse()
   thumbing = 'browse-wait';
   browsables = [];
   browser_cat_cursor = 1;
+  browser_first_cat = 1;
+  browser_mode = 'category';
 
   $("#msg-layer").html ('<p>One moment...</p>');
   $("#msg-layer").show();
@@ -3144,6 +3198,9 @@ function browse()
     sanity_check_data ('categoryBrowse', data);
 
     calculate_empties();
+
+    $("#add-panel").hide();
+    $("#category-panel").show();
     $("#ch-directory").show();
     elastic();
 
@@ -3151,8 +3208,6 @@ function browse()
 
     var html = '';
     var add_html = '';
-
-    var first_category;
 
     var lines = data.split ('\n');
 
@@ -3163,16 +3218,18 @@ function browse()
       return;
       }
 
+    n_browse = 0;
     for (var i = 1; i < lines.length; i++)
       {
       if (lines [i] != '')
         {
+        n_browse++;
         var fields = lines[i].split ('\t');
-        var xclass = (i == 1) ? ' class="selected"' : '';
-        if (i == 1) first_category = fields[0];
-        html += '<li id="cat-' + i + '"' + xclass + '><p>' + fields[1] + '<span class="arrow">&raquo;</span></li>';
-        add_html += '<li id="addcat-' + i + '"><img id="img-addcat-' + i + '" src="' + root + 'check_off.png"><span>' + fields[1] + '</span></li>';
-        browsables [i] = fields[0];
+        var xclass = (n_browse == 1) ? ' class="selected"' : '';
+        if (n_browse <= max_browse)
+          html += '<li id="cat-' + n_browse + '"' + xclass + '><p>' + fields[1] + '<span class="arrow">&raquo;</span></li>';
+        add_html += '<li id="addcat-' + n_browse + '"><img id="img-addcat-' + n_browse + '" src="' + root + 'check_off.png"><span>' + fields[1] + '</span></li>';
+        browsables [n_browse] = { category: fields[0], name: fields[1] };
         }
       }
 
@@ -3183,42 +3240,122 @@ function browse()
     $("#ch-catlist li").bind ('click', function () { browse_click (2, $(this).attr ('id')); });
     $("#cate-list  li").bind ('click', function () { browse_click (5, $(this).attr ('id')); });
 
+    $("#main-panel li, #ch-catlist li, cate-list li").hover (browse_hover_in, browse_hover_out);
+
     browse_set_cursor (2, 1);
     });
   }
 
+function redraw_browser_categories()
+  {
+  var html = '';
+
+  if (browser_y < browser_first_cat)
+    browser_first_cat = browser_y;
+
+  while (browser_y >= browser_first_cat + max_browse)
+    browser_first_cat++;
+
+  for (var i = browser_first_cat; i <= n_browse && i < browser_first_cat + max_browse; i++)
+    {
+    var xclass = (browser_y == i) ? ' class="selected"' : '';
+    html += '<li id="cat-' + i + '"' + xclass + '><p>' + browsables[i]['name'] + '<span class="arrow">&raquo;</span></li>';
+    }
+
+  $("#ch-catlist").html (html);
+  $("#ch-catlist li").bind ('click', function () { browse_click (2, $(this).attr ('id')); });
+  $("#ch-catlist li").hover (browse_hover_in, browse_hover_out);
+
+  if (browser_x == 1)
+    $("#cat-" + browser_y).addClass ("on");
+  }
+
+function browse_hover_in()
+  {
+  $(this).addClass ("hover");
+  }
+
+function browse_hover_out()
+  {
+  $(this).removeClass ("hover");
+  }
+
 function browse_set_cursor (x, y)
   {
-  log ('browse set cursor: ' + x + ', ' + y);
+  log ('browse [' + browser_mode + '] set cursor: ' + x + ', ' + y);
 
   if (!browser_x || !browser_y)
     {
     browser_x = x;
     browser_y = y;
-    browse_category (browsables [browser_y]);
+    browse_category (browsables [browser_y]['category']);
     return;
     }
 
   if ((browser_x && x != browser_x) || (browser_y && y != browser_y))
     {
     if (browser_x == 1)
+      {
       $("#main-" + browser_y).removeClass ("on");
+      if (x == 1 && browser_y != y)
+        $("#main-" + browser_y).removeClass ("selected");
+      }
 
-    else if (browser_x == 2)
-      $("#cat-" + browser_y).removeClass ("on");
+    else if (browser_mode == 'category')
+      {
+      if (browser_x == 2)
+        $("#cat-" + browser_y).removeClass ("on");
 
-    else if (browser_x == 3 || browser_x == 4)
-      $("#content-" + browser_x + '-' + browser_y).removeClass ("on");
+      else if (browser_x == 3)
+        $("#content-" + browser_y).removeClass ("on");
+      }
+
+    else if (browser_mode == 'add')
+      {
+      if (browser_x == 2)
+        {
+        if (browser_y == 1)
+          {
+          $("#submit-url-box").removeClass ("on");
+          $("#submit-url").blur();
+          }
+        }
+      else if (browser_x == 3)
+        $("#addcat-" + browser_y).removeClass ("on");
+
+      else if (browser_x == 4)
+        $("#add-go").removeClass ("on");
+      }
     }
 
   if (x == 1)
+    {
     $("#main-" + y).addClass ("on");
+    $("#main-" + y).addClass ("selected");
+    }
+  else if (browser_mode == 'category')
+    {
+    if (x == 2)
+      $("#cat-" + y).addClass ("on");
 
-  else if (x == 2)
-    $("#cat-" + y).addClass ("on");
+    else if (x == 3)
+      $("#content-" + y).addClass ("on");
+    }
+  else if (browser_mode == 'add')
+    {
+    if (x == 2)
+      {
+      $("#submit-url-box").addClass ("on");
+      $("#submit-url").focus();
+      }
+    else if (x == 3)
+      $("#addcat-" + y).addClass ("on");
 
-  else if (x == 3 || x == 4)
-    $("#content-" + x + '-' + y).addClass ("on");
+    else if (x == 4)
+      $("#add-go").addClass ("on");
+    }
+
+  log ('setting new cursor: ' + x + ', ' + y);
 
   browser_x = x;
   browser_y = y;
@@ -3229,21 +3366,35 @@ function browse_set_cursor (x, y)
       {
       $("#add-panel").hide();
       $("#category-panel").show();
+      browser_mode = 'category';
       }
     else if (browser_y == 2)
       {
       $("#category-panel").hide();
       $("#add-panel").show();
+      browser_mode = 'add';
       }
     }
 
-  if (browser_x == 2 && browser_cat != browsables [browser_y])
+  if (browser_mode == 'category' && browser_x == 2 && browser_cat != browsables [browser_y]['category'])
     {
+    if (browser_y < browser_first_cat || browser_y >= browser_first_cat + max_browse)
+      redraw_browser_categories();
+
     log ('  selected category, cursor: ' + browser_cat_cursor + ', new: ' + browser_y);
     $("#cat-" + browser_cat_cursor).removeClass ("selected");
     browser_cat_cursor = browser_y;
     $("#cat-" + browser_cat_cursor).addClass ("selected");
-    browse_category (browsables [browser_y]);
+    browse_category (browsables [browser_y]['category']);
+    }
+
+  if (browser_mode == 'category' && browser_x == 3)
+    {
+    if (browser_y < browse_list_first || browser_y >= browse_list_first + 8)
+      {
+      log ("CONTENT OUT OF RANGE! REDRAW!");
+      redraw_browse_content();
+      }
     }
   }
 
@@ -3251,10 +3402,42 @@ function browse_left()
   {
   if (browser_x > 1)
     {
-    if (browser_x == 3)
+    if (browser_mode == 'category' && browser_x == 3)
+      {
       browse_set_cursor (parseInt (browser_x) - 1, browser_cat_cursor);
-    else
-      browse_set_cursor (parseInt (browser_x) - 1, browser_y);
+      }
+    else if (browser_x == 2)
+      {
+      switch (browser_mode)
+        {
+        case 'category': browse_set_cursor (1, 1);
+                         break;
+
+        case 'add':      browse_set_cursor (1, 2);
+                         break;
+        }
+      }
+    else if (browser_mode == 'add')
+      {
+      if (browser_x == 2)
+        browse_set_cursor (1, 2);
+      else if (browser_x == 3)
+        {
+        if ((parseInt (browser_y) % 4) == 1)
+          browse_set_cursor (1, 2);
+        else
+          browse_set_cursor (browser_x, parseInt (browser_y) - 1);
+        }
+      else if (browser_x == 4)
+        browse_set_cursor (1, 2);
+      }
+    else if (browser_mode == 'category')
+      {
+      if ((parseInt (browser_y) % 2) == 1)
+        browse_set_cursor (parseInt (browser_x) - 1, browser_y);
+      else
+        browse_set_cursor (browser_x, parseInt (browser_y) - 1);
+      }
     }
   }
 
@@ -3262,26 +3445,114 @@ function browse_right()
   {
   if (browser_x < 4)
     {
-    if (browser_x == 1)
-      browse_set_cursor (parseInt (browser_x) + 1, browser_cat_cursor);
-    else
-      browse_set_cursor (parseInt (browser_x) + 1, browser_y);
+    if (browser_mode == 'add')
+      {
+      if (browser_x == 1)
+        {
+        browse_set_cursor (parseInt (browser_x) + 1, 1);
+        }
+      else if (browser_x == 2)
+        {
+        /* do nothing */
+        }
+      else if (browser_x == 3)
+        {
+        if (browser_y < n_browse)
+          browse_set_cursor (browser_x, parseInt (browser_y) + 1);
+        }
+      }
+    else if (browser_mode == 'category')
+      {
+      if (browser_x == 1)
+        browse_set_cursor (parseInt (browser_x) + 1, browser_cat_cursor);
+      else if (browser_x == 2)
+        browse_set_cursor (parseInt (browser_x) + 1, 1);
+      else if (browser_x == 3)
+        {
+        if (browser_y < n_browse_list)
+          browse_set_cursor (browser_x, 1 + parseInt (browser_y));
+        }
+      }
     }
   }
 
 function browse_up()
   {
-  if (browser_y > 1)
+  if (browser_mode == 'add')
     {
-    browse_set_cursor (browser_x, parseInt (browser_y) - 1);
+    if (browser_x == 1 && browser_y > 1)
+      {
+      browse_set_cursor (browser_x, parseInt (browser_y) - 1);
+      }
+    else if (browser_x == 3)
+      {
+      if (browser_y <= 4)
+        {
+        /* top row */
+        browse_set_cursor (2, 1);
+        }
+      else
+        browse_set_cursor (3, parseInt (browser_y) - 4);
+      }
+    else if (browser_x == 4)
+      {
+      var new_y = n_browse;
+      while ((new_y % 4) != 1) new_y--;
+      browse_set_cursor (3, new_y);
+      }
+    }
+  else if (browser_mode == 'category')
+    {
+    if (browser_x == 1 || browser_x == 2)
+      {
+      if (browser_y > 1)
+        browse_set_cursor (browser_x, parseInt (browser_y) - 1);
+      }
+    else if (browser_x == 3)
+      {
+      if (browser_y > 2)
+        browse_set_cursor (browser_x, parseInt (browser_y) - 2);
+      }
     }
   }
 
 function browse_down()
   {
-  if (true)
+  if (browser_x == 1 && browser_y >= 2)
     {
-    browse_set_cursor (browser_x, parseInt (browser_y) + 1);
+    /* last menu item */
+    }
+  else if (browser_mode == 'add')
+    {
+    if (browser_x == 2)
+      {
+      browse_set_cursor (3, 1);
+      }
+    else if (browser_x == 3)
+      {
+      if (parseInt (browser_y) + 4 <= n_browse)
+        browse_set_cursor (3, parseInt (browser_y) + 4);
+      else
+        browse_set_cursor (4, 1);
+      }
+    }
+  else if (browser_mode == 'category')
+    {
+    if (browser_x == 2 && browser_y >= n_browse)
+      {
+      /* at last category */
+      }
+    else if (browser_x == 3)
+      {
+      if (browser_y + 2 <= n_browse_list)
+        browse_set_cursor (browser_x, parseInt (browser_y) + 2);
+      else if (browser_y + 1 <= n_browse_list)
+        browse_set_cursor (browser_x, parseInt (browser_y) + 1);
+      }
+    else
+      {
+      browse_set_cursor (browser_x, parseInt (browser_y) + 1);
+      }
     }
   }
 
@@ -3318,16 +3589,21 @@ function browse_click (column, id)
     }
   else if (column == 5)
     {
-    if ($("#" + id).hasClass ("selected"))
-      {
-      $("#" + id).removeClass ("selected");
-      $("#img-" + id).attr ('src', root + 'check_off.png');
-      }
-    else
-      {
-      $("#" + id).addClass ("selected");
-      $("#img-" + id).attr ('src', root + 'check_on.png');
-      }
+    browse_add_checkbox (id);
+    }
+  }
+
+function browse_add_checkbox (id)
+  {
+  if ($("#" + id).hasClass ("selected"))
+    {
+    $("#" + id).removeClass ("selected");
+    $("#img-" + id).attr ('src', root + 'check_off.png');
+    }
+  else
+    {
+    $("#" + id).addClass ("selected");
+    $("#img-" + id).attr ('src', root + 'check_on.png');
     }
   }
 
@@ -3348,11 +3624,11 @@ function browse_category (category_id)
     sanity_check_data ('channelBrowse', data);
 
     browse_content = {};
+    browse_list = {};
+    n_browse_list = 0;
+    browse_list_first = 1;
 
     // 0=sequence-number 1=channel-id 2=channel-name 3=thumbnail 4=count
-
-    var html = '';
-    var n_count = 0;
 
     var lines = data.split ('\n');
 
@@ -3364,229 +3640,85 @@ function browse_category (category_id)
       }
 
 
-    /* remove the status code */
+    /* remove the status code line */
     lines.shift();
 
     for (var i = 0; i < lines.length; i++)
       {
       if (lines [i] != '')
         {
-        var fields = lines[i].split ('\t');
+        n_browse_list++;
 
-        var y = (i % 2 == 0) ? 1 + i/2 : 1 + (i-1)/2;
-        var x = 3 + (i % 2);
+        var fields = lines[i].split ('\t');
 
         browse_content [fields[1]] = { 'name': fields[2], 'thumb': fields[3], 'count': fields[4] };
-
-        html += '<li id="content-' + x + '-' + y + '" data-id="' + fields[1] + '"><img src=' + fields[3] + ' class="thumbnail">';
-        html += '<p class="chdir-title">' + fields[2] + '</p>';
-
-        var eps = (fields[4] == 1) ? (fields[4] + ' episode') : (fields[4] + ' episodes');
-
-        html += '<p class="chdir-meta">' + eps + '<br>0 subscribers</p>';
-        html += '<div class="msgbar">';
-
-        if (fields[1] in channels_by_id)
-          html += '<p class="status">Subscribed</p></div></li>';
-        else
-          html += '<p class="tip">Press ENTER to subscribe</p></div></li>';
-
-        if (i == 7) break;
+        browse_list [n_browse_list] = { 'id': fields[1], 'name': fields[2], 'thumb': fields[3], 'count': fields[4] };
         }
       }
 
-    $("#content-list").html (html);
-    $("#content-list li").bind ('click', function () { browse_click (3, $(this).attr ('id')); });
-
-    browse_set_cursor (browser_x, browser_y);
+    redraw_browse_content();
     });
 
   }
 
-function old_browse()
+function redraw_browse_content()
   {
-  n_browse = 0;
-  browse_first = 1;
-  browsables = {};
+  var html = '';
 
-  saved_thumbing = thumbing;
-  thumbing = 'browse-wait';
-
-  // why doesn't this work?
-  document.getElementById("podcastRSS").value = "";
-
-  log ('obtaining browse information');
-
-  var query = "/playerAPI/channelBrowse";
-
-  // 1  570     Channel One     /thumb/01.jpg
-  // 0=grid-location(ignore) 1=channel-id 2=channel-name 3=channel-thumb
-
-  //$("#loading").show();
-  $("#msg-layer").html ('<p>One moment...</p>');
-  $("#msg-layer").show();
-
-  var d = $.get (query, function (data)
+  if (browser_mode == 'category' && browser_x == 3)
     {
-    //$("#loading").hide();
-    $("#msg-layer").hide();
-
-    // <li class="on"><img src="thumb/abc.jpg"><span>ABC Entertainment</span></li>
-    // <li><img src="thumb/abc.jpg"><span>ABC Entertainment</span></li>
-
-    sanity_check_data ('channelBrowse', data);
-
-    var lines = data.split ('\n');
-    log ('number of browse channels obtained: ' + lines.length);
-    for (var i = 0; i < lines.length; i++)
+    if (browser_y < browse_list_first)
       {
-      if (lines [i] != '')
-        {
-        var fields = lines[i].split ('\t');
-        if (fields [1] in channels_by_id)
-          {
-          // log ('channel ' + fields [1] + ' already in lineup: ' + fields [2]);
-          }
-        else
-          {
-          // log ('browse ' + fields [1] + ': ' + lines [i]);
-
-          n_browse++;
-          browsables [n_browse] = { 'id': fields [1], 'thumb': fields [3], 'name': fields [2], 'count': fields [4] };
-          }
-        }
+      browse_list_first = browser_y;
+      if ((browse_list_first % 2) != 1)
+        browse_list_first--;
       }
 
-    log ('displaying browse');
-
-    browse_cursor = 1;
-    redraw_browse();
-    
-    $("#mask").show();
-    $("#ch-directory").show();
-
-    thumbing = 'browse';
-
-    if (n_browse > 0)
-      $("#pod-" + browse_cursor).addClass ("on");
-
-    document.getElementById("podcastRSS").value = "";
-    });
-  }
-
-function old_redraw_browse()
-  {
-  var html = "";
-
-  for (var i = browse_first; i <= n_browse && i <= browse_first + 9; i++)
-    {
-    var count = browsables [i]['count'] >= 0 ? ' <span style="color: orange">(' + browsables [i]['count'] + ')</span>' : '';
-    var thumb = browsables [i]['thumb'];
-    if (thumb == '' || thumb == 'null' || thumb == 'false')
-      thumb = 'http://zoo.atomics.org/video/images-x1/no_images.png';
-    html += '<li id="pod-' + i + '"><img src="' + thumb + '"><span>' + browsables [i]['name'] + '</span>' + count + '</li>';
+    while (browser_y >= browse_list_first + 8)
+      browse_list_first += 2;
     }
 
-  $("#podcast-list").html (html);
-  $("#podcast-list img").error(function () { $(this).unbind("error").attr("src", "http://zoo.atomics.org/video/images-x1/no_images.png"); });
-
-  if (n_browse > 0)
-    $("#pod-" + browse_cursor).addClass ("on");
-
-  $("#podcast-list li").bind ('click', function() { browse_click ($(this).attr('id')); });
-  }
-
-function old_browse_up()
-  {
-  if (n_browse > 0 && browse_cursor > 1)
+  for (var i = browse_list_first; i <= n_browse_list && i < browse_list_first + 8; i++)
     {
-    if (browse_cursor - 1 < browse_first)
-      {
-      browse_first--;
-      redraw_browse();
-      }
-    $("#pod-" + browse_cursor).removeClass ("on");
-    browse_cursor--;
-    $("#pod-" + browse_cursor).addClass ("on");
-    // log ('browser now at: ' + browsables [browse_cursor]['id']);
-    }
-  }
+    var content = browse_list [i];
 
-function old_browse_down()
-  {
-  if (n_browse > 0 && browse_cursor < n_browse)
-    {
-    if (browse_cursor + 1 > browse_first + 9)
-      {
-      browse_first++;
-      redraw_browse();
-      }
-    $("#pod-" + browse_cursor).removeClass ("on");
-    browse_cursor++;
-    $("#pod-" + browse_cursor).addClass ("on");
-    // log ('browser now at: ' + browsables [browse_cursor]['id']);
-    }
-  }
+    html += '<li id="content-' + i + '" data-id="' + content['id'] + '"><img src=' + content['thumb'] + ' class="thumbnail">';
+    html += '<p class="chdir-title">' + content['name'] + '</p>';
 
-function old_browse_page_up()
-  {
-  if (n_browse > 0 && browse_cursor > 1)
-    {
-    if (browse_cursor - 10 < browse_first)
-      {
-      browse_first -= 10;
-      if (browse_first < 1) browse_first = 1;
-      redraw_browse();
-      }
+    var eps = (content['count'] == 1) ? (content['count'] + ' episode') : (content['count'] + ' episodes');
 
-    $("#pod-" + browse_cursor).removeClass ("on");
-    browse_cursor -= 10;
-    if (browse_cursor < 1) browse_cursor = 1;
-    $("#pod-" + browse_cursor).addClass ("on");
-    // log ('browser now at: ' + browsables [browse_cursor]['id']);
-    }
-  }
+    html += '<p class="chdir-meta">' + eps + '<br>0 subscribers</p>';
+    html += '<div class="msgbar">';
 
-function old_browse_page_down()
-  {
-  if (n_browse > 0 && browse_cursor < n_browse)
-    {
-    if (browse_cursor + 10 > browse_first + 9)
-      {
-      browse_first += 10;
-      if (browse_first > n_browse) browse_first = n_browse - 9;
-      if (browse_first < 1) browse_first = 1;
-      redraw_browse();
-      }
-    $("#pod-" + browse_cursor).removeClass ("on");
-    browse_cursor += 10;
-    if (browse_cursor > n_browse) browse_cursor = n_browse;
-    $("#pod-" + browse_cursor).addClass ("on");
-    // log ('browser now at: ' + browsables [browse_cursor]['id']);
-    }
-  }
-
-function old_browse_click (id)
-  {
-  if (thumbing == 'browse')
-    {
-    id = id.replace (/^pod-/, '');
-    log ('browse_click: ' + id);
-    if (id != browse_cursor)
-      {
-      $("#pod-" + browse_cursor).removeClass ("on");
-      browse_cursor = id;
-      $("#pod-" + browse_cursor).addClass ("on");
-      }
+    if (content['id'] in channels_by_id)
+      html += '<p class="status">Subscribed</p></div></li>';
     else
-      browse_accept();
+      html += '<p class="tip">Press ENTER to subscribe</p></div></li>';
     }
+
+  $("#content-list").html (html);
+  $("#content-list li").bind ('click', function () { browse_click (3, $(this).attr ('id')); });
+  $("#content-list li").hover (browse_hover_in, browse_hover_out);
+
+  browse_set_cursor (browser_x, browser_y);
+
+  if (browser_mode == 'category' && browser_x == 3)
+    $("#content-" + browser_y).addClass ("on");
   }
 
-function browse_enter (id)
+function browse_enter()
   {
-  if (id)
-    browse_accept (id);
+  if (browser_mode == 'category')
+    {
+    var id = $("#content-" + browser_x + '-' + browser_y).attr ("data-id");
+    if (id)
+      browse_accept (id);
+    }
+  else if (browser_mode == 'add')
+    {
+    if (browser_x == 3)
+      browse_add_checkbox ("addcat-" + browser_y);
+    }
   }
 
 function browse_accept (channel)
@@ -3603,22 +3735,6 @@ function browse_accept (channel)
     var d = $.get (cmd, function (data)
       {
       continue_acceptance (channel);
-      });
-    }
-  }
-
-function old_browse_accept()
-  {
-  if (browse_cursor in browsables)
-    {
-    var new_channel_id = browsables [browse_cursor]['id'];
-
-    log ('browser accepts: ' + new_channel_id +  ' (' + server_grid (ipg_cursor) + ')');
-
-    var cmd = "/playerAPI/subscribe?user=" + user + '&' + "channel=" + new_channel_id + '&' + "grid=" + server_grid (ipg_cursor);
-    var d = $.get (cmd, function (data)
-      {
-      continue_acceptance();
       });
     }
   }
@@ -4994,20 +5110,20 @@ One moment...
   </div>
 
 <div id="ep-layer" style="display: none">
-  <img src="http://zoo.atomics.org/video/9x9playerV27/images/ep_panel_off.png" id="ep-panel">
+  <img src="http://zoo.atomics.org/video/9x9playerV29/images/ep_panel_off.png" id="ep-panel">
   <div id="ep-tip"><p><span class="hilite">Press ENTER key</span> or <span class="hilite">click</span> on the highlighted channel icon in your IPG to see channel episodes.</p></div>
   <div id="ep-container">
     <div class="ep-swish" style="display: block">
       <ul class="ep-list" id="ep-list"></ul>
     </div>
-    <div id="ep-meta"><p><span class="ch-title" id="ep-layer-ch-title">ABC news</span> - <span class="ep-title" id="ep-layer-ep-title">Jay Leno's eclectic car collection</span> - <span class="age">Today</span> - <span class="duration">10:10</span></p></div>
+    <div id="ep-meta"><p><span class="ch-title" id="ep-layer-ch-title">ABC news</span> - <span class="ep-title" id="ep-layer-ep-title">Jay Leno's eclectic car collection</span> - <span class="age" id="ep-age">Today</span> - <span class="duration" id="ep-duration">10:10</span></p></div>
   </div>
 </div>
 
 <div id="ipg-layer" style="display: none">
   <div id="ipg-holder">
     <div id="header">
-      <img src="http://zoo.atomics.org/video/9x9playerV27/images/logo.png" id="logo">
+      <img src="http://zoo.atomics.org/video/9x9playerV29/images/logo.png" id="logo">
       <p id="user-name">Hello, <span id="user">Guest</span></p>  
       <ul id="control-list"><li><a href="javascript:login_screen()" class="btn" id="btn-signin"><span>Sign in / Sign up</span></a></li><li><a href="javascript:;" class="btn" id="btn-signout"><span>Sign out</span></a></li><li><a href="javascript:;" class="btn"><span>Resume Watching</span></a></li></ul>
     </div>
@@ -5028,7 +5144,7 @@ One moment...
         <li id="preloading"><p><span class="hilite">Preload:</span> <span id="preload"></span></p></li>
       </ul>
       <div id="ipg-grid">
-        <p id="watermark"><img src="http://zoo.atomics.org/video/9x9playerV27/images/watermark.png"></p>
+        <p id="watermark"><img src="http://zoo.atomics.org/video/9x9playerV29/images/watermark.png"></p>
         <div id="list-holder">
         </div>
       </div>     
@@ -5050,20 +5166,20 @@ One moment...
   </div>
     <div class="br-panel" id="category-panel">
     <div class="sub-panel">
-      <p class="page-up"><img src="http://zoo.atomics.org/video/9x9playerV27/images/arrow_up.png"></p>
+      <p class="page-up"><img src="http://zoo.atomics.org/video/9x9playerV29/images/arrow_up.png"></p>
       <div class="sub-holder">
         <ul id="ch-catlist"></ul>
       </div>
-      <p class="page-down"><img src="http://zoo.atomics.org/video/9x9playerV27/images/arrow_down.png"></p>
+      <p class="page-down"><img src="http://zoo.atomics.org/video/9x9playerV29/images/arrow_down.png"></p>
     </div>
     <div class="content-panel">
-      <p class="page-up"><img src="http://zoo.atomics.org/video/9x9playerV27/images/arrow_up.png"></p>
+      <p class="page-up"><img src="http://zoo.atomics.org/video/9x9playerV29/images/arrow_up.png"></p>
       <div class="content-holder">
         <ul id="content-list"></ul>
       </div>
       <p id="ch-vacancy"></p>
       <!--a href="javascript:;" class="btn" id="btn-subscribeAll">Subscribe all</a-->
-      <p class="page-down"><img src="http://zoo.atomics.org/video/9x9playerV27/images/arrow_down.png"></p>
+      <p class="page-down"><img src="http://zoo.atomics.org/video/9x9playerV29/images/arrow_down.png"></p>
     </div>
   </div>
   
@@ -5075,15 +5191,15 @@ One moment...
           <li><a href="javascript:;" class="btn">Go</a></li>
         </ul>
     </div>
-    <p class="page-up"><img src="http://zoo.atomics.org/video/9x9playerV27/images/arrow_up.png"></p>
-    <p class="page-down"><img src="http://zoo.atomics.org/video/9x9playerV27/images/arrow_down.png"></p>
+    <p class="page-up"><img src="http://zoo.atomics.org/video/9x9playerV29/images/arrow_up.png"></p>
+    <p class="page-down"><img src="http://zoo.atomics.org/video/9x9playerV29/images/arrow_down.png"></p>
   </div>
   
   <div class="op-panel" id="add-panel">
     <div class="input-area">
       <label for="RSS/YouTube input">Contribute a Podcast / YouTube URL:</label>
       <ul class="url-input">
-        <li class="textfieldbox"><input name="" type="text" class="textfield" id="submit-url"></li>
+        <li class="textfieldbox" id="submit-url-box"><input name="" type="text" class="textfield" id="submit-url"></li>
       </ul>
     </div>
     <div class="cate-selector">
@@ -5091,7 +5207,7 @@ One moment...
       <ul class="cate-list" id="cate-list"></ul>
     </div>
     <div id="feedback" class="success"><p></p></div>
-    <a href="javascript:submit_throw()" class="btn">Go</a>
+    <a href="javascript:submit_throw()" class="btn" id="add-go">Go</a>
   </div>
   </div>
 </div>
@@ -5145,15 +5261,15 @@ One moment...
     <p>Press <span class="enlarge">&uarr;</span> to see your IPG</p>
   </div>
   <div id="controler">
-    <img src="http://zoo.atomics.org/video/9x9playerV27/images/bg_controler.png" id="controler-bg">
+    <img src="http://zoo.atomics.org/video/9x9playerV29/images/bg_controler.png" id="controler-bg">
     <ul id="control-bar">
-      <li id="btn-replay"><img src="http://zoo.atomics.org/video/9x9playerV27/images/btn_replay.png"></li>
-      <li id="btn-rewind"><img src="http://zoo.atomics.org/video/9x9playerV27/images/btn_rewind.png"></li>
-      <li id="btn-play" style="display: none"><img src="http://zoo.atomics.org/video/9x9playerV27/images/btn_play.png"></li>
-      <li id="btn-pause"><img src="http://zoo.atomics.org/video/9x9playerV27/images/btn_pause.png"></li>
-      <li id="btn-forward"><img src="http://zoo.atomics.org/video/9x9playerV27/images/btn_forward.png"></li>
+      <li id="btn-replay"><img src="http://zoo.atomics.org/video/9x9playerV29/images/btn_replay.png"></li>
+      <li id="btn-rewind"><img src="http://zoo.atomics.org/video/9x9playerV29/images/btn_rewind.png"></li>
+      <li id="btn-play" style="display: none"><img src="http://zoo.atomics.org/video/9x9playerV29/images/btn_play.png"></li>
+      <li id="btn-pause"><img src="http://zoo.atomics.org/video/9x9playerV29/images/btn_pause.png"></li>
+      <li id="btn-forward"><img src="http://zoo.atomics.org/video/9x9playerV29/images/btn_forward.png"></li>
       <li class="divider"></li>
-      <li id="btn-volume"><img src="http://zoo.atomics.org/video/9x9playerV27/images/btn_volume.png"></li>
+      <li id="btn-volume"><img src="http://zoo.atomics.org/video/9x9playerV29/images/btn_volume.png"></li>
       <li id="volume-constrain" class="on">
         <ul id="volume-bars">
           <li></li>
@@ -5166,10 +5282,10 @@ One moment...
         </ul>
       </li>
       <li class="divider"></li>
-      <li id="btn-facebook"><img src="http://zoo.atomics.org/video/9x9playerV27/images/btn_facebook.png"></li>
-      <li id="btn-screensaver"><img src="http://zoo.atomics.org/video/9x9playerV27/images/btn_screensaver.png"></li>
+      <li id="btn-facebook"><img src="http://zoo.atomics.org/video/9x9playerV29/images/btn_facebook.png"></li>
+      <li id="btn-screensaver"><img src="http://zoo.atomics.org/video/9x9playerV29/images/btn_screensaver.png"></li>
       <li class="divider"></li>
-      <li id="btn-close"><img src="http://zoo.atomics.org/video/9x9playerV27/images/btn_close.png"></li>
+      <li id="btn-close"><img src="http://zoo.atomics.org/video/9x9playerV29/images/btn_close.png"></li>
       <li id="play-time">-- / --</li>
       <li id="progress-bar">
         <p id="loaded"></p>
@@ -5184,21 +5300,21 @@ One moment...
 
 <div id="waiting">
   <div class="waiting-holder">
-    <img src="http://zoo.atomics.org/video/9x9playerV27/images/loading.gif">
+    <img src="http://zoo.atomics.org/video/9x9playerV29/images/loading.gif">
     <p>One moment...</p>
   </div>
 </div>
 
 <div id="buffering">
   <div class="waiting-holder">
-    <img src="http://zoo.atomics.org/video/9x9playerV27/images/loading.gif">
+    <img src="http://zoo.atomics.org/video/9x9playerV29/images/loading.gif">
     <p>Buffering...</p>
   </div>
 </div>
 
 <div id="dir-waiting">
   <div class="waiting-holder">
-    <img src="http://zoo.atomics.org/video/9x9playerV27/images/loading.gif">
+    <img src="http://zoo.atomics.org/video/9x9playerV29/images/loading.gif">
     <p>One moment...</p>
   </div>
 </div>
@@ -5221,7 +5337,7 @@ One moment...
 <div id="log-layer" style="position: absolute; left: 0; top: 0; height: 100%; width: 100%; background: white; color: black; text-align: left; padding: 20px; overflow: scroll; z-index: 9999; display: none"></div>
 
 <div id="mask"></div>
-<div id="loading"><img src="http://zoo.atomics.org/video/9x9playerV27/images/loading.gif"></div>
+<div id="loading"><img src="http://zoo.atomics.org/video/9x9playerV29/images/loading.gif"></div>
 
 <!--/div-->
 </body>
