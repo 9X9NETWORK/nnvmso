@@ -16,12 +16,12 @@
 </head>
 <body>
 <div id="header">
-  <a href="/mso/login"><img src="/WEB-INF/../images/logo_9x9.png" id="logo"></a>
+  <a href=""><img src="/WEB-INF/../images/logo_9x9.png" id="logo"></a>
   <ul id="tabs">
-    <li><a href="/channel/list" id="ipg">Channel IPG</a></li>
-    <li><a href="/show/list/*" id="shows">Shows</a></li>
-    <li><a href="/statistics/index" id="statistics">Statistics</a></li>
-    <li><a href="/player/embed" id="embed">Embed</a></li>
+    <li><a href="" id="ipg">Channel IPG</a></li>
+    <li><a href="" id="shows">Shows</a></li>
+    <li><a href="" id="statistics">Statistics</a></li>
+    <li><a href="" id="embed">Embed</a></li>
   </ul>
   <a href="javascript:;" id="btn-signout">Sign Out</a>
   <a href="javascript:;" id="btn-account">Account</a>
