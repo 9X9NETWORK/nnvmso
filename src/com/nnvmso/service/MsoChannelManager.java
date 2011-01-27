@@ -24,6 +24,11 @@ public class MsoChannelManager {
 	
 	private MsoChannelDao msoChannelDao = new MsoChannelDao();
 		
+	/**
+	 * @@@IMPORTANT 
+	 * setProgramCount will be done automatically in MsoProgramManager when a program is added.
+	 * If necessary to manually change programCount, please do with caution.    	
+	 */
 	public void create(MsoChannel channel, List<Category> categories) {		
 		msoChannelDao.create(channel);
 		CategoryChannelManager ccMngr = new CategoryChannelManager();
@@ -31,7 +36,11 @@ public class MsoChannelManager {
 			ccMngr.create(new CategoryChannel(c.getKey(), channel.getKey()));
 		}
 	}
-		
+	
+	public MsoChannel save(MsoChannel channel) {
+		return msoChannelDao.save(channel);
+	}		
+	
 	public MsoChannel initChannelSubmittedFromPlayer(String sourceUrl, NnUser user) {
 		MsoChannel channel = new MsoChannel(sourceUrl, user.getKey());
 		channel.setContentType(this.getContentTypeByUrl(sourceUrl));		
@@ -46,11 +55,7 @@ public class MsoChannelManager {
 		channel.setPublic(false);
 		return channel;
 	}
-	
-	public MsoChannel save(MsoChannel channel) {
-		return msoChannelDao.save(channel);
-	}		
-			
+				
 	public short getContentTypeByUrl(String url) {
 		short type = MsoChannel.CONTENTTYPE_PODCAST;
 		//!!!

@@ -54,7 +54,6 @@ public class InitService {
 		MsoChannel channel1 = new MsoChannel("中文伊特", "中文伊特.com", "http://s3.amazonaws.com/9x9chthumb/54e2967caf4e60fe9bc19ef1920997977eae1578.gif", user.getKey());
 		channel1.setSourceUrl("http://feeds.feedburner.com/etsyetsyetsy");
 		channel1.setPublic(true);
-		channel1.setProgramCount(2);
 		categories.add(category);
 		channelMngr.create(channel1, categories);
 		
@@ -112,8 +111,7 @@ public class InitService {
 		//create channel		
 		MsoChannel channel1 = new MsoChannel("Etsy", "Etsy.com", "http://s3.amazonaws.com/9x9chthumb/54e2967caf4e60fe9bc19ef1920997977eae1578.gif", user.getKey());
 		channel1.setSourceUrl("http://feeds.feedburner.com/etsyetsyetsy");
-		channel1.setPublic(true);
-		channel1.setProgramCount(2);		
+		channel1.setPublic(true);		
 		channelMngr.create(channel1, categories);
 		
 		MsoProgram program1 = new MsoProgram("Handmade Confessional: Eli Dlugach", "Eli Dlugach gives a testimonial on why he loves handmade", "http://s3.amazonaws.com/9x9cache/005a69b4431d521e39534431254d81a211ebefc7_1227739497_thumbnail.jpg", MsoProgram.TYPE_VIDEO);
@@ -133,7 +131,6 @@ public class InitService {
 		MsoChannel channel2 = new MsoChannel("TEDTalks (hd)", "TED", "http://s3.amazonaws.com/9x9chthumb/f14a9bb972adfefab1c9c4f0ec44f251686d655a.jpg", user.getKey());		
 		channel2.setSourceUrl("http://feeds.feedburner.com/tedtalksHD");
 		channel2.setPublic(true);
-		channel2.setProgramCount(2);
 		channelMngr.create(channel2, categories);
 
 		MsoProgram program3 = new MsoProgram("TEDTalks : Beverly + Dereck", "Beverly + Dereck Joubert live in the bush", "http://s3.amazonaws.com/9x9cache/8ad69b8dcbd0edd516c4f6bd530390d9f640de45_1292858280_thumbnail.jpg", MsoProgram.TYPE_VIDEO);
@@ -163,8 +160,7 @@ public class InitService {
 		
 		//create channel				
 		MsoChannel channel5 = new MsoChannel("System Channel", "System Channel", "/WEB-INF/../images/logo_9x9.png", user.getKey());
-		channel5.setPublic(true);
-		channel5.setProgramCount(1);		
+		channel5.setPublic(true);		
 		channelMngr.create(channel5, categories);
 
 		MsoProgram program7 = new MsoProgram("System Program", "", "/WEB-INF/../images/logo_9x9.png", MsoProgram.TYPE_VIDEO);
@@ -178,7 +174,6 @@ public class InitService {
 		channel3.setSourceUrl("http://feeds.feedburner.com/veganagogo");
 		channel3.setStatus(MsoChannel.STATUS_ERROR);
 		channel3.setPublic(true);
-		channel3.setProgramCount(2);
 		channelMngr.create(channel3, categories);
 				
 		MsoProgram program5 = new MsoProgram("EP 40: Caramelized Rosemary Pears", "Caramelized Rosemary Pears Serves: 6-8", "http://s3.amazonaws.com/9x9cache/a023cd7cafa3b9d18d3e48274b5994c3cbacd759_1218075566_thumbnail.jpg", MsoProgram.TYPE_VIDEO);
@@ -199,7 +194,6 @@ public class InitService {
 		MsoChannel channel4 = new MsoChannel("Comedy Central's Jokes.com", "", "http://s3.amazonaws.com/9x9cache/1b2885a8ba30ee692b56fd0e9c9128995473367e_1199163600_thumbnail.jpg", user.getKey());		
 		channel4.setSourceUrl("http://feeds.feedburner.com/comedycentral/standup");
 		channel4.setPublic(true);
-		channel4.setProgramCount(2);
 		channelMngr.create(channel3, categories);				
 	}
 	
@@ -251,7 +245,7 @@ public class InitService {
 		
 		//initialize default categories
 		String[] categoryStr = {
-			"喜劇", "動物", "藝術", "部落格"
+				"喜劇", "動物", "藝術", "部落格"
 		};
 		
 		CategoryManager categoryMngr = new CategoryManager();
