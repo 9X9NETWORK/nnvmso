@@ -181,20 +181,20 @@ public class InitService {
 		program5.setMpeg4FileUrl("http://s3.amazonaws.com/9x9pod/a023cd7cafa3b9d18d3e48274b5994c3cbacd759_1218075566.mp4");
 		program5.setWebMFileUrl("http://s3.amazonaws.com/9x9cache/a023cd7cafa3b9d18d3e48274b5994c3cbacd759_1218075566.webm");
 		program5.setPublic(true);
-		programMngr.create(channel2, program5);
+		programMngr.create(channel3, program5);
 
 		MsoProgram program6 = new MsoProgram("EP 55: Herbed Fruit Salad", "Herbed Fruit Salad Serves: 10 Difficulty", "http://s3.amazonaws.com/9x9cache/0047ece77a9dcdce929d69be889d3f4258e98b38_1245713603_thumbnail.jpg", MsoProgram.TYPE_VIDEO);
 		program6.setImageLargeUrl("http://s3.amazonaws.com/9x9cache/0047ece77a9dcdce929d69be889d3f4258e98b38_1245713603_thumbLarge.jpg");
 		program6.setMpeg4FileUrl("http://s3.amazonaws.com/9x9pod/0047ece77a9dcdce929d69be889d3f4258e98b38_1245713603.mp4");
 		program6.setWebMFileUrl("http://s3.amazonaws.com/9x9cache/0047ece77a9dcdce929d69be889d3f4258e98b38_1245713603.webm");
 		program6.setPublic(true);
-		programMngr.create(channel2, program6);
+		programMngr.create(channel3, program6);
 
 		//create a channel, but no programs
 		MsoChannel channel4 = new MsoChannel("Comedy Central's Jokes.com", "", "http://s3.amazonaws.com/9x9cache/1b2885a8ba30ee692b56fd0e9c9128995473367e_1199163600_thumbnail.jpg", user.getKey());		
 		channel4.setSourceUrl("http://feeds.feedburner.com/comedycentral/standup");
 		channel4.setPublic(true);
-		channelMngr.create(channel3, categories);				
+		channelMngr.create(channel4, categories);				
 	}
 	
 	private void initializeMso1AndCategories() {
