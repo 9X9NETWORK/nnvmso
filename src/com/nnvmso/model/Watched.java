@@ -3,7 +3,6 @@ package com.nnvmso.model;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Hashtable;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
