@@ -15,7 +15,8 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
   <servlet-mapping>
     <servlet-name>nnvmso</servlet-name>
     <url-pattern>/</url-pattern>
-  </servlet-mapping>  
+  </servlet-mapping>
+    
   <!-- 
     remote api 
   -->
@@ -26,7 +27,33 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
   <servlet-mapping>
   	<servlet-name>remoteapi</servlet-name>
   	<url-pattern>/remote_api</url-pattern>
-  </servlet-mapping>  
+  </servlet-mapping>
+    
+  <!--
+    mapreduce 
+   -->
+  <servlet>
+    <servlet-name>mapreduce</servlet-name>
+    <servlet-class>
+      com.google.appengine.tools.mapreduce.MapReduceServlet
+    </servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>mapreduce</servlet-name>
+    <url-pattern>/mapreduce/*</url-pattern>
+  </servlet-mapping>
+  
+  <!-- 
+    error handling 
+  -->
+  <error-page>
+    <error-code>404</error-code>
+    <location>/not-found</location>
+  </error-page> 
+
+  <!-- 
+  	security 
+  -->   
   <security-constraint>
   	<web-resource-collection>
   		<web-resource-name>remoteapi</web-resource-name>
@@ -35,14 +62,25 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
   	<auth-constraint>
   		<role-name>admin</role-name>
   	</auth-constraint>
-  </security-constraint>  
-  <!-- 
-    error handling 
-  -->
-  <error-page>
-    <error-code>404</error-code>
-    <location>/not-found</location>
-  </error-page> 
+  </security-constraint>
+  
+  <security-constraint>
+    <web-resource-collection>
+      <url-pattern>/mapreduce/*</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+      <role-name>admin</role-name>
+    </auth-constraint>
+  </security-constraint>
+
+  <security-constraint>
+    <web-resource-collection>
+      <url-pattern>/admin/*</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+      <role-name>admin</role-name>
+    </auth-constraint>
+  </security-constraint>
 
   <!-- 
     tld config 

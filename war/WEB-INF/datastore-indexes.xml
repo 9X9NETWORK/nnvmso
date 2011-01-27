@@ -1,8 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<datastore-indexes
-  autoGenerate="true">
-  <datastore-index kind="MsoChannel" ancestor="false">
-     <property name="msoKey" direction="asc" />
-     <property name="seq" direction="desc" />
+<datastore-indexes autoGenerate="true">
+  <datastore-index kind="Category" ancestor="false" source="manual">
+    <property name="__key__" direction="desc"/>
+  </datastore-index>
+  <datastore-index kind="CategoryChannel" ancestor="false" source="manual">
+    <property name="__key__" direction="desc"/>
+  </datastore-index>
+  <datastore-index kind="Ipg" ancestor="false" source="manual">
+    <property name="__key__" direction="desc"/>
+  </datastore-index>
+  <datastore-index kind="Mso" ancestor="false" source="manual">
+    <property name="__key__" direction="desc"/>
   </datastore-index>  
+  <datastore-index kind="MsoChannel" ancestor="false" source="manual">
+    <property name="__key__" direction="desc"/>
+  </datastore-index>
+  <datastore-index kind="MsoIpg" ancestor="false" source="manual">
+    <property name="__key__" direction="desc"/>
+  </datastore-index>  
+  <datastore-index kind="MsoProgram" ancestor="false" source="manual">
+    <property name="__key__" direction="desc"/>
+  </datastore-index>   
+  <datastore-index kind="NnUser" ancestor="false" source="manual">
+    <property name="__key__" direction="desc"/>
+  </datastore-index>
+  <datastore-index kind="PdrRaw" ancestor="false" source="manual">
+    <property name="__key__" direction="desc"/>
+  </datastore-index>        
+  <datastore-index kind="Subscription" ancestor="false" source="manual">
+    <property name="__key__" direction="desc"/>
+  </datastore-index>
+  <datastore-index kind="Watched" ancestor="false" source="manual">
+    <property name="__key__" direction="desc"/>
+  </datastore-index>                
 </datastore-indexes>
