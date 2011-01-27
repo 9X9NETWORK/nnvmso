@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.6.0_20"/>
+	<classpathentry kind="src" path="resources"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER/App Engine (2)"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/apache-standard-taglib"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/bean-validator"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/commons-logging"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Spring-3.0.4"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/bean-validator"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/jackson"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JCache"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/mapreduce"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Spring-3.0.4"/>
-	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER/App Engine (2)"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>
