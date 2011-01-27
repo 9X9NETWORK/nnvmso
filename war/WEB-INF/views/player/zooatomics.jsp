@@ -3402,11 +3402,7 @@ function browse_left()
   {
   if (browser_x > 1)
     {
-    if (browser_mode == 'category' && browser_x == 3)
-      {
-      browse_set_cursor (parseInt (browser_x) - 1, browser_cat_cursor);
-      }
-    else if (browser_x == 2)
+    if (browser_x == 2)
       {
       switch (browser_mode)
         {
@@ -3434,7 +3430,7 @@ function browse_left()
     else if (browser_mode == 'category')
       {
       if ((parseInt (browser_y) % 2) == 1)
-        browse_set_cursor (parseInt (browser_x) - 1, browser_y);
+        browse_set_cursor (parseInt (browser_x) - 1, browser_cat_cursor);
       else
         browse_set_cursor (browser_x, parseInt (browser_y) - 1);
       }
@@ -3466,7 +3462,10 @@ function browse_right()
       if (browser_x == 1)
         browse_set_cursor (parseInt (browser_x) + 1, browser_cat_cursor);
       else if (browser_x == 2)
-        browse_set_cursor (parseInt (browser_x) + 1, 1);
+        {
+        if (n_browse_list > 0)
+          browse_set_cursor (parseInt (browser_x) + 1, 1);
+        }
       else if (browser_x == 3)
         {
         if (browser_y < n_browse_list)
