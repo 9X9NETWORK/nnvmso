@@ -1242,6 +1242,14 @@ function escape()
     return;
     }
 
+  if (thumbing == 'browse')
+    {
+    log ('browse return to ipg');
+    $("#ch-directory").hide();
+    thumbing = 'ipg';
+    return;
+    }
+
   switch (thumbing)
     {
     case 'program': layer = $("#ep-layer");
@@ -3243,6 +3251,7 @@ function browse()
     $("#cate-list  li").bind ('click', function () { browse_click (5, $(this).attr ('id')); });
 
     $("#main-panel li, #ch-catlist li, cate-list li").hover (hover_in, hover_out);
+    $("#btn-returnIPG").hover (hover_in, hover_out);
 
     browse_set_cursor (2, 1);
     });
@@ -3377,6 +3386,7 @@ function browse_set_cursor (x, y)
       $("#add-go").removeClass ("on");
       $("#category-panel").hide();
       $("#add-panel").show();
+      $(".btn").hover (hover_in, hover_out);
       browser_mode = 'add';
       }
     }
@@ -5179,7 +5189,7 @@ One moment...
       <li id="search"><p>Search</p><span class="arrow">&raquo;</span></li>-->
       <li id="main-2"><p>Add RSS / YouTube</p><span class="arrow">&raquo;</span></li>
     </ul>
-    <a href="javascript:;" class="btn" id="btn-returnIPG">Return to IPG</a>
+    <div class="btn" id="btn-returnIPG" onclick="escape()"><span>Return to IPG</span></div>
   </div>
     <div class="br-panel" id="category-panel">
     <div class="sub-panel">
@@ -5224,7 +5234,7 @@ One moment...
       <ul class="cate-list" id="cate-list"></ul>
     </div>
     <div id="feedback" class="success"><p></p></div>
-    <a href="javascript:submit_throw()" class="btn" id="add-go">Go</a>
+    <a href="javascript:submit_throw()" class="btn" id="add-go"><span>Go</span></a>
   </div>
   </div>
 </div>
