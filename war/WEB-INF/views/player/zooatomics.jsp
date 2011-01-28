@@ -12,7 +12,7 @@
 <meta name="description" content="My 9x9 Channel Guide. Easily browse your favorite video podcasts on the 9x9 Player! Podcasts automatically download and update for you, bringing up to 81 channels of new videos daily." />
 <link rel="image_src" href="http://www.cksinfo.com/clipart/toys/abc-blocks.png" />
 
-<link rel="stylesheet" href="http://zoo.atomics.org/video/9x9playerV30/stylesheets/main.css" />
+<link rel="stylesheet" href="http://zoo.atomics.org/video/9x9playerV31/stylesheets/main.css" />
 
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.8/jquery-ui.min.js"></script>
@@ -21,9 +21,9 @@
 <script type="text/javascript" src="http://static.ak.fbcdn.net/connect/en_US/core.debug.js"></script>
 <script type="text/javascript" src="http://zoo.atomics.org/video/cssanim.js"></script>
 <script type="text/javascript" src="http://zoo.atomics.org/video/swfobject.js"></script>
-<script type="text/javascript" src="http://zoo.atomics.org/video/9x9playerV30/javascripts/jquery.swfobject.1-1-1.min.js"></script>
+<script type="text/javascript" src="http://zoo.atomics.org/video/9x9playerV31/javascripts/jquery.swfobject.1-1-1.min.js"></script>
 <script type="text/javascript" src="http://zoo.atomics.org/video/flowplayer-3.2.4.min.js"></script>
-<script type="text/javascript" src="http://zoo.atomics.org/video/9x9playerV30/javascripts/whatsnew.js"></script>
+<script type="text/javascript" src="http://zoo.atomics.org/video/9x9playerV31/javascripts/whatsnew.js"></script>
 
 <script>
 
@@ -52,6 +52,8 @@ var fp = {  player1: { file: '', duration: 0, timex: 0, mute: false },
 
 var language = 'en';
 
+var all_programs_fetched = false;
+var all_channels_fetched = false;
 var activated = false;
 var remembered_pause = false;
 
@@ -75,6 +77,7 @@ var program_cursor = 1;
 var program_first = 1;
 
 var ipg_cursor;
+var ipg_saved_cursor;
 var ipg_timex = 0;
 var ipg_delayed_stop_timex = 0;
 var ipg_preload_timex = 0;
@@ -135,7 +138,7 @@ var via_shared_ipg = false;
 /* reduced functionality if there is a valid user but he is visiting a shared ipg */
 var readonly_ipg = false;
 
-var root = 'http://zoo.atomics.org/video/9x9playerV30/images/';
+var root = 'http://zoo.atomics.org/video/9x9playerV31/images/';
 
 $(document).ready (function()
  {
@@ -164,14 +167,14 @@ function elastic_innards()
   var vh = $(window).height();
   var vw = $(window).width();
 
-  var h = document.getElementById ("v");
-  h.style.height = vh + "px";
-  var h = document.getElementById ("fp1");
-  h.style.height = vh + "px";
-  var h = document.getElementById ("fp2");
-  h.style.height = vh + "px";
+  // var h = document.getElementById ("v");
+  // h.style.height = vh + "px";
+  // var h = document.getElementById ("fp1");
+  // h.style.height = vh + "px";
+  // var h = document.getElementById ("fp2");
+  // h.style.height = vh + "px";
   var h = document.getElementById ("yt1");
-  h.style.height = vh + "px";
+  // h.style.height = vh + "px";
   h.style.width = vw + "px";
 
   resize_fp();
@@ -273,10 +276,10 @@ function resize_fp()
   {
   var vh = $(window).height();
 
-  if (shrink_hack && vh > 25)
-    { vh -= 20; }
+  if (shrink_hack && vh > 30)
+    { vh -= 25; }
 
-  for (var p in { 'player1':'', 'player2':'' })
+  for (var p in { 'player1':'', 'player2':'', 'v':'', 'fp1':'', fp2:'', 'yt1':'' })
     {
     var h = document.getElementById (p);
     h.style.height = vh + "px";
@@ -394,10 +397,24 @@ function fetch_programs_in (channel)
   var d = $.get (query, function (data)
     {
     parse_program_data (data);
+    $("#waiting").hide();
+    thumbing = 'ipg';
 
     if (thumbing == 'ipg')
       ipg_metainfo();
     });
+  }
+
+function fetch_everything()
+  {
+  all_channels_fetched = false;
+  all_programs_fetched = false;
+
+  channelgrid = {};
+  programgrid = {};
+
+  fetch_channels();
+  fetch_programs();
   }
 
 function fetch_programs()
@@ -413,7 +430,13 @@ function fetch_programs()
     else
       log ('*** programInfo: DATA RETURNED BY SERVER FAILS SANITY CHECK');
 
-    fetch_channels();
+    all_programs_fetched = true;
+
+    $("#waiting").hide();
+    if (thumbing == 'ipg-wait')
+      thumbing = 'ipg';
+
+    /* fetch_channels(); */
     });
   }
 
@@ -498,6 +521,9 @@ function fetch_channels()
       else
         log ("ignoring channels line " + i + ": " + lines [i]);
       }
+
+    all_channels_fetched = true;
+
     if (!activated)
       activate();
     else
@@ -664,7 +690,7 @@ function hide_layers()
 
 function end_message (duration)
   {
-  $("#loading").hide();
+  $("#buffering").hide();
 
   if (thumbing != 'program' && thumbing != 'channel' && thumbing != 'control')
     return;
@@ -726,7 +752,7 @@ function start_play_html5 (url)
 
   fake_timex = 0;
 
-  $("#loading").show();
+  $("#buffering").show();
 
   // v.addEventListener ('loadstart', function() { loadstart_callback(); }, false);
   v.addEventListener ('play', function () { play_callback(); }, false);
@@ -735,12 +761,12 @@ function start_play_html5 (url)
   v.addEventListener ('pause', function () { pause_callback(); }, false);
 
   v.addEventListener ('error', function () { notify ("error"); }, false);
-  v.addEventListener ('stalled', function () { $("#loading").show(); notify ("stalled"); }, false);
-  v.addEventListener ('waiting', function () { $("#loading").show(); notify ("waiting"); }, false);
+  v.addEventListener ('stalled', function () { $("#buffering").show(); notify ("stalled"); }, false);
+  v.addEventListener ('waiting', function () { $("#buffering").show(); notify ("waiting"); }, false);
   v.addEventListener ('seeking', function () { notify ("seeking"); }, false);
   v.addEventListener ('seeked', function () { notify ("seeked"); }, false);
   v.addEventListener ('suspend', function () { notify ("suspend"); }, false);
-  v.addEventListener ('playing', function () { $("#loading").hide(); notify ("playing"); }, false);
+  v.addEventListener ('playing', function () { $("#buffering").hide(); notify ("playing"); }, false);
   v.addEventListener ('abort', function () { notify ("abort"); }, false);
   v.addEventListener ('emptied', function () { notify ("emptied"); }, false);
 
@@ -762,13 +788,13 @@ function notify (text)
 function loadstart_callback()
   {
   log ('loadstart callback');
-  $("#loading").show();
+  $("#buffering").show();
   }
 
 function play_callback()
   {
   log ('play callback');
-  $("#loading").hide();
+  $("#buffering").hide();
   var v = document.getElementById ("vvv");
   // v.addEventListener ('ended', function () { channel_right(); }, false);
   $("#btn-play").hide();
@@ -1760,17 +1786,14 @@ function exit_whats_new()
   {
   StopWhatsNew();
   $("body").removeClass ("on");
-  //$("body").css ("background-image", "none");
   thumbing = 'program';
   switch_to_ipg();
-  // $("#all-players").show();
   }
 
 function whatsnew_enter()
   {
   StopWhatsNew();
   $("body").removeClass ("on");
-  // $("#all-players").show();
 
   var grid = whatsnew [i]['grid'];
   var episode = whatsnew [i]['episodes'][n];
@@ -1874,7 +1897,7 @@ function switch_to_ipg()
   $("#ipg-btn-resume").hover (hover_in, hover_out);
 
   stop_preload();
-  $("#loading").hide();
+  $("#buffering").hide();
 
   //if (jQuery.browser.msie && (jQuery.browser.version == '7.0' || jQuery.browser.version == '8.0'))
   if (true)
@@ -2081,6 +2104,8 @@ function ipg_metainfo()
       if (! ('refetched' in channelgrid [ipg_cursor]))
         {
         channelgrid [ipg_cursor]['refetched'] = true;
+        $("#waiting").show();
+        thumbing = 'ipg-wait';
         fetch_programs_in (channelgrid [ipg_cursor]['id']);
         }
       }
@@ -2299,6 +2324,7 @@ function ipg_up()
     {
     $("#ipg-" + ipg_cursor).removeClass ("on");
     $("#ipg-btn-signin").addClass ("on");
+    ipg_saved_cursor = ipg_cursor;
     ipg_cursor = -1;
     }
   else if (parseInt (ipg_cursor) > 20)
@@ -2330,7 +2356,8 @@ function ipg_down()
     {
     $("#ipg-btn-signin").removeClass ("on");
     $("#ipg-btn-resume").removeClass ("on");
-    ipg_cursor = first_channel();
+    // ipg_cursor = first_channel();
+    ipg_cursor = ipg_saved_cursor;
     }
   else if (ipg_cursor > 90)
     {
@@ -2761,7 +2788,7 @@ function setup_ajax_error_handling()
   {
   $.ajaxSetup ({ error: function (x, e)
     {
-    $("#loading").hide();
+    $("#buffering").hide();
     $("#msg-layer").hide();
 
     if (x.status == 0)
@@ -2886,7 +2913,8 @@ function submit_login()
       resume();
       activated = false;
 
-      fetch_programs();
+      /* fetch_programs(); */
+      fetch_everything();
       }
     else
       log_and_alert ("LOGIN FAIL: " + fields [1]);
@@ -2950,8 +2978,8 @@ function submit_signup()
         //log_and_alert ('signed up as user: ' + user);
         }
 
-      resume();
-      fetch_programs();
+      /* fetch_programs(); */
+      fetch_everything();
       }
     else
       log_and_alert ("SIGNUP FAIL: " + fields [1]);
@@ -3164,7 +3192,8 @@ function login()
         if (via_shared_ipg)
           readonly_ipg = true;
 
-        fetch_programs();
+        /* fetch_programs(); */
+        fetch_everything();
         }
       else
         {
@@ -3192,14 +3221,16 @@ function login()
         {
         log ('no "user" cookie, but login was successful: ' + fields [1])
         user = fields [1];
-        fetch_programs();
+        /* fetch_programs(); */
+        fetch_everything();
         }
       else if (u)
         {
         log ('user cookie now exists');
         user = u;
         via_shared_ipg = false;
-        fetch_programs();
+        /* fetch_programs(); */
+        fetch_everything();
         }
       else
         panic ("was not able to get a user cookie");
@@ -3239,13 +3270,16 @@ function browse()
   browser_first_cat = 1;
   browser_mode = 'category';
 
-  $("#msg-layer").html ('<p>One moment...</p>');
-  $("#msg-layer").show();
+  // $("#msg-layer").html ('<p>One moment...</p>');
+  // $("#msg-layer").show();
+
+  $("#waiting").show();
 
   var query = "/playerAPI/categoryBrowse?langCode=en";
   var d = $.get (query, function (data)
     {
-    $("#msg-layer").hide();
+    // $("#msg-layer").hide();
+    $("#waiting").hide();
     sanity_check_data ('categoryBrowse', data);
 
     calculate_empties();
@@ -3350,9 +3384,14 @@ function browse_set_cursor (x, y)
     {
     if (browser_x == 1)
       {
-      $("#main-" + browser_y).removeClass ("on");
-      if (x == 1 && browser_y != y)
-        $("#main-" + browser_y).removeClass ("selected");
+      if (browser_y == 3)
+        $("#btn-returnIPG").removeClass ("on");
+      else
+        {
+        $("#main-" + browser_y).removeClass ("on");
+        if (x == 1 && browser_y != y)
+          $("#main-" + browser_y).removeClass ("selected");
+        }
       }
 
     else if (browser_mode == 'category')
@@ -3384,8 +3423,13 @@ function browse_set_cursor (x, y)
 
   if (x == 1)
     {
-    $("#main-" + y).addClass ("on");
-    $("#main-" + y).addClass ("selected");
+    if (y == 3)
+      $("#btn-returnIPG").addClass ("on");
+    else
+      {
+      $("#main-" + y).addClass ("on");
+      $("#main-" + y).addClass ("selected");
+      }
     }
   else if (browser_mode == 'category')
     {
@@ -3574,13 +3618,17 @@ function browse_up()
 
 function browse_down()
   {
-  if (browser_x == 1 && browser_y >= 2)
+  if (browser_x == 1 && browser_y >= 3)
     {
     /* last menu item */
     }
   else if (browser_mode == 'add')
     {
-    if (browser_x == 2)
+    if (browser_x == 1)
+      {
+      browse_set_cursor (1, parseInt (browser_y) + 1);
+      }
+    else if (browser_x == 2)
       {
       browse_set_cursor (3, 1);
       }
@@ -3697,6 +3745,8 @@ function browse_category (category_id)
       return;
       }
 
+    log ('received channels for category: ' + category);
+
     browse_content = {};
     browse_list = {};
     n_browse_list = 0;
@@ -3711,7 +3761,7 @@ function browse_category (category_id)
       if (lines [i] != '')
         {
         var fields = lines[i].split ('\t');
-
+log ('BROWSE: ' + fields[1]);
         if (parseInt (fields[1]) > 0)
           {
           n_browse_list++;
@@ -3747,7 +3797,7 @@ function redraw_browse_content()
   for (var i = browse_list_first; i <= n_browse_list && i < browse_list_first + 8; i++)
     {
     var content = browse_list [i];
-
+log ('  i: ' + i + ' content: ' + content);
     html += '<li id="content-' + i + '" data-id="' + content['id'] + '"><img src=' + content['thumb'] + ' class="thumbnail">';
     html += '<p class="chdir-title">' + content['name'] + '</p>';
 
@@ -3774,7 +3824,11 @@ function redraw_browse_content()
 
 function browse_enter()
   {
-  if (browser_mode == 'category')
+  if (browser_x == 1 && browser_y == 3)
+    {
+    escape();
+    }
+  else if (browser_mode == 'category')
     {
     var id = $("#content-" + browser_y).attr ("data-id");
     if (id)
@@ -4131,7 +4185,7 @@ function jw_state_change()
     log ("jw STOP");
     //jwplayer.sendEvent ('STOP');
     physical_stop();
-    // $("#loading").hide();
+    // $("#buffering").hide();
     ended_callback();
     }
 
@@ -4141,18 +4195,18 @@ function jw_state_change()
     log ("jw STOP");
     //jwplayer.sendEvent ('STOP');
     physical_stop();
-    // $("#loading").hide();
+    // $("#buffering").hide();
     ended_callback();
     }
 
   else if (state == 'BUFFERING')
     {
-    // $("#loading").show();
+    // $("#buffering").show();
     }
 
   else if (state == 'PLAYING')
     {
-    // $("#loading").hide();
+    // $("#buffering").hide();
     }
   }
 
@@ -4241,7 +4295,7 @@ function fp_buffering()
   var id = this.id();
   log ('fp ' + id + ' buffering')
   if (id == fp_player)
-    $("#loading").show();
+    $("#buffering").show();
   }
 
 function fp_notbuffering()
@@ -4250,7 +4304,7 @@ function fp_notbuffering()
   log ('fp ' + id + ' no longer buffering')
 
   if (id == fp_player)
-    $("#loading").hide();
+    $("#buffering").hide();
 
   // if (id == fp_preloaded)
   //  {
@@ -4394,19 +4448,19 @@ function ipg_preload_play()
           if (state == -1)
             {
             log ('*** flowplayer was unloaded, trying over');
-            $("#loading").show();
+            $("#buffering").show();
             stop_preload();
             ipg_play();
             }
           else if (state == 1)
             {
             log ('*** flowplayer was unexpectedly idle, restarting with: ' + fp [fp_player]['file']);
-            $("#loading").show();
+            $("#buffering").show();
             flowplayer (fp_player).play (fp [fp_player]['file']);
             }
           else if (state == 2)
             {
-            $("#loading").show();
+            $("#buffering").show();
             }
           }
         catch (error)
@@ -4435,7 +4489,7 @@ function start_play_fp (url)
 
   try { flowplayer (fp_player).unload(); } catch (error) {};
 
-  $("#loading").show();
+  $("#buffering").show();
 
   flowplayer (fp_player,
       {src: 'http://zoo.atomics.org/video/fc/flowplayer.commercial-3.2.5.swf', wmode: 'transparent', allowfullscreen: 'false', allowscriptaccess: 'always' }, 
@@ -4484,7 +4538,7 @@ function fp_onbegin()
   var now = new Date();
   var waited = Math.round ((now.getTime() - start_preload.getTime()) / 100) / 10;
   $("#preload").html ('Preloaded ' + waited + 's');
-  $("#loading").hide();
+  $("#buffering").hide();
   }
 
 function fp_onstart()
@@ -5178,8 +5232,8 @@ One moment...
   </div>
 
 <div id="ep-layer" style="display: none">
-  <img src="http://zoo.atomics.org/video/9x9playerV30/images/ep_panel_off.png" id="ep-panel">
-  <div id="ep-tip"><p><span class="hilite">Press ENTER key</span> or <span class="hilite">click</span> on the highlighted channel icon in your IPG to see channel episodes.</p></div>
+  <img src="http://zoo.atomics.org/video/9x9playerV31/images/ep_panel_off.png" id="ep-panel">
+  <div id="ep-tip"><!--<p><span class="hilite">Press ENTER key</span> or <span class="hilite">click</span> on the highlighted channel icon in your IPG to see channel episodes.</p>--></div>
   <div id="ep-container">
     <div class="ep-swish" style="display: block">
       <ul class="ep-list" id="ep-list"></ul>
@@ -5191,7 +5245,7 @@ One moment...
 <div id="ipg-layer" style="display: none">
   <div id="ipg-holder">
     <div id="header">
-      <img src="http://zoo.atomics.org/video/9x9playerV30/images/logo.png" id="logo">
+      <img src="http://zoo.atomics.org/video/9x9playerV31/images/logo.png" id="logo">
       <p id="user-name">Hello, <span id="user">Guest</span></p>  
       <ul id="control-list"><li><a href="javascript:login_screen()" class="btn" id="ipg-btn-signin"><span>Sign in / Sign up</span></a></li><li><a href="javascript:;" class="btn" id="btn-signout"><span>Sign out</span></a></li><li><a href="javascript:;" class="btn" id="ipg-btn-resume"><span>Resume Watching</span></a></li></ul>
     </div>
@@ -5212,7 +5266,7 @@ One moment...
         <li id="preloading"><p><span class="hilite">Preload:</span> <span id="preload"></span></p></li>
       </ul>
       <div id="ipg-grid">
-        <p id="watermark"><img src="http://zoo.atomics.org/video/9x9playerV30/images/watermark.png"></p>
+        <p id="watermark"><img src="http://zoo.atomics.org/video/9x9playerV31/images/watermark.png"></p>
         <div id="list-holder">
         </div>
       </div>     
@@ -5234,20 +5288,20 @@ One moment...
   </div>
     <div class="br-panel" id="category-panel">
     <div class="sub-panel">
-      <p class="page-up"><img src="http://zoo.atomics.org/video/9x9playerV30/images/arrow_up.png"></p>
+      <p class="page-up"><img src="http://zoo.atomics.org/video/9x9playerV31/images/arrow_up.png"></p>
       <div class="sub-holder">
         <ul id="ch-catlist"></ul>
       </div>
-      <p class="page-down"><img src="http://zoo.atomics.org/video/9x9playerV30/images/arrow_down.png"></p>
+      <p class="page-down"><img src="http://zoo.atomics.org/video/9x9playerV31/images/arrow_down.png"></p>
     </div>
     <div class="content-panel">
-      <p class="page-up"><img src="http://zoo.atomics.org/video/9x9playerV30/images/arrow_up.png"></p>
-      <div class="content-holder">
+      <p class="page-up"><img src="http://zoo.atomics.org/video/9x9playerV31/images/arrow_up.png"></p>
+      <div class="content-holder" style="display: block">
         <ul id="content-list"></ul>
       </div>
       <p id="ch-vacancy"></p>
       <!--a href="javascript:;" class="btn" id="btn-subscribeAll">Subscribe all</a-->
-      <p class="page-down"><img src="http://zoo.atomics.org/video/9x9playerV30/images/arrow_down.png"></p>
+      <p class="page-down"><img src="http://zoo.atomics.org/video/9x9playerV31/images/arrow_down.png"></p>
     </div>
   </div>
   
@@ -5259,8 +5313,8 @@ One moment...
           <li><a href="javascript:;" class="btn">Go</a></li>
         </ul>
     </div>
-    <p class="page-up"><img src="http://zoo.atomics.org/video/9x9playerV30/images/arrow_up.png"></p>
-    <p class="page-down"><img src="http://zoo.atomics.org/video/9x9playerV30/images/arrow_down.png"></p>
+    <p class="page-up"><img src="http://zoo.atomics.org/video/9x9playerV31/images/arrow_up.png"></p>
+    <p class="page-down"><img src="http://zoo.atomics.org/video/9x9playerV31/images/arrow_down.png"></p>
   </div>
   
   <div class="op-panel" id="add-panel">
@@ -5329,15 +5383,15 @@ One moment...
     <p>Press <span class="enlarge">&uarr;</span> to see your IPG</p>
   </div>
   <div id="controler">
-    <img src="http://zoo.atomics.org/video/9x9playerV30/images/bg_controler.png" id="controler-bg">
+    <img src="http://zoo.atomics.org/video/9x9playerV31/images/bg_controler.png" id="controler-bg">
     <ul id="control-bar">
-      <li id="btn-replay"><img src="http://zoo.atomics.org/video/9x9playerV30/images/btn_replay.png"></li>
-      <li id="btn-rewind"><img src="http://zoo.atomics.org/video/9x9playerV30/images/btn_rewind.png"></li>
-      <li id="btn-play" style="display: none"><img src="http://zoo.atomics.org/video/9x9playerV30/images/btn_play.png"></li>
-      <li id="btn-pause"><img src="http://zoo.atomics.org/video/9x9playerV30/images/btn_pause.png"></li>
-      <li id="btn-forward"><img src="http://zoo.atomics.org/video/9x9playerV30/images/btn_forward.png"></li>
+      <li id="btn-replay"><img src="http://zoo.atomics.org/video/9x9playerV31/images/btn_replay.png"></li>
+      <li id="btn-rewind"><img src="http://zoo.atomics.org/video/9x9playerV31/images/btn_rewind.png"></li>
+      <li id="btn-play" style="display: none"><img src="http://zoo.atomics.org/video/9x9playerV31/images/btn_play.png"></li>
+      <li id="btn-pause"><img src="http://zoo.atomics.org/video/9x9playerV31/images/btn_pause.png"></li>
+      <li id="btn-forward"><img src="http://zoo.atomics.org/video/9x9playerV31/images/btn_forward.png"></li>
       <li class="divider"></li>
-      <li id="btn-volume"><img src="http://zoo.atomics.org/video/9x9playerV30/images/btn_volume.png"></li>
+      <li id="btn-volume"><img src="http://zoo.atomics.org/video/9x9playerV31/images/btn_volume.png"></li>
       <li id="volume-constrain" class="on">
         <ul id="volume-bars">
           <li></li>
@@ -5350,10 +5404,10 @@ One moment...
         </ul>
       </li>
       <li class="divider"></li>
-      <li id="btn-facebook"><img src="http://zoo.atomics.org/video/9x9playerV30/images/btn_facebook.png"></li>
-      <li id="btn-screensaver"><img src="http://zoo.atomics.org/video/9x9playerV30/images/btn_screensaver.png"></li>
+      <li id="btn-facebook"><img src="http://zoo.atomics.org/video/9x9playerV31/images/btn_facebook.png"></li>
+      <li id="btn-screensaver"><img src="http://zoo.atomics.org/video/9x9playerV31/images/btn_screensaver.png"></li>
       <li class="divider"></li>
-      <li id="btn-close"><img src="http://zoo.atomics.org/video/9x9playerV30/images/btn_close.png"></li>
+      <li id="btn-close"><img src="http://zoo.atomics.org/video/9x9playerV31/images/btn_close.png"></li>
       <li id="play-time">-- / --</li>
       <li id="progress-bar">
         <p id="loaded"></p>
@@ -5368,21 +5422,21 @@ One moment...
 
 <div id="waiting">
   <div class="waiting-holder">
-    <img src="http://zoo.atomics.org/video/9x9playerV30/images/loading.gif">
+    <img src="http://zoo.atomics.org/video/9x9playerV31/images/loading.gif">
     <p>One moment...</p>
   </div>
 </div>
 
 <div id="buffering">
   <div class="waiting-holder">
-    <img src="http://zoo.atomics.org/video/9x9playerV30/images/loading.gif">
+    <img src="http://zoo.atomics.org/video/9x9playerV31/images/loading.gif">
     <p>Buffering...</p>
   </div>
 </div>
 
 <div id="dir-waiting">
   <div class="waiting-holder">
-    <img src="http://zoo.atomics.org/video/9x9playerV30/images/loading.gif">
+    <img src="http://zoo.atomics.org/video/9x9playerV31/images/loading.gif">
     <p>One moment...</p>
   </div>
 </div>
@@ -5405,7 +5459,7 @@ One moment...
 <div id="log-layer" style="position: absolute; left: 0; top: 0; height: 100%; width: 100%; background: white; color: black; text-align: left; padding: 20px; overflow: scroll; z-index: 9999; display: none"></div>
 
 <div id="mask"></div>
-<div id="loading"><img src="http://zoo.atomics.org/video/9x9playerV30/images/loading.gif"></div>
+<!--div id="loading"><img src="http://zoo.atomics.org/video/9x9playerV31/images/loading.gif"></div-->
 
 <!--/div-->
 </body>
