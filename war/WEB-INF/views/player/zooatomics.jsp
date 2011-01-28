@@ -1291,20 +1291,49 @@ function escape()
   {
   var layer;
 
-  if (thumbing == 'browse-wait')
-    return;
+  log ('escape!');
 
-  if (thumbing == 'ipg' && ipg_mode == 'episodes')
-    {
-    ipg_exit_episode_mode();
+  if (thumbing == 'browse-wait' || thumbing == 'ipg-wait')
     return;
-    }
 
   if (thumbing == 'browse')
     {
     log ('browse return to ipg');
     $("#ch-directory").hide();
     thumbing = 'ipg';
+    return;
+    }
+
+  if (thumbing == 'ipg')
+    {
+    if (ipg_mode == 'episodes')
+      {
+      ipg_exit_episode_mode();
+      return;
+      }
+
+    if (! (ipg_cursor in channelgrid))
+      {
+      log ('not on a channel');
+      return;
+      }
+
+    try
+      {
+      clearTimeout (ipg_timex);
+      clearTimeout (ipg_delayed_stop_timex);
+      }
+    catch (error)
+      {
+      }
+
+    $("#ch-directory").hide();
+    $("#ipg-layer").hide();
+
+    //thumbing = 'program';
+    //prepare_channel();
+    ipg_play();
+
     return;
     }
 
@@ -1903,6 +1932,7 @@ function switch_to_ipg()
   if (true)
     {
     $("#control-layer").hide();
+    $("#ch-directory").hide();
     // $("#ep-layer").hide();
     ipg_program_tip();
     $("#ipg-layer").show();
