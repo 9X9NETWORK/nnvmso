@@ -32,6 +32,9 @@ public class Mso implements Serializable {
 	private String logoUrl;
 	
 	@Persistent
+	private String logoClickUrl;
+	
+	@Persistent
 	private String jingleUrl;
 	
 	@Persistent
@@ -144,5 +147,14 @@ public class Mso implements Serializable {
 
 	public void setPreferredLangCode(String preferredLangCode) {
 		this.preferredLangCode = preferredLangCode;
+	}
+
+	public String getLogoClickUrl() {
+		return logoClickUrl;
+	}
+
+	public void setLogoClickUrl(String logoClickUrl) {
+		this.logoClickUrl = logoClickUrl;
 	}	
+	
 }
