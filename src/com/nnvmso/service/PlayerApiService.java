@@ -29,6 +29,7 @@ import com.nnvmso.model.CategoryChannel;
 import com.nnvmso.model.Ipg;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
+import com.nnvmso.model.MsoConfig;
 import com.nnvmso.model.MsoIpg;
 import com.nnvmso.model.MsoProgram;
 import com.nnvmso.model.NnUser;
@@ -174,8 +175,9 @@ public class PlayerApiService {
 		String results = NnStatusMsg.successStr(locale);
 		results = results + "key" + "\t" +NnStringUtil.getKeyStr(mso.getKey()) + "\n";
 		results = results + "name"  + "\t" + mso.getName() + "\n";
-		results = results + "loglUrl"  + "\t" + mso.getLogoUrl() + "\n";
+		results = results + "logoUrl"  + "\t" + mso.getLogoUrl() + "\n";
 		results = results + "jingleUrl" + "\t"+ mso.getJingleUrl() + "\n";
+		results = results + "logoClickUrl" + "\t"+ mso.getJingleUrl() + "\n";
 		results = results + "preferredLangCode" + "\t" + mso.getPreferredLangCode() + "\n"; 
 		return results;
 	}
@@ -485,7 +487,7 @@ public class PlayerApiService {
 		return result;
 	}
 	
-	public String programInfo(String channelIds, String userKeyStr, String ipgId, Locale locale) {
+	public String programInfo(String channelIds, String userKeyStr, String ipgId, Locale locale, HttpServletRequest req) {
 		if (channelIds == null || (channelIds.equals("*") && userKeyStr == null)) {
 			return NnStatusMsg.inputMissing(locale);
 		}
@@ -507,7 +509,12 @@ public class PlayerApiService {
 		} else {
 			programs = programMngr.findAllByChannelId(Long.parseLong(channelIds));
 		}		
-		return NnStatusMsg.successStr(locale) + this.composeProgramInfoStr(programs);
+		
+		Mso mso = msoMngr.findMsoViaHttpReq(req);		
+		MsoConfig config = new MsoConfigManager().findByMsoAndItem(mso, MsoConfig.CDN);
+		if (config == null) {return NnStatusMsg.errorStr(locale);}
+		
+		return NnStatusMsg.successStr(locale) + this.composeProgramInfoStr(programs, config);
 	}
 
 	private String getCategoriesByMsoKey(Key msoKey, Locale locale) {
@@ -550,28 +557,61 @@ public class PlayerApiService {
 		return output;
 	}
 	
-	private String composeProgramInfoStr(List<MsoProgram> programs) {		
+	private String composeProgramInfoStr(List<MsoProgram> programs, MsoConfig config) {		
 		String output = "";
+		
+		String regexCache = "^(http|https)://(9x9cache.s3.amazonaws.com|s3.amazonaws.com/9x9cache)";
+		String regexPod = "^(http|https)://(9x9pod.s3.amazonaws.com|s3.amazonaws.com/9x9pod)";
+		String cache = "http://cache.9x9.tv";
+		String pod = "http://pod.9x9.tv";
+		
 		for (MsoProgram p : programs) {
+			//file urls
 			String url1 = p.getMpeg4FileUrl();
 			String url2 = p.getWebMFileUrl();
 			String url3 = p.getOtherFileUrl();
 			String url4 = p.getAudioFileUrl();
+			if (url1 == null) {url1 = "";}
+			if (url2 == null) {url2 = "";}
+			if (url3 == null) {url3 = "";}
+			if (url4 == null) {url4 = "";}	
+			String imageUrl = p.getImageUrl();
+			String imageLargeUrl = p.getImageLargeUrl();
+			if (imageUrl == null) {imageUrl = "";}
+			if (imageLargeUrl == null) {imageLargeUrl = "";}	
+			if (config.getValue().equals(MsoConfig.CDN_AKAMAI)) {
+				log.info("akamai replacement");
+				url1 = url1.replaceFirst(regexCache, cache);
+				url1 = url1.replaceAll(regexPod, pod);
+				url2 = url2.replaceFirst(regexCache, cache);
+				url2 = url2.replaceAll(regexPod, pod);
+				url3 = url3.replaceFirst(regexCache, cache);
+				url3 = url3.replaceAll(regexPod, pod);
+				url4 = url4.replaceFirst(regexCache, cache);
+				url4 = url4.replaceAll(regexPod, pod);
+				imageUrl = imageUrl.replaceFirst(regexCache, cache);
+				imageUrl = imageUrl.replaceAll(regexPod, pod);
+				imageLargeUrl = imageLargeUrl.replaceFirst(regexCache, cache);
+				imageLargeUrl = imageLargeUrl.replaceAll(regexPod, pod);				 
+			}
+					
+			//intro
 			String intro = p.getIntro();			
 			if (intro != null) {
 				int introLenth = (intro.length() > 256 ? 256 : intro.length()); 
 				intro = intro.replaceAll("\\s", " ");				
 				intro = intro.substring(0, introLenth);
 			}
-
+					
+			//the rest
 			String[] ori = {String.valueOf(p.getChannelKey().getId()), 
 					        String.valueOf(p.getKey().getId()), 
 					        p.getName(), 
 					        intro,
 					        String.valueOf(p.getType()), 
 					        p.getDuration(),
-					        p.getImageUrl(),
-					        p.getImageLargeUrl(),
+					        imageUrl,
+					        imageLargeUrl,
 					        url1, 
 					        url2, 
 					        url3, 
