@@ -38,6 +38,8 @@ public class PlayerApiController {
 	
 	private final PlayerApiService playerApiService;
 	
+
+	//!!! inject mso and locale 
 	@Autowired
 	public PlayerApiController(PlayerApiService playerApiService) {
 		this.playerApiService= playerApiService;
@@ -544,7 +546,7 @@ public class PlayerApiController {
 		String output = NnStatusMsg.errorStr(locale);
 
 		try {
-			output =  playerApiService.programInfo(channelIds, userKey, ipgId, locale);
+			output =  playerApiService.programInfo(channelIds, userKey, ipgId, locale, req);
 		} catch (Exception e){
 			output = playerApiService.handleException(e, locale);
 		}
