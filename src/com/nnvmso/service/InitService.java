@@ -165,8 +165,8 @@ public class InitService {
 
 		MsoProgram program7 = new MsoProgram("System Program", "", "/WEB-INF/../images/logo_9x9.png", MsoProgram.TYPE_VIDEO);
 		program7.setPublic(true);
-		program7.setMpeg4FileUrl("http://s3.amazonaws.com/mp4_9x9/default.mp4");
-		program7.setWebMFileUrl("http://s3.amazonaws.com/webm9x9/default.webm");	
+		program7.setMpeg4FileUrl("http://9x9pod.s3.amazonaws.com/default.mp4");
+		program7.setWebMFileUrl("http://9x9pod.s3.amazonaws.com/default.mp4");	
 		programMngr.create(channel5, program7);		
 				
 		//create a channel, but status set to error
@@ -204,7 +204,13 @@ public class InitService {
 		mso.setPreferredLangCode(MsoChannel.LANG_EN);
 		mso.setJingleUrl("/WEB-INF/../videos/logo2.swf");
 		mso.setLogoUrl("/WEB-INF/../images/logo_9x9.png");
+		mso.setLogoClickUrl("/");
 		msoMngr.create(mso);
+		
+		//config
+		MsoConfigManager configMngr = new MsoConfigManager();
+		MsoConfig config = new MsoConfig(mso.getKey(), MsoConfig.CDN, MsoConfig.CDN_AKAMAI);
+		configMngr.save(config);
 		
 		//a default MSO user
 		NnUserManager userMngr = new NnUserManager();
@@ -214,14 +220,13 @@ public class InitService {
 		
 		//initialize default categories
 		String[] categoryStr = {
-			"Activism", "Animals", "Animation", "Arts", "Blogs", "Business",
-			"Comedy", "Education", "Environment", "Family & Kids", 
-			"Food", "Government", "Health", "Linux & Free Software",
-			"Movies & TV", "Music", "News", "Politics", "Public Broadcasting",
-			"Religion & Spirituality", "Science", "Sports",
-			"Technology", "Travel", "Video", "Games", "System"
+			"Activism", "Automotive", "Comedy", "Entertainment", "Finance", "Food & Wine",
+			"Gaming", "Gay & Lesbian", "Health & Fitness", "How to", 
+			"Lifestyle", "Music", "News & Politics", "Outdoor",
+			"People", "Pets & Animals", "Religion", "Sports", "Tech & Science",
+			"Travel"
 		};
-		
+				
 		CategoryManager categoryMngr = new CategoryManager();
 		for (String name : categoryStr) {			
 			categoryMngr.create(new Category(name, true, mso.getKey()));
@@ -235,7 +240,13 @@ public class InitService {
 		mso.setPreferredLangCode(MsoChannel.LANG_ZH_TW);
 		mso.setJingleUrl("/WEB-INF/../videos/logo2.swf");
 		mso.setLogoUrl("/WEB-INF/../images/5 floor.jpg");
+		mso.setLogoClickUrl("/");
 		msoMngr.create(mso);
+		
+		//config
+		MsoConfigManager configMngr = new MsoConfigManager();
+		MsoConfig config = new MsoConfig(mso.getKey(), MsoConfig.CDN, MsoConfig.CDN_AKAMAI);
+		configMngr.save(config);
 		
 		//a default MSO user
 		NnUserManager userMngr = new NnUserManager();
@@ -276,7 +287,4 @@ public class InitService {
 		createMso2DefaultIpg();		
 	}
 	
-	public void init() {
-		deleteAll();
-	}
 }
