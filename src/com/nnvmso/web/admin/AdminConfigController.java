@@ -1,5 +1,7 @@
 package com.nnvmso.web.admin;
 
+import java.util.Locale;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -11,7 +13,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.nnvmso.lib.CookieHelper;
 import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.model.Mso;
+import com.nnvmso.model.MsoConfig;
+import com.nnvmso.service.MsoConfigManager;
 import com.nnvmso.service.MsoManager;
+import com.nnvmso.service.NnStatusMsg;
 import com.nnvmso.service.TranscodingService;
 
 @Controller
@@ -45,5 +50,21 @@ public class AdminConfigController {
 		return NnNetUtil.textReturn("OK");		
 	}
 	
+	@RequestMapping("changeConfig")
+	public ResponseEntity<String> changeConfig(@RequestParam(value="msoName",required=false) String msoName,
+			                                   @RequestParam(value="key",required=false) String key,
+			                                   @RequestParam(value="value", required=false) String value ) {
+		MsoManager msoMngr = new MsoManager();
+		MsoConfigManager configMngr = new MsoConfigManager();		
+		
+		Mso mso = msoMngr.findByName(msoName);
+		if (mso == null) {NnNetUtil.textReturn("mso not found");}
+		MsoConfig config = configMngr.findByMsoAndItem(mso, key);
+		if (config == null) { config = new MsoConfig();	}
+		config.setItem(key);
+		config.setValue(value);
+		configMngr.save(config);
+		return NnNetUtil.textReturn("OK");
+	}
 	
 }
