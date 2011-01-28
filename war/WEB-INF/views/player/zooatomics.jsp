@@ -45,6 +45,7 @@ var jw_position = 0;
 var fp_player = 'player1';
 var fp_preloaded = '';
 var start_preload = 0;
+var shrink_hack = false;
 
 var fp = {  player1: { file: '', duration: 0, timex: 0, mute: false },
             player2: { file: '', duration: 0, timex: 0, mute: false }  };
@@ -172,10 +173,12 @@ function elastic_innards()
   var h = document.getElementById ("yt1");
   h.style.height = vh + "px";
   h.style.width = vw + "px";
-  var h = document.getElementById ("player1");
-  h.style.height = vh + "px";
-  var h = document.getElementById ("player2");
-  h.style.height = vh + "px";
+
+  resize_fp();
+  // var h = document.getElementById ("player1");
+  // h.style.height = vh + "px";
+  // var h = document.getElementById ("player2");
+  // h.style.height = vh + "px";
 
   ipg_fixup_margin();
   ipg_fixup_middle();
@@ -249,6 +252,35 @@ function align_center()
 //$("#error-layer").css ("left", (ww - $("#error-layer").width()) / 2);
 
   $("#splash").css      ("top",  (wh - $("#splash").height())     / 2);
+  }
+
+/* flowplayer for some reason wants about 10 pixels more than the
+   window height, causing UI problems with overlays */
+
+function shrink_video()
+  {
+  shrink_hack = true;
+  resize_fp();
+  }
+
+function unshrink_video()
+  {
+  shrink_hack = false;
+  resize_fp();
+  }
+
+function resize_fp()
+  {
+  var vh = $(window).height();
+
+  if (shrink_hack && vh > 25)
+    { vh -= 20; }
+
+  for (var p in { 'player1':'', 'player2':'' })
+    {
+    var h = document.getElementById (p);
+    h.style.height = vh + "px";
+    }
   }
 
 function log (text)
@@ -1851,6 +1883,9 @@ function switch_to_ipg()
     // $("#ep-layer").hide();
     ipg_program_tip();
     $("#ipg-layer").show();
+    if (navigator.userAgent.match (/Firefox/))
+      shrink_video();
+    desired = 'webm';
     $("#body").addClass ("on");
     elastic();
     extend_ipg_timex();
@@ -1858,6 +1893,8 @@ function switch_to_ipg()
     start_preload_timer();
     return;
     }
+
+  /* NOT USED */
 
   if (thumbing == 'control')
     $("#control-layer").animateWithCss ({ opacity: "0" }, 500, "ease-in-out", function() { $("#control-layer").hide(); $("#control-layer").css ("opacity", "1"); });
@@ -2512,6 +2549,8 @@ function ipg_play()
     physical_play();
     unhide_player (current_tube);
     $("#ipg-layer").hide();
+    if (navigator.userAgent.match (/Firefox/))
+      unshrink_video();
     thumbing = 'program';
     stop_all_other_players();
     return;
@@ -2527,7 +2566,8 @@ function ipg_play()
     }
 
   $("#ipg-layer").hide();
-
+  if (navigator.userAgent.match (/Firefox/))
+    unshrink_video();
 
 
   enter_category ((""+ipg_cursor).substring (0, 1));
@@ -2618,6 +2658,8 @@ log ("EP CLICK");
       {
       thumbing = 'program';
       $("#ipg-layer").hide();
+      if (navigator.userAgent.match (/Firefox/))
+        shrink_video();
       }
     if (tube() == 'fp') play_program();
     }
@@ -3636,11 +3678,6 @@ function browse_category (category_id)
     $("#dir-waiting").hide();
     sanity_check_data ('channelBrowse', data);
 
-    browse_content = {};
-    browse_list = {};
-    n_browse_list = 0;
-    browse_list_first = 1;
-
     // 0=sequence-number 1=channel-id 2=channel-name 3=thumbnail 4=count
 
     var lines = data.split ('\n');
@@ -3660,6 +3697,11 @@ function browse_category (category_id)
       return;
       }
 
+    browse_content = {};
+    browse_list = {};
+    n_browse_list = 0;
+    browse_list_first = 1;
+
     /* remove the status code line */
     lines.shift();
     lines.shift();
@@ -3668,10 +3710,7 @@ function browse_category (category_id)
       {
       if (lines [i] != '')
         {
-
-
         var fields = lines[i].split ('\t');
-log ('BROWSE: ' + fields[1]);
 
         if (parseInt (fields[1]) > 0)
           {
@@ -3737,7 +3776,7 @@ function browse_enter()
   {
   if (browser_mode == 'category')
     {
-    var id = $("#content-" + browser_x + '-' + browser_y).attr ("data-id");
+    var id = $("#content-" + browser_y).attr ("data-id");
     if (id)
       browse_accept (id);
     }
@@ -4327,6 +4366,8 @@ function ipg_preload_play()
       redraw_channel_line()
       thumbing = 'channel';
       $("#ipg-layer").css ("display", "none");
+      if (navigator.userAgent.match (/Firefox/))
+        unshrink_video();
       // play_first_program_in (channel_line [channel_cursor]);
       program_cursor = 1;
       program_first = 1;
