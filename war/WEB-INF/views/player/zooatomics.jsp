@@ -52,11 +52,15 @@ var fp = {  player1: { file: '', duration: 0, timex: 0, mute: false },
 
 var language = 'en';
 
+var timezero = 0;
 var all_programs_fetched = false;
 var all_channels_fetched = false;
 var activated = false;
 var jingled = false;
 var remembered_pause = false;
+
+var pdr = ''; /* player data record */
+var n_pdr = 0;
 
 var current_category = 0;
 var current_program = '';
@@ -143,6 +147,8 @@ var root = 'http://zoo.atomics.org/video/9x9playerV31/images/';
 
 $(document).ready (function()
  {
+ var now = new Date();
+ timezero = now.getTime();
  log ('begin execution');
  init();
  pre_login();
@@ -305,6 +311,8 @@ function log (text)
       loglayer = document.getElementById ("log-layer");
 
     loglayer.innerHTML += text + '<br>';
+
+    report ('s', text);
     }
   catch (error)
     {
@@ -346,6 +354,38 @@ function panic (text)
   {
   log (text);
   alert (text);
+  }
+
+function report (type, arg)
+  {
+  var delta = Math.floor ((new Date().getTime() - timezero) / 1000);
+
+  pdr += (delta + '\t' + type + '\t' + arg + '\n');
+
+  if (++n_pdr >= 200)
+    {
+    n_pdr = 0;
+
+    var serialized = 'user=' + user + '&' + 'session=' + 
+           Math.floor (timezero/1000) + '&' + 'time=' + delta + '&' + 'pdr=' + encodeURIComponent (pdr);
+
+    pdr = '';
+
+    var d = $.post ("/playerAPI/pdr", serialized, function (data)
+      {
+      var lines = data.split ('\n');
+      var fields = lines[0].split ('\t');
+      if (fields [0] != '0')
+        log ('[pdr] server error, ignoring: ' + lines [0]);
+      else
+        log ('[pdr] success');
+      });
+    }
+  }
+
+function report_program()
+  {
+  report ('w', current_program + '\t' + channelgrid [channel_line [channel_cursor]] ['id']);
   }
 
 function init()
@@ -750,6 +790,10 @@ function play()
     }
 
   log ('Playing ' + current_program + ': ' + programgrid [current_program]['name'] + ' :: ' + url);
+
+  if (thumbing == 'program' || thumbing == 'control')
+    report_program();
+
   physical_start_play (url);
 
   clips_played++;
@@ -1405,7 +1449,6 @@ function escape()
   $("#log-layer").hide();
   $("#msg-layer").hide();
   $("#epend-layer").hide();
-  $("#body").removeClass ("on");
 
   if (thumbing == 'channel' || thumbing == 'program')
     {
@@ -1448,6 +1491,8 @@ function keypress (keycode)
 
   if (thumbing == 'ipg')
     extend_ipg_timex();
+
+  report ('k', keycode);
 
   /* ensure osd is up */
 
@@ -1818,8 +1863,6 @@ function switch_to_whats_new()
 
     $("#new-holder").html (html);
 
-    $("body").addClass ("on");
-
     elastic();
     $("#all-players").hide();
     PlayWhatsNew();
@@ -1829,7 +1872,6 @@ function switch_to_whats_new()
 function exit_whats_new()
   {
   StopWhatsNew();
-  $("body").removeClass ("on");
   thumbing = 'program';
   switch_to_ipg();
   }
@@ -1837,7 +1879,6 @@ function exit_whats_new()
 function whatsnew_enter()
   {
   StopWhatsNew();
-  $("body").removeClass ("on");
 
   var grid = whatsnew [i]['grid'];
   var episode = whatsnew [i]['episodes'][n];
@@ -1954,55 +1995,12 @@ function switch_to_ipg()
     if (navigator.userAgent.match (/Firefox/))
       shrink_video();
     desired = 'webm';
-    $("#body").addClass ("on");
     elastic();
     extend_ipg_timex();
     thumbing = 'ipg';
     start_preload_timer();
     return;
     }
-
-  /* NOT USED */
-
-  if (thumbing == 'control')
-    $("#control-layer").animateWithCss ({ opacity: "0" }, 500, "ease-in-out", function() { $("#control-layer").hide(); $("#control-layer").css ("opacity", "1"); });
-
-  $("#ipg-layer").hide();
-  $("#ipg-layer").css ("opacity", "0");
-  $("#ipg-layer").show();
-
-  var phase_out_ch =
-    {
-    opacity: "0",
-    bottom: "-3em"
-    };
-
-  setTimeout ("outt()", 500);
-
-  $("#ep-layer").animateWithCss ({ opacity: 0 }, 500, "ease-in-out", function()
-    {
-    $("#ep-layer").css ("display", "none");
-    $("#ep-layer").css ("opacity", "1");
-    elastic(); /* fixups */
-    });
-
-  thumbing = 'ipg';
-  start_preload_timer();
-  }
-
-function outt()
-  {
-  $("#ipg-layer").animateWithCss ({ opacity: "1" }, 500, "ease-in", function() {});
-  setTimeout ("ipg_failsafe()", 500);
-  }
-
-function ipg_failsafe()
-  {
-  $("#ipg-layer").css ("opacity", "1");
-  $("#ipg-layer").show();
-  $("#body").addClass ("on");
-  elastic();
-  extend_ipg_timex();
   }
 
 function ipg_idle()
@@ -2604,7 +2602,6 @@ function ipg_play()
   clearTimeout (ipg_timex);
   clearTimeout (ipg_delayed_stop_timex);
 
-//xyz
   if (ipg_mode == 'episodes' && program_cursor != 1)
     {
     fp_preloaded = '';
@@ -2617,6 +2614,7 @@ function ipg_play()
       unshrink_video();
     thumbing = 'program';
     stop_all_other_players();
+    report_program();
     return;
     }
 
@@ -2644,11 +2642,12 @@ function ipg_play()
       enter_channel();
 
       current_program = first_program_in (ipg_cursor);
+      report_program();
+
       update_bubble();
       redraw_channel_line()
 
       thumbing = 'channel';
-      $("#body").removeClass ("on");
       play_first_program_in (channel_line [channel_cursor]);
       enter_channel();
       return;
@@ -4480,6 +4479,8 @@ function ipg_preload_play()
       program_first = 1;
       enter_channel();
       clips_played++;
+
+      report_program();
 
       try
         {
