@@ -254,6 +254,9 @@ function align_center()
 //$("#ep-hit").css      ("left", (ww - $("#ep-hit").width())      / 2);
 //$("#error-layer").css ("left", (ww - $("#error-layer").width()) / 2);
 
+log ('splash height: ' + $("#splash").height());
+log (   'position splash: ' + (     (wh - $("#splash").height())     / 2    )   );
+
   $("#splash").css      ("top",  (wh - $("#splash").height())     / 2);
   }
 
@@ -276,8 +279,8 @@ function resize_fp()
   {
   var vh = $(window).height();
 
-  if (shrink_hack && vh > 30)
-    { vh -= 25; }
+  // if (shrink_hack && vh > 30)
+  //  { vh -= 25; }
 
   for (var p in { 'player1':'', 'player2':'', 'v':'', 'fp1':'', fp2:'', 'yt1':'' })
     {
@@ -2311,14 +2314,6 @@ function ipg_left()
 
   // ipg_cursor = previous_channel_square (ipg_cursor)
 
-  if (parseInt (ipg_cursor) % 10 == 1)
-    {
-    log ('switching to ipg left panel');
-    ipg_cursor = -2;
-    $("#ipg-btn-signin").addClass ("on");
-    return;
-    }
-
   if (parseInt (ipg_cursor) == 11)
     ipg_cursor = 99;
   else if (parseInt (ipg_cursor) % 10 == 1)
@@ -3171,6 +3166,9 @@ function pre_login()
           //$("#opening").css("z-index", "99999");
           $("#blue").hide();
           $("#splash").flash({ swf: fields[1], width: "100%", height: "100%", wmode: 'transparent' });
+          log ('splash height: ' + $("#splash").height());
+          $("#splash").css ("position", "absolute");
+          align_center();
           }
         else if (fields[0] == 'preferredLangCode')
           {
@@ -5207,15 +5205,15 @@ function noop (e)
 
 <body id="body" style="overflow: hidden">
 
-<div id="fp1" style="width: 100%; z-index: 1; visibility: hidden; position: absolute; left: 0; top: 0">
-  <a href="" style="display:block;width:100%;" id="player1" onClick="noop(this)"></a>
+<div id="fp1" style="width: 100%; height: 100%; z-index: 1; visibility: hidden; position: absolute; left: 0; top: 0; overflow: hidden;">
+  <a href="" style="display:block; width:100%;" id="player1" onClick="noop(this)"></a>
 </div>
 
-<div id="fp2" style="width: 100%; z-index: 2; visibility: hidden; position: absolute; left: 0; top: 0">
-  <a href="" style="display:block;width:100%;" id="player2" onClick="noop(this)"></a>
+<div id="fp2" style="width: 100%; height: 100%; z-index: 2; visibility: hidden; position: absolute; left: 0; top: 0; overflow: hidden;">
+  <a href="" style="display:block; width:100%;" id="player2" onClick="noop(this)"></a>
 </div>
 
-<div id="yt1" style="width: 100%; z-index: 1; visibility: visible; position: absolute; left: 0; top: 0">
+<div id="yt1" style="width: 100%; height: 100%; z-index: 1; visibility: visible; position: absolute; left: 0; top: 0; overflow: hidden;">
   <div id="ytapiplayer">
     <!-- You need Flash player 8+ and JavaScript enabled to view this video.-->
   </div>
