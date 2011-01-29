@@ -5,7 +5,7 @@
 <meta charset="UTF-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
-<!-- $Revision$ -->
+<!-- $Revision: 0 $ -->
 
 <!-- FB Sharing meta data -->
 <meta name="title" content="My 9x9 Channel Guide <%= (new SimpleDateFormat("MM.dd.yyyy")).format(new Date()) %>" />
@@ -55,7 +55,7 @@ var language = 'en';
 var all_programs_fetched = false;
 var all_channels_fetched = false;
 var activated = false;
-var jingled = false;
+var jingle_completed = false;
 var remembered_pause = false;
 
 var current_category = 0;
@@ -192,9 +192,6 @@ function elastic_innards()
   dir_waiting_fixup();
   align_center();
 
-  if (!jingled)
-    align_jingle();
-
   if (thumbing == 'ipg')
     extend_ipg_timex();
   }
@@ -257,12 +254,8 @@ function align_center()
 //$("#ipg-hit").css     ("left", (ww - $("#ipg-hit").width())     / 2);
 //$("#ep-hit").css      ("left", (ww - $("#ep-hit").width())      / 2);
 //$("#error-layer").css ("left", (ww - $("#error-layer").width()) / 2);
-  }
 
-function align_jingle()
-  {
-  var wh = $(window).height();
-  $("#splash").css ("margin-top", (wh - $("#splash").height()) / 2);
+  $("#splash").css      ("margin-top",  (wh - $("#splash").height())     / 2);
   }
 
 /* flowplayer for some reason wants about 10 pixels more than the
@@ -556,11 +549,7 @@ function activate()
   {
   log ('activate');
 
-  if (jingled)
-    {
-    log ('have already jingled');
-    $("#opening").hide();
-    }
+  $("#opening").hide();
 
   if (!browser_support())
     return;
@@ -1430,9 +1419,6 @@ function kp (e)
 
 function keypress (keycode)
   {
-  if (!jingled)
-   return;
-
   /* if in rss field entry and down key, exit field */
 
   if (document.activeElement.id == 'podcastRSS' && keycode == 40)
@@ -3174,15 +3160,9 @@ function pre_login()
         else if (fields[0] == 'jingleUrl')
           {
           log ('jingle: ' + fields[1]);
-          elastic();
           $("#blue").hide();
-          $("#opening").css ("display", "block");
-
           $("#splash").flash({ swf: fields[1], width: "100%", height: "100%", wmode: 'transparent' });
-          align_jingle();
-
-          /* temporary */
-          setTimeout ("jingle_completed()", 6000);
+          align_center();
           }
         else if (fields[0] == 'preferredLangCode')
           {
@@ -3197,17 +3177,6 @@ function pre_login()
       alert ('[brandInfo] failure!');
       }
     });
-  }
-
-function jingle_completed()
-  {
-log ('opening display: ' + $("#opening").css('display'));
-  log ('jingle completed');
-
-  if (activated)
-    $("#opening").hide();
-
-  jingled = true;
   }
 
 function login()
@@ -5245,6 +5214,7 @@ function noop (e)
 </div>
 
 <div id="blue" style="background: black; width: 100%; height: 100%; display: block; position: absolute; color: white">
+One moment...
 </div>
 
 <!--div id="notblue" style="width: 100%; display: none; position: absolute; top: 0; margin: 0; overflow: hidden"-->
@@ -5504,7 +5474,7 @@ function noop (e)
   <div id="go-right"><img src="" id="right-tease">Press <span class="enlarge">&rarr;</span> to watch next channel</div>
 </div>
 
-<div id="opening" style="display: block; z-index: 999">
+<div id="opening" style="display: block">
   <div class="opening-holder" id="splash"></div>
 </div>
 
