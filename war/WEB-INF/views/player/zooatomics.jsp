@@ -59,7 +59,8 @@ var activated = false;
 var jingled = false;
 var remembered_pause = false;
 
-var pdr = ''; /* player data record */
+/* player data record */
+var pdr = '';
 var n_pdr = 0;
 
 var current_category = 0;
@@ -449,7 +450,10 @@ function fetch_programs_in (channel)
     thumbing = 'ipg';
 
     if (thumbing == 'ipg')
+      {
       ipg_metainfo();
+      ipg_sync();
+      }
     });
   }
 
@@ -1990,7 +1994,7 @@ function switch_to_ipg()
     $("#control-layer").hide();
     $("#ch-directory").hide();
     // $("#ep-layer").hide();
-    ipg_program_tip();
+    // ipg_program_tip();
     $("#ipg-layer").show();
     if (navigator.userAgent.match (/Firefox/))
       shrink_video();
@@ -1999,6 +2003,7 @@ function switch_to_ipg()
     extend_ipg_timex();
     thumbing = 'ipg';
     start_preload_timer();
+    ipg_sync();
     return;
     }
   }
@@ -2244,15 +2249,16 @@ function ipg_sync()
     {
     ipg_set_channel (ipg_cursor);
     ipg_program_index();
-    $("#ipg-content").addClass("fade");
+    // $("#ipg-content").addClass("fade");
     $("#ep-list .clickable").bind ('click', function() { ep_click ($(this).attr('id')); });
     $("#ep-list .clickable").hover (ipg_episode_hover_in, ipg_episode_hover_out);
-    ipg_mode = 'episodes';
+    // ipg_mode = 'episodes';
+    ipg_mode = 'tip';
     }
   else
     {
     ipg_program_tip();
-    $("#ipg-content").removeClass("fade");
+    // $("#ipg-content").removeClass("fade");
     ipg_mode = 'tip';
     }
   }
@@ -2297,7 +2303,7 @@ function ipg_right()
   stop_preload();
   start_preload_timer();
 
-  ipg_program_tip();
+  ipg_sync();
   }
 
 function ipg_left()
@@ -2339,7 +2345,7 @@ function ipg_left()
   stop_preload();
   start_preload_timer();
 
-  ipg_program_tip();
+  ipg_sync();
   }
 
 function ipg_up()
@@ -2377,7 +2383,7 @@ function ipg_up()
   if (ipg_cursor > 0)
     start_preload_timer();
 
-  ipg_program_tip();
+  ipg_sync();
   }
 
 function ipg_down()
@@ -2412,7 +2418,7 @@ function ipg_down()
   stop_preload();
   start_preload_timer();
 
-  ipg_program_tip();
+  ipg_sync();
   }
 
 function ipg_resume()
@@ -2509,6 +2515,7 @@ function ipg_episode_thumbs (id)
 function ipg_program_index()
   {
   $("#ep-list").html (ep_html());
+  $("#ep-list li").removeClass ("on");
   $("#ep-layer").show();
   $("#ep-tip").hide();
   $("#ep-container").show(); //.fadeIn()
@@ -2586,12 +2593,12 @@ function ipg_play()
     return;
     }
 
-  if (ipg_mode == 'tip')
-    {
-    ipg_mode = 'episodes';
-    ipg_sync();
-    return;
-    }
+  // if (ipg_mode == 'tip')
+  //   {
+  //   ipg_mode = 'episodes';
+  //   ipg_sync();
+  //   return;
+  //   }
 
   if (programs_in_channel (ipg_cursor) < 1)
     {
@@ -2731,7 +2738,7 @@ log ("EP CLICK");
 function ipg_episode_hover_in()
   {
   $(this).addClass ("hover");
-  $("#p-li-" + program_cursor).removeClass ("on");
+  // $("#p-li-" + program_cursor).removeClass ("on");
 
   var id = $(this).attr('id').replace (/^p-li-/, '');
   var program = programgrid [program_line [id]];
@@ -2744,7 +2751,7 @@ function ipg_episode_hover_in()
 function ipg_episode_hover_out()
   {
   $(this).removeClass ("hover");
-  $("#p-li-" + program_cursor).addClass ("on");
+  // $("#p-li-" + program_cursor).addClass ("on");
 
   var program = programgrid [program_line [program_cursor]];
 
