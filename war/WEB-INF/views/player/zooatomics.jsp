@@ -2088,6 +2088,7 @@ function drag_cleanup()
     log ('drag cleanup');
     redraw_ipg();
     elastic();
+    ipg_sync();
     }
   }
 
