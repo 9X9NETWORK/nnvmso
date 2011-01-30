@@ -59,7 +59,7 @@ public class AdminConfigController {
 		
 		Mso mso = msoMngr.findByName(msoName);
 		if (mso == null) {NnNetUtil.textReturn("mso not found");}
-		MsoConfig config = configMngr.findByMsoAndItem(mso, key);
+		MsoConfig config = configMngr.findByMsoIdAndItem(mso.getKey().getId(), key);
 		if (config == null) { config = new MsoConfig();	}
 		config.setItem(key);
 		config.setValue(value);
