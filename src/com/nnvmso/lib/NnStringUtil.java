@@ -8,6 +8,7 @@ import com.google.appengine.api.datastore.KeyFactory;
 
 public class NnStringUtil {
 	public static String capitalize(String str) {
+		if (str == null) {return null;}
 		str = str.toLowerCase();
 		String firstLetter = str.substring(0,1);
         String remainder   = str.substring(1);
