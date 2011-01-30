@@ -21,8 +21,11 @@ public class NnUser implements Serializable {
 	private Key key;
 		
 	@Persistent
-	private Key msoKey;
-
+	private String token;
+	
+	@Persistent
+	private long msoId;
+	
 	public static String GUEST_EMAIL = "guest@9x9.com";
 	public static String GUEST_NAME = "Guest";
 	@Email
@@ -60,12 +63,15 @@ public class NnUser implements Serializable {
 	private Date updateDate;
 	
 	public static short TYPE_ADMIN = 1; 
-	public static short TYPE_TBC = 2; //mso?
+	public static short TYPE_TBC = 2;
 	public static short TYPE_TCO = 3; 
 	public static short TYPE_USER = 4;
 	public static short TYPE_NN = 5; //default user, must have and only one
 	@Persistent
 	private short type;
+	
+	@Persistent
+	private String facebookToken;
 	
 	public NnUser(String email, String password, String name, short type) {
 		this.email = email;
@@ -75,13 +81,13 @@ public class NnUser implements Serializable {
 		this.type = type;
 	}
 
-	public NnUser(String email, String password, String name, short type, Key msoKey) {
+	public NnUser(String email, String password, String name, short type, long msoId) {
 		this.email = email;
 		this.salt = AuthLib.generateSalt();
 		this.cryptedPassword= AuthLib.encryptPassword(password, this.getSalt());
 		this.name = name;
 		this.type = type;
-		this.msoKey = msoKey;
+		this.msoId = msoId;
 	}
 	
 	public Key getKey() {
@@ -107,15 +113,6 @@ public class NnUser implements Serializable {
 	public void setName(String name) {
 		this.name = name;
 	}
-
-	public Key getMsoKey() {
-		return msoKey;
-	}
-
-	public void setMsoKey(Key msoKey) {
-		this.msoKey = msoKey;
-	}
-
 
 	public Date getCreateDate() {
 		return createDate;
@@ -189,4 +186,28 @@ public class NnUser implements Serializable {
 		this.age = age;
 	}
 
+	public long getMsoId() {
+		return msoId;
+	}
+
+	public void setMsoId(long msoId) {
+		this.msoId = msoId;
+	}
+
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
+	}
+
+	public String getFacebookToken() {
+		return facebookToken;
+	}
+
+	public void setFacebookToken(String facebookToken) {
+		this.facebookToken = facebookToken;
+	}
+		
 }

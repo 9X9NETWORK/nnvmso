@@ -18,7 +18,7 @@ public class MsoChannel implements Serializable {
 	private Key key;
 	
 	@Persistent
-	private Key nnUserKey;
+	private long userId;
 		
 	@Persistent
 	private String name; 
@@ -32,14 +32,17 @@ public class MsoChannel implements Serializable {
 	@Persistent
 	private boolean isPublic;
 	
-	public static String LANG_EN = "en"; 
-	public static String LANG_ZH = "zh";	
-	public static String LANG_ZH_TW = "zh-tw";	
 	@Persistent
 	private String langCode;
 	
 	@Persistent
-	private String tag;
+	private short rating;
+	
+	@Persistent
+	private short license;
+	
+	@Persistent
+	private short advertsing;
 
 	@Persistent
 	private int programCount;
@@ -58,8 +61,7 @@ public class MsoChannel implements Serializable {
 	
 	public static short STATUS_SUCCESS = 0;
 	public static short STATUS_ERROR = 1;
-	public static short STATUS_INFRINGEMENT = 2;
-	public static short STATUS_RRATED = 3;
+	public static short STATUS_PROCESSING = 2;
 	@Persistent
 	private short status;
 		
@@ -75,16 +77,16 @@ public class MsoChannel implements Serializable {
 	@Persistent
 	private Date updateDate;
 			
-	public MsoChannel(String name, String intro, String imageUrl, Key nnUserKey) {
+	public MsoChannel(String name, String intro, String imageUrl, long userId) {
 		this.name = name;
 		this.intro = intro;
 		this.imageUrl = imageUrl;
-		this.nnUserKey = nnUserKey;
+		this.userId = userId;
 	}
 	
-	public MsoChannel(String sourceUrl, Key nnUserKey) {
+	public MsoChannel(String sourceUrl, long userId) {
 		this.sourceUrl = sourceUrl;
-		this.nnUserKey = nnUserKey;
+		this.userId = userId;
 	}
 	
 	public Key getKey() {
@@ -147,14 +149,6 @@ public class MsoChannel implements Serializable {
 		this.langCode = langCode;
 	}
 
-	public String getTag() {
-		return tag;
-	}
-
-	public void setTag(String tag) {
-		this.tag = tag;
-	}
-
 	public short getType() {
 		return type;
 	}
@@ -183,12 +177,12 @@ public class MsoChannel implements Serializable {
 		this.createDate = createDate;
 	}
 
-	public Key getNnUserKey() {
-		return nnUserKey;
+	public long getUserId() {
+		return userId;
 	}
 
-	public void setNnUserKey(Key nnUserKey) {
-		this.nnUserKey = nnUserKey;
+	public void setUserId(long userId) {
+		this.userId = userId;
 	}
 
 	public String getSourceUrl() {
@@ -222,5 +216,29 @@ public class MsoChannel implements Serializable {
 	public void setErrorReason(String errorReason) {
 		this.errorReason = errorReason;
 	}
-		
+
+	public short getRating() {
+		return rating;
+	}
+
+	public void setRating(short rating) {
+		this.rating = rating;
+	}
+
+	public short getLicense() {
+		return license;
+	}
+
+	public void setLicense(short license) {
+		this.license = license;
+	}
+
+	public short getAdvertsing() {
+		return advertsing;
+	}
+
+	public void setAdvertsing(short advertsing) {
+		this.advertsing = advertsing;
+	}
+	
 }

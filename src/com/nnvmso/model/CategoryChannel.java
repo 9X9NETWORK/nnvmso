@@ -23,10 +23,10 @@ public class CategoryChannel implements Serializable {
 	private Key key;
 
 	@Persistent
-	private Key categoryKey;
+	private long categoryId;
 	
 	@Persistent
-	private Key channelKey;
+	private long channelId;
 
 	@Persistent
 	private Date createDate;
@@ -34,9 +34,9 @@ public class CategoryChannel implements Serializable {
 	@Persistent
 	private Date updateDate;
 
-	public CategoryChannel(Key categoryKey, Key channelKey) {
-		this.categoryKey = categoryKey;
-		this.channelKey = channelKey;
+	public CategoryChannel(long categoryId, long channelId) {
+		this.categoryId = categoryId;
+		this.channelId = channelId;
 	}
 	
 	public Key getKey() {
@@ -47,20 +47,20 @@ public class CategoryChannel implements Serializable {
 		this.key = key;
 	}
 
-	public Key getCategoryKey() {
-		return categoryKey;
+	public long getCategoryId() {
+		return categoryId;
 	}
 
-	public void setCategoryKey(Key categoryKey) {
-		this.categoryKey = categoryKey;
+	public void setCategoryId(long categoryId) {
+		this.categoryId = categoryId;
 	}
 
-	public Key getChannelKey() {
-		return channelKey;
+	public long getChannelId() {
+		return channelId;
 	}
 
-	public void setChannelKey(Key channelKey) {
-		this.channelKey = channelKey;
+	public void setChannelId(long channelId) {
+		this.channelId = channelId;
 	}
 
 	public Date getCreateDate() {

@@ -23,7 +23,7 @@ public class Category implements Serializable {
 	private Key key;
 	
 	@Persistent
-	private Key msoKey;
+	private long msoId;
 	
 	@Persistent
 	private String name;
@@ -40,19 +40,21 @@ public class Category implements Serializable {
 	@Persistent
 	private Date updateDate;
 	
-	public Category(String name, boolean isPublic, Key msoKey) {
+	public Category(String name, boolean isPublic, long msoId) {
 		this.name = name;
 		this.isPublic = isPublic;
-		this.msoKey= msoKey;
-	}
-		
-	public Key getMsoKey() {
-		return msoKey;
+		this.msoId= msoId;
 	}
 
-	public void setMsoKey(Key msoKey) {
-		this.msoKey = msoKey;
+	public long getMsoId() {
+		return msoId;
 	}
+
+
+	public void setMsoId(long msoId) {
+		this.msoId = msoId;
+	}
+
 
 	public Key getKey() {
 		return key;

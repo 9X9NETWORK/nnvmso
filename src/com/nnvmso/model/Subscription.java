@@ -19,10 +19,10 @@ public class Subscription implements Serializable {
 	private Key key;
 
 	@Persistent
-	private Key userKey;
+	private long userId;
 	
 	@Persistent
-	private Key channelKey;
+	private long channelId;
 
 	@Persistent
 	private Date createDate;
@@ -36,9 +36,9 @@ public class Subscription implements Serializable {
 	@Persistent
 	private Date updateDate;
 	
-	public Subscription(Key userKey, Key channelKey, int seq, short type) {
-		this.userKey = userKey;
-		this.channelKey = channelKey;
+	public Subscription(long userId, long channelId, int seq, short type) {
+		this.userId = userId;
+		this.channelId= channelId;
 		this.seq = seq;
 		this.type = type;
 	}
@@ -51,20 +51,20 @@ public class Subscription implements Serializable {
 		this.key = key;
 	}
 
-	public Key getUserKey() {
-		return userKey;
+	public long getUserId() {
+		return userId;
 	}
 
-	public void setUserKey(Key userKey) {
-		this.userKey = userKey;
+	public void setUserId(long userId) {
+		this.userId = userId;
 	}
 
-	public Key getChannelKey() {
-		return channelKey;
+	public long getChannelId() {
+		return channelId;
 	}
 
-	public void setChannelKey(Key channelKey) {
-		this.channelKey = channelKey;
+	public void setChannelId(long channelId) {
+		this.channelId = channelId;
 	}
 
 	public Date getCreateDate() {

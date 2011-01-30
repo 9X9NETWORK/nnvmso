@@ -3,7 +3,6 @@ package com.nnvmso.model;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Hashtable;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
@@ -13,7 +12,7 @@ import javax.jdo.annotations.PrimaryKey;
 import com.google.appengine.api.datastore.Key;
 
 @PersistenceCapable(detachable="true")
-public class Watched implements Serializable {
+public class ViewLog implements Serializable {
 
 	private static final long serialVersionUID = -4611831552437881824L;
 	
@@ -22,10 +21,10 @@ public class Watched implements Serializable {
 	private Key key;
 
 	@Persistent
-	private Key userKey;
+	private long userId;
 	
 	@Persistent
-	private Key channelKey;
+	private long channelId;
 	
 	@Persistent(serialized = "true")
 	private HashSet<Long> programs = new HashSet<Long>();
@@ -36,6 +35,11 @@ public class Watched implements Serializable {
 	@Persistent
 	private Date updateDate;
 	
+	public ViewLog(long userId, long channelId) {
+		this.userId = userId;
+		this.channelId = channelId;
+	}
+	
 	public Key getKey() {		
 		return key;
 	}
@@ -44,20 +48,20 @@ public class Watched implements Serializable {
 		this.key = key;
 	}
 
-	public Key getUserKey() {
-		return userKey;
+	public long getUserId() {
+		return userId;
 	}
 
-	public void setUserKey(Key userKey) {
-		this.userKey = userKey;
+	public void setUserId(long userId) {
+		this.userId = userId;
 	}
 
-	public Key getChannelKey() {
-		return channelKey;
+	public long getChannelId() {
+		return channelId;
 	}
 
-	public void setChannelKey(Key channelKey) {
-		this.channelKey = channelKey;
+	public void setChannelId(long channelId) {
+		this.channelId = channelId;
 	}
 
 	public HashSet<Long> getPrograms() {

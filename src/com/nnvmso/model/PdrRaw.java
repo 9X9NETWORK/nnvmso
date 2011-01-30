@@ -18,13 +18,19 @@ public class PdrRaw implements Serializable {
 	private Key key;
 	
 	@Persistent
-	private Key userKey;
-		
+	private long userId;
+	
+	@Persistent
+	private String sessionId;
+
+	@Persistent
+	private long timeDelta;
+	
 	@Persistent
 	private String verb;
 	
 	@Persistent
-	private String data;
+	private String info;
 
 	@Persistent
 	private Date createDate;
@@ -32,10 +38,12 @@ public class PdrRaw implements Serializable {
 	@Persistent
 	private Date updateDate;
 	
-	public PdrRaw (Key userKey, String verb, String data) {
-		this.userKey = userKey;
+	public PdrRaw (long userId, String sessionId, long timeDelta, String verb, String info) {
+		this.sessionId = sessionId;
+		this.timeDelta = timeDelta;
+		this.userId = userId;
 		this.verb = verb;
-		this.data = data;
+		this.info = info;
 	}
 	
 	public Key getKey() {
@@ -46,12 +54,12 @@ public class PdrRaw implements Serializable {
 		this.key = key;
 	}
 
-	public Key getUserKey() {
-		return userKey;
+	public long getUserId() {
+		return userId;
 	}
 
-	public void setUserKey(Key userKey) {
-		this.userKey = userKey;
+	public void setUserId(long userId) {
+		this.userId = userId;
 	}
 
 	public String getVerb() {
@@ -62,12 +70,12 @@ public class PdrRaw implements Serializable {
 		this.verb = verb;
 	}
 
-	public String getData() {
-		return data;
+	public String getInfo() {
+		return info;
 	}
 
-	public void setData(String data) {
-		this.data = data;
+	public void setInfo(String info) {
+		this.info = info;
 	}
 
 	public Date getCreateDate() {
@@ -85,6 +93,21 @@ public class PdrRaw implements Serializable {
 	public void setUpdateDate(Date updateDate) {
 		this.updateDate = updateDate;
 	}
-	
-	
+
+	public String getSessionId() {
+		return sessionId;
+	}
+
+	public void setSessionId(String sessionId) {
+		this.sessionId = sessionId;
+	}
+
+	public long getTimeDelta() {
+		return timeDelta;
+	}
+
+	public void setTimeDelta(long timeDelta) {
+		this.timeDelta = timeDelta;
+	}
+		
 }

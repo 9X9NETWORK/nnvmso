@@ -17,7 +17,7 @@ public class MsoProgram implements Serializable {
 	private Key key;
 	
 	@Persistent
-	private Key channelKey;
+	private long channelId;
 	
 	@Persistent
 	private String name;
@@ -88,12 +88,12 @@ public class MsoProgram implements Serializable {
 		this.key = key;
 	}
 
-	public Key getChannelKey() {
-		return channelKey;
+	public long getChannelId() {
+		return channelId;
 	}
 
-	public void setChannelKey(Key channelKey) {
-		this.channelKey = channelKey;
+	public void setChannelId(long channelId) {
+		this.channelId = channelId;
 	}
 
 	public String getName() {

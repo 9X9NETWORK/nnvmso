@@ -22,10 +22,10 @@ public class MsoIpg  implements Serializable {
 	private Key key;
 		
 	@Persistent
-	private Key msoKey; 
+	private long msoId; 
 
 	@Persistent 
-	private Key channelKey;
+	private long channelId;
 	
 	public static short TYPE_GENERAL = 1;
 	public static short TYPE_READONLY = 2;
@@ -34,6 +34,9 @@ public class MsoIpg  implements Serializable {
 	
 	@Persistent
 	private int seq;
+
+	@Persistent
+	private short start;
 	
 	@Persistent
 	private Date createDate;
@@ -41,9 +44,9 @@ public class MsoIpg  implements Serializable {
 	@Persistent
 	private Date updateDate;
 	
-	public MsoIpg(Key msoKey, Key channelKey, int seq, short type) {
-		this.msoKey = msoKey;
-		this.channelKey = channelKey;
+	public MsoIpg(long msoId, long channelId, int seq, short type) {
+		this.msoId = msoId;
+		this.channelId = channelId;
 		this.seq = seq;
 		this.type = type;
 	}
@@ -56,20 +59,20 @@ public class MsoIpg  implements Serializable {
 		this.key = key;
 	}
 
-	public Key getMsoKey() {
-		return msoKey;
+	public long getMsoId() {
+		return msoId;
 	}
 
-	public void setMsoKey(Key msoKey) {
-		this.msoKey = msoKey;
+	public void setMsoId(long msoId) {
+		this.msoId = msoId;
 	}
 
-	public Key getChannelKey() {
-		return channelKey;
+	public long getChannelId() {
+		return channelId;
 	}
 
-	public void setChannelKey(Key channelKey) {
-		this.channelKey = channelKey;
+	public void setChannelId(long channelId) {
+		this.channelId = channelId;
 	}
 
 	public short getType() {
@@ -103,5 +106,13 @@ public class MsoIpg  implements Serializable {
 	public void setUpdateDate(Date updateDate) {
 		this.updateDate = updateDate;
 	}
-		
+
+	public short getStart() {
+		return start;
+	}
+
+	public void setStart(short start) {
+		this.start = start;
+	}
+	
 }

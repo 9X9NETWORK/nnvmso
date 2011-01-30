@@ -16,7 +16,7 @@ public class MsoConfig {
 	private Key key;
 
 	@Persistent
-	private Key msoKey;
+	private long msoId;
 		
 	@Persistent
 	private String item;
@@ -35,8 +35,8 @@ public class MsoConfig {
 	
 	public MsoConfig() {}
 	
-	public MsoConfig(Key msoKey, String item, String value) {
-		this.msoKey = msoKey;
+	public MsoConfig(long msoId, String item, String value) {
+		this.msoId = msoId;
 		this.item = item;
 		this.value = value;
 	}
@@ -49,12 +49,12 @@ public class MsoConfig {
 		this.key = key;
 	}
 
-	public Key getMsoKey() {
-		return msoKey;
+	public long getMsoId() {
+		return msoId;
 	}
 
-	public void setMsoKey(Key msoKey) {
-		this.msoKey = msoKey;
+	public void setMsoId(long msoId) {
+		this.msoId = msoId;
 	}
 
 	public String getItem() {
