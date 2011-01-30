@@ -1,7 +1,6 @@
 package com.nnvmso.dao;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.jdo.JDOObjectNotFoundException;
@@ -15,27 +14,15 @@ import com.nnvmso.lib.PMF;
 import com.nnvmso.model.Category;
 
 public class CategoryDao {
-
-	public void create(Category category) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Date now = new Date();
-		category.setName(NnStringUtil.capitalize(category.getName()));
-		category.setCreateDate(now);
-		category.setUpdateDate(now);
-		pm.makePersistent(category);
-		pm.close();		
-	}
 	
 	public Category save(Category category) {
+		if (category == null) {return null;}
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		category.setName(NnStringUtil.capitalize(category.getName()));
-		category.setUpdateDate(new Date());
 		pm.makePersistent(category);
 		pm.close();
 		return category;
 	}
 
-	//!!!
 	public void delete(Category category) {
 		throw new JDOFatalException();
 	}
@@ -54,14 +41,14 @@ public class CategoryDao {
 		return detached;
 	}
 		
-	public List<Category> findAllByMsoKey(Key msoKey) {
+	public List<Category> findAllByMsoId(long msoId) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Query q = pm.newQuery(Category.class);
-		q.setFilter("msoKey == msoKeyParam");
-		q.declareParameters(Key.class.getName() + " msoKeyParam");
+		q.setFilter("msoId == msoIdParam");
+		q.declareParameters("long msoIdParam");
 		q.setOrdering("name");
 		@SuppressWarnings("unchecked")
-		List<Category> categories = (List<Category>)q.execute(msoKey);
+		List<Category> categories = (List<Category>)q.execute(msoId);
 		categories = (List<Category>)pm.detachCopyAll(categories);
 		pm.close();
 		return categories;		
@@ -109,7 +96,7 @@ public class CategoryDao {
 			Category c = this.findById(id); 
 			if (c != null) {
 				categories.add(c);
-			}			
+			}
 		}
 		pm.close();
 		return categories;

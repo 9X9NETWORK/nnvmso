@@ -6,24 +6,13 @@ import java.util.List;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
-import com.google.appengine.api.datastore.Key;
 import com.nnvmso.lib.PMF;
 import com.nnvmso.model.Subscription;
 
 public class SubscriptionDao {
-	public void create(Subscription sub) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Date now = new Date();
-		sub.setCreateDate(now);
-		sub.setUpdateDate(now);
-		pm.makePersistent(sub);
-		pm.close();		
-	}
-
 	public Subscription save(Subscription sub) {
+		if (sub == null) {return null;}
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Date now = new Date();
-		sub.setUpdateDate(now);
 		pm.makePersistent(sub);
 		sub = pm.detachCopy(sub);
 		pm.close();		
@@ -48,27 +37,27 @@ public class SubscriptionDao {
 		}
 	}
 	
-	public List<Subscription> findAllByUserKeyAndSeq(Key userKey, int seq1, int seq2) {
+	public List<Subscription> findAllByUserIdAndSeq(long userId, int seq1, int seq2) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Query q = pm.newQuery(Subscription.class);
-		q.setFilter("userKey == userKeyParam && (seq == seq1Param || seq == seq2Param)");
-		q.declareParameters(Key.class.getName() + " userKeyParam, int seq1Param, int seq2Param");
+		q.setFilter("userId == userIdParam && (seq == seq1Param || seq == seq2Param)");
+		q.declareParameters("long userIdParam, int seq1Param, int seq2Param");
 		q.setOrdering("seq asc");
 		@SuppressWarnings("unchecked")
-		List<Subscription> subscriptions = (List<Subscription>)q.execute(userKey, seq1, seq2);
+		List<Subscription> subscriptions = (List<Subscription>)q.execute(userId, seq1, seq2);
 		subscriptions = (List<Subscription>)pm.detachCopyAll(subscriptions);
 		pm.close();
 		return subscriptions;
 	}	 
 	
-	public Subscription findByUserKeyAndChannelKey(Key userKey, Key channelKey) {
+	public Subscription findByUserIdAndChannelId(long userId, long channelId) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();		
 		Query q = pm.newQuery(Subscription.class);
-		q.setFilter("userKey == userKeyParam && channelKey == channelKeyParam");
+		q.setFilter("userId == userIdParam && channelId== channelIdParam");
 		q.setOrdering("seq asc");
-		q.declareParameters(Key.class.getName() + " userKeyParam, " + Key.class.getName() + " channelKeyParam");
+		q.declareParameters("long userIdParam, long channelIdParam");
 		@SuppressWarnings("unchecked")
-		List<Subscription> subs = (List<Subscription>)q.execute(userKey, channelKey);
+		List<Subscription> subs = (List<Subscription>)q.execute(userId, channelId);
 		Subscription s = null;
 		if (subs.size() > 0) {
 			s = subs.get(0);
@@ -78,14 +67,14 @@ public class SubscriptionDao {
 		return s;
 	}
 	
-	public List<Subscription> findAllByUserKey(Key userKey) {
+	public List<Subscription> findAllByUserId(long userId) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Query q = pm.newQuery(Subscription.class);
-		q.setFilter("userKey == userKeyParam");
-		q.declareParameters(Key.class.getName() + " userKeyParam");
+		q.setFilter("userId == userIdParam");
+		q.declareParameters("long userIdParam");
 		q.setOrdering("seq asc");
 		@SuppressWarnings("unchecked")
-		List<Subscription> subscriptions = (List<Subscription>)q.execute(userKey);
+		List<Subscription> subscriptions = (List<Subscription>)q.execute(userId);
 		subscriptions = (List<Subscription>)pm.detachCopyAll(subscriptions);
 		pm.close();
 		return subscriptions;

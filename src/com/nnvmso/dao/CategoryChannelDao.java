@@ -1,6 +1,5 @@
 package com.nnvmso.dao;
 
-import java.util.Date;
 import java.util.List;
 
 import javax.jdo.JDOObjectNotFoundException;
@@ -14,19 +13,9 @@ import com.nnvmso.model.Subscription;
 
 public class CategoryChannelDao {
 
-	public void create(CategoryChannel cc) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Date now = new Date();
-		cc.setCreateDate(now);
-		cc.setUpdateDate(now);
-		pm.makePersistent(cc);
-		pm.close();		
-	}
-
 	public CategoryChannel save(CategoryChannel cc) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Date now = new Date();
-		cc.setUpdateDate(now);
+		if (cc == null) {return null;}
+		PersistenceManager pm = PMF.get().getPersistenceManager();		
 		pm.makePersistent(cc);
 		cc= pm.detachCopy(cc);
 		pm.close();		
@@ -53,25 +42,25 @@ public class CategoryChannelDao {
 		return cc;		
 	}	
 	
-	public List<CategoryChannel> findAllByCategoryKey(Key categoryKey) {
+	public List<CategoryChannel> findAllByCategoryId(long categoryId) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Query q = pm.newQuery(CategoryChannel.class);
-		q.setFilter("categoryKey == categoryKeyParam");
-		q.declareParameters(Key.class.getName() + " categoryKeyParam");
+		q.setFilter("categoryId == categoryIdParam");
+		q.declareParameters("long categoryIdParam");
 		@SuppressWarnings("unchecked")
-		List<CategoryChannel> ccs = (List<CategoryChannel>)q.execute(categoryKey);
+		List<CategoryChannel> ccs = (List<CategoryChannel>)q.execute(categoryId);
 		ccs = (List<CategoryChannel>)pm.detachCopyAll(ccs);		
 		pm.close();
 		return ccs;
 	}	
 
-	public List<CategoryChannel> findAllByChannelKey(Key channelKey) {
+	public List<CategoryChannel> findAllByChannelId(long channelId) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Query q = pm.newQuery(CategoryChannel.class);
-		q.setFilter("channelKey == channelKeyParam");
-		q.declareParameters(Key.class.getName() + " channelKeyParam");
+		q.setFilter("channelId == channelIdParam");
+		q.declareParameters("long channelIdParam");
 		@SuppressWarnings("unchecked")
-		List<CategoryChannel> ccs = (List<CategoryChannel>)q.execute(channelKey);
+		List<CategoryChannel> ccs = (List<CategoryChannel>)q.execute(channelId);
 		ccs = (List<CategoryChannel>)pm.detachCopyAll(ccs);		
 		pm.close();
 		return ccs;

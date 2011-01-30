@@ -1,9 +1,5 @@
 package com.nnvmso.dao;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.jdo.JDOObjectNotFoundException;
@@ -15,19 +11,10 @@ import com.nnvmso.lib.PMF;
 import com.nnvmso.model.MsoChannel;
 
 public class MsoChannelDao {
-	
-	public void create(MsoChannel channel) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Date now = new Date();
-		channel.setCreateDate(now);
-		channel.setUpdateDate(now);
-		pm.makePersistent(channel);
-		pm.close();	
-	}
-	
+		
 	public MsoChannel save(MsoChannel channel) {
+		if (channel == null) {return null;}
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		channel.setUpdateDate(new Date());
 		pm.makePersistent(channel);
 		pm.close();		
 		return channel;
@@ -36,6 +23,7 @@ public class MsoChannelDao {
 	public MsoChannel findById(long id) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		MsoChannel channel = null;
+		System.out.println("id:" + id);
 		try {
 			channel = pm.getObjectById(MsoChannel.class, id);
 			channel = pm.detachCopy(channel);
@@ -57,6 +45,21 @@ public class MsoChannelDao {
 		return channel;		
 	}	
 
+	public MsoChannel findByName(String name) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();		    	
+		Query q = pm.newQuery(MsoChannel.class);
+		q.setFilter("name == nameParam");
+		q.declareParameters(Key.class.getName() + " nameParam");
+		@SuppressWarnings("unchecked")
+		List<MsoChannel> channels = (List<MsoChannel>) q.execute(name);
+		MsoChannel channel = null;
+		if (channels.size() > 0) {
+			channel = pm.detachCopy(channels.get(0));
+		}
+		pm.close();
+		return channel;				
+	}	
+	
 	public MsoChannel findBySourceUrl(String url) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();		    	
 		Query q = pm.newQuery(MsoChannel.class);
@@ -70,29 +73,7 @@ public class MsoChannelDao {
 		}
 		pm.close();
 		return channel;				
-	}
-		
-	public List<MsoChannel> findPublicChannelsByCategoryIds(long[] categoryIds) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();		
-		Key[] categoryKeys = new Key[categoryIds.length];
-		for (int i=0; i<categoryIds.length; i++) {
-			MsoChannel c = pm.getObjectById(MsoChannel.class, categoryIds[i]);
-			categoryKeys[i] = c.getKey();
-		}
-		Query q = pm.newQuery(MsoChannel.class, ":p.contains(categoryKey)");
-		@SuppressWarnings("unchecked")
-		List<MsoChannel> channels = new ArrayList<MsoChannel>((List<MsoChannel>) q.execute(Arrays.asList(categoryKeys)));
-		Iterator<MsoChannel> iter = channels.iterator();
-		while(iter.hasNext()) {
-		  MsoChannel c = iter.next();
-		  if (!c.isPublic()) {
-			  iter.remove();
-		  }
-		}
-		channels = (List<MsoChannel>)pm.detachCopyAll(channels);
-		pm.close();
-		return channels;
-	}
+	}		
 	
 	public List<MsoChannel> findPublicChannels() {
 		PersistenceManager pm = PMF.get().getPersistenceManager();

@@ -16,19 +16,9 @@ import com.nnvmso.model.NnUser;
 public class IpgDao {
 
 	protected static final Logger log = Logger.getLogger(IpgDao.class.getName());
-	
-	public void create(Ipg ipg) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Date now = new Date();
-		ipg.setCreateDate(now);
-		ipg.setUpdateDate(now);
-		pm.makePersistent(ipg);
-		pm.close();				
-	}	
-	
+		
 	public Ipg save(Ipg ipg) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		ipg.setUpdateDate(new Date());
 		pm.makePersistent(ipg);
 		ipg = pm.detachCopy(ipg);
 		pm.close();
@@ -42,7 +32,7 @@ public class IpgDao {
 		try {
 			DateFormat df = DateFormat.getDateInstance();
 			ipg = (Ipg)pm.getObjectById(Ipg.class, id);
-			log.info("ipg channel count: " + ipg.getChannels().size() + ";owner: " + ipg.getUser().getName() + ";ipg date: " + df.format(ipg.getCreateDate())); 
+			log.info("ipg channel count: " + ipg.getChannels().size() + ";owner: " + ipg.getUserId() + ";ipg date: " + df.format(ipg.getCreateDate())); 
 			detached = (Ipg)pm.detachCopy(ipg);
 		} catch (JDOObjectNotFoundException e) {
 		}
@@ -50,13 +40,13 @@ public class IpgDao {
 		return detached;
 	}	
 	
-	public List<Ipg> findByUser(NnUser user) {
+	public List<Ipg> findByUserId(long userId) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Query query = pm.newQuery(Ipg.class);
-		query.setFilter("user == userParam");
-		query.declareParameters("NnUser userParam");
+		query.setFilter("userId == userIdParam");
+		query.declareParameters("long userIdParam");
 		@SuppressWarnings("unchecked")
-		List<Ipg> results = (List<Ipg>)query.execute();
+		List<Ipg> results = (List<Ipg>)query.execute(userId);
 		log.info("ipg count = " + results.size());
 		results = (List<Ipg>)pm.detachCopyAll(results);
 		pm.close();

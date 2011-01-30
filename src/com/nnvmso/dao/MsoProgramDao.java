@@ -1,8 +1,6 @@
 package com.nnvmso.dao;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -13,64 +11,50 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
-import com.google.appengine.api.datastore.Key;
 import com.nnvmso.lib.PMF;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoProgram;
-import com.nnvmso.model.Watched;
 import com.nnvmso.service.PlayerApiService;
 
 public class MsoProgramDao {
 	
 	protected static final Logger log = Logger.getLogger(PlayerApiService.class.getName());	
-	
-	public void create(MsoProgram program) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Date now = new Date();
-		program.setCreateDate(now);
-		if (program.getUpdateDate() == null) {
-			program.setUpdateDate(now);
-		}
-		pm.makePersistent(program);
-		pm.close();		
-	}
-	
+		
 	public MsoProgram save(MsoProgram program) {
+		if (program == null) {return null;}
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		if (program.getUpdateDate() == null) {
-			program.setUpdateDate(new Date());
-		}
 		pm.makePersistent(program);
 		program = pm.detachCopy(program);
 		pm.close();		
 		return program;
 	}
 	
-	public List<MsoProgram> findNewProgramsByChannels(List<MsoChannel> channels, Hashtable<Key, Watched> watchedTable) {
+	public List<MsoProgram> findNewProgramsByChannels(List<MsoChannel> channels, Hashtable<Long, HashSet<Long>> watchedTable) {
 		List<MsoProgram> programs = new ArrayList<MsoProgram>();
 		PersistenceManager pm = PMF.get().getPersistenceManager();
+		System.out.println("channels size:" + channels.size());
 		for (MsoChannel c : channels) {
 			Query query = pm.newQuery(MsoProgram.class);
-			query.setFilter("channelKey == channelKeyParam");
-			query.declareParameters(Key.class.getName() + " channelKeyParam");
+			query.setFilter("channelId == channelIdParam");
+			query.declareParameters("long channelIdParam");
 	    	query.setOrdering("updateDate desc");	   
 	    	@SuppressWarnings("unchecked")
-	    	List<MsoProgram> results = (List<MsoProgram>) query.execute(c.getKey());	    	
+	    	List<MsoProgram> results = (List<MsoProgram>) query.execute(c.getKey().getId());	    	 
 			int RECENT_SIZE = 3;	    			
     		int cnt = 0;
-	    	if (watchedTable.containsKey(c.getKey())) {
-	    		HashSet<Long> watchedPrograms = watchedTable.get(c.getKey()).getPrograms();
+	    	if (watchedTable.containsKey(c.getKey().getId())) {
+	    		HashSet<Long> watchedPrograms = watchedTable.get(c.getKey());
     			log.info("this channel has been watched:" + c.getKey().getId());
 	    		for (int i=0; i<results.size(); i++) {
 	    			if (cnt == RECENT_SIZE) {break;}
-					if (!watchedPrograms.contains(results.get(i).getKey().getId())) {
-						log.info("unwatched program:" + results.get(i).getKey().getId());
+					if (watchedPrograms != null && !watchedPrograms.contains(results.get(i).getKey().getId())) {
+						log.info("unwatched program:" + results.get(i));
 						programs.add(results.get(i));
 						cnt++;
 					}
 	    		}
 		    	if (cnt < RECENT_SIZE) {
-		    		log.info("part of the channel is watched:" + c.getKey());
+		    		log.info("part of the channel is watched:" + c.getKey().getId());
 					for (int i=0; i<results.size(); i++) {
 						if (cnt == RECENT_SIZE) {break;}
 						if (!programs.contains(results.get(i))) {
@@ -79,9 +63,8 @@ public class MsoProgramDao {
 						}
 					}
 		    	}	    		
-	    	}
-	    	if (!watchedTable.containsKey(c.getKey())) {
-	    		log.info("the whole channel is unwatched:" + c.getKey());
+	    	} else {
+	    		log.info("the whole channel is unwatched:" + c.getKey().getId());
 				for (int i=0; i<results.size(); i++) {
 					if (i == RECENT_SIZE) {break;}
 					System.out.println(results.get(i).getKey().getId());
@@ -107,39 +90,13 @@ public class MsoProgramDao {
 		pm.close();
 		return detached;
 	}
-
-	public List<MsoProgram> findAllByChannelKeys(Key[] keys) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Query q = pm.newQuery(MsoProgram.class, ":p.contains(channelKey)"); 
-		@SuppressWarnings("unchecked")
-		List<MsoProgram> programs = (List<MsoProgram>) q.execute(Arrays.asList(keys));
-		List<MsoProgram> results = new ArrayList<MsoProgram>();
-		results.addAll(programs);
-		Iterator<MsoProgram> iter = results.iterator();
-		while(iter.hasNext()) {
-			MsoProgram p = iter.next();
-			if (!p.isPublic()) {
-				iter.remove();
-			}
-		}
-		programs = (List<MsoProgram>) pm.detachCopyAll(programs);
-		pm.close();
-		return programs;
-	}
 	
-	public List<MsoProgram> findAllByChannelIdsAndIsPublic(long[] channelIds, boolean isPublic) { 			
+	public List<MsoProgram> findAllByChannelIdsAndIsPublic(List<Long> channelIds, boolean isPublic) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Key[] channelKeys = new Key[channelIds.length];
-		for (int i=0; i<channelIds.length; i++) {
-			try {
-				MsoChannel c = pm.getObjectById(MsoChannel.class, channelIds[i]);
-				channelKeys[i] = c.getKey();
-			} catch (JDOObjectNotFoundException e) { }			
-		}
-		Query q = pm.newQuery(MsoProgram.class, ":p.contains(channelKey)");
-		//q.setOrdering("updateDate desc");
+		Query q = pm.newQuery(MsoProgram.class, ":p.contains(channelId)");
 		@SuppressWarnings("unchecked")
-		List<MsoProgram> programs = new ArrayList<MsoProgram>((List<MsoProgram>) q.execute(Arrays.asList(channelKeys)));
+		//List<MsoProgram> programs = ((List<MsoProgram>) q.execute(Arrays.asList(367L, 385L, 377L)));
+		List<MsoProgram> programs = ((List<MsoProgram>) q.execute(channelIds));
 		Iterator<MsoProgram> iter = programs.iterator();
 		while(iter.hasNext()) {
 		  MsoProgram p = iter.next();
@@ -152,13 +109,13 @@ public class MsoProgramDao {
 		return programs;
 	}
 	
-	public List<MsoProgram> findAllByChannel(MsoChannel channel) {
+	public List<MsoProgram> findAllByChannelId(long channelId) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Query q = pm.newQuery(MsoProgram.class);
-		q.setFilter("channelKey == channelKeyParam");
-		q.declareParameters(Key.class.getName() + " channelKeyParam");
+		q.setFilter("channelId == channelIdParam");
+		q.declareParameters("long channelIdParam");
 		@SuppressWarnings("unchecked")
-		List<MsoProgram> programs = (List<MsoProgram>) q.execute(channel.getKey());		
+		List<MsoProgram> programs = (List<MsoProgram>) q.execute(channelId);		
 		List<MsoProgram> detached = (List<MsoProgram>)pm.detachCopyAll(programs);
 		pm.close();
 		return detached;

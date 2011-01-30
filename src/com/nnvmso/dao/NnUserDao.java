@@ -1,7 +1,6 @@
 package com.nnvmso.dao;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import javax.jdo.JDOObjectNotFoundException;
@@ -13,36 +12,23 @@ import com.nnvmso.lib.AuthLib;
 import com.nnvmso.lib.PMF;
 import com.nnvmso.model.NnUser;
 
-public class NnUserDao {
-	
-	public void create(NnUser user) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Date now = new Date();
-		user.setEmail(user.getEmail().toLowerCase());
-		user.setCreateDate(now);
-		user.setUpdateDate(now);
-		pm.makePersistent(user);
-		pm.close();		
-	}
-	
+public class NnUserDao {		
 	public NnUser save(NnUser user) {
+		if (user == null) {return null;}
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		user.setUpdateDate(new Date());
-		user.setSalt(AuthLib.generateSalt());
-		user.setCryptedPassword(AuthLib.encryptPassword(user.getPassword(), user.getSalt()));		
 		pm.makePersistent(user);
 		user = pm.detachCopy(user);
 		pm.close();		
 		return user;
 	}
 
-	public NnUser findAuthenticatedUser(String email, String password, Key msoKey) {
+	public NnUser findAuthenticatedUser(String email, String password, long msoId) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();		
 		Query query = pm.newQuery(NnUser.class);
-		query.setFilter("email == emailParam && msoKey == msoKeyParam");
-		query.declareParameters("String emailParam, " + Key.class.getName() + " msoKeyParam");				
+		query.setFilter("email == emailParam && msoId == msoIdParam");
+		query.declareParameters("String emailParam, long msoIdParam");				
 		@SuppressWarnings("unchecked")
-		List<NnUser> results = (List<NnUser>) query.execute(email, msoKey);
+		List<NnUser> results = (List<NnUser>) query.execute(email, msoId);
 		NnUser user = null;
 		if (results.size() > 0) {
 			user = results.get(0);		
@@ -56,13 +42,29 @@ public class NnUserDao {
 		return user;		
 	}
 		 
-	public NnUser findByEmailAndMsoKey(String email, Key msoKey) {
+	public NnUser findByEmailAndMsoId(String email, long msoId) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();		
 		Query query = pm.newQuery(NnUser.class);
-		query.setFilter("email == emailParam && msoKey == msoKeyParam");
-		query.declareParameters("String emailParam, " + Key.class.getName() + " msoKeyParam");		
+		query.setFilter("email == emailParam && msoId == msoIdParam");
+		query.declareParameters("String emailParam, " + Key.class.getName() + " msoIdParam");		
 		@SuppressWarnings("unchecked")
-		List<NnUser> results = (List<NnUser>) query.execute(email, msoKey);
+		List<NnUser> results = (List<NnUser>) query.execute(email, msoId);
+		NnUser user = null;
+		if (results.size() > 0) {
+			user = results.get(0);			
+		}
+		user = pm.detachCopy(user);
+		pm.close();
+		return user;				
+	}
+
+	public NnUser findByToken(String token) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();		
+		Query query = pm.newQuery(NnUser.class);
+		query.setFilter("token == tokenParam");
+		query.declareParameters("String tokenParam");		
+		@SuppressWarnings("unchecked")
+		List<NnUser> results = (List<NnUser>) query.execute(token);
 		NnUser user = null;
 		if (results.size() > 0) {
 			user = results.get(0);			
