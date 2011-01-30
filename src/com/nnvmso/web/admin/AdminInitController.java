@@ -42,18 +42,18 @@ public class AdminInitController {
 		initService.initMsoAndCategories();
 		return NnNetUtil.textReturn("OK");		
 	}
-	
-	@RequestMapping("initDefaultChannels")
-	public ResponseEntity<String> initTestChannels() {
-		InitService initService = new InitService();
-		initService.initTestData();
-		return NnNetUtil.textReturn("OK");		
-	}
-	
-	@RequestMapping("initAll")
+		
+	@RequestMapping("initAllDevel")
 	public ResponseEntity<String> initAll() {
 		InitService initService = new InitService();
-		initService.initAll();
+		initService.initAll(true);
+		return NnNetUtil.textReturn("OK");		
+	}
+
+	@RequestMapping("initAllIntegration")
+	public ResponseEntity<String> initAllIntegration() {
+		InitService initService = new InitService();
+		initService.initAll(false);
 		return NnNetUtil.textReturn("OK");		
 	}
 	
