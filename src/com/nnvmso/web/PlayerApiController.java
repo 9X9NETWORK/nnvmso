@@ -1,6 +1,7 @@
 package com.nnvmso.web;
 
 import java.util.Locale;
+import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -10,14 +11,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.nnvmso.lib.*;
-import com.nnvmso.model.*;
-import com.nnvmso.service.*;
-
-import java.util.logging.Logger;
+import com.nnvmso.lib.CookieHelper;
+import com.nnvmso.lib.NnLogUtil;
+import com.nnvmso.lib.NnNetUtil;
+import com.nnvmso.model.Mso;
+import com.nnvmso.service.MsoManager;
+import com.nnvmso.service.NnStatusMsg;
+import com.nnvmso.service.PlayerApiService;
 
 /**
  * <p>Serves for Player.</p>
@@ -36,15 +38,27 @@ import java.util.logging.Logger;
 public class PlayerApiController {
 	protected static final Logger log = Logger.getLogger(PlayerApiController.class.getName());
 	
-	private final PlayerApiService playerApiService;
+	private final PlayerApiService playerApiService;	
+	private Locale locale;
 	
-
-	//!!! inject mso and locale 
 	@Autowired
 	public PlayerApiController(PlayerApiService playerApiService) {
 		this.playerApiService= playerApiService;
 	}	
-
+	
+	//!!! if can't find any mso, all dead!
+	private void prepService(HttpServletRequest req) {
+		MsoManager msoMngr = new MsoManager();
+		Mso mso = msoMngr.findMsoViaHttpReq(req);
+		Locale locale = Locale.ENGLISH;
+		if (mso.getPreferredLangCode().equals(Mso.LANG_ZH_TW)){
+			locale = Locale.TRADITIONAL_CHINESE;
+		}		
+		playerApiService.setLocale(locale);
+		playerApiService.setMso(mso);
+		this.locale = locale;
+	}		
+	
 	/**
 	 * To be ignored  
 	 */
@@ -52,18 +66,6 @@ public class PlayerApiController {
 	public String exception(Exception e) {
 		NnLogUtil.logException(e);
 		return "error/blank";
-	}
-
-	@RequestMapping(value="hello") 
-	public ResponseEntity<String> hello(HttpServletRequest req) {
-		Locale locale = playerApiService.getLocaleByMso(new MsoManager().findMsoTypeViaHttpReq(req));		
-		String output = NnStatusMsg.errorStr(locale);
-		try {
-			output = playerApiService.hello();
-		} catch (Exception e) {
-			output = playerApiService.handleException(e, locale);
-		}
-		return NnNetUtil.textReturn(output);				
 	}
 	
 	/* ==========  CATEGORY: BRAND RELATED ========== */
@@ -77,12 +79,12 @@ public class PlayerApiController {
 	@RequestMapping(value="brandInfo")
 	public ResponseEntity<String> brandInfo(@RequestParam(value="mso", required=false)String brandName, HttpServletRequest req) {
 		log.info("brandInfo:" + brandName);
-		Locale locale = playerApiService.getLocaleByMso(new MsoManager().findMsoTypeViaHttpReq(req));		
+		this.prepService(req);
 		String output = NnStatusMsg.errorStr(locale);
 		try {
-			output = playerApiService.findMsoInfo(req, locale);
+			output = playerApiService.findMsoInfo(req);
 		} catch (Exception e) {
-			output = playerApiService.handleException(e, locale);
+			output = playerApiService.handleException(e);
 		}
 		return NnNetUtil.textReturn(output);
 	}	
@@ -105,16 +107,14 @@ public class PlayerApiController {
 	@RequestMapping(value="login")
 	public ResponseEntity<String> login(HttpServletRequest req, HttpServletResponse resp) {
 		String email = req.getParameter("email");
-		String password = req.getParameter("password");
-		log.fine("login: email=" + email + "; password=" + password);
-		
-		Locale locale = playerApiService.getLocaleByMso(new MsoManager().findMsoTypeViaHttpReq(req));		
-		String output = NnStatusMsg.errorStr(locale);
-		
+		String password = req.getParameter("password");		
+		this.prepService(req);
+		log.info("login: email=" + email);		
+		String output = NnStatusMsg.errorStr(locale);		
 		try {
-			output = playerApiService.findAuthenticatedUser(email, password, req, resp, locale);
+			output = playerApiService.findAuthenticatedUser(email, password, req, resp);
 		} catch (Exception e) {
-			output = playerApiService.handleException(e, locale);
+			output = playerApiService.handleException(e);
 		}
 		return NnNetUtil.textReturn(output);
 	}	
@@ -128,13 +128,13 @@ public class PlayerApiController {
 	 */	
 	@RequestMapping(value="guestRegister")
 	public ResponseEntity<String> guestRegister(@RequestParam(value="ipg", required = false) String ipg, HttpServletRequest req, HttpServletResponse resp) {
-		Locale locale = playerApiService.getLocaleByMso(new MsoManager().findMsoTypeViaHttpReq(req));		
+		log.info("guest register: (ipg)" + ipg);
+		this.prepService(req);
 		String output = NnStatusMsg.errorStr(locale);
-
 		try {
-			output = playerApiService.guestCreate(ipg, req, resp, locale); 
+			output = playerApiService.createGuest(ipg, req, resp); 
 		} catch (Exception e) {
-			output = playerApiService.handleException(e, locale);
+			output = playerApiService.handleException(e);
 		}		
 		return NnNetUtil.textReturn(output);
 	} 
@@ -154,16 +154,15 @@ public class PlayerApiController {
 		String email = req.getParameter("email");
 		String password = req.getParameter("password");
 		String name = req.getParameter("name");
-		String userToken = req.getParameter("user");
+		String userToken = req.getParameter("user");				
 		log.info("signup: email=" + email + ";name=" + name + ";userToken=" + userToken);
 
-		Locale locale = playerApiService.getLocaleByMso(new MsoManager().findMsoTypeViaHttpReq(req));		
+		this.prepService(req);
 		String output = NnStatusMsg.errorStr(locale);
-
 		try {
-			output = playerApiService.userCreate(email, password, name, userToken, req, resp, locale);
+			output = playerApiService.createUser(email, password, name, userToken, req, resp);
 		} catch (Exception e) {
-			output = playerApiService.handleException(e, locale);
+			output = playerApiService.handleException(e);
 		}
 		return NnNetUtil.textReturn(output);
 	}	
@@ -171,25 +170,23 @@ public class PlayerApiController {
 	/**
 	 * Sign out
 	 * 
-	 * Cleans the cookie
+	 * Clean the cookie
 	 * 
 	 * @param user user key identifier 
 	 */		
 	@RequestMapping(value="signout")
     public ResponseEntity<String> signout(@RequestParam(value="user", required=false) String userKey, HttpServletRequest req, HttpServletResponse resp) {
-		Locale locale = playerApiService.getLocaleByMso(new MsoManager().findMsoTypeViaHttpReq(req));		
+		this.prepService(req);
 		String output = NnStatusMsg.errorStr(locale);
-
 		try {
 			CookieHelper.deleteCookie(resp, CookieHelper.USER);
 			output = NnStatusMsg.successStr(locale);
 		} catch (Exception e) {
-			output = playerApiService.handleException(e, locale);
+			output = playerApiService.handleException(e);
 		}
 		return NnNetUtil.textReturn(output);
 	}	
-	
-	
+		
 	/**
 	 * Verify a user token <br/>
 	 * Example: http://<host>/playerAPI/userTokenVerify?token=aghubmUzdm1zb3INCxIGTm5Vc2VyGKsEDA
@@ -202,13 +199,13 @@ public class PlayerApiController {
 	public ResponseEntity<String> userTokenVerify(@RequestParam(value="token") String token, HttpServletRequest req, HttpServletResponse resp) {
 		log.info("userTokenVerify() : userToken=" + token);		
 
-		Locale locale = playerApiService.getLocaleByMso(new MsoManager().findMsoTypeViaHttpReq(req));		
+		this.prepService(req);
 		String output = NnStatusMsg.errorStr(locale);
 
 		try {			
-			output = playerApiService.findUserByToken(token, req, resp, locale);
+			output = playerApiService.findUserByToken(token, req, resp);
 		} catch (Exception e){
-			output = playerApiService.handleException(e, locale);
+			output = playerApiService.handleException(e);
 		}
 		return NnNetUtil.textReturn(output);
 	}
@@ -220,14 +217,12 @@ public class PlayerApiController {
 	 */
 	@RequestMapping(value="getLangCode")
 	public ResponseEntity<String> getLangCode(HttpServletRequest req) {
-
-		Locale locale = playerApiService.getLocaleByMso(new MsoManager().findMsoTypeViaHttpReq(req));		
+		this.prepService(req);
 		String output = NnStatusMsg.errorStr(locale);
-
 		try {
-			output = playerApiService.findLocaleByHttpRequest(req, locale);
+			output = playerApiService.findLocaleByHttpRequest(req);
 		} catch (Exception e) {
-			output = playerApiService.handleException(e, locale);
+			output = playerApiService.handleException(e);
 		}
 		return NnNetUtil.textReturn(output);
 
@@ -245,19 +240,17 @@ public class PlayerApiController {
 	 * @return basic message scheme.
 	 */		
 	@RequestMapping(value="subscribe")
-	public ResponseEntity<String> subscribe(@RequestParam(value="user", required=false) String userKey, 
+	public ResponseEntity<String> subscribe(@RequestParam(value="user", required=false) String userToken, 
 			                                @RequestParam(value="channel", required=false) String channelId, 
 			                                @RequestParam(value="grid", required=false) String grid, 
 			                                HttpServletRequest req ) {		
-		log.info("subscribe: userToken=" + userKey + "; channel=" + channelId + "; grid=" + grid);
-
-		Locale locale = playerApiService.getLocaleByMso(new MsoManager().findMsoTypeViaHttpReq(req));		
+		log.info("subscribe: userToken=" + userToken+ "; channel=" + channelId + "; grid=" + grid);
+		this.prepService(req);
 		String output = NnStatusMsg.errorStr(locale);
-
 		try {
-			output = playerApiService.channelSubscribe(userKey, channelId, grid, locale);
+			output = playerApiService.subscribeChannel(userToken, channelId, grid);
 		} catch (Exception e) {
-			output = playerApiService.handleException(e, locale);
+			output = playerApiService.handleException(e);
 		}
 		return NnNetUtil.textReturn(output);
 	}
@@ -272,67 +265,21 @@ public class PlayerApiController {
 	 * @return basic message scheme.
 	 */			
 	@RequestMapping(value="unsubscribe")
-	public ResponseEntity<String> unsubscribe(@RequestParam(value="user") String userKey, 
+	public ResponseEntity<String> unsubscribe(@RequestParam(value="user") String userToken, 
 								              @RequestParam(value="channel") String channelId,
 								              HttpServletRequest req) {			
-		log.info("userToken=" + userKey + "; channel=" + channelId);
-
-		Locale locale = playerApiService.getLocaleByMso(new MsoManager().findMsoTypeViaHttpReq(req));		
+		this.prepService(req);
+		log.info("userToken=" + userToken + "; channel=" + channelId);
 		String output = NnStatusMsg.errorStr(locale);
-
 		try {
-			SubscriptionManager subMngr = new SubscriptionManager();
-			subMngr.channelUnsubscribe(userKey, Long.parseLong(channelId));
-			output = NnStatusMsg.successStr(locale);
+			output = playerApiService.unsubscribeChannel(userToken, channelId);
 		} catch (Exception e) {
-			output = playerApiService.handleException(e, locale);
+			output = playerApiService.handleException(e);
 		}
 		return NnNetUtil.textReturn(output);
 	}	
 
-	/* ==========  CATEGORY: CHANNEL CREATE ========== */	
-	/**
-	 * @deprecated
-	 * 
-	 * Generate a channel based on a podcast RSS feed.
-	 * 
-	 * <p>Only POST operation is supported.</p>
-	 *  
-	 * @param url a podcast RSS feed or a YouTube url
-	 * @param user user's unique identifier
-	 * @param grid grid location
-	 * @param category category id
-	 * @param langCode language code, en or zh.
-	 * 
-	 * @return channel id, channel name, image url. <br/> 
-	 */	
-	@RequestMapping(value="podcastSubmit", method=RequestMethod.POST)
-	public ResponseEntity<String> podcastSubmit(HttpServletRequest req) {
-		String url = req.getParameter("url");
-		if (url == null) { url = req.getParameter("podcastRSS");} 
-		String userKey= req.getParameter("user");
-		String grid = req.getParameter("grid");
-		String categoryIds = req.getParameter("category");
-
-		Locale locale = playerApiService.getLocaleByMso(new MsoManager().findMsoTypeViaHttpReq(req));		
-		String output = NnStatusMsg.errorStr(locale);
-
-		log.info("player input - userToken=" + userKey + "; url=" + url + ";grid=" + grid + ";categoryId=" + categoryIds);				
-
-		if (categoryIds == null) {
-			CategoryManager categoryMngr = new CategoryManager();
-			Category category = categoryMngr.findByName("animals");			
-			categoryIds = String.valueOf(category.getKey().getId());
-		}
-		
-		try {
-			output = playerApiService.createChannel(categoryIds, userKey, url, grid, req, locale);
-		} catch (Exception e){
-			output = playerApiService.handleException(e, locale);
-		}
-		return NnNetUtil.textReturn(output);		
-	}
-	
+	/* ==========  CATEGORY: CHANNEL CREATE ========== */		
 	/**
 	 * Generate a channel based on a podcast RSS feed.
 	 * 
@@ -349,19 +296,18 @@ public class PlayerApiController {
 	@RequestMapping(value="channelSubmit")
 	public ResponseEntity<String> channelSubmit(HttpServletRequest req) {
 		String url = req.getParameter("url"); 
-		String userKey= req.getParameter("user");
+		String userToken= req.getParameter("user");
 		String grid = req.getParameter("grid");
 		String categoryIds = req.getParameter("category");
 
-		Locale locale = playerApiService.getLocaleByMso(new MsoManager().findMsoTypeViaHttpReq(req));		
-		String output = NnStatusMsg.errorStr(locale);
-		
-		log.info("player input - userToken=" + userKey + "; url=" + url + ";grid=" + grid + ";categoryId=" + categoryIds);				
+		this.prepService(req);		
+		log.info("player input - userToken=" + userToken+ "; url=" + url + ";grid=" + grid + ";categoryId=" + categoryIds);				
+		String output = NnStatusMsg.errorStr(locale);		
 		
 		try {
-			output = playerApiService.createChannel(categoryIds, userKey, url, grid, req, locale);
+			output = playerApiService.createChannel(categoryIds, userToken, url, grid, req);
 		} catch (Exception e){
-			output = playerApiService.handleException(e, locale);
+			output = playerApiService.handleException(e);
 		}
 		return NnNetUtil.textReturn(output);		
 	}
@@ -379,12 +325,12 @@ public class PlayerApiController {
 	 */	
 	@RequestMapping(value="channelBrowse")
 	public ResponseEntity<String> channelBrowse(@RequestParam(value="category", required=false) String categoryIds, HttpServletRequest req) {
-		Locale locale = playerApiService.getLocaleByMso(new MsoManager().findMsoTypeViaHttpReq(req));		
+		this.prepService(req);
 		String output = NnStatusMsg.errorStr(locale);
 		try {
-			output = playerApiService.findPublicChannelsByCategory(categoryIds, locale);
+			output = playerApiService.findPublicChannelsByCategory(categoryIds);
 		} catch (Exception e){
-			output = playerApiService.handleException(e, locale);
+			output = playerApiService.handleException(e);
 		}
 		log.info("channelBrowse() return:" + output);
 		return NnNetUtil.textReturn(output);
@@ -392,20 +338,18 @@ public class PlayerApiController {
 
 	/**
 	 * Browse categories.
-	 * 
-	 * @param  mso mso name, optional 
+	 *  
 	 * @return Categories info. Each category is \n separated.<br/>
 	 *         Category info has category id, category name, langCode.<br/>
 	 */		
 	@RequestMapping(value="categoryBrowse")
-	public ResponseEntity<String> categoryBrowse(@RequestParam(value="mso",required=false) String msoName, HttpServletRequest req) {
-		Locale locale = playerApiService.getLocaleByMso(new MsoManager().findMsoTypeViaHttpReq(req));		
-		String output = NnStatusMsg.errorStr(locale);
-		
+	public ResponseEntity<String> categoryBrowse(HttpServletRequest req) {
+		this.prepService(req);
+		String output = NnStatusMsg.errorStr(locale);		
 		try {
-			output = playerApiService.findCategoriesByMsoName(msoName, req, locale);
+			output = playerApiService.findCategoriesByMso();
 		} catch (Exception e){
-			output = playerApiService.handleException(e, locale);
+			output = playerApiService.handleException(e);
 		}		
 		return NnNetUtil.textReturn(output);
 	}
@@ -425,16 +369,16 @@ public class PlayerApiController {
 	 *         </p>
 	 */		
 	@RequestMapping(value="channelLineup")
-	public ResponseEntity<String> channelLineup(@RequestParam(value="user", required=false) String userKey, HttpServletRequest req) {
-		log.info("userToken=" + userKey);
-		
-		Locale locale = playerApiService.getLocaleByMso(new MsoManager().findMsoTypeViaHttpReq(req));		
+	public ResponseEntity<String> channelLineup(@RequestParam(value="user", required=false) String userToken,
+												@RequestParam(value="userInfo", required=false) String userInfo,
+											    HttpServletRequest req) {
+		this.prepService(req);
+		log.info("userToken=" + userToken);				
 		String output = NnStatusMsg.errorStr(locale);
-
 		try {
-			output = playerApiService.findSubscribedChannels(userKey, locale);
+			output = playerApiService.findSubscribedChannels(userToken);
 		} catch (Exception e){
-			output = playerApiService.handleException(e, locale);
+			output = playerApiService.handleException(e);
 		}
 		return NnNetUtil.textReturn(output);
 	}	
@@ -449,42 +393,51 @@ public class PlayerApiController {
 	 * @return basic message scheme.
 	*/
 	@RequestMapping(value="moveChannel")
-	public ResponseEntity<String> moveChannel(@RequestParam(value="user", required=false) String userKey, 
+	public ResponseEntity<String> moveChannel(@RequestParam(value="user", required=false) String userToken, 
 											  @RequestParam(value="grid1", required=false) String grid1,
 											  @RequestParam(value="grid2", required=false) String grid2,
 											  HttpServletRequest req){
-		log.info("userToken=" + userKey + ";grid1=" + grid1 + ";grid2=" + grid2);
-		
-		Locale locale = playerApiService.getLocaleByMso(new MsoManager().findMsoTypeViaHttpReq(req));		
+		this.prepService(req);
+		log.info("userToken=" + userToken + ";grid1=" + grid1 + ";grid2=" + grid2);
 		String output = NnStatusMsg.errorStr(locale);
-
 		try {
-			output = playerApiService.moveChannel(userKey, grid1, grid2, locale);
+			output = playerApiService.moveChannel(userToken, grid1, grid2);
 		} catch (Exception e){
-			output = playerApiService.handleException(e, locale);
+			output = playerApiService.handleException(e);
 		}		
 		return NnNetUtil.textReturn(output);		
 	}					
 	
-	//http://localhost:8888/playerAPI/pdr?user=agg5eDl0dmRldnINCxIGTm5Vc2VyGPI_DA&pdr=watched%098156%092%093%094%095%0Awatched%092%092%0A
-	//http://localhost:8888/playerAPI/pdr?user=agg5eDl0dmRldnINCxIGTm5Vc2VyGPI_DA&pdr=watched%098156%098168
+	//tab = %09
+	//\n = %0A
+	//http://localhost:8888/playerAPI/pdr?user=2g9p42n5np51913F11gg&pdr=watched%098156%092%093%094%095%0Awatched%092%092%0A
+	//http://localhost:8888/playerAPI/pdr?user=2g9p42n5np51913F11gg&session=12345&pdr=1%09clicked%098156%098168%0A100%09clicked%098156%098168
+	//http://localhost:8888/playerAPI/pdr?user=2g9p42n5np51913F11gg&session=12345&pdr=1%09watched%09367%09371%0A
 	/**
-	 * expecting
-	 * watched 1 1 2 3 4 5 [first 1 is channel, the rest are program ids]
-	 * clicked 1 1 1 1 [don't know what they are yet...]
-	 */
+	 * Collecting PDR
+	 * 
+	 * @param user user token
+	 * @param session indicates the session when user starts using the player
+	 * @param pdr pdr data
+	 * 		  <p> Expecting lines(separated by \n) of the following:<br/>  
+	 * 		  delta verb info <br/>
+	 * 		  Example: delta watched 1 1 2 3 <br/>
+	 * 		  Note: first 1 is channel, the rest are program ids. <br/>  
+	 * 		  Note: each field is separated by tab.
+	 * 		  </p> 
+	 */	
 	@RequestMapping(value="pdr")
-	public ResponseEntity<String> pdr(@RequestParam(value="user", required=false) String userKey,
+	public ResponseEntity<String> pdr(@RequestParam(value="user", required=false) String userToken,
+									  @RequestParam(value="session", required=false) String session,
 									  @RequestParam(value="pdr", required=false) String pdr,
 									  HttpServletRequest req) {
-
-		Locale locale = playerApiService.getLocaleByMso(new MsoManager().findMsoTypeViaHttpReq(req));		
+		this.prepService(req);
 		String output = NnStatusMsg.errorStr(locale);
-
+		log.info("user=" + userToken + ";session=" + session + ";pdr=" + pdr);
 		try {
-			output = playerApiService.processPdr(userKey, pdr, locale);
+			output = playerApiService.processPdr(userToken, pdr, session);
 		} catch (Exception e) {
-			output = playerApiService.handleException(e, locale);
+			output = playerApiService.handleException(e);
 		}
 		return NnNetUtil.textReturn(output);
 	}
@@ -500,16 +453,15 @@ public class PlayerApiController {
 	 *         Example: 1\n2\n3\n
 	 */	
 	@RequestMapping(value="whatsNew") 
-	public ResponseEntity<String> whatsNew(@RequestParam(value="user") String userKey, HttpServletRequest req) {
-		log.info("userToken=" + userKey);
-		
-		Locale locale = playerApiService.getLocaleByMso(new MsoManager().findMsoTypeViaHttpReq(req));		
+	public ResponseEntity<String> whatsNew(@RequestParam(value="user") String userToken, HttpServletRequest req) {
+		this.prepService(req);		
+		log.info("userToken=" + userToken);		
 		String output = NnStatusMsg.errorStr(locale);
 		
 		try {
-			output = playerApiService.findNewPrograms(userKey, locale);
+			output = playerApiService.findNewPrograms(userToken);
 		} catch (Exception e) {
-			output = playerApiService.handleException(e, locale);
+			output = playerApiService.handleException(e);
 		}
 		return NnNetUtil.textReturn(output);		
 	}	
@@ -539,16 +491,16 @@ public class PlayerApiController {
 	 */
 	@RequestMapping("programInfo")
 	public ResponseEntity<String> programInfo(@RequestParam(value="channel", required=false) String channelIds,
-									          @RequestParam(value="user", required = false) String userKey,
+									          @RequestParam(value="user", required = false) String userToken,
+									          @RequestParam(value="userInfo", required=false) String userInfo,
 									          @RequestParam(value="ipg", required = false) String ipgId,
 									          HttpServletRequest req) {
-		Locale locale = playerApiService.getLocaleByMso(new MsoManager().findMsoTypeViaHttpReq(req));		
+		this.prepService(req);		
 		String output = NnStatusMsg.errorStr(locale);
-
 		try {
-			output =  playerApiService.programInfo(channelIds, userKey, ipgId, locale, req);
+			output =  playerApiService.findProgramInfo(channelIds, userToken, ipgId);
 		} catch (Exception e){
-			output = playerApiService.handleException(e, locale);
+			output = playerApiService.handleException(e);
 		}
 		return NnNetUtil.textReturn(output);
 	}
@@ -561,14 +513,14 @@ public class PlayerApiController {
 	 * @return     An unique IPG identifier
 	 */
 	@RequestMapping(value="saveIpg")
-	public ResponseEntity<String> saveIpg(@RequestParam(value="user") String user, HttpServletRequest req) {		
-		log.info("saveIpg(" + user + ")");
-		Locale locale = playerApiService.getLocaleByMso(new MsoManager().findMsoTypeViaHttpReq(req));		
+	public ResponseEntity<String> saveIpg(@RequestParam(value="user") String userToken, HttpServletRequest req) {		
+		this.prepService(req);
+		log.info("saveIpg(" + userToken + ")");
 		String output = NnStatusMsg.errorStr(locale);		
 		try {
-			output = playerApiService.saveIpg(user, locale);
+			output = playerApiService.saveIpg(userToken);
 		} catch (Exception e) {
-			output = playerApiService.handleException(e, locale);
+			output = playerApiService.handleException(e);
 		}
 		return NnNetUtil.textReturn(output);
 	}	
@@ -580,15 +532,16 @@ public class PlayerApiController {
 	 * @return    please refer to channelLineup()
 	 */
 	@RequestMapping(value="loadIpg")
-	public ResponseEntity<String> loadIpg(@RequestParam(value="ipg") Long ipgId, HttpServletRequest req) {
-		log.info("saveIpg(" + ipgId + ")");
-		Locale locale = playerApiService.getLocaleByMso(new MsoManager().findMsoTypeViaHttpReq(req));		
+	public ResponseEntity<String> loadIpg(@RequestParam(value="ipg") Long ipgId, HttpServletRequest req) {		
+		log.info("saveIpg(" + ipgId + ")");		
+		this.prepService(req);
 		String output = NnStatusMsg.errorStr(locale);		
 		try {
-			output = playerApiService.loadIpg(ipgId, locale);
+			output = playerApiService.loadIpg(ipgId);
 		} catch (Exception e) {
-			output = playerApiService.handleException(e, locale);
+			output = playerApiService.handleException(e);
 		}
 		return NnNetUtil.textReturn(output);						
-	}	
+	}
+	
 }
