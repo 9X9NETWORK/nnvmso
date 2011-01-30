@@ -40,7 +40,7 @@ public class InitService {
 		dumper.deleteAll(Subscription.class, list);
 	}
 	
-	private void createMso2DefaultChannels(){
+	private void createMso2DefaultChannels(boolean devel){
 		//prepare data
 		Mso mso = new MsoManager().findByName("5f");
 		NnUserManager userMngr = new NnUserManager();
@@ -51,7 +51,7 @@ public class InitService {
 		CategoryManager categoryMngr = new CategoryManager();
 		Category category = categoryMngr.findByName("喜劇");		
 		MsoChannelManager channelMngr = new MsoChannelManager();
-		MsoChannel channel1 = new MsoChannel("中文伊特", "中文伊特.com", "http://s3.amazonaws.com/9x9chthumb/54e2967caf4e60fe9bc19ef1920997977eae1578.gif", user.getKey());
+		MsoChannel channel1 = new MsoChannel("中文伊特", "中文伊特.com", "http://s3.amazonaws.com/9x9chthumb/54e2967caf4e60fe9bc19ef1920997977eae1578.gif", user.getKey().getId());
 		channel1.setSourceUrl("http://feeds.feedburner.com/etsyetsyetsy");
 		channel1.setPublic(true);
 		categories.add(category);
@@ -79,13 +79,26 @@ public class InitService {
 		Mso mso = new MsoManager().findNNMso();
 		Category c = new CategoryManager().findByName("Activism");
 		List<MsoChannel> channels = new MsoChannelManager().findPublicChannelsByCategoryId(c.getKey().getId());
-		for (int i=0; i<2; i++) {
-			MsoIpg msoIpg = new MsoIpg(mso.getKey(), channels.get(i).getKey(), i+1, MsoIpg.TYPE_READONLY);
-			System.out.println("before name:" + channels.get(i).getName());			
-			msoIpgMngr.create(msoIpg);
+		int counter = 1;
+		int limit = 4;
+		for (int i=0; i<channels.size(); i++) {
+			if (counter > limit) {break;}
+			if (counter < 2) {
+				MsoIpg msoIpg = new MsoIpg(mso.getKey().getId(), channels.get(i).getKey().getId(), counter, MsoIpg.TYPE_READONLY);			
+				msoIpgMngr.create(msoIpg);
+				counter++;
+			}
+			if (counter < 3) {
+				MsoIpg msoIpg = new MsoIpg(mso.getKey().getId(), channels.get(i).getKey().getId(), counter, MsoIpg.TYPE_GENERAL);			
+				msoIpgMngr.create(msoIpg);
+				counter++;
+			}						
+			if (channels.get(i).getName().equals("System Channel")) {
+				MsoIpg msoIpg = new MsoIpg(mso.getKey().getId(), channels.get(2).getKey().getId(), 81, MsoIpg.TYPE_READONLY);
+				msoIpgMngr.create(msoIpg);
+				counter++;
+			}
 		}
-		MsoIpg msoIpg = new MsoIpg(mso.getKey(), channels.get(2).getKey(), 81, MsoIpg.TYPE_GENERAL);
-		msoIpgMngr.create(msoIpg);
 	}
 
 	private void createMso2DefaultIpg() {
@@ -93,11 +106,11 @@ public class InitService {
 		Mso mso = new MsoManager().findByName("5f");
 		Category c = new CategoryManager().findByName("喜劇");
 		List<MsoChannel> channels = new MsoChannelManager().findPublicChannelsByCategoryId(c.getKey().getId());
-		MsoIpg msoIpg = new MsoIpg(mso.getKey(), channels.get(0).getKey(), 1, MsoIpg.TYPE_READONLY);					
+		MsoIpg msoIpg = new MsoIpg(mso.getKey().getId(), channels.get(0).getKey().getId(), 1, MsoIpg.TYPE_READONLY);					
 		msoIpgMngr.create(msoIpg);
 	}
 	
-	private void createMso1DefaultChannels(){
+	private void createMso1DefaultChannels(boolean devel){
 		//prepare data
 		NnUserManager userMngr = new NnUserManager();
 		NnUser user = userMngr.findNNUser();
@@ -109,7 +122,7 @@ public class InitService {
 		categories.add(category);
 		
 		//create channel		
-		MsoChannel channel1 = new MsoChannel("Etsy", "Etsy.com", "http://s3.amazonaws.com/9x9chthumb/54e2967caf4e60fe9bc19ef1920997977eae1578.gif", user.getKey());
+		MsoChannel channel1 = new MsoChannel("Etsy", "Etsy.com", "http://s3.amazonaws.com/9x9chthumb/54e2967caf4e60fe9bc19ef1920997977eae1578.gif", user.getKey().getId());
 		channel1.setSourceUrl("http://feeds.feedburner.com/etsyetsyetsy");
 		channel1.setPublic(true);		
 		channelMngr.create(channel1, categories);
@@ -128,7 +141,7 @@ public class InitService {
 		programMngr.create(channel1, program2);
 		
 		//create channel
-		MsoChannel channel2 = new MsoChannel("TEDTalks (hd)", "TED", "http://s3.amazonaws.com/9x9chthumb/f14a9bb972adfefab1c9c4f0ec44f251686d655a.jpg", user.getKey());		
+		MsoChannel channel2 = new MsoChannel("TEDTalks (hd)", "TED", "http://s3.amazonaws.com/9x9chthumb/f14a9bb972adfefab1c9c4f0ec44f251686d655a.jpg", user.getKey().getId());		
 		channel2.setSourceUrl("http://feeds.feedburner.com/tedtalksHD");
 		channel2.setPublic(true);
 		channelMngr.create(channel2, categories);
@@ -159,7 +172,7 @@ public class InitService {
 		programMngr.create(channel2, program9);
 		
 		//create channel				
-		MsoChannel channel5 = new MsoChannel("System Channel", "System Channel", "/WEB-INF/../images/logo_9x9.png", user.getKey());
+		MsoChannel channel5 = new MsoChannel("System Channel", "System Channel", "/WEB-INF/../images/logo_9x9.png", user.getKey().getId());
 		channel5.setPublic(true);		
 		channelMngr.create(channel5, categories);
 
@@ -170,7 +183,7 @@ public class InitService {
 		programMngr.create(channel5, program7);		
 				
 		//create a channel, but status set to error
-		MsoChannel channel3 = new MsoChannel("Vegan A Go-Go", "A simple vegan cooking show.", "http://s3.amazonaws.com/9x9chthumb/6bb992aafe18c3054ca30035d7e5fe7cc9394d37.jpg", user.getKey());		
+		MsoChannel channel3 = new MsoChannel("Vegan A Go-Go", "A simple vegan cooking show.", "http://s3.amazonaws.com/9x9chthumb/6bb992aafe18c3054ca30035d7e5fe7cc9394d37.jpg", user.getKey().getId());		
 		channel3.setSourceUrl("http://feeds.feedburner.com/veganagogo");
 		channel3.setStatus(MsoChannel.STATUS_ERROR);
 		channel3.setPublic(true);
@@ -191,7 +204,7 @@ public class InitService {
 		programMngr.create(channel3, program6);
 
 		//create a channel, but no programs
-		MsoChannel channel4 = new MsoChannel("Comedy Central's Jokes.com", "", "http://s3.amazonaws.com/9x9cache/1b2885a8ba30ee692b56fd0e9c9128995473367e_1199163600_thumbnail.jpg", user.getKey());		
+		MsoChannel channel4 = new MsoChannel("Comedy Central's Jokes.com", "", "http://s3.amazonaws.com/9x9cache/1b2885a8ba30ee692b56fd0e9c9128995473367e_1199163600_thumbnail.jpg", user.getKey().getId());		
 		channel4.setSourceUrl("http://feeds.feedburner.com/comedycentral/standup");
 		channel4.setPublic(true);
 		channelMngr.create(channel4, categories);				
@@ -201,7 +214,7 @@ public class InitService {
 		//a default MSO
 		MsoManager msoMngr = new MsoManager();
 		Mso mso = new Mso("9x9", "9x9", "mso@9x9.tv", Mso.TYPE_NN);
-		mso.setPreferredLangCode(MsoChannel.LANG_EN);
+		mso.setPreferredLangCode(Mso.LANG_EN);
 		mso.setJingleUrl("/WEB-INF/../videos/logo2.swf");
 		mso.setLogoUrl("/WEB-INF/../images/logo_9x9.png");
 		mso.setLogoClickUrl("/");
@@ -209,13 +222,13 @@ public class InitService {
 		
 		//config
 		MsoConfigManager configMngr = new MsoConfigManager();
-		MsoConfig config = new MsoConfig(mso.getKey(), MsoConfig.CDN, MsoConfig.CDN_AKAMAI);
+		MsoConfig config = new MsoConfig(mso.getKey().getId(), MsoConfig.CDN, MsoConfig.CDN_AKAMAI);
 		configMngr.save(config);
 		
 		//a default MSO user
 		NnUserManager userMngr = new NnUserManager();
 		NnUser user = new NnUser("mso@9x9.tv", "9x9mso", "9x9 mso", NnUser.TYPE_NN);
-		user.setMsoKey(mso.getKey());
+		user.setMsoId(mso.getKey().getId()); //!!!
 		userMngr.create(user);
 		
 		//initialize default categories
@@ -229,7 +242,7 @@ public class InitService {
 				
 		CategoryManager categoryMngr = new CategoryManager();
 		for (String name : categoryStr) {			
-			categoryMngr.create(new Category(name, true, mso.getKey()));
+			categoryMngr.create(new Category(name, true, mso.getKey().getId()));
 		}
 	}
 
@@ -237,21 +250,21 @@ public class InitService {
 		//a default MSO
 		MsoManager msoMngr = new MsoManager();
 		Mso mso = new Mso("5f", "5f", "mso@5f.tv", Mso.TYPE_MSO);
-		mso.setPreferredLangCode(MsoChannel.LANG_ZH_TW);
+		mso.setPreferredLangCode(Mso.LANG_ZH_TW);
 		mso.setJingleUrl("/WEB-INF/../videos/logo2.swf");
-		mso.setLogoUrl("/WEB-INF/../images/5 floor.jpg");
+		mso.setLogoUrl("/WEB-INF/../images/5floor-logo.png");
 		mso.setLogoClickUrl("/");
 		msoMngr.create(mso);
 		
 		//config
 		MsoConfigManager configMngr = new MsoConfigManager();
-		MsoConfig config = new MsoConfig(mso.getKey(), MsoConfig.CDN, MsoConfig.CDN_AKAMAI);
+		MsoConfig config = new MsoConfig(mso.getKey().getId(), MsoConfig.CDN, MsoConfig.CDN_AKAMAI);
 		configMngr.save(config);
 		
 		//a default MSO user
 		NnUserManager userMngr = new NnUserManager();
-		NnUser user = new NnUser("mso@5f.tv", "5ffmso", "5f mso", NnUser.TYPE_TBC);
-		user.setMsoKey(mso.getKey());
+		NnUser user = new NnUser("mso@5f.tv", "5ffmso", "5f mso", NnUser.TYPE_TBC);		
+		user.setMsoId(mso.getKey().getId()); //!!! constructor, or create
 		userMngr.create(user);
 		
 		//initialize default categories
@@ -261,28 +274,21 @@ public class InitService {
 		
 		CategoryManager categoryMngr = new CategoryManager();
 		for (String name : categoryStr) {			
-			categoryMngr.create(new Category(name, true, mso.getKey()));
+			categoryMngr.create(new Category(name, true, mso.getKey().getId()));
 		}
 	}		
 	
-	public void initTestData() {
-		createMso1DefaultChannels();
-		createMso2DefaultChannels();	
-		createMso1DefaultIpg();
-		createMso2DefaultIpg();
-	}
-
 	public void initMsoAndCategories() {
 		initializeMso1AndCategories();
 		initializeMso2AndCategories();	
 	}	
 	
-	public void initAll() {
+	public void initAll(boolean devel) {
 		deleteAll();		
 		initializeMso1AndCategories();
 		initializeMso2AndCategories();	
-		createMso1DefaultChannels();
-		createMso2DefaultChannels();	
+		createMso1DefaultChannels(devel);
+		createMso2DefaultChannels(devel);	
 		createMso1DefaultIpg();
 		createMso2DefaultIpg();		
 	}

@@ -1,5 +1,6 @@
 package com.nnvmso.service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -18,10 +19,21 @@ public class MsoManager {
 	protected static final Logger log = Logger.getLogger(MsoManager.class.getName());
 	
 	private MsoDao msoDao = new MsoDao();
-
-	//@@@IMPORTANT, name duplication check is your responsibility 
+ 
 	public void create(Mso mso) {
-		msoDao.create(mso);
+		if (this.findByName(mso.getName()) == null) {
+			this.save(mso);			
+		}		
+	}
+	
+	public Mso save(Mso mso) {
+		if (mso.getName() != null) {
+			mso.setNameSearch(mso.getName().toLowerCase());
+		}
+		Date now = new Date();
+		if (mso.getCreateDate() == null) {mso.setUpdateDate(now);}
+		mso.setUpdateDate(now);
+		return msoDao.save(mso);
 	}
 	
 	public List<Mso> findByType(short type) {

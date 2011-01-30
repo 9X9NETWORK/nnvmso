@@ -1,27 +1,31 @@
 package com.nnvmso.service;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.google.appengine.api.datastore.Key;
 import com.nnvmso.dao.MsoProgramDao;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoProgram;
-import com.nnvmso.model.NnUser;
-import com.nnvmso.model.Watched;
-import com.nnvmso.lib.*;
+import com.nnvmso.model.ViewLog;
+
 
 @Service
 public class MsoProgramManager {
 	private MsoProgramDao msoProgramDao = new MsoProgramDao();
 	
 	public void create(MsoChannel channel, MsoProgram program) {		
-		program.setChannelKey(channel.getKey());
-		msoProgramDao.create(program);
-		
+		Date now = new Date();
+		program.setCreateDate(now);
+		program.setUpdateDate(now);
+		program.setChannelId(channel.getKey().getId());
+		msoProgramDao.save(program);
+
+		//set channel count
 		int count = channel.getProgramCount() + 1;
 		channel.setProgramCount(count);
 		MsoChannelManager channelMngr = new MsoChannelManager();
@@ -29,55 +33,43 @@ public class MsoProgramManager {
 	}
 	
 	public MsoProgram save(MsoProgram program) {
+		program.setUpdateDate(new Date());
 		return msoProgramDao.save(program);
 	}
 	
-	public List<MsoProgram> findNew(String userKey) {
+	public List<MsoProgram> findNew(long userId) {
 		SubscriptionManager subMngr = new SubscriptionManager();
-		WatchedManager watchedMngr = new WatchedManager();
-		List<MsoChannel> channels = subMngr.findSubscribedChannels(userKey);
-		Key[] channelKeys = new Key[channels.size()];
-		for (int i=0; i< channelKeys.length; i++) {
-			channelKeys[i] = channels.get(i).getKey();
+		ViewLogManager watchedMngr = new ViewLogManager();
+		List<MsoChannel> channels = subMngr.findSubscribedChannels(userId);
+		List<Long> list = new ArrayList<Long>();
+		for (int i=0; i< channels.size(); i++) {
+			list.add(channels.get(i).getKey().getId());
 		}
-		List<Watched> watchedList = watchedMngr.findAllByUserKey(channelKeys);
-		Hashtable<Key, Watched> watchedTable = new Hashtable<Key, Watched>();
-		for (Watched w : watchedList) {
-			watchedTable.put(w.getChannelKey(), w);
+		List<ViewLog> watchedList = watchedMngr.findAllByUserId(list);
+		Hashtable<Long, HashSet<Long>> watchedTable = new Hashtable<Long, HashSet<Long>>();
+		for (ViewLog w : watchedList) {
+			watchedTable.put(w.getChannelId(), w.getPrograms());
 		}
-		List<MsoProgram> programs = msoProgramDao.findNewProgramsByChannels(channels, watchedTable);
+		List<MsoProgram> programs = msoProgramDao.findNewProgramsByChannels(channels, watchedTable);	
 		return programs;
 	} 
-
-	public List<MsoProgram> findAllByKeys(Key[] channelKeys) {
-		return msoProgramDao.findAllByChannelKeys(channelKeys);		
+	
+	public List<MsoProgram> findAllByChannelId(long channelId) {
+		return msoProgramDao.findAllByChannelId(channelId);
 	}
 	
-	public List<MsoProgram> findAllByChannelId(long id) {
-		MsoChannelManager channelMngr = new MsoChannelManager();
-		MsoChannel channel = channelMngr.findById(id);
-		if (channel == null) {return null;}
-		return msoProgramDao.findAllByChannel(channel);
+	public List<MsoProgram> findAllByChannelIdsAndIsPublic(List<Long>channelIds, boolean isPublic) {
+		return msoProgramDao.findAllByChannelIdsAndIsPublic(channelIds, isPublic);
 	}
 	
-	public List<MsoProgram> findAllByChannelIdsAndIsPublic(String channelIds, boolean isPublic) {
-		 String[] idStrArr = channelIds.split(",");		 
-		 long idLongArr[] = new long[idStrArr.length];
-		 for (int i=0; i<idLongArr.length; i++) {
-			 idLongArr[i] = Long.valueOf(idStrArr[i]);
-		 }		
-		return msoProgramDao.findAllByChannelIdsAndIsPublic(idLongArr, isPublic);
-	}
-	
-	//!!! cache key and id exchange to save query !!!
-	public List<MsoProgram> findAllByUser(NnUser user) {
+	public List<MsoProgram> findSubscribedPrograms(long userId) {
 		SubscriptionManager subService = new SubscriptionManager();			
-		List<MsoChannel> channels = subService.findSubscribedChannels(NnStringUtil.getKeyStr(user.getKey()));
+		List<MsoChannel> channels = subService.findSubscribedChannels(userId);
 		List<MsoProgram> programs = new ArrayList<MsoProgram>();
-		String channelIds = "";
+		List<Long> channelIds = new ArrayList<Long>();
 		for (MsoChannel c : channels) {
-			channelIds = channelIds + c.getKey().getId() + ",";
-		}
+			channelIds.add(c.getKey().getId());
+		}		
 		programs = this.findAllByChannelIdsAndIsPublic(channelIds, true);
 		return programs;
 	}

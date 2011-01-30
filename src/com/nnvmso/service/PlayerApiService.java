@@ -4,11 +4,11 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Locale;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
@@ -23,7 +23,9 @@ import org.springframework.stereotype.Service;
 import com.google.appengine.api.datastore.DatastoreFailureException;
 import com.google.appengine.api.datastore.DatastoreNeedIndexException;
 import com.google.appengine.api.datastore.DatastoreTimeoutException;
-import com.google.appengine.api.datastore.Key;
+import com.nnvmso.lib.CookieHelper;
+import com.nnvmso.lib.NnLogUtil;
+import com.nnvmso.lib.NnStringUtil;
 import com.nnvmso.model.Category;
 import com.nnvmso.model.CategoryChannel;
 import com.nnvmso.model.Ipg;
@@ -33,80 +35,41 @@ import com.nnvmso.model.MsoConfig;
 import com.nnvmso.model.MsoIpg;
 import com.nnvmso.model.MsoProgram;
 import com.nnvmso.model.NnUser;
-import com.nnvmso.model.PdrRaw;
-import com.nnvmso.model.Watched;
-import com.nnvmso.lib.*;
 
 @Service
 public class PlayerApiService {
 	
 	private static MessageSource messageSource = new ClassPathXmlApplicationContext("locale.xml");
-	
-	private Locale myLocale;
-	
-	public void setLocale(Locale myLocale) {
-		this.myLocale = myLocale;
-	}
-	 	
 	protected static final Logger log = Logger.getLogger(PlayerApiService.class.getName());	
 	
 	private NnUserManager userMngr = new NnUserManager();	
 	private MsoManager msoMngr = new MsoManager();
+	private Locale locale;
+	private Mso mso;
+	private String separatorStr = "--\n";
 	
-	public String hello() {
-		return messageSource.getMessage("nnstatus.input_missing", new Object[] {NnStatusCode.INPUT_ERROR}, myLocale);
-		
+	public void setLocale(Locale locale) {
+		this.locale = locale;
+	}
+	
+	public void setMso(Mso mso) {
+		this.mso = mso;
+	}	
+	
+	public String findMsoInfo(HttpServletRequest req) {
+		Mso theMso = msoMngr.findMsoViaHttpReq(req);
+		if (theMso == null) {return NnStatusMsg.msoInvalid(locale);}
+		String results = NnStatusMsg.successStr(locale) + separatorStr;
+		results = results + this.assembleKeyValue("key", String.valueOf(mso.getKey().getId()));
+		results = results + this.assembleKeyValue("name", mso.getName());
+		results = results + this.assembleKeyValue("logoUrl", mso.getLogoUrl());
+		results = results + this.assembleKeyValue("jingleUrl", mso.getJingleUrl());
+		results = results + this.assembleKeyValue("logoClickUrl", mso.getJingleUrl());
+		results = results + this.assembleKeyValue("preferredLangCode", mso.getPreferredLangCode()); 
+		return results;
 	}
 
-	public String processPdr(String userKey, String pdr, Locale locale) {
-		if (userKey == null || userKey.length() == 0 || userKey.equals("undefined")) {
-			return NnStatusMsg.inputMissing(locale);
-		}
-		if (pdr == null || pdr.length() == 0) {return NnStatusMsg.successStr(locale);};
-		NnUser user = userMngr.findByKeyStr(userKey);
-		if (user == null) {return NnStatusMsg.userInvalid(locale);}
-		
-		String output = NnStatusMsg.errorStr(locale);
-		log.info("original pdr: \n" + pdr);
-		String[] lines = pdr.split("\n");
-		MsoChannelManager channelMngr = new MsoChannelManager();		
-		WatchedManager watchedMngr= new WatchedManager();
-		PdrRawManager pdrMngr = new PdrRawManager();
-		for (String line : lines) {			
-			String[] data = line.split("\t");	
-			String verb = data[0]; 
-			if (verb.equals("watched")) {
-				long channelId = Long.parseLong(data[1]);
-				MsoChannel c = channelMngr.findById(channelId);
-				Watched watched = watchedMngr.findByUserKeyAndChannelKey(user.getKey(), c.getKey());
-				if (c != null) {
-					for (int i=2; i< data.length; i++) {
-						long programId = Long.parseLong(data[i]);
-						if (watched == null) {
-							watched = new Watched();
-							watched.setChannelKey(c.getKey());
-							watched.setUserKey(user.getKey());
-							watched.getPrograms().add(programId);
-							watchedMngr.create(watched);
-						} else {
-							System.out.println("detach problem occurs:" + watched.getPrograms().toString() );							
-						    if (!watched.getPrograms().contains(programId)) {
-						    	watched.getPrograms().add(programId);
-						    	watchedMngr.save(watched);
-						    }
-						}
-					}
-				}
-			} else {
-				PdrRaw raw = new PdrRaw(user.getKey(), verb, line.replaceFirst(data[0]+"\t", ""));
-				pdrMngr.create(raw);
-			}
-		}
-		output = NnStatusMsg.successStr(locale);
-		return output;
-	}
-	
-	public String handleException (Exception e, Locale locale) {
+	public String handleException (Exception e) {
 		String output = NnStatusMsg.errorStr(locale);
 		if (e.getClass().equals(DatastoreTimeoutException.class)) {
 			output = NnStatusCode.DATABASE_TIMEOUT + "\t" + "database timeout";			
@@ -121,68 +84,69 @@ public class PlayerApiService {
 		return output;
 	}	
 	
-	public String saveIpg(String userKey, Locale locale) {
-		if (userKey == null || userKey.length() == 0 || userKey.equals("undefined")) {
+	public String processPdr(String userToken, String pdr, String session) {
+		//verify input
+		if (userToken == null || userToken.length() == 0 || userToken.equals("undefined")) {
 			return NnStatusMsg.inputMissing(locale);
-		}				
-		NnUser foundUser = userMngr.findByKeyStr(userKey);				
-		if (foundUser == null) { return NnStatusMsg.userInvalid(locale);}				
-		Ipg ipg = new Ipg(foundUser);
-		IpgManager ipgMngr = new IpgManager();
-		ipgMngr.save(ipg);				
-		return NnStatusMsg.successStr(locale) + "\n" + Long.toString(ipg.getId());				
+		}
+		if (pdr == null || pdr.length() == 0) {return NnStatusMsg.successStr(locale);};
+		
+		//verify user
+		NnUser user = userMngr.findByToken(userToken);
+		if (user == null) {return NnStatusMsg.userInvalid(locale);}
+		
+		//pdr process
+		String output = NnStatusMsg.errorStr(locale);
+		PdrRawManager pdrMngr = new PdrRawManager();
+		pdrMngr.processPdr(pdr, user.getKey().getId(), session);
+		output = NnStatusMsg.successStr(locale);
+		return output;
 	}
 	
-	public String loadIpg(long ipgId, Locale locale) {
+	public String saveIpg(String userToken) {
+		if (userToken == null || userToken.length() == 0 || userToken.equals("undefined")) {
+			return NnStatusMsg.inputMissing(locale);
+		}				
+		NnUser foundUser = userMngr.findByToken(userToken);				
+		if (foundUser == null) { return NnStatusMsg.userInvalid(locale);}
+		
+		Ipg ipg = new Ipg();
+		IpgManager ipgMngr = new IpgManager();
+		ipgMngr.create(ipg, foundUser.getKey().getId());				
+		return NnStatusMsg.successStr(locale) + separatorStr + Long.toString(ipg.getId());				
+	}
+	
+	public String loadIpg(long ipgId) {
 		IpgManager ipgMngr = new IpgManager();
 		Ipg ipg = ipgMngr.findById(ipgId);
 		if (ipg == null) { return messageSource.getMessage("nnstatus.ipg_invalid", new Object[] {NnStatusCode.IPG_INVALID} , locale);} 
 		List<MsoChannel> channels = ipgMngr.findIpgChannels(ipg);
 		String output = NnStatusMsg.successStr(locale);
 		for (MsoChannel c : channels) {
-			output = output + this.composeChannelLineupStr(c);
+			output = output + this.composeChannelLineupStr(c, mso);
 			output = output + "\n";			
 		}
 		return output;		
 	}
-		
-	public Locale getLocaleByMso(short msoType) {
-		Locale locale = Locale.ENGLISH;
-		if (msoType != Mso.TYPE_NN) { locale = Locale.TRADITIONAL_CHINESE; }
-		return locale;
-	}
-	
-	public String moveChannel(String userKey, String grid1, String grid2, Locale locale) {		
+			
+	public String moveChannel(String userToken, String grid1, String grid2) {		
 		//verify input
-		if (userKey == null || userKey.length() == 0 || userKey.equals("undefined") || grid1 == null || grid2 == null) {
+		if (userToken == null || userToken.length() == 0 || userToken.equals("undefined") || grid1 == null || grid2 == null) {
 			return NnStatusMsg.inputMissing(locale);
 		}
 		if (!Pattern.matches("^\\d*$", grid1) || !Pattern.matches("^\\d*$", grid2)) {
 			return messageSource.getMessage("nnstatus.input_error", new Object[] {NnStatusCode.SUCCESS} , locale);
 		}		
-		NnUser user = userMngr.findByKeyStr(userKey);
+		NnUser user = userMngr.findByToken(userToken);
 		if (user == null) { return messageSource.getMessage("nnstatus.input_error", new Object[] {NnStatusCode.SUCCESS} , locale); }
 		
 		SubscriptionManager subMngr = new SubscriptionManager();
-		boolean success = subMngr.changeSeq(user.getKey(), Integer.parseInt(grid1), Integer.parseInt(grid2));
+		boolean success = subMngr.changeSeq(user.getKey().getId(), Integer.parseInt(grid1), Integer.parseInt(grid2));
 		if (success) { return NnStatusMsg.successStr(locale); }
 		return NnStatusMsg.successStr(locale);
 	}
 	
-	public String findMsoInfo(HttpServletRequest req, Locale locale) {
-		Mso mso = msoMngr.findMsoViaHttpReq(req);
-		if (mso == null) {return NnStatusMsg.msoInvalid(locale);}
-		String results = NnStatusMsg.successStr(locale);
-		results = results + "key" + "\t" +NnStringUtil.getKeyStr(mso.getKey()) + "\n";
-		results = results + "name"  + "\t" + mso.getName() + "\n";
-		results = results + "logoUrl"  + "\t" + mso.getLogoUrl() + "\n";
-		results = results + "jingleUrl" + "\t"+ mso.getJingleUrl() + "\n";
-		results = results + "logoClickUrl" + "\t"+ mso.getJingleUrl() + "\n";
-		results = results + "preferredLangCode" + "\t" + mso.getPreferredLangCode() + "\n"; 
-		return results;
-	}
-
-	public String findLocaleByHttpRequest(HttpServletRequest req, Locale locale) {
+	public String findLocaleByHttpRequest(HttpServletRequest req) {
 		String ip = req.getRemoteAddr();
 		log.info("findLocaleByHttpRequest() ip is " + ip);
         String country = "";
@@ -204,25 +168,24 @@ public class PlayerApiService {
 		} else if (country.equals("")) {
 			localeCode = "default";
 		}
-		return NnStatusMsg.successStr(locale) + localeCode;
+		return NnStatusMsg.successStr(locale) + separatorStr + localeCode;
 	}
 	 
-	public String findCategoriesByUser(String userKey, HttpServletRequest req) {
-		Locale locale = this.getLocaleByMso(msoMngr.findMsoTypeViaHttpReq(req));
-		//verify input
-		if (userKey == null || userKey.length() == 0 || userKey.equals("undefined")) {
-			return NnStatusMsg.inputMissing(locale);
-		}		
-		//verify user		
-		NnUser user = userMngr.findByKeyStr(userKey);
-		if (user == null) {
-			return NnStatusMsg.userInvalid(locale);
-		}		
-		//find categories
-		return NnStatusMsg.successStr(locale) + this.getCategoriesByMsoKey(user.getMsoKey(), locale);
-	}
+//	public String findCategoriesByUser(String userKey) {
+//		//verify input
+//		if (userKey == null || userKey.length() == 0 || userKey.equals("undefined")) {
+//			return NnStatusMsg.inputMissing(locale);
+//		}		
+//		//verify user		
+//		NnUser user = userMngr.findByKeyStr(userKey);
+//		if (user == null) {
+//			return NnStatusMsg.userInvalid(locale);
+//		}		
+//		//find categories
+//		return NnStatusMsg.successStr(locale) + this.getCategoriesByMsoKey(user.getMsoKey(), locale);
+//	}
 			
-	public String findPublicChannelsByCategory(String categoryId, Locale locale) {		
+	public String findPublicChannelsByCategory(String categoryId) {		
 		//verify input
 		List<MsoChannel> channels = new ArrayList<MsoChannel>();
 		if (categoryId == null || categoryId.length() < 1) { return NnStatusMsg.inputMissing(locale); }
@@ -231,12 +194,12 @@ public class PlayerApiService {
 		//find public channels by categoryId
 		MsoChannelManager channelMngr = new MsoChannelManager();
 		channels = channelMngr.findPublicChannelsByCategoryId(Long.parseLong(categoryId));
-		if (channels == null) {
-			return NnStatusMsg.successStr(locale); 
-		}
+		if (channels == null) { return NnStatusMsg.successStr(locale);}
+		
+		//assemble output
 		log.info("find " + channels.size() + " of channels in category, category id:" + categoryId);
-		String result = NnStatusMsg.successStr(locale);
-		result = result + categoryId + "\n";
+		String result = NnStatusMsg.successStr(locale) + separatorStr;
+		result = result + categoryId + "\n" + separatorStr;
 		for (int i=0; i< channels.size(); i++) {	
 			if (channels.get(i).getProgramCount() > 0 ) {
 				String[] ori = {String.valueOf(channels.get(i).getSeq()),
@@ -250,18 +213,10 @@ public class PlayerApiService {
 		}
 		return result;
 	}	
-	
-	public String findCategoriesByMsoName(String msoName, HttpServletRequest req, Locale locale) {
-		//give a default MSO if msoName does not exist		
-		Mso mso = msoMngr.findMsoViaHttpReq(req);
-		return this.getCategoriesByMsoKey(mso.getKey(), locale);
-	}
-	
-	public String guestCreate(String ipgId, HttpServletRequest req, HttpServletResponse resp, Locale locale) {				
-		// find mso 
-		Mso mso = msoMngr.findMsoViaHttpReq(req);
+		
+	public String createGuest(String ipgId, HttpServletRequest req, HttpServletResponse resp) {
+		//verify input
 		if (mso == null) { return NnStatusMsg.errorStr(locale); }
-
 		if (ipgId != null) {
 			IpgManager ipgMngr = new IpgManager();
 			Ipg ipg = ipgMngr.findById(Long.decode(ipgId));
@@ -269,47 +224,73 @@ public class PlayerApiService {
 				return messageSource.getMessage("nnstatus.ipg_invalid", new Object[] {NnStatusCode.IPG_INVALID} , locale);
 			}
 		}		
-				
+		
 		//create guest
 		String password = String.valueOf(("token" + Math.random() + new Date().getTime()).hashCode());
-		NnUser guest = new NnUser(NnUser.GUEST_EMAIL, password, NnUser.GUEST_NAME, NnUser.TYPE_USER, mso.getKey());		
+		NnUser guest = new NnUser(NnUser.GUEST_EMAIL, password, NnUser.GUEST_NAME, NnUser.TYPE_USER, mso.getKey().getId());		
 		userMngr.create(guest);
+		System.out.println(guest.getToken());
 		
 		//subscribe default channels		
 		userMngr.subscibeDefaultChannels(guest);
+		
+		//prepare cookie and output
 		String output = this.prepareUserInfo(guest, req, resp);
 		return output;
 	}
-	
-	public String prepareUserInfo(NnUser user, HttpServletRequest req, HttpServletResponse resp) {
-		String[] results = {"0", 
-							String.valueOf(NnStringUtil.getKeyStr(user.getKey())),
-							user.getName(),
-							String.valueOf(user.getMsoKey().getId())};
-		String output = NnStringUtil.getDelimitedStr(results);
-		this.setUserCookie(resp, NnStringUtil.getKeyStr(user.getKey()));
-		Locale locale = this.getLocaleByMso(msoMngr.findMsoTypeViaHttpReq(req));
-		return NnStatusMsg.successStr(locale) + output;
+
+	//assemble key and value string
+	private String assembleKeyValue(String key, String value) {
+		return key + "\t" + value + "\n";
 	}
 	
-	public String channelSubscribe(String userKey, String channelId, String grid, Locale locale) {
-		if (userKey == null || channelId == null || grid == null ||
-			userKey.equals("undefined")) {
+	//Prepare user info, set user cookie, it is used by login, guest register, userTokenVerify
+	public String prepareUserInfo(NnUser user, HttpServletRequest req, HttpServletResponse resp) {
+		String output = NnStatusMsg.successStr(locale) + separatorStr;		
+		output = output + assembleKeyValue("token", user.getToken());
+		output = output + assembleKeyValue("name", user.getName()); 		
+		this.setUserCookie(resp, user.getToken());
+		return output;
+	}
+	
+	public void setUserCookie(HttpServletResponse resp, String userId) {
+		CookieHelper.setCookie(resp, CookieHelper.USER, userId);
+	}	
+		
+	public String unsubscribeChannel(String userToken, String channelId) {
+		//verify input
+		if (userToken == null || channelId == null || userToken.equals("undefined")) {			
 			return NnStatusMsg.inputMissing(locale);
 		}
-		if (!Pattern.matches("^\\d*$", channelId) || Pattern.matches("^\\d*$", grid)) {
+		if (!Pattern.matches("^\\d*$", channelId)) {
 			return NnStatusMsg.inputError(locale);
+		}		
+		//verify user
+		NnUser user = new NnUserManager().findByToken(userToken);
+		if (user == null) {return NnStatusMsg.userInvalid(locale);}		
+		SubscriptionManager subMngr = new SubscriptionManager();
+		subMngr.unsubscribeChannel(user.getKey().getId(), Long.parseLong(channelId));
+		return NnStatusMsg.successStr(locale);		
+	}
+	
+	public String subscribeChannel(String userToken, String channelId, String grid) {
+		//verify input
+		if (userToken == null || channelId == null || grid == null || userToken.equals("undefined")) {			
+			return NnStatusMsg.inputMissing(locale);
 		}
-		
-		String output = messageSource.getMessage("nnstatus.channel_or_user_invalid", new Object[] {NnStatusCode.CHANNEL_OR_USER_INVALID} , locale);
-		
-		NnUser user = new NnUserManager().findByKeyStr(userKey);
+		if (!Pattern.matches("^\\d*$", channelId) || !Pattern.matches("^\\d*$", grid)) {
+			return NnStatusMsg.inputError(locale);
+		}		
+		//verify user and channel
+		String output = messageSource.getMessage("nnstatus.channel_or_user_invalid", new Object[] {NnStatusCode.CHANNEL_OR_USER_INVALID} , locale);		
+		NnUser user = new NnUserManager().findByToken(userToken);
 		if (user == null) {return output;}		
 		MsoChannel channel = new MsoChannelManager().findById(Long.parseLong(channelId));
 		if (channel == null || channel.getStatus() == MsoChannel.STATUS_ERROR) { return output;}			
 				
+		//subscribe
 		SubscriptionManager subMngr = new SubscriptionManager();
-		boolean status = subMngr.channelSubscribe(user, channel, Integer.valueOf(grid), MsoIpg.TYPE_GENERAL);
+		boolean status = subMngr.subscribeChannel(user.getKey().getId(), channel.getKey().getId(), Integer.valueOf(grid), MsoIpg.TYPE_GENERAL);
 		if (status) {
 			output = NnStatusMsg.successStr(locale);
 		} else {
@@ -318,59 +299,58 @@ public class PlayerApiService {
 		return output;		
 	}
 
-	public String userCreate(String email, String password, String name, String userToken, HttpServletRequest req, HttpServletResponse resp, Locale locale) {
+	public String createUser(String email, String password, String name, String userToken, 
+			                 HttpServletRequest req, HttpServletResponse resp) {
 		//verify input		
 		if (email == null || password == null || name == null ||
 			email.length() == 0 || password.length() == 0 || name.length() == 0 ||
 			email.equals("undefined")) {
 			return NnStatusMsg.inputMissing(locale);
 		}
-		
+		String regex = "^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$";
+		if (!Pattern.matches(regex, email) || password.length() < 6) {		
+			return messageSource.getMessage("nnstatus.input_error", new Object[] {NnStatusCode.SUCCESS} , locale);
+		}
+			
 		//find mso
-		Mso mso = msoMngr.findMsoViaHttpReq(req);
 		if (mso == null) { return NnStatusMsg.msoInvalid(locale);}
 		
 		//verify email
 		NnUser user = userMngr.findByEmailAndMso(email, mso);
 		if (user != null) {
-			log.info("user email taken:" + user.getEmail() + ";user msokey=" + user.getMsoKey() + ";msokey:" + mso.getKey());
+			log.info("user email taken:" + user.getEmail() + "; mso=" + mso.getName() + ";user token=" + user.getToken());
 			return messageSource.getMessage("nnstatus.user_email_taken", new Object[] {NnStatusCode.USER_EMAIL_TAKEN} , locale);
 		}
 		
 		//create user
-		if (userToken != null) { user = userMngr.findByKeyStr(userToken);}
+		if (userToken != null) { user = userMngr.findByToken(userToken);}
 		if (user == null ) {
 			log.info("User signup userToken NOT FOUND. Token=" + userToken);
-			user = new NnUser(email, password, name, NnUser.TYPE_USER, mso.getKey());
+			user = new NnUser(email, password, name, NnUser.TYPE_USER, mso.getKey().getId());
 			userMngr.create(user); 
 			userMngr.subscibeDefaultChannels(user);
 		} else {
-			log.info("User signup with token=" + userToken + "; email=" + user.getEmail() + "; name=" + user.getName());					 		
+			log.info("User signup with guest token=" + userToken + "; email=" + user.getEmail() + "; name=" + user.getName());					 		
 			if (user.getEmail().equals(NnUser.GUEST_EMAIL)) {
 				log.info("1st time signup after being a guest");
 				user.setEmail(email);
 				user.setPassword(password);
 				user.setName(name);
-				userMngr.save(user);				
+				userMngr.save(user);
 			} else {
-				return messageSource.getMessage("nnstatus.user_token_taken", new Object[] {NnStatusCode.USER_TOKEN_TAKEN} , locale);
-				
+				return messageSource.getMessage("nnstatus.user_token_taken", new Object[] {NnStatusCode.USER_TOKEN_TAKEN} , locale);				
 			}
 		}
 		String output = this.prepareUserInfo(user, req, resp);
 		return output;
-	}					
+	}
 	
-	public void setUserCookie(HttpServletResponse resp, String userId) {
-		CookieHelper.setCookie(resp, CookieHelper.USER, userId);
-	}	
-    
-	public String findUserByToken(String token, HttpServletRequest req, HttpServletResponse resp, Locale locale) {
+	public String findUserByToken(String token, HttpServletRequest req, HttpServletResponse resp) {
 		if (token == null) {return NnStatusMsg.inputMissing(locale);}
 		
-		NnUser found = userMngr.findByKeyStr(token);			
-		Mso mso = new MsoManager().findMsoViaHttpReq(req);
-		if (found == null || (found != null && !found.getMsoKey().equals(mso.getKey()))) {
+		NnUser found = userMngr.findByToken(token);	
+		
+		if (found == null || (found != null && found.getMsoId() != mso.getKey().getId())) {
 			CookieHelper.deleteCookie(resp, CookieHelper.USER);
 			return NnStatusMsg.userInvalid(locale);
 		}
@@ -378,28 +358,27 @@ public class PlayerApiService {
 		return this.prepareUserInfo(found, req, resp);
 	}
 	
-	public String findAuthenticatedUser(String email, String password, HttpServletRequest req, HttpServletResponse resp, Locale locale) {		
-		Mso mso= new MsoManager().findMsoViaHttpReq(req);		
-		String output = messageSource.getMessage("nnstatus.user_login_failed", new Object[] {NnStatusCode.USER_LOGIN_FAILED} , locale);
-		NnUser user = userMngr.findAuthenticatedUser(email, password, mso);
+	public String findAuthenticatedUser(String email, String password, HttpServletRequest req, HttpServletResponse resp) {		
+		log.info("login: email=" + email + "; mso=" + mso.getName());
+		String output = messageSource.getMessage("nnstatus.user_login_failed", new Object[] {NnStatusCode.USER_LOGIN_FAILED} , locale);		
+		NnUser user = userMngr.findAuthenticatedUser(email, password, mso.getKey().getId());
 		if (user != null) {
 			output = this.prepareUserInfo(user, req, resp);
 		}
 		return output;
 	}
 
-	public String createChannel(String categoryIds, String userKey, String url, String grid, HttpServletRequest req, Locale locale) {
+	public String createChannel(String categoryIds, String userToken, String url, String grid, HttpServletRequest req) {
 		//verify input
 		if (url == null || url.length() == 0 ||  grid == null || 
 			categoryIds == null || categoryIds.equals("undefined") ||
-			userKey == null || userKey.length() == 0 || grid.length() == 0) {
+			userToken== null || userToken.length() == 0 || grid.length() == 0) {
 			return NnStatusMsg.inputMissing(locale);
 		}
 		
 		//verify user
-		NnUser user = userMngr.findByKeyStr(userKey);
-		if (user == null) { return NnStatusMsg.userInvalid(locale);}
-
+		NnUser user = userMngr.findByToken(userToken);
+		if (user == null) { return NnStatusMsg.userInvalid(locale);}		
 		if (user.getEmail().equals(NnUser.GUEST_EMAIL)) {
 			return messageSource.getMessage("nnstatus.user_permission_error", new Object[] {NnStatusCode.USER_PERMISSION_ERROR} , locale);
 		}
@@ -420,10 +399,10 @@ public class PlayerApiService {
 			//update category if necessary
 			CategoryChannelManager ccMngr = new CategoryChannelManager();
 			// --find existing categories
-			List<CategoryChannel> ccs = ccMngr.findByChannelKey(channel.getKey()); 			
+			List<CategoryChannel> ccs = ccMngr.findAllByChannelId(channel.getKey().getId()); 			
 			HashMap<Long, String> existing = new HashMap<Long, String>();
 			for (CategoryChannel cc : ccs) {
-				existing.put(cc.getCategoryKey().getId(), "");
+				existing.put(cc.getCategoryId(), "");
 			}
 			// --find new category user defines if there's any 
 			String[] ids = categoryIds.split(",");
@@ -440,7 +419,7 @@ public class PlayerApiService {
 				for (String id : newIds) {
 					Category c = categoryMap.get(Long.valueOf(id));
 					log.info("a duplicate url but new category:" + c.getName() + ";" + c.getKey().getId());
-					ccMngr.create(new CategoryChannel(c.getKey(), channel.getKey()));
+					ccMngr.create(new CategoryChannel(c.getKey().getId(), channel.getKey().getId()));
 				}
 			}
 		}
@@ -468,27 +447,34 @@ public class PlayerApiService {
 		
 		//subscribe
 		SubscriptionManager subMngr = new SubscriptionManager();
-		subMngr.channelSubscribe(user, channel, Integer.parseInt(grid), MsoIpg.TYPE_GENERAL);		
+		subMngr.subscribeChannel(user.getKey().getId(), channel.getKey().getId(), Integer.parseInt(grid), MsoIpg.TYPE_GENERAL);		
 		String result[]= {String.valueOf(channel.getKey().getId()),				  	 	  
 				  	 	  channel.getName(),
 				  	 	  channel.getImageUrl()};
-		return NnStatusMsg.successStr(locale) + NnStringUtil.getDelimitedStr(result);
+		return NnStatusMsg.successStr(locale) + separatorStr + NnStringUtil.getDelimitedStr(result);
 	}
 				
-	public String findSubscribedChannels(String userKey, Locale locale) {
-		if (userKey == null) {return NnStatusMsg.inputMissing(locale);}
+	public String findSubscribedChannels(String userToken) {
+		//verify input
+		if (userToken == null) {return NnStatusMsg.inputMissing(locale);}
+		
+		//verify user
+		NnUser user = userMngr.findByToken(userToken);
+		if (user == null) {return NnStatusMsg.userInvalid(locale);}
+		
+		//find subscribed channels 
 		SubscriptionManager subMngr = new SubscriptionManager();
-		List<MsoChannel> channels = subMngr.findSubscribedChannels(userKey);
-		String result = NnStatusMsg.successStr(locale);
+		List<MsoChannel> channels = subMngr.findSubscribedChannels(user.getKey().getId());
+		String result = NnStatusMsg.successStr(locale) + separatorStr;
 		for (MsoChannel c : channels) {
-			result = result + this.composeChannelLineupStr(c);
+			result = result + this.composeChannelLineupStr(c, mso);
 			result = result + "\n";
 		}
 		return result;
 	}
 	
-	public String programInfo(String channelIds, String userKeyStr, String ipgId, Locale locale, HttpServletRequest req) {
-		if (channelIds == null || (channelIds.equals("*") && userKeyStr == null)) {
+	public String findProgramInfo(String channelIds, String userToken, String ipgId) {
+		if (channelIds == null || (channelIds.equals("*") && userToken == null)) {
 			return NnStatusMsg.inputMissing(locale);
 		}
 		MsoProgramManager programMngr = new MsoProgramManager();		
@@ -501,38 +487,42 @@ public class PlayerApiService {
 			programs = ipgMngr.findIpgPrograms(ipg);
 			log.info("ipg program count: " + programs.size());
 		} else if (channelIds.equals("*")) {
-			NnUser user = userMngr.findByKeyStr(userKeyStr);
+			NnUser user = userMngr.findByToken(userToken);
 			if (user == null) { return NnStatusMsg.userInvalid(locale); }
-			programs = programMngr.findAllByUser(user);
+			programs = programMngr.findSubscribedPrograms(user.getKey().getId());
 		} else if (chArr.length > 1) {
-			programs = programMngr.findAllByChannelIdsAndIsPublic(channelIds, true);
+			List<Long> list = new ArrayList<Long>();
+			for (int i=0; i<chArr.length; i++) { list.add(Long.valueOf(chArr[i]));}
+			programs = programMngr.findAllByChannelIdsAndIsPublic(list, true);
 		} else {
 			programs = programMngr.findAllByChannelId(Long.parseLong(channelIds));
 		}		
-		
-		Mso mso = msoMngr.findMsoViaHttpReq(req);		
-		MsoConfig config = new MsoConfigManager().findByMsoAndItem(mso, MsoConfig.CDN);
-		if (config == null) {return NnStatusMsg.errorStr(locale);}
-		
-		return NnStatusMsg.successStr(locale) + this.composeProgramInfoStr(programs, config);
+				
+		MsoConfig config = new MsoConfigManager().findByMsoIdAndItem(mso.getKey().getId(), MsoConfig.CDN);
+		if (config == null) {
+			config = new MsoConfig(mso.getKey().getId(), MsoConfig.CDN, MsoConfig.CDN_AMAZON);
+			log.severe("mso config does not exist! mso: " + mso.getKey());
+		}
+		System.out.println("program size:" + programs.size());		
+		return NnStatusMsg.successStr(locale) + separatorStr + this.composeProgramInfoStr(programs, config);
 	}
 
-	private String getCategoriesByMsoKey(Key msoKey, Locale locale) {
+	public String findCategoriesByMso() {
 		CategoryManager categoryMngr = new CategoryManager();	
-		List<Category> categories = categoryMngr.findAllByMsoKey(msoKey);
+		List<Category> categories = categoryMngr.findAllByMsoId(mso.getKey().getId());
 				
-		String output = NnStatusMsg.successStr(locale);
+		String output = NnStatusMsg.successStr(locale) + separatorStr;
 		for (Category c : categories) {
 			String[] str = {String.valueOf(c.getKey().getId()), c.getName(), String.valueOf(c.getChannelCount())};
 			output = output + NnStringUtil.getDelimitedStr(str) + "\n";			
-		}		
+		}
+		
 		if (categories.size() < 1) { return messageSource.getMessage("nnstatus.category_invalid", new Object[] {NnStatusCode.CATEGORY_INVALID} , locale);}
-		
-		
+			
 		return output;
 	}
 		
-	private String composeChannelLineupStr(MsoChannel c) {
+	private String composeChannelLineupStr(MsoChannel c, Mso mso) {
 		String intro = c.getIntro();
 		if (intro != null) {
 			int introLenth = (intro.length() > 256 ? 256 : intro.length()); 
@@ -543,6 +533,10 @@ public class PlayerApiService {
 		String imageUrl = c.getImageUrl();
 		if (c.getStatus() == MsoChannel.STATUS_ERROR) {
 			imageUrl = "/WEB-INF/../images/error.jpg";
+		} else if (c.getStatus() == MsoChannel.STATUS_PROCESSING) {
+			if (mso.getPreferredLangCode().equals(Mso.LANG_ZH_TW)) {
+				imageUrl = "/WEB-INF/../images/processing_cn.png";
+			}
 		}
 
 		String[] ori = {Integer.toString(c.getSeq()), 
@@ -604,7 +598,7 @@ public class PlayerApiService {
 			}
 					
 			//the rest
-			String[] ori = {String.valueOf(p.getChannelKey().getId()), 
+			String[] ori = {String.valueOf(p.getChannelId()), 
 					        String.valueOf(p.getKey().getId()), 
 					        p.getName(), 
 					        intro,
@@ -624,10 +618,12 @@ public class PlayerApiService {
 		return output;		
 	}
 	
-	public String findNewPrograms(String userKey, Locale locale) {
+	public String findNewPrograms(String userToken) {
+		NnUser user = userMngr.findByToken(userToken);
+		if (user == null) {return NnStatusMsg.userInvalid(locale);}
 		MsoProgramManager programMngr = new MsoProgramManager();
-		List<MsoProgram> programs = programMngr.findNew(userKey);
-		String output = NnStatusMsg.successStr(locale);
+		List<MsoProgram> programs = programMngr.findNew(user.getKey().getId());
+		String output = NnStatusMsg.successStr(locale) + separatorStr;
 		for (MsoProgram p : programs) {
 			output = output + p.getKey().getId() + "\n";			
 		}

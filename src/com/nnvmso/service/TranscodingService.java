@@ -131,8 +131,7 @@ public class TranscodingService {
 		boolean isNew = false;
 		if (program == null) {
 			isNew = true;
-			program = new MsoProgram("", "", "", MsoProgram.TYPE_VIDEO);			
-			program.setChannelKey(channel.getKey());
+			program = new MsoProgram("", "", "", MsoProgram.TYPE_VIDEO);
 		}					
 		if (item.getTitle() != null) { program.setName(item.getTitle()); }					
 		

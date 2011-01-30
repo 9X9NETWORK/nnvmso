@@ -1,13 +1,12 @@
 package com.nnvmso.service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
 import org.springframework.stereotype.Service;
 
-import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
 import com.nnvmso.model.*;
 import com.nnvmso.dao.*;
 
@@ -17,52 +16,50 @@ public class SubscriptionManager {
 	protected static final Logger log = Logger.getLogger(SubscriptionManager.class.getName());
 	
 	SubscriptionDao subDao = new SubscriptionDao(); 
+
+	public List<Subscription> findAllByUser(long userId) {
+		return subDao.findAllByUserId(userId);
+	}
 	
-	//!!! is it necessary to make it boolean, or check if user is null etc
-	public boolean channelSubscribe(NnUser user, MsoChannel channel, int seq, short type) {
-		if (user == null || channel == null) {return false;}
-		Subscription existed = subDao.findByUserKeyAndChannelKey(user.getKey(), channel.getKey());
+	public boolean subscribeChannel(long userId, long channelId, int seq, short type) {
+		Subscription existed = subDao.findByUserIdAndChannelId(userId, channelId);
 		if (existed != null) {
 			log.info("user trying to subscribe a channel that has been subscribed.");
 			return false;
 		}
-		Subscription s = new Subscription(user.getKey(), channel.getKey(), seq, type);
-		subDao.create(s);
-		log.info("user subscribe a new channel " + channel.getKey().getId() + ";grid=" + seq);
+		Subscription s = new Subscription(userId, channelId, seq, type);
+		Date now = new Date();
+		s.setCreateDate(now);
+		s.setUpdateDate(now);
+		subDao.save(s);
+		log.info("user subscribe a new channel " + channelId + ";grid=" + seq);
 		return true;
 	}
 	
-	public void channelUnsubscribe(String userKey, long channelId) {
-		MsoChannel channel = new MsoChannelDao().findById(channelId);
-		try {
-			Subscription s = subDao.findByUserKeyAndChannelKey(KeyFactory.stringToKey(userKey), channel.getKey());
-			subDao.delete(s);
-		} catch (IllegalArgumentException e) { log.info("invalid key string"); }
+	public void unsubscribeChannel(long userId, long channelId) {
+		Subscription s = subDao.findByUserIdAndChannelId(userId, channelId);
+		if (s != null) { subDao.delete(s); }
 	}
-
-	public List<MsoChannel> findSubscribedChannels(String userKey) {
-		try {
-			List<Subscription> subs = subDao.findAllByUserKey(KeyFactory.stringToKey(userKey));
-			System.out.println("subscription: " + subs.size());
-			List<MsoChannel> channels = new ArrayList<MsoChannel>();
-			MsoChannelDao channelDao = new MsoChannelDao();		
-			for (Subscription s : subs) {
-				MsoChannel c = channelDao.findByKey(s.getChannelKey()); //!!!
-				c.setSeq(s.getSeq());
-				c.setType(s.getType());
-				channels.add(c);
-			}
-			return channels;
-		} catch (IllegalArgumentException e) {
-			 log.info("invalid key string");
+	
+	//!!! findByIds
+	public List<MsoChannel> findSubscribedChannels(long userId) {
+		List<Subscription> subs = subDao.findAllByUserId(userId);
+		System.out.println("subscription: " + subs.size());
+		List<MsoChannel> channels = new ArrayList<MsoChannel>();
+		MsoChannelDao channelDao = new MsoChannelDao();		
+		for (Subscription s : subs) {
+			MsoChannel c = channelDao.findById(s.getChannelId()); //!!!
+			c.setSeq(s.getSeq());
+			c.setType(s.getType());
+			channels.add(c);
 		}
-		return null;			 
+		return channels;			 
 	}
 
-	public boolean changeSeq(Key userKey, int seq1, int seq2) {
-		List<Subscription> subs = subDao.findAllByUserKeyAndSeq(userKey, seq1, seq2);
+	public boolean changeSeq(long userId, int seq1, int seq2) {
+		List<Subscription> subs = subDao.findAllByUserIdAndSeq(userId, seq1, seq2);
 		if (subs.size() != 2) {
-			log.info("Chagne seq does not find matching data. User key=" + userKey + "; seq1=" + seq1 + "; seq2=" + seq2);
+			log.info("Chagne seq does not find matching data. User key=" + userId + "; seq1=" + seq1 + "; seq2=" + seq2);
 			return false;
 		}
 		System.out.println("subs1=" + subs.get(0).getKey().getId() + ";" + subs.get(0).getSeq() + ";subs2=" + subs.get(1).getKey().getId() + ";" + subs.get(1).getSeq());

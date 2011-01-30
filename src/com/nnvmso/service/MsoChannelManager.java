@@ -1,6 +1,7 @@
 package com.nnvmso.service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -29,11 +30,16 @@ public class MsoChannelManager {
 	 * setProgramCount will be done automatically in MsoProgramManager when a program is added.
 	 * If necessary to manually change programCount, please do with caution.    	
 	 */
-	public void create(MsoChannel channel, List<Category> categories) {		
-		msoChannelDao.create(channel);
+	public void create(MsoChannel channel, List<Category> categories) {
+		Date now = new Date();
+		channel.setCreateDate(now);
+		channel.setUpdateDate(now);
+		msoChannelDao.save(channel);
 		CategoryChannelManager ccMngr = new CategoryChannelManager();
-		for (Category c : categories) {
-			ccMngr.create(new CategoryChannel(c.getKey(), channel.getKey()));
+		if (channel.getStatus() == MsoChannel.STATUS_SUCCESS && channel.isPublic() == true) {
+			for (Category c : categories) {
+				ccMngr.create(new CategoryChannel(c.getKey().getId(), channel.getKey().getId()));
+			}
 		}
 	}
 	
@@ -42,16 +48,16 @@ public class MsoChannelManager {
 	}		
 	
 	public MsoChannel initChannelSubmittedFromPlayer(String sourceUrl, NnUser user) {
-		MsoChannel channel = new MsoChannel(sourceUrl, user.getKey());
+		MsoChannel channel = new MsoChannel(sourceUrl, user.getKey().getId());
 		channel.setContentType(this.getContentTypeByUrl(sourceUrl));		
+		channel.setImageUrl("/WEB-INF/../images/processing.png");
 		if (channel.getContentType() == MsoChannel.CONTENTTYPE_PODCAST) {
 			channel.setName("Podcast Processing");
-			channel.setImageUrl("/WEB-INF/../images/podcastDefault.jpg");
 		} else if (channel.getType() == MsoChannel.CONTENTTYPE_YOUTUBE) {
 			channel.setName("Youtube Processing");
-			channel.setImageUrl("/WEB-INF/../images/youtube_videos.gif");
 		}
-		channel.setNnUserKey(user.getKey());
+		channel.setStatus(MsoChannel.STATUS_PROCESSING);
+		channel.setUserId(user.getKey().getId());
 		channel.setPublic(false);
 		return channel;
 	}
@@ -79,15 +85,15 @@ public class MsoChannelManager {
 		return valid;
 	}
 
-	public List<MsoChannel> findMsoDefaultChannels(Key msoKey) {		
+	public List<MsoChannel> findMsoDefaultChannels(long msoId) {		
 		//find msoIpg
 		MsoIpgManager msoIpgMngr = new MsoIpgManager();
-		List<MsoIpg>msoIpg = msoIpgMngr.findByMsoKey(msoKey);				
+		List<MsoIpg>msoIpg = msoIpgMngr.findAllByMsoId(msoId);				
 		
 		//retrieve channels
 		List<MsoChannel> channels = new ArrayList<MsoChannel>();
 		for (MsoIpg i : msoIpg) {
-			MsoChannel channel = msoChannelDao.findByKey(i.getChannelKey());
+			MsoChannel channel = msoChannelDao.findById(i.getChannelId());
 			if (channel != null) {
 				channel.setType(i.getType());
 				channel.setSeq(i.getSeq());
@@ -108,22 +114,20 @@ public class MsoChannelManager {
 	public MsoChannel findBySourceUrl(String url) {
 		return msoChannelDao.findBySourceUrl(url);
 	}
-		
-	//!!! return null a good idea? or category should be handled by outside.
-	public List<MsoChannel> findPublicChannelsByCategoryId(long id) {
-		//get category
-		CategoryManager categoryMngr= new CategoryManager();
-		Category category = categoryMngr.findById(id);
-		if (category == null) {return null;}
-		
+
+	public MsoChannel findByName(String name) {
+		return msoChannelDao.findByName(name);
+	}
+	
+	public List<MsoChannel> findPublicChannelsByCategoryId(long categoryId) {
 		//channels within a category
 		CategoryChannelManager ccMngr = new CategoryChannelManager();
-		List<CategoryChannel> ccs = (List<CategoryChannel>) ccMngr.findByCategoryKey(category.getKey());
+		List<CategoryChannel> ccs = (List<CategoryChannel>) ccMngr.findAllByCategoryId(categoryId);
 
 		//retrieve channels
 		List<MsoChannel> channels = new ArrayList<MsoChannel>();
 		for (CategoryChannel cc : ccs) {
-			MsoChannel channel = msoChannelDao.findByKey(cc.getChannelKey());
+			MsoChannel channel = msoChannelDao.findById(cc.getChannelId());
 			if (channel != null && channel.getStatus() != MsoChannel.STATUS_ERROR && channel.getProgramCount() > 0) {
 				channels.add(channel);
 			}
