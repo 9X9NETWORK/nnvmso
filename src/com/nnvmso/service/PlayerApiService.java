@@ -217,12 +217,12 @@ public class PlayerApiService {
 	public String createGuest(String ipgId, HttpServletRequest req, HttpServletResponse resp) {
 		//verify input
 		if (mso == null) { return NnStatusMsg.errorStr(locale); }
+		IpgManager ipgMngr = new IpgManager();
+		Ipg ipg = null;
 		if (ipgId != null) {
-			IpgManager ipgMngr = new IpgManager();
-			Ipg ipg = ipgMngr.findById(Long.decode(ipgId));
-			if (ipg == null) { 
+			ipg = ipgMngr.findById(Long.decode(ipgId));
+			if (ipg == null) 
 				return messageSource.getMessage("nnstatus.ipg_invalid", new Object[] {NnStatusCode.IPG_INVALID} , locale);
-			}
 		}		
 		
 		//create guest
@@ -231,8 +231,15 @@ public class PlayerApiService {
 		userMngr.create(guest);
 		System.out.println(guest.getToken());
 		
-		//subscribe default channels		
-		userMngr.subscibeDefaultChannels(guest);
+		//subscribe default channels
+		if (ipg != null) {
+			SubscriptionManager sMngr = new SubscriptionManager();
+			List<MsoChannel> ipgChannels = ipgMngr.findIpgChannels(ipg);
+			for (MsoChannel c : ipgChannels)
+				sMngr.subscribeChannel(guest.getKey().getId(), c.getKey().getId(), c.getSeq(), c.getType());			
+		} else {
+			userMngr.subscibeDefaultChannels(guest);
+		}
 		
 		//prepare cookie and output
 		String output = this.prepareUserInfo(guest, req, resp);

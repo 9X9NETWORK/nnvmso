@@ -71,8 +71,6 @@ public class IpgManager {
 		MsoChannel c;
 		for (Enumeration<Integer> e = hash.keys(); e.hasMoreElements();) {
 			Integer grid = (Integer)e.nextElement();
-			System.out.println("grid:" + grid);
-			System.out.println("channel:" + hash.get(grid));
 			c = msoChannelMngr.findById(hash.get(grid));
 			if (c != null) {
 				c.setSeq(grid.intValue());
