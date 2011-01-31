@@ -29,7 +29,10 @@ public class InitService {
 
 		list = dumper.findAll(MsoChannel.class, "createDate");
 		dumper.deleteAll(MsoChannel.class, list);
-				
+
+		list = dumper.findAll(MsoConfig.class, "createDate");
+		dumper.deleteAll(MsoConfig.class, list);
+		
 		list = dumper.findAll(MsoProgram.class, "createDate");
 		dumper.deleteAll(MsoProgram.class, list);
 		
