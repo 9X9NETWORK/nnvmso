@@ -2,6 +2,8 @@ package com.nnvmso.web.admin;
 
 import java.util.List;
 import java.util.logging.Logger;
+import java.lang.Short;
+import java.lang.Integer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -61,5 +63,27 @@ public class AdminMsoChannelController {
 		}
 		String output = NnStringUtil.getDelimitedStr(title) + result + "\n";
 		return NnNetUtil.textReturn(output);	
+	}
+	
+	@RequestMapping("modify")
+	public @ResponseBody String modify(@RequestParam(required=true)  String key,
+	                                   @RequestParam(required=false) String name,
+	                                   @RequestParam(required=false) String status,
+	                                   @RequestParam(required=false) String programCount) {
+		
+		logger.info("name: " + name + " status: " + status + " programCount: " + programCount + " key: " + key);
+		MsoChannel channel = channelMngr.findByKeyStr(key);
+		if (channel == null)
+			return "Channel Not Found";
+		
+		if (name != null)
+			channel.setName(name);
+		if (status != null)
+			channel.setStatus(Short.parseShort(status));
+		if (programCount != null)
+			channel.setProgramCount(Integer.parseInt(programCount));
+		
+		channelMngr.save(channel);
+		return "OK";
 	}
 }

@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.springframework.stereotype.Service;
 
@@ -13,9 +14,14 @@ import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoProgram;
 import com.nnvmso.model.ViewLog;
 
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 
 @Service
 public class MsoProgramManager {
+	
+	protected static final Logger log = Logger.getLogger(MsoProgramManager.class.getName());
+	
 	private MsoProgramDao msoProgramDao = new MsoProgramDao();
 	
 	public void create(MsoChannel channel, MsoProgram program) {		
@@ -82,4 +88,16 @@ public class MsoProgramManager {
 		return msoProgramDao.findById(id);
 	}
 	
+	public MsoProgram findByKey(Key key) {
+		return msoProgramDao.findByKey(key);
+	}
+	
+	public MsoProgram findByKeyStr(String key) {
+		try {
+		  return this.findByKey(KeyFactory.stringToKey(key));
+		} catch (IllegalArgumentException e) {
+			log.info("invalid key string");
+			return null;
+		}
+	}
 }

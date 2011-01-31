@@ -16,6 +16,8 @@ import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoProgram;
 import com.nnvmso.service.PlayerApiService;
 
+import com.google.appengine.api.datastore.Key;
+
 public class MsoProgramDao {
 	
 	protected static final Logger log = Logger.getLogger(PlayerApiService.class.getName());	
@@ -133,4 +135,15 @@ public class MsoProgramDao {
 		return program;		
 	}	
 	
+	public MsoProgram findByKey(Key key) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		MsoProgram program = null;
+		try {
+			program = pm.getObjectById(MsoProgram.class, key);
+			program = pm.detachCopy(program);
+		} catch (JDOObjectNotFoundException e) {
+		}		
+		pm.close();
+		return program;		
+	}	
 }
