@@ -19,7 +19,7 @@
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.8/i18n/jquery-ui-i18n.min.js"></script>
 
 <script type="text/javascript" src="http://static.ak.fbcdn.net/connect/en_US/core.debug.js"></script>
-<script type="text/javascript" src="http://zoo.atomics.org/video/cssanim.js"></script>
+<!--script type="text/javascript" src="http://zoo.atomics.org/video/cssanim.js"></script-->
 <script type="text/javascript" src="http://zoo.atomics.org/video/swfobject.js"></script>
 <script type="text/javascript" src="http://zoo.atomics.org/video/9x9playerV31/javascripts/jquery.swfobject.1-1-1.min.js"></script>
 <script type="text/javascript" src="http://zoo.atomics.org/video/flowplayer-3.2.4.min.js"></script>
@@ -502,7 +502,7 @@ function parse_program_data (data)
 
   var lines = data.split ('\n');
 
-  log ('number of programs obtained: ' + lines.length);
+  log ('number of programs obtained: ' + (lines.length - 3));
 
   if (lines.length > 0)
     {
@@ -513,7 +513,7 @@ function parse_program_data (data)
       return;
       }
 
-    for (var i = 1; i < lines.length; i++)
+    for (var i = 2; i < lines.length; i++)
       {
       if (lines [i] != '')
         {
@@ -552,7 +552,7 @@ function fetch_channels()
         conv [++n] = "" + y + "" + x;
 
     var lines = data.split ('\n');
-    log ('number of channels obtained: ' + lines.length);
+    log ('number of channels obtained: ' + (lines.length - 3));
 
     var fields = lines[0].split ('\t');
     if (fields [0] != '0')
@@ -561,7 +561,7 @@ function fetch_channels()
       return;
       }
 
-    for (var i = 1; i < lines.length; i++)
+    for (var i = 2; i < lines.length; i++)
       {
       if (lines [i] != '')
         {
@@ -996,36 +996,13 @@ function prepare_channel()
 function enter_channel()
   {
   $("#epend-layer").hide();
-
   prepare_channel();
-
-  //if (jQuery.browser.msie && jQuery.browser.version == '8.0')
-  if (true)
-    {
-    $("#control-layer").hide();
-    redraw_program_line();
-    $("#ep-layer").show();
-    thumbing = 'program';
-    enter_channel_failsafe();
-    reset_osd_timex();
-    return;
-    }
-  }
-
-function enter_channel_failsafe()
-  {
-  // prepare_channel();
-
-  $("#ep-layer").css ("opacity", "1");
-  $("#ep-swish").css ("top", "1.4275em");
-  $("#ep-swish").css ("display", "block");
-
-  $("#control-layer").css ("opacity", "1");
-
-  if (thumbing == 'program')
-    $("#ep-layer").show();
-
+  $("#control-layer").hide();
+  redraw_program_line();
+  $("#ep-layer").show();
+  thumbing = 'program';
   turn_off_ancillaries();
+  reset_osd_timex();
   }
 
 function ep_html()
@@ -1748,12 +1725,12 @@ function switch_to_whats_new()
       return;
       }
 
-    log ('number of new programs obtained: ' + lines.length);
+    log ('number of new programs obtained: ' + (lines.length - 3));
 
     var wn = {};
     var wn_count = 0;
 
-    for (var i = 1; i < lines.length; i++)
+    for (var i = 2; i < lines.length; i++)
       {
       var program = lines [i].replace (/\s+$/, '');
       if (program != '')
@@ -2068,8 +2045,6 @@ function redraw_ipg()
                       { setTimeout ('move_channel ("' + ui.draggable.attr('id') + '", "' + $(this).attr('id') + '")', 20); }
          });
     });
-
-  // ipg_cursor = parseInt (channel_line [channel_cursor]);
 
   if (ipg_cursor > 0)
     $("#ipg-" + ipg_cursor).addClass ("on");
@@ -2896,6 +2871,28 @@ function getcookie (id)
   return undefined;
   }
 
+function sign_in_or_out()
+  {
+  if (username != 'Guest' && username != '')
+    {
+    var d = $.get ("/playerAPI/signout?user=" + user, function (data)
+      {
+      var lines = data.split ('\n');
+
+      var fields = lines[0].split ('\t');
+      if (fields [0] != '0')
+        {
+        log ('[signout] server error: ' + lines [0]);
+        return;
+        }
+
+      login();
+      });
+    }
+  else
+    login_screen();
+  }
+
 function login_screen()
   {
   /* this may have received focus */
@@ -2930,17 +2927,25 @@ function submit_login()
   
   $.post ("/playerAPI/login", serialized, function (data)
     {
+    log ('login raw data: ' + data);
+
     var lines = data.split ('\n');
     var fields = lines[0].split ('\t');
 
     if (fields [0] == "0")
       {
-      var fields = lines[1].split ('\t');
+      for (var i = 2; i < lines.length; i++)
+        {
+        fields = lines [i].split ('\t');
+        if (fields [0] == 'token')
+          user = fields [1];
+        else if (fields [0] == 'name')
+          username = fields [1];
+        }
 
-      user = fields [1];
-      username = fields [2];
       $("#user").html (username);
       log ('[explicit login] welcome ' + username + ', AKA ' + user);
+      solicit();
 
       if (readonly_ipg)
         {
@@ -2957,7 +2962,6 @@ function submit_login()
       resume();
       activated = false;
 
-      /* fetch_programs(); */
       fetch_everything();
       }
     else
@@ -2992,12 +2996,18 @@ function submit_signup()
 
     if (fields [0] == "0")
       {
-      fields = lines[1].split ('\t');
+      for (var i = 2; i < lines.length; i++)
+        {
+        fields = lines [i].split ('\t');
+        if (fields [0] == 'token')
+          user = fields [1];
+        else if (fields [0] == 'name')
+          username = fields [1];
+        }
 
-      user = fields [1];
-      username = fields [2];
       $("#user").html (username);
       log ('[login via signup] welcome ' + username + ', AKA ' + user);
+      solicit();
 
       if (readonly_ipg)
         {
@@ -3011,18 +3021,6 @@ function submit_signup()
       programgrid = {};
       escape();
 
-      if (fields.length >= 3)
-        {
-        //log_and_alert ('signed up as user: ' + fields [2]);
-        username = fields [2];
-        $("#user").html (username);
-        }
-      else
-        {
-        //log_and_alert ('signed up as user: ' + user);
-        }
-
-      /* fetch_programs(); */
       fetch_everything();
       }
     else
@@ -3046,6 +3044,12 @@ function submit_throw()
     return;
     }
 
+  if (username == 'Guest' || username == '')
+    {
+    feedback (false, 'You must be logged in!');
+    return;
+    }
+
   /* always called from IPG, use ipg_cursor */
   var categories = '';
 
@@ -3056,20 +3060,26 @@ function submit_throw()
       { categories += ','; }
     categories += browsables [id]['category'];
     });
-//xxzz
+
+  if (categories == '')
+    {
+    feedback (false, 'Please select a category for this channel');
+    return;
+    }
+
   var url = encodeURIComponent ($("#submit-url").val());
+
+  if (url == '')
+    {
+    feedback (false, 'Please provide a URL');
+    return;
+    }
 
   // $("#throw").serialize()
   var serialized =  'url=' + url + '&' + 'user=' + user + '&' + 'grid=' + server_grid (ipg_cursor) + '&' + 'langCode=' + language + '&' + 'category=' + categories;
   log ('throw: ' + serialized);
 
   feedback (true, 'Please wait...');
-
-  if (username == 'Guest' || username == '')
-    {
-    feedback (false, 'You must be logged in!');
-    return;
-    }
 
   $.post ("/playerAPI/channelSubmit", serialized, function (data)
     {
@@ -3081,8 +3091,8 @@ function submit_throw()
       feedback (true, 'Successful!');
       //escape();
       log ('podcast thrown successfully!')
-      log ('channelSubmit returned: ' + lines[1]);
-      fields = lines[1].split('\t');
+      log ('channelSubmit returned: ' + data);
+      fields = lines[2].split('\t');
       // fields: 0=channel-id 1=channel-name 2=channel-thumb
       channelgrid [ipg_cursor] = { 'id': fields[0], 'name': fields[1], 'thumb': fields[2] };
       channels_by_id [fields[0]] = ipg_cursor;
@@ -3133,7 +3143,7 @@ function dirty()
     /* once program data is returned, remove those channels from dirty list */
 
     var lines = data.split ('\n');
-    for (var i = 1; i < lines.length; i++)
+    for (var i = 2; i < lines.length; i++)
       {
       if (lines [i] != '')
         {
@@ -3170,7 +3180,7 @@ function pre_login()
     var fields = lines[0].split ('\t');
     if (fields[0] == '0')
       {
-      for (var i = 1; i < lines.length; i++)
+      for (var i = 2; i < lines.length; i++)
         {
         var fields = lines[i].split ('\t');
         if (fields[0] == 'loglUrl')
@@ -3217,6 +3227,14 @@ log ('opening display: ' + $("#opening").css('display'));
   jingled = true;
   }
 
+function solicit()
+  {
+  if (username == 'Guest' || username == '')
+    $("#solicit").html ("Sign in / Sign up");
+  else
+    $("#solicit").html ("Sign out");
+  }
+
 function login()
   {
   log ('login')
@@ -3242,17 +3260,24 @@ function login()
       if (fields[0] == '0')
         {
         log ('user token was valid');
-        fields = lines[1].split ('\t');
 
-        user = u;
-        username = fields[2];
+        for (var i = 2; i < lines.length; i++)
+          {
+          fields = lines [i].split ('\t');
+          if (fields [0] == 'token')
+            user = fields [1];
+          else if (fields [0] == 'name')
+            username = fields [1];
+          }
+
         $("#user").html (username);
+        solicit();
+
         log ('[login via cookie] welcome ' + username + ', AKA ' + user);
 
         if (via_shared_ipg)
           readonly_ipg = true;
 
-        /* fetch_programs(); */
         fetch_everything();
         }
       else
@@ -3276,20 +3301,39 @@ function login()
       log ('response to guestRegister: ' + data);
       var u = getcookie ("user");
 
-      var fields = data.split ('\t');
-      if (!u && fields [0] == '0')
+      var lines = data.split ('\n');
+      var fields = lines[0].split ('\t');
+
+      if (fields [0] == '0')
         {
-        log ('no "user" cookie, but login was successful: ' + fields [1])
-        user = fields [1];
-        /* fetch_programs(); */
+        if (u)
+          log ('user cookie now exists');
+        else
+          log ('no "user" cookie, but login was successful')
+
+        for (var i = 2; i < lines.length; i++)
+          {
+          fields = lines [i].split ('\t');
+          if (fields [0] == 'token')
+            user = fields [1];
+          else if (fields [0] == 'name')
+            username = fields [1];
+          }
+
+        $("#user").html (username);
+        log ('[guest login, without cookie] welcome ' + username + ', AKA ' + user);
+        solicit();
+
         fetch_everything();
         }
       else if (u)
         {
-        log ('user cookie now exists');
+        log ('guest register failed, but user cookie now exists');
         user = u;
+        username = u;
+        $("#user").html (username);
+        solicit();
         via_shared_ipg = false;
-        /* fetch_programs(); */
         fetch_everything();
         }
       else
@@ -3364,7 +3408,7 @@ function browse()
       }
 
     n_browse = 0;
-    for (var i = 1; i < lines.length; i++)
+    for (var i = 2; i < lines.length; i++)
       {
       if (lines [i] != '')
         {
@@ -3797,7 +3841,7 @@ function browse_category (category_id)
       return;
       }
 
-    var category = parseInt (lines[1]);
+    var category = parseInt (lines[2]);
 
     if (category != browser_cat)
       {
@@ -3812,16 +3856,11 @@ function browse_category (category_id)
     n_browse_list = 0;
     browse_list_first = 1;
 
-    /* remove the status code line */
-    lines.shift();
-    lines.shift();
-
-    for (var i = 0; i < lines.length; i++)
+    for (var i = 4; i < lines.length; i++)
       {
       if (lines [i] != '')
         {
         var fields = lines[i].split ('\t');
-log ('BROWSE: ' + fields[1]);
         if (parseInt (fields[1]) > 0)
           {
           n_browse_list++;
@@ -5308,7 +5347,7 @@ function noop (e)
     <div id="header">
       <img src="http://zoo.atomics.org/video/9x9playerV31/images/logo.png" id="logo">
       <p id="user-name">Hello, <span id="user">Guest</span></p>  
-      <ul id="control-list"><li><a href="javascript:login_screen()" class="btn" id="ipg-btn-signin"><span>Sign in / Sign up</span></a></li><li><a href="javascript:;" class="btn" id="btn-signout"><span>Sign out</span></a></li><li><a href="javascript:;" class="btn" id="ipg-btn-resume"><span>Resume Watching</span></a></li></ul>
+      <ul id="control-list"><li><a href="javascript:sign_in_or_out()" class="btn" id="ipg-btn-signin"><span id="solicit">Sign in / Sign up</span></a></li><li><a href="javascript:;" class="btn" id="btn-signout"><span>Sign out</span></a></li><li><a href="javascript:;" class="btn" id="ipg-btn-resume"><span>Resume Watching</span></a></li></ul>
     </div>
     <div id="ipg-content">
       <ul id="info-list">
