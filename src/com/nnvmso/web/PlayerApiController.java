@@ -30,7 +30,9 @@ import com.nnvmso.service.PlayerApiService;
  * <p>General rules:<br/>
  *    API always returns a string. <br/>
  *    First line is status code and status message, separated by tab. <br/>
- *    The second line starts data listing if any, data is tab separated, different record is \n separated. <br/>
+ *    If there is second set of data, it will be separated from the status line by "--\n" <br/>
+ *    Different sets of data are separated by "--\n" <br/>
+ *    Follows data listing if any, data is tab separated, different record is \n separated. <br/>
  * </p>
  */
 @Controller
@@ -358,6 +360,7 @@ public class PlayerApiController {
 	 * Get all of a user's subscriptions. 
 	 * 
 	 * @param user user's unique identifier
+	 * @param userInfo true or false. Whether to return user information as login. If asked, it will be returned after status code. 
 	 * @return <p>A string of all of the user's subscribed channels' information.</p>  
 	 *         <p>Channel info has following fields: 
 	 *         <blockquote> grid id, channel id,  <br/>
@@ -373,10 +376,11 @@ public class PlayerApiController {
 												@RequestParam(value="userInfo", required=false) String userInfo,
 											    HttpServletRequest req) {
 		this.prepService(req);
-		log.info("userToken=" + userToken);				
+		log.info("userToken=" + userToken + ";isUserInfo:" + userInfo);				
+		boolean isUserInfo = Boolean.parseBoolean(userInfo);
 		String output = NnStatusMsg.errorStr(locale);
 		try {
-			output = playerApiService.findSubscribedChannels(userToken);
+			output = playerApiService.findSubscribedChannels(userToken, isUserInfo);
 		} catch (Exception e){
 			output = playerApiService.handleException(e);
 		}
@@ -479,7 +483,8 @@ public class PlayerApiController {
 	 * @param  channel (1)Could be *, all the programs, e.g. channel=* (user is required for wildcard query). 
 	 * 		           (2)Could be a channel Id, e.g. channel=1 <br/>
 	 * 		           (3)Could be list of channels, e.g. channels = 34,35,36.
-	 * @param  user user's unique identifier, it is required for wildcard query 
+	 * @param  user user's unique identifier, it is required for wildcard query
+	 * @param  userInfo true or false. Whether to return user information as login. If asked, it will be returned after status code. 
 	 * @param  ipg  ipg's unique identifier, it is required for wildcard query
 	 * @return <p>Programs info. Each program is separate by \n.</p>
 	 *   	   <p>Program info has: <br/>
@@ -497,8 +502,9 @@ public class PlayerApiController {
 									          HttpServletRequest req) {
 		this.prepService(req);		
 		String output = NnStatusMsg.errorStr(locale);
+		boolean isUserInfo = Boolean.parseBoolean(userInfo);
 		try {
-			output =  playerApiService.findProgramInfo(channelIds, userToken, ipgId);
+			output =  playerApiService.findProgramInfo(channelIds, userToken, ipgId, isUserInfo);
 		} catch (Exception e){
 			output = playerApiService.handleException(e);
 		}
