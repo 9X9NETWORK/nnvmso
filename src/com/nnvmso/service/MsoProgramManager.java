@@ -35,7 +35,7 @@ public class MsoProgramManager {
 		int count = channel.getProgramCount() + 1;
 		channel.setProgramCount(count);
 		MsoChannelManager channelMngr = new MsoChannelManager();
-		channelMngr.save(channel);
+		channelMngr.save(null, channel);
 	}
 	
 	public MsoProgram save(MsoProgram program) {

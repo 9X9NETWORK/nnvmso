@@ -42,8 +42,20 @@ public class MsoChannelManager {
 			}
 		}
 	}
-	
-	public MsoChannel save(MsoChannel channel) {
+
+	public MsoChannel save(MsoChannel originalState, MsoChannel channel) {
+		/*
+		if (channel.getStatus() == MsoChannel.STATUS_SUCCESS && channel.isPublic() == true && 
+			(originalState.getStatus() != MsoChannel.STATUS_SUCCESS || !originalState.isPublic()) ) {						
+		}
+		CategoryChannelManager ccMngr = new CategoryChannelManager();
+		if (channel.getStatus() == MsoChannel.STATUS_SUCCESS && channel.isPublic() == true) {
+			for (Category c : categories) {
+				ccMngr.create(new CategoryChannel(c.getKey().getId(), channel.getKey().getId()));
+			}
+		}				
+		if (originalState == null) { msoChannelDao.save(channel);}
+		*/
 		return msoChannelDao.save(channel);
 	}		
 	

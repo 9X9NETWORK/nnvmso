@@ -46,6 +46,7 @@ public class TranscodingService {
 	public PostResponse updateChannel(RtnChannel podcast) {
 		MsoChannelManager channelMngr = new MsoChannelManager();
 		MsoChannel channel = channelMngr.findByKeyStr(podcast.getKey());
+		MsoChannel originalState = channel;
 		if (channel == null) {
 			return new PostResponse(String.valueOf(NnStatusCode.CHANNEL_INVALID), "CHANNEL_INVALID");
 		}
@@ -53,7 +54,7 @@ public class TranscodingService {
 			channel.setPublic(false);
 			channel.setStatus(MsoChannel.STATUS_ERROR);
 			channel.setErrorReason(podcast.getErrorReason());
-			channelMngr.save(channel);
+			channelMngr.save(originalState, channel);
 			return new PostResponse(String.valueOf(NnStatusCode.SUCCESS), "SUCCESS"); 
 		}
 		String name = podcast.getTitle(); 
@@ -72,7 +73,7 @@ public class TranscodingService {
 			channel.setUpdateDate(new Date(Long.parseLong(podcast.getPubDate())*1000));
 		}
 		channel.setPublic(true);
-		channelMngr.save(channel);		
+		channelMngr.save(originalState, channel);		
 		return new PostResponse(String.valueOf(NnStatusCode.SUCCESS), "SUCCESS");
 	}
 
@@ -114,6 +115,7 @@ public class TranscodingService {
 		RtnProgramItem item = rtnProgram.getItems()[0]; //for now there's only one item		
 		log.info("updateProgramViaTranscodingService(): " + item.toString());
 		MsoChannel channel = channelMngr.findByKeyStr(rtnProgram.getKey());		
+		MsoChannel originalState = channel;
 		if (channel == null) {
 			return new PostResponse(String.valueOf(NnStatusCode.CHANNEL_INVALID), "channel invalid");
 		}
@@ -124,7 +126,7 @@ public class TranscodingService {
 		
 		if (channel.isPublic() != true) {
 			channel.setPublic(true);
-			channelMngr.save(channel);
+			channelMngr.save(originalState, channel);
 		}
 		
 		MsoProgram program = programMngr.findByStorageId(item.getItemId());
