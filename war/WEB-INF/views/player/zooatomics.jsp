@@ -1561,7 +1561,7 @@ function keypress (keycode)
       else if (thumbing == 'channel')
         enter_channel();
       else if (thumbing == 'control')
-        switch_to_ipg();
+        control_up();
       else if (thumbing == 'browse')
         browse_up();
       else if (thumbing == 'ipg')
@@ -1571,7 +1571,7 @@ function keypress (keycode)
     case 40:
       /* down arrow */
       if (thumbing == 'control')
-        enter_channel();
+        control_down();
       else if (thumbing == 'end')
         {
         $("#epend-layer").hide();
@@ -5005,9 +5005,60 @@ function physical_replay()
     }
   }
 
+function physical_volume()
+  {
+  switch (tube())
+    {
+    case "fp":
+
+      if (flowplayer)
+        {
+        try
+          {
+          return flowplayer (fp_player).getVolume() / 100;
+          }
+        catch (error)
+          {
+          return 0.5;
+          }
+        }
+      else
+        return false;
+
+    case "yt":
+      if (ytplayer && ytplayer.getVolume)
+        return ytplayer.getVolume() / 100;
+      else
+        return 1;
+    }
+  }
+
+function physical_set_volume (volume)
+  {
+  if (volume > 1)
+    volume = 1;
+  else if (volume < 0)
+    volume = 0;
+
+  switch (tube())
+    {
+    case "fp":
+
+      if (flowplayer)
+        try { flowplayer (fp_player).setVolume (volume * 100); } catch (error) {};
+      break;
+
+    case "yt":
+
+      if (ytplayer && ytplayer.setVolume)
+        ytplayer.setVolume (100 * volume);
+
+      break;
+    }
+  }
+
 function update_progress_bar()
   {
-  // log ('progress');
   var pct = 100 * physical_offset() / physical_length();
 
   if (pct >= 0)
@@ -5068,7 +5119,24 @@ function switch_to_control_layer()
     $("#btn-pause").show();
     }
 
+  control_volume();
   $("#control-layer").show();
+  }
+
+function control_volume()
+  {
+  var bars = Math.round (physical_volume() * 7);
+
+  var html = '';
+  for (var i = 7; i >= 1; i--)
+    {
+    if (i > bars)
+      html += '<li></li>'
+    else
+      html += '<li class="on"></li>';
+    }
+
+  $("#volume-bars").html (html);
   }
 
 function control_left()
@@ -5105,6 +5173,34 @@ function control_right()
 
   if (control_buttons [control_cursor] == 'btn-play')
     $('#btn-pause').addClass ("on");
+  }
+
+function control_up()
+  {
+  if (control_buttons [control_cursor] == 'btn-volume')
+    {
+    var volume = physical_volume();
+    volume += 1/7;
+    if (volume > 1.0) volume = 1.0;
+    physical_set_volume (volume);
+    control_volume();
+    }
+  else
+    switch_to_ipg();
+  }
+
+function control_down()
+  {
+  if (control_buttons [control_cursor] == 'btn-volume')
+    {
+    var volume = physical_volume();
+    volume -= 1/7;
+    if (volume < 0) volume = 0;
+    physical_set_volume (volume);
+    control_volume();
+    }
+  else
+    enter_channel();
   }
 
 function control_enter()
