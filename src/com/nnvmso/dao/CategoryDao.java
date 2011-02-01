@@ -89,7 +89,7 @@ public class CategoryDao {
 	}
 	
 	//!!! contains query
-	public List<Category> findAllByIds(long[] ids) {
+	public List<Category> findAllByIds(List<Long> ids) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		List<Category> categories= new ArrayList<Category>();
 		for (long id : ids) {
