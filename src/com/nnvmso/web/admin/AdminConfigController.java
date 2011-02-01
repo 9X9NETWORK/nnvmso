@@ -1,7 +1,5 @@
 package com.nnvmso.web.admin;
 
-import java.util.Locale;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -16,12 +14,13 @@ import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoConfig;
 import com.nnvmso.service.MsoConfigManager;
 import com.nnvmso.service.MsoManager;
-import com.nnvmso.service.NnStatusMsg;
 import com.nnvmso.service.TranscodingService;
 
 @Controller
 @RequestMapping("admin/config")
 public class AdminConfigController {
+	
+	//check transcoding server setting
 	@RequestMapping("transcodingServer")
 	public ResponseEntity<String> transcodingServer(HttpServletRequest req) {
 		TranscodingService tranService = new TranscodingService();
@@ -36,6 +35,7 @@ public class AdminConfigController {
 		return NnNetUtil.textReturn(output);
 	}
 	
+	//check current mso, if it returns the expected data
 	@RequestMapping("mso")
 	public ResponseEntity<String> mso(HttpServletRequest req) {
 		Mso mso = new MsoManager().findMsoViaHttpReq(req);
@@ -44,12 +44,14 @@ public class AdminConfigController {
 		return NnNetUtil.textReturn(output);
 	}
 	
+	//change mso, for devel testing on local machine
 	@RequestMapping("changeMso")
 	public ResponseEntity<String> changeMso(@RequestParam(value="mso",required=false) String mso, HttpServletRequest req, HttpServletResponse resp) {
 		CookieHelper.setCookie(resp, CookieHelper.MSO, mso);
 		return NnNetUtil.textReturn("OK");		
 	}
 	
+	//change config 
 	@RequestMapping("changeConfig")
 	public ResponseEntity<String> changeConfig(@RequestParam(value="msoName",required=false) String msoName,
 			                                   @RequestParam(value="key",required=false) String key,
