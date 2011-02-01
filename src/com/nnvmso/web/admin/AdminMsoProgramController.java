@@ -40,10 +40,13 @@ public class AdminMsoProgramController {
 		return "error/exception";				
 	}
 
+	/*
 	@RequestMapping("list")
 	public ResponseEntity<String> list(@RequestParam(value="channelKey", required = false)String channelKey) {
 		List<MsoProgram> programs = null;
-		if (channelKey == null)
+		//find all programs, including the not public ones
+		//!!! maybe should use id in transcoding service as well. delimit the use of channel key
+		if (channelKey == null)			
 			programs = programMngr.findPublicPrograms();
 		else
 			programs = programMngr.findAllByChannelKeyStr(channelKey);
@@ -62,6 +65,7 @@ public class AdminMsoProgramController {
 		String output = NnStringUtil.getDelimitedStr(title) + "\n" + result;
 		return NnNetUtil.textReturn(output);
 	}
+	*/
 	
 	@RequestMapping("modify")
 	public @ResponseBody String modify(@RequestParam(required=true)  String key,

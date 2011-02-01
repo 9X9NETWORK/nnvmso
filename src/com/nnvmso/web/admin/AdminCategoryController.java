@@ -1,6 +1,7 @@
 package com.nnvmso.web.admin;
 
 import java.util.logging.Logger;
+import java.util.ArrayList;
 import java.util.List;
 import java.lang.Boolean;
 import java.lang.Long;
@@ -40,10 +41,14 @@ public class AdminCategoryController {
 	public ResponseEntity<String> list(@RequestParam(required=false)String ids) {
 		
 		List<Category> categories = null;
-		if (ids == null)
+		if (ids == null) {
 			categories = categoryMngr.findAll();
-		else
-			categories = categoryMngr.findAllByIds(ids);
+		} else {	
+			List<Long> categoryIdList = new ArrayList<Long>();	
+			String[] arr = ids.split(",");
+			for (int i=0; i<arr.length; i++) { categoryIdList.add(Long.parseLong(arr[i])); }			
+			categories = categoryMngr.findAllByIds(categoryIdList);
+		}
 		
 		String[] title = {"key", "msoId", "isPublic", "channelCount", "name"};
 		String result = "";
