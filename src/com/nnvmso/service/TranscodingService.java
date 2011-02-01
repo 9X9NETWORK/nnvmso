@@ -57,6 +57,7 @@ public class TranscodingService {
 			channelMngr.save(originalState, channel);
 			return new PostResponse(String.valueOf(NnStatusCode.SUCCESS), "SUCCESS"); 
 		}
+		channel.setStatus(MsoChannel.STATUS_SUCCESS);
 		String name = podcast.getTitle(); 
 		if (name != null) { name = NnStringUtil.capitalize(name);}
 		channel.setName(name);
