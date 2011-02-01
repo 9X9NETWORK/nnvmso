@@ -43,6 +43,8 @@ var jw_position = 0;
 
 var fp_player = 'player1';
 var fp_preloaded = '';
+var fp_next = ''; /* preload for episode level */
+var fp_next_timex = 0;
 var start_preload = 0;
 var shrink_hack = false;
 
@@ -1636,13 +1638,14 @@ function switch_to_whats_new()
       log ('channels with new things: ' + whatsnew.length);
       }
 
-    try { force_pause(); } catch (error) { log ('exception in force_pause!'); };
+    stop_preload();
+    stop_all_players();
 
-    escape();
+    // try { force_pause(); } catch (error) { log ('exception in force_pause!'); };
+
+    // escape();
     hide_layers();
     thumbing = 'whatsnew';
-
-    stop_preload();
 
     log ('what is new?');
 
@@ -1675,7 +1678,6 @@ function switch_to_whats_new()
     $("#new-holder").html (html);
 
     elastic();
-    $("#all-players").hide();
     PlayWhatsNew();
     });
   }
@@ -2013,6 +2015,15 @@ function stop_preload()
 
   fp_preloaded = '';
   $("#preload").html ('None');
+
+  if (fp_next)
+    {
+    try { flowplayer (fp_next).stop(); } catch (error) {};
+    try { flowplayer (fp_next).unmute(); } catch (error) {};
+    fp_next = '';
+    }
+
+  clearTimeout (fp_next_timex);
   }
 
 function start_preload_timer()
@@ -2496,6 +2507,18 @@ function ipg_episode_hover_out()
   $("#ep-duration").html (durationof (program ['duration']));
   }
 
+function preload_is_valid (program)
+  {
+  if (current_tube == 'fp' && fp_next != '')
+    {
+    var url = best_url (program);
+    url = url.replace (/^fp:/, '');
+    return fp [fp_next]['file'] == url;
+    }
+  else
+    return false;
+  }
+
 function program_right()
   {
   log ('program right');
@@ -2505,6 +2528,21 @@ function program_right()
     program_cursor++;
     redraw_program_line();
     physical_stop();
+
+    if (preload_is_valid (program_line [program_cursor]))
+      {
+      log ('valid episode preload detected, using it');
+      fp_player = fp_next;
+      fp_next = '';
+      physical_seek (0);
+      physical_unmute();
+      physical_play();
+      unhide_player ("fp");
+      return;
+      }
+    else
+      log ('no valid episode preload detected');
+
     if (tube() == 'fp' || tube() == 'yt') play_program();
     }
   else
@@ -3989,7 +4027,7 @@ function physical_stop()
                try { jwplayer.sendEvent ('STOP'); } catch (error) {};
                break;
 
-    case "fp": log ('fp STOP');
+    case "fp": log ('fp ' + fp_player + ' STOP');
                if (flowplayer)
                  try { flowplayer (fp_player).stop(); } catch (error) {};
                break;
@@ -4220,6 +4258,13 @@ function stop_all_other_players()
     try { ytplayer.stopVideo(); } catch (error) {};
   }
 
+function stop_all_players()
+  {
+  try { flowplayer ('player1').stop(); } catch (error) {};
+  try { flowplayer ('player2').stop(); } catch (error) {};
+  try { ytplayer.stopVideo(); } catch (error) {};
+  }
+
 function ipg_preload_play()
   {
   if (fp_preloaded == '')
@@ -4324,6 +4369,12 @@ function ipg_preload_play()
       {
       }
     }
+
+  if (current_tube == 'fp')
+    {
+    thumbing = 'program';
+    fp_next_timex = setTimeout ("fp_preload_next(" + program_cursor + ")", 500);
+    }
   }
 
 function start_play_fp (url)
@@ -4332,7 +4383,7 @@ function start_play_fp (url)
   current_tube = 'fp';
 
   // ugh! don't know actual url until player is chosen
-  url = best_url (current_program);
+  var url = best_url (current_program);
 
   url  = url.replace (/^fp:/, '');
   fp [fp_player]['file'] = url;
@@ -4356,16 +4407,16 @@ function start_play_fp (url)
   if (thumbing != 'ipg' || ipg_mode != 'episodes')
     fp [fp_player]['mute'] = false;
 
-  // flowplayer (fp_player).unmute();
-  // flowplayer (fp_player).play (url);
+  stop_all_other_players();
   }
 
 function fp_onload()
   {
-  log ('fp onload');
+  var id = this.id();
+  log ('fp onload: ' + id);
   unhide_player ("fp");
-  flowplayer (fp_player).unmute();
-  flowplayer (fp_player).play (fp [fp_player]['file']);
+  flowplayer (id).unmute();
+  flowplayer (id).play (fp [id]['file']);
   }
 
 function fpkp()
@@ -4422,13 +4473,85 @@ function fp_onstart()
     else
       $("#fp2").css ("visibility", "hidden");
     }
+
+  if (id == fp_player)
+    {
+    fp_next = '';
+    log ('fp_next cleared');
+    fp_next_timex = setTimeout ("fp_preload_next(" + program_cursor + ")", 500);
+    }
+  }
+
+function fp_preload_next (cursor)
+  {
+  if (cursor != program_cursor)
+    {
+    /* have already moved on */
+    return;
+    }
+
+  if (thumbing != 'program')
+    {
+    log ('preload next -- not in program mode');
+    return;
+    }
+
+  if (program_cursor < n_program_line)
+    {
+    var next_program = program_line [program_cursor + 1];
+    fp_next = (fp_player == 'player1') ? 'player2' : 'player1';
+
+    log ('fp_next is: ' + fp_next);
+    try { flowplayer (fp_next).unload(); } catch (error) {};
+
+    if (fp_next == 'player1')
+      {
+      $("#fp2").css ("z-index", "2");
+      $("#fp1").css ("z-index", "1");
+      }
+    else if (fp_next == 'player2')
+      {
+      $("#fp1").css ("z-index", "2");
+      $("#fp2").css ("z-index", "1");
+      }
+
+    var url = best_url (next_program);
+    url  = url.replace (/^fp:/, '');
+
+    fp [fp_next]['file'] = url;
+    fp [fp_next]['mute'] = true;
+
+    log ('Episode preload: ' + url);
+
+    flowplayer (fp_next,
+          {src: 'http://zoo.atomics.org/video/fc/flowplayer.commercial-3.2.5.swf', wmode: 'transparent', allowfullscreen: 'false', allowscriptaccess: 'always' }, 
+          { canvas: { backgroundColor: '#000000', backgroundGradient: 'none', linkUrl: '' },
+          clip: { onFinish: fp_ended, onStart: fp_onstart, bufferLength: 1, autoPlay: true, scaling: 'fit', onBufferEmpty: fp_buffering, onBufferFull: fp_notbuffering }, 
+          plugins: { controls: null },
+          play: null, onBeforeKeypress: fpkp, onLoad: fp_next_onload,
+          key: '#$f469b88194323deb943' });
+    }
+  }
+
+function fp_next_onload()
+  {
+  var id = this.id();
+
+  log ('fp_next_onload: ' + id);
+  unhide_player ("fp");
+
+  flowplayer (id).mute();
+  flowplayer (id).play (fp [id]['file']);
   }
 
 function fp_ended()
   {
   var id = this.id();
   log ('fp ' + id + ' ended');
-  ended_callback();
+
+  if (id == fp_player)
+    ended_callback();
+
   clearTimeout (fp [id]['timex']);
   }
 
