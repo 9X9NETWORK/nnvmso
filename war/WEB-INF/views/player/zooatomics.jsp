@@ -451,6 +451,7 @@ function fetch_everything()
 
   channelgrid = {};
   programgrid = {};
+  channels_by_id = {};
 
   fetch_channels();
   fetch_programs();
@@ -2756,6 +2757,7 @@ function submit_login()
       /* wipe out the current guest account program+channel data */
       channelgrid = {};
       programgrid = {};
+      channels_by_id = {};
       escape();
 
       resume();
@@ -2818,6 +2820,7 @@ function submit_signup()
       /* wipe out the current guest account program+channel data */
       channelgrid = {};
       programgrid = {};
+      channels_by_id = {};
       escape();
 
       fetch_everything();
