@@ -156,7 +156,7 @@ public class MsoChannelManager {
 		List<MsoChannel> channels = new ArrayList<MsoChannel>();
 		for (CategoryChannel cc : ccs) {
 			MsoChannel channel = msoChannelDao.findById(cc.getChannelId());
-			if (channel != null && channel.getStatus() != MsoChannel.STATUS_ERROR && channel.getProgramCount() > 0) {
+			if (channel != null && channel.getStatus() == MsoChannel.STATUS_SUCCESS && channel.getProgramCount() > 0) {
 				channels.add(channel);
 			}
 		}
