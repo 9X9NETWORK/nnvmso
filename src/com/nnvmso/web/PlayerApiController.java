@@ -157,7 +157,7 @@ public class PlayerApiController {
 		String password = req.getParameter("password");
 		String name = req.getParameter("name");
 		String userToken = req.getParameter("user");				
-		log.info("signup: email=" + email + ";name=" + name + ";userToken=" + userToken);
+		log.info("signup: email=" + email + ";name=" + name + ";userToken=" + userToken + ";password=" + password);
 
 		this.prepService(req);
 		String output = NnStatusMsg.errorStr(locale);
