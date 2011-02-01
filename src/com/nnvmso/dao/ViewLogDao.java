@@ -41,8 +41,6 @@ public class ViewLogDao {
 			w = pm.detachCopy(w);
 		}		
 		pm.close();
-		return w;
-		
+		return w;		
 	}
-
 }

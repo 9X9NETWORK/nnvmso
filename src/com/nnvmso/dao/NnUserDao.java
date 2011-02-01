@@ -7,6 +7,8 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import org.mortbay.log.Log;
+
 import com.google.appengine.api.datastore.Key;
 import com.nnvmso.lib.AuthLib;
 import com.nnvmso.lib.PMF;
@@ -23,6 +25,7 @@ public class NnUserDao {
 	}
 
 	public NnUser findAuthenticatedUser(String email, String password, long msoId) {
+		Log.info("email=" + email + ";password=" + password + ";msoId:" + msoId);
 		PersistenceManager pm = PMF.get().getPersistenceManager();		
 		Query query = pm.newQuery(NnUser.class);
 		query.setFilter("email == emailParam && msoId == msoIdParam");

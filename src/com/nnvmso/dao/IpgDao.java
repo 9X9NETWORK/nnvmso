@@ -1,7 +1,6 @@
 package com.nnvmso.dao;
 
 import java.text.DateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -11,7 +10,6 @@ import javax.jdo.Query;
 
 import com.nnvmso.lib.PMF;
 import com.nnvmso.model.Ipg;
-import com.nnvmso.model.NnUser;
 
 public class IpgDao {
 
