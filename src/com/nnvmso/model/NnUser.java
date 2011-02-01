@@ -209,5 +209,13 @@ public class NnUser implements Serializable {
 	public void setFacebookToken(String facebookToken) {
 		this.facebookToken = facebookToken;
 	}
-		
+
+	public String toString() {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("name: " + name + ";");
+        buffer.append("msoId: " + msoId + ";");
+        buffer.append("key: " + key + ";");
+        buffer.append("token: " + token + ";");
+        return buffer.toString();		
+	}
 }
