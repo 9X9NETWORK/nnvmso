@@ -216,6 +216,8 @@ function ipg_fixup_margin()
     $(".ipg-list").css ("margin-bottom", "0");
 
   $(".ipg-list:last-child").css ("margin-bottom","0");
+
+  $("#list-holder").css ("top", (gridH - $("#list-holder").height()) / 2);
   }
 
 function ipg_fixup_middle()
@@ -2494,7 +2496,7 @@ function ipg_episode_hover_in()
 
   $("#ep-layer-ep-title").html (program ['name']);
   $("#ep-age").html (ageof (program ['timestamp']));
-  $("#ep-duration").html (durationof (program ['duration']));
+  $("#ep-length").html (durationof (program ['duration']));
   }
 
 function ipg_episode_hover_out()
@@ -2505,7 +2507,7 @@ function ipg_episode_hover_out()
 
   $("#ep-layer-ep-title").html (program ['name']);
   $("#ep-age").html (ageof (program ['timestamp']));
-  $("#ep-duration").html (durationof (program ['duration']));
+  $("#ep-length").html (durationof (program ['duration']));
   }
 
 function preload_is_valid (program)
@@ -3218,7 +3220,7 @@ function browse()
         var xclass = (n_browse == 1) ? ' class="selected"' : '';
         var count = (fields[2] == 0) ? '' : ' (' + fields[2] + ')';
         if (n_browse <= max_browse)
-          html += '<li id="cat-' + n_browse + '"' + xclass + '><p>' + fields[1] + count + '<span class="arrow">&raquo;</span></li>';
+          html += '<li id="cat-' + n_browse + '"' + xclass + '><p>' + fields[1] + count + '</p><span class="arrow">&raquo;</span></li>';
         add_html += '<li id="addcat-' + n_browse + '"><img id="img-addcat-' + n_browse + '" src="' + root + 'check_off.png"><span>' + fields[1] + '</span></li>';
         browsables [n_browse] = { category: fields[0], name: fields[1], count: fields[2] };
         }
@@ -5313,7 +5315,7 @@ function noop (e)
     <div class="ep-swish" style="display: block">
       <ul class="ep-list" id="ep-list"></ul>
     </div>
-    <div id="ep-meta"><p><span class="ch-title" id="ep-layer-ch-title">ABC news</span> - <span class="ep-title" id="ep-layer-ep-title">Jay Leno's eclectic car collection</span> - <span class="age" id="ep-age">Today</span> - <span class="duration" id="ep-duration">10:10</span></p></div>
+    <div id="ep-meta"><p><span class="ch-title" id="ep-layer-ch-title">ABC news</span> - <span class="ep-title" id="ep-layer-ep-title">Jay Leno's eclectic car collection</span> - <span class="age" id="ep-age">Today</span> - <span class="duration" id="ep-length">10:10</span></p></div>
   </div>
 </div>
 
