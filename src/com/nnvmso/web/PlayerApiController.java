@@ -30,10 +30,15 @@ import com.nnvmso.service.PlayerApiService;
  * <p>General rules:<br/>
  *    API always returns a string. <br/>
  *    First line is status code and status message, separated by tab. <br/>
- *    If there is second set of data, it will be separated from the status line by "--\n" <br/>
- *    Different sets of data are separated by "--\n" <br/>
- *    Follows data listing if any, data is tab separated, different record is \n separated. <br/>
+ *    If there is another set of data, it will be separated from the status line by "--\n" <br/>
+ *    Follows data listing if any, data is tab separated, different record is \n separated. <br/>    
  * </p>
+ * <p>Example: <br/>
+ * 0	success  <br/>
+ * -- <br/>
+ * token	a466D491UaaU245P412a <br/>
+ * name	a
+ * </p>8
  */
 @Controller
 @RequestMapping("playerAPI")
@@ -76,7 +81,7 @@ public class PlayerApiController {
 	 * 	
 	 * @param mso mso name, optional 
 	 * @return Data returns in key and value pair. Key and value is tab separated. Each pair is \n separated.<br/> 
-	 * 		   keys include "key", "name", logoUrl", "jingleUrl", "preferredLangCode" <br/>
+	 * 		   keys include "key", "name", logoUrl", "jingleUrl", "preferredLangCode" "debug"<br/>
 	 */	
 	@RequestMapping(value="brandInfo")
 	public ResponseEntity<String> brandInfo(@RequestParam(value="mso", required=false)String brandName, HttpServletRequest req) {
@@ -365,7 +370,8 @@ public class PlayerApiController {
 	 *         <p>Channel info has following fields: 
 	 *         <blockquote> grid id, channel id,  <br/>
 	 *         channel name, channel description, channel image url, <br/>
-	 *         program count, type(integer, see following), status(integer, see following)</blockquote>
+	 *         program count, type(integer, see following), status(integer, see following), <br/>
+	 *         subscription count</blockquote>
 	 *         <p>type: TYPE_GENERAL = 1; TYPE_READONLY = 2;</p>
 	 *         <p>status: STATUS_SUCCESS = 0; STATUS_ERROR = 1; STATUS_INFRINGEMENT = 2; STATUS_RRATED = 3;
 	 *         <p> Example: 1	1	Channel1	http://hostname/images/img.jpg	3	1 0</p>
