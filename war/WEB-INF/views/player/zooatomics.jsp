@@ -63,7 +63,6 @@ var debug = 1;
 var pdr = '';
 var n_pdr = 0;
 
-var current_category = 0;
 var current_program = '';
 var current_url = '';
 
@@ -72,9 +71,6 @@ var dragging = false;
 
 var channelgrid = {};
 var channels_by_id = {}
-var channel_line = {};
-var n_channel_line = 0;
-var channel_cursor = 1;
 
 var programgrid = {};
 var program_line = [];
@@ -375,7 +371,7 @@ function report (type, arg)
 
 function report_program()
   {
-  report ('w', current_program + '\t' + channelgrid [channel_line [channel_cursor]] ['id']);
+  report ('w', current_program + '\t' + channelgrid [current_channel]['id']);
   }
 
 function init()
@@ -593,13 +589,12 @@ function activate()
     return;
 
   activated = true;
-  enter_category (first_category(), 'b');
   elastic();
 
-  //play_first_program_in (first_channel());
+  current_channel = first_channel();
   program_cursor = 1;
   program_first = 1;
-  current_program = first_program_in (first_channel());
+  current_program = first_program_in (current_channel);
 
   enter_channel();
 
@@ -736,10 +731,8 @@ function end_message (duration)
   log ('end!');
   hide_layers();
 
-  var square = parseInt (channel_line [channel_cursor]);
-
-  var prev = previous_channel_square (square);
-  var next = next_channel_square (square);
+  var prev = previous_channel_square (current_channel);
+  var next = next_channel_square (current_channel);
 
   $("#left-tease").attr ("src", channelgrid [prev]['thumb']);
   $("#right-tease").attr ("src", channelgrid [next]['thumb']);
@@ -906,11 +899,9 @@ function update_bubble()
   if (program_name.match (/^\s*$/))
     program_name = '[no title]';
 
-  var channel = channel_line [channel_cursor];
-
-  if (channel in channelgrid)
+  if (current_channel in channelgrid)
     {
-    var channel_name = channelgrid [channel]['name'];
+    var channel_name = channelgrid [current_channel]['name'];
     if (channel_name.match (/^\s*$/)) { channel_name = '[no channel name]'; }
 
     $("#ep-layer-ch-title").html (channel_name);
@@ -925,8 +916,7 @@ function prepare_channel()
   {
   program_line = [];
 
-  var channel = channel_line [channel_cursor];
-  log ('prepare channel ' + channel);
+  log ('prepare channel ' + current_channel);
 
   if (channelgrid.length == 0)
     {
@@ -934,15 +924,15 @@ function prepare_channel()
     return;
     }
 
-  if (channel in channelgrid)
-    var real_channel = channelgrid [channel]['id'];
+  if (current_channel in channelgrid)
+    var real_channel = channelgrid [current_channel]['id'];
   else
     {
-    log ('not in channelgrid: ' + channel);
+    log ('not in channelgrid: ' + current_channel);
     return;
     }
 
-  if (programs_in_channel (channel) < 1)
+  if (programs_in_channel (current_channel) < 1)
     {
     log ('no programs in channel');
     return;
@@ -954,9 +944,6 @@ function prepare_channel()
     {
     if (programgrid [p]['channel'] == real_channel)
       program_line [n_program_line++] = p;
-
-    // var image = new Image();
-    // image.src = programgrid [p]['thumb'];
     }
 
   program_line = program_line.sort (function (a,b) { return Math.floor (programgrid [b]['timestamp']) - Math.floor (programgrid [a]['timestamp']) });
@@ -1074,81 +1061,6 @@ function ageof (timestamp)
   return age + ' ' + ago_or_hence;
   }
 
-var old_cline;
-var new_cline;
-
-function enter_category (cat, positioning)
-  {
-  log ('enter category: ' + cat + ', thumbing: ' + thumbing);
-
-  if (true)
-    {
-    channel_line = {};
-
-    $("#ipg-layer").hide();
-    $("#control-layer").hide();
-    $("#ch-list-" + cat).html (ch_html (cat));
-    $("#row-number").html ('<p>' + cat + '</p>');
-
-    current_category = cat;
-
-    for (var y = 1; y <= 9; y++)
-      $("#ch-swish-" + y).css ("display", y == cat ? "block" : "none");
-
-    /* position at beginning or ending */
-    if (positioning == 'b')
-      channel_cursor = 1;
-    else if (positioning == 'e')
-      channel_cursor = n_channel_line;
-
-    redraw_channel_line();
-    prepare_channel();
-
-    thumbing = 'channel';
-
-    turn_off_ancillaries();
-    return;
-    }
-  }
-
-function ch_html (cat)
-  {
-  var html = "";
-  var bad_thumbnail = 'http://zoo.atomics.org/video/images-x1/no_images.png';
-
-  n_channel_line = 0;
-
-  for (var x = 1; x <= 9; x++)
-    {
-    var chan = "" + cat + "" + x;
-  
-    if (channelgrid [chan])
-      {
-      var thumbnail = channelgrid [chan]['thumb'];
-      if (thumbnail == '' || thumbnail == 'null' || thumbnail == 'false')
-        thumbnail = bad_thumbnail;
-
-      channel_line [++n_channel_line] = chan;
-
-      html += '<li id="c-' + cat + '-li-' + n_channel_line;
-      html += (channel_cursor == n_channel_line) ? '" class="on">' : '">';
-
-      var programs = programs_in_channel (chan);
-      if (programs == 0)
-        programs = "no episodes";
-      else
-        programs += (programs == 1) ? " episode" : " episodes";
-
-      html += '<img src="' + thumbnail + '"><p class="number"><span>' + programs + ' episodes</span></p></li>';
-      log ('channel ' + channelgrid [chan]['id'] + ': ' + channelgrid [chan]['name']);
-      }
-    else
-      html += '<li></li>';
-    }
-
-  return html;
-  }
-
 function next_channel_square (channel)
   {
   for (var i = channel + 1; i <= 99; i++)
@@ -1164,20 +1076,6 @@ function next_channel_square (channel)
     }
 
   panic ("No next channel!")
-  }
-
-function channels_in_category (cat)
-  {
-  var num_channels = 0;
-
-  for (var c = 1; c <= 9; c++)
-    {
-    if ("" + cat + "" + c in channelgrid)
-      num_channels++;
-    }
-
-  log ('channels in category ' + cat + ': ' + num_channels);
-  return num_channels;
   }
 
 function programs_in_channel (channel)
@@ -1198,62 +1096,15 @@ function programs_in_channel (channel)
   return num_programs;
   }
 
-function first_category()
-  {
-  for (var cat = 1; cat <= 9; cat++)
-    {
-    if (channels_in_category (cat) > 0)
-      return cat;
-    }
-  }
-
-function next_category()
-  {
-  log ('next category');
-
-  for (var cat = parseInt (current_category) + 1; cat <= 9; cat++)
-    {
-    if (channels_in_category (cat) > 0)
-      return cat;
-    }
-
-  for (var cat = 1; cat < parseInt (current_category); cat++)
-    {
-    if (channels_in_category (cat) > 0)
-      return cat;
-    }
-
-  return current_category;
-  }
-
-function previous_category()
-  {
-  log ('previous category');
-
-  for (var cat = parseInt (current_category) - 1; cat >= 1; cat--)
-    {
-    if (channels_in_category (cat) > 0)
-      return cat;
-    }
-
-  for (var cat = 9; cat > parseInt (current_category); cat--)
-    {
-    if (channels_in_category (cat) > 0)
-      return cat;
-    }
-
-  return current_category;
-  }
-
 function previous_channel_square (channel)
   {
-  for (var i = channel - 1; i > 10; i--)
+  for (var i = parseInt (channel) - 1; i > 10; i--)
     {
     if (i in channelgrid)
       return i;
     }
 
-  for (var i = 99; i >= channel; i--)
+  for (var i = 99; i >= parseInt (channel); i--)
     {
     if (i in channelgrid)
       return i;
@@ -1845,31 +1696,25 @@ function whatsnew_enter()
   var channel = whatsnew [i]['channel'];
 
   log ('whatsnew enter: want to play episode ' + episode + ' in channel ' + channel + ' at grid location ' + grid)
-  enter_category ((""+grid).substring (0, 1));
 
-  for (var c in channel_line)
-    {
-    if (channel_line [c] == grid)
+  current_channel = grid;
+  enter_channel();
+
+  /* select episode */
+  for (var p = 1; p <= n_program_line; p++)
+    if (episode == program_line [p])
       {
-      channel_cursor = c;
-      redraw_channel_line()
-      enter_channel();
-      /* select episode, but for now, play first */
-      for (var p = 1; p <= n_program_line; p++)
-        if (episode == program_line [p])
-          {
-          program_first = 1;
-          program_cursor = p;
-          current_program = episode;
-          prepare_channel();
-          play();
-          return;
-          }
-      log ('episode ' + episode + ' not found in channel ' + grid);
+      program_first = 1;
+      program_cursor = p;
+      current_program = episode;
+      prepare_channel();
+      play();
       return;
       }
-    }
-   }
+
+  log ('episode ' + episode + ' not found in channel ' + grid);
+  return;
+  }
 
 function clear_osd_timex()
   {
@@ -1924,13 +1769,12 @@ function switch_to_ipg()
   clear_msg_timex();
   clear_osd_timex()
 
-  // force_pause();
   physical_stop();
   ipg_delayed_stop_timex = setTimeout ("delayed_video_stop()", 5000);
 
-  ipg_cursor = parseInt (channel_line [channel_cursor]);
-
-  if (! (ipg_cursor in channelgrid))
+  if (current_channel in channelgrid)
+    ipg_cursor = current_channel;
+  else
     ipg_cursor = '11';
 
   redraw_ipg();
@@ -1944,24 +1788,18 @@ function switch_to_ipg()
   stop_preload();
   $("#buffering").hide();
 
-  //if (jQuery.browser.msie && (jQuery.browser.version == '7.0' || jQuery.browser.version == '8.0'))
-  if (true)
-    {
-    $("#control-layer").hide();
-    $("#ch-directory").hide();
-    // $("#ep-layer").hide();
-    // ipg_program_tip();
-    $("#ipg-layer").show();
-    if (navigator.userAgent.match (/Firefox/))
-      shrink_video();
-    desired = 'webm';
-    elastic();
-    extend_ipg_timex();
-    thumbing = 'ipg';
-    start_preload_timer();
-    ipg_sync();
-    return;
-    }
+  $("#control-layer").hide();
+  $("#ch-directory").hide();
+
+  $("#ipg-layer").show();
+  if (navigator.userAgent.match (/Firefox/))
+    shrink_video();
+
+  elastic();
+  extend_ipg_timex();
+  thumbing = 'ipg';
+  start_preload_timer();
+  ipg_sync();
   }
 
 function ipg_idle()
@@ -2391,7 +2229,6 @@ function ipg_resume()
   clearTimeout (ipg_delayed_stop_timex);
 
   escape();
-  enter_category (current_category, '');
   enter_channel();
 
   stop_preload();
@@ -2400,26 +2237,19 @@ function ipg_resume()
 
 function ipg_set_channel (grid)
   {
-  enter_category (Math.floor (grid/10), '');
-
   program_cursor = 1;
   program_first = 1;
 
   current_program = first_program_in (grid);
 
-  for (var c in channel_line)
-    if (channel_line [c] == grid)
-      {
-      channel_cursor = c;
-      enter_channel();
-      /* and then yucky fixups (temporary) */
-      thumbing = 'ipg';
-      $("#ipg-layer").show();
-      clear_osd_timex();
-      return;
-      }
+  current_channel = grid;
+  enter_channel();
 
-  log_and_alert ('was unable to enter channel: ' + grid);
+  /* and then yucky fixups (temporary) */
+  thumbing = 'ipg';
+  $("#ipg-layer").show();
+
+  clear_osd_timex();
   }
 
 function ipg_program_tip()
@@ -2593,82 +2423,33 @@ function ipg_play()
   if (navigator.userAgent.match (/Firefox/))
     unshrink_video();
 
+  current_channel = ipg_cursor;
+  current_program = first_program_in (ipg_cursor);
 
-  enter_category ((""+ipg_cursor).substring (0, 1));
+  enter_channel();
+  update_bubble();
 
-  for (var c in channel_line)
-    {
-    if (channel_line [c] == ipg_cursor)
-      {
-      channel_cursor = c;
-      enter_channel();
+  report_program();
 
-      current_program = first_program_in (ipg_cursor);
-      report_program();
-
-      update_bubble();
-      redraw_channel_line()
-
-      thumbing = 'channel';
-      play_first_program_in (channel_line [channel_cursor]);
-      enter_channel();
-      return;
-      }
-    }
-
-  log_and_alert ('ipg_play: no channel');
+  play_first_program_in (current_channel);
   }
 
 function channel_right()
   {
-  if (channel_cursor < n_channel_line)
-    channel_cursor++;
-  else
-    {
-    log ('channel_right: current category: ' + current_category + ', next category: ' + next_category());
-    enter_category (next_category(), 'b');
-    }
-  redraw_channel_line();
-  prepare_channel();
-
-  play_first_program_in (channel_line [channel_cursor]);
+  current_channel = next_channel_square (current_channel);
+  enter_channel();
+  play_first_program_in (current_channel);
   }
 
 function channel_left()
   {
-  if (channel_cursor > 1)
-    channel_cursor--;
-  else
-    enter_category (previous_category(), 'e');
-
-  redraw_channel_line();
-  prepare_channel();
-
-  play_first_program_in (channel_line [channel_cursor]);
-  }
-
-function redraw_channel_line()
-  {
-  for (y = 1; y <= 9; y++)
-    {
-    var c = $("#c-" + current_category + "-li-" + y);
-
-    if (y == channel_cursor)
-      {
-      if (!c.hasClass ("on"))
-        $("#c-" + current_category + "-li-" + y).addClass ("on");
-      }
-    else
-      {
-      if (c.hasClass ("on"))
-        $("#c-" + current_category + "-li-" + y).removeClass ("on");
-      }
-    }
+  current_channel = previous_channel_square (current_channel);
+  enter_channel();
+  play_first_program_in (current_channel);
   }
 
 function ep_click (id)
   {
-log ("EP CLICK");
   if (thumbing == 'program' || thumbing == 'ipg')
     {
     id = id.replace (/^p-li-/, '');
@@ -2680,8 +2461,13 @@ log ("EP CLICK");
       {
       thumbing = 'program';
       $("#ipg-layer").hide();
-      if (navigator.userAgent.match (/Firefox/))
-        shrink_video();
+      if (program_cursor == 1)
+        {
+        ipg_play()
+        return;
+        }
+      else
+        stop_preload();
       }
     if (tube() == 'fp' || tube() == 'yt') play_program();
     }
@@ -3221,18 +3007,13 @@ function login()
   log ('login')
   var u = getcookie ("user");
 
-  // "response to userTokenVerify: 0\tsuccess\n 0\tagg5eDl0dmRldnINCxIGTm5Vc2VyGLc_DA\tGuest\t8040"
   if (u)
     {
     log ('user cookie exists, checking');
 
     var d = $.get ("/playerAPI/userTokenVerify?token=" + u, function (data)
       {
-      if (!sanity_check_data ('userTokenVerify', data))
-        {
-        // xyz
-        }
-
+      sanity_check_data ('userTokenVerify', data);
       log ('response to userTokenVerify: ' + data);
 
       var lines = data.split ('\n');
@@ -4161,7 +3942,6 @@ function start_play_jw (url)
 
   log ('setting up JW player, video file is: ' + jw_video_file);
   unhide_player ("jw");
-  $("#yt1").css ("visibility", "visible");
 
   if (jwplayer)
     jw_play();
@@ -4462,6 +4242,7 @@ function ipg_preload_play()
     try { ytplayer.playVideo(); } catch (error) {};
     clearTimeout (yt_timex);
     yt_timex = setInterval ("yt_tick()", 333);
+    unhide_player ("yt");
     }
   else
     {
@@ -4489,70 +4270,58 @@ function ipg_preload_play()
 
   stop_all_other_players();
 
-  enter_category ((""+ipg_cursor).substring (0, 1));
+  current_channel = ipg_cursor;
+  current_program = first_program_in (ipg_cursor);
 
-  for (var c in channel_line)
+  enter_channel();
+  update_bubble();
+  $("#ipg-layer").css ("display", "none");
+
+  program_cursor = 1;
+  program_first = 1;
+
+  enter_channel();
+  clips_played++;
+
+  report_program();
+
+  try
     {
-    if (channel_line [c] == ipg_cursor)
+    if (tube() == 'yt')
+      log ('EXIT PRELOAD PLAY, player ' + fp_player);
+    else
+      log ('EXIT PRELOAD PLAY, player ' + fp_player + ', state ' + flowplayer (fp_player).getState());
+    }
+  catch (error)
+    {
+    log ('EXIT PRELOAD PLAY, state unknown');
+    }
+
+  if (tube() == 'fp')
+    {
+    try
       {
-      channel_cursor = c;
-      enter_channel();
-      current_program = first_program_in (ipg_cursor);
-      update_bubble();
-      redraw_channel_line()
-      thumbing = 'channel';
-      $("#ipg-layer").css ("display", "none");
-      if (navigator.userAgent.match (/Firefox/))
-        unshrink_video();
-      // play_first_program_in (channel_line [channel_cursor]);
-      program_cursor = 1;
-      program_first = 1;
-      enter_channel();
-      clips_played++;
-
-      report_program();
-
-      try
+      var state = flowplayer (fp_player).getState();
+      if (state == -1)
         {
-        if (tube() == 'yt')
-          log ('EXIT PRELOAD PLAY, player ' + fp_player);
-        else
-          log ('EXIT PRELOAD PLAY, player ' + fp_player + ', state ' + flowplayer (fp_player).getState());
+        log ('*** flowplayer was unloaded, trying over');
+        $("#buffering").show();
+        stop_preload();
+        ipg_play();
         }
-      catch (error)
+      else if (state == 1)
         {
-        log ('EXIT PRELOAD PLAY, state unknown');
+        log ('*** flowplayer was unexpectedly idle, restarting with: ' + fp [fp_player]['file']);
+        $("#buffering").show();
+        flowplayer (fp_player).play (fp [fp_player]['file']);
         }
-
-      if (tube() == 'fp')
+      else if (state == 2)
         {
-        try
-          {
-          var state = flowplayer (fp_player).getState();
-          if (state == -1)
-            {
-            log ('*** flowplayer was unloaded, trying over');
-            $("#buffering").show();
-            stop_preload();
-            ipg_play();
-            }
-          else if (state == 1)
-            {
-            log ('*** flowplayer was unexpectedly idle, restarting with: ' + fp [fp_player]['file']);
-            $("#buffering").show();
-            flowplayer (fp_player).play (fp [fp_player]['file']);
-            }
-          else if (state == 2)
-            {
-            $("#buffering").show();
-            }
-          }
-        catch (error)
-          {
-          }
+        $("#buffering").show();
         }
-
-      return;
+      }
+    catch (error)
+      {
       }
     }
   }
@@ -4736,6 +4505,7 @@ function yt_state (state)
   log ('yt state: ' + state);
   if (fp_preloaded == 'yt' && state == 1)
     {
+    log ('yt preloaded, setting visibility to hidden');
     ytplayer.pauseVideo();
     $("#yt1").css ("visibility", "hidden");
     $("#preload").html ('YT Preloaded');
