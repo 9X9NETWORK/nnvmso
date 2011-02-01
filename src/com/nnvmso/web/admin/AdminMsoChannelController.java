@@ -61,7 +61,7 @@ public class AdminMsoChannelController {
 			result = result + NnStringUtil.getDelimitedStr(ori);		
 			result = result + "\n";
 		}
-		String output = NnStringUtil.getDelimitedStr(title) + result + "\n";
+		String output = NnStringUtil.getDelimitedStr(title) + "\n" + result;
 		return NnNetUtil.textReturn(output);	
 	}
 	
@@ -83,7 +83,7 @@ public class AdminMsoChannelController {
 		if (programCount != null)
 			channel.setProgramCount(Integer.parseInt(programCount));
 		
-		channelMngr.save(channel);
+		channelMngr.save(null, channel);
 		return "OK";
 	}
 }

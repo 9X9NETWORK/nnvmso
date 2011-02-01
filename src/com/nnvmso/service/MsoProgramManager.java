@@ -64,8 +64,25 @@ public class MsoProgramManager {
 		return msoProgramDao.findAllByChannelId(channelId);
 	}
 	
+	public List<MsoProgram> findAllByChannelKey(Key channelKey) {
+		return msoProgramDao.findAllByChannelKey(channelKey);
+	}
+	
+	public List<MsoProgram> findAllByChannelKeyStr(String channelKey) {
+		try {
+		  return this.findAllByChannelKey(KeyFactory.stringToKey(channelKey));
+		} catch (IllegalArgumentException e) {
+			log.info("invalid channel key string");
+			return null;
+		}
+	}
+	
 	public List<MsoProgram> findAllByChannelIdsAndIsPublic(List<Long>channelIds, boolean isPublic) {
 		return msoProgramDao.findAllByChannelIdsAndIsPublic(channelIds, isPublic);
+	}
+	
+	public List<MsoProgram> findPublicPrograms() {
+		return msoProgramDao.findPublicPrograms();
 	}
 	
 	public List<MsoProgram> findSubscribedPrograms(long userId) {

@@ -13,6 +13,9 @@ import com.nnvmso.lib.CookieHelper;
 import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.model.Mso;
 
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
+
 @Service
 public class MsoManager {
 
@@ -94,5 +97,25 @@ public class MsoManager {
 		}
 		return mso;
 	}
-		
+	
+	public Mso findById(long id) {
+		return msoDao.findById(id);
+	}
+	
+	public List<Mso> findAll() {
+		return msoDao.findAll();
+	}
+	
+	public Mso findByKey(Key key) {
+		return msoDao.findByKey(key);
+	}
+	
+	public Mso findByKeyStr(String key) {
+		try {
+			return this.findByKey(KeyFactory.stringToKey(key));
+		} catch (IllegalArgumentException e) {
+			log.info("invalid key string");
+			return null;
+		}
+	}
 }

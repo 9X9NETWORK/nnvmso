@@ -1,14 +1,20 @@
 package com.nnvmso.dao;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.JDOObjectNotFoundException;
+
+import com.google.appengine.api.datastore.Key;
 
 import com.nnvmso.lib.PMF;
 import com.nnvmso.model.Mso;
 
 public class MsoDao {
+	
+	protected static final Logger logger = Logger.getLogger(MsoDao.class.getName());
 	
 	public Mso save(Mso mso) {
 		if (mso == null) {return null;}
@@ -45,4 +51,38 @@ public class MsoDao {
 		return results;
 	}
 	
+	public Mso findById(long id) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		Mso mso = null;
+		logger.info("id == '" + id + "'");
+		try {
+			mso = pm.getObjectById(Mso.class, id);
+			mso = pm.detachCopy(mso);
+		} catch (JDOObjectNotFoundException e) {
+		}		
+		pm.close();
+		return mso;
+	}
+	
+	public List<Mso> findAll() {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		Query query = pm.newQuery(Mso.class);
+		@SuppressWarnings("unchecked")
+		List<Mso> results = (List<Mso>) query.execute();
+		results = (List<Mso>)pm.detachCopyAll(results);
+		pm.close();
+		return results;
+	}
+	
+	public Mso findByKey(Key key) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		Mso mso = null;
+		try {
+			mso = pm.getObjectById(Mso.class, key);
+			mso = pm.detachCopy(mso);
+		} catch (JDOObjectNotFoundException e) {
+		}
+		pm.close();
+		return mso;
+	}
 }

@@ -17,6 +17,7 @@ import com.nnvmso.model.MsoProgram;
 import com.nnvmso.service.PlayerApiService;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 
 public class MsoProgramDao {
 	
@@ -111,6 +112,10 @@ public class MsoProgramDao {
 		return programs;
 	}
 	
+	public List<MsoProgram> findAllByChannelKey(Key channelKey) {
+		return this.findAllByChannelId(channelKey.getId());
+	}
+	
 	public List<MsoProgram> findAllByChannelId(long channelId) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Query q = pm.newQuery(MsoProgram.class);
@@ -146,4 +151,17 @@ public class MsoProgramDao {
 		pm.close();
 		return program;		
 	}	
+	
+	public List<MsoProgram> findPublicPrograms() {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		Query q = pm.newQuery(MsoProgram.class);
+		q.setFilter("isPublic == isPublicParam");
+		q.declareParameters("boolean isPublicParam");
+		q.setOrdering("name asc");
+		@SuppressWarnings("unchecked")
+		List<MsoProgram> programs = (List<MsoProgram>) q.execute(true);
+		programs = (List<MsoProgram>)pm.detachCopyAll(programs);
+		pm.close();
+		return programs;
+	}
 }

@@ -1,9 +1,11 @@
 package com.nnvmso.web.admin;
 
+import java.util.List;
 import java.util.Date;
 import java.util.logging.Logger;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
+import java.lang.Boolean;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -38,9 +40,27 @@ public class AdminMsoProgramController {
 		return "error/exception";				
 	}
 
-	//!!! 
-	public ResponseEntity<String> programList(@RequestParam(value="channelKey", required = false)String channelKey) {
-		return NnNetUtil.textReturn("");
+	@RequestMapping("list")
+	public ResponseEntity<String> list(@RequestParam(value="channelKey", required = false)String channelKey) {
+		List<MsoProgram> programs = null;
+		if (channelKey == null)
+			programs = programMngr.findPublicPrograms();
+		else
+			programs = programMngr.findAllByChannelKeyStr(channelKey);
+		String[] title = {"key", "channelId", "isPublic", "status", "updateDate", "name"};		
+		String result = "";
+		for (MsoProgram p:programs) {
+			String[] ori = {NnStringUtil.getKeyStr(p.getKey()),
+			                String.valueOf(p.getChannelId()),
+			                Boolean.toString(p.isPublic()),
+			                String.valueOf(p.getStatus()),
+			                NnStringUtil.getDateString(p.getUpdateDate()),
+			                p.getName()};
+			result = result + NnStringUtil.getDelimitedStr(ori);
+			result = result + "\n";
+		}
+		String output = NnStringUtil.getDelimitedStr(title) + "\n" + result;
+		return NnNetUtil.textReturn(output);
 	}
 	
 	@RequestMapping("modify")

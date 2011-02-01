@@ -16,7 +16,7 @@ public class NnStringUtil {
         return capitalized;
 	}
 
-	public String getDateString(Date date) {
+	public static String getDateString(Date date) {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, MMM d, yyyy hh:mm a");
         String result = dateFormat.format(date);
         System.out.println("getUpdateDate() : UDate = " + result);
