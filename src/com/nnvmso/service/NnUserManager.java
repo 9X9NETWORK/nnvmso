@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.google.appengine.api.datastore.Key;
 import com.nnvmso.dao.NnUserDao;
+import com.nnvmso.lib.AuthLib;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.NnUser;
@@ -32,6 +33,10 @@ public class NnUserManager {
 	}
 
 	public NnUser save(NnUser user) {
+		if (user.getPassword() != null) {
+			user.setSalt(AuthLib.generateSalt());
+			user.setCryptedPassword(AuthLib.encryptPassword(user.getPassword(), user.getSalt()));
+		}
 		user.setUpdateDate(new Date());
 		return nnUserDao.save(user);
 	}

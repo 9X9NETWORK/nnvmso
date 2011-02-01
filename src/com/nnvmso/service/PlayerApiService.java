@@ -332,7 +332,7 @@ public class PlayerApiService {
 			userMngr.create(user);
 			userMngr.subscibeDefaultChannels(user);
 		} else {
-			log.info("User signup with guest token=" + userToken + "; email=" + email + "; name=" + name);					 		
+			log.info("User signup with guest token=" + userToken + "; email=" + email + "; name=" + name + ";password=" + password);					 		
 			if (user.getEmail().equals(NnUser.GUEST_EMAIL)) {
 				log.info("1st time signup after being a guest");
 				user.setEmail(email);
