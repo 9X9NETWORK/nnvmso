@@ -11,10 +11,13 @@
   </datastore-index>
   <datastore-index kind="Mso" ancestor="false" source="manual">
     <property name="__key__" direction="desc"/>
-  </datastore-index>  
+  </datastore-index>
   <datastore-index kind="MsoChannel" ancestor="false" source="manual">
     <property name="__key__" direction="desc"/>
   </datastore-index>
+  <datastore-index kind="MsoConfig" ancestor="false" source="manual">
+    <property name="__key__" direction="desc"/>
+  </datastore-index>        
   <datastore-index kind="MsoIpg" ancestor="false" source="manual">
     <property name="__key__" direction="desc"/>
   </datastore-index>  
@@ -30,7 +33,10 @@
   <datastore-index kind="Subscription" ancestor="false" source="manual">
     <property name="__key__" direction="desc"/>
   </datastore-index>
-  <datastore-index kind="Watched" ancestor="false" source="manual">
+  <datastore-index kind="SubscriptionLog" ancestor="false" source="manual">
+    <property name="__key__" direction="desc"/>
+  </datastore-index>                
+  <datastore-index kind="ViewLog" ancestor="false" source="manual">
     <property name="__key__" direction="desc"/>
   </datastore-index>                
 </datastore-indexes>
