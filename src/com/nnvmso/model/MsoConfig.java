@@ -20,7 +20,8 @@ public class MsoConfig {
 		
 	@Persistent
 	private String item;
-	public static String CDN = "cdn"; 
+	public static String CDN = "cdn";
+	public static String DEBUG = "debug";
 	
 	@Persistent
 	private String value;
