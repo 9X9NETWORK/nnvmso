@@ -49,23 +49,22 @@ public class MsoProgram implements Serializable {
 	@Persistent
 	private String errorCode;
 
+	@NotPersistent
+	private short status;
 	public static short STATUS_OK = 0;
 	public static short STATUS_ERROR = 1;	
 	public static short STATUS_PROCESSING = 2;
-	
-	@NotPersistent
-	private short status;
-	
+		
 	@Persistent
 	private String duration;
 		
 	@Persistent
 	private boolean isPublic; 
 	
-	public static short TYPE_VIDEO = 1;
-	public static short TYPE_AUDIO = 2;	
 	@Persistent
 	private short type;
+	public static short TYPE_VIDEO = 1;
+	public static short TYPE_AUDIO = 2;	
 		
 	@Persistent
 	private Date createDate;
