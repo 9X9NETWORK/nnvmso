@@ -70,6 +70,9 @@ public class MsoChannel implements Serializable {
 	
 	@NotPersistent
 	private int seq; //use with subscription, to specify sequence in IPG. 
+		
+	@NotPersistent
+	private int subscriptionCount;
 	
 	@Persistent
 	private Date createDate;
@@ -240,5 +243,12 @@ public class MsoChannel implements Serializable {
 	public void setAdvertsing(short advertsing) {
 		this.advertsing = advertsing;
 	}
-	
+
+	public int getSubscriptionCount() {
+		return subscriptionCount;
+	}
+
+	public void setSubscriptionCount(int subscriptionCount) {
+		this.subscriptionCount = subscriptionCount;
+	}	
 }
