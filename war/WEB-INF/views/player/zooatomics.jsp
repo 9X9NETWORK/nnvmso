@@ -2564,6 +2564,8 @@ function ipg_play()
 
   if (ipg_mode == 'episodes' && program_cursor != 1)
     {
+    /* program is already started or in process of starting */
+    /* note that since this navigation is disabled in the ipg, won't use this */
     fp_preloaded = '';
     physical_seek (0);
     physical_unmute();
@@ -2681,14 +2683,13 @@ log ("EP CLICK");
       if (navigator.userAgent.match (/Firefox/))
         shrink_video();
       }
-    if (tube() == 'fp') play_program();
+    if (tube() == 'fp' || tube() == 'yt') play_program();
     }
   }
 
 function ipg_episode_hover_in()
   {
   $(this).addClass ("hover");
-  // $("#p-li-" + program_cursor).removeClass ("on");
 
   var id = $(this).attr('id').replace (/^p-li-/, '');
   var program = programgrid [program_line [id]];
@@ -2701,7 +2702,6 @@ function ipg_episode_hover_in()
 function ipg_episode_hover_out()
   {
   $(this).removeClass ("hover");
-  // $("#p-li-" + program_cursor).addClass ("on");
 
   var program = programgrid [program_line [program_cursor]];
 
@@ -4096,11 +4096,15 @@ function unhide_player (player)
         {
         $("#fp2").css ("visibility", "hidden");
         $("#fp1").css ("visibility", "visible");
+        $("#fp1").css ("z-index", "2");
+        $("#fp2").css ("z-index", "1");
         }
-      else
+      else if (fp_player == 'player2')
         {
         $("#fp1").css ("visibility", "hidden");
         $("#fp2").css ("visibility", "visible");
+        $("#fp1").css ("z-index", "1");
+        $("#fp2").css ("z-index", "2");
         }
 
       $("#fp1").show();
