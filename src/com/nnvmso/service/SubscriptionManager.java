@@ -21,7 +21,7 @@ public class SubscriptionManager {
 		return subDao.findAllByUserId(userId);
 	}
 	
-	public boolean subscribeChannel(long userId, long channelId, int seq, short type) {
+	public boolean subscribeChannel(long userId, long channelId, int seq, short type, long msoId) {
 		Subscription existed = subDao.findByUserIdAndChannelId(userId, channelId);
 		if (existed != null) {
 			log.info("user trying to subscribe a channel that has been subscribed.");
@@ -32,6 +32,14 @@ public class SubscriptionManager {
 		s.setCreateDate(now);
 		s.setUpdateDate(now);
 		subDao.save(s);
+		SubscriptionLogManager sublogMngr = new SubscriptionLogManager();
+		SubscriptionLog sublog = sublogMngr.findByMsoIdAndChannelId(msoId, channelId);
+		if (sublog == null) {
+			sublog = new SubscriptionLog(msoId, channelId);
+		} else {
+			sublog.setCount(sublog.getCount()+1);
+		}
+		sublogMngr.save(sublog);		
 		log.info("user subscribe a new channel " + channelId + ";grid=" + seq);
 		return true;
 	}
@@ -42,15 +50,19 @@ public class SubscriptionManager {
 	}
 	
 	//!!! findByIds
-	public List<MsoChannel> findSubscribedChannels(long userId) {
+	public List<MsoChannel> findSubscribedChannels(long userId, long msoId) {
 		List<Subscription> subs = subDao.findAllByUserId(userId);
-		System.out.println("subscription: " + subs.size());
 		List<MsoChannel> channels = new ArrayList<MsoChannel>();
-		MsoChannelDao channelDao = new MsoChannelDao();		
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		SubscriptionLogManager sublogMngr = new SubscriptionLogManager();
 		for (Subscription s : subs) {
-			MsoChannel c = channelDao.findById(s.getChannelId()); //!!!
+			MsoChannel c = channelMngr.findById(s.getChannelId()); //!!!
 			c.setSeq(s.getSeq());
 			c.setType(s.getType());
+			if (msoId != 0) {
+				SubscriptionLog sublog = sublogMngr.findByMsoIdAndChannelId(msoId, c.getKey().getId());			
+				if (sublog != null) {c.setSubscriptionCount(sublog.getCount());}
+			}			
 			channels.add(c);
 		}
 		return channels;			 

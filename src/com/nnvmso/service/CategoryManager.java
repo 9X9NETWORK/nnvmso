@@ -58,13 +58,8 @@ public class CategoryManager {
 		return categoryDao.findByName(name);
 	}	
 	
-	public List<Category> findAllByIds(String ids) {
-		 String[] idStrArr = ids.split(",");		 
-		 long idLongArr[] = new long[idStrArr.length];
-		 for (int i=0; i<idLongArr.length; i++) {
-			 idLongArr[i] = Long.valueOf(idStrArr[i]);
-		 }
-		 return categoryDao.findAllByIds(idLongArr);
+	public List<Category> findAllByIds(List<Long> ids) {
+		 return categoryDao.findAllByIds(ids);
 	}
 
 	public Category findById(long id) {

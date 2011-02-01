@@ -59,13 +59,21 @@ public class PlayerApiService {
 	public String findMsoInfo(HttpServletRequest req) {
 		Mso theMso = msoMngr.findMsoViaHttpReq(req);
 		if (theMso == null) {return NnStatusMsg.msoInvalid(locale);}
+		
+		MsoConfigManager configMngr = new MsoConfigManager();
+		MsoConfig config = configMngr.findByMsoIdAndItem(theMso.getKey().getId(), MsoConfig.DEBUG);
+		String debug = "1";
+		if (config != null) { debug = config.getValue(); }
+		
 		String results = NnStatusMsg.successStr(locale) + separatorStr;
 		results = results + this.assembleKeyValue("key", String.valueOf(mso.getKey().getId()));
 		results = results + this.assembleKeyValue("name", mso.getName());
 		results = results + this.assembleKeyValue("logoUrl", mso.getLogoUrl());
 		results = results + this.assembleKeyValue("jingleUrl", mso.getJingleUrl());
 		results = results + this.assembleKeyValue("logoClickUrl", mso.getJingleUrl());
-		results = results + this.assembleKeyValue("preferredLangCode", mso.getPreferredLangCode()); 
+		results = results + this.assembleKeyValue("preferredLangCode", mso.getPreferredLangCode());
+		results = results + this.assembleKeyValue("debug", debug);
+		
 		return results;
 	}
 
@@ -170,21 +178,7 @@ public class PlayerApiService {
 		}
 		return NnStatusMsg.successStr(locale) + separatorStr + localeCode;
 	}
-	 
-//	public String findCategoriesByUser(String userKey) {
-//		//verify input
-//		if (userKey == null || userKey.length() == 0 || userKey.equals("undefined")) {
-//			return NnStatusMsg.inputMissing(locale);
-//		}		
-//		//verify user		
-//		NnUser user = userMngr.findByKeyStr(userKey);
-//		if (user == null) {
-//			return NnStatusMsg.userInvalid(locale);
-//		}		
-//		//find categories
-//		return NnStatusMsg.successStr(locale) + this.getCategoriesByMsoKey(user.getMsoKey(), locale);
-//	}
-			
+	 			
 	public String findPublicChannelsByCategory(String categoryId) {		
 		//verify input
 		List<MsoChannel> channels = new ArrayList<MsoChannel>();
@@ -236,7 +230,7 @@ public class PlayerApiService {
 			SubscriptionManager sMngr = new SubscriptionManager();
 			List<MsoChannel> ipgChannels = ipgMngr.findIpgChannels(ipg);
 			for (MsoChannel c : ipgChannels)
-				sMngr.subscribeChannel(guest.getKey().getId(), c.getKey().getId(), c.getSeq(), c.getType());			
+				sMngr.subscribeChannel(guest.getKey().getId(), c.getKey().getId(), c.getSeq(), c.getType(), mso.getKey().getId());			
 		} else {
 			userMngr.subscibeDefaultChannels(guest);
 		}
@@ -297,7 +291,7 @@ public class PlayerApiService {
 				
 		//subscribe
 		SubscriptionManager subMngr = new SubscriptionManager();
-		boolean status = subMngr.subscribeChannel(user.getKey().getId(), channel.getKey().getId(), Integer.valueOf(grid), MsoIpg.TYPE_GENERAL);
+		boolean status = subMngr.subscribeChannel(user.getKey().getId(), channel.getKey().getId(), Integer.valueOf(grid), MsoIpg.TYPE_GENERAL, mso.getKey().getId());
 		if (status) {
 			output = NnStatusMsg.successStr(locale);
 		} else {
@@ -334,10 +328,11 @@ public class PlayerApiService {
 		if (user == null ) {
 			log.info("User signup userToken NOT FOUND. Token=" + userToken);
 			user = new NnUser(email, password, name, NnUser.TYPE_USER, mso.getKey().getId());
-			userMngr.create(user); 
+			log.info("user, based on the input:" + user.toString());
+			userMngr.create(user);
 			userMngr.subscibeDefaultChannels(user);
 		} else {
-			log.info("User signup with guest token=" + userToken + "; email=" + user.getEmail() + "; name=" + user.getName());					 		
+			log.info("User signup with guest token=" + userToken + "; email=" + email + "; name=" + name);					 		
 			if (user.getEmail().equals(NnUser.GUEST_EMAIL)) {
 				log.info("1st time signup after being a guest");
 				user.setEmail(email);
@@ -348,6 +343,7 @@ public class PlayerApiService {
 				return messageSource.getMessage("nnstatus.user_token_taken", new Object[] {NnStatusCode.USER_TOKEN_TAKEN} , locale);				
 			}
 		}
+		log.info("user, after user's created" + user.toString());			
 		String output = this.prepareUserInfo(user);
 		this.setUserCookie(resp, user.getToken());
 		return output;
@@ -367,7 +363,7 @@ public class PlayerApiService {
 	}
 	
 	public String findAuthenticatedUser(String email, String password, HttpServletRequest req, HttpServletResponse resp) {		
-		log.info("login: email=" + email + "; mso=" + mso.getName());
+		log.info("login: email=" + email + "; mso=" + mso.getKey().getId() + ";password=" + password);
 		String output = messageSource.getMessage("nnstatus.user_login_failed", new Object[] {NnStatusCode.USER_LOGIN_FAILED} , locale);		
 		NnUser user = userMngr.findAuthenticatedUser(email, password, mso.getKey().getId());
 		if (user != null) {
@@ -394,7 +390,10 @@ public class PlayerApiService {
 				
 		//verify category
 		CategoryManager categoryMngr = new CategoryManager();
-		List<Category> categories = categoryMngr.findAllByIds(categoryIds);
+		List<Long> categoryIdList = new ArrayList<Long>();	
+		String[] arr = categoryIds.split(",");
+		for (int i=0; i<arr.length; i++) { categoryIdList.add(Long.parseLong(arr[i])); }
+		List<Category> categories = categoryMngr.findAllByIds(categoryIdList);
 		if (categories.size() == 0) { return messageSource.getMessage("nnstatus.category_invalid", new Object[] {NnStatusCode.CATEGORY_INVALID} , locale); }
 		
 
@@ -413,6 +412,7 @@ public class PlayerApiService {
 			for (CategoryChannel cc : ccs) {
 				existing.put(cc.getCategoryId(), "");
 			}
+			//** this requirement should be removed, therefore not making it a general case in channel save.
 			// --find new category user defines if there's any 
 			String[] ids = categoryIds.split(",");
 			List<String> newIds = new ArrayList<String>();
@@ -456,7 +456,7 @@ public class PlayerApiService {
 		
 		//subscribe
 		SubscriptionManager subMngr = new SubscriptionManager();
-		subMngr.subscribeChannel(user.getKey().getId(), channel.getKey().getId(), Integer.parseInt(grid), MsoIpg.TYPE_GENERAL);		
+		subMngr.subscribeChannel(user.getKey().getId(), channel.getKey().getId(), Integer.parseInt(grid), MsoIpg.TYPE_GENERAL, mso.getKey().getId());		
 		String result[]= {String.valueOf(channel.getKey().getId()),				  	 	  
 				  	 	  channel.getName(),
 				  	 	  channel.getImageUrl()};
@@ -476,7 +476,7 @@ public class PlayerApiService {
 		
 		//find subscribed channels 
 		SubscriptionManager subMngr = new SubscriptionManager();
-		List<MsoChannel> channels = subMngr.findSubscribedChannels(user.getKey().getId());
+		List<MsoChannel> channels = subMngr.findSubscribedChannels(user.getKey().getId(), mso.getKey().getId());
 		for (MsoChannel c : channels) {
 			result = result + this.composeChannelLineupStr(c, mso);
 			result = result + "\n";
@@ -563,7 +563,8 @@ public class PlayerApiService {
 					    imageUrl,
 					    String.valueOf(c.getProgramCount()),
 					    String.valueOf(c.getType()),
-					    String.valueOf(c.getStatus())}; 					    
+					    String.valueOf(c.getStatus()),
+					    String.valueOf(c.getSubscriptionCount())}; 					    
 		String output = NnStringUtil.getDelimitedStr(ori);
 		return output;
 	}

@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.List;
 
 import com.nnvmso.dao.CategoryChannelDao;
-import com.nnvmso.model.Category;
 import com.nnvmso.model.CategoryChannel;
 
 public class CategoryChannelManager {
@@ -16,10 +15,6 @@ public class CategoryChannelManager {
 		cc.setCreateDate(now);
 		cc.setUpdateDate(now);
 		ccDao.save(cc);
-		CategoryManager categoryMngr = new CategoryManager();
-		Category category = categoryMngr.findById(cc.getCategoryId());
-		category.setChannelCount(category.getChannelCount() + 1);
-		categoryMngr.save(category);
 	}	
 
 	public List<CategoryChannel> findAllByCategoryId(long categoryId) {

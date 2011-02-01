@@ -22,7 +22,6 @@ public class NnUserManager {
 	
 	//@@@IMPORTANT email duplication is your responsibility
 	public void create(NnUser user) {
-		System.out.println(user.getEmail());
 		user.setName(user.getName().replaceAll("\\s", " "));
 		user.setEmail(user.getEmail().toLowerCase());
 		user.setToken(this.generateToken());
@@ -42,7 +41,6 @@ public class NnUserManager {
 		String random = RandomStringUtils.randomAlphabetic(10);
 		String result = time + random;
 		result = RandomStringUtils.random(20, 0, 20, true, true, result.toCharArray());
-		System.out.println("random = " + result);				
 		return result;
 	}	
 	
@@ -65,7 +63,7 @@ public class NnUserManager {
 		List<MsoChannel> channels = channelMngr.findMsoDefaultChannels(user.getMsoId());		
 		SubscriptionManager subManager = new SubscriptionManager();
 		for (MsoChannel c : channels) {
-			subManager.subscribeChannel(user.getKey().getId(), c.getKey().getId(), c.getSeq(), c.getType());
+			subManager.subscribeChannel(user.getKey().getId(), c.getKey().getId(), c.getSeq(), c.getType(), user.getMsoId());
 		}
 		log.info("subscribe to " + channels.size() + " of channels by user:" + user.getKey() + "(mso is " + user.getMsoId() + ")");
 	}

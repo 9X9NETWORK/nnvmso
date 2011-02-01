@@ -24,20 +24,21 @@ public class PdrRawManager {
 	}		
 	
 	public void processPdr(String pdr, long userId, String sessionId) {
-		log.info("original pdr: \n" + pdr);
+		if (pdr == null) {return;}		
+		
 		String[] lines = pdr.split("\n");
 		PdrRawManager pdrMngr = new PdrRawManager();
 		ViewLogManager viewLogMngr = new ViewLogManager();
-		try {
+		//store raw data !!! change to blob type
+		if (pdr.length() > 500) { pdr = pdr.substring(0, 499);}
+		PdrRaw raw = new PdrRaw(userId, sessionId, 0, null, pdr);			
+		pdrMngr.save(raw);
+		//if the verb is watch, store the data in viewlog
+		try {			
 			for (String line : lines) {						
 				String[] data = line.split("\t");			
-				long delta = Long.parseLong(data[0]);
 				String verb = data[1];			
-				int beginningIndex = data[0].length() + data[1].length() + 2;
-				String info = line.substring(beginningIndex);
-				PdrRaw raw = new PdrRaw(userId, sessionId, delta, verb, info);			
-				pdrMngr.save(raw);			
-				if (verb.equals("watched")) {
+				if (verb.equals(PdrRaw.VERB_WATCH)) {
 					viewLogMngr.processPdr(line, userId);
 				}
 			}

@@ -3,15 +3,33 @@ package com.nnvmso.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.stereotype.Service;
-import com.nnvmso.model.*;
+
+import com.nnvmso.lib.NnStringUtil;
+import com.nnvmso.model.Category;
+import com.nnvmso.model.CategoryChannel;
+import com.nnvmso.model.Mso;
+import com.nnvmso.model.MsoChannel;
+import com.nnvmso.model.MsoConfig;
+import com.nnvmso.model.MsoIpg;
+import com.nnvmso.model.MsoProgram;
+import com.nnvmso.model.NnUser;
+import com.nnvmso.model.Subscription;
 
 /**
  * for testing, works only for small set of data
  */	
 @Service
 public class InitService {
+
+	private HttpServletRequest req;
 	
+	public void setRequest(HttpServletRequest req) {
+		this.req = req;
+	}
+
 	public void deleteAll() {
 		DbDumper dumper = new DbDumper();
 		@SuppressWarnings("rawtypes")
@@ -127,21 +145,26 @@ public class InitService {
 		//create channel		
 		MsoChannel channel1 = new MsoChannel("Etsy", "Etsy.com", "http://s3.amazonaws.com/9x9chthumb/54e2967caf4e60fe9bc19ef1920997977eae1578.gif", user.getKey().getId());
 		channel1.setSourceUrl("http://feeds.feedburner.com/etsyetsyetsy");
-		channel1.setPublic(true);		
+		channel1.setPublic(true);
 		channelMngr.create(channel1, categories);
+		TranscodingService tranService = new TranscodingService();
 		
-		MsoProgram program1 = new MsoProgram("Handmade Confessional: Eli Dlugach", "Eli Dlugach gives a testimonial on why he loves handmade", "http://s3.amazonaws.com/9x9cache/005a69b4431d521e39534431254d81a211ebefc7_1227739497_thumbnail.jpg", MsoProgram.TYPE_VIDEO);
-		program1.setImageLargeUrl("http://s3.amazonaws.com/9x9cache/005a69b4431d521e39534431254d81a211ebefc7_1227739497_thumbLarge.jpg");
-		program1.setMpeg4FileUrl("http://s3.amazonaws.com/9x9pod/005a69b4431d521e39534431254d81a211ebefc7_1227739497.m4v");
-		program1.setWebMFileUrl("http://s3.amazonaws.com/9x9cache/005a69b4431d521e39534431254d81a211ebefc7_1227739497.webm");	
-		program1.setPublic(true);
-		programMngr.create(channel1, program1);
-
-		MsoProgram program2 = new MsoProgram("How-Tuesday: Needle Felted Eyeballs", "Read the full Etsy blog post", "http://s3.amazonaws.com/9x9cache/5a14e5502fd5ab6b26e7f11f2a38ee718bc06eea_1288043514_thumbnail.jpg", MsoProgram.TYPE_VIDEO);
-		program2.setImageLargeUrl("http://s3.amazonaws.com/9x9cache/5a14e5502fd5ab6b26e7f11f2a38ee718bc06eea_1288043514_thumbLarge.jpg");
-		program2.setMpeg4FileUrl("http://s3.amazonaws.com/9x9pod/5a14e5502fd5ab6b26e7f11f2a38ee718bc06eea_1288043514.m4v");	
-		program2.setPublic(true);
-		programMngr.create(channel1, program2);
+		if (devel) {
+			MsoProgram program1 = new MsoProgram("Handmade Confessional: Eli Dlugach", "Eli Dlugach gives a testimonial on why he loves handmade", "http://s3.amazonaws.com/9x9cache/005a69b4431d521e39534431254d81a211ebefc7_1227739497_thumbnail.jpg", MsoProgram.TYPE_VIDEO);
+			program1.setImageLargeUrl("http://s3.amazonaws.com/9x9cache/005a69b4431d521e39534431254d81a211ebefc7_1227739497_thumbLarge.jpg");
+			program1.setMpeg4FileUrl("http://s3.amazonaws.com/9x9pod/005a69b4431d521e39534431254d81a211ebefc7_1227739497.m4v");
+			program1.setWebMFileUrl("http://s3.amazonaws.com/9x9cache/005a69b4431d521e39534431254d81a211ebefc7_1227739497.webm");	
+			program1.setPublic(true);
+			programMngr.create(channel1, program1);
+	
+			MsoProgram program2 = new MsoProgram("How-Tuesday: Needle Felted Eyeballs", "Read the full Etsy blog post", "http://s3.amazonaws.com/9x9cache/5a14e5502fd5ab6b26e7f11f2a38ee718bc06eea_1288043514_thumbnail.jpg", MsoProgram.TYPE_VIDEO);
+			program2.setImageLargeUrl("http://s3.amazonaws.com/9x9cache/5a14e5502fd5ab6b26e7f11f2a38ee718bc06eea_1288043514_thumbLarge.jpg");
+			program2.setMpeg4FileUrl("http://s3.amazonaws.com/9x9pod/5a14e5502fd5ab6b26e7f11f2a38ee718bc06eea_1288043514.m4v");	
+			program2.setPublic(true);
+			programMngr.create(channel1, program2);
+		} else {
+			tranService.submitToTranscodingService(NnStringUtil.getKeyStr(channel1.getKey()), channel1.getSourceUrl(), req);
+		}
 		
 		//create channel
 		MsoChannel channel2 = new MsoChannel("TEDTalks (hd)", "TED", "http://s3.amazonaws.com/9x9chthumb/f14a9bb972adfefab1c9c4f0ec44f251686d655a.jpg", user.getKey().getId());		
@@ -149,30 +172,34 @@ public class InitService {
 		channel2.setPublic(true);
 		channelMngr.create(channel2, categories);
 
-		MsoProgram program3 = new MsoProgram("TEDTalks : Beverly + Dereck", "Beverly + Dereck Joubert live in the bush", "http://s3.amazonaws.com/9x9cache/8ad69b8dcbd0edd516c4f6bd530390d9f640de45_1292858280_thumbnail.jpg", MsoProgram.TYPE_VIDEO);
-		program3.setImageLargeUrl("http://s3.amazonaws.com/9x9cache/8ad69b8dcbd0edd516c4f6bd530390d9f640de45_1292858280_thumbLarge.jpg");
-		program3.setMpeg4FileUrl("http://s3.amazonaws.com/9x9pod/8ad69b8dcbd0edd516c4f6bd530390d9f640de45_1292858280.mp4");	
-		program3.setPublic(true);
-		programMngr.create(channel2, program3);
-
-		MsoProgram program4 = new MsoProgram("TEDTalks : Peter Molyneux", "Peter Molyneux demos Milo", "http://s3.amazonaws.com/9x9cache/5716619074068502b91f5f9668cf906a6702078b_1282119180_thumbnail.jpg", MsoProgram.TYPE_VIDEO);
-		program4.setImageLargeUrl("http://s3.amazonaws.com/9x9cache/5716619074068502b91f5f9668cf906a6702078b_1282119180_thumbLarge.jpg");
-		program4.setMpeg4FileUrl("http://s3.amazonaws.com/9x9pod/5716619074068502b91f5f9668cf906a6702078b_1282119180.mp4");	
-		program4.setPublic(true);
-		programMngr.create(channel2, program4);
-
-		MsoProgram program8 = new MsoProgram("TEDTalks : Hans Rosling", "Hans Rosling reframes 10 years of UN", "http://s3.amazonaws.com/9x9cache/5ee1ea7ea93d6703c90fb4dc00188f4e5619ee1f_1286442720_thumbnail.jpg", MsoProgram.TYPE_VIDEO);
-		program8.setImageLargeUrl("http://s3.amazonaws.com/9x9cache/5ee1ea7ea93d6703c90fb4dc00188f4e5619ee1f_1286442720_thumbLarge.jpg");
-		program8.setMpeg4FileUrl("http://s3.amazonaws.com/9x9pod/5ee1ea7ea93d6703c90fb4dc00188f4e5619ee1f_1286442720.mp4");	
-		program8.setPublic(true);
-		programMngr.create(channel2, program8);
-
-		MsoProgram program9 = new MsoProgram("TEDTalks : Zainab Salbi: Women", "In war we often see only the frontline stories of soldiers and combat", "http://s3.amazonaws.com/9x9cache/6e0c1a48b2a5b8b9253b25885a2cce9586564366_1290523500_thumbnail.jpg", MsoProgram.TYPE_VIDEO);
-		program9.setImageLargeUrl("http://s3.amazonaws.com/9x9cache/6e0c1a48b2a5b8b9253b25885a2cce9586564366_1290523500_thumbLarge.jpg");
-		program9.setMpeg4FileUrl("http://s3.amazonaws.com/9x9pod/6e0c1a48b2a5b8b9253b25885a2cce9586564366_1290523500.mp4");
-		program9.setWebMFileUrl("http://s3.amazonaws.com/9x9cache/6e0c1a48b2a5b8b9253b25885a2cce9586564366_1290523500.webm");
-		program9.setPublic(true);
-		programMngr.create(channel2, program9);
+		if (devel) {
+			MsoProgram program3 = new MsoProgram("TEDTalks : Beverly + Dereck", "Beverly + Dereck Joubert live in the bush", "http://s3.amazonaws.com/9x9cache/8ad69b8dcbd0edd516c4f6bd530390d9f640de45_1292858280_thumbnail.jpg", MsoProgram.TYPE_VIDEO);
+			program3.setImageLargeUrl("http://s3.amazonaws.com/9x9cache/8ad69b8dcbd0edd516c4f6bd530390d9f640de45_1292858280_thumbLarge.jpg");
+			program3.setMpeg4FileUrl("http://s3.amazonaws.com/9x9pod/8ad69b8dcbd0edd516c4f6bd530390d9f640de45_1292858280.mp4");	
+			program3.setPublic(true);
+			programMngr.create(channel2, program3);
+	
+			MsoProgram program4 = new MsoProgram("TEDTalks : Peter Molyneux", "Peter Molyneux demos Milo", "http://s3.amazonaws.com/9x9cache/5716619074068502b91f5f9668cf906a6702078b_1282119180_thumbnail.jpg", MsoProgram.TYPE_VIDEO);
+			program4.setImageLargeUrl("http://s3.amazonaws.com/9x9cache/5716619074068502b91f5f9668cf906a6702078b_1282119180_thumbLarge.jpg");
+			program4.setMpeg4FileUrl("http://s3.amazonaws.com/9x9pod/5716619074068502b91f5f9668cf906a6702078b_1282119180.mp4");	
+			program4.setPublic(true);
+			programMngr.create(channel2, program4);
+	
+			MsoProgram program8 = new MsoProgram("TEDTalks : Hans Rosling", "Hans Rosling reframes 10 years of UN", "http://s3.amazonaws.com/9x9cache/5ee1ea7ea93d6703c90fb4dc00188f4e5619ee1f_1286442720_thumbnail.jpg", MsoProgram.TYPE_VIDEO);
+			program8.setImageLargeUrl("http://s3.amazonaws.com/9x9cache/5ee1ea7ea93d6703c90fb4dc00188f4e5619ee1f_1286442720_thumbLarge.jpg");
+			program8.setMpeg4FileUrl("http://s3.amazonaws.com/9x9pod/5ee1ea7ea93d6703c90fb4dc00188f4e5619ee1f_1286442720.mp4");	
+			program8.setPublic(true);
+			programMngr.create(channel2, program8);
+	
+			MsoProgram program9 = new MsoProgram("TEDTalks : Zainab Salbi: Women", "In war we often see only the frontline stories of soldiers and combat", "http://s3.amazonaws.com/9x9cache/6e0c1a48b2a5b8b9253b25885a2cce9586564366_1290523500_thumbnail.jpg", MsoProgram.TYPE_VIDEO);
+			program9.setImageLargeUrl("http://s3.amazonaws.com/9x9cache/6e0c1a48b2a5b8b9253b25885a2cce9586564366_1290523500_thumbLarge.jpg");
+			program9.setMpeg4FileUrl("http://s3.amazonaws.com/9x9pod/6e0c1a48b2a5b8b9253b25885a2cce9586564366_1290523500.mp4");
+			program9.setWebMFileUrl("http://s3.amazonaws.com/9x9cache/6e0c1a48b2a5b8b9253b25885a2cce9586564366_1290523500.webm");
+			program9.setPublic(true);
+			programMngr.create(channel2, program9);
+		} else {
+			tranService.submitToTranscodingService(NnStringUtil.getKeyStr(channel2.getKey()), channel2.getSourceUrl(), req);
+		}
 		
 		//create channel				
 		MsoChannel channel5 = new MsoChannel("System Channel", "System Channel", "/WEB-INF/../images/logo_9x9.png", user.getKey().getId());
@@ -183,7 +210,7 @@ public class InitService {
 		program7.setPublic(true);
 		program7.setMpeg4FileUrl("http://9x9pod.s3.amazonaws.com/default.mp4");
 		program7.setWebMFileUrl("http://9x9pod.s3.amazonaws.com/default.mp4");	
-		programMngr.create(channel5, program7);		
+		programMngr.create(channel5, program7);
 				
 		//create a channel, but status set to error
 		MsoChannel channel3 = new MsoChannel("Vegan A Go-Go", "A simple vegan cooking show.", "http://s3.amazonaws.com/9x9chthumb/6bb992aafe18c3054ca30035d7e5fe7cc9394d37.jpg", user.getKey().getId());		
@@ -213,12 +240,12 @@ public class InitService {
 		channelMngr.create(channel4, categories);				
 	}
 	
-	private void initializeMso1AndCategories() {
+	private void initializeMso1AndCategories(boolean debug) {
 		//a default MSO
 		MsoManager msoMngr = new MsoManager();
 		Mso mso = new Mso("9x9", "9x9", "mso@9x9.tv", Mso.TYPE_NN);
 		mso.setPreferredLangCode(Mso.LANG_EN);
-		mso.setJingleUrl("/WEB-INF/../videos/logo2.swf");
+		mso.setJingleUrl("/WEB-INF/../videos/opening.swf");
 		mso.setLogoUrl("/WEB-INF/../images/logo_9x9.png");
 		mso.setLogoClickUrl("/");
 		msoMngr.create(mso);
@@ -227,6 +254,10 @@ public class InitService {
 		MsoConfigManager configMngr = new MsoConfigManager();
 		MsoConfig config = new MsoConfig(mso.getKey().getId(), MsoConfig.CDN, MsoConfig.CDN_AKAMAI);
 		configMngr.save(config);
+		String debugStr = "1";
+		if (!debug) {debugStr = "0";}
+		MsoConfig config1 = new MsoConfig(mso.getKey().getId(), MsoConfig.DEBUG, debugStr);
+		configMngr.save(config1);
 		
 		//a default MSO user
 		NnUserManager userMngr = new NnUserManager();
@@ -249,12 +280,12 @@ public class InitService {
 		}
 	}
 
-	private void initializeMso2AndCategories() {
+	private void initializeMso2AndCategories(boolean debug) {
 		//a default MSO
 		MsoManager msoMngr = new MsoManager();
 		Mso mso = new Mso("5f", "5f", "mso@5f.tv", Mso.TYPE_MSO);
 		mso.setPreferredLangCode(Mso.LANG_ZH_TW);
-		mso.setJingleUrl("/WEB-INF/../videos/logo2.swf");
+		mso.setJingleUrl("/WEB-INF/../videos/opening.swf");
 		mso.setLogoUrl("/WEB-INF/../images/5floor-logo.png");
 		mso.setLogoClickUrl("/");
 		msoMngr.create(mso);
@@ -263,6 +294,11 @@ public class InitService {
 		MsoConfigManager configMngr = new MsoConfigManager();
 		MsoConfig config = new MsoConfig(mso.getKey().getId(), MsoConfig.CDN, MsoConfig.CDN_AKAMAI);
 		configMngr.save(config);
+		String debugStr = "1";
+		if (!debug) {debugStr = "0";}
+		MsoConfig config1 = new MsoConfig(mso.getKey().getId(), MsoConfig.DEBUG, debugStr);
+		configMngr.save(config1);
+		
 		
 		//a default MSO user
 		NnUserManager userMngr = new NnUserManager();
@@ -281,15 +317,15 @@ public class InitService {
 		}
 	}		
 	
-	public void initMsoAndCategories() {
-		initializeMso1AndCategories();
-		initializeMso2AndCategories();	
+	public void initMsoAndCategories(boolean debug) {
+		initializeMso1AndCategories(debug);
+		initializeMso2AndCategories(debug);	
 	}	
 	
-	public void initAll(boolean devel) {
+	public void initAll(boolean devel, boolean debug) {
 		deleteAll();		
-		initializeMso1AndCategories();
-		initializeMso2AndCategories();	
+		initializeMso1AndCategories(debug);
+		initializeMso2AndCategories(debug);	
 		createMso1DefaultChannels(devel);
 		createMso2DefaultChannels(devel);	
 		createMso1DefaultIpg();

@@ -46,7 +46,7 @@ public class MsoProgramManager {
 	public List<MsoProgram> findNew(long userId) {
 		SubscriptionManager subMngr = new SubscriptionManager();
 		ViewLogManager watchedMngr = new ViewLogManager();
-		List<MsoChannel> channels = subMngr.findSubscribedChannels(userId);
+		List<MsoChannel> channels = subMngr.findSubscribedChannels(userId, 0);
 		List<Long> list = new ArrayList<Long>();
 		for (int i=0; i< channels.size(); i++) {
 			list.add(channels.get(i).getKey().getId());
@@ -87,7 +87,7 @@ public class MsoProgramManager {
 	
 	public List<MsoProgram> findSubscribedPrograms(long userId) {
 		SubscriptionManager subService = new SubscriptionManager();			
-		List<MsoChannel> channels = subService.findSubscribedChannels(userId);
+		List<MsoChannel> channels = subService.findSubscribedChannels(userId, 0);
 		List<MsoProgram> programs = new ArrayList<MsoProgram>();
 		List<Long> channelIds = new ArrayList<Long>();
 		for (MsoChannel c : channels) {
