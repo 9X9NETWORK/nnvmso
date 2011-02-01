@@ -28,6 +28,7 @@ public class PdrRaw implements Serializable {
 	
 	@Persistent
 	private String verb;
+	public static String VERB_WATCH = "w";
 	
 	@Persistent
 	private String info;
