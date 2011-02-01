@@ -19,7 +19,6 @@
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.8/i18n/jquery-ui-i18n.min.js"></script>
 
 <script type="text/javascript" src="http://static.ak.fbcdn.net/connect/en_US/core.debug.js"></script>
-<!--script type="text/javascript" src="http://zoo.atomics.org/video/cssanim.js"></script-->
 <script type="text/javascript" src="http://zoo.atomics.org/video/swfobject.js"></script>
 <script type="text/javascript" src="http://zoo.atomics.org/video/9x9playerV31/javascripts/jquery.swfobject.1-1-1.min.js"></script>
 <script type="text/javascript" src="http://zoo.atomics.org/video/flowplayer-3.2.4.min.js"></script>
@@ -58,6 +57,7 @@ var all_channels_fetched = false;
 var activated = false;
 var jingled = false;
 var remembered_pause = false;
+var debug = 1;
 
 /* player data record */
 var pdr = '';
@@ -175,21 +175,10 @@ function elastic_innards()
   var vh = $(window).height();
   var vw = $(window).width();
 
-  // var h = document.getElementById ("v");
-  // h.style.height = vh + "px";
-  // var h = document.getElementById ("fp1");
-  // h.style.height = vh + "px";
-  // var h = document.getElementById ("fp2");
-  // h.style.height = vh + "px";
   var h = document.getElementById ("yt1");
-  // h.style.height = vh + "px";
   h.style.width = vw + "px";
 
   resize_fp();
-  // var h = document.getElementById ("player1");
-  // h.style.height = vh + "px";
-  // var h = document.getElementById ("player2");
-  // h.style.height = vh + "px";
 
   ipg_fixup_margin();
   ipg_fixup_middle();
@@ -494,12 +483,6 @@ function fetch_programs()
 
 function parse_program_data (data)
   {
-  // 0=channelId, 1=programId, 2=programName, 3=description(max length=256),
-  // 4=programType, 5=duration,
-  // 6=programThumbnailUrl, 7=programLargeThumbnailUrl,
-  // 8=url1(mpeg4/slideshow), 9=url2(webm), 10=url3(flv more likely), 11=url4(audio),
-  // 12=timestamp
-
   var lines = data.split ('\n');
 
   log ('number of programs obtained: ' + (lines.length - 3));
@@ -627,7 +610,6 @@ function activate()
   log ('activate: ipg');
   switch_to_ipg();
 
-  //$("#notblue").show();
   $("#blue").hide();
   preload_control_images()
 
@@ -1099,7 +1081,6 @@ function enter_category (cat, positioning)
   {
   log ('enter category: ' + cat + ', thumbing: ' + thumbing);
 
-  /* temporary code, if channel mode is removed */
   if (true)
     {
     channel_line = {};
@@ -1148,7 +1129,7 @@ function ch_html (cat)
         thumbnail = bad_thumbnail;
 
       channel_line [++n_channel_line] = chan;
-      // html += '<li id="c-' + current_category + '-li-' + n_channel_line + '"><img id="c-th-' + n_channel_line + '" src="' + channelgrid [chan]['thumb'] + '"></li>';
+
       html += '<li id="c-' + cat + '-li-' + n_channel_line;
       html += (channel_cursor == n_channel_line) ? '" class="on">' : '">';
 
@@ -1767,8 +1748,6 @@ function switch_to_whats_new()
             programgrid [program]['screenshot'] = programgrid [program]['snapshot'];
           else
             programgrid [program]['screenshot'] = programgrid [program]['thumb']
-
-          //log ('whatsnew ' + program + ' (ch: ' + real_channel + '): ' + programgrid [program]['name']);
           }
         else
           log ('program ' + program + ' not known');
@@ -2114,17 +2093,20 @@ function ipg_metainfo()
 
     $("#description").html ('<p>' + desc + '</p>');
 
-    var display_eps;
     var n_eps = programs_in_channel (ipg_cursor);
+    var display_eps = n_eps;
 
     if (channelgrid [ipg_cursor]['count'] == undefined)
       {
       /* brackets quietly indicate a data inconsistency */
-      display_eps = '[' + n_eps + ']';
+      if (debug)
+        display_eps = '[' + n_eps + ']';
       }
     else if (n_eps != channelgrid [ipg_cursor]['count'])
       {
-      display_eps = channelgrid [ipg_cursor]['count'] + ' [' + n_eps + ']';
+      if (debug)
+        display_eps = channelgrid [ipg_cursor]['count'] + ' [' + n_eps + ']';
+
       if (! ('refetched' in channelgrid [ipg_cursor]))
         {
         channelgrid [ipg_cursor]['refetched'] = true;
@@ -2262,8 +2244,6 @@ function ipg_right()
 
   $("#ipg-" + ipg_cursor).removeClass ("on");
 
-  // ipg_cursor = next_channel_square (ipg_cursor)
-
   if (parseInt (ipg_cursor) == 99)
     ipg_cursor = 11;
   else if (parseInt (ipg_cursor) % 10 == 9)
@@ -2303,8 +2283,6 @@ function ipg_left()
     return;
 
   $("#ipg-" + ipg_cursor).removeClass ("on");
-
-  // ipg_cursor = previous_channel_square (ipg_cursor)
 
   if (parseInt (ipg_cursor) == 11)
     ipg_cursor = 99;
@@ -2373,7 +2351,6 @@ function ipg_down()
     {
     $("#ipg-btn-signin").removeClass ("on");
     $("#ipg-btn-resume").removeClass ("on");
-    // ipg_cursor = first_channel();
     ipg_cursor = ipg_saved_cursor;
     }
   else if (ipg_cursor > 90)
@@ -2578,7 +2555,7 @@ function ipg_play()
 
   if (programs_in_channel (ipg_cursor) < 1)
     {
-    log_and_alert ('no programs in channel!');
+    log_and_alert ('No programs in channel!');
     return;
     }
 
@@ -2685,9 +2662,6 @@ function redraw_channel_line()
         $("#c-" + current_category + "-li-" + y).removeClass ("on");
       }
     }
-
-  // old way, replace all html inside div:
-  // $("#ch-list-" + current_category).html (ch_html (current_category));
   }
 
 function ep_click (id)
@@ -2856,10 +2830,8 @@ function getcookie (id)
     try
       {
       var kv = fields[i].split ('=');
-      // log ('k: ' + kv[0] + ' v: ' + kv[1]);
       if (kv [0] == id)
         return kv [1];
-      // log ('nope');
       }
     catch (err)
       {
@@ -2873,6 +2845,9 @@ function getcookie (id)
 
 function sign_in_or_out()
   {
+  if (thumbing != 'ipg')
+    return;
+
   if (username != 'Guest' && username != '')
     {
     var d = $.get ("/playerAPI/signout?user=" + user, function (data)
@@ -2912,7 +2887,7 @@ function submit_login()
   var things = [];
   var params = { 'L-email': 'email', 'L-password': 'password' };
 
-  // this is broken in Opera, appears to be Javascript bug
+  // this is broken in earlier Opera, appears to be Javascript implementation bug
   for (var p in params)
     {
     var v = $('#' + p).val();
@@ -2974,7 +2949,7 @@ function submit_signup()
   var things = [];
   var params = { 'S-name': 'name', 'S-email': 'email', 'S-password': 'password' };
 
-  // this is broken in Opera, appears to be Javascript bug
+  // this is broken in earlier Opera, appears to be Javascript implementation bug
   for (var p in params)
     {
     var v = $('#' + p).val();
@@ -3093,7 +3068,6 @@ function submit_throw()
       log ('podcast thrown successfully!')
       log ('channelSubmit returned: ' + data);
       fields = lines[2].split('\t');
-      // fields: 0=channel-id 1=channel-name 2=channel-thumb
       channelgrid [ipg_cursor] = { 'id': fields[0], 'name': fields[1], 'thumb': fields[2] };
       channels_by_id [fields[0]] = ipg_cursor;
       redraw_ipg();
@@ -3206,6 +3180,13 @@ function pre_login()
           log ('language: ' + fields[1]);
           language = fields[1];
           }
+        else if (fields[0] == 'debug')
+          {
+          log ('debug: ' + fields[1]);
+          debug = fields[1];
+          if (debug)
+            $("#preload").hide();
+          }
         }
       login();
       }
@@ -3282,7 +3263,10 @@ function login()
         }
       else
         {
-        log_and_alert ('user token was not valid');
+        if (debug)
+          log_and_alert ('user token was not valid');
+        else
+          log ('user token was not valid');
         login();
         }
       });
@@ -3374,15 +3358,10 @@ function browse()
   browser_first_cat = 1;
   browser_mode = 'category';
 
-  // $("#msg-layer").html ('<p>One moment...</p>');
-  // $("#msg-layer").show();
-
   $("#waiting").show();
 
-  var query = "/playerAPI/categoryBrowse?langCode=en";
-  var d = $.get (query, function (data)
+  var d = $.get ("/playerAPI/categoryBrowse?langCode=en", function (data)
     {
-    // $("#msg-layer").hide();
     $("#waiting").hide();
     sanity_check_data ('categoryBrowse', data);
 
@@ -3764,6 +3743,14 @@ function browse_down()
     }
   }
 
+function browse_page_up()
+  {
+  }
+
+function browse_page_down()
+  { 
+  }
+
 function browse_click (column, id)
   {
   log ('browse click :: ' + column + ', ' + id);
@@ -3896,7 +3883,7 @@ function redraw_browse_content()
   for (var i = browse_list_first; i <= n_browse_list && i < browse_list_first + 8; i++)
     {
     var content = browse_list [i];
-log ('  i: ' + i + ' content: ' + content);
+
     html += '<li id="content-' + i + '" data-id="' + content['id'] + '"><img src=' + content['thumb'] + ' class="thumbnail">';
     html += '<p class="chdir-title">' + content['name'] + '</p>';
 
@@ -4404,12 +4391,6 @@ function fp_notbuffering()
 
   if (id == fp_player)
     $("#buffering").hide();
-
-  // if (id == fp_preloaded)
-  //  {
-  //  log ('pausing preload');
-  //  flowplayer (fp_preloaded).pause();
-  //  }
   }
 
 function fp_onpreload()
@@ -4428,8 +4409,6 @@ function fp_onpreload()
 
 function yt_tick()
   {
-  // log ('yt_tick');
-
   if (tube() == "yt")
     update_progress_bar();
 
