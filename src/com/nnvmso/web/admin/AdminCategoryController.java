@@ -78,13 +78,13 @@ public class AdminCategoryController {
 	}
 	
 	@RequestMapping("modify")
-	public @ResponseBody String modify(@RequestParam(required=true)  String key,
+	public @ResponseBody String modify(@RequestParam(required=true)  long id,
 	                                   @RequestParam(required=false) String name,
 	                                   @RequestParam(required=false) String isPublic,
 	                                   @RequestParam(required=false) String channelCount) {
 		
-		logger.info("name: " + name + " isPublic: " + isPublic + " channelCount: " + channelCount + " key: " + key);
-		Category category = categoryMngr.findByKeyStr(key);
+		logger.info("name: " + name + " isPublic: " + isPublic + " channelCount: " + channelCount + " id: " + id);
+		Category category = categoryMngr.findById(id);
 		if (category == null)
 			return "Category Not Found";
 		
