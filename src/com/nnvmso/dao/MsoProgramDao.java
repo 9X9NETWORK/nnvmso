@@ -11,13 +11,11 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import com.google.appengine.api.datastore.Key;
 import com.nnvmso.lib.PMF;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoProgram;
 import com.nnvmso.service.PlayerApiService;
-
-import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
 
 public class MsoProgramDao {
 	
@@ -98,7 +96,6 @@ public class MsoProgramDao {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Query q = pm.newQuery(MsoProgram.class, ":p.contains(channelId)");
 		@SuppressWarnings("unchecked")
-		//List<MsoProgram> programs = ((List<MsoProgram>) q.execute(Arrays.asList(367L, 385L, 377L)));
 		List<MsoProgram> programs = ((List<MsoProgram>) q.execute(channelIds));
 		Iterator<MsoProgram> iter = programs.iterator();
 		while(iter.hasNext()) {
@@ -111,11 +108,7 @@ public class MsoProgramDao {
 		pm.close();
 		return programs;
 	}
-	
-	public List<MsoProgram> findAllByChannelKey(Key channelKey) {
-		return this.findAllByChannelId(channelKey.getId());
-	}
-	
+		
 	public List<MsoProgram> findAllByChannelId(long channelId) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Query q = pm.newQuery(MsoProgram.class);

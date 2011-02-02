@@ -24,7 +24,6 @@ public class MsoChannelDao {
 	public MsoChannel findById(long id) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		MsoChannel channel = null;
-		System.out.println("id:" + id);
 		try {
 			channel = pm.getObjectById(MsoChannel.class, id);
 			channel = pm.detachCopy(channel);
