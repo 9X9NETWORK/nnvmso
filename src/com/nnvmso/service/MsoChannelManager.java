@@ -1,14 +1,18 @@
 package com.nnvmso.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
+import net.sf.jsr107cache.Cache;
+import net.sf.jsr107cache.CacheException;
+import net.sf.jsr107cache.CacheManager;
+
 import org.springframework.stereotype.Service;
 
 import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
 import com.nnvmso.dao.MsoChannelDao;
 import com.nnvmso.model.Category;
 import com.nnvmso.model.CategoryChannel;
@@ -24,12 +28,12 @@ public class MsoChannelManager {
 	public static short MAX_CHANNEL_SIZE = 50;
 	
 	private MsoChannelDao msoChannelDao = new MsoChannelDao();
-		
+	private Cache cache;
+	
 	/**
 	 * @@@IMPORTANT 
 	 * setProgramCount will be done automatically in MsoProgramManager when a program is added.
-	 * If necessary to manually change programCount, please do with caution.  
-	 * 
+	 * If necessary to manually change programCount, please do with caution.   
 	 */
 	public void create(MsoChannel channel, List<Category> categories) {
 		Date now = new Date();
@@ -51,8 +55,16 @@ public class MsoChannelManager {
 				categoryMngr.save(c);
 			}
 		}
+		
+		//save to cache
+		this.setCache();		
+		String key = this.getCacheKey(channel.getKey().getId());
+		if (cache != null) { cache.put(key, channel); }		
 	}
 
+	/** 
+	 * @param originalState used to calculate category counter, pass null if not interested
+	 */
 	public MsoChannel save(MsoChannel originalState, MsoChannel channel) {
 		//change category's channelCount() !!! minus scenario is missing
 		if (originalState != null &&
@@ -72,7 +84,12 @@ public class MsoChannelManager {
 				c.setChannelCount(c.getChannelCount()+1);
 			}
 		}
-		return msoChannelDao.save(channel);
+		channel = msoChannelDao.save(channel);
+		//save to cache
+		this.setCache();		
+		String key = this.getCacheKey(channel.getKey().getId());
+		if (cache != null) { cache.put(key, channel); }
+		return channel;
 	}		
 	
 	public MsoChannel initChannelSubmittedFromPlayer(String sourceUrl, NnUser user) {
@@ -92,7 +109,6 @@ public class MsoChannelManager {
 				
 	public short getContentTypeByUrl(String url) {
 		short type = MsoChannel.CONTENTTYPE_PODCAST;
-		//!!!
 		if (url.contains("http://www.youtube.com") || url.contains("https://www.youtube.com") || 
 			url.contains("http://youtube.com") || url.contains("https://youtube.com"))
 		{			
@@ -121,7 +137,7 @@ public class MsoChannelManager {
 		//retrieve channels
 		List<MsoChannel> channels = new ArrayList<MsoChannel>();
 		for (MsoIpg i : msoIpg) {
-			MsoChannel channel = msoChannelDao.findById(i.getChannelId());
+			MsoChannel channel = this.findById(i.getChannelId());
 			if (channel != null) {
 				channel.setType(i.getType());
 				channel.setSeq(i.getSeq());
@@ -131,8 +147,24 @@ public class MsoChannelManager {
 		return channels;
 	}	
 
+	//cached
 	public MsoChannel findById(long id) {
-		return msoChannelDao.findById(id);
+		//find from cache
+		this.setCache();
+		String key = this.getCacheKey(id);
+		if (cache != null) {
+			MsoChannel channel = (MsoChannel) cache.get(key);
+			if (channel != null) {
+				log.info("Cache found: channel in cache:" + channel.getKey().getId());
+				return channel;
+			}
+		}
+		//find
+		MsoChannel channel = msoChannelDao.findById(id);
+		//save in cache
+		if (cache != null && channel != null) { cache.put(key, channel);}		
+		log.info("Cache NOT found: channel is just added:" + channel.getKey().getId());
+		return channel;
 	}
 	
 	public List<MsoChannel> findPublicChannels() {
@@ -155,7 +187,8 @@ public class MsoChannelManager {
 		//retrieve channels
 		List<MsoChannel> channels = new ArrayList<MsoChannel>();
 		for (CategoryChannel cc : ccs) {
-			MsoChannel channel = msoChannelDao.findById(cc.getChannelId());
+			//!!! fix query
+			MsoChannel channel = this.findById(cc.getChannelId());
 			if (channel != null && channel.getStatus() == MsoChannel.STATUS_SUCCESS && channel.getProgramCount() > 0) {
 				channels.add(channel);
 			}
@@ -167,13 +200,14 @@ public class MsoChannelManager {
 		return msoChannelDao.findByKey(key);
 	}
 	
-	public MsoChannel findByKeyStr(String key) {		
-		try {
-		  return this.findByKey(KeyFactory.stringToKey(key));
-		} catch (IllegalArgumentException e) {
-			log.info("invalid key string");
-			return null;
-		}				
+	private void setCache() {
+	    try {
+	        cache = CacheManager.getInstance().getCacheFactory().createCache(
+	            Collections.emptyMap());
+	      } catch (CacheException e) {}	      		
 	}
-	
+
+	private String getCacheKey(long id) {
+		return "channel(" + id + ")";		
+	}
 }

@@ -1,20 +1,23 @@
 package com.nnvmso.service;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 
+import net.sf.jsr107cache.Cache;
+import net.sf.jsr107cache.CacheException;
+import net.sf.jsr107cache.CacheManager;
+
 import org.springframework.stereotype.Service;
 
+import com.google.appengine.api.datastore.Key;
 import com.nnvmso.dao.MsoDao;
 import com.nnvmso.lib.CookieHelper;
 import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.model.Mso;
-
-import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
 
 @Service
 public class MsoManager {
@@ -22,11 +25,14 @@ public class MsoManager {
 	protected static final Logger log = Logger.getLogger(MsoManager.class.getName());
 	
 	private MsoDao msoDao = new MsoDao();
- 
+	private Cache cache;
+		
 	public void create(Mso mso) {
 		if (this.findByName(mso.getName()) == null) {
 			this.save(mso);			
-		}		
+		}
+		this.setCache();
+		if (cache != null) { cache.put(this.getCacheKey(mso.getName()), mso);	}
 	}
 	
 	public Mso save(Mso mso) {
@@ -36,6 +42,8 @@ public class MsoManager {
 		Date now = new Date();
 		if (mso.getCreateDate() == null) {mso.setUpdateDate(now);}
 		mso.setUpdateDate(now);
+		this.setCache();
+		if (cache != null) { cache.put(this.getCacheKey(mso.getName()), mso);	}
 		return msoDao.save(mso);
 	}
 	
@@ -49,40 +57,41 @@ public class MsoManager {
 		return null;
 	}
 
+	//cached
 	public Mso findByName(String name) {
+		//find from cache
 		if (name == null) {return null;}
+		this.setCache();
+		String cacheKey = this.getCacheKey(name);
+		if (cache != null) {
+			Mso mso = (Mso) cache.get(cacheKey);
+			if (mso != null) {
+				log.info("Cache found: mso in cache:" + mso.getName());
+				return mso;	
+			}
+		}
+		//find
 		Mso mso = msoDao.findByName(name);
+		//save in cache
+		if (cache != null && mso != null) { cache.put(cacheKey, mso);}
+		log.info("Cache NOT found: mso is just added:" + name);
 		return mso;
 	}	
-
-	//to be removed in the future, for multi-language
-	public short findMsoTypeViaHttpReq(HttpServletRequest req) {
-		String msoName = this.findMsoNameViaHttpReq(req);
-		if (!msoName.equals("5f")) {
-			return Mso.TYPE_NN;
-		}
-		return Mso.TYPE_MSO;
-	}
-
+	
 	public String findMsoNameViaHttpReq(HttpServletRequest req) {
 		String url = NnNetUtil.getUrlRoot(req);
 		String msoName = "";
 		if (url.contains("5f.tv")) {
 			msoName = "5f";
-			log.info("determine mso name by url:" + msoName);
 		} else if (url.contains("9x9.tv")) {
 			msoName = "9x9";
-			log.info("determine mso name by url:" + msoName);
 		} else {
 			msoName = req.getParameter("mso");
-			log.info("determine mso name by header:" + msoName);
 			if (msoName == null) {
 				msoName = CookieHelper.getCookie(req, CookieHelper.MSO);
-				log.info("determine mso name by cookie:" + msoName);
 			}
 			if (msoName == null) {
 				msoName = "9x9";
-				log.info("determine mso name by default:" + msoName);
 			}
 		}
 		return msoName;
@@ -90,7 +99,7 @@ public class MsoManager {
 	
 	public Mso findMsoViaHttpReq(HttpServletRequest req) {
 		String msoName = this.findMsoNameViaHttpReq(req);
-		Mso mso = new MsoManager().findByName(msoName);
+		Mso mso = this.findByName(msoName);
 		if (mso == null) {
 			log.info("determine mso failed. use default mso");
 			mso = this.findNNMso(); 
@@ -108,14 +117,27 @@ public class MsoManager {
 	
 	public Mso findByKey(Key key) {
 		return msoDao.findByKey(key);
+	}	
+	
+	//example: mso(1)category(123), returns category
+	private String getCacheKey(String name) {
+		return "mso(" + name + ")";
 	}
 	
-	public Mso findByKeyStr(String key) {
-		try {
-			return this.findByKey(KeyFactory.stringToKey(key));
-		} catch (IllegalArgumentException e) {
-			log.info("invalid key string");
-			return null;
-		}
+	private void setCache() {
+	    try {
+	        cache = CacheManager.getInstance().getCacheFactory().createCache(
+	            Collections.emptyMap());
+	      } catch (CacheException e) {}	      		
 	}
+	
+	public void deleteCache() {
+		this.setCache();
+		List<Mso> msos = this.findAll();
+		if (cache != null) {
+			for (Mso m : msos) {				
+				cache.remove(this.getCacheKey(m.getName()));
+			}
+		}
+	}		
 }
