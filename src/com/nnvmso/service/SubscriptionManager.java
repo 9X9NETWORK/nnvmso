@@ -49,7 +49,9 @@ public class SubscriptionManager {
 		if (s != null) { subDao.delete(s); }
 	}
 	
-	//!!! findByIds
+	/**
+	 * @param msoId used if interested in finding subscription count, pass 0 if not.  	      	    
+	 */
 	public List<MsoChannel> findSubscribedChannels(long userId, long msoId) {
 		List<Subscription> subs = subDao.findAllByUserId(userId);
 		List<MsoChannel> channels = new ArrayList<MsoChannel>();
