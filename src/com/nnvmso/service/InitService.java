@@ -7,7 +7,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.stereotype.Service;
 
-import com.nnvmso.lib.NnStringUtil;
 import com.nnvmso.model.Category;
 import com.nnvmso.model.CategoryChannel;
 import com.nnvmso.model.Mso;
@@ -163,7 +162,7 @@ public class InitService {
 			program2.setPublic(true);
 			programMngr.create(channel1, program2);
 		} else {
-			tranService.submitToTranscodingService(NnStringUtil.getKeyStr(channel1.getKey()), channel1.getSourceUrl(), req);
+			tranService.submitToTranscodingService(channel1.getKey().getId(), channel1.getSourceUrl(), req);
 		}
 		
 		//create channel
@@ -198,7 +197,7 @@ public class InitService {
 			program9.setPublic(true);
 			programMngr.create(channel2, program9);
 		} else {
-			tranService.submitToTranscodingService(NnStringUtil.getKeyStr(channel2.getKey()), channel2.getSourceUrl(), req);
+			tranService.submitToTranscodingService(channel2.getKey().getId(), channel2.getSourceUrl(), req);
 		}
 		
 		//create channel				
@@ -308,7 +307,7 @@ public class InitService {
 		
 		//initialize default categories
 		String[] categoryStr = {
-				"喜劇", "動物", "藝術", "部落格"
+			"活動中心", "視聽劇場", "數位高手", "ACG夢工廠", "生活娛樂館", "國家研究院", "國家體育場", "文創藝廊", "影音實驗室"
 		};
 		
 		CategoryManager categoryMngr = new CategoryManager();
