@@ -191,6 +191,8 @@ function elastic_innards()
 
   if (thumbing == 'ipg')
     extend_ipg_timex();
+
+  try { $("#film").css ({ "left": (vw - $("#film").width()) / 2, "top": (vh - $("#film").height()) / 2 }); } catch (error) {};
   }
 
 function episode_end_layer_fixup()
@@ -203,21 +205,7 @@ function episode_end_layer_fixup()
 
 function ipg_fixup_margin()
   {
-  var gridH = $("#ipg-grid").height();
-  var listH = 0;
-
-  $(".ipg-list").each (function() { listH += $(this).height() + 2; });
-
-  var gap = (gridH - listH) / 8;
-
-  if (gap >= 0)
-    $(".ipg-list").css ("margin-bottom", gap);
-  else
-    $(".ipg-list").css ("margin-bottom", "0");
-
-  $(".ipg-list:last-child").css ("margin-bottom","0");
-
-  $("#list-holder").css ("top", (gridH - $("#list-holder").height()) / 2);
+  $("#list-holder").css ("top", ($("#ipg-grid").height() - $("#list-holder").height()) / 2);
   }
 
 function ipg_fixup_middle()
@@ -361,16 +349,24 @@ function report (type, arg)
 
     pdr = '';
 
-    var d = $.post ("/playerAPI/pdr", serialized, function (data)
-      {
-      var lines = data.split ('\n');
-      var fields = lines[0].split ('\t');
-      if (fields [0] != '0')
-        log ('[pdr] server error, ignoring: ' + lines [0]);
-      else
-        log ('[pdr] success');
-      });
+    $.ajax ({ type: 'POST', url: "/playerAPI/pdr", data: serialized, 
+                dataType: 'text', success: report_, error: report_error_ });
     }
+  }
+
+function report_ (data, textStatus, jqXHR)
+  {
+  var lines = data.split ('\n');
+  var fields = lines[0].split ('\t');
+  if (fields [0] != '0')
+    log ('[pdr] server error, ignoring: ' + lines [0]);
+  else
+    log ('[pdr] success');
+  }
+
+function report_error_ (jqXHR, textStatus, errorThrown)
+  {
+  log ('[pdr] error: ' + textStatus);
   }
 
 function report_program()
