@@ -1,11 +1,10 @@
 package com.nnvmso.web.admin;
 
-import java.util.List;
-import java.util.Date;
-import java.util.logging.Logger;
-import java.text.SimpleDateFormat;
 import java.text.ParseException;
-import java.lang.Boolean;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -15,22 +14,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.nnvmso.lib.*;
-import com.nnvmso.service.MsoChannelManager;
-import com.nnvmso.service.MsoProgramManager;
+import com.nnvmso.lib.NnLogUtil;
+import com.nnvmso.lib.NnNetUtil;
+import com.nnvmso.lib.NnStringUtil;
 import com.nnvmso.model.MsoProgram;
+import com.nnvmso.service.MsoProgramManager;
 
 @Controller
 @RequestMapping("admin/program")
 public class AdminMsoProgramController {
 	protected static final Logger logger = Logger.getLogger(AdminMsoProgramController.class.getName());		
 	
-	private final MsoChannelManager channelMngr;
 	private final MsoProgramManager programMngr;
 	
 	@Autowired
-	public AdminMsoProgramController(MsoChannelManager channelMngr, MsoProgramManager programMngr) {
-		this.channelMngr = channelMngr;
+	public AdminMsoProgramController(MsoProgramManager programMngr) {
 		this.programMngr = programMngr;
 	}
 
@@ -40,16 +38,10 @@ public class AdminMsoProgramController {
 		return "error/exception";				
 	}
 
-	/*
 	@RequestMapping("list")
-	public ResponseEntity<String> list(@RequestParam(value="channelKey", required = false)String channelKey) {
-		List<MsoProgram> programs = null;
+	public ResponseEntity<String> list(@RequestParam(value="channel")long channelId) {
 		//find all programs, including the not public ones
-		//!!! maybe should use id in transcoding service as well. delimit the use of channel key
-		if (channelKey == null)			
-			programs = programMngr.findPublicPrograms();
-		else
-			programs = programMngr.findAllByChannelKeyStr(channelKey);
+		List<MsoProgram> programs = programMngr.findAllByChannelId(channelId);
 		String[] title = {"key", "channelId", "isPublic", "status", "updateDate", "name"};		
 		String result = "";
 		for (MsoProgram p:programs) {
@@ -65,14 +57,13 @@ public class AdminMsoProgramController {
 		String output = NnStringUtil.getDelimitedStr(title) + "\n" + result;
 		return NnNetUtil.textReturn(output);
 	}
-	*/
 	
 	@RequestMapping("modify")
-	public @ResponseBody String modify(@RequestParam(required=true)  String key,
+	public @ResponseBody String modify(@RequestParam(required=true)  String id,
 	                                   @RequestParam(required=false) String updateDate) {
 		
-		logger.info("updateDate: " + updateDate + " key: " + key);
-		MsoProgram program = programMngr.findByKeyStr(key);
+		logger.info("updateDate: " + updateDate + " id: " + id);
+		MsoProgram program = programMngr.findById(Long.parseLong(id));
 		if (program == null)
 			return "Program Not Found";
 		

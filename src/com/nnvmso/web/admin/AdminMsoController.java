@@ -67,7 +67,7 @@ public class AdminMsoController {
 	}
 	
 	@RequestMapping("modify")
-	public @ResponseBody String modify(@RequestParam(required=true)  String key,
+	public @ResponseBody String modify(@RequestParam(required=true)  String id,
 	                                   @RequestParam(required=false) String name,
 	                                   @RequestParam(required=false) String contactEmail,
 	                                   @RequestParam(required=false) String intro,
@@ -76,8 +76,8 @@ public class AdminMsoController {
 	                                   @RequestParam(required=false) String logoClickUrl,
 	                                   @RequestParam(required=false) String jingleUrl) {
 		
-		logger.info("name: " + name + " contactEmail: " + contactEmail + " preferredLangCode: " + preferredLangCode + " key: " + key);
-		Mso mso = msoMngr.findByKeyStr(key);
+		logger.info("name: " + name + " contactEmail: " + contactEmail + " preferredLangCode: " + preferredLangCode + " key: " + id);
+		Mso mso = msoMngr.findById(Long.parseLong(id));
 		if (mso == null)
 			return "Mso Not Found";
 		

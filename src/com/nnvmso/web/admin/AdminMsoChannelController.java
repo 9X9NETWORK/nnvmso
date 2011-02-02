@@ -2,8 +2,6 @@ package com.nnvmso.web.admin;
 
 import java.util.List;
 import java.util.logging.Logger;
-import java.lang.Short;
-import java.lang.Integer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,13 +11,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.nnvmso.lib.*;
-import com.nnvmso.model.Mso;
+import com.nnvmso.lib.NnLogUtil;
+import com.nnvmso.lib.NnNetUtil;
+import com.nnvmso.lib.NnStringUtil;
 import com.nnvmso.model.MsoChannel;
-import com.nnvmso.model.NnUser;
 import com.nnvmso.service.MsoChannelManager;
-import com.nnvmso.service.MsoManager;
-import com.nnvmso.service.NnUserManager;
 
 @Controller
 @RequestMapping("admin/channel")
@@ -53,7 +49,7 @@ public class AdminMsoChannelController {
 		String[] title = {"key", "name", "sourceUrl", "status", "programCount"};		
 		String result = "";
 		for (MsoChannel c:channels) {
-			String[] ori = {NnStringUtil.getKeyStr(c.getKey()),
+			String[] ori = {String.valueOf(c.getKey().getId()),
 						    c.getName(),
 							c.getSourceUrl(), 
 						    String.valueOf(c.getStatus()), 
@@ -66,13 +62,13 @@ public class AdminMsoChannelController {
 	}
 	
 	@RequestMapping("modify")
-	public @ResponseBody String modify(@RequestParam(required=true)  String key,
+	public @ResponseBody String modify(@RequestParam(required=true)  String id,
 	                                   @RequestParam(required=false) String name,
 	                                   @RequestParam(required=false) String status,
 	                                   @RequestParam(required=false) String programCount) {
 		
-		logger.info("name: " + name + " status: " + status + " programCount: " + programCount + " key: " + key);
-		MsoChannel channel = channelMngr.findByKeyStr(key);
+		logger.info("name: " + name + " status: " + status + " programCount: " + programCount + " key: " + id);
+		MsoChannel channel = channelMngr.findById(Long.parseLong(id));
 		if (channel == null)
 			return "Channel Not Found";
 		
