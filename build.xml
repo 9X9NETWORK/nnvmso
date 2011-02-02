@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project name="Guestbook" default="datanucleusenhance">
   <property name="appengine.sdk" location="..\lib\appengine-java-sdk-1.4.0" />
 
@@ -10,32 +11,21 @@
     </fileset>
     <fileset dir="${appengine.sdk}/lib">
       <include name="shared/**/*.jar" />
-      <include name="user/**/*.jar" />
-    </fileset>
-    <fileset dir="../lib">
-      <include name="**/*.jar" />
     </fileset>
   </path>
 
-<!-- don't do copy, files should have been added via Eclipse
-  <target name="copyjars"
-      description="Copies the App Engine JARs to the WAR.">
-    <copy
-        todir="war/WEB-INF/lib"
-        flatten="true">
-      <fileset dir="${appengine.sdk}/lib/user">
-        <include name="**/*.jar" />
-      </fileset>
-      <fileset dir="../lib">
-        <include name="**/*.jar" />
-      </fileset>
+
+curl http://everest.teltel.com:8080/cgi-bin/svnrev
+
+  <target name="copyfiles"
+      description="Copies necessary file to the WAR.">
+    <copy todir="war/WEB-INF/classes">
+      <fileset dir="resources"
+             includes="**/*.xml,**/*.properties,**/*.txt,**/*.ico" />
     </copy>
   </target>
--->
 
-<!--  <target name="compile" depends="copyjars"
--->
-  <target name="compile" 
+  <target name="compile" depends="copyfiles"
       description="Compiles Java source and copies other source files to the WAR.">
     <mkdir dir="war/WEB-INF/classes" />
     <copy todir="war/WEB-INF/classes">
@@ -47,6 +37,7 @@
         srcdir="src"
         destdir="war/WEB-INF/classes"
         classpathref="project.classpath"
+        encoding="UTF-8"
         debug="on" />
   </target>
 
@@ -62,7 +53,14 @@
 
   <target name="update" depends="datanucleusenhance"
       description="Uploads the application to App Engine.">
-    <appcfg action="update" war="war" />
+    <appcfg action="update" war="war" >
+      <args>
+        <arg value="-e nncloudtv@gmail.com"/>
+      </args>
+      <options>
+        <arg value="--passin"/>
+      </options>
+    </appcfg>
   </target>
 
   <target name="update_indexes" depends="datanucleusenhance"
