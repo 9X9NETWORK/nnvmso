@@ -45,7 +45,7 @@ public class TranscodingService {
 	
 	public PostResponse updateChannel(RtnChannel podcast) {
 		MsoChannelManager channelMngr = new MsoChannelManager();
-		MsoChannel channel = channelMngr.findByKeyStr(podcast.getKey());
+		MsoChannel channel = channelMngr.findById(Long.parseLong(podcast.getKey()));
 		MsoChannel originalState = channel;
 		if (channel == null) {
 			return new PostResponse(String.valueOf(NnStatusCode.CHANNEL_INVALID), "CHANNEL_INVALID");
@@ -115,7 +115,7 @@ public class TranscodingService {
 		MsoChannelManager channelMngr = new MsoChannelManager();			
 		RtnProgramItem item = rtnProgram.getItems()[0]; //for now there's only one item		
 		log.info("updateProgramViaTranscodingService(): " + item.toString());
-		MsoChannel channel = channelMngr.findByKeyStr(rtnProgram.getKey());		
+		MsoChannel channel = channelMngr.findById(Long.parseLong(rtnProgram.getKey()));		
 		MsoChannel originalState = channel;
 		if (channel == null) {
 			return new PostResponse(String.valueOf(NnStatusCode.CHANNEL_INVALID), "channel invalid");
@@ -192,9 +192,9 @@ public class TranscodingService {
 		return new PostResponse(String.valueOf(NnStatusCode.SUCCESS), "SUCCESS");
 	}
 
-	public void submitToTranscodingService(String channelKey, String sourceUrl, HttpServletRequest req) {
+	public void submitToTranscodingService(long channelId, String sourceUrl, HttpServletRequest req) {
 		PostUrl postUrl = new PostUrl();
-		postUrl.setKey(channelKey);
+		postUrl.setKey(String.valueOf(channelId));
 		postUrl.setRss(sourceUrl);	
 		TranscodingService tranService = new TranscodingService();
 		String[] transcodingEnv = tranService.getTranscodingEnv(req);

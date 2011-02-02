@@ -412,8 +412,8 @@ public class PlayerApiService {
 			for (CategoryChannel cc : ccs) {
 				existing.put(cc.getCategoryId(), "");
 			}
-			//** this requirement should be removed, therefore not making it a general case in channel save.
 			// --find new category user defines if there's any 
+			//   this requirement should be removed, not making it a general case in channel save.
 			String[] ids = categoryIds.split(",");
 			List<String> newIds = new ArrayList<String>();
 			for (int i=0; i<ids.length; i++) {		
@@ -450,7 +450,7 @@ public class PlayerApiService {
 			channelMngr.create(channel, categories);
 			if (channel.getKey() != null) {
 				TranscodingService tranService = new TranscodingService();
-				tranService.submitToTranscodingService(NnStringUtil.getKeyStr(channel.getKey()), url, req);
+				tranService.submitToTranscodingService(channel.getKey().getId(), url, req);
 			}
 		}
 		
