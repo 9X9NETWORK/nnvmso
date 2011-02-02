@@ -1182,6 +1182,12 @@ function escape()
       return;
       }
 
+    if (ipg_mode == 'edit')
+      {
+      ipg_exit_edit_mode();
+      return;
+      }
+
     if (! (ipg_cursor in channelgrid))
       {
       log ('not on a channel');
@@ -1331,7 +1337,7 @@ function keypress (keycode)
       /* esc */
       if (thumbing == 'whatsnew')
         exit_whats_new();
-      else if (thumbing == 'ipg' && ipg_mode == 'episodes')
+      else if (thumbing == 'ipg' && (ipg_mode == 'episodes' || ipg_mode == 'edit'))
         escape();
       else if (thumbing == 'ipg' && clips_played == 0)
         { /* do nothing */ }
@@ -1781,9 +1787,11 @@ function switch_to_ipg()
   redraw_ipg();
 
   $("#ipg-btn-signin").removeClass ("on");
+  $("#ipg-btn-edit").removeClass ("on");
   $("#ipg-btn-resume").removeClass ("on");
 
   $("#ipg-btn-signin").hover (hover_in, hover_out);
+  $("#ipg-btn-edit").hover (hover_in, hover_out);
   $("#ipg-btn-resume").hover (hover_in, hover_out);
 
   stop_preload();
@@ -1865,7 +1873,7 @@ function redraw_ipg()
     });
 
   if (ipg_cursor > 0)
-    $("#ipg-" + ipg_cursor).addClass ("on");
+    $("#ipg-" + ipg_cursor).addClass ((ipg_mode == 'edit') ? "editcursor" : "on");
 
   ipg_metainfo();
 
@@ -2040,6 +2048,41 @@ function preload_this_square()
     ipg_preload (ipg_cursor);
   }
 
+function ipg_edit_mode()
+  {
+  if (ipg_mode == 'edit')
+    {
+    ipg_exit_edit_mode();
+    return;
+    }
+
+  log ('enter ipg edit mode');
+  ipg_mode = 'edit';
+  $("#edit-or-finish").html ("Finished editing");
+
+  if (ipg_cursor in channelgrid)
+    $("#ipg-" + ipg_cursor).removeClass ("on");
+  else
+    {
+    ipg_cursor = ipg_saved_cursor;
+    $("#ipg-btn-edit").removeClass ("on");
+    }
+
+  $("#ipg-" + ipg_cursor).addClass ("editcursor");
+  }
+
+function ipg_exit_edit_mode()
+  {
+  log ('exit ipg edit mode');
+  ipg_mode = 'tip';
+  $("#edit-or-finish").html ("Edit");
+
+  if (parseInt (ipg_cursor) >= 11 || parseInt (ipg_cursor) <= 99)
+    {
+    $("#ipg-" + ipg_cursor).removeClass ("editcursor");
+    $("#ipg-" + ipg_cursor).addClass ("on");
+    }
+  }
 
 function ipg_exit_episode_mode()
   {
@@ -2059,14 +2102,16 @@ function ipg_sync()
     $("#ep-list .clickable").bind ('click', function() { ep_click ($(this).attr('id')); });
     $("#ep-list .clickable").hover (ipg_episode_hover_in, ipg_episode_hover_out);
     // ipg_mode = 'episodes';
-    ipg_mode = 'tip';
     }
   else
     {
     ipg_program_tip();
     // $("#ipg-content").removeClass("fade");
-    ipg_mode = 'tip';
     }
+
+  /* mostly stay in tip mode now */
+  if (ipg_mode != 'edit')
+    ipg_mode = 'tip';
   }
 
 function ipg_right()
@@ -2080,17 +2125,26 @@ function ipg_right()
     return;
     }
 
+  var iclass = (ipg_mode == 'edit') ? 'editcursor' : 'on';
+
   if (ipg_cursor == -1)
     {
     $("#ipg-btn-signin").removeClass ("on");
-    $("#ipg-btn-resume").addClass ("on");
+    $("#ipg-btn-edit").addClass ("on");
     ipg_cursor = -2;
+    return;
+    }
+  else if (ipg_cursor == -2)
+    {
+    $("#ipg-btn-edit").removeClass ("on");
+    $("#ipg-btn-resume").addClass ("on");
+    ipg_cursor = -3;
     return;
     }
   else if (ipg_cursor < 0)
     return;
 
-  $("#ipg-" + ipg_cursor).removeClass ("on");
+  $("#ipg-" + ipg_cursor).removeClass (iclass);
 
   if (parseInt (ipg_cursor) == 99)
     ipg_cursor = 11;
@@ -2101,7 +2155,7 @@ function ipg_right()
 
   log ("new ipg cursor: " + ipg_cursor);
 
-  $("#ipg-" + ipg_cursor).addClass ("on");
+  $("#ipg-" + ipg_cursor).addClass (iclass);
   ipg_metainfo();
 
   stop_preload();
@@ -2120,9 +2174,18 @@ function ipg_left()
     return;
     }
 
-  if (ipg_cursor == -2)
+  var iclass = (ipg_mode == 'edit') ? 'editcursor' : 'on';
+
+  if (ipg_cursor == -3)
     {
     $("#ipg-btn-resume").removeClass ("on");
+    $("#ipg-btn-edit").addClass ("on");
+    ipg_cursor = -2;
+    return;
+    }
+  else if (ipg_cursor == -2)
+    {
+    $("#ipg-btn-edit").removeClass ("on");
     $("#ipg-btn-signin").addClass ("on");
     ipg_cursor = -1;
     return;
@@ -2130,7 +2193,7 @@ function ipg_left()
   else if (ipg_cursor < 0)
     return;
 
-  $("#ipg-" + ipg_cursor).removeClass ("on");
+  $("#ipg-" + ipg_cursor).removeClass (iclass);
 
   if (parseInt (ipg_cursor) == 11)
     ipg_cursor = 99;
@@ -2141,7 +2204,7 @@ function ipg_left()
 
   log ("new ipg cursor: " + ipg_cursor);
 
-  $("#ipg-" + ipg_cursor).addClass ("on");
+  $("#ipg-" + ipg_cursor).addClass (iclass);
   ipg_metainfo();
 
   stop_preload();
@@ -2160,21 +2223,23 @@ function ipg_up()
     return;
     }
 
+  var iclass = (ipg_mode == 'edit') ? 'editcursor' : 'on';
+
   if (parseInt (ipg_cursor) < 0)
     {
     }
   else if (parseInt (ipg_cursor) >= 11 && parseInt (ipg_cursor) <= 19)
     {
-    $("#ipg-" + ipg_cursor).removeClass ("on");
+    $("#ipg-" + ipg_cursor).removeClass (iclass);
     $("#ipg-btn-signin").addClass ("on");
     ipg_saved_cursor = ipg_cursor;
     ipg_cursor = -1;
     }
   else if (parseInt (ipg_cursor) > 20)
     {
-    $("#ipg-" + ipg_cursor).removeClass ("on");
+    $("#ipg-" + ipg_cursor).removeClass (iclass);
     ipg_cursor = parseInt (ipg_cursor) - 10;
-    $("#ipg-" + ipg_cursor).addClass ("on");
+    $("#ipg-" + ipg_cursor).addClass (iclass);
     }
 
   log ("new ipg cursor: " + ipg_cursor);
@@ -2195,9 +2260,12 @@ function ipg_down()
   if (ipg_mode == 'episodes')
     return;
 
+  var iclass = (ipg_mode == 'edit') ? 'editcursor' : 'on';
+
   if (ipg_cursor < 0)
     {
     $("#ipg-btn-signin").removeClass ("on");
+    $("#ipg-btn-edit").removeClass ("on");
     $("#ipg-btn-resume").removeClass ("on");
     ipg_cursor = ipg_saved_cursor;
     }
@@ -2207,13 +2275,13 @@ function ipg_down()
     }
   else
     {
-    $("#ipg-" + ipg_cursor).removeClass ("on");
+    $("#ipg-" + ipg_cursor).removeClass (iclass);
     ipg_cursor = parseInt (ipg_cursor) + 10;
     }
 
   log ("new ipg cursor: " + ipg_cursor);
 
-  $("#ipg-" + ipg_cursor).addClass ("on");
+  $("#ipg-" + ipg_cursor).addClass (iclass);
   ipg_metainfo();
 
   stop_preload();
@@ -2270,7 +2338,8 @@ function ipg_program_tip()
   $("#ipg-content").removeClass ("fade");
   $("#ep-panel").attr ("src", root + '/ep_panel_off.png');
 
-  ipg_mode = 'tip';
+  if (ipg_mode != 'edit')
+    ipg_mode = 'tip';
 
   if (ipg_cursor in channelgrid && !channelgrid [ipg_cursor]['thumbcache'])
     {
@@ -2367,10 +2436,20 @@ function ipg_play()
       }
     else if (ipg_cursor == -2)
       {
+      ipg_edit_mode();
+      }
+    else if (ipg_cursor == -3)
+      {
       ipg_resume();
       }
 
     clearTimeout (ipg_timex);
+    return;
+    }
+
+  if (ipg_mode == 'edit')
+    {
+    unsubscribe_channel();
     return;
     }
 
@@ -5320,7 +5399,7 @@ function noop (e)
     <div id="header">
       <img src="http://zoo.atomics.org/video/9x9playerV31/images/logo.png" id="logo">
       <p id="user-name">Hello, <span id="user">Guest</span></p>  
-      <ul id="control-list"><li><a href="javascript:sign_in_or_out()" class="btn" id="ipg-btn-signin"><span id="solicit">Sign in / Sign up</span></a></li><li><a href="javascript:;" class="btn" id="btn-signout"><span>Sign out</span></a></li><li><a href="javascript:;" class="btn" id="ipg-btn-resume"><span>Resume Watching</span></a></li></ul>
+      <ul id="control-list"><li><a href="javascript:sign_in_or_out()" class="btn" id="ipg-btn-signin"><span id="solicit">Sign in / Sign up</span></a></li><li><div onclick="ipg_edit_mode()" class="btn" id="ipg-btn-edit"><span id="edit-or-finish">Edit</span></div></li><li><a href="javascript:;" class="btn" id="ipg-btn-resume"><span>Resume Watching</span></a></li></ul>
     </div>
     <div id="ipg-content">
       <ul id="info-list">
