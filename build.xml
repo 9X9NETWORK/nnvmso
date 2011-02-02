@@ -14,9 +14,6 @@
     </fileset>
   </path>
 
-
-curl http://everest.teltel.com:8080/cgi-bin/svnrev
-
   <target name="copyfiles"
       description="Copies necessary file to the WAR.">
     <copy todir="war/WEB-INF/classes">
