@@ -1,22 +1,23 @@
 package com.nnvmso.web.admin;
 
-import java.util.logging.Logger;
-import java.util.ArrayList;
 import java.util.List;
-import java.lang.Boolean;
-import java.lang.Long;
+import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.http.ResponseEntity;
 
-import com.nnvmso.lib.*;
-import com.nnvmso.model.*;
-import com.nnvmso.service.*;
+import com.nnvmso.lib.NnLogUtil;
+import com.nnvmso.lib.NnNetUtil;
+import com.nnvmso.lib.NnStringUtil;
+import com.nnvmso.model.Category;
+import com.nnvmso.model.Mso;
+import com.nnvmso.service.CategoryManager;
+import com.nnvmso.service.MsoManager;
 
 @Controller
 @RequestMapping("admin/category")
@@ -38,22 +39,19 @@ public class AdminCategoryController {
 	}
 	
 	@RequestMapping("list")
-	public ResponseEntity<String> list(@RequestParam(required=false)String ids) {
+	public ResponseEntity<String> list(@RequestParam(required=false)String id) {
 		
 		List<Category> categories = null;
-		if (ids == null) {
+		if (id == null) {
 			categories = categoryMngr.findAll();
 		} else {	
-			List<Long> categoryIdList = new ArrayList<Long>();	
-			String[] arr = ids.split(",");
-			for (int i=0; i<arr.length; i++) { categoryIdList.add(Long.parseLong(arr[i])); }			
-			categories = categoryMngr.findAllByIds(categoryIdList);
+			categories = categoryMngr.findAllByMsoId(Long.parseLong(id));
 		}
 		
-		String[] title = {"key", "msoId", "isPublic", "channelCount", "name"};
+		String[] title = {"id", "msoId", "isPublic", "channelCount", "name"};
 		String result = "";
 		for (Category c:categories) {
-			String[] ori = {NnStringUtil.getKeyStr(c.getKey()),
+			String[] ori = {String.valueOf(c.getKey().getId()),
 			                Long.toString(c.getMsoId()),
 			                Boolean.toString(c.isPublic()),
 			                String.valueOf(c.getChannelCount()),

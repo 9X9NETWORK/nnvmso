@@ -47,10 +47,10 @@ public class AdminMsoController {
 		
 		List<Mso> msoList = msoMngr.findAll();
 		
-		String[] title = {"key", "type", "lang", "name", "contactEmail", "intro", "logoUrl", "logoClickUrl", "JingleUrl"};
+		String[] title = {"id", "type", "lang", "name", "contactEmail", "intro", "logoUrl", "logoClickUrl", "JingleUrl"};
 		String result = "";
 		for (Mso mso:msoList) {
-			String[] ori = {NnStringUtil.getKeyStr(mso.getKey()),
+			String[] ori = {String.valueOf(mso.getKey().getId()),
 			                Short.toString(mso.getType()),
 			                mso.getPreferredLangCode(),
 			                mso.getName(),
