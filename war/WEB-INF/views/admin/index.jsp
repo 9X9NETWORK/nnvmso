@@ -1,8 +1,8 @@
 <ul>
   <li>initialize (works only for small set of data)
     <ul>
-      <li><a href="/admin/init/initAll?devel=0&debug=1">turn on debug</a></li>          	   
-      <li><a href="/admin/init/initAll?devel=0&debug=0">turn off debug</a></li>          	   
+      <li><a href="/admin/init/initAll?devel=1&debug=1">turn on debug</a></li>          	   
+      <li><a href="/admin/init/initAll?devel=1&debug=0">turn off debug</a></li>          	   
       <li><a href="/admin/init/deleteAll">deleteAll</a></li>
     </ul>
   </li> 
@@ -30,6 +30,21 @@
       <li><a href="/admin/mso/list">mso listing</a></li>
       <li>change data <br/>
 		  http://host/admin/mso/modify?id=xx&logoUrl=xx&logoClickUrl=xx&jingleUrl                        	   
+    </ul>
+  </li>
+</ul>
+
+<ul>
+  <li>Cache
+    <ul>
+      <li><a href="/admin/cache/deleteAll">deleteAll</a></li>      
+      <li>cache category, one mso at a time. <br/>
+		  add, http://host/admin/cache/category?id=xx  <br/>
+		  delete, http://host/admin/cache/category?id=xx&delete=1  <br/>
+	  </li>
+	  <li>cache current mso [check config, current mso] <br/>
+	  	  add, http://host/admin/cache/mso <br/>
+	  	  delete, http://host/admin/cache/mso?delete=1	  	  
     </ul>
   </li>
 </ul>
