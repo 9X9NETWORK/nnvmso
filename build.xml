@@ -16,10 +16,8 @@
 
   <target name="svnrevision"
       description="Get SVN revision number">
-    <exec executable="curl">
-      <arg value="--output"/>
-      <arg value="SVNRevision.txt"/>
-      <arg value="http://everest.teltel.com:8080/cgi-bin/svnrev"/>
+    <exec executable="cmd">
+      <arg line="/c getrevision.bat"/>
     </exec>
   </target>
 
