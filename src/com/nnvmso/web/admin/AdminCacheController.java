@@ -1,8 +1,13 @@
 package com.nnvmso.web.admin;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+
+import net.sf.jsr107cache.Cache;
+import net.sf.jsr107cache.CacheException;
+import net.sf.jsr107cache.CacheManager;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -54,4 +59,18 @@ public class AdminCacheController {
 		return NnNetUtil.textReturn(output);
 	}	
 		
+	@RequestMapping("deleteAll")
+	public ResponseEntity<String> deleteAll() {		
+	    Cache cache = null;
+	    try {
+	        cache = CacheManager.getInstance().getCacheFactory().createCache(
+	            Collections.emptyMap());
+	      } catch (CacheException e) {}	      		
+
+		if (cache != null) {
+			cache.clear();
+		}
+		return NnNetUtil.textReturn("OK");
+	}
+	
 }
