@@ -40,7 +40,7 @@ public class MsoManager {
 			mso.setNameSearch(mso.getName().toLowerCase());
 		}
 		Date now = new Date();
-		if (mso.getCreateDate() == null) {mso.setUpdateDate(now);}
+		if (mso.getCreateDate() == null) {mso.setCreateDate(now);}
 		mso.setUpdateDate(now);
 		this.setCache();
 		if (cache != null) { cache.put(this.getCacheKey(mso.getName()), mso);	}
