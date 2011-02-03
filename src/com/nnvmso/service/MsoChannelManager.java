@@ -42,7 +42,7 @@ public class MsoChannelManager {
 		msoChannelDao.save(channel);
 		
 		//create CategoryChannel
-		CategoryChannelManager ccMngr = new CategoryChannelManager();		
+		CategoryChannelManager ccMngr = new CategoryChannelManager();
 		for (Category c : categories) {
 			ccMngr.create(new CategoryChannel(c.getKey().getId(), channel.getKey().getId()));
 		}
@@ -163,7 +163,7 @@ public class MsoChannelManager {
 		MsoChannel channel = msoChannelDao.findById(id);
 		//save in cache
 		if (cache != null && channel != null) { cache.put(key, channel);}		
-		log.info("Cache NOT found: channel is just added:" + channel.getKey().getId());
+		if (channel != null) {log.info("Cache NOT found: channel is just added:" + channel.getKey().getId());}
 		return channel;
 	}
 	
