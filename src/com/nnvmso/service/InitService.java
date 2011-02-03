@@ -1,9 +1,14 @@
 package com.nnvmso.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+
+import net.sf.jsr107cache.Cache;
+import net.sf.jsr107cache.CacheException;
+import net.sf.jsr107cache.CacheManager;
 
 import org.springframework.stereotype.Service;
 
@@ -24,12 +29,18 @@ import com.nnvmso.model.Subscription;
 public class InitService {
 
 	private HttpServletRequest req;
+	private Cache cache;
 	
 	public void setRequest(HttpServletRequest req) {
 		this.req = req;
 	}
 
 	public void deleteAll() {
+		this.setCache();
+		if (cache != null) {
+			cache.clear();
+		}
+		
 		DbDumper dumper = new DbDumper();
 		@SuppressWarnings("rawtypes")
 		List list = dumper.findAll(Category.class, "createDate");
@@ -67,34 +78,103 @@ public class InitService {
 		NnUser user = userMngr.findByEmailAndMso("mso@5f.tv", mso);
 		List<Category> categories = new ArrayList<Category>();
 				
-		//create channel1
-		CategoryManager categoryMngr = new CategoryManager();
-		Category category = categoryMngr.findByName("喜劇");		
-		MsoChannelManager channelMngr = new MsoChannelManager();
-		MsoChannel channel1 = new MsoChannel("中文伊特", "中文伊特.com", "http://s3.amazonaws.com/9x9chthumb/54e2967caf4e60fe9bc19ef1920997977eae1578.gif", user.getKey().getId());
-		channel1.setSourceUrl("http://feeds.feedburner.com/etsyetsyetsy");
-		channel1.setPublic(true);
-		categories.add(category);
-		channelMngr.create(channel1, categories);
+		if (devel) {
+			//create channel1
+			CategoryManager categoryMngr = new CategoryManager();
+			Category category = categoryMngr.findByName("活動中心");		
+			MsoChannelManager channelMngr = new MsoChannelManager();
+			MsoChannel channel1 = new MsoChannel("中文伊特", "中文伊特.com", "http://s3.amazonaws.com/9x9chthumb/54e2967caf4e60fe9bc19ef1920997977eae1578.gif", user.getKey().getId());
+			channel1.setSourceUrl("http://feeds.feedburner.com/etsyetsyetsy");
+			channel1.setPublic(true);
+			categories.add(category);
+			channelMngr.create(channel1, categories);
+			
+			// -- create program1
+			MsoProgramManager programMngr = new MsoProgramManager();
+			MsoProgram program1 = new MsoProgram("手作", "手作", "http://s3.amazonaws.com/9x9cache/005a69b4431d521e39534431254d81a211ebefc7_1227739497_thumbnail.jpg", MsoProgram.TYPE_VIDEO);
+			program1.setImageLargeUrl("http://s3.amazonaws.com/9x9cache/005a69b4431d521e39534431254d81a211ebefc7_1227739497_thumbLarge.jpg");
+			program1.setMpeg4FileUrl("http://s3.amazonaws.com/9x9pod/005a69b4431d521e39534431254d81a211ebefc7_1227739497.m4v");
+			program1.setWebMFileUrl("http://s3.amazonaws.com/9x9cache/005a69b4431d521e39534431254d81a211ebefc7_1227739497.webm");	
+			program1.setPublic(true);
+			programMngr.create(channel1, program1);
 		
-		// -- create program1
-		MsoProgramManager programMngr = new MsoProgramManager();
-		MsoProgram program1 = new MsoProgram("手作", "手作", "http://s3.amazonaws.com/9x9cache/005a69b4431d521e39534431254d81a211ebefc7_1227739497_thumbnail.jpg", MsoProgram.TYPE_VIDEO);
-		program1.setImageLargeUrl("http://s3.amazonaws.com/9x9cache/005a69b4431d521e39534431254d81a211ebefc7_1227739497_thumbLarge.jpg");
-		program1.setMpeg4FileUrl("http://s3.amazonaws.com/9x9pod/005a69b4431d521e39534431254d81a211ebefc7_1227739497.m4v");
-		program1.setWebMFileUrl("http://s3.amazonaws.com/9x9cache/005a69b4431d521e39534431254d81a211ebefc7_1227739497.webm");	
-		program1.setPublic(true);
-		programMngr.create(channel1, program1);
-		
-		MsoProgram program2 = new MsoProgram("禮拜二", "詳情請讀部落格", "http://s3.amazonaws.com/9x9cache/5a14e5502fd5ab6b26e7f11f2a38ee718bc06eea_1288043514_thumbnail.jpg", MsoProgram.TYPE_VIDEO);
-		program2.setImageLargeUrl("http://s3.amazonaws.com/9x9cache/5a14e5502fd5ab6b26e7f11f2a38ee718bc06eea_1288043514_thumbLarge.jpg");
-		program2.setMpeg4FileUrl("http://s3.amazonaws.com/9x9pod/5a14e5502fd5ab6b26e7f11f2a38ee718bc06eea_1288043514.m4v");	
-		program2.setPublic(true);
-		programMngr.create(channel1, program2);
+			MsoProgram program2 = new MsoProgram("禮拜二", "詳情請讀部落格", "http://s3.amazonaws.com/9x9cache/5a14e5502fd5ab6b26e7f11f2a38ee718bc06eea_1288043514_thumbnail.jpg", MsoProgram.TYPE_VIDEO);
+			program2.setImageLargeUrl("http://s3.amazonaws.com/9x9cache/5a14e5502fd5ab6b26e7f11f2a38ee718bc06eea_1288043514_thumbLarge.jpg");
+			program2.setMpeg4FileUrl("http://s3.amazonaws.com/9x9pod/5a14e5502fd5ab6b26e7f11f2a38ee718bc06eea_1288043514.m4v");	
+			program2.setPublic(true);
+			programMngr.create(channel1, program2);
+		} else {
+			CategoryManager categoryMngr = new CategoryManager();
+			Category category = categoryMngr.findByName("活動中心");
+			categories.add(category);
+			String[] urls1 = {"http://www.youtube.com/user/taiwanroc100", "http://www.youtube.com/user/msfhk",
+					 "http://www.youtube.com/user/lisahou62", "http://www.youtube.com/user/savedogs2009",
+					 "http://www.youtube.com/user/twtati", "http://www.youtube.com/user/twchannel",
+					 "http://www.youtube.com/user/Twimitv"};
+			this.channelsCreate(urls1, categories, user.getKey().getId());
+			categories.clear();
+			category = categoryMngr.findByName("視聽劇場");
+			categories.add(category);
+			String[] urls2 = this.getShowUrl();
+			this.channelsCreate(urls2, categories, user.getKey().getId());
+
+			categories.clear();
+			category = categoryMngr.findByName("數位高手");
+			categories.add(category);
+			String[] urls3 = this.getDigitalUrl();
+			this.channelsCreate(urls3, categories, user.getKey().getId());
+
+			categories.clear();
+			category = categoryMngr.findByName("ACG夢工廠");
+			categories.add(category);
+			String[] urls4 = this.getDreamUrl();
+			this.channelsCreate(urls4, categories, user.getKey().getId());
+
+			categories.clear();
+			category = categoryMngr.findByName("生活娛樂館");
+			categories.add(category);
+			String[] urls5 = this.getUrlEntertainment();
+			this.channelsCreate(urls5, categories, user.getKey().getId());
+
+			categories.clear();
+			category = categoryMngr.findByName("國家研究院");
+			categories.add(category);
+			String[] urls6 = this.getUrlStudy();
+			this.channelsCreate(urls6, categories, user.getKey().getId());
+
+			categories.clear();
+			category = categoryMngr.findByName("國家體育場");
+			categories.add(category);
+			String[] urls7 = this.getUrlSports();
+			this.channelsCreate(urls7, categories, user.getKey().getId());
+
+			categories.clear();
+			category = categoryMngr.findByName("文創藝廊");
+			categories.add(category);
+			String[] urls8 = this.getUrlArt();
+			this.channelsCreate(urls8, categories, user.getKey().getId());
+
+			categories.clear();
+			category = categoryMngr.findByName("影音實驗室");
+			categories.add(category);
+			String[] urls9 = this.getUrlMovie();
+			this.channelsCreate(urls9, categories, user.getKey().getId());
+			
+		}
 		
 	}
 	
-	private void createMso1DefaultIpg() {
+	private void channelsCreate(String[] urls, List<Category>categories, long userId) {
+		TranscodingService tranService = new TranscodingService();
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		for (String url : urls) {
+			MsoChannel c = new MsoChannel(url, userId);
+			channelMngr.create(c, categories);				
+			tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
+		}		
+	}
+	
+	private void createMso1DefaultIpg(boolean devel) {
 		MsoIpgManager msoIpgMngr = new MsoIpgManager();
 		Mso mso = new MsoManager().findNNMso();
 		Category c = new CategoryManager().findByName("Activism");
@@ -114,20 +194,20 @@ public class InitService {
 				counter++;
 			}						
 			if (channels.get(i).getName().equals("System Channel")) {
-				MsoIpg msoIpg = new MsoIpg(mso.getKey().getId(), channels.get(2).getKey().getId(), 81, MsoIpg.TYPE_READONLY);
+				MsoIpg msoIpg = new MsoIpg(mso.getKey().getId(), channels.get(i).getKey().getId(), 81, MsoIpg.TYPE_READONLY);
 				msoIpgMngr.create(msoIpg);
 				counter++;
 			}
 		}
 	}
 
-	private void createMso2DefaultIpg() {
+	private void createMso2DefaultIpg(boolean devel) {
 		MsoIpgManager msoIpgMngr = new MsoIpgManager();
 		Mso mso = new MsoManager().findByName("5f");
-		Category c = new CategoryManager().findByName("喜劇");
+		Category c = new CategoryManager().findByName("活動中心");
 		List<MsoChannel> channels = new MsoChannelManager().findPublicChannelsByCategoryId(c.getKey().getId());
 		MsoIpg msoIpg = new MsoIpg(mso.getKey().getId(), channels.get(0).getKey().getId(), 1, MsoIpg.TYPE_READONLY);					
-		msoIpgMngr.create(msoIpg);
+		msoIpgMngr.create(msoIpg);		
 	}
 	
 	private void createMso1DefaultChannels(boolean devel){
@@ -321,14 +401,439 @@ public class InitService {
 		initializeMso2AndCategories(debug);	
 	}	
 	
-	public void initAll(boolean devel, boolean debug) {
+	public void initAll(boolean devel, boolean debug) {		
 		deleteAll();		
 		initializeMso1AndCategories(debug);
 		initializeMso2AndCategories(debug);	
 		createMso1DefaultChannels(devel);
 		createMso2DefaultChannels(devel);	
-		createMso1DefaultIpg();
-		createMso2DefaultIpg();		
+		createMso1DefaultIpg(devel);
+		createMso2DefaultIpg(devel);		
 	}
 	
+	private void setCache() {
+	    try {
+	        cache = CacheManager.getInstance().getCacheFactory().createCache(
+	            Collections.emptyMap());
+	      } catch (CacheException e) {}	      		
+	}
+
+	private String[] getUrlMovie() {
+		String[] url = {
+				"http://www.youtube.com/user/rtvshow19",
+				"http://www.youtube.com/user/bigbirdasa",
+				"http://www.youtube.com/user/yan27149",
+				"http://www.youtube.com/user/ca12fju",
+				"http://www.youtube.com/user/wowwanwan",
+				"http://www.youtube.com/user/journalismshu",
+				"http://www.youtube.com/user/pccujnn9th",
+				"http://www.youtube.com/user/vtkutaiwan",
+				"http://www.youtube.com/user/cyberTKU",
+				"http://www.youtube.com/user/DmaTut",
+				"http://www.youtube.com/user/fcutv",
+				"http://www.youtube.com/user/fcumlc",
+				"http://www.youtube.com/user/ttudesign",
+				"http://www.youtube.com/user/boyandgirlcomehere",
+				"http://www.youtube.com/user/tr908325",
+				"http://www.youtube.com/user/kevinjason03",
+				"http://www.youtube.com/user/kinkuanc",
+				"http://www.youtube.com/user/annie020612",
+				"http://www.youtube.com/user/kimzzchizz",
+				"http://www.youtube.com/user/catlocker",
+				"http://www.youtube.com/user/rtvshow19",
+				"http://www.youtube.com/user/bigbirdasa",
+				"http://www.youtube.com/user/yan27149",
+				"http://www.youtube.com/user/ca12fju",
+				"http://www.youtube.com/user/wowwanwan",
+				"http://www.youtube.com/user/journalismshu",
+				"http://www.youtube.com/user/pccujnn9th",
+				"http://www.youtube.com/user/vtkutaiwan",
+				"http://www.youtube.com/user/cyberTKU",
+				"http://www.youtube.com/user/DmaTut",
+				"http://www.youtube.com/user/fcutv",
+				"http://www.youtube.com/user/fcumlc",
+				"http://www.youtube.com/user/ttudesign",
+				"http://www.youtube.com/user/boyandgirlcomehere",
+				"http://www.youtube.com/user/tr908325",
+				"http://www.youtube.com/user/kevinjason03",
+				"http://www.youtube.com/user/kinkuanc",
+				"http://www.youtube.com/user/annie020612",
+				"http://www.youtube.com/user/kimzzchizz",
+				"http://www.youtube.com/user/catlocker"				
+		};
+		return url;
+	}
+	
+	private String[] getUrlArt() {
+		String[] url = {
+				"http://www.youtube.com/user/CCANEWS",
+				"http://www.youtube.com/user/dxmonline",
+				"http://www.youtube.com/user/ntcharts",
+				"http://www.youtube.com/user/khamtw",
+				"http://www.youtube.com/user/TheNextBigThingTW",
+				"http://www.youtube.com/user/WINYEDA",
+				"http://www.youtube.com/user/awakeningtw"				
+		};
+		return url;
+	}
+	
+	private String[] getUrlSports() {
+		String[] url = {
+				"http://www.youtube.com/user/NBA",
+				"http://www.youtube.com/user/NBAHiighlights",
+				"http://www.youtube.com/user/NBAErik",
+				"http://www.youtube.com/user/lalakersfan88",
+				"http://www.youtube.com/user/PRIVATEMARMOL",
+				"http://www.youtube.com/user/HeatTeo",
+				"http://www.youtube.com/user/ATPWorldTour",
+				"http://www.youtube.com/user/TennisAustralia",
+				"http://www.youtube.com/user/yowmingchen",
+				"http://www.youtube.com/user/JRSportBrief",
+				"http://www.youtube.com/user/sheng98news",
+				"http://www.youtube.com/user/taiwansr",
+				"http://www.youtube.com/user/jimmylin121",
+				"http://www.youtube.com/user/bostonceltics", 
+				"http://www.youtube.com/user/YESNetwork",
+				"http://www.youtube.com/user/wwedivax5",
+				"http://www.youtube.com/user/djscratch2008",
+				"http://www.youtube.com/user/theF1com",
+				"http://www.youtube.com/user/secondsout",
+				"http://www.youtube.com/user/lisachen110",
+				"http://www.youtube.com/user/ilovebaseballforever",
+				"http://www.youtube.com/user/topmma",
+				"http://www.youtube.com/user/UFC",
+				"http://www.youtube.com/user/TNAwrestling",
+				"http://www.youtube.com/user/glyphmedia",
+				"http://www.youtube.com/user/fcbarcelona",
+				"http://www.youtube.com/user/NHLVideo",
+				"http://www.youtube.com/user/redbull",
+				"http://www.youtube.com/user/MotoGP",
+				"http://www.youtube.com/user/nikefootball",
+				"http://www.youtube.com/user/Hoopmixtape",
+				"http://www.youtube.com/user/TeamFlightBrothers",
+				"http://www.youtube.com/user/wrc",
+				"http://www.youtube.com/user/LoadedNewsletter",
+				"http://www.youtube.com/user/enminem",
+				"http://www.youtube.com/user/ThrasherMagazine",
+				"http://www.youtube.com/user/XTremeVideo",
+				"http://www.youtube.com/user/golf",
+				"http://www.youtube.com/user/AmericanParkour",
+				"http://www.youtube.com/user/nkalexander7",
+				"http://www.youtube.com/user/NJPW",
+				"http://www.youtube.com/user/letsKENDO",
+				"http://www.youtube.com/user/IKIKAZEBOXING",
+				"http://www.youtube.com/user/Happymagicskateboard", 
+				"http://www.youtube.com/user/adblitz",
+				"http://www.youtube.com/user/adidasoriginals", 
+				"http://www.youtube.com/user/adidasfootballtv",
+				"http://www.youtube.com/user/nikesoccer",                              
+				"http://www.youtube.com/user/jumpman23"
+		};
+		return url;
+	}
+	
+	public String[] getUrlStudy() {
+		String url[] = {
+				"http://www.youtube.com/user/Taiwantrade",
+				"http://www.youtube.com/user/ChurchofScientology",
+				"http://www.youtube.com/user/CambridgeUniversity",
+				"http://www.youtube.com/user/MIT", 
+				"http://www.youtube.com/user/StanfordUniversity",
+				"http://www.youtube.com/user/UCBerkeley",
+				"http://www.youtube.com/user/UCtelevision",
+				"http://www.youtube.com/user/YaleUniversity",
+				"http://www.youtube.com/user/UCLA",
+				"http://www.youtube.com/user/UCBerkeleyEvents",
+				"http://www.youtube.com/user/stanfordbusiness",
+				"http://www.youtube.com/user/arirangkorean",
+				"http://www.youtube.com/user/japanesepod101",
+				"http://www.youtube.com/user/CWTV",
+				"http://www.youtube.com/user/cwgv",
+				"http://www.youtube.com/user/eballgogogo",
+				"http://www.youtube.com/user/presidentialoffice",
+				"http://www.youtube.com/user/bwnet"				
+		};
+		return url;
+	}
+	
+	private String[] getUrlEntertainment() {
+		String url[] = {
+				"http://www.youtube.com/user/gorgeousspace",
+				"http://www.youtube.com/user/IKEAmeatball",
+				"http://www.youtube.com/user/fashionguide",
+				"http://www.youtube.com/user/CWNTV",
+				"http://www.youtube.com/user/elletvfashion",
+				"http://www.youtube.com/user/vogueTV",
+				"http://www.youtube.com/user/fashionTV",
+				"http://www.youtube.com/user/mctw1",
+				"http://www.youtube.com/user/sppweb",
+				"http://www.youtube.com/user/catwalk2009",
+				"http://www.youtube.com/user/beauty321",
+				"http://www.youtube.com/user/fuzkittie",
+				"http://www.youtube.com/user/pitin999",
+				"http://www.youtube.com/user/lohas88louis",
+				"http://www.youtube.com/user/webwave970",
+				"http://www.youtube.com/user/lioncyber",
+				"http://www.youtube.com/user/TLC",                                                                     
+				"http://www.youtube.com/user/clys23",
+				"http://www.youtube.com/user/starfunTV",
+				"http://www.youtube.com/user/happy100stay",
+				"http://www.youtube.com/user/thegrandformosa",
+				"http://www.youtube.com/user/chiayigov",
+				"http://www.youtube.com/user/ipapr",
+				"http://www.youtube.com/user/tw078413",
+				"http://www.youtube.com/user/parispeetee",
+				"http://www.youtube.com/user/weatherrisk",
+				"http://www.youtube.com/user/WestJet",
+				"http://www.youtube.com/user/Budgetplaces",
+				"http://www.youtube.com/user/Visitvictoria",
+				"http://www.youtube.com/user/EmiratesExperience",
+				"http://www.youtube.com/user/DisneyParks",
+				"http://www.youtube.com/user/gionettaiwan",
+				"http://www.youtube.com/user/seouldreamseries ",
+				"http://www.youtube.com/user/visitkorea ",
+				"http://www.youtube.com/user/spain",
+				"http://www.youtube.com/user/machilogmovie",
+				"http://www.youtube.com/user/drivemovie",
+				"http://www.youtube.com/user/tontantin",
+				"http://www.youtube.com/user/shitemita",
+				"http://www.youtube.com/user/syaso",
+				"http://www.youtube.com/user/nimo5",
+				"http://www.youtube.com/user/ddloveaa",
+				"http://www.youtube.com/user/wwwBeauTubecc",
+				"http://www.youtube.com/user/qwq33",
+				"http://www.youtube.com/user/ikkiknoles",
+				"http://www.youtube.com/user/momallnet",
+				"http://www.youtube.com/user/tw078413",
+				"http://www.youtube.com/user/2ojux",
+				"http://www.youtube.com/user/bikinicom",
+				"http://www.youtube.com/user/FHMTW",
+				"http://www.youtube.com/user/VICTORIASSECRET",
+				"http://www.youtube.com/user/A3Network",
+				"http://www.youtube.com/user/starbucks",
+				"http://www.youtube.com/user/BMW",
+				"http://www.youtube.com/user/MercedesBenzTV",
+				"http://www.youtube.com/user/UnitedStatesNavy ",
+				"http://www.youtube.com/user/porsche",
+				"http://www.youtube.com/user/Audi",
+				"http://www.youtube.com/user/Honda",
+				"http://www.youtube.com/user/hennesandmauritz",
+				"http://www.youtube.com/user/DisneyParks",
+				"http://www.youtube.com/user/dolcegabbanachannel",
+				"http://www.youtube.com/user/Burberry ",
+				"http://www.youtube.com/user/myvolkswagen ",
+				"http://www.youtube.com/user/LexusVehicles ",
+				"http://www.youtube.com/user/MINI",
+				"http://www.youtube.com/user/thejeepchannel",
+				"http://www.youtube.com/user/chevrolet",
+				"http://www.youtube.com/user/Ford",
+				"http://www.youtube.com/user/Peugeot",
+				"http://www.youtube.com/user/LorealParis",
+				"http://www.youtube.com/user/Pepsi",
+				"http://www.youtube.com/user/Bundeswehr",
+				"http://www.youtube.com/user/Lowes",
+				"http://www.youtube.com/user/LOUISVUITTON",
+				"http://www.youtube.com/user/namgeun",
+				"http://www.youtube.com/user/sun57500",
+				"http://www.youtube.com/user/olivinej",
+				"http://www.youtube.com/user/Mmovies21",
+				"http://www.youtube.com/user/YTAnimalJP",
+				"http://www.youtube.com/user/gardea23",
+				"http://www.youtube.com/user/dogs101tw",
+				"http://www.youtube.com/user/Wearefordogs",
+				"http://www.youtube.com/user/TEAMJGY",
+				"http://www.youtube.com/user/sppa105986",
+				"http://www.youtube.com/user/mimi74812",
+				"http://www.youtube.com/user/88100dog",
+				"http://www.youtube.com/user/ca8207",
+				"http://www.youtube.com/user/brunello1997",
+				"http://www.youtube.com/user/haijiq",
+				"http://www.youtube.com/user/ShippoTV",
+				"http://www.youtube.com/user/buycartv",
+				"http://www.youtube.com/user/bk20185",
+				"http://www.youtube.com/user/motousa",
+				"http://www.youtube.com/user/RevZillaTV",
+				"http://www.youtube.com/user/autocar",
+				"http://www.youtube.com/user/TopGear",
+				"http://www.youtube.com/user/motorstelevision",
+				"http://www.youtube.com/user/motorcyclenewsdotcom",
+				"http://www.youtube.com/user/Autoexpress",
+				"http://www.youtube.com/user/Shmee150",
+				"http://www.youtube.com/user/Motorscouk",
+				"http://www.youtube.com/user/carshowclassic",
+				"http://www.youtube.com/user/BEAUTYQQ",
+				"http://www.youtube.com/user/michellephan",
+				"http://www.youtube.com/user/makeupbytiffanyD",
+				"http://www.youtube.com/user/ilovemakeup",
+				"http://www.youtube.com/user/qafbeijing",
+				"http://www.youtube.com/user/TheDailyGays",
+				"http://www.youtube.com/user/thatgaybunch",
+				"http://www.youtube.com/user/beaverbunch",
+				"http://www.youtube.com/user/johnpatton15",
+				"http://www.youtube.com/user/devinanderica",
+				"http://www.youtube.com/user/wearnNews",
+				"http://www.youtube.com/user/chung1219",                                                        
+				"http://www.youtube.com/user/chri5784 ",
+				"http://www.youtube.com/user/millitarychannel",
+				"http://www.youtube.com/user/millitarynewsnetwork",
+				"http://www.youtube.com/user/Dulan9 ",
+				"http://www.youtube.com/user/ma19ko",
+				"http://www.youtube.com/user/gd1104",
+				"http://www.youtube.com/user/3rdid8487",
+				"http://www.youtube.com/user/pepsi",
+				"http://www.youtube.com/user/Porche",
+				"http://www.youtube.com/user/Otakuarmy"				
+		};
+		return url;
+	}
+	
+	private String[] getDreamUrl() {
+		String url[] = {
+				"http://www.youtube.com/user/efunTV",
+				"http://www.youtube.com/user/RUGNN",
+				"http://www.youtube.com/user/BahamutGNN",
+				"http://www.youtube.com/user/gamebasegnc",           
+				"http://www.youtube.com/user/SuperEAMAN",
+				"http://www.youtube.com/user/huskystarcraft",
+				"http://www.youtube.com/user/hdstarcraft",
+				"http://www.youtube.com/user/EASPORTS",
+				"http://www.youtube.com/user/MrOperationSports",
+				"http://www.youtube.com/user/yaoilover019",
+				"http://www.youtube.com/user/rrobbert184",
+				"http://www.youtube.com/user/shingin",
+				"http://www.youtube.com/user/animemixparty",
+				"http://www.youtube.com/user/NextGenTactics",
+				"http://www.youtube.com/user/IGNentertainment",
+				"http://www.youtube.com/user/HazardCinema",
+				"http://www.youtube.com/user/PS3Comedy",
+				"http://www.youtube.com/user/Games",
+				"http://www.youtube.com/user/InecomCompany",
+				"http://www.youtube.com/user/pilicreateworld",
+				"http://www.youtube.com/user/Fujiigumi",
+				"http://www.youtube.com/user/xbox",
+				"http://www.youtube.com/user/LittleBigPlanetUK",
+				"http://www.youtube.com/user/ElectronicArtsDE",				
+		};
+		return url;
+	}
+	
+	private String[] getDigitalUrl() {
+		String url[] = {
+				"http://www.youtube.com/user/lifesforsharing",
+				"http://www.youtube.com/user/bing",
+				"http://www.youtube.com/user/IBM",
+				"http://www.youtube.com/user/BlackBerry",
+				"http://www.youtube.com/user/terry28853669",
+				"http://www.youtube.com/user/nokia",
+				"http://www.youtube.com/user/sonyericsson",
+				"http://www.youtube.com/user/Google",
+				"http://www.youtube.com/user/apple",
+				"http://www.youtube.com/user/WindowsVideos",
+				"http://www.youtube.com/user/sonyelectronics",
+				"http://www.youtube.com/user/AtGoogleTalks",
+				"http://www.youtube.com/user/Googledevelopers",
+				"http://www.youtube.com/user/EngadgetChinese",
+				"http://www.youtube.com/user/15fun",
+				"http://www.youtube.com/user/CNETTV",
+				"http://www.youtube.com/user/jon4lakers",                                                                       
+				"http://www.youtube.com/user/UDNDigital",
+				"http://www.youtube.com/user/iphone4tw",
+				"http://www.youtube.com/user/jima6636",
+				"http://www.youtube.com/user/tapcritic",
+				"http://www.youtube.com/user/TEDtalksDirector",
+				"http://www.youtube.com/user/tysiphonehelp",
+				"http://www.youtube.com/user/DCviewNO1",
+				"http://www.youtube.com/user/androidcentral",
+				"http://www.youtube.com/user/salesforce",
+				"http://www.youtube.com/user/sogitv"			
+		};
+		return url;
+	}
+	
+	private String[] getShowUrl() {
+		String[] url = {
+				"http://www.youtube.com/user/aff0021",
+				"http://www.youtube.com/user/thaicraze",
+				"http://www.youtube.com/user/ptscc",
+				"http://www.youtube.com/user/ChinaTimes",
+				"http://www.youtube.com/user/ttvnewsview",
+				"http://www.youtube.com/user/NMANews",
+				"http://www.youtube.com/user/ETTVnews",
+				"http://www.youtube.com/user/asahicom",
+				"http://www.youtube.com/user/peoponews",
+				"http://www.youtube.com/user/InDeepCloud",
+				"http://www.youtube.com/user/PTSTalk",
+				"http://www.youtube.com/user/hakkatv",
+				"http://www.youtube.com/user/appleactionews",
+				"http://www.youtube.com/user/FTVCP",
+				"http://www.youtube.com/user/FMTV168",
+				"http://www.youtube.com/user/ctitv",
+				"http://www.youtube.com/user/TBSCTS",
+				"http://www.youtube.com/user/chinatv",
+				"http://www.youtube.com/user/pts",                                                                                            
+				"http://www.youtube.com/user/zimeitao",
+				"http://www.youtube.com/user/TaiwanTalks4",
+				"http://www.youtube.com/user/atmovies88",
+				"http://www.youtube.com/user/trailers",
+				"http://www.youtube.com/user/twfoxmovies",
+				"http://www.youtube.com/user/YattaMovie",
+				"http://www.youtube.com/user/2010jaychou",
+				"http://www.youtube.com/user/FoxBroadcasting",
+				"http://www.youtube.com/user/elura2009",
+				"http://www.youtube.com/user/NextTVent",
+				"http://www.youtube.com/user/nagootv",
+				"http://www.youtube.com/user/SETTV",
+				"http://www.youtube.com/user/RTHK",
+				"http://www.youtube.com/user/hollywoodstreams",
+				"http://www.youtube.com/user/NationalGeographic",
+				"http://www.youtube.com/user/kbsworld",
+				"http://www.youtube.com/user/arirangworld",
+				"http://www.youtube.com/user/ystarchannel2",
+				"http://www.youtube.com/user/NHKonline",
+				"http://www.youtube.com/user/ystarchannel4",
+				"http://www.youtube.com/user/achun5",
+				"http://www.youtube.com/user/khalilfongfanclub",
+				"http://www.youtube.com/user/goodtv",
+				"http://www.youtube.com/user/bearchen000",
+				"http://www.youtube.com/user/DaAiVideo",
+				"http://www.youtube.com/user/BillboardGoddess",
+				"http://www.youtube.com/user/avexnetwork",
+				"http://www.youtube.com/user/Rina93",
+				"http://www.youtube.com/user/kpopmv2011",
+				"http://www.youtube.com/user/AsiaHolicKpop",
+				"http://www.youtube.com/user/AsianMusicWorldHD",
+				"http://www.youtube.com/user/sment",
+				"http://www.youtube.com/user/kbsworld",
+				"http://www.youtube.com/user/musiciansinstitute",
+				"http://www.youtube.com/user/universalmusicjapan",
+				"http://www.youtube.com/user/musiciansinstituteja",
+				"http://www.youtube.com/user/vul3a04SNSDing",
+				"http://www.youtube.com/user/KPOPMV020",
+				"http://www.youtube.com/user/mamonuser",
+				"http://www.youtube.com/user/TonyKPOPMV",
+				"http://www.youtube.com/user/rockhall",
+				"http://www.youtube.com/user/rockitoutblog",
+				"http://www.youtube.com/user/KpopNET4",
+				"http://www.youtube.com/user/GuitarCenterTV",
+				"http://www.youtube.com/user/AKB48",
+				"http://www.youtube.com/user/FueledByRamen",
+				"http://www.youtube.com/user/ahmirTV",
+				"http://www.youtube.com/user/officialtiesto",
+				"http://www.youtube.com/user/UltraRecords",
+				"http://www.youtube.com/user/JRAquinomusic",
+				"http://www.youtube.com/user/atlanticvideos",
+				"http://www.youtube.com/user/armadamusic",
+				"http://www.youtube.com/user/datarecordsuk",
+				"http://www.youtube.com/user/scantraxxrecordz",
+				"http://www.youtube.com/user/ortoPilot",
+				"http://www.youtube.com/user/warnertaiwan",
+				"http://www.youtube.com/user/universaltwn",
+				"http://www.youtube.com/user/ystarchannel3",
+				"http://www.youtube.com/user/PRINTGAKUFU",
+				"http://www.youtube.com/user/discoverynetworks",
+				"http://www.youtube.com/user/nationalgeographic",
+				"http://www.youtube.com/user/animalplanetTV",
+		};
+		return url;
+	}
 }
