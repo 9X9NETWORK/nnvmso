@@ -113,8 +113,8 @@ public class PlayerApiController {
 	 */	
 	@RequestMapping(value="login")
 	public ResponseEntity<String> login(HttpServletRequest req, HttpServletResponse resp) {
-		String email = req.getParameter("email").trim();
-		String password = req.getParameter("password").trim();		
+		String email = req.getParameter("email");
+		String password = req.getParameter("password");		
 		this.prepService(req);
 		log.info("login: email=" + email);		
 		String output = NnStatusMsg.errorStr(locale);		
@@ -158,10 +158,10 @@ public class PlayerApiController {
 	 */	
 	@RequestMapping(value="signup")
     public ResponseEntity<String> signup(HttpServletRequest req, HttpServletResponse resp) {
-		String email = req.getParameter("email").trim();
-		String password = req.getParameter("password").trim();
-		String name = req.getParameter("name").trim();
-		String userToken = req.getParameter("use	r").trim();				
+		String email = req.getParameter("email");
+		String password = req.getParameter("password");
+		String name = req.getParameter("name");
+		String userToken = req.getParameter("user");				
 		log.info("signup: email=" + email + ";name=" + name + ";userToken=" + userToken + ";password=" + password);
 
 		this.prepService(req);
@@ -302,10 +302,10 @@ public class PlayerApiController {
 	 */	
 	@RequestMapping(value="channelSubmit")
 	public ResponseEntity<String> channelSubmit(HttpServletRequest req) {
-		String url = req.getParameter("url").trim(); 
-		String userToken= req.getParameter("user").trim();
-		String grid = req.getParameter("grid").trim();
-		String categoryIds = req.getParameter("category").trim();
+		String url = req.getParameter("url") ;
+		String userToken= req.getParameter("user");
+		String grid = req.getParameter("grid");
+		String categoryIds = req.getParameter("category");
 
 		this.prepService(req);		
 		log.info("player input - userToken=" + userToken+ "; url=" + url + ";grid=" + grid + ";categoryId=" + categoryIds);				
