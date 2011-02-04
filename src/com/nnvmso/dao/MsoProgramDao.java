@@ -33,7 +33,6 @@ public class MsoProgramDao {
 	public List<MsoProgram> findNewProgramsByChannels(List<MsoChannel> channels, Hashtable<Long, HashSet<Long>> watchedTable) {
 		List<MsoProgram> programs = new ArrayList<MsoProgram>();
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		System.out.println("channels size:" + channels.size());
 		for (MsoChannel c : channels) {
 			Query query = pm.newQuery(MsoProgram.class);
 			query.setFilter("channelId == channelIdParam");
@@ -68,7 +67,6 @@ public class MsoProgramDao {
 	    		log.info("the whole channel is unwatched:" + c.getKey().getId());
 				for (int i=0; i<results.size(); i++) {
 					if (i == RECENT_SIZE) {break;}
-					System.out.println(results.get(i).getKey().getId());
 					programs.add(results.get(i));
 				}	    			    		
 	    	}
