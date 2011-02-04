@@ -230,10 +230,6 @@ public class TranscodingService {
 		if (env.equals("office")) {
 			callbackServer = pro.getProperty("office_callback");
 		}		
-
-		log.info("Original requestUrl=" + req.getRequestURL().toString() + 
-				 "; Callback server=" + callbackServer +
-				 "; Transcoding server=" + transcodingServer); 
 		String devel = pro.getProperty("devel");
 		return new String[]{transcodingServer, callbackServer, devel};
 	}
