@@ -1,5 +1,6 @@
 package com.nnvmso.web.admin;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -15,8 +16,12 @@ import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.lib.NnStringUtil;
 import com.nnvmso.model.Category;
+import com.nnvmso.model.CategoryChannel;
 import com.nnvmso.model.Mso;
+import com.nnvmso.model.MsoChannel;
+import com.nnvmso.service.CategoryChannelManager;
 import com.nnvmso.service.CategoryManager;
+import com.nnvmso.service.MsoChannelManager;
 import com.nnvmso.service.MsoManager;
 
 @Controller
@@ -37,6 +42,26 @@ public class AdminCategoryController {
 		NnLogUtil.logException(e);
 		return "error/exception";				
 	}
+	
+	//list every channel under a category
+	@RequestMapping(value="channelList")
+	public ResponseEntity<String> categoryCount(@RequestParam("category")long category) {		
+		CategoryChannelManager ccMngr = new CategoryChannelManager();
+		MsoChannelManager cMngr = new MsoChannelManager();
+		List<CategoryChannel> ccs = ccMngr.findAllByCategoryId(category);
+		List<MsoChannel> channels = new ArrayList<MsoChannel>();
+		for (CategoryChannel cc : ccs) {
+			channels.add(cMngr.findById(cc.getChannelId()));
+		}
+		String output = "";
+		output = "category count = " + new CategoryManager().findById(category).getChannelCount() + "\n";
+		output = output + "id \t name \t program count \t status \t isPublic\n";
+		for (MsoChannel c : channels) {
+			output = output + c.getKey().getId() + "\t" + c.getName() + "\t" + + c.getProgramCount() + "\t" + c.getStatus() + "\t" + c.isPublic() + "\n";
+		}
+		return NnNetUtil.textReturn(output);
+	}
+	
 	
 	@RequestMapping("list")
 	public ResponseEntity<String> list(@RequestParam(required=false)String id) {
