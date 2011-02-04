@@ -1,6 +1,5 @@
 package com.nnvmso.service;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
@@ -8,13 +7,12 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 
 import net.sf.jsr107cache.Cache;
-import net.sf.jsr107cache.CacheException;
-import net.sf.jsr107cache.CacheManager;
 
 import org.springframework.stereotype.Service;
 
 import com.google.appengine.api.datastore.Key;
 import com.nnvmso.dao.MsoDao;
+import com.nnvmso.lib.CacheFactory;
 import com.nnvmso.lib.CookieHelper;
 import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.model.Mso;
@@ -25,13 +23,12 @@ public class MsoManager {
 	protected static final Logger log = Logger.getLogger(MsoManager.class.getName());
 	
 	private MsoDao msoDao = new MsoDao();
-	private Cache cache;
 		
 	public void create(Mso mso) {
 		if (this.findByName(mso.getName()) == null) {
 			this.save(mso);			
 		}
-		this.setCache();
+		Cache cache = CacheFactory.get();
 		if (cache != null) { cache.put(this.getCacheKey(mso.getName()), mso);	}
 	}
 	
@@ -42,7 +39,7 @@ public class MsoManager {
 		Date now = new Date();
 		if (mso.getCreateDate() == null) {mso.setCreateDate(now);}
 		mso.setUpdateDate(now);
-		this.setCache();
+		Cache cache = CacheFactory.get();
 		if (cache != null) { cache.put(this.getCacheKey(mso.getName()), mso);	}
 		return msoDao.save(mso);
 	}
@@ -61,20 +58,16 @@ public class MsoManager {
 	public Mso findByName(String name) {
 		//find from cache
 		if (name == null) {return null;}
-		this.setCache();
+		Cache cache = CacheFactory.get();
 		String cacheKey = this.getCacheKey(name);
 		if (cache != null) {
 			Mso mso = (Mso) cache.get(cacheKey);
-			if (mso != null) {
-				log.info("Cache found: mso in cache:" + mso.getName());
-				return mso;	
-			}
+			if (mso != null) { return mso;}
 		}
 		//find
 		Mso mso = msoDao.findByName(name);
 		//save in cache
-		if (cache != null && mso != null) { cache.put(cacheKey, mso);}
-		log.info("Cache NOT found: mso is just added:" + name);
+		if (cache != null && mso != null) { cache.put(cacheKey, mso);}				
 		return mso;
 	}	
 	
@@ -124,15 +117,23 @@ public class MsoManager {
 		return "mso(" + name + ")";
 	}
 	
-	private void setCache() {
-	    try {
-	        cache = CacheManager.getInstance().getCacheFactory().createCache(
-	            Collections.emptyMap());
-	      } catch (CacheException e) {}	      		
+	public String findCache() {
+		String output = "";
+		Cache cache = CacheFactory.get();
+		if (cache != null) {
+			List<Mso> msos = this.findAll();
+			for (Mso m : msos) {
+				Mso mso = ((Mso)cache.get(this.getCacheKey(m.getName())));
+				if (mso != null) {
+					output = output + mso.toString();
+				}				
+			}
+		}
+		return output;
 	}
 	
 	public void deleteCache() {
-		this.setCache();
+		Cache cache = CacheFactory.get();
 		List<Mso> msos = this.findAll();
 		if (cache != null) {
 			for (Mso m : msos) {				

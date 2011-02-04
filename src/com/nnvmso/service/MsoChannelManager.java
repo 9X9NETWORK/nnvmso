@@ -1,19 +1,17 @@
 package com.nnvmso.service;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
 import net.sf.jsr107cache.Cache;
-import net.sf.jsr107cache.CacheException;
-import net.sf.jsr107cache.CacheManager;
 
 import org.springframework.stereotype.Service;
 
 import com.google.appengine.api.datastore.Key;
 import com.nnvmso.dao.MsoChannelDao;
+import com.nnvmso.lib.CacheFactory;
 import com.nnvmso.model.Category;
 import com.nnvmso.model.CategoryChannel;
 import com.nnvmso.model.MsoChannel;
@@ -28,7 +26,6 @@ public class MsoChannelManager {
 	public static short MAX_CHANNEL_SIZE = 50;
 	
 	private MsoChannelDao msoChannelDao = new MsoChannelDao();
-	private Cache cache;
 	
 	/**
 	 * @@@IMPORTANT 
@@ -49,48 +46,48 @@ public class MsoChannelManager {
 		
 		//set category channelCount if necessary
 		CategoryManager categoryMngr = new CategoryManager();
-		if (channel.getStatus() == MsoChannel.STATUS_SUCCESS && channel.isPublic()) {
-			for (Category c : categories) {			
-				c.setChannelCount(c.getChannelCount() + 1);
-				categoryMngr.save(c);
-			}
+		if (this.isCounterQualified(channel)) {
+		    System.out.println("channel manager, channel create, addChannelCount");
+			categoryMngr.addChannelCounter(channel);
 		}
 		
 		//save to cache
-		this.setCache();		
+		Cache cache = CacheFactory.get();		
 		String key = this.getCacheKey(channel.getKey().getId());
 		if (cache != null) { cache.put(key, channel); }		
 	}
 
-	/** 
-	 * @param originalState used to calculate category counter, pass null if not interested
+	/**
+	 * There's chance category's channelCounter is wrong, but so far the chance is small: 
+	 * 1. when channel from public to non-public
+	 * 2. when channel from status success to non-success
+	 * Currently the counter is mainly dealt in MsoProgramManager.create() 
+	 * Will need to fix it in transaction     
 	 */
-	public MsoChannel save(MsoChannel originalState, MsoChannel channel) {
-		//change category's channelCount() !!! minus scenario is missing
-		if (originalState != null &&
-			channel.getStatus() == MsoChannel.STATUS_SUCCESS && 
-			channel.isPublic() == true && 
-			(originalState.getStatus() != MsoChannel.STATUS_SUCCESS || !originalState.isPublic()) ) {
-			log.info("add category counter");
-			CategoryChannelManager ccMngr = new CategoryChannelManager();
-			CategoryManager categoryManager = new CategoryManager();
-			List<CategoryChannel> ccs = ccMngr.findAllByChannelId(channel.getKey().getId());
-			List<Long> categoryIds = new ArrayList<Long>(); 
-			for (CategoryChannel cc : ccs) {
-				categoryIds.add(cc.getCategoryId());
-			}
-			List<Category> categories = categoryManager.findAllByIds(categoryIds);
-			for (Category c : categories) {
-				c.setChannelCount(c.getChannelCount()+1);
-			}
-		}
+	public MsoChannel save(MsoChannel channel) {
 		channel = msoChannelDao.save(channel);
 		//save to cache
-		this.setCache();		
+		Cache cache = CacheFactory.get();		
 		String key = this.getCacheKey(channel.getKey().getId());
 		if (cache != null) { cache.put(key, channel); }
 		return channel;
 	}		
+	
+	public void delete(MsoChannel channel) {
+		//category channelCount
+		//cache
+	}
+	
+	//!!! model?
+	public boolean isCounterQualified(MsoChannel channel) {
+		boolean qualified = false;
+		if (channel.getStatus() == MsoChannel.STATUS_SUCCESS &&
+			channel.getProgramCount() > 0 &&
+			channel.isPublic()) {
+			qualified = true;
+		}
+		return qualified;
+	}
 	
 	public MsoChannel initChannelSubmittedFromPlayer(String sourceUrl, NnUser user) {
 		MsoChannel channel = new MsoChannel(sourceUrl, user.getKey().getId());
@@ -150,20 +147,16 @@ public class MsoChannelManager {
 	//cached
 	public MsoChannel findById(long id) {
 		//find from cache
-		this.setCache();
+		Cache cache = CacheFactory.get();
 		String key = this.getCacheKey(id);
 		if (cache != null) {
 			MsoChannel channel = (MsoChannel) cache.get(key);
-			if (channel != null) {
-				log.info("Cache found: channel in cache:" + channel.getKey().getId());
-				return channel;
-			}
+			if (channel != null) { return channel;}
 		}
 		//find
 		MsoChannel channel = msoChannelDao.findById(id);
 		//save in cache
 		if (cache != null && channel != null) { cache.put(key, channel);}		
-		if (channel != null) {log.info("Cache NOT found: channel is just added:" + channel.getKey().getId());}
 		return channel;
 	}
 	
@@ -200,13 +193,6 @@ public class MsoChannelManager {
 		return msoChannelDao.findByKey(key);
 	}
 	
-	private void setCache() {
-	    try {
-	        cache = CacheManager.getInstance().getCacheFactory().createCache(
-	            Collections.emptyMap());
-	      } catch (CacheException e) {}	      		
-	}
-
 	private String getCacheKey(long id) {
 		return "channel(" + id + ")";		
 	}

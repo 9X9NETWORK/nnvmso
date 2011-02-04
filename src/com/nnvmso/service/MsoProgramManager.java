@@ -1,7 +1,6 @@
 package com.nnvmso.service;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -9,13 +8,12 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import net.sf.jsr107cache.Cache;
-import net.sf.jsr107cache.CacheException;
-import net.sf.jsr107cache.CacheManager;
 
 import org.springframework.stereotype.Service;
 
 import com.google.appengine.api.datastore.Key;
 import com.nnvmso.dao.MsoProgramDao;
+import com.nnvmso.lib.CacheFactory;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoProgram;
 import com.nnvmso.model.ViewLog;
@@ -26,7 +24,6 @@ public class MsoProgramManager {
 	protected static final Logger log = Logger.getLogger(MsoProgramManager.class.getName());
 	
 	private MsoProgramDao msoProgramDao = new MsoProgramDao();
-	private Cache cache;	
 	
 	public void create(MsoChannel channel, MsoProgram program) {		
 		Date now = new Date();
@@ -39,10 +36,17 @@ public class MsoProgramManager {
 		int count = channel.getProgramCount() + 1;
 		channel.setProgramCount(count);
 		MsoChannelManager channelMngr = new MsoChannelManager();
-		channelMngr.save(null, channel);
+		channelMngr.save(channel);
 
+		//if the channel's original programCount is zero, its count will not be in the category, adding it now.
+		if (count == 1) {
+			CategoryManager categoryMngr = new CategoryManager();
+			System.out.println("mso program manager, channel create, addChannelCount");
+			categoryMngr.addChannelCounter(channel);
+		}		
+		
 		//store in cache
-		this.setCache();
+		Cache cache = CacheFactory.get();
 		if (cache != null) {
 			List<MsoProgram> programs = new ArrayList<MsoProgram>();
 			programs.add(program);
@@ -53,6 +57,12 @@ public class MsoProgramManager {
 	public MsoProgram save(MsoProgram program) {
 		program.setUpdateDate(new Date());
 		return msoProgramDao.save(program);
+	}
+	
+	public void delete(MsoProgram program) {
+		//category channelCount 
+		//channel programCount
+		//cache
 	}
 	
 	public List<MsoProgram> findNew(long userId) {
@@ -75,7 +85,7 @@ public class MsoProgramManager {
 	//cached
 	public List<MsoProgram> findAllByChannelId(long channelId) {
 		List<MsoProgram> programs = new ArrayList<MsoProgram>();
-		this.setCache();
+		Cache cache = CacheFactory.get();
 		//find from cache
 		if (cache != null) {
 			@SuppressWarnings("unchecked")
@@ -169,6 +179,7 @@ public class MsoProgramManager {
 	//cached
 	public MsoProgram findById(long id) {
 		//find from cache
+		Cache cache = CacheFactory.get();
 		String key = this.getCacheKey(id);
 		if (cache != null) {
 			MsoProgram program = (MsoProgram) cache.get(key);
@@ -189,13 +200,6 @@ public class MsoProgramManager {
 		return msoProgramDao.findByKey(key);
 	}
 		
-	private void setCache() {
-	    try {
-	        cache = CacheManager.getInstance().getCacheFactory().createCache(
-	            Collections.emptyMap());
-	      } catch (CacheException e) {}
-	}
-
 	//example, program(1)
 	private String getCacheKey(long id) {
 		return "program(" + id + ")";		

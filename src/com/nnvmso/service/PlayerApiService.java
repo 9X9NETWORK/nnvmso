@@ -40,6 +40,7 @@ import com.nnvmso.model.NnUser;
 public class PlayerApiService {
 	
 	private static MessageSource messageSource = new ClassPathXmlApplicationContext("locale.xml");
+
 	protected static final Logger log = Logger.getLogger(PlayerApiService.class.getName());	
 	
 	private NnUserManager userMngr = new NnUserManager();	
@@ -55,6 +56,10 @@ public class PlayerApiService {
 	public void setMso(Mso mso) {
 		this.mso = mso;
 	}	
+	
+	public String hello() {
+		return NnStatusMsg.inputMissing(Locale.TRADITIONAL_CHINESE);
+	}
 	
 	public String findMsoInfo(HttpServletRequest req) {
 		Mso theMso = msoMngr.findMsoViaHttpReq(req);
@@ -223,7 +228,6 @@ public class PlayerApiService {
 		String password = String.valueOf(("token" + Math.random() + new Date().getTime()).hashCode());
 		NnUser guest = new NnUser(NnUser.GUEST_EMAIL, password, NnUser.GUEST_NAME, NnUser.TYPE_USER, mso.getKey().getId());		
 		userMngr.create(guest);
-		System.out.println(guest.getToken());
 		
 		//subscribe default channels
 		if (ipg != null) {
@@ -446,7 +450,6 @@ public class PlayerApiService {
 			}
 			//create a new channel
 			log.info("User throws a new url:" + url);
-			System.out.println("channel=" + channel.getName() + ";img=" + channel.getImageUrl());
 			channelMngr.create(channel, categories);
 			if (channel.getKey() != null) {
 				TranscodingService tranService = new TranscodingService();
@@ -514,8 +517,7 @@ public class PlayerApiService {
 		if (config == null) {
 			config = new MsoConfig(mso.getKey().getId(), MsoConfig.CDN, MsoConfig.CDN_AMAZON);
 			log.severe("mso config does not exist! mso: " + mso.getKey());
-		}
-		System.out.println("program size:" + programs.size());		
+		}		
 		String result = NnStatusMsg.successStr(locale) + separatorStr;
 		if (userInfo) {
 			if (user == null && userToken != null) {user = userMngr.findByToken(userToken);}

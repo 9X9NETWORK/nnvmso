@@ -70,7 +70,7 @@ public class NnUserManager {
 		for (MsoChannel c : channels) {
 			subManager.subscribeChannel(user.getKey().getId(), c.getKey().getId(), c.getSeq(), c.getType(), user.getMsoId());
 		}
-		log.info("subscribe to " + channels.size() + " of channels by user:" + user.getKey() + "(mso is " + user.getMsoId() + ")");
+		log.info("user " +  user.getKey().getId() + "(" + user.getToken() + ") subscribe " + channels.size() + " channels (mso:" + user.getMsoId() + ")");
 	}
 			
 	public NnUser findByEmailAndMso(String email, Mso mso) {

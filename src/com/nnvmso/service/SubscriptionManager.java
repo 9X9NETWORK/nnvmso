@@ -24,7 +24,7 @@ public class SubscriptionManager {
 	public boolean subscribeChannel(long userId, long channelId, int seq, short type, long msoId) {
 		Subscription existed = subDao.findByUserIdAndChannelId(userId, channelId);
 		if (existed != null) {
-			log.info("user trying to subscribe a channel that has been subscribed.");
+			log.info("user trying to subscribe a channel that has been subscribed." + channelId);
 			return false;
 		}
 		Subscription s = new Subscription(userId, channelId, seq, type);
@@ -40,7 +40,6 @@ public class SubscriptionManager {
 			sublog.setCount(sublog.getCount()+1);
 		}
 		sublogMngr.save(sublog);		
-		log.info("user subscribe a new channel " + channelId + ";grid=" + seq);
 		return true;
 	}
 	
@@ -76,7 +75,6 @@ public class SubscriptionManager {
 			log.info("Chagne seq does not find matching data. User key=" + userId + "; seq1=" + seq1 + "; seq2=" + seq2);
 			return false;
 		}
-		System.out.println("subs1=" + subs.get(0).getKey().getId() + ";" + subs.get(0).getSeq() + ";subs2=" + subs.get(1).getKey().getId() + ";" + subs.get(1).getSeq());
 		if (subs.get(0).getSeq() == seq1) {
 			subs.get(0).setSeq(seq2);
 			subs.get(1).setSeq(seq1);
