@@ -25,7 +25,6 @@ public class CategoryChannelManager {
 	
 	public List<CategoryChannel> findAllByChannelId(long channelId) {
 		List<CategoryChannel> ccs = ccDao.findAllByChannelId(channelId);
-		System.out.println("CategoryChannelManager: findByChannelKey(): found " + ccs.size() + " with channel id " + channelId);
 		return ccs;
 	}
 	
