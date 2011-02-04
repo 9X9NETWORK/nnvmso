@@ -313,6 +313,8 @@ public class PlayerApiService {
 			return NnStatusMsg.inputMissing(locale);
 		}
 		String regex = "^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$";
+		email = email.trim();
+		name = name.trim();
 		if (!Pattern.matches(regex, email.toLowerCase()) || password.length() < 6) {		
 			return messageSource.getMessage("nnstatus.input_error", new Object[] {NnStatusCode.SUCCESS} , locale);
 		}
@@ -384,6 +386,7 @@ public class PlayerApiService {
 			userToken== null || userToken.length() == 0 || grid.length() == 0) {
 			return NnStatusMsg.inputMissing(locale);
 		}
+		url = url.trim();
 		
 		//verify user
 		NnUser user = userMngr.findByToken(userToken);
