@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,7 +35,11 @@ public class AdminInitController {
 	
 	@ExceptionHandler(Exception.class)
 	public String exception(Exception e) {
-		NnLogUtil.logException(e);
+		if (e.getClass().equals(MissingServletRequestParameterException.class) ||
+			e.getClass().equals(IllegalStateException.class)) {
+		} else {
+			NnLogUtil.logException(e);			
+		}
 		return "error/exception";				
 	}
 

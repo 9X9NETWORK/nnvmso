@@ -43,8 +43,7 @@ public class AdminMsoController {
 	}
 	
 	@RequestMapping("list")
-	public ResponseEntity<String> list() {
-		
+	public ResponseEntity<String> list() {		
 		List<Mso> msoList = msoMngr.findAll();
 		
 		String[] title = {"id", "type", "lang", "name", "contactEmail", "intro", "logoUrl", "logoClickUrl", "JingleUrl"};

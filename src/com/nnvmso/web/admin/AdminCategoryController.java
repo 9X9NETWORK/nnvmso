@@ -45,7 +45,7 @@ public class AdminCategoryController {
 	
 	//list every channel under a category
 	@RequestMapping(value="channelList")
-	public ResponseEntity<String> categoryCount(@RequestParam("category")long category) {		
+	public ResponseEntity<String> channelList(@RequestParam("category")long category) {		
 		CategoryChannelManager ccMngr = new CategoryChannelManager();
 		MsoChannelManager cMngr = new MsoChannelManager();
 		List<CategoryChannel> ccs = ccMngr.findAllByCategoryId(category);
@@ -54,10 +54,15 @@ public class AdminCategoryController {
 			channels.add(cMngr.findById(cc.getChannelId()));
 		}
 		String output = "";
-		output = "category count = " + new CategoryManager().findById(category).getChannelCount() + "\n";
-		output = output + "id \t name \t program count \t status \t isPublic\n";
-		for (MsoChannel c : channels) {
-			output = output + c.getKey().getId() + "\t" + c.getName() + "\t" + + c.getProgramCount() + "\t" + c.getStatus() + "\t" + c.isPublic() + "\n";
+		Category theC = new CategoryManager().findById(category);
+		if (theC == null) {
+			output = "category does not exist";
+		} else {
+			output = "category count = " + new CategoryManager().findById(category).getChannelCount() + "\n";
+			output = output + "id \t name \t program count \t status \t isPublic\n";
+			for (MsoChannel c : channels) {
+				output = output + c.getKey().getId() + "\t" + c.getName() + "\t" + + c.getProgramCount() + "\t" + c.getStatus() + "\t" + c.isPublic() + "\n";
+			}
 		}
 		return NnNetUtil.textReturn(output);
 	}
