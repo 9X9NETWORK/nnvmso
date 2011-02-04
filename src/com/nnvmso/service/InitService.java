@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import net.sf.jsr107cache.Cache;
 
-import org.mortbay.log.Log;
 import org.springframework.stereotype.Service;
 
 import com.nnvmso.lib.CacheFactory;
@@ -21,7 +20,6 @@ import com.nnvmso.model.MsoIpg;
 import com.nnvmso.model.MsoProgram;
 import com.nnvmso.model.NnUser;
 import com.nnvmso.model.Subscription;
-import com.nnvmso.web.admin.AdminInitController;
 
 /**
  * for testing, works only for small set of data
