@@ -1,8 +1,9 @@
 <ul>
   <li>initialize (works only for small set of data)
     <ul>
-      <li><a href="/admin/init/initAll?devel=1&debug=1">turn on debug</a></li>          	   
-      <li><a href="/admin/init/initAll?devel=1&debug=0">turn off debug</a></li>          	   
+      <li><a href="/admin/init/initDevel?devel=1&debug=1&trans=0">turn on debug</a></li>          	   
+      <li><a href="/admin/init/initDevel?devel=1&debug=0&trans=0">turn off debug</a></li>          	   
+      <li><a href="/admin/init/initProTask?devel=0&trans=1&debug=1">turn on pro, but debug=1</a></li>
       <li><a href="/admin/init/deleteAll">deleteAll</a></li>
     </ul>
   </li> 
@@ -55,13 +56,13 @@
     <ul>
       <li><a href="/admin/category/list">category listing</a></li>
       <li>category listing by brand <br/>
-          http://host/admin/category/list?id=xx
+          http://host/admin/category/list?mso=xx
       </li>
       <li>change data <br/>
 		  http://host/admin/category/modify?id=123&name=xxx&&isPublic=1&channelCount=123
 	  </li>
 	  <li>list every channel under a category <br/>
-	      http://host/admin/category/channelList?category=123 
+	      http://host/admin/category/channelList?id=123 
 	  </li>
 	      	                          	   
     </ul>
@@ -72,7 +73,7 @@
   <li>MsoIpg
     <ul>
       <li>msoIpg listing by brand <br/>
-          http://host/admin/msoIpg/list?id=123
+          http://host/admin/msoIpg/list?mso=123
       </li>
     </ul>
   </li>
