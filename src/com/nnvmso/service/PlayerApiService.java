@@ -313,7 +313,7 @@ public class PlayerApiService {
 			return NnStatusMsg.inputMissing(locale);
 		}
 		String regex = "^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$";
-		if (!Pattern.matches(regex, email) || password.length() < 6) {		
+		if (!Pattern.matches(regex, email.toLowerCase()) || password.length() < 6) {		
 			return messageSource.getMessage("nnstatus.input_error", new Object[] {NnStatusCode.SUCCESS} , locale);
 		}
 			
@@ -438,7 +438,7 @@ public class PlayerApiService {
 		}
 		
 		//verify whether it's a bad channel
-		if (duplicate && channel.getStatus() != MsoChannel.STATUS_SUCCESS) {
+		if (duplicate && channel.getStatus() == MsoChannel.STATUS_ERROR) {
 			return messageSource.getMessage("nnstatus.channel_status_error", new Object[] {NnStatusCode.CHANNEL_STATUS_ERROR} , locale);
 		}
 		
@@ -459,11 +459,17 @@ public class PlayerApiService {
 		
 		//subscribe
 		SubscriptionManager subMngr = new SubscriptionManager();
-		subMngr.subscribeChannel(user.getKey().getId(), channel.getKey().getId(), Integer.parseInt(grid), MsoIpg.TYPE_GENERAL, mso.getKey().getId());		
-		String result[]= {String.valueOf(channel.getKey().getId()),				  	 	  
-				  	 	  channel.getName(),
-				  	 	  channel.getImageUrl()};
-		return NnStatusMsg.successStr(locale) + separatorStr + NnStringUtil.getDelimitedStr(result);
+		boolean success = subMngr.subscribeChannel(user.getKey().getId(), channel.getKey().getId(), Integer.parseInt(grid), MsoIpg.TYPE_GENERAL, mso.getKey().getId());
+		String output = "";
+		if (!success) {
+			output = messageSource.getMessage("nnstatus.subscription_duplicate_channel", new Object[] {NnStatusCode.SUBSCRIPTION_DUPLICATE_CHANNEL} , locale);			
+		} else {
+			String result[]= {String.valueOf(channel.getKey().getId()),				  	 	  
+			  	 	  channel.getName(),
+			  	 	  channel.getImageUrl()};
+			output = NnStringUtil.getDelimitedStr(result);
+		}
+		return NnStatusMsg.successStr(locale) + separatorStr + output;
 	}
 				
 	public String findSubscribedChannels(String userToken, boolean userInfo) {
