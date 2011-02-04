@@ -94,5 +94,14 @@ public class Category implements Serializable {
 	public void setChannelCount(int channelCount) {
 		this.channelCount = channelCount;
 	}
+
+	public String toString() {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("name: " + name + ";");
+        buffer.append("key: " + key + ";");
+        buffer.append("msoId: " + msoId + ";");
+        buffer.append("channelCount: " + channelCount + ";");
+        return buffer.toString();
+	}
 	
 }
