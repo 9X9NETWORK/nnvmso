@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.model.Category;
-import com.nnvmso.model.Mso;
 import com.nnvmso.service.CategoryManager;
 import com.nnvmso.service.MsoManager;
 
@@ -35,26 +34,40 @@ public class AdminCacheController {
 	//cache add, one mso at a time, depends on the url
 	//cache delete, delete all
 	@RequestMapping("mso")
-	public ResponseEntity<String> cacheMso(@RequestParam(value="delete", required=false)boolean delete, HttpServletRequest req) {
-		MsoManager msoMngr = new MsoManager();
-		Mso mso = msoMngr.findMsoViaHttpReq(req);
-		if (delete) { msoMngr.deleteCache();}
-		return NnNetUtil.textReturn(mso.getName());
+	public ResponseEntity<String> cacheMso(@RequestParam(value="delete", required=false)boolean delete, 
+			                               @RequestParam(value="list", required=false)boolean list,
+			                               HttpServletRequest req) {		
+		MsoManager msoMngr = new MsoManager();		
+		String output = "OK";
+		if (delete) { 
+			msoMngr.deleteCache();
+		} else if (list) { 		
+			output = msoMngr.findCache();
+		} else {
+			msoMngr.findMsoViaHttpReq(req);
+		}
+		return NnNetUtil.textReturn(output);
 	}
 	
 	//cache add, one mso at a time
+	//cache listing, list all mso's
 	@RequestMapping("category")
-	public ResponseEntity<String> cacheCategory(@RequestParam("mso") long msoId, @RequestParam(value="delete", required=false)boolean delete, HttpServletRequest req) {
+	public ResponseEntity<String> cacheCategory(@RequestParam(required=false)Long mso, 
+			                                    @RequestParam(required=false)boolean delete,
+			                                    @RequestParam(required=false)boolean list,
+			                                    HttpServletRequest req) {
 		CategoryManager categoryMngr = new CategoryManager();
 		String output = "";
 		if (delete) {
-			categoryMngr.deleteCache(msoId);
+			categoryMngr.deleteCache(mso);
 			output = "Delete";
-		} else {
-			List<Category> categories = categoryMngr.findAllByMsoId(msoId);
+		} else if (list) {
+			output = categoryMngr.findCache();
+		} else{		
+			List<Category> categories = categoryMngr.findAllByMsoId(mso);
 			for (Category c : categories) {
 				output = output + c.getName() + "\n";
-			}
+			}			
 		}
 		return NnNetUtil.textReturn(output);
 	}	

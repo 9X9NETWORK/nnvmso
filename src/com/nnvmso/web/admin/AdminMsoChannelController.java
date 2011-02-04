@@ -79,7 +79,7 @@ public class AdminMsoChannelController {
 		if (programCount != null)
 			channel.setProgramCount(Integer.parseInt(programCount));
 		
-		channelMngr.save(null, channel);
+		channelMngr.save(channel);
 		return "OK";
 	}
 }
