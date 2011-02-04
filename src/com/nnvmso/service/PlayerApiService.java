@@ -75,7 +75,7 @@ public class PlayerApiService {
 		results = results + this.assembleKeyValue("name", mso.getName());
 		results = results + this.assembleKeyValue("logoUrl", mso.getLogoUrl());
 		results = results + this.assembleKeyValue("jingleUrl", mso.getJingleUrl());
-		results = results + this.assembleKeyValue("logoClickUrl", mso.getJingleUrl());
+		results = results + this.assembleKeyValue("logoClickUrl", mso.getLogoClickUrl());
 		results = results + this.assembleKeyValue("preferredLangCode", mso.getPreferredLangCode());
 		results = results + this.assembleKeyValue("debug", debug);
 		
