@@ -1,9 +1,9 @@
 <ul>
   <li>initialize (works only for small set of data)
     <ul>
-      <li><a href="/admin/init/initDevel?devel=1&debug=1&trans=0">turn on debug</a></li>          	   
-      <li><a href="/admin/init/initDevel?devel=1&debug=0&trans=0">turn off debug</a></li>          	   
-      <li><a href="/admin/init/initProTask?devel=0&trans=1&debug=1">turn on pro, but debug=1</a></li>
+      <li><a href="/admin/init/initDevel?debug=1">turn on debug</a></li>          	   
+      <li><a href="/admin/init/initDevel?debug=0">turn off debug</a></li>          	   
+      <li><a href="/admin/init/initProTask?devel=0&trans=1&debug=1">turn on production data, but debug=1</a></li>
       <li><a href="/admin/init/deleteAll">deleteAll</a></li>
     </ul>
   </li> 
