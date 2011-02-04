@@ -2,11 +2,13 @@ package com.nnvmso.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 
 import net.sf.jsr107cache.Cache;
 
+import org.mortbay.log.Log;
 import org.springframework.stereotype.Service;
 
 import com.nnvmso.lib.CacheFactory;
@@ -19,12 +21,14 @@ import com.nnvmso.model.MsoIpg;
 import com.nnvmso.model.MsoProgram;
 import com.nnvmso.model.NnUser;
 import com.nnvmso.model.Subscription;
+import com.nnvmso.web.admin.AdminInitController;
 
 /**
  * for testing, works only for small set of data
  */	
 @Service
 public class InitService {
+	protected static final Logger log = Logger.getLogger(InitService.class.getName());		
 
 	private HttpServletRequest req;
 	private Cache cache;
@@ -82,6 +86,7 @@ public class InitService {
 		
 		list = dumper.findAll(Subscription.class, "createDate");
 		dumper.deleteAll(Subscription.class, list);
+		log.info("delete all is done");
 	}
 	
 	private void initializeMso1AndCategories(boolean debug) {
@@ -122,6 +127,7 @@ public class InitService {
 		for (String name : categoryStr) {			
 			categoryMngr.create(new Category(name, true, mso.getKey().getId()));
 		}
+		log.info("initializeMso1AndCategories is done");
 	}
 
 	private void initializeMso2AndCategories(boolean debug) {
@@ -158,6 +164,7 @@ public class InitService {
 		for (String name : categoryStr) {			
 			categoryMngr.create(new Category(name, true, mso.getKey().getId()));
 		}
+		log.info("initializeMso2AndCategories is done");
 	}		
 		
 	private void createMso1DefaultChannels(boolean devel, boolean trans){
@@ -289,6 +296,7 @@ public class InitService {
 			program7.setWebMFileUrl("http://9x9pod.s3.amazonaws.com/default.mp4");	
 			programMngr.create(channel5, program7);			
 		}
+		log.info("prepareMso1DefaultChannels is done");
 	}	
 	
 	private void createMso2DefaultChannels(boolean devel, boolean trans){
@@ -378,10 +386,9 @@ public class InitService {
 			category = categoryMngr.findByName("影音實驗室");
 			categories.add(category);
 			String[] urls9 = this.getUrlMovie();
-			this.channelsCreate(urls9, categories, user.getKey().getId(), trans);
-			
+			this.channelsCreate(urls9, categories, user.getKey().getId(), trans);			
 		}
-		
+		log.info("prepareMso2DefaultChannels is done");		
 	}
 	
 	private void channelsCreate(String[] urls, List<Category>categories, long userId, boolean trans) {
@@ -436,6 +443,7 @@ public class InitService {
 			msoIpgMngr.create(msoIpg);	
 			System.out.println("mso1 ipg:" + urls.length);
 		}
+		log.info("prepareMso1DefaultIpg is done");
 	}
 
 	private void createMso2DefaultIpg(boolean devel) {
@@ -459,6 +467,7 @@ public class InitService {
 			}
 			System.out.println("mso2 ipg:" + urls.length);
 		}
+		log.info("prepareMso2DefaultIpg is done");
 	}
 		
 	private String[] getUrlMovie() {
