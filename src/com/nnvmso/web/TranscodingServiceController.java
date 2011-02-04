@@ -3,6 +3,8 @@ package com.nnvmso.web;
  import java.util.Locale;
 import java.util.logging.Logger;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -74,7 +76,7 @@ public class TranscodingServiceController {
      *  } 
 	 */
 	@RequestMapping("itemUpdate")
-	public @ResponseBody PostResponse itemUpdate(@RequestBody RtnProgram rtnProgram) {
+	public @ResponseBody PostResponse itemUpdate(@RequestBody RtnProgram rtnProgram, HttpServletRequest req) {
 		log.info(rtnProgram.toString());
 		PostResponse resp = new PostResponse(String.valueOf(NnStatusCode.ERROR), NnStatusMsg.errorStr(Locale.ENGLISH));
 		try {
