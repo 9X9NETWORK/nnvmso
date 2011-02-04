@@ -159,5 +159,12 @@ public class Mso implements Serializable {
 	public void setLogoClickUrl(String logoClickUrl) {
 		this.logoClickUrl = logoClickUrl;
 	}	
-	
+
+	public String toString() {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("name: " + name + ";");
+        buffer.append("key: " + key + ";");
+        buffer.append("logoUrl: " + logoUrl + ";");
+        return buffer.toString();
+	}
 }
