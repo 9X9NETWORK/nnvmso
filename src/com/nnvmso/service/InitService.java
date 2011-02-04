@@ -177,24 +177,26 @@ public class InitService {
 	private void createMso1DefaultIpg(boolean devel) {
 		MsoIpgManager msoIpgMngr = new MsoIpgManager();
 		Mso mso = new MsoManager().findNNMso();
-		Category c = new CategoryManager().findByName("Activism");
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		CategoryManager categoryMngr = new CategoryManager();
+		Category c = categoryMngr.findByName("Activism");
 		List<MsoChannel> channels = new MsoChannelManager().findPublicChannelsByCategoryId(c.getKey().getId());
 		int counter = 1;
 		int limit = 4;
 		for (int i=0; i<channels.size(); i++) {
-			if (counter > limit) {break;}
-			if (counter < 2) {
-				MsoIpg msoIpg = new MsoIpg(mso.getKey().getId(), channels.get(i).getKey().getId(), counter, MsoIpg.TYPE_READONLY);			
+			if (counter > limit) {break;}	
+			MsoChannel chn = channels.get(i);
+			if (counter < 2 && !chn.getName().equals("System Channel") && channelMngr.isCounterQualified(chn)) {
+				MsoIpg msoIpg = new MsoIpg(mso.getKey().getId(), chn.getKey().getId(), counter, MsoIpg.TYPE_READONLY);			
 				msoIpgMngr.create(msoIpg);
-				counter++;
-			}
-			if (counter < 3) {
-				MsoIpg msoIpg = new MsoIpg(mso.getKey().getId(), channels.get(i).getKey().getId(), counter, MsoIpg.TYPE_GENERAL);			
+				counter++;			
+			} else if (counter < 3 && !chn.getName().equals("System Channel") && channelMngr.isCounterQualified(chn)) {
+				MsoIpg msoIpg = new MsoIpg(mso.getKey().getId(), chn.getKey().getId(), counter, MsoIpg.TYPE_GENERAL);			
 				msoIpgMngr.create(msoIpg);
 				counter++;
 			}						
-			if (channels.get(i).getName().equals("System Channel")) {
-				MsoIpg msoIpg = new MsoIpg(mso.getKey().getId(), channels.get(i).getKey().getId(), 81, MsoIpg.TYPE_READONLY);
+			if (chn.getName().equals("System Channel")) {
+				MsoIpg msoIpg = new MsoIpg(mso.getKey().getId(), chn.getKey().getId(), 81, MsoIpg.TYPE_READONLY);
 				msoIpgMngr.create(msoIpg);
 				counter++;
 			}
@@ -218,9 +220,9 @@ public class InitService {
 		CategoryManager categoryMngr = new CategoryManager();
 		MsoChannelManager channelMngr = new MsoChannelManager();
 		MsoProgramManager programMngr = new MsoProgramManager();
-		Category category = categoryMngr.findByName("Activism");				
+		Category category = categoryMngr.findByName("Activism");
 		categories.add(category);
-		
+
 		//create channel		
 		MsoChannel channel1 = new MsoChannel("Etsy", "Etsy.com", "http://s3.amazonaws.com/9x9chthumb/54e2967caf4e60fe9bc19ef1920997977eae1578.gif", user.getKey().getId());
 		channel1.setSourceUrl("http://feeds.feedburner.com/etsyetsyetsy");
@@ -282,7 +284,10 @@ public class InitService {
 		
 		//create channel				
 		MsoChannel channel5 = new MsoChannel("System Channel", "System Channel", "/WEB-INF/../images/logo_9x9.png", user.getKey().getId());
-		channel5.setPublic(true);		
+		channel5.setPublic(true);
+		Category system = categoryMngr.findByName("Tech & Science");
+		List<Category> systemCategories = new ArrayList<Category>();
+		systemCategories.add(system);
 		channelMngr.create(channel5, categories);
 
 		MsoProgram program7 = new MsoProgram("System Program", "", "/WEB-INF/../images/logo_9x9.png", MsoProgram.TYPE_VIDEO);
