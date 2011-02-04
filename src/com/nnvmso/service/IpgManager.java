@@ -31,8 +31,6 @@ public class IpgManager {
 		int size = subscriptions.size();
 		for (int i = 0; i < size; i++) {
 			Subscription s = subscriptions.get(i);
-			System.out.println("grid:" + s.getSeq());
-			System.out.println("subscribed channel id:" + s.getChannelId());
 			channels.put(new Integer(s.getSeq()), s.getChannelId());
 		}
 		ipg.setChannels(channels);
