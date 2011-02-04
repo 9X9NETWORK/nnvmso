@@ -14,7 +14,7 @@
       <li><a href="/admin/cache/deleteAll">deleteAll</a></li>      
       <li>cache category, one mso at a time. <br/>
 		  add, http://host/admin/cache/category?id=xx  <br/>
-		  delete, http://host/admin/cache/category?id=xx&delete=1  <br/>
+		  delete, http://host/admin/cache/category?id=123&delete=1  <br/>
 		  list, <a href="/admin/cache/category?list=1"> list </a> 
 	  </li>
 	  <li>cache current mso [1. the host url is what current mso is 2. check config, current mso] <br/>
@@ -45,7 +45,7 @@
     <ul>
       <li><a href="/admin/mso/list">mso listing</a></li>
       <li>change data <br/>
-		  http://host/admin/mso/modify?id=xx&logoUrl=xx&logoClickUrl=xx&jingleUrl                        	   
+		  http://host/admin/mso/modify?id=123&logoUrl=xx&logoClickUrl=xx&jingleUrl=xx                       	   
     </ul>
   </li>
 </ul>
@@ -55,10 +55,25 @@
     <ul>
       <li><a href="/admin/category/list">category listing</a></li>
       <li>category listing by brand <br/>
-          http://host/admin/category/list?id=2417
+          http://host/admin/category/list?id=xx
       </li>
       <li>change data <br/>
-		  http://host/admin/mso/modify?id=xx&logoUrl=xx&logoClickUrl=xx&jingleUrl                        	   
+		  http://host/admin/category/modify?id=123&name=xxx&&isPublic=1&channelCount=123
+	  </li>
+	  <li>list every channel under a category <br/>
+	      http://host/admin/category/channelList?category=123 
+	  </li>
+	      	                          	   
+    </ul>
+  </li>
+</ul>
+
+<ul>
+  <li>MsoIpg
+    <ul>
+      <li>msoIpg listing by brand <br/>
+          http://host/admin/msoIpg/list?id=123
+      </li>
     </ul>
   </li>
 </ul>
@@ -68,7 +83,8 @@
     <ul>
       <li><a href="/admin/channel/list">channel listing</a></li>
       <li>channel modify <br/>
-          http://host/admin/channel/modify?id=xx&name=xx&status=xx&programCount=xx            	   
+          http://host/admin/channel/modify?id=123&name=xx&status=1&programCount=123
+      </li>                	   
     </ul>
   </li>
 </ul>
