@@ -33,12 +33,12 @@ public class InitService {
 		this.req = req;
 	}
 
-	public void initAll(boolean devel, boolean debug) {		
+	public void initAll(boolean devel, boolean debug, boolean trans) {		
 		deleteAll();		
 		initializeMso1AndCategories(debug);
 		initializeMso2AndCategories(debug);	
-		createMso1DefaultChannels(devel);
-		createMso2DefaultChannels(devel);	
+		createMso1DefaultChannels(devel, trans);
+		createMso2DefaultChannels(devel, trans);	
 		createMso1DefaultIpg(devel);
 		createMso2DefaultIpg(devel);		
 	}
@@ -160,14 +160,7 @@ public class InitService {
 		}
 	}		
 		
-	private void createMso1DefaultChannels(boolean devel){
-		System.out.println("devel value=" + devel);
-		if (devel) {
-			System.out.println("devel");
-		} else {
-			System.out.println("not devel");	
-		}
-		
+	private void createMso1DefaultChannels(boolean devel, boolean trans){
 		//prepare data
 		NnUserManager userMngr = new NnUserManager();
 		NnUser user = userMngr.findNNUser();
@@ -178,37 +171,32 @@ public class InitService {
 		Category category = categoryMngr.findByName("Activism");
 		categories.add(category);
 
-		//create channel		
-		MsoChannel channel1 = new MsoChannel("Etsy", "Etsy.com", "http://s3.amazonaws.com/9x9chthumb/54e2967caf4e60fe9bc19ef1920997977eae1578.gif", user.getKey().getId());
-		channel1.setSourceUrl("http://feeds.feedburner.com/etsyetsyetsy");
-		channel1.setPublic(true);
-		channelMngr.create(channel1, categories);
-		TranscodingService tranService = new TranscodingService();
-		
 		if (devel) {
+			//create channel		
+			MsoChannel channel1 = new MsoChannel("Etsy", "Etsy.com", "http://s3.amazonaws.com/9x9chthumb/54e2967caf4e60fe9bc19ef1920997977eae1578.gif", user.getKey().getId());
+			channel1.setSourceUrl("http://feeds.feedburner.com/etsyetsyetsy");
+			channel1.setPublic(true);
+			channelMngr.create(channel1, categories);
+			
 			MsoProgram program1 = new MsoProgram("Handmade Confessional: Eli Dlugach", "Eli Dlugach gives a testimonial on why he loves handmade", "http://s3.amazonaws.com/9x9cache/005a69b4431d521e39534431254d81a211ebefc7_1227739497_thumbnail.jpg", MsoProgram.TYPE_VIDEO);
 			program1.setImageLargeUrl("http://s3.amazonaws.com/9x9cache/005a69b4431d521e39534431254d81a211ebefc7_1227739497_thumbLarge.jpg");
 			program1.setMpeg4FileUrl("http://s3.amazonaws.com/9x9pod/005a69b4431d521e39534431254d81a211ebefc7_1227739497.m4v");
 			program1.setWebMFileUrl("http://s3.amazonaws.com/9x9cache/005a69b4431d521e39534431254d81a211ebefc7_1227739497.webm");	
 			program1.setPublic(true);
-			programMngr.create(channel1, program1);
-	
+			
+			programMngr.create(channel1, program1);	
 			MsoProgram program2 = new MsoProgram("How-Tuesday: Needle Felted Eyeballs", "Read the full Etsy blog post", "http://s3.amazonaws.com/9x9cache/5a14e5502fd5ab6b26e7f11f2a38ee718bc06eea_1288043514_thumbnail.jpg", MsoProgram.TYPE_VIDEO);
 			program2.setImageLargeUrl("http://s3.amazonaws.com/9x9cache/5a14e5502fd5ab6b26e7f11f2a38ee718bc06eea_1288043514_thumbLarge.jpg");
 			program2.setMpeg4FileUrl("http://s3.amazonaws.com/9x9pod/5a14e5502fd5ab6b26e7f11f2a38ee718bc06eea_1288043514.m4v");	
 			program2.setPublic(true);
 			programMngr.create(channel1, program2);
-		} else {
-			tranService.submitToTranscodingService(channel1.getKey().getId(), channel1.getSourceUrl(), req);
-		}
 		
-		//create channel
-		MsoChannel channel2 = new MsoChannel("TEDTalks (hd)", "TED", "http://s3.amazonaws.com/9x9chthumb/f14a9bb972adfefab1c9c4f0ec44f251686d655a.jpg", user.getKey().getId());		
-		channel2.setSourceUrl("http://feeds.feedburner.com/tedtalksHD");
-		channel2.setPublic(true);
-		channelMngr.create(channel2, categories);
+			//create channel
+			MsoChannel channel2 = new MsoChannel("TEDTalks (hd)", "TED", "http://s3.amazonaws.com/9x9chthumb/f14a9bb972adfefab1c9c4f0ec44f251686d655a.jpg", user.getKey().getId());		
+			channel2.setSourceUrl("http://feeds.feedburner.com/tedtalksHD");
+			channel2.setPublic(true);
+			channelMngr.create(channel2, categories);
 
-		if (devel) {
 			MsoProgram program3 = new MsoProgram("TEDTalks : Beverly + Dereck", "Beverly + Dereck Joubert live in the bush", "http://s3.amazonaws.com/9x9cache/8ad69b8dcbd0edd516c4f6bd530390d9f640de45_1292858280_thumbnail.jpg", MsoProgram.TYPE_VIDEO);
 			program3.setImageLargeUrl("http://s3.amazonaws.com/9x9cache/8ad69b8dcbd0edd516c4f6bd530390d9f640de45_1292858280_thumbLarge.jpg");
 			program3.setMpeg4FileUrl("http://s3.amazonaws.com/9x9pod/8ad69b8dcbd0edd516c4f6bd530390d9f640de45_1292858280.mp4");	
@@ -233,53 +221,77 @@ public class InitService {
 			program9.setWebMFileUrl("http://s3.amazonaws.com/9x9cache/6e0c1a48b2a5b8b9253b25885a2cce9586564366_1290523500.webm");
 			program9.setPublic(true);
 			programMngr.create(channel2, program9);
-		} else {
-			tranService.submitToTranscodingService(channel2.getKey().getId(), channel2.getSourceUrl(), req);
-		}
 		
-		//create channel				
-		MsoChannel channel5 = new MsoChannel("System Channel", "System Channel", "/WEB-INF/../images/logo_9x9.png", user.getKey().getId());
-		channel5.setPublic(true);
-		Category system = categoryMngr.findByName("Tech & Science");
-		List<Category> systemCategories = new ArrayList<Category>();
-		systemCategories.add(system);
-		channelMngr.create(channel5, categories);
-
-		MsoProgram program7 = new MsoProgram("System Program", "", "/WEB-INF/../images/logo_9x9.png", MsoProgram.TYPE_VIDEO);
-		program7.setPublic(true);
-		program7.setMpeg4FileUrl("http://9x9pod.s3.amazonaws.com/default.mp4");
-		program7.setWebMFileUrl("http://9x9pod.s3.amazonaws.com/default.mp4");	
-		programMngr.create(channel5, program7);
-				
-		//create a channel, but status set to error
-		MsoChannel channel3 = new MsoChannel("Vegan A Go-Go", "A simple vegan cooking show.", "http://s3.amazonaws.com/9x9chthumb/6bb992aafe18c3054ca30035d7e5fe7cc9394d37.jpg", user.getKey().getId());		
-		channel3.setSourceUrl("http://feeds.feedburner.com/veganagogo");
-		channel3.setStatus(MsoChannel.STATUS_ERROR);
-		channel3.setPublic(true);
-		channelMngr.create(channel3, categories);
-				
-		MsoProgram program5 = new MsoProgram("EP 40: Caramelized Rosemary Pears", "Caramelized Rosemary Pears Serves: 6-8", "http://s3.amazonaws.com/9x9cache/a023cd7cafa3b9d18d3e48274b5994c3cbacd759_1218075566_thumbnail.jpg", MsoProgram.TYPE_VIDEO);
-		program5.setImageLargeUrl("	http://s3.amazonaws.com/9x9cache/a023cd7cafa3b9d18d3e48274b5994c3cbacd759_1218075566_thumbLarge.jpg");
-		program5.setMpeg4FileUrl("http://s3.amazonaws.com/9x9pod/a023cd7cafa3b9d18d3e48274b5994c3cbacd759_1218075566.mp4");
-		program5.setWebMFileUrl("http://s3.amazonaws.com/9x9cache/a023cd7cafa3b9d18d3e48274b5994c3cbacd759_1218075566.webm");
-		program5.setPublic(true);
-		programMngr.create(channel3, program5);
-
-		MsoProgram program6 = new MsoProgram("EP 55: Herbed Fruit Salad", "Herbed Fruit Salad Serves: 10 Difficulty", "http://s3.amazonaws.com/9x9cache/0047ece77a9dcdce929d69be889d3f4258e98b38_1245713603_thumbnail.jpg", MsoProgram.TYPE_VIDEO);
-		program6.setImageLargeUrl("http://s3.amazonaws.com/9x9cache/0047ece77a9dcdce929d69be889d3f4258e98b38_1245713603_thumbLarge.jpg");
-		program6.setMpeg4FileUrl("http://s3.amazonaws.com/9x9pod/0047ece77a9dcdce929d69be889d3f4258e98b38_1245713603.mp4");
-		program6.setWebMFileUrl("http://s3.amazonaws.com/9x9cache/0047ece77a9dcdce929d69be889d3f4258e98b38_1245713603.webm");
-		program6.setPublic(true);
-		programMngr.create(channel3, program6);
-
-		//create a channel, but no programs
-		MsoChannel channel4 = new MsoChannel("Comedy Central's Jokes.com", "", "http://s3.amazonaws.com/9x9cache/1b2885a8ba30ee692b56fd0e9c9128995473367e_1199163600_thumbnail.jpg", user.getKey().getId());		
-		channel4.setSourceUrl("http://feeds.feedburner.com/comedycentral/standup");
-		channel4.setPublic(true);
-		channelMngr.create(channel4, categories);				
+			//create channel				
+			MsoChannel channel5 = new MsoChannel("System Channel", "System Channel", "/WEB-INF/../images/logo_9x9.png", user.getKey().getId());
+			channel5.setPublic(true);
+			Category system = categoryMngr.findByName("Tech & Science");
+			List<Category> systemCategories = new ArrayList<Category>();
+			systemCategories.add(system);
+			channelMngr.create(channel5, categories);
+	
+			MsoProgram program7 = new MsoProgram("System Program", "", "/WEB-INF/../images/logo_9x9.png", MsoProgram.TYPE_VIDEO);
+			program7.setPublic(true);
+			program7.setMpeg4FileUrl("http://9x9pod.s3.amazonaws.com/default.mp4");
+			program7.setWebMFileUrl("http://9x9pod.s3.amazonaws.com/default.mp4");	
+			programMngr.create(channel5, program7);
+					
+			//create a channel, but status set to error
+			MsoChannel channel3 = new MsoChannel("Vegan A Go-Go", "A simple vegan cooking show.", "http://s3.amazonaws.com/9x9chthumb/6bb992aafe18c3054ca30035d7e5fe7cc9394d37.jpg", user.getKey().getId());		
+			channel3.setSourceUrl("http://feeds.feedburner.com/veganagogo");
+			channel3.setStatus(MsoChannel.STATUS_ERROR);
+			channel3.setPublic(true);
+			channelMngr.create(channel3, categories);
+					
+			MsoProgram program5 = new MsoProgram("EP 40: Caramelized Rosemary Pears", "Caramelized Rosemary Pears Serves: 6-8", "http://s3.amazonaws.com/9x9cache/a023cd7cafa3b9d18d3e48274b5994c3cbacd759_1218075566_thumbnail.jpg", MsoProgram.TYPE_VIDEO);
+			program5.setImageLargeUrl("	http://s3.amazonaws.com/9x9cache/a023cd7cafa3b9d18d3e48274b5994c3cbacd759_1218075566_thumbLarge.jpg");
+			program5.setMpeg4FileUrl("http://s3.amazonaws.com/9x9pod/a023cd7cafa3b9d18d3e48274b5994c3cbacd759_1218075566.mp4");
+			program5.setWebMFileUrl("http://s3.amazonaws.com/9x9cache/a023cd7cafa3b9d18d3e48274b5994c3cbacd759_1218075566.webm");
+			program5.setPublic(true);
+			programMngr.create(channel3, program5);
+	
+			MsoProgram program6 = new MsoProgram("EP 55: Herbed Fruit Salad", "Herbed Fruit Salad Serves: 10 Difficulty", "http://s3.amazonaws.com/9x9cache/0047ece77a9dcdce929d69be889d3f4258e98b38_1245713603_thumbnail.jpg", MsoProgram.TYPE_VIDEO);
+			program6.setImageLargeUrl("http://s3.amazonaws.com/9x9cache/0047ece77a9dcdce929d69be889d3f4258e98b38_1245713603_thumbLarge.jpg");
+			program6.setMpeg4FileUrl("http://s3.amazonaws.com/9x9pod/0047ece77a9dcdce929d69be889d3f4258e98b38_1245713603.mp4");
+			program6.setWebMFileUrl("http://s3.amazonaws.com/9x9cache/0047ece77a9dcdce929d69be889d3f4258e98b38_1245713603.webm");
+			program6.setPublic(true);
+			programMngr.create(channel3, program6);
+	
+			//create a channel, but no programs
+			MsoChannel channel4 = new MsoChannel("Comedy Central's Jokes.com", "", "http://s3.amazonaws.com/9x9cache/1b2885a8ba30ee692b56fd0e9c9128995473367e_1199163600_thumbnail.jpg", user.getKey().getId());		
+			channel4.setSourceUrl("http://feeds.feedburner.com/comedycentral/standup");
+			channel4.setPublic(true);
+			channelMngr.create(channel4, categories);
+		} else {			
+			String[] urls = this.getMso1DefaultChannels();
+			List<Category> list = categoryMngr.findAll();
+			TranscodingService tranService = new TranscodingService();
+			for (int i=0; i < urls.length; i++) {
+				categories.clear();
+				categories.add(list.get(i));
+				MsoChannel c = new MsoChannel(urls[i], user.getKey().getId());
+				System.out.println("i=" + i + urls[i]);
+				channelMngr.create(c, categories);	
+				if (trans) {
+					tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
+				}
+			}	
+			MsoChannel channel5 = new MsoChannel("System Channel", "System Channel", "/WEB-INF/../images/logo_9x9.png", user.getKey().getId());
+			channel5.setPublic(true);
+			Category system = categoryMngr.findByName("Tech & Science");
+			List<Category> systemCategories = new ArrayList<Category>();
+			systemCategories.add(system);
+			channelMngr.create(channel5, categories);
+	
+			MsoProgram program7 = new MsoProgram("System Program", "", "/WEB-INF/../images/logo_9x9.png", MsoProgram.TYPE_VIDEO);
+			program7.setPublic(true);
+			program7.setMpeg4FileUrl("http://9x9pod.s3.amazonaws.com/default.mp4");
+			program7.setWebMFileUrl("http://9x9pod.s3.amazonaws.com/default.mp4");	
+			programMngr.create(channel5, program7);			
+		}
 	}	
 	
-	private void createMso2DefaultChannels(boolean devel){
+	private void createMso2DefaultChannels(boolean devel, boolean trans){
 		//prepare data
 		Mso mso = new MsoManager().findByName("5f");
 		NnUserManager userMngr = new NnUserManager();
@@ -319,66 +331,68 @@ public class InitService {
 					 "http://www.youtube.com/user/lisahou62", "http://www.youtube.com/user/savedogs2009",
 					 "http://www.youtube.com/user/twtati", "http://www.youtube.com/user/twchannel",
 					 "http://www.youtube.com/user/Twimitv"};
-			this.channelsCreate(urls1, categories, user.getKey().getId());
+			this.channelsCreate(urls1, categories, user.getKey().getId(), trans);
 			categories.clear();
 			category = categoryMngr.findByName("視聽劇場");
 			categories.add(category);
 			String[] urls2 = this.getShowUrl();
-			this.channelsCreate(urls2, categories, user.getKey().getId());
+			this.channelsCreate(urls2, categories, user.getKey().getId(), trans);
 
 			categories.clear();
 			category = categoryMngr.findByName("數位高手");
 			categories.add(category);
 			String[] urls3 = this.getDigitalUrl();
-			this.channelsCreate(urls3, categories, user.getKey().getId());
+			this.channelsCreate(urls3, categories, user.getKey().getId(), trans);
 
 			categories.clear();
 			category = categoryMngr.findByName("ACG夢工廠");
 			categories.add(category);
 			String[] urls4 = this.getDreamUrl();
-			this.channelsCreate(urls4, categories, user.getKey().getId());
+			this.channelsCreate(urls4, categories, user.getKey().getId(), trans);
 
 			categories.clear();
 			category = categoryMngr.findByName("生活娛樂館");
 			categories.add(category);
 			String[] urls5 = this.getUrlEntertainment();
-			this.channelsCreate(urls5, categories, user.getKey().getId());
+			this.channelsCreate(urls5, categories, user.getKey().getId(), trans);
 
 			categories.clear();
 			category = categoryMngr.findByName("國家研究院");
 			categories.add(category);
 			String[] urls6 = this.getUrlStudy();
-			this.channelsCreate(urls6, categories, user.getKey().getId());
+			this.channelsCreate(urls6, categories, user.getKey().getId(), trans);
 
 			categories.clear();
 			category = categoryMngr.findByName("國家體育場");
 			categories.add(category);
 			String[] urls7 = this.getUrlSports();
-			this.channelsCreate(urls7, categories, user.getKey().getId());
+			this.channelsCreate(urls7, categories, user.getKey().getId(), trans);
 
 			categories.clear();
 			category = categoryMngr.findByName("文創藝廊");
 			categories.add(category);
 			String[] urls8 = this.getUrlArt();
-			this.channelsCreate(urls8, categories, user.getKey().getId());
+			this.channelsCreate(urls8, categories, user.getKey().getId(), trans);
 
 			categories.clear();
 			category = categoryMngr.findByName("影音實驗室");
 			categories.add(category);
 			String[] urls9 = this.getUrlMovie();
-			this.channelsCreate(urls9, categories, user.getKey().getId());
+			this.channelsCreate(urls9, categories, user.getKey().getId(), trans);
 			
 		}
 		
 	}
 	
-	private void channelsCreate(String[] urls, List<Category>categories, long userId) {
+	private void channelsCreate(String[] urls, List<Category>categories, long userId, boolean trans) {
 		TranscodingService tranService = new TranscodingService();
 		MsoChannelManager channelMngr = new MsoChannelManager();
 		for (String url : urls) {
 			MsoChannel c = new MsoChannel(url, userId);
 			channelMngr.create(c, categories);				
-			tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
+			if (trans) {
+				tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
+			}
 		}		
 	}
 	
@@ -387,27 +401,40 @@ public class InitService {
 		Mso mso = new MsoManager().findNNMso();
 		MsoChannelManager channelMngr = new MsoChannelManager();
 		CategoryManager categoryMngr = new CategoryManager();
-		Category c = categoryMngr.findByName("Activism");
-		List<MsoChannel> channels = new MsoChannelManager().findPublicChannelsByCategoryId(c.getKey().getId());
-		int counter = 1;
-		int limit = 4;
-		for (int i=0; i<channels.size(); i++) {
-			if (counter > limit) {break;}	
-			MsoChannel chn = channels.get(i);
-			if (counter < 2 && !chn.getName().equals("System Channel") && channelMngr.isCounterQualified(chn)) {
-				MsoIpg msoIpg = new MsoIpg(mso.getKey().getId(), chn.getKey().getId(), counter, MsoIpg.TYPE_READONLY);			
-				msoIpgMngr.create(msoIpg);
-				counter++;			
-			} else if (counter < 3 && !chn.getName().equals("System Channel") && channelMngr.isCounterQualified(chn)) {
-				MsoIpg msoIpg = new MsoIpg(mso.getKey().getId(), chn.getKey().getId(), counter, MsoIpg.TYPE_GENERAL);			
-				msoIpgMngr.create(msoIpg);
-				counter++;
-			}						
-			if (chn.getName().equals("System Channel")) {
-				MsoIpg msoIpg = new MsoIpg(mso.getKey().getId(), chn.getKey().getId(), 81, MsoIpg.TYPE_READONLY);
-				msoIpgMngr.create(msoIpg);
-				counter++;
+		if (devel) {
+			Category c = categoryMngr.findByName("Activism");
+			List<MsoChannel> channels = new MsoChannelManager().findPublicChannelsByCategoryId(c.getKey().getId());
+			int counter = 1;
+			int limit = 4;
+			for (int i=0; i<channels.size(); i++) {
+				if (counter > limit) {break;}	
+				MsoChannel chn = channels.get(i);
+				if (counter < 2 && !chn.getName().equals("System Channel") && channelMngr.isCounterQualified(chn)) {
+					MsoIpg msoIpg = new MsoIpg(mso.getKey().getId(), chn.getKey().getId(), counter, MsoIpg.TYPE_READONLY);			
+					msoIpgMngr.create(msoIpg);
+					counter++;			
+				} else if (counter < 3 && !chn.getName().equals("System Channel") && channelMngr.isCounterQualified(chn)) {
+					MsoIpg msoIpg = new MsoIpg(mso.getKey().getId(), chn.getKey().getId(), counter, MsoIpg.TYPE_GENERAL);			
+					msoIpgMngr.create(msoIpg);
+					counter++;
+				}						
+				if (chn.getName().equals("System Channel")) {
+					MsoIpg msoIpg = new MsoIpg(mso.getKey().getId(), chn.getKey().getId(), 81, MsoIpg.TYPE_READONLY);
+					msoIpgMngr.create(msoIpg);
+					counter++;
+				}
 			}
+		} else {
+			String[] urls = this.getMso1DefaultIpg();
+			for (int i=0; i< urls.length; i++) {
+				MsoChannel c = channelMngr.findBySourceUrl(urls[i]);
+				MsoIpg msoIpg = new MsoIpg(mso.getKey().getId(), c.getKey().getId(), i, MsoIpg.TYPE_GENERAL);			
+				msoIpgMngr.create(msoIpg);							
+			}			
+			MsoChannel channel = new MsoChannelManager().findByName("System Channel");
+			MsoIpg msoIpg = new MsoIpg(mso.getKey().getId(), channel.getKey().getId(), 81, MsoIpg.TYPE_READONLY);
+			msoIpgMngr.create(msoIpg);	
+			System.out.println("mso1 ipg:" + urls.length);
 		}
 	}
 
@@ -426,10 +453,11 @@ public class InitService {
 			String[] seqs = this.getMso2IpgSeq();
 			System.out.println(urls.length + seqs.length);
 			for (int i=0; i<urls.length; i++) {
-				MsoChannel c = cMngr.findBySourceUrl(urls[i]);			
+				MsoChannel c = cMngr.findBySourceUrl(urls[i]);
 				MsoIpg msoIpg = new MsoIpg(mso.getKey().getId(), c.getKey().getId(), Integer.parseInt(seqs[i]), MsoIpg.TYPE_GENERAL);					
 				msoIpgMngr.create(msoIpg);					
 			}
+			System.out.println("mso2 ipg:" + urls.length);
 		}
 	}
 		
@@ -906,4 +934,54 @@ public class InitService {
 		};
 	    return seq;
 	}
+	
+	public String[] getMso1DefaultIpg() {
+		String[] urls = {
+				"http://feeds.visionontv.net/visionontv/Olympics?format=xml",
+				"http://feeds.feedburner.com/cnet/cartechpodcastvideo?format=xml",
+				"http://www.youtube.com/user/huluDotCom",
+				"http://feeds.feedburner.com/tedtalks_video",
+				"http://feeds.feedburner.com/cnet/buzzreport?format=xml",
+				"http://feeds.visionontv.net/Livinginthefuture?format=xml",
+				"http://revision3.com/hak5/feed/MP4-Large",
+				"http://anyonebutme.blip.tv/rss/itunes",
+				"http://www.youtube.com/user/LoveSystems",
+				"http://feeds.feedburner.com/survivalpcast?format=xml",
+				"http://feeds.feedburner.com/rocknrolltv",
+				"http://feeds.feedburner.com/earth-touch_featured_720p?format=xml",
+				"http://www.youtube.com/user/SHAYTARDS?feature=chclk",
+				"http://feeds.feedburner.com/SelfPsychologyPodcast?format=xml",
+				"http://www.youtube.com/user/nba?blend=1&ob=4",
+				"http://feeds.feedburner.com/caliextralarge?format=xml",
+				"http://lltv.libsyn.com/rss"				
+		};
+		return urls;
+	}
+	
+	public String[] getMso1DefaultChannels() {
+		String[] urls = {
+				"http://feeds.visionontv.net/visionontv/Olympics?format=xml",
+				"http://feeds.feedburner.com/cnet/cartechpodcastvideo?format=xml",
+				"http://www.youtube.com/user/huluDotCom",
+				"http://feeds.feedburner.com/tedtalks_video",
+				"http://feeds.feedburner.com/cnet/buzzreport?format=xml",
+				"http://feeds.visionontv.net/Livinginthefuture?format=xml",
+				"http://revision3.com/hak5/feed/MP4-Large",
+				"http://anyonebutme.blip.tv/rss/itunes",
+				"http://feeds.visionontv.net/Livinginthefuture?format=xml",
+				"http://www.youtube.com/user/LoveSystems",
+				"http://feeds.feedburner.com/survivalpcast?format=xml",
+				"http://feeds.feedburner.com/rocknrolltv",
+				"http://feeds.feedburner.com/cnet/buzzreport?format=xml",
+				"http://feeds.feedburner.com/earth-touch_featured_720p?format=xml",
+				"http://www.youtube.com/user/SHAYTARDS?feature=chclk",
+				"http://feeds.feedburner.com/earth-touch_featured_720p?format=xml",
+				"http://feeds.feedburner.com/SelfPsychologyPodcast?format=xml",
+				"http://www.youtube.com/user/nba?blend=1&ob=4",
+				"http://feeds.feedburner.com/caliextralarge?format=xml",
+				"http://lltv.libsyn.com/rss"
+		};
+		return urls;
+	}
+	
 }
