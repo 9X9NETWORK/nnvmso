@@ -65,16 +65,21 @@ public class AdminInitController {
 		return NnNetUtil.textReturn("OK");		
 	}
 		
-	//devel mode, whether to use test data or production mode   
-	//debug mode, whether to turn on player's debugging information
+	/**
+	 * @param debug whether to turn on player's debugging information
+	 */
 	@RequestMapping("initDevel")
-	public ResponseEntity<String> initAll(@RequestParam(value="debug")boolean debug, HttpServletRequest req) { 
+	public ResponseEntity<String> initAllDevel(@RequestParam(value="debug")boolean debug, HttpServletRequest req) { 
 		initService.setRequest(req);
 		initService.initAll(true, debug, false);
 		return NnNetUtil.textReturn("OK");		
 	}
 	
-	//intended to be executed as a task
+	/**
+	 * This is intended to be executed as a task.
+	 * 
+	 * @param reference initProTask
+	 */
 	@RequestMapping("initPro")
 	public ResponseEntity<String> initPro(@RequestParam boolean devel, @RequestParam boolean trans, @RequestParam boolean debug, HttpServletRequest req) {
 		log.info("init task kicked in");	
@@ -100,6 +105,11 @@ public class AdminInitController {
 		return NnNetUtil.textReturn("OK");		
 	}		
 	
+	/**
+	 * @param debug whether to turn on player's debugging information
+	 * @param devel whether to use test data (versus data from PM)
+	 * @param trans whether to submit data to transcoding service. turn off for internal data integretiy testing.
+	 */	
 	@RequestMapping("initProTask")
 	public ResponseEntity<String> initProTask(@RequestParam boolean devel, @RequestParam boolean trans, @RequestParam boolean debug) {
 		System.out.println(String.valueOf(devel));
