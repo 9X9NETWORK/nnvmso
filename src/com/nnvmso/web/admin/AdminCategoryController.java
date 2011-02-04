@@ -45,20 +45,20 @@ public class AdminCategoryController {
 	
 	//list every channel under a category
 	@RequestMapping(value="channelList")
-	public ResponseEntity<String> channelList(@RequestParam("category")long category) {		
+	public ResponseEntity<String> channelList(@RequestParam("category")long id) {		
 		CategoryChannelManager ccMngr = new CategoryChannelManager();
 		MsoChannelManager cMngr = new MsoChannelManager();
-		List<CategoryChannel> ccs = ccMngr.findAllByCategoryId(category);
+		List<CategoryChannel> ccs = ccMngr.findAllByCategoryId(id);
 		List<MsoChannel> channels = new ArrayList<MsoChannel>();
 		for (CategoryChannel cc : ccs) {
 			channels.add(cMngr.findById(cc.getChannelId()));
 		}
 		String output = "";
-		Category theC = new CategoryManager().findById(category);
+		Category theC = new CategoryManager().findById(id);
 		if (theC == null) {
 			output = "category does not exist";
 		} else {
-			output = "category count = " + new CategoryManager().findById(category).getChannelCount() + "\n";
+			output = "category count = " + new CategoryManager().findById(id).getChannelCount() + "\n";
 			output = output + "id \t name \t program count \t status \t isPublic\n";
 			for (MsoChannel c : channels) {
 				output = output + c.getKey().getId() + "\t" + c.getName() + "\t" + + c.getProgramCount() + "\t" + c.getStatus() + "\t" + c.isPublic() + "\n";
@@ -69,13 +69,13 @@ public class AdminCategoryController {
 	
 	
 	@RequestMapping("list")
-	public ResponseEntity<String> list(@RequestParam(required=false)String id) {
+	public ResponseEntity<String> list(@RequestParam(required=false)String mso) {
 		
 		List<Category> categories = null;
-		if (id == null) {
+		if (mso == null) {
 			categories = categoryMngr.findAll();
 		} else {	
-			categories = categoryMngr.findAllByMsoId(Long.parseLong(id));
+			categories = categoryMngr.findAllByMsoId(Long.parseLong(mso));
 		}
 		
 		String[] title = {"id", "msoId", "isPublic", "channelCount", "name"};
