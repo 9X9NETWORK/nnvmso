@@ -24,6 +24,7 @@ public class MsoIpgDao {
 		Query q = pm.newQuery(MsoIpg.class);
 		q.setFilter("msoId == msoIdParam");
 		q.declareParameters("long msoIdParam");
+		q.setOrdering("seq asc");
 		@SuppressWarnings("unchecked")
 		List<MsoIpg> ipg = (List<MsoIpg>)q.execute(msoId);
 		ipg = (List<MsoIpg>)pm.detachCopyAll(ipg);
