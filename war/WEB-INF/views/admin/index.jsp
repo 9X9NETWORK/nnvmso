@@ -75,7 +75,9 @@
       <li>msoIpg listing by brand <br/>
           http://host/admin/msoIpg/list?mso=123
       </li>
-      <li>remove an ipg!!!!! (well, easier change channel)</li>
+      <li>!!!add msoIpg</li>
+      <li>!!!modify msoIpg</li>
+      <li>!!!(delete)</li>      
     </ul>
   </li>
 </ul>
