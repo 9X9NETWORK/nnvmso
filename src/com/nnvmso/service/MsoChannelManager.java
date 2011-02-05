@@ -30,7 +30,10 @@ public class MsoChannelManager {
 	/**
 	 * @@@IMPORTANT 
 	 * setProgramCount will be done automatically in MsoProgramManager when a program is added.
-	 * If necessary to manually change programCount, please do with caution.   
+	 * If necessary to manually change programCount, please do with caution.
+	 * 
+	 * @@@IMPORTANT
+	 * sourceURL is not supposed to be duplicated. Duplication check is your responsibility.   
 	 */
 	public void create(MsoChannel channel, List<Category> categories) {
 		Date now = new Date();
