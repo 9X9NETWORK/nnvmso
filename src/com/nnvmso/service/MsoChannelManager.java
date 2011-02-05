@@ -94,11 +94,11 @@ public class MsoChannelManager {
 	
 	public MsoChannel initChannelSubmittedFromPlayer(String sourceUrl, NnUser user) {
 		MsoChannel channel = new MsoChannel(sourceUrl, user.getKey().getId());
-		channel.setContentType(this.getContentTypeByUrl(sourceUrl));		
+		channel.setContentType(this.getContentTypeByUrl(sourceUrl));
 		channel.setImageUrl("/WEB-INF/../images/processing.png");
 		if (channel.getContentType() == MsoChannel.CONTENTTYPE_PODCAST) {
 			channel.setName("Podcast Processing");
-		} else if (channel.getType() == MsoChannel.CONTENTTYPE_YOUTUBE) {
+		} else if (channel.getContentType() == MsoChannel.CONTENTTYPE_YOUTUBE) {
 			channel.setName("Youtube Processing");
 		}
 		channel.setStatus(MsoChannel.STATUS_PROCESSING);
