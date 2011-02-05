@@ -19,8 +19,14 @@
     <property name="__key__" direction="desc"/>
   </datastore-index>        
   <datastore-index kind="MsoIpg" ancestor="false" source="manual">
+    <property name="msoId" direction="asc"/>
+    <property name="seq" direction="asc"/>    
+  </datastore-index>
+  <datastore-index kind="MsoIpg" ancestor="false" source="manual">
     <property name="__key__" direction="desc"/>
-  </datastore-index>  
+    <property name="msoId" direction="asc"/>
+    <property name="seq" direction="asc"/>    
+  </datastore-index>    
   <datastore-index kind="MsoProgram" ancestor="false" source="manual">
     <property name="__key__" direction="desc"/>
   </datastore-index>   
