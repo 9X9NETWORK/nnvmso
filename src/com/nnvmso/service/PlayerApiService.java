@@ -73,10 +73,11 @@ public class PlayerApiService {
 		String results = NnStatusMsg.successStr(locale) + separatorStr;
 		results = results + this.assembleKeyValue("key", String.valueOf(mso.getKey().getId()));
 		results = results + this.assembleKeyValue("name", mso.getName());
+		results = results + this.assembleKeyValue("title", mso.getTitle());		
 		results = results + this.assembleKeyValue("logoUrl", mso.getLogoUrl());
 		results = results + this.assembleKeyValue("jingleUrl", mso.getJingleUrl());
 		results = results + this.assembleKeyValue("logoClickUrl", mso.getLogoClickUrl());
-		results = results + this.assembleKeyValue("preferredLangCode", mso.getPreferredLangCode());
+		results = results + this.assembleKeyValue("preferredLangCode", mso.getPreferredLangCode());		
 		results = results + this.assembleKeyValue("debug", debug);
 		
 		return results;
