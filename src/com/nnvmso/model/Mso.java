@@ -23,6 +23,9 @@ public class Mso implements Serializable {
 	private String name;
 
 	@Persistent
+	private String title;
+	
+	@Persistent
 	private String nameSearch; //used for search
 	
 	@Persistent 
@@ -159,6 +162,14 @@ public class Mso implements Serializable {
 	public void setLogoClickUrl(String logoClickUrl) {
 		this.logoClickUrl = logoClickUrl;
 	}	
+	
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
 
 	public String toString() {
         StringBuffer buffer = new StringBuffer();
