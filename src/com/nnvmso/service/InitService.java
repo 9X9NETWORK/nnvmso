@@ -91,6 +91,7 @@ public class InitService {
 		//a default MSO
 		MsoManager msoMngr = new MsoManager();
 		Mso mso = new Mso("9x9", "9x9", "mso@9x9.tv", Mso.TYPE_NN);
+		mso.setTitle("9x9.tv");
 		mso.setPreferredLangCode(Mso.LANG_EN);
 		mso.setJingleUrl("/WEB-INF/../videos/opening.swf");
 		mso.setLogoUrl("/WEB-INF/../images/logo_9x9.png");
@@ -132,6 +133,7 @@ public class InitService {
 		//a default MSO
 		MsoManager msoMngr = new MsoManager();
 		Mso mso = new Mso("5f", "5f", "mso@5f.tv", Mso.TYPE_MSO);
+		mso.setTitle("5f.tv");
 		mso.setPreferredLangCode(Mso.LANG_ZH_TW);
 		mso.setJingleUrl("/WEB-INF/../videos/5fLogo2.swf");
 		mso.setLogoUrl("/WEB-INF/../images/5floor-logo.png");
@@ -433,7 +435,7 @@ public class InitService {
 			String[] urls = this.getMso1DefaultIpg();
 			for (int i=0; i< urls.length; i++) {
 				MsoChannel c = channelMngr.findBySourceUrl(urls[i]);
-				MsoIpg msoIpg = new MsoIpg(mso.getKey().getId(), c.getKey().getId(), i, MsoIpg.TYPE_GENERAL);			
+				MsoIpg msoIpg = new MsoIpg(mso.getKey().getId(), c.getKey().getId(), i+1, MsoIpg.TYPE_GENERAL);			
 				msoIpgMngr.create(msoIpg);							
 			}			
 			MsoChannel channel = new MsoChannelManager().findByName("System Channel");
@@ -477,7 +479,6 @@ public class InitService {
 				"http://www.youtube.com/user/wowwanwan",
 				"http://www.youtube.com/user/journalismshu",
 				"http://www.youtube.com/user/pccujnn9th",
-				"http://www.youtube.com/user/vtkutaiwan",
 				"http://www.youtube.com/user/cyberTKU",
 				"http://www.youtube.com/user/DmaTut",
 				"http://www.youtube.com/user/fcutv",
@@ -497,7 +498,6 @@ public class InitService {
 				"http://www.youtube.com/user/wowwanwan",
 				"http://www.youtube.com/user/journalismshu",
 				"http://www.youtube.com/user/pccujnn9th",
-				"http://www.youtube.com/user/vtkutaiwan",
 				"http://www.youtube.com/user/cyberTKU",
 				"http://www.youtube.com/user/DmaTut",
 				"http://www.youtube.com/user/fcutv",
@@ -533,7 +533,6 @@ public class InitService {
 				"http://www.youtube.com/user/NBAHiighlights",
 				"http://www.youtube.com/user/NBAErik",
 				"http://www.youtube.com/user/lalakersfan88",
-				"http://www.youtube.com/user/PRIVATEMARMOL",
 				"http://www.youtube.com/user/HeatTeo",
 				"http://www.youtube.com/user/ATPWorldTour",
 				"http://www.youtube.com/user/TennisAustralia",
@@ -724,7 +723,6 @@ public class InitService {
 				"http://www.youtube.com/user/wearnNews",
 				"http://www.youtube.com/user/chung1219",                                                        
 				"http://www.youtube.com/user/chri5784 ",
-				"http://www.youtube.com/user/millitarychannel",
 				"http://www.youtube.com/user/millitarynewsnetwork",
 				"http://www.youtube.com/user/Dulan9 ",
 				"http://www.youtube.com/user/ma19ko",
@@ -953,8 +951,8 @@ public class InitService {
 				"http://revision3.com/hak5/feed/MP4-Large",
 				"http://anyonebutme.blip.tv/rss/itunes",
 				"http://www.youtube.com/user/LoveSystems",
-				"http://feeds.feedburner.com/survivalpcast?format=xml",
 				"http://feeds.feedburner.com/rocknrolltv",
+				"http://www.youtube.com/user/QueenBeeuty",
 				"http://feeds.feedburner.com/earth-touch_featured_720p?format=xml",
 				"http://www.youtube.com/user/SHAYTARDS?feature=chclk",
 				"http://feeds.feedburner.com/SelfPsychologyPodcast?format=xml",
@@ -977,7 +975,6 @@ public class InitService {
 				"http://anyonebutme.blip.tv/rss/itunes",
 				"http://feeds.visionontv.net/Livinginthefuture?format=xml",
 				"http://www.youtube.com/user/LoveSystems",
-				"http://feeds.feedburner.com/survivalpcast?format=xml",
 				"http://feeds.feedburner.com/rocknrolltv",
 				"http://feeds.feedburner.com/cnet/buzzreport?format=xml",
 				"http://feeds.feedburner.com/earth-touch_featured_720p?format=xml",
