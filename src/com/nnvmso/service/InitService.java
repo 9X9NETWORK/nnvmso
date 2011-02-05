@@ -403,7 +403,7 @@ public class InitService {
 		}		
 	}
 	
-	private void createMso1DefaultIpg(boolean devel) {
+	public void createMso1DefaultIpg(boolean devel) {
 		MsoIpgManager msoIpgMngr = new MsoIpgManager();
 		Mso mso = new MsoManager().findNNMso();
 		MsoChannelManager channelMngr = new MsoChannelManager();
@@ -446,7 +446,7 @@ public class InitService {
 		log.info("prepareMso1DefaultIpg is done");
 	}
 
-	private void createMso2DefaultIpg(boolean devel) {
+	public void createMso2DefaultIpg(boolean devel) {
 		MsoIpgManager msoIpgMngr = new MsoIpgManager();
 		MsoChannelManager cMngr = new MsoChannelManager();
 		Mso mso = new MsoManager().findByName("5f");
@@ -723,7 +723,6 @@ public class InitService {
 				"http://www.youtube.com/user/wearnNews",
 				"http://www.youtube.com/user/chung1219",                                                        
 				"http://www.youtube.com/user/chri5784 ",
-				"http://www.youtube.com/user/millitarynewsnetwork",
 				"http://www.youtube.com/user/Dulan9 ",
 				"http://www.youtube.com/user/ma19ko",
 				"http://www.youtube.com/user/gd1104",
@@ -952,7 +951,6 @@ public class InitService {
 				"http://anyonebutme.blip.tv/rss/itunes",
 				"http://www.youtube.com/user/LoveSystems",
 				"http://feeds.feedburner.com/rocknrolltv",
-				"http://www.youtube.com/user/QueenBeeuty",
 				"http://feeds.feedburner.com/earth-touch_featured_720p?format=xml",
 				"http://www.youtube.com/user/SHAYTARDS?feature=chclk",
 				"http://feeds.feedburner.com/SelfPsychologyPodcast?format=xml",
