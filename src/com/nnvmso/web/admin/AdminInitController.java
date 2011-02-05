@@ -112,7 +112,6 @@ public class AdminInitController {
 	 */	
 	@RequestMapping("initProTask")
 	public ResponseEntity<String> initProTask(@RequestParam boolean devel, @RequestParam boolean trans, @RequestParam boolean debug) {
-		System.out.println(String.valueOf(devel));
 		QueueFactory.getDefaultQueue().add(
 		      TaskOptions.Builder.withUrl("/admin/init/initPro")
 		         .param("devel", String.valueOf(devel))
