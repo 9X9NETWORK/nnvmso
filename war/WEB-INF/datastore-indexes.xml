@@ -3,6 +3,10 @@
   <datastore-index kind="Category" ancestor="false" source="manual">
     <property name="__key__" direction="desc"/>
   </datastore-index>
+  <datastore-index kind="Category" ancestor="false" source="manual">
+    <property name="msoId" direction="asc"/>
+    <property name="name" direction="asc"/>
+  </datastore-index>  
   <datastore-index kind="CategoryChannel" ancestor="false" source="manual">
     <property name="__key__" direction="desc"/>
   </datastore-index>
@@ -30,6 +34,10 @@
   <datastore-index kind="MsoProgram" ancestor="false" source="manual">
     <property name="__key__" direction="desc"/>
   </datastore-index>   
+  <datastore-index kind="MsoProgram" ancestor="false" source="auto">
+    <property name="channelId" direction="asc"/>
+    <property name="updateDate" direction="desc"/>
+  </datastore-index>  
   <datastore-index kind="NnUser" ancestor="false" source="manual">
     <property name="__key__" direction="desc"/>
   </datastore-index>
@@ -38,6 +46,15 @@
   </datastore-index>        
   <datastore-index kind="Subscription" ancestor="false" source="manual">
     <property name="__key__" direction="desc"/>
+  </datastore-index>
+  <datastore-index kind="Subscription" ancestor="false" source="auto">
+    <property name="channelId" direction="asc"/>
+    <property name="userId" direction="asc"/>
+    <property name="seq" direction="asc"/>
+  </datastore-index>
+  <datastore-index kind="Subscription" ancestor="false" source="auto">
+    <property name="userId" direction="asc"/>
+    <property name="seq" direction="asc"/>
   </datastore-index>
   <datastore-index kind="SubscriptionLog" ancestor="false" source="manual">
     <property name="__key__" direction="desc"/>
