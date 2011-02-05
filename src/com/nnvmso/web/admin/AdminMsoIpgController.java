@@ -49,13 +49,13 @@ public class AdminMsoIpgController {
 				if (c!= null) {channels.add(c);};
 			}
 		}
-		String output = "id\tname\tseq\ttype (1=general; 2=readonly)\n";
+		String output = "channel id\tseq\ttype\tname (type, 1=general; 2=readonly)\n";
 		for (MsoChannel c : channels) {
 			String[] result = {
 					String.valueOf(output + c.getKey().getId()),
-					c.getName(),
 					String.valueOf(c.getSeq()),
-					String.valueOf(c.getType())										
+					String.valueOf(c.getType()),										
+					c.getName()
 			};
 			output = NnStringUtil.getDelimitedStr(result) + "\n";
 		}
