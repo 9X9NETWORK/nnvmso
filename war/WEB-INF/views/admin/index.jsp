@@ -1,5 +1,5 @@
 <ul>
-  <li>initialize (works only for small set of data)
+  <li>USE WITH CAUTION: initialize (works only for small set of data)
     <ul>
       <li><a href="/admin/init/initDevel?debug=1">turn on debug</a></li>          	   
       <li><a href="/admin/init/initDevel?debug=0">turn off debug</a></li>          	   
