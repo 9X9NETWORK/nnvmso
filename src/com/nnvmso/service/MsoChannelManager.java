@@ -147,7 +147,9 @@ public class MsoChannelManager {
 		return channels;
 	}	
 
-	//cached
+	/**
+	 * @@@ Cached 
+	 */
 	public MsoChannel findById(long id) {
 		//find from cache
 		Cache cache = CacheFactory.get();
@@ -191,7 +193,12 @@ public class MsoChannelManager {
 		}
 		return channels;
 	}
-						
+		
+	//!!! limit
+	public List<MsoChannel> findAll() {
+		return msoChannelDao.findAll();
+	}
+	
 	public MsoChannel findByKey(Key key) {
 		return msoChannelDao.findByKey(key);
 	}
@@ -199,4 +206,40 @@ public class MsoChannelManager {
 	private String getCacheKey(long id) {
 		return "channel(" + id + ")";		
 	}
+
+	public List<MsoChannel> findCache() {
+		List<MsoChannel> channels = this.findAll();
+		List<MsoChannel> cachedChannels = new ArrayList<MsoChannel>();
+		Cache cache = CacheFactory.get();
+		if (cache != null) {
+			for (MsoChannel c : channels) {
+				if (cache.get(this.getCacheKey(c.getKey().getId())) != null) {
+					cachedChannels.add(c);
+				}
+			}			
+		}
+		return cachedChannels;
+	}
+	
+	//!!! timeout
+	public void cacheAll() {
+		List<MsoChannel> channels = this.findAll();
+		Cache cache = CacheFactory.get();
+		if (cache != null) {
+			for (MsoChannel c : channels) {
+				cache.put(this.getCacheKey(c.getKey().getId()), c);
+			}			
+		}		
+	}
+	
+	public void deleteCache() {
+		Cache cache = CacheFactory.get();
+		List<MsoChannel> channels = this.findAll();
+		if (cache != null) {
+			for (MsoChannel c : channels) {
+				cache.remove(this.getCacheKey(c.getKey().getId()));
+			}						
+		}
+	}
+	
 }
