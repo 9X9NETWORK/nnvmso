@@ -7,7 +7,6 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import com.google.appengine.api.datastore.Key;
-
 import com.nnvmso.lib.PMF;
 import com.nnvmso.model.MsoChannel;
 
@@ -45,6 +44,17 @@ public class MsoChannelDao {
 		return channel;		
 	}	
 
+	//!!!
+	public List<MsoChannel> findAll() {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		Query query = pm.newQuery(MsoChannel.class);
+		@SuppressWarnings("unchecked")
+		List<MsoChannel> results = (List<MsoChannel>) query.execute();
+		results = (List<MsoChannel>)pm.detachCopyAll(results);
+		pm.close();
+		return results;
+	}
+	
 	public MsoChannel findByName(String name) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();		    	
 		Query q = pm.newQuery(MsoChannel.class);
