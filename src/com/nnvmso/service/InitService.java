@@ -974,6 +974,7 @@ public class InitService {
 				"http://feeds.visionontv.net/Livinginthefuture?format=xml",
 				"http://www.youtube.com/user/LoveSystems",
 				"http://feeds.feedburner.com/rocknrolltv",
+				"http://www.youtube.com/user/maaximumseduction",
 				"http://feeds.feedburner.com/cnet/buzzreport?format=xml",
 				"http://feeds.feedburner.com/earth-touch_featured_720p?format=xml",
 				"http://www.youtube.com/user/SHAYTARDS?feature=chclk",
@@ -983,6 +984,7 @@ public class InitService {
 				"http://feeds.feedburner.com/caliextralarge?format=xml",
 				"http://lltv.libsyn.com/rss"
 		};
+		
 		return urls;
 	}
 	
