@@ -60,7 +60,7 @@ public class NnUserManager {
 	}
 	
 	public NnUser findAuthenticatedUser(String email, String password, long msoId) {
-		return nnUserDao.findAuthenticatedUser(email, password, msoId);
+		return nnUserDao.findAuthenticatedUser(email.toLowerCase(), password, msoId);
 	}
 	
 	public void subscibeDefaultChannels(NnUser user) {
