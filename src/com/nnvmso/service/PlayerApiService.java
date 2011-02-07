@@ -56,11 +56,7 @@ public class PlayerApiService {
 	public void setMso(Mso mso) {
 		this.mso = mso;
 	}	
-	
-	public String hello() {
-		return NnStatusMsg.inputMissing(Locale.TRADITIONAL_CHINESE);
-	}
-	
+		
 	public String findMsoInfo(HttpServletRequest req) {
 		Mso theMso = msoMngr.findMsoViaHttpReq(req);
 		if (theMso == null) {return NnStatusMsg.msoInvalid(locale);}
@@ -520,7 +516,7 @@ public class PlayerApiService {
 			for (int i=0; i<chArr.length; i++) { list.add(Long.valueOf(chArr[i]));}
 			programs = programMngr.findAllByChannelIdsAndIsPublic(list, true);
 		} else {
-			programs = programMngr.findAllByChannelId(Long.parseLong(channelIds));
+			programs = programMngr.findAllByChannelIdAndIsPublic(Long.parseLong(channelIds));
 		}		
 				
 		MsoConfig config = new MsoConfigManager().findByMsoIdAndItem(mso.getKey().getId(), MsoConfig.CDN);
@@ -604,7 +600,6 @@ public class PlayerApiService {
 			if (imageUrl == null) {imageUrl = "";}
 			if (imageLargeUrl == null) {imageLargeUrl = "";}	
 			if (config.getValue().equals(MsoConfig.CDN_AKAMAI)) {
-				log.info("akamai replacement");
 				url1 = url1.replaceFirst(regexCache, cache);
 				url1 = url1.replaceAll(regexPod, pod);
 				url2 = url2.replaceFirst(regexCache, cache);
