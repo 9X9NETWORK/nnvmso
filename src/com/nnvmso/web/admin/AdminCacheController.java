@@ -18,8 +18,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.model.Category;
+import com.nnvmso.model.MsoChannel;
 import com.nnvmso.service.CategoryManager;
+import com.nnvmso.service.MsoChannelManager;
 import com.nnvmso.service.MsoManager;
+import com.nnvmso.service.MsoProgramManager;
 
 @Controller
 @RequestMapping("admin/cache")
@@ -49,6 +52,41 @@ public class AdminCacheController {
 		return NnNetUtil.textReturn(output);
 	}
 	
+	@RequestMapping("channel")
+	public ResponseEntity<String> cacheChannel(@RequestParam(required=false)Long channelId, 
+									           @RequestParam(required=false)boolean delete,
+									           @RequestParam(required=false)boolean list) {		
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		String output = "";
+		if (list) {
+			List<MsoChannel> channels = channelMngr.findCache();			
+			for (MsoChannel c : channels) {
+				output = output + c.getKey().getId() + "\n";
+			}			
+		} else if (delete) {
+			channelMngr.deleteCache();
+		} else {
+			channelMngr.cacheAll();
+		}
+		return NnNetUtil.textReturn(output);
+	}
+	
+	@RequestMapping("program")
+	public ResponseEntity<String> cacheProgram(@RequestParam(required=false)Long channelId, 
+									           @RequestParam(required=false)boolean delete,
+									           @RequestParam(required=false)boolean list) {		
+		MsoProgramManager programMngr = new MsoProgramManager();
+		String output = "";
+		if (list) {
+			output = programMngr.findCacheByChannel(channelId);
+		} else if (delete) {
+			programMngr.deleteCacheByChannel(channelId);
+		} else {
+			programMngr.cacheByChannelId(channelId);
+		}
+		return NnNetUtil.textReturn(output);
+	}	
+		
 	//cache add, one mso at a time
 	//cache listing, list all mso's
 	@RequestMapping("category")

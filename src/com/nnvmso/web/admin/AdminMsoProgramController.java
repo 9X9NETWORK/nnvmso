@@ -41,7 +41,7 @@ public class AdminMsoProgramController {
 	@RequestMapping("list")
 	public ResponseEntity<String> list(@RequestParam(value="channel")long channelId) {
 		//find all programs, including the not public ones
-		List<MsoProgram> programs = programMngr.findAllByChannelId(channelId);
+		List<MsoProgram> programs = programMngr.findAllByChannelIdAndIsPublic(channelId);
 		String[] title = {"id", "channelId", "isPublic", "status", "updateDate", "name"};		
 		String result = "";
 		for (MsoProgram p:programs) {

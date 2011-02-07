@@ -61,6 +61,12 @@ public class AdminMsoChannelController {
 		return NnNetUtil.textReturn(output);	
 	}
 	
+	@RequestMapping("changeCategory")
+	public @ResponseBody String changeCategory() {
+		
+		return "OK";
+	}
+	
 	@RequestMapping("modify")
 	public @ResponseBody String modify(@RequestParam(required=true)  String id,
 	                                   @RequestParam(required=false) String name,
