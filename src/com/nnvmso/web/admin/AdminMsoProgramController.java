@@ -36,16 +36,16 @@ public class AdminMsoProgramController {
 	public String exception(Exception e) {
 		NnLogUtil.logException(e);
 		return "error/exception";				
-	}
-
+	}	
+	
 	@RequestMapping("list")
 	public ResponseEntity<String> list(@RequestParam(value="channel")long channelId) {
 		//find all programs, including the not public ones
 		List<MsoProgram> programs = programMngr.findAllByChannelId(channelId);
-		String[] title = {"key", "channelId", "isPublic", "status", "updateDate", "name"};		
+		String[] title = {"id", "channelId", "isPublic", "status", "updateDate", "name"};		
 		String result = "";
 		for (MsoProgram p:programs) {
-			String[] ori = {NnStringUtil.getKeyStr(p.getKey()),
+			String[] ori = {String.valueOf(p.getKey().getId()),
 			                String.valueOf(p.getChannelId()),
 			                Boolean.toString(p.isPublic()),
 			                String.valueOf(p.getStatus()),
