@@ -1,9 +1,10 @@
 <ul>
   <li>USE WITH CAUTION: initialize (works only for small set of data)
     <ul>
-      <li><a href="/admin/init/initDevel?debug=1">turn on debug</a></li>          	   
-      <li><a href="/admin/init/initDevel?debug=0">turn off debug</a></li>          	   
+      <li><a href="/admin/init/initDevel?debug=1">dev turn on debug</a></li>
+      <li><a href="/admin/init/initDevel?debug=0">dev turn off debug</a></li>          	   
       <li><a href="/admin/init/initProTask?devel=0&trans=1&debug=1">turn on production data, but debug=1</a></li>
+      <li><a href="/admin/init/initProTask?devel=0&trans=1&debug=0">turn on production data, but debug=0</a></li>
       <li><a href="/admin/init/deleteAll">deleteAll</a></li>
     </ul>
   </li> 
@@ -22,6 +23,17 @@
 	  	  add, http://host/admin/cache/mso <br/>
 	  	  delete, http://host/admin/cache/mso?delete=1 <br/>	  	  
 	  	  list, <a href="/admin/cache/mso?list=1"> list </a>
+	  </li>
+	  <li>cache channel <br/>
+	      add all,  http://host/admin/cache/channel<br/>
+	      delete all, http://host/admin/cache/channel?delete=1<br/>
+	      list all, http://host/admin/cache/channel?list=1<br/>
+	  </li>
+	  <li>cache programs <br/>
+	      add, http://host/admin/cache/program?channelId=123<br/>
+	      delete, http://host/admin/cache/program?channelId=123&delete=123<br/>
+	      list, http://host/admin/cache/program?channelId=123&list=1 <br/>
+	  </li>	  	  
     </ul>
   </li>
 </ul>
@@ -63,8 +75,7 @@
 	  </li>
 	  <li>list every channel under a category <br/>
 	      http://host/admin/category/channelList?id=123 
-	  </li>
-	      	                          	   
+	  </li>	      	                          	   
     </ul>
   </li>
 </ul>
@@ -88,7 +99,16 @@
       <li><a href="/admin/channel/list">channel listing</a></li>
       <li>channel modify <br/>
           http://host/admin/channel/modify?id=123&name=xx&status=1&programCount=123
-      </li>                	   
+      </li>            
+      <li>a channel's categories<br/>
+          http://host/admin/channel/listCategories?channel=123
+      </li>
+      <li>add a channel's categories<br/>
+          http://host/admin/channel/addCategories?channel=123&categories=111,112
+      </li>
+      <li>delete a channel's categories<br/>
+          http://host/admin/channel/deleteCategories?channel=123&categories=111,112
+      </li>
     </ul>
   </li>
 </ul>
