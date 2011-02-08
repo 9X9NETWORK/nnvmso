@@ -14,7 +14,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.lib.NnStringUtil;
-import com.nnvmso.model.MsoChannel;
+import com.nnvmso.model.*;
+import com.nnvmso.service.CategoryManager;
 import com.nnvmso.service.MsoChannelManager;
 
 @Controller
@@ -61,10 +62,38 @@ public class AdminMsoChannelController {
 		return NnNetUtil.textReturn(output);	
 	}
 	
-	@RequestMapping("changeCategory")
-	public @ResponseBody String changeCategory() {
+	//add only, a channel's categories are accumulated
+	@RequestMapping("addCategories")
+	public @ResponseBody String addCategories(@RequestParam(required=true)long channel, String categories) {
+		CategoryManager categoryMngr = new CategoryManager();
+		List<Category> categoryList = categoryMngr.findCategoriesByIdStr(categories);
+		List<Category> list = categoryMngr.changeCategory(channel, categoryList);
+		String output = "";
+		for (Category c : list) {
+			output = output + c.getKey().getId() + "\t" + c.getName() + "<br/>";
+		}
+		return output;
+	}
+	
+	@RequestMapping("deleteCategories")
+	public @ResponseBody String deleteCategories(@RequestParam(required=true)long channel, String categories) {
+		String output = "success";
+		CategoryManager categoryMngr = new CategoryManager();
+		boolean success = categoryMngr.deleteCategory(channel, categories);
+		if (!success) {output = "failed";}
+		return output;
+	}
 		
-		return "OK";
+	@RequestMapping("listCategories")
+	public @ResponseBody String listCategories(@RequestParam(required=true)long channel) {
+		CategoryManager categoryMngr = new CategoryManager();
+		List<Category> categories = categoryMngr.findCategoriesByChannelId(channel);
+		System.out.print("list category size:" + categories.size());
+		String output = "";
+		for (Category c : categories) {
+			output = output + c.getKey().getId() + "\t" + c.getName() + "<br/>";
+		}
+		return output;
 	}
 	
 	@RequestMapping("modify")
