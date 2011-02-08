@@ -93,6 +93,7 @@ public class PlayerApiController {
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}
+		log.info(output);
 		return NnNetUtil.textReturn(output);
 	}	
 
@@ -123,6 +124,7 @@ public class PlayerApiController {
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}
+		log.info(output);
 		return NnNetUtil.textReturn(output);
 	}	
 
@@ -142,7 +144,8 @@ public class PlayerApiController {
 			output = playerApiService.createGuest(ipg, req, resp); 
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
-		}		
+		}	
+		log.info(output);
 		return NnNetUtil.textReturn(output);
 	} 
 	
@@ -171,6 +174,7 @@ public class PlayerApiController {
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}
+		log.info(output);
 		return NnNetUtil.textReturn(output);
 	}	
 
@@ -191,6 +195,7 @@ public class PlayerApiController {
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}
+		log.info(output);
 		return NnNetUtil.textReturn(output);
 	}	
 		
@@ -214,6 +219,7 @@ public class PlayerApiController {
 		} catch (Exception e){
 			output = playerApiService.handleException(e);
 		}
+		log.info(output);
 		return NnNetUtil.textReturn(output);
 	}
 	
@@ -231,6 +237,7 @@ public class PlayerApiController {
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}
+		log.info(output);
 		return NnNetUtil.textReturn(output);
 
 	}	
@@ -259,6 +266,7 @@ public class PlayerApiController {
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}
+		log.info(output);
 		return NnNetUtil.textReturn(output);
 	}
 	
@@ -283,6 +291,7 @@ public class PlayerApiController {
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}
+		log.info(output);
 		return NnNetUtil.textReturn(output);
 	}	
 
@@ -316,6 +325,7 @@ public class PlayerApiController {
 		} catch (Exception e){
 			output = playerApiService.handleException(e);
 		}
+		log.info(output);
 		return NnNetUtil.textReturn(output);		
 	}
 	
@@ -339,7 +349,7 @@ public class PlayerApiController {
 		} catch (Exception e){
 			output = playerApiService.handleException(e);
 		}
-		log.info("channelBrowse() return:" + output);
+		log.info(output);
 		return NnNetUtil.textReturn(output);
 	}	
 
@@ -357,7 +367,8 @@ public class PlayerApiController {
 			output = playerApiService.findCategoriesByMso();
 		} catch (Exception e){
 			output = playerApiService.handleException(e);
-		}		
+		}	
+		log.info(output);
 		return NnNetUtil.textReturn(output);
 	}
 
@@ -390,6 +401,7 @@ public class PlayerApiController {
 		} catch (Exception e){
 			output = playerApiService.handleException(e);
 		}
+		log.info(output);
 		return NnNetUtil.textReturn(output);
 	}	
 
@@ -414,7 +426,8 @@ public class PlayerApiController {
 			output = playerApiService.moveChannel(userToken, grid1, grid2);
 		} catch (Exception e){
 			output = playerApiService.handleException(e);
-		}		
+		}	
+		log.info(output);
 		return NnNetUtil.textReturn(output);		
 	}					
 	
@@ -473,6 +486,7 @@ public class PlayerApiController {
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}
+		log.info(output);
 		return NnNetUtil.textReturn(output);		
 	}	
 	
@@ -514,6 +528,7 @@ public class PlayerApiController {
 		} catch (Exception e){
 			output = playerApiService.handleException(e);
 		}
+		log.info(output);
 		return NnNetUtil.textReturn(output);
 	}
 	
@@ -534,6 +549,7 @@ public class PlayerApiController {
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}
+		log.info(output);
 		return NnNetUtil.textReturn(output);
 	}	
 	
@@ -553,6 +569,7 @@ public class PlayerApiController {
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}
+		log.info(output);
 		return NnNetUtil.textReturn(output);						
 	}
 	
