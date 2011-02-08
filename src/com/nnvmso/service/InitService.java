@@ -269,20 +269,120 @@ public class InitService {
 			channel4.setSourceUrl("http://feeds.feedburner.com/comedycentral/standup");
 			channel4.setPublic(true);
 			channelMngr.create(channel4, categories);
-		} else {			
-			String[] urls = this.getMso1DefaultChannels();
-			List<Category> list = categoryMngr.findAll();
-			TranscodingService tranService = new TranscodingService();
-			for (int i=0; i < urls.length; i++) {
-				categories.clear();
-				categories.add(list.get(i));
-				MsoChannel c = new MsoChannel(urls[i], user.getKey().getId());
-				System.out.println("i=" + i + urls[i]);
-				channelMngr.create(c, categories);	
-				if (trans) {
-					tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
-				}
-			}	
+		} else {						
+			categories.clear();
+			Category c = categoryMngr.findByName("Activism");
+			String[] urls1 = this.getMso1ActivismChannels();
+			this.channelsCreate(urls1, categories, user.getKey().getId(), trans);
+						
+			categories.clear();
+			c = categoryMngr.findByName("Automotive");
+			String[] urls2 = this.getMso1AutomativeChannels();
+			this.channelsCreate(urls2, categories, user.getKey().getId(), trans);
+			categories.add(c);
+
+			categories.clear();
+			c = categoryMngr.findByName("Comedy");
+			categories.add(c);
+			String[] urls3 = this.getMso1ComedyChannels();
+			this.channelsCreate(urls3, categories, user.getKey().getId(), trans);
+
+			categories.clear();
+			c = categoryMngr.findByName("Entertainment");
+			categories.add(c);
+			String[] urls4 = this.getMso1EntertainmentChannels();
+			this.channelsCreate(urls4, categories, user.getKey().getId(), trans);
+			
+			categories.clear();			
+			c = categoryMngr.findByName("Finance");
+			categories.add(c);
+			String[] urls5 = this.getMso1FinanceChannels();
+			this.channelsCreate(urls5, categories, user.getKey().getId(), trans);
+			
+			categories.clear();			
+			c = categoryMngr.findByName("Food & Wine");
+			categories.add(c);
+			String[] urls6 = this.getMso1FoodWineChannels();
+			this.channelsCreate(urls6, categories, user.getKey().getId(), trans);
+						
+			categories.clear();
+			c = categoryMngr.findByName("Gaming");
+			categories.add(c);
+			String[] urls7 = this.getMso1GamingChannels();
+			this.channelsCreate(urls7, categories, user.getKey().getId(), trans);
+			
+			categories.clear();
+			c = categoryMngr.findByName("Gay & Lesbian");
+			categories.add(c);
+			String[] urls8 = this.getMso1GLChannels();
+			this.channelsCreate(urls8, categories, user.getKey().getId(), trans);
+			
+			categories.clear();
+			c = categoryMngr.findByName("Health & Fitness");
+			categories.add(c);
+			String[] urls9 = this.getMso1HFChannels();
+			this.channelsCreate(urls9, categories, user.getKey().getId(), trans);
+			
+			categories.clear();
+			c = categoryMngr.findByName("How to");
+			categories.add(c);
+			String[] urls10 = this.getMso1HowToChannels();
+			this.channelsCreate(urls10, categories, user.getKey().getId(), trans);
+			
+			categories.clear();			
+			c = categoryMngr.findByName("Lifestyle");
+			categories.add(c);
+			String[] urls11 = this.getMso1LifeStyleChannels();
+			this.channelsCreate(urls11, categories, user.getKey().getId(), trans);
+			
+			categories.clear();
+			c = categoryMngr.findByName("Music");
+			categories.add(c);
+			String[] urls12 = this.getMso1MusicChannels();
+			this.channelsCreate(urls12, categories, user.getKey().getId(), trans);
+			
+			categories.clear();
+			c = categoryMngr.findByName("News & Politics");
+			categories.add(c);
+			String[] urls13 = this.getMso1NPChannels();
+			this.channelsCreate(urls13, categories, user.getKey().getId(), trans);
+			
+			categories.clear();
+			c = categoryMngr.findByName("People");
+			categories.add(c);
+			String[] urls14 = this.getMso1PeopleChannels();
+			this.channelsCreate(urls14, categories, user.getKey().getId(), trans);
+			
+			categories.clear();
+			c = categoryMngr.findByName("Pets & Animals");
+			categories.add(c);
+			String[] urls15 = this.getMso1PAChannels();
+			this.channelsCreate(urls15, categories, user.getKey().getId(), trans);
+			
+			categories.clear();
+			c = categoryMngr.findByName("Religion");
+			categories.add(c);
+			String[] urls16 = this.getMso1ReligionChannels();
+			this.channelsCreate(urls16, categories, user.getKey().getId(), trans);
+			
+			categories.clear();
+			c = categoryMngr.findByName("Sports");
+			categories.add(c);
+			String[] urls17 = this.getMso1SportsChannels();
+			this.channelsCreate(urls17, categories, user.getKey().getId(), trans);
+			
+			categories.clear();
+			c = categoryMngr.findByName("Tech & Science");
+			categories.add(c);
+			String[] urls18 = this.getMso1TSChannels();
+			this.channelsCreate(urls18, categories, user.getKey().getId(), trans);
+			
+			categories.clear();
+			c = categoryMngr.findByName("Travel");
+			categories.add(c);
+			String[] urls19 = this.getMso1TravelChannels();
+			this.channelsCreate(urls19, categories, user.getKey().getId(), trans);
+															
 			MsoChannel channel5 = new MsoChannel("System Channel", "System Channel", "/WEB-INF/../images/logo_9x9.png", user.getKey().getId());
 			channel5.setPublic(true);
 			Category system = categoryMngr.findByName("Tech & Science");
@@ -394,12 +494,18 @@ public class InitService {
 	private void channelsCreate(String[] urls, List<Category>categories, long userId, boolean trans) {
 		TranscodingService tranService = new TranscodingService();
 		MsoChannelManager channelMngr = new MsoChannelManager();
+		CategoryManager categoryMngr = new CategoryManager();
 		for (String url : urls) {
-			MsoChannel c = new MsoChannel(url, userId);
-			channelMngr.create(c, categories);				
-			if (trans) {
-				tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
-			}
+			MsoChannel channel = channelMngr.findBySourceUrl(url);
+			if (channel != null) {
+				categoryMngr.changeCategory(channel.getKey().getId(), categories);				
+			} else {
+				MsoChannel c = new MsoChannel(url, userId);
+				channelMngr.create(c, categories);				
+				if (trans) {
+					tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
+				}			
+			}			
 		}		
 	}
 	
@@ -949,14 +1055,249 @@ public class InitService {
 				"http://feeds.visionontv.net/Livinginthefuture?format=xml",
 				"http://revision3.com/hak5/feed/MP4-Large",
 				"http://anyonebutme.blip.tv/rss/itunes",
+				"http://feeds.feedburner.com/fitlife",				
 				"http://www.youtube.com/user/LoveSystems",
 				"http://feeds.feedburner.com/rocknrolltv",
+				"http://vimeo.com/wspn/videos/rss",
 				"http://feeds.feedburner.com/earth-touch_featured_720p?format=xml",
 				"http://www.youtube.com/user/SHAYTARDS?feature=chclk",
+				"http://www.discovery.com/radio/xml/discovery_video.xml",
 				"http://feeds.feedburner.com/SelfPsychologyPodcast?format=xml",
 				"http://www.youtube.com/user/nba?blend=1&ob=4",
 				"http://feeds.feedburner.com/caliextralarge?format=xml",
 				"http://lltv.libsyn.com/rss"				
+		};
+		return urls;
+	}
+	
+	public String[] getMso1ActivismChannels() {
+		String[] urls = {
+				"http://feeds.visionontv.net/visionontv/Olympics?format=xml",
+				"http://www.democracynow.org/podcast-video.xml",
+				"http://www.youtube.com/profile?user=TheRealNews"				
+		};
+		return urls;
+	}
+	
+	public String[] getMso1AutomativeChannels() {
+		String[] urls = {
+				"http://feeds.feedburner.com/cnet/cartechpodcastvideo?format=xml",
+				"http://www.mevio.com/feeds/hdv.xml",
+				"http://feeds.drivingsports.com/dstv-extra?format=xml",
+				"http://www.youtube.com/user/TopGear",
+				"http://www.youtube.com/user/mercedesbenztv?blend=1&ob=4",
+				"http://www.youtube.com/user/iconmotosports"				
+		};
+		return urls;
+	}
+	
+	public String[] getMso1ComedyChannels() {
+		String[] urls = {
+				"http://www.youtube.com/user/huluDotCom",
+				"http://www.youtube.com/user/BestofYTChannel",
+				"http://revision3.com/scamschool/feed/xvid-large/"				
+		};
+		return urls;
+	}
+	
+	public String[] getMso1EntertainmentChannels() {
+		String[] urls = {	
+				"http://feeds.feedburner.com/tedtalks_video",
+				"http://www.youtube.com/user/HBO",
+				"http://revision3.com/hdnation/feed/Quicktime-High-Definition",
+				"http://feeds.feedburner.com/imoviesblogspot?format=xml",
+				"http://feeds.feedburner.com/macappguide-hd?format=xml",
+				"http://www.hbo.com/podcasts/true_blood/podcast.xml",
+				"http://podcast.msnbc.com/audio/podcast/MSNBC-MADDOW-NETCAST-M4V.xml",
+				"http://podcast.msnbc.com/audio/podcast/MSNBC-NN-NETCAST-M4V.xml",
+				"http://rss.cnn.com/services/podcasting/lkl/rss?format=xml",
+				"http://www.youtube.com/profile?user=richarddawkinsdotnet"				
+		};
+		return urls;
+	}
+
+	public String[] getMso1FinanceChannels() {
+		String[] urls = {				
+				"http://feeds.feedburner.com/cnet/buzzreport?format=xml",
+				"http://www.youtube.com/user/TheInnovationNetwork",
+				"http://feeds.harvardbusiness.org/harvardbusiness/videoideacast",
+				"http://feeds.tvo.org/tvobigideasVideo?format=xml",
+				"http://ecorner.stanford.edu/VideoPodcastRssFeed.xml",
+				"http://podcast.msnbc.com/audio/podcast/MSNBC-COUNTDOWN-NETCAST-M4V.xml"				
+		};
+		return urls;
+	}
+
+	public String[] getMso1FoodWineChannels() {
+		String[] urls = {				
+				"http://feeds.visionontv.net/Livinginthefuture?format=xml",
+				"http://delicioustv.libsyn.com/rss",
+				"http://simplyming.dreamhosters.com/rss/vodcast.xml",
+				"http://feeds2.feedburner.com/lfsn-cooking",
+				"http://legourmettv.blip.tv/rss",
+				"http://nytsynvideo.com/itunes/1",
+				"http://feeds.feedburner.com/WinelibraryTv",
+				"http://feeds.feedburner.com/eddVideo?format=xml",
+				"http://wineweek.com.au/bm/rss.php?i=2"				
+		};
+		return urls;
+	}
+
+	public String[] getMso1GamingChannels() {
+		String[] urls = {	
+				"http://revision3.com/hak5/feed/MP4-Large",
+				"http://feeds.gametrailers.com/rss_ipod_gen.php?source=xb360",
+				"http://feeds.gametrailers.com/rss_ipod_gen.php?source=ps3",
+				"http://www.g4tv.com/xplay/podcasts/6/G4_TV__XPlay_Video_Podcast.xml",
+				"http://www.g4tv.com/attackoftheshow/podcasts/5/Attack_of_the_Show_Daily_Video_Podcast__G4_TV.xml",
+				"http://www.youtube.com/user/freddiew?blend=1&ob=4",
+				"http://www.youtube.com/user/huskystarcraft?blend=1&ob=4",				
+		};
+		return urls;
+	}
+
+	public String[] getMso1GLChannels() {
+		String[] urls = {		
+				"http://anyonebutme.blip.tv/rss/itunes",
+				"http://jengotv.com/player-content/video-myd.xml",
+				"http://www.youtube.com/user/kateclinton",
+				"http://robsfeedtoday.blip.tv/rss"				
+		};
+		return urls;
+	}
+
+	public String[] getMso1HFChannels() {
+		String[] urls = {
+				"http://feeds.feedburner.com/fitlife",
+				"http://relax.lightreport.org/?feed=rss2",
+				"http://feeds.feedburner.com/PilatesOnFifth?format=xml",
+				"http://urbansustainableliv.blip.tv/rss",
+				"http://www.diet.com/videos/rss-vodcast.php",				
+		};
+		return urls;
+	}
+
+	public String[] getMso1HowToChannels() {
+		String[] urls = {	
+				"http://www.youtube.com/user/LoveSystems",
+				"http://blog.makezine.com/feed",
+				"http://feeds.feedburner.com/thewoodwhisperer",
+				"http://www.basicbrewing.com/radio/video.rss",
+				"http://www.youtube.com/user/MichellePhan",
+				"http://www.youtube.com/user/AuntiesBeads",
+				"http://www.youtube.com/user/spacepainter",				
+		};
+		return urls;
+	}
+
+	public String[] getMso1LifeStyleChannels() {
+		String[] urls = {
+				"http://feeds.feedburner.com/rocknrolltv",
+				"http://www.youtube.com/user/maaximumseduction",
+				"http://www.cbc.ca/podcasting/includes/vinylcafe.xml",
+				"http://www.chanelpodcast.com/RSS2",
+				"http://feeds.feedburner.com/fashionrocks",
+				"http://www.designfix.tv/design_fix.xml",
+				"http://downloads.designforlife.ie/podcasts/dfl_wmv/designforlife_windowsfeed.xml",
+				"http://feeds.feedburner.com/YdnDesignGuide?format=xml",				
+		};
+		return urls;
+	}
+
+	public String[] getMso1MusicChannels() {
+		String[] urls = {
+				"http://feeds.feedburner.com/rocknrolltv",
+				"http://www.youtube.com/user/OkGo",
+				"http://www.youtube.com/user/stlhiphop",
+				"http://caribbeanbeats.blip.tv/rss",
+				"http://feeds.feedburner.com/djvibe_tv"				
+		};
+		return urls;
+	}
+	
+	public String[] getMso1NPChannels() {
+		String[] urls = {			
+				"http://vimeo.com/wspn/videos/rss  ",
+				"http://www.democracynow.org/podcast-video.xml",
+				"http://feeds.theonion.com/OnionNewsNetwork",
+				"http://feeds.feedburner.com/Euronews-NoComment?format=xml"				
+		};
+		return urls;
+	}
+
+	public String[] getMso1OutdoorChannels() {
+		String[] urls = {	
+				"http://feeds.feedburner.com/earth-touch_featured_720p?format=xml",
+				"http://feeds.feedburner.com/alaskahdtv?format=xml",
+				"http://feeds.visionontv.net/A-zOfBushcraft?format=xml"				
+		};
+		return urls;
+	}
+
+	public String[] getMso1PeopleChannels() {
+		String[] urls = {				
+				"http://www.youtube.com/user/SHAYTARDS?feature=chclk",
+				"http://www.youtube.com/user/charlieissocoollike?blend=1&ob=4",
+				"http://www.youtube.com/user/CiNNtv1",
+				"http://www.youtube.com/user/mahmoodkhanpictures",
+				"http://www.youtube.com/user/PhilipDeFranco"				
+		};
+		return urls;
+	}
+
+	public String[] getMso1PAChannels() {
+		String[] urls = {				
+				"http://www.discovery.com/radio/xml/discovery_video.xml",
+				"http://feeds.pbs.org/pbs/wnet/nature-video",
+				"http://egrettv.blip.tv/posts/?sort=date&skin=rss",
+				"http://feeds.feedburner.com/KittyCast?format=xml",				
+		};
+		return urls;
+	}
+	public String[] getMso1ReligionChannels() {
+		String[] urls = {		
+				"http://feeds.feedburner.com/SelfPsychologyPodcast?format=xml",
+				"http://www.youtube.com/user/patcondell",
+				"http://feeds.churchmediadesign.tv/churchmediadesign?format=xml",
+				"http://ishafoundation.blip.tv/rss",
+				"http://feeds.harvest.org/greglaurietv?format=xml",
+				"http://rss.marshillchurch.org/mhcsermonvideo"				
+		};
+		return urls;
+	}
+	public String[] getMso1SportsChannels() {
+		String[] urls = {
+				"http://www.youtube.com/user/nba?blend=1&ob=4",
+				"http://www.youtube.com/user/BigBlueChat",
+				"http://www.youtube.com/user/EpicMealTime",
+				"http://www.youtube.com/user/fcbarcelona?blend=1&ob=4",
+				"http://sports.espn.go.com/espnradio/podcast/feeds/itunes/podCast?id=3403194",
+				"http://www.youtube.com/user/UFC",
+				"http://www.youtube.com/user/wwwtvgolocom",
+				"http://www.youtube.com/user/hockeyfightsdotcom?feature=chclk"				
+		};
+		return urls;
+	}
+	public String[] getMso1TSChannels() {
+		String[] urls = {	
+				"http://feeds.feedburner.com/caliextralarge?format=xml",
+				"http://www.youtube.com/user/richarddawkinsdotnet",
+				"http://www.discovery.com/radio/xml/sciencevideo.xml",
+				"http://chandra.harvard.edu/resources/podcasts/hd/podcasts.xml",
+				"http://www.youtube.com/user/amzertech",
+				"http://linuxjournal.blip.tv/rss/itunes/",
+				"http://feeds.feedburner.com/cnet/applebytehd?format=xml",
+				"http://feeds.feedburner.com/doctype/episodes?format=xml",
+				"http://wordpress.tv/feed/",
+				"http://revision3.com/tekzilla/feed/quicktime-high-definition?subshow=false",
+				"http://www.engadget.com/engadgetshow.xml"				
+		};
+		return urls;
+	}
+	public String[] getMso1TravelChannels() {
+		String[] urls = {		
+				"http://lltv.libsyn.com/rss",
+				"http://feeds.feedburner.com/Mayda3000"				
 		};
 		return urls;
 	}
