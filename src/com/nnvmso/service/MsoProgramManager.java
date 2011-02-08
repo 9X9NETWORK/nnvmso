@@ -2,9 +2,12 @@ package com.nnvmso.service;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import net.sf.jsr107cache.Cache;
@@ -115,18 +118,28 @@ public class MsoProgramManager {
 		if (cache != null) { this.storeInCache(cache, programs, channelId); }				
 		return msoProgramDao.findAllByChannelId(channelId);
 	}
-	
+		
 	private void storeInCache(Cache cache, List<MsoProgram>programs, long channelId) {
 		@SuppressWarnings("unchecked")
 		List<Long> list = (List<Long>)cache.get(this.getCacheProgramListKey(channelId));
 		if (list == null) { list = new ArrayList<Long>(); }
 		//store individual program
+		System.out.println("store in cache with programs:" + programs.size());
 		for (MsoProgram p : programs) {
 			cache.put(this.getCacheKey(p.getKey().getId()), p);
-			if (!list.contains(p.getKey().getId())) {list.add(p.getKey().getId());}
+			MsoProgram pp = (MsoProgram)cache.get(getCacheKey(p.getKey().getId()));
+			System.out.println("put program in cache " + pp.getName());
+			
+			if (!list.contains(p.getKey().getId())) {
+				list.add(p.getKey().getId());
+			}
 		}
 		//store a channel's program list
-		if (list != null) {cache.put(this.getCacheProgramListKey(channelId), list);};
+		if (list != null) {
+			cache.put(this.getCacheProgramListKey(channelId), list);
+			List<Long> test = (List<Long>)cache.get(this.getCacheProgramListKey(channelId));
+			System.out.println("put list in cache " + test.size());
+		};
 	}
 	
 	/**
@@ -138,7 +151,7 @@ public class MsoProgramManager {
 		System.out.println("original channel size:" + channelIds.size());
 		List<MsoProgram> programs = new ArrayList<MsoProgram>();
 		List<Long> test = new ArrayList<Long>();
-		test.addAll(channelIds);
+		test.addAll(channelIds); //!!!! test
 		Cache cache = CacheFactory.get();
 		//find from cache
 		if (cache != null) {
@@ -148,6 +161,7 @@ public class MsoProgramManager {
 				if (list != null) {
 					for (Long l : list) {
 						MsoProgram p =  this.findById(l);
+						System.out.println("find from cache p:" + p.getName());
 						if (p!= null) {programs.add(p);}
 					}
 					channelIds.remove(id);					
@@ -156,24 +170,25 @@ public class MsoProgramManager {
 		}
 		System.out.println("remaining channel size:" + channelIds.size());
 		if (channelIds.size() > 0) {
-			//find those not in cache
+			//find
 			List<MsoProgram> list = msoProgramDao.findAllByChannelIdsAndIsPublic(channelIds, isPublic);
 			//store in cache
 			if (list.size() > 0) {
-				long groupId = list.get(0).getChannelId();
-				for (int i=0; i<list.size(); i++) {
-					List<MsoProgram> group = new ArrayList<MsoProgram>();
-					if (list.get(i).getChannelId() != groupId || (i == list.size()-1)) {
-						this.storeInCache(cache, group, groupId);
-						groupId = list.get(i).getChannelId();
-						group.removeAll(group);
-						System.out.println("store this channel in cache:" + groupId);
-					} else {
-						group.add(list.get(i));
-					}
-				}
 				programs.addAll(list);
-			}
+				HashMap<Long, List<MsoProgram>> map = new HashMap<Long, List<MsoProgram>>();
+				for (int i=0; i<list.size(); i++) {
+					List<MsoProgram> temp = map.get(list.get(i).getChannelId());
+					if (temp == null) {temp = new ArrayList<MsoProgram>();}
+					temp.add(list.get(i));
+					map.put(list.get(i).getChannelId(), temp);
+				}								
+			    Iterator it = map.entrySet().iterator();
+			    while (it.hasNext()) {
+					Map.Entry pairs = (Map.Entry)it.next();
+			        System.out.println(pairs.getKey() + " = " + ((List<MsoProgram>)pairs.getValue()).size());
+			        this.storeInCache(cache, (List<MsoProgram>)pairs.getValue(), (Long)pairs.getKey());
+			    }											    
+			}			
 		}
 
 		return programs;
