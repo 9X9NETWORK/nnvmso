@@ -6,6 +6,7 @@ import java.net.URL;
 import java.util.Date;
 import java.util.Properties;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -113,6 +114,9 @@ public class TranscodingService {
 		MsoChannelManager channelMngr = new MsoChannelManager();			
 		RtnProgramItem item = rtnProgram.getItems()[0]; //for now there's only one item		
 		log.info("updateProgramViaTranscodingService(): " + item.toString());
+		if (!Pattern.matches("^\\d*$", rtnProgram.getKey())) {
+			return new PostResponse(String.valueOf(NnStatusCode.CHANNEL_INVALID), "channel invalid");
+		}
 		MsoChannel channel = channelMngr.findById(Long.parseLong(rtnProgram.getKey()));		
 		if (channel == null) {
 			return new PostResponse(String.valueOf(NnStatusCode.CHANNEL_INVALID), "channel invalid");
