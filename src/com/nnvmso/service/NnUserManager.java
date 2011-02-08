@@ -37,6 +37,7 @@ public class NnUserManager {
 			user.setSalt(AuthLib.generateSalt());
 			user.setCryptedPassword(AuthLib.encryptPassword(user.getPassword(), user.getSalt()));
 		}
+		user.setEmail(user.getEmail().toLowerCase());
 		user.setUpdateDate(new Date());
 		return nnUserDao.save(user);
 	}
