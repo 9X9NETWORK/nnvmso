@@ -6,7 +6,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.Logger;
@@ -27,7 +26,6 @@ import com.nnvmso.lib.CookieHelper;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnStringUtil;
 import com.nnvmso.model.Category;
-import com.nnvmso.model.CategoryChannel;
 import com.nnvmso.model.Ipg;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
@@ -394,47 +392,18 @@ public class PlayerApiService {
 				
 		//verify category
 		CategoryManager categoryMngr = new CategoryManager();
-		List<Long> categoryIdList = new ArrayList<Long>();	
-		String[] arr = categoryIds.split(",");
-		for (int i=0; i<arr.length; i++) { categoryIdList.add(Long.parseLong(arr[i])); }
-		List<Category> categories = categoryMngr.findAllByIds(categoryIdList);
+		List<Category> categories = categoryMngr.findCategoriesByIdStr(categoryIds);
 		if (categories.size() == 0) { return messageSource.getMessage("nnstatus.category_invalid", new Object[] {NnStatusCode.CATEGORY_INVALID} , locale); }
 		
-
 		//verify whether a duplication
 		MsoChannelManager channelMngr = new MsoChannelManager();
 		MsoChannel channel = channelMngr.findBySourceUrl(url);
 		boolean duplicate = false;
 		if (channel != null) {
 			duplicate = true;
-			log.info("User submits a duplicate url:" + url);			
-			//update category if necessary
-			CategoryChannelManager ccMngr = new CategoryChannelManager();
-			// --find existing categories
-			List<CategoryChannel> ccs = ccMngr.findAllByChannelId(channel.getKey().getId()); 			
-			HashMap<Long, String> existing = new HashMap<Long, String>();
-			for (CategoryChannel cc : ccs) {
-				existing.put(cc.getCategoryId(), "");
-			}
-			// --find new category user defines if there's any 
-			//   this requirement should be removed, not making it a general case in channel save.
-			String[] ids = categoryIds.split(",");
-			List<String> newIds = new ArrayList<String>();
-			for (int i=0; i<ids.length; i++) {		
-				if (!existing.containsKey(Long.parseLong(ids[i]))) {newIds.add(ids[i]);}
-			}
-			// --add new category
-			if (newIds.size() > 0) {
-				HashMap<Long, Category> categoryMap = new HashMap<Long, Category>();
-				for (Category c : categories) {
-					categoryMap.put(c.getKey().getId(), c);
-				}
-				for (String id : newIds) {
-					Category c = categoryMap.get(Long.valueOf(id));
-					log.info("a duplicate url but new category:" + c.getName() + ";" + c.getKey().getId());
-					ccMngr.create(new CategoryChannel(c.getKey().getId(), channel.getKey().getId()));
-				}
-			}
+			log.info("User submits a duplicate url:" + url);
+			//add categories if necessary
+			categoryMngr.changeCategory(channel.getKey().getId(), categories);
 		}
 		
 		//verify whether it's a bad channel
