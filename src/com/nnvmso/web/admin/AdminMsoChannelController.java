@@ -47,10 +47,11 @@ public class AdminMsoChannelController {
 	@RequestMapping("list")
 	public ResponseEntity<String> list() {
 		List<MsoChannel> channels = channelMngr.findPublicChannels();
-		String[] title = {"id", "name", "sourceUrl", "status", "programCount"};		
+		String[] title = {"key", "id", "name", "sourceUrl", "status", "programCount"};		
 		String result = "";
 		for (MsoChannel c:channels) {
-			String[] ori = {String.valueOf(c.getKey().getId()),
+			String[] ori = {NnStringUtil.getKeyStr(c.getKey()),
+						    String.valueOf(c.getKey().getId()),
 						    c.getName(),
 							c.getSourceUrl(), 
 						    String.valueOf(c.getStatus()), 
