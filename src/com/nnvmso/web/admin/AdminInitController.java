@@ -105,6 +105,7 @@ public class AdminInitController {
 		return NnNetUtil.textReturn("OK");		
 	}		
 	
+	//!!! make msoIpg pipelined after all the channels get updated from transcoding service	
 	/**
 	 * @param debug whether to turn on player's debugging information
 	 * @param devel whether to use test data (versus data from PM)
