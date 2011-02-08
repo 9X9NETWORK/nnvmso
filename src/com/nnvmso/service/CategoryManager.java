@@ -2,6 +2,8 @@ package com.nnvmso.service;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -55,6 +57,101 @@ public class CategoryManager {
 		String key = this.getCacheKey(category.getMsoId(),category.getKey().getId());
 		if (cache != null) { cache.put(key, category);	}				
 		return category;
+	}
+	
+	public List<Category> findCategoriesByChannelId(long channelId) {
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		MsoChannel channel = channelMngr.findById(channelId);
+		if (channel == null) {return new ArrayList<Category>();}
+		
+		CategoryChannelManager ccMngr = new CategoryChannelManager();
+		CategoryManager categoryMngr = new CategoryManager();
+		List<CategoryChannel> ccs = ccMngr.findAllByChannelId(channel.getKey().getId());
+		
+		System.out.println("ccs size:" + ccs.size());
+		
+		List<Category> categories = new ArrayList<Category>();		
+		for (CategoryChannel cc : ccs) {
+			Category c = categoryMngr.findById(cc.getCategoryId());
+			if (c != null) {categories.add(c);}
+		}
+		System.out.println("category size:" + categories.size());
+		return categories;
+	}
+
+	public boolean deleteCategory(long channelId, String categoryIds) {
+		System.out.println("categoryIds:" + categoryIds);
+		
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		MsoChannel channel = channelMngr.findById(channelId);
+		if (channel == null) {return false;}
+		
+		//find requested categories
+		CategoryManager categoryMngr = new CategoryManager();		
+		List<Long> categoryIdList = new ArrayList<Long>();	
+		String[] arr = categoryIds.split(",");
+		for (int i=0; i<arr.length; i++) { categoryIdList.add(Long.parseLong(arr[i])); }		
+		List<Category> categories = categoryMngr.findAllByIds(categoryIdList);
+		if (categories.size() == 0) {return false;}
+		
+		CategoryChannelManager ccMngr = new CategoryChannelManager();
+		// --find existing categories
+		List<CategoryChannel> ccs = ccMngr.findAllByChannelId(channel.getKey().getId());
+		//a channel needs to be belonged to at least a category
+		if (ccs.size() <= categories.size()) {return false;}		
+		
+		//delete
+		for (Category c : categories) {	
+			CategoryChannel cc = ccMngr.findByCategoryIdAndChanelId(c.getKey().getId(), channelId);
+			ccMngr.delete(cc);
+		}		
+		return true;
+	}
+	
+	public List<Category> findCategoriesByIdStr(String categoryIds) {
+		List<Long> categoryIdList = new ArrayList<Long>();	
+		String[] arr = categoryIds.split(",");
+		for (int i=0; i<arr.length; i++) { categoryIdList.add(Long.parseLong(arr[i])); }
+		List<Category> categories = this.findAllByIds(categoryIdList);
+		return categories;		
+	}
+	
+	//add only
+	public List<Category> changeCategory(long channelId, List<Category>categories) {
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		MsoChannel channel = channelMngr.findById(channelId);
+		if (channel == null) {return new ArrayList<Category>();}		
+		if (categories.size() == 0) {return new ArrayList<Category>();}		
+		System.out.println("want to be in how many categories:" + categories.size());
+		
+		//update category if necessary
+		CategoryChannelManager ccMngr = new CategoryChannelManager();
+		// --find existing categories
+		List<CategoryChannel> ccs = ccMngr.findAllByChannelId(channel.getKey().getId()); 			
+		HashSet<Long> existing = new HashSet<Long>();
+		for (CategoryChannel cc : ccs) {
+			existing.add(cc.getCategoryId());
+		}		
+		System.out.println("existing category:" + existing.size());		
+		// --find new categories user defines if there's any	
+		List<Long> newCategoryIdList = new ArrayList<Long>();
+		for (int i=0; i<categories.size(); i++) {
+			if (!existing.contains((categories.get(i)))) {newCategoryIdList.add(categories.get(i).getKey().getId());}
+		}
+		
+		System.out.println("new category:" + newCategoryIdList.size());		
+		// --add new category		
+		if (newCategoryIdList.size() > 0) {
+			HashMap<Long, Category> categoryMap = new HashMap<Long, Category>();
+			for (Category c : categories) {
+				categoryMap.put(c.getKey().getId(), c);
+			}
+			for (Long id : newCategoryIdList) {
+				Category c = categoryMap.get(Long.valueOf(id));
+				ccMngr.create(new CategoryChannel(c.getKey().getId(), channel.getKey().getId()));				
+			}
+		}
+		return categories;
 	}
 	
 	public void addChannelCounter(MsoChannel channel) {
