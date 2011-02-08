@@ -6,10 +6,8 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
-import com.google.appengine.api.datastore.Key;
 import com.nnvmso.lib.PMF;
 import com.nnvmso.model.CategoryChannel;
-import com.nnvmso.model.Subscription;
 
 public class CategoryChannelDao {
 
@@ -66,13 +64,13 @@ public class CategoryChannelDao {
 		return ccs;
 	}	
 	
-	public CategoryChannel findByCategoryKeyAndChannelKey(Key categoryKey, Key channelKey) {
+	public CategoryChannel findByCategoryIdAndChannelId(long categoryId, long channelId) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();		
-		Query q = pm.newQuery(Subscription.class);
-		q.setFilter("categoryKey == categoryKeyParam && channelKey == channelKeyParam");
-		q.declareParameters(Key.class.getName() + " categoryKeyParam, " + Key.class.getName() + " channelKeyParam");
+		Query q = pm.newQuery(CategoryChannel.class);
+		q.setFilter("categoryId == categoryIdParam && channelId == channelIdParam");
+		q.declareParameters("long categoryIdParam, long channelIdParam");
 		@SuppressWarnings("unchecked")
-		List<CategoryChannel> ccs= (List<CategoryChannel>)q.execute(categoryKey, channelKey);
+		List<CategoryChannel> ccs= (List<CategoryChannel>)q.execute(categoryId, channelId);
 		CategoryChannel cc = null;
 		if (ccs.size() > 0) {
 			cc = ccs.get(0);
