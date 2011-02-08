@@ -431,7 +431,8 @@ public class PlayerApiService {
 		boolean success = subMngr.subscribeChannel(user.getKey().getId(), channel.getKey().getId(), Integer.parseInt(grid), MsoIpg.TYPE_GENERAL, mso.getKey().getId());
 		String output = "";
 		if (!success) {
-			output = messageSource.getMessage("nnstatus.subscription_duplicate_channel", new Object[] {NnStatusCode.SUBSCRIPTION_DUPLICATE_CHANNEL} , locale);			
+			output = messageSource.getMessage("nnstatus.subscription_duplicate_channel", new Object[] {NnStatusCode.SUBSCRIPTION_DUPLICATE_CHANNEL} , locale);
+			return output;
 		} else {
 			String result[]= {String.valueOf(channel.getKey().getId()),				  	 	  
 			  	 	  channel.getName(),
