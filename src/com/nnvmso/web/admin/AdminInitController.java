@@ -1,6 +1,15 @@
 package com.nnvmso.web.admin;
 
+import java.util.Properties;
 import java.util.logging.Logger;
+
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -49,13 +58,15 @@ public class AdminInitController {
 	public ResponseEntity<String> initialize(HttpServletRequest req) {
 		initService.setRequest(req);
 		initService.deleteAll();
-		return NnNetUtil.textReturn("Done.\nYou might also want to use \"initMsoAndCategories\"?");
+		this.sendEmail("step1 done: delete all");
+		return NnNetUtil.textReturn("OK");
 	}
  
 	@RequestMapping("initMsoAndCategories")
 	public ResponseEntity<String> initMsoAndCategories(HttpServletRequest req, @RequestParam(value="debug")boolean debug) {
 		initService.setRequest(req);
 		initService.initMsoAndCategories(debug);
+		this.sendEmail("step2 done: initiate mso and categories");
 		return NnNetUtil.textReturn("OK");		
 	}
 		
@@ -67,6 +78,22 @@ public class AdminInitController {
 		initService.setRequest(req);
 		initService.initAll(true, debug, false);
 		return NnNetUtil.textReturn("OK");		
+	}
+	
+	private void sendEmail(String subject) {
+		Properties props = new Properties();
+        Session session = Session.getDefaultInstance(props, null);
+
+        try {
+        	Message msg = new MimeMessage(session);
+            msg.setFrom(new InternetAddress("nncloudtv@gmail.com", "nncloudtv"));
+            msg.addRecipient(Message.RecipientType.TO, new InternetAddress("nncloudtv@gmail.com", "nncloudtv"));                             
+            msg.setSubject(subject);
+            msg.setText("");
+            Transport.send(msg);
+        } catch (Exception e) {
+        	NnLogUtil.logException(e);
+		}					
 	}
 	
 //	/**
@@ -103,6 +130,7 @@ public class AdminInitController {
 	public ResponseEntity<String> initMso1Channels(@RequestParam boolean devel, @RequestParam boolean trans, HttpServletRequest req) {
 		initService.setRequest(req);
 		initService.createMso1DefaultChannels(devel, trans);
+		this.sendEmail("step2 done: create 9x9 channels");
 		return NnNetUtil.textReturn("OK");
 	}
 	
@@ -110,6 +138,7 @@ public class AdminInitController {
 	public ResponseEntity<String> initMso2Channels(@RequestParam boolean devel, @RequestParam boolean trans, HttpServletRequest req) {
 		initService.setRequest(req);
 		initService.createMso2DefaultChannels(devel, trans);
+		this.sendEmail("step4 done: create 5f channels");
 		return NnNetUtil.textReturn("OK");
 	}
 	
@@ -124,10 +153,10 @@ public class AdminInitController {
 	public ResponseEntity<String> initMso2Ipg(@RequestParam boolean devel, HttpServletRequest req) {
 		initService.setRequest(req);
 		initService.createMso2DefaultIpg(devel);
+		this.sendEmail("step5 done: 9x9 and 5f default ipgs");
 		return NnNetUtil.textReturn("OK");
 	}
-	
-	
+		
 	@RequestMapping("initProStep2")
 	public ResponseEntity<String> initProStep2(@RequestParam boolean devel, @RequestParam boolean trans, @RequestParam boolean debug, HttpServletRequest req) {
 		initService.setRequest(req);
