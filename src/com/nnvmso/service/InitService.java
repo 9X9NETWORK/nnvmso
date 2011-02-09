@@ -11,15 +11,7 @@ import net.sf.jsr107cache.Cache;
 import org.springframework.stereotype.Service;
 
 import com.nnvmso.lib.CacheFactory;
-import com.nnvmso.model.Category;
-import com.nnvmso.model.CategoryChannel;
-import com.nnvmso.model.Mso;
-import com.nnvmso.model.MsoChannel;
-import com.nnvmso.model.MsoConfig;
-import com.nnvmso.model.MsoIpg;
-import com.nnvmso.model.MsoProgram;
-import com.nnvmso.model.NnUser;
-import com.nnvmso.model.Subscription;
+import com.nnvmso.model.*;
 
 /**
  * for testing, works only for small set of data
@@ -64,17 +56,20 @@ public class InitService {
 		list = dumper.findAll(CategoryChannel.class, "createDate");
 		dumper.deleteAll(CategoryChannel.class, list);
 		
+		list = dumper.findAll(Ipg.class, "createDate");
+		dumper.deleteAll(Ipg.class, list);
+
 		list = dumper.findAll(Mso.class, "createDate");
 		dumper.deleteAll(Mso.class, list);
 		
-		list = dumper.findAll(MsoIpg.class, "createDate");
-		dumper.deleteAll(MsoIpg.class, list);		
-
 		list = dumper.findAll(MsoChannel.class, "createDate");
 		dumper.deleteAll(MsoChannel.class, list);
 
 		list = dumper.findAll(MsoConfig.class, "createDate");
 		dumper.deleteAll(MsoConfig.class, list);
+		
+		list = dumper.findAll(MsoIpg.class, "createDate");
+		dumper.deleteAll(MsoIpg.class, list);		
 		
 		list = dumper.findAll(MsoProgram.class, "createDate");
 		dumper.deleteAll(MsoProgram.class, list);
@@ -82,8 +77,18 @@ public class InitService {
 		list = dumper.findAll(NnUser.class, "createDate");
 		dumper.deleteAll(NnUser.class, list);
 		
+		list = dumper.findAll(PdrRaw.class, "createDate");
+		dumper.deleteAll(PdrRaw.class, list);
+
 		list = dumper.findAll(Subscription.class, "createDate");
 		dumper.deleteAll(Subscription.class, list);
+		
+		list = dumper.findAll(SubscriptionLog.class, "createDate");
+		dumper.deleteAll(SubscriptionLog.class, list);
+
+		list = dumper.findAll(ViewLog.class, "createDate");
+		dumper.deleteAll(ViewLog.class, list);
+		
 		log.info("delete all is done");
 	}
 	
@@ -167,7 +172,7 @@ public class InitService {
 		log.info("initializeMso2AndCategories is done");
 	}		
 		
-	private void createMso1DefaultChannels(boolean devel, boolean trans){
+	public void createMso1DefaultChannels(boolean devel, boolean trans){
 		//prepare data
 		NnUserManager userMngr = new NnUserManager();
 		NnUser user = userMngr.findNNUser();
@@ -272,14 +277,15 @@ public class InitService {
 		} else {						
 			categories.clear();
 			Category c = categoryMngr.findByName("Activism");
+			categories.add(c);
 			String[] urls1 = this.getMso1ActivismChannels();
 			this.channelsCreate(urls1, categories, user.getKey().getId(), trans);
 						
 			categories.clear();
 			c = categoryMngr.findByName("Automotive");
+			categories.add(c);
 			String[] urls2 = this.getMso1AutomativeChannels();
 			this.channelsCreate(urls2, categories, user.getKey().getId(), trans);
-			categories.add(c);
 
 			categories.clear();
 			c = categoryMngr.findByName("Comedy");
@@ -399,7 +405,7 @@ public class InitService {
 		log.info("prepareMso1DefaultChannels is done");
 	}	
 	
-	private void createMso2DefaultChannels(boolean devel, boolean trans){
+	public void createMso2DefaultChannels(boolean devel, boolean trans){
 		//prepare data
 		Mso mso = new MsoManager().findByName("5f");
 		NnUserManager userMngr = new NnUserManager();
@@ -454,6 +460,7 @@ public class InitService {
 
 			categories.clear();
 			category = categoryMngr.findByName("ACG夢工廠");
+			if (category == null) {categoryMngr.findByName("Acg夢工廠");}
 			categories.add(category);
 			String[] urls4 = this.getDreamUrl();
 			this.channelsCreate(urls4, categories, user.getKey().getId(), trans);
@@ -501,7 +508,10 @@ public class InitService {
 				categoryMngr.changeCategory(channel.getKey().getId(), categories);				
 			} else {
 				MsoChannel c = new MsoChannel(url, userId);
-				channelMngr.create(c, categories);				
+				channelMngr.create(c, categories);
+				System.out.println(c.getSourceUrl());
+				System.out.println(c.getKey().getId());
+				if (req == null) {System.out.println("error");}
 				if (trans) {
 					tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
 				}			
@@ -854,7 +864,6 @@ public class InitService {
 				"http://www.youtube.com/user/yaoilover019",
 				"http://www.youtube.com/user/rrobbert184",
 				"http://www.youtube.com/user/shingin",
-				"http://www.youtube.com/user/animemixparty",
 				"http://www.youtube.com/user/NextGenTactics",
 				"http://www.youtube.com/user/IGNentertainment",
 				"http://www.youtube.com/user/HazardCinema",
@@ -926,10 +935,8 @@ public class InitService {
 				"http://www.youtube.com/user/pts",                                                                                            
 				"http://www.youtube.com/user/zimeitao",
 				"http://www.youtube.com/user/TaiwanTalks4",
-				"http://www.youtube.com/user/atmovies88",
 				"http://www.youtube.com/user/trailers",
 				"http://www.youtube.com/user/twfoxmovies",
-				"http://www.youtube.com/user/YattaMovie",
 				"http://www.youtube.com/user/2010jaychou",
 				"http://www.youtube.com/user/FoxBroadcasting",
 				"http://www.youtube.com/user/elura2009",
@@ -1013,8 +1020,6 @@ public class InitService {
 				"http://www.youtube.com/user/pts",
 				"http://www.youtube.com/user/ChinaTimes",
 				"http://www.youtube.com/user/TaiwanTalks4",
-				"http://www.youtube.com/user/atmovies88",
-				"http://www.youtube.com/user/YattaMovie",
 				"http://www.youtube.com/user/SETTV",
 				"http://www.youtube.com/user/weatherrisk",
 				"http://www.youtube.com/user/kbsworld",
@@ -1110,7 +1115,6 @@ public class InitService {
 				"http://www.hbo.com/podcasts/true_blood/podcast.xml",
 				"http://podcast.msnbc.com/audio/podcast/MSNBC-MADDOW-NETCAST-M4V.xml",
 				"http://podcast.msnbc.com/audio/podcast/MSNBC-NN-NETCAST-M4V.xml",
-				"http://rss.cnn.com/services/podcasting/lkl/rss?format=xml",
 				"http://www.youtube.com/profile?user=richarddawkinsdotnet"				
 		};
 		return urls;
@@ -1169,7 +1173,6 @@ public class InitService {
 	public String[] getMso1HFChannels() {
 		String[] urls = {
 				"http://feeds.feedburner.com/fitlife",
-				"http://relax.lightreport.org/?feed=rss2",
 				"http://feeds.feedburner.com/PilatesOnFifth?format=xml",
 				"http://urbansustainableliv.blip.tv/rss",
 				"http://www.diet.com/videos/rss-vodcast.php",				
@@ -1180,7 +1183,6 @@ public class InitService {
 	public String[] getMso1HowToChannels() {
 		String[] urls = {	
 				"http://www.youtube.com/user/LoveSystems",
-				"http://blog.makezine.com/feed",
 				"http://feeds.feedburner.com/thewoodwhisperer",
 				"http://www.basicbrewing.com/radio/video.rss",
 				"http://www.youtube.com/user/MichellePhan",
@@ -1194,7 +1196,6 @@ public class InitService {
 		String[] urls = {
 				"http://feeds.feedburner.com/rocknrolltv",
 				"http://www.youtube.com/user/maaximumseduction",
-				"http://www.cbc.ca/podcasting/includes/vinylcafe.xml",
 				"http://www.chanelpodcast.com/RSS2",
 				"http://feeds.feedburner.com/fashionrocks",
 				"http://www.designfix.tv/design_fix.xml",
@@ -1249,7 +1250,6 @@ public class InitService {
 		String[] urls = {				
 				"http://www.discovery.com/radio/xml/discovery_video.xml",
 				"http://feeds.pbs.org/pbs/wnet/nature-video",
-				"http://egrettv.blip.tv/posts/?sort=date&skin=rss",
 				"http://feeds.feedburner.com/KittyCast?format=xml",				
 		};
 		return urls;
