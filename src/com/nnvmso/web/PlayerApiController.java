@@ -345,7 +345,6 @@ public class PlayerApiController {
 		this.prepService(req);
 		String output = NnStatusMsg.errorStr(locale);
 		try {
-			//!!! add subscription count
 			output = playerApiService.findPublicChannelsByCategory(categoryIds);
 		} catch (Exception e){
 			output = playerApiService.handleException(e);
@@ -385,7 +384,7 @@ public class PlayerApiController {
 	 *         program count, type(integer, see following), status(integer, see following), <br/>
 	 *         subscription count</blockquote>
 	 *         <p>type: TYPE_GENERAL = 1; TYPE_READONLY = 2;</p>
-	 *         <p>status: STATUS_SUCCESS = 0; STATUS_ERROR = 1; STATUS_INFRINGEMENT = 2; STATUS_RRATED = 3;
+	 *         <p>status: STATUS_SUCCESS = 0; STATUS_ERROR = 1; 
 	 *         <p> Example: 1	1	Channel1	http://hostname/images/img.jpg	3	1 0</p>
 	 *         </p>
 	 */		
