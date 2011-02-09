@@ -131,15 +131,12 @@ public class CategoryManager {
 		HashSet<Long> existing = new HashSet<Long>();
 		for (CategoryChannel cc : ccs) {
 			existing.add(cc.getCategoryId());
-		}		
-		System.out.println("existing category:" + existing.size());		
+		}				
 		// --find new categories user defines if there's any	
 		List<Long> newCategoryIdList = new ArrayList<Long>();
 		for (int i=0; i<categories.size(); i++) {
-			if (!existing.contains((categories.get(i)))) {newCategoryIdList.add(categories.get(i).getKey().getId());}
-		}
-		
-		System.out.println("new category:" + newCategoryIdList.size());		
+			if (!existing.contains((categories.get(i).getKey().getId()))) {newCategoryIdList.add(categories.get(i).getKey().getId());}
+		}				
 		// --add new category		
 		if (newCategoryIdList.size() > 0) {
 			HashMap<Long, Category> categoryMap = new HashMap<Long, Category>();
