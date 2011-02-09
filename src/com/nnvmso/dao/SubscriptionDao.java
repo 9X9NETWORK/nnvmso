@@ -37,17 +37,21 @@ public class SubscriptionDao {
 		}
 	}
 	
-	public List<Subscription> findAllByUserIdAndSeq(long userId, int seq1, int seq2) {
+	public Subscription findByUserIdAndSeq(long userId, int seq) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Query q = pm.newQuery(Subscription.class);
-		q.setFilter("userId == userIdParam && (seq == seq1Param || seq == seq2Param)");
-		q.declareParameters("long userIdParam, int seq1Param, int seq2Param");
+		q.setFilter("userId == userIdParam && seq == seqParam");
+		q.declareParameters("long userIdParam, int seqParam");
 		q.setOrdering("seq asc");
 		@SuppressWarnings("unchecked")
-		List<Subscription> subscriptions = (List<Subscription>)q.execute(userId, seq1, seq2);
-		subscriptions = (List<Subscription>)pm.detachCopyAll(subscriptions);
+		List<Subscription> subs = (List<Subscription>)q.execute(userId, seq);
+		Subscription s = null;
+		if (subs.size() > 0) {
+			s = subs.get(0);
+			s = pm.detachCopy(s);
+		}
 		pm.close();
-		return subscriptions;
+		return s;
 	}	 
 	
 	public Subscription findByUserIdAndChannelId(long userId, long channelId) {
