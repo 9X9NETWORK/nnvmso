@@ -91,43 +91,13 @@ public class AdminInitController {
         } catch (Exception e) {
         	NnLogUtil.logException(e);
 		}					
-	}
-	
-//	/**
-//	 * This is intended to be executed as a task.
-//	 * 
-//	 * @param reference initProTask
-//	 */
-//	@RequestMapping("initPro")
-//	public ResponseEntity<String> initPro(@RequestParam boolean devel, @RequestParam boolean trans, @RequestParam boolean debug, HttpServletRequest req) {
-//		log.info("init task kicked in");	
-//
-//		initService.setRequest(req);		
-//		initService.initAll(devel, debug, trans);
-//		log.info("init task done. trying to send out email now");		
-//		
-//		Properties props = new Properties();
-//		Session session = Session.getInstance(props);
-//		
-//        try {
-//            Message msg = new MimeMessage(session);
-//            msg.setFrom(new InternetAddress("nncloudtv@gmail.com", "nncloudtv"));
-//            msg.addRecipient(Message.RecipientType.TO, new InternetAddress("nncloudtv@gmail.com", "nncloudtv"));                             
-//            msg.setSubject("init task is finished");
-//            msg.setText("init task is finished.");
-//            Transport.send(msg);
-//        } catch (Exception e) {
-//        	NnLogUtil.logException(e);
-//		}			
-//		
-//		return NnNetUtil.textReturn("OK");		
-//	}		
+	}	
 	
 	@RequestMapping("initMso1Channels")
 	public ResponseEntity<String> initMso1Channels(@RequestParam boolean devel, @RequestParam boolean trans, HttpServletRequest req) {
 		initService.setRequest(req);
 		initService.createMso1DefaultChannels(devel, trans);
-		this.sendEmail("step2 done: create 9x9 channels");
+		this.sendEmail("step3 done: create 9x9 channels");
 		return NnNetUtil.textReturn("OK");
 	}
 	
