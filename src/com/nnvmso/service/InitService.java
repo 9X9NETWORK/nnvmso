@@ -148,11 +148,11 @@ public class InitService {
 		//config
 		MsoConfigManager configMngr = new MsoConfigManager();
 		MsoConfig config = new MsoConfig(mso.getKey().getId(), MsoConfig.CDN, MsoConfig.CDN_AKAMAI);
-		configMngr.save(config);
+		configMngr.create(config);
 		String debugStr = "1";
 		if (!debug) {debugStr = "0";}
 		MsoConfig config1 = new MsoConfig(mso.getKey().getId(), MsoConfig.DEBUG, debugStr);
-		configMngr.save(config1);		
+		configMngr.create(config1);		
 		
 		//a default MSO user
 		NnUserManager userMngr = new NnUserManager();
