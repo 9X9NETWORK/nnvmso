@@ -354,6 +354,12 @@ public class InitService {
 			this.channelsCreate(urls13, categories, user.getKey().getId(), trans);
 			
 			categories.clear();
+			c = categoryMngr.findByName("Outdoor");
+			categories.add(c);
+			String[] urls20 = this.getMso1OutdoorChannels();
+			this.channelsCreate(urls20, categories, user.getKey().getId(), trans);
+			
+			categories.clear();
 			c = categoryMngr.findByName("People");
 			categories.add(c);
 			String[] urls14 = this.getMso1PeopleChannels();
@@ -551,6 +557,8 @@ public class InitService {
 			String[] urls = this.getMso1DefaultIpg();
 			for (int i=0; i< urls.length; i++) {
 				MsoChannel c = channelMngr.findBySourceUrl(urls[i]);
+				System.out.println("i=" + i + ";" + urls[i]);
+				System.out.println("channel=" + c.getName() + ";");
 				MsoIpg msoIpg = new MsoIpg(mso.getKey().getId(), c.getKey().getId(), i+1, MsoIpg.TYPE_GENERAL);			
 				msoIpgMngr.create(msoIpg);							
 			}			
@@ -1061,7 +1069,8 @@ public class InitService {
 				"http://revision3.com/hak5/feed/MP4-Large",
 				"http://anyonebutme.blip.tv/rss/itunes",
 				"http://feeds.feedburner.com/fitlife",				
-				"http://www.youtube.com/user/LoveSystems",
+				"http://www.youtube.com/user/LoveSystems",				
+				"http://www.youtube.com/user/maaximumseduction",
 				"http://feeds.feedburner.com/rocknrolltv",
 				"http://vimeo.com/wspn/videos/rss",
 				"http://feeds.feedburner.com/earth-touch_featured_720p?format=xml",
@@ -1218,7 +1227,7 @@ public class InitService {
 	
 	public String[] getMso1NPChannels() {
 		String[] urls = {			
-				"http://vimeo.com/wspn/videos/rss  ",
+				"http://vimeo.com/wspn/videos/rss",
 				"http://www.democracynow.org/podcast-video.xml",
 				"http://feeds.theonion.com/OnionNewsNetwork",
 				"http://feeds.feedburner.com/Euronews-NoComment?format=xml"				
@@ -1319,7 +1328,6 @@ public class InitService {
 				"http://feeds.feedburner.com/cnet/buzzreport?format=xml",
 				"http://feeds.feedburner.com/earth-touch_featured_720p?format=xml",
 				"http://www.youtube.com/user/SHAYTARDS?feature=chclk",
-				"http://feeds.feedburner.com/earth-touch_featured_720p?format=xml",
 				"http://feeds.feedburner.com/SelfPsychologyPodcast?format=xml",
 				"http://www.youtube.com/user/nba?blend=1&ob=4",
 				"http://feeds.feedburner.com/caliextralarge?format=xml",
