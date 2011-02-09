@@ -18,6 +18,14 @@ public class MsoIpgDao {
 		pm.close();		
 		return msoIpg;
 	}
+	
+	public void delete(MsoIpg msoIpg) {
+		if (msoIpg != null) {
+			PersistenceManager pm = PMF.get().getPersistenceManager();		
+			pm.deletePersistent(msoIpg);
+			pm.close();
+		}
+	}
 
 	public List<MsoIpg> findAllByMsoId(long msoId) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();		
@@ -32,4 +40,36 @@ public class MsoIpgDao {
 		return ipg;
 	}
 	
+	public MsoIpg findByMsoIdAndChannelId(long msoId, long channelId) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		Query q = pm.newQuery(MsoIpg.class);
+		q.setFilter("msoId == msoIdParam && channelId== channelIdParam");
+		q.setOrdering("seq asc");
+		q.declareParameters("long msoIdParam, long channelIdParam");
+		@SuppressWarnings("unchecked")
+		List<MsoIpg> results = (List<MsoIpg>)q.execute(msoId, channelId);
+		MsoIpg msoIpg = null;
+		if (results.size() > 0) {
+			msoIpg = results.get(0);
+			msoIpg = pm.detachCopy(msoIpg);
+		}
+		pm.close();
+		return msoIpg;
+	}
+	
+	public MsoIpg findByMsoIdAndSeq(long msoId, int seq) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		Query q = pm.newQuery(MsoIpg.class);
+		q.setFilter("msoId == msoIdParam && seq == seqParam");
+		q.declareParameters("long msoIdParam, int seqParam");
+		@SuppressWarnings("unchecked")
+		List<MsoIpg> results = (List<MsoIpg>)q.execute(msoId, seq);
+		MsoIpg msoIpg = null;
+		if (results.size() > 0) {
+			msoIpg = results.get(0);
+			msoIpg = pm.detachCopy(msoIpg);
+		}
+		pm.close();
+		return msoIpg;
+	}
 }

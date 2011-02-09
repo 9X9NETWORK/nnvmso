@@ -87,9 +87,15 @@
       <li>msoIpg listing by brand <br/>
           http://host/admin/msoIpg/list?mso=123
       </li>
-      <li>!!!add msoIpg</li>
-      <li>!!!modify msoIpg</li>
-      <li>!!!(delete)</li>      
+      <li>add msoIpg <br/>
+          http://host/admin/msoIpg/add?mso=123&channel=456&seq=7&type=2
+      </li>
+      <li>modify msoIpg (only 'seq' and 'type' are modifiable) <br/>
+          http://host/admin/msoIpg/modify?mso=123&channel=456&seq=8&type=1
+      </li>
+      <li>delete msoIpg <br/>
+          http://host/admin/msoIpg/delete?mso=123&channel=456
+      </li>
     </ul>
   </li>
 </ul>

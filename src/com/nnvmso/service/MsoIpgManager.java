@@ -32,8 +32,20 @@ public class MsoIpgManager {
 		msoIpgDao.save(msoIpg);
 	}
 	
+	public void deleteMsoIpg(long msoId, long channelId) {
+		MsoIpg msoIpg = msoIpgDao.findByMsoIdAndChannelId(msoId, channelId);
+		if (msoIpg != null) { msoIpgDao.delete(msoIpg); }
+	}
+	
 	public List<MsoIpg> findAllByMsoId(long msoId) {
 		return msoIpgDao.findAllByMsoId(msoId);
 	}
-
+	
+	public MsoIpg findByMsoIdAndChannelId(long msoId, long channelId) {
+		return msoIpgDao.findByMsoIdAndChannelId(msoId, channelId);
+	}
+	
+	public MsoIpg findByMsoIdAndSeq(long msoId, int seq) {
+		return msoIpgDao.findByMsoIdAndSeq(msoId, seq);
+	}
 }
