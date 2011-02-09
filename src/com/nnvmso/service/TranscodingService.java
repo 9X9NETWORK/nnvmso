@@ -222,12 +222,14 @@ public class TranscodingService {
 		Properties pro = getTranscodingServerPro();
 		String url = NnNetUtil.getUrlRoot(req);
 		String env = "office";
-		if (url.contains("9x9tvalpha") || url.contains("alpha.9x9.tv")) {
+		if (url.contains("9x9tvalpha") || url.contains("alpha.9x9.tv") || url.contains("alpha.5f.tv")) {
 			env = "alpha";
-		} else if (url.contains("9x9tvbeta") || url.contains("beta.9x9.tv")){
+		} else if (url.contains("9x9tvbeta") || url.contains("beta.9x9.tv") || url.contains("beta.5f.tv")){
 			env = "beta";
-		} else if (url.contains("9x9tvdev") || url.contains("dev.9x9.tv")){
+		} else if (url.contains("9x9tvdev") || url.contains("dev.9x9.tv") || url.contains("dev.5f.tv")){
 			env = "dev";
+		} else if (url.contains("9x9tvqa") || url.contains("qa.9x9.tv") || url.contains("qa.5f.tv")) {
+			env = "qa";
 		}
 		String transcodingServer = pro.getProperty(env);
 		String callbackServer = url;
