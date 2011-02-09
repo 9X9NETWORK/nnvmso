@@ -178,7 +178,6 @@ public class MsoChannelManager {
 		return msoChannelDao.findByName(name);
 	}
 	
-	//!!! fix query
 	public List<MsoChannel> findPublicChannelsByCategoryId(long categoryId) {
 		//channels within a category
 		CategoryChannelManager ccMngr = new CategoryChannelManager();
