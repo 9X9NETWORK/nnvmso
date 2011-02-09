@@ -33,6 +33,7 @@ import com.nnvmso.model.MsoConfig;
 import com.nnvmso.model.MsoIpg;
 import com.nnvmso.model.MsoProgram;
 import com.nnvmso.model.NnUser;
+import com.nnvmso.model.Subscription;
 
 @Service
 public class PlayerApiService {
@@ -149,7 +150,7 @@ public class PlayerApiService {
 		if (user == null) { return messageSource.getMessage("nnstatus.user_invalid", new Object[] {NnStatusCode.USER_INVALID} , locale); }
 		
 		SubscriptionManager subMngr = new SubscriptionManager();
-		boolean success = subMngr.changeSeq(user.getKey().getId(), Integer.parseInt(grid1), Integer.parseInt(grid2));
+		boolean success = subMngr.moveSeq(user.getKey().getId(), Integer.parseInt(grid1), Integer.parseInt(grid2));
 		if (success) { return NnStatusMsg.successStr(locale); }
 		return NnStatusMsg.successStr(locale);
 	}
@@ -269,10 +270,16 @@ public class PlayerApiService {
 		}		
 		//verify user
 		NnUser user = new NnUserManager().findByToken(userToken);
-		if (user == null) {return NnStatusMsg.userInvalid(locale);}		
+		if (user == null) {return NnStatusMsg.userInvalid(locale);}
+		
+		//unsubscribe
 		SubscriptionManager subMngr = new SubscriptionManager();
-		subMngr.unsubscribeChannel(user.getKey().getId(), Long.parseLong(channelId));
-		return NnStatusMsg.successStr(locale);		
+		Subscription s = subMngr.findByUserIdAndChannelId(user.getKey().getId(), Long.parseLong(channelId));
+		if (s == null || (s != null && s.getType() == MsoIpg.TYPE_READONLY)) {
+			return messageSource.getMessage("nnstatus.subscription_ro_channel", new Object[] {NnStatusCode.SUBSCRIPTION_ERROR} , locale);			
+		}			
+		subMngr.unsubscribeChannel(s);
+		return NnStatusMsg.successStr(locale);
 	}
 	
 	public String subscribeChannel(String userToken, String channelId, String grid) {

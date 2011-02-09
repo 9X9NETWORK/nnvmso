@@ -122,7 +122,7 @@ public class TranscodingService {
 			return new PostResponse(String.valueOf(NnStatusCode.CHANNEL_INVALID), "channel invalid");
 		}
 		
-		if (channel.getProgramCount() > MsoChannelManager.MAX_CHANNEL_SIZE) {
+		if (channel.getProgramCount() >= MsoChannelManager.MAX_CHANNEL_SIZE) {
 			return new PostResponse(String.valueOf(NnStatusCode.CHANNEL_MAXSIZE_EXCEEDED), "CHANNEL_MAXSIZE_EXCEEDED");			
 		}
 		

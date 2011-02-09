@@ -43,8 +43,12 @@ public class SubscriptionManager {
 		return true;
 	}
 	
-	public void unsubscribeChannel(long userId, long channelId) {
+	public Subscription findByUserIdAndChannelId(long userId, long channelId) {
 		Subscription s = subDao.findByUserIdAndChannelId(userId, channelId);
+		return s;
+	}
+	
+	public void unsubscribeChannel(Subscription s) {
 		if (s != null) { subDao.delete(s); }
 	}
 	
@@ -69,20 +73,12 @@ public class SubscriptionManager {
 		return channels;			 
 	}
 
-	public boolean changeSeq(long userId, int seq1, int seq2) {
-		List<Subscription> subs = subDao.findAllByUserIdAndSeq(userId, seq1, seq2);
-		if (subs.size() != 2) {
-			log.info("Chagne seq does not find matching data. User key=" + userId + "; seq1=" + seq1 + "; seq2=" + seq2);
-			return false;
-		}
-		if (subs.get(0).getSeq() == seq1) {
-			subs.get(0).setSeq(seq2);
-			subs.get(1).setSeq(seq1);
-		} else {
-			subs.get(0).setSeq(seq1);
-			subs.get(1).setSeq(seq2);
-		}
-		subDao.saveAll(subs);
+	//move from seq1 to seq2
+	public boolean moveSeq(long userId, int seq1, int seq2) {						
+		Subscription sub = subDao.findByUserIdAndSeq(userId, seq1);
+		if (sub == null) {return false;}
+		sub.setSeq(seq2);
+		subDao.save(sub);
 		return true;
 	}
 }
