@@ -3,6 +3,7 @@
     <ul>
       <li><a href="/admin/init/initDevel?debug=1">dev turn on debug</a></li>
       <li><a href="/admin/init/initDevel?debug=0">dev turn off debug</a></li>          	   
+      [UNDER CONSTRUCTION]
       <li><a href="/admin/init/initProTask?devel=0&trans=1&debug=1">turn on production data, but debug=1</a></li>
       <li><a href="/admin/init/initProTask?devel=0&trans=1&debug=0">turn on production data, but debug=0</a></li>
       <li><a href="/admin/init/deleteAll">deleteAll</a></li>
