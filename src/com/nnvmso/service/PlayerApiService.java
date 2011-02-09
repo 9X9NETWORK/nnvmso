@@ -200,7 +200,8 @@ public class PlayerApiService {
 						        String.valueOf(channels.get(i).getKey().getId()), 
 						        channels.get(i).getName(), 
 						        channels.get(i).getImageUrl(), 
-						        Integer.toString(channels.get(i).getProgramCount())};
+						        Integer.toString(channels.get(i).getProgramCount()),
+						        String.valueOf(channels.get(i).getSubscriptionCount())};
 				result = result + NnStringUtil.getDelimitedStr(ori);
 				result = result + "\n";
 			}
@@ -249,7 +250,8 @@ public class PlayerApiService {
 	public String prepareUserInfo(NnUser user) {
 		String output = NnStatusMsg.successStr(locale) + separatorStr;		
 		output = output + assembleKeyValue("token", user.getToken());
-		output = output + assembleKeyValue("name", user.getName()); 		
+		output = output + assembleKeyValue("name", user.getName());
+		output = output + assembleKeyValue("lastLogin", String.valueOf(user.getUpdateDate().getTime()));
 		return output;
 	}
 	
@@ -359,7 +361,8 @@ public class PlayerApiService {
 			CookieHelper.deleteCookie(resp, CookieHelper.USER);
 			return NnStatusMsg.userInvalid(locale);
 		}
-		this.setUserCookie(resp, found.getToken());	
+		this.setUserCookie(resp, found.getToken());
+		userMngr.save(found); //change last login time (ie updateTime)
 		return this.prepareUserInfo(found);
 	}
 	
@@ -369,6 +372,7 @@ public class PlayerApiService {
 		NnUser user = userMngr.findAuthenticatedUser(email, password, mso.getKey().getId());
 		if (user != null) {
 			output = this.prepareUserInfo(user);
+			userMngr.save(user); //change last login time (ie updateTime)
 			this.setUserCookie(resp, user.getToken());
 		}
 		return output;
@@ -541,8 +545,8 @@ public class PlayerApiService {
 					    imageUrl,
 					    String.valueOf(c.getProgramCount()),
 					    String.valueOf(c.getType()),
-					    String.valueOf(c.getStatus()),
-					    String.valueOf(c.getSubscriptionCount())}; 					    
+					    String.valueOf(c.getStatus())};
+ 					    
 		String output = NnStringUtil.getDelimitedStr(ori);
 		return output;
 	}
