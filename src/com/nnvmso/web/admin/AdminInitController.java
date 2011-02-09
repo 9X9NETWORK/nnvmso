@@ -1,13 +1,7 @@
 package com.nnvmso.web.admin;
 
-import java.util.Properties;
 import java.util.logging.Logger;
 
-import javax.mail.Message;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -59,7 +53,7 @@ public class AdminInitController {
 	}
  
 	@RequestMapping("initMsoAndCategories")
-	public ResponseEntity<String> initCategories(HttpServletRequest req, @RequestParam(value="debug")boolean debug) {
+	public ResponseEntity<String> initMsoAndCategories(HttpServletRequest req, @RequestParam(value="debug")boolean debug) {
 		initService.setRequest(req);
 		initService.initMsoAndCategories(debug);
 		return NnNetUtil.textReturn("OK");		
@@ -75,49 +69,119 @@ public class AdminInitController {
 		return NnNetUtil.textReturn("OK");		
 	}
 	
-	/**
-	 * This is intended to be executed as a task.
-	 * 
-	 * @param reference initProTask
-	 */
-	@RequestMapping("initPro")
-	public ResponseEntity<String> initPro(@RequestParam boolean devel, @RequestParam boolean trans, @RequestParam boolean debug, HttpServletRequest req) {
-		log.info("init task kicked in");	
-
-		initService.setRequest(req);
-		initService.initAll(devel, debug, trans);
-		log.info("init task done. trying to send out email now");		
-		
-		Properties props = new Properties();
-		Session session = Session.getInstance(props);
-		
-        try {
-            Message msg = new MimeMessage(session);
-            msg.setFrom(new InternetAddress("nncloudtv@gmail.com", "nncloudtv"));
-            msg.addRecipient(Message.RecipientType.TO, new InternetAddress("nncloudtv@gmail.com", "nncloudtv"));                             
-            msg.setSubject("init task is finished");
-            msg.setText("init task is finished.");
-            Transport.send(msg);
-        } catch (Exception e) {
-        	NnLogUtil.logException(e);
-		}			
-		
-		return NnNetUtil.textReturn("OK");		
-	}		
+//	/**
+//	 * This is intended to be executed as a task.
+//	 * 
+//	 * @param reference initProTask
+//	 */
+//	@RequestMapping("initPro")
+//	public ResponseEntity<String> initPro(@RequestParam boolean devel, @RequestParam boolean trans, @RequestParam boolean debug, HttpServletRequest req) {
+//		log.info("init task kicked in");	
+//
+//		initService.setRequest(req);		
+//		initService.initAll(devel, debug, trans);
+//		log.info("init task done. trying to send out email now");		
+//		
+//		Properties props = new Properties();
+//		Session session = Session.getInstance(props);
+//		
+//        try {
+//            Message msg = new MimeMessage(session);
+//            msg.setFrom(new InternetAddress("nncloudtv@gmail.com", "nncloudtv"));
+//            msg.addRecipient(Message.RecipientType.TO, new InternetAddress("nncloudtv@gmail.com", "nncloudtv"));                             
+//            msg.setSubject("init task is finished");
+//            msg.setText("init task is finished.");
+//            Transport.send(msg);
+//        } catch (Exception e) {
+//        	NnLogUtil.logException(e);
+//		}			
+//		
+//		return NnNetUtil.textReturn("OK");		
+//	}		
 	
-	//!!! make msoIpg pipelined after all the channels get updated from transcoding service	
+	@RequestMapping("initMso1Channels")
+	public ResponseEntity<String> initMso1Channels(@RequestParam boolean devel, @RequestParam boolean trans, HttpServletRequest req) {
+		initService.setRequest(req);
+		initService.createMso1DefaultChannels(devel, trans);
+		return NnNetUtil.textReturn("OK");
+	}
+	
+	@RequestMapping("initMso2Channels")
+	public ResponseEntity<String> initMso2Channels(@RequestParam boolean devel, @RequestParam boolean trans, HttpServletRequest req) {
+		initService.setRequest(req);
+		initService.createMso2DefaultChannels(devel, trans);
+		return NnNetUtil.textReturn("OK");
+	}
+	
+	@RequestMapping("initMso1Ipg")
+	public ResponseEntity<String> initMso1Ipg(@RequestParam boolean devel, HttpServletRequest req) {
+		initService.setRequest(req);
+		initService.createMso1DefaultIpg(devel);
+		return NnNetUtil.textReturn("OK");
+	}
+		
+	@RequestMapping("initMso2Ipg")
+	public ResponseEntity<String> initMso2Ipg(@RequestParam boolean devel, HttpServletRequest req) {
+		initService.setRequest(req);
+		initService.createMso2DefaultIpg(devel);
+		return NnNetUtil.textReturn("OK");
+	}
+	
+	
+	@RequestMapping("initProStep2")
+	public ResponseEntity<String> initProStep2(@RequestParam boolean devel, @RequestParam boolean trans, @RequestParam boolean debug, HttpServletRequest req) {
+		initService.setRequest(req);
+		QueueFactory.getDefaultQueue().add(
+			      TaskOptions.Builder.withUrl("/admin/init/initMsoAndCategories")
+			          .param("debug", String.valueOf(debug)));
+		return NnNetUtil.textReturn("OK");
+	}
+
+	@RequestMapping("initProStep3")
+	public ResponseEntity<String> initProStep3(@RequestParam boolean devel, @RequestParam boolean trans, @RequestParam boolean debug, HttpServletRequest req) {
+		initService.setRequest(req);
+		QueueFactory.getDefaultQueue().add(
+			      TaskOptions.Builder.withUrl("/admin/init/initMso1Channels")
+			         .param("devel", String.valueOf(devel))
+			         .param("trans", String.valueOf(trans)));
+		return NnNetUtil.textReturn("OK");
+	}
+
+	@RequestMapping("initProStep4")
+	public ResponseEntity<String> initProStep4(@RequestParam boolean devel, @RequestParam boolean trans, @RequestParam boolean debug, HttpServletRequest req) {
+		initService.setRequest(req);
+		QueueFactory.getDefaultQueue().add(
+			      TaskOptions.Builder.withUrl("/admin/init/initMso2Channels")
+			         .param("devel", String.valueOf(devel))
+			         .param("trans", String.valueOf(trans)));
+		
+		return NnNetUtil.textReturn("OK");
+	}
+
+	@RequestMapping("initProStep5")
+	public ResponseEntity<String> initProStep5(@RequestParam boolean devel, @RequestParam boolean trans, @RequestParam boolean debug, HttpServletRequest req) {
+		initService.setRequest(req);
+		QueueFactory.getDefaultQueue().add(
+	      TaskOptions.Builder.withUrl("/admin/init/initMso1Ipg")
+	         .param("devel", String.valueOf(devel)));
+
+		QueueFactory.getDefaultQueue().add(
+	      TaskOptions.Builder.withUrl("/admin/init/initMso2Ipg")
+	         .param("devel", String.valueOf(devel)));		
+		
+		return NnNetUtil.textReturn("OK");
+	}
+	
 	/**
 	 * @param debug whether to turn on player's debugging information
 	 * @param devel whether to use test data (versus data from PM)
 	 * @param trans whether to submit data to transcoding service. turn off for internal data integretiy testing.
 	 */	
-	@RequestMapping("initProTask")
-	public ResponseEntity<String> initProTask(@RequestParam boolean devel, @RequestParam boolean trans, @RequestParam boolean debug) {
+	@RequestMapping("initProStep1")
+	public ResponseEntity<String> initProTask(@RequestParam boolean devel, @RequestParam boolean trans, @RequestParam boolean debug, HttpServletRequest req) {
+		initService.setRequest(req);
 		QueueFactory.getDefaultQueue().add(
-		      TaskOptions.Builder.withUrl("/admin/init/initPro")
-		         .param("devel", String.valueOf(devel))
-		         .param("trans", String.valueOf(trans))
-		         .param("debug", String.valueOf(debug)));
+			      TaskOptions.Builder.withUrl("/admin/init/deleteAll"));
 		return NnNetUtil.textReturn("You will receive an email when it is done.");
 	}		
 	
