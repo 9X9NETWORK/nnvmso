@@ -331,20 +331,21 @@ public class PlayerApiController {
 	
 	/* ==========  CATEGORY: BROWSING ========== */
 	/**
-	 * Browse all the on-air channels.
+	 * Browse all the on-air channels by category.
 	 * 
 	 * @param category category id
 	 * @return Category info and channels info. <br/>
 	 *  	   First line is category info follows channels info. Each channel is \n separated.<br/>    
 	 *         Category info includes category id. <br/>
-	 *         Channel info includes channel id, channel name, channel image url, program count. <br/>
-	 *         Example: 1	Channel1	http://hostname/images/img.jpg	5
+	 *         Channel info includes channel id, channel name, channel image url, program count, subscription count <br/>
+	 *         Example: 1	Channel1	http://hostname/images/img.jpg	5	5
 	 */	
 	@RequestMapping(value="channelBrowse")
 	public ResponseEntity<String> channelBrowse(@RequestParam(value="category", required=false) String categoryIds, HttpServletRequest req) {
 		this.prepService(req);
 		String output = NnStatusMsg.errorStr(locale);
 		try {
+			//!!! add subscription count
 			output = playerApiService.findPublicChannelsByCategory(categoryIds);
 		} catch (Exception e){
 			output = playerApiService.handleException(e);
