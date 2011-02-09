@@ -17,6 +17,7 @@ import com.nnvmso.model.CategoryChannel;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoIpg;
 import com.nnvmso.model.NnUser;
+import com.nnvmso.model.SubscriptionLog;
 
 @Service
 public class MsoChannelManager {
@@ -177,20 +178,28 @@ public class MsoChannelManager {
 		return msoChannelDao.findByName(name);
 	}
 	
+	//!!! fix query
 	public List<MsoChannel> findPublicChannelsByCategoryId(long categoryId) {
 		//channels within a category
 		CategoryChannelManager ccMngr = new CategoryChannelManager();
+		CategoryManager categoryMngr = new CategoryManager();
+		SubscriptionLogManager sublogMngr = new SubscriptionLogManager();
 		List<CategoryChannel> ccs = (List<CategoryChannel>) ccMngr.findAllByCategoryId(categoryId);
 
 		//retrieve channels
 		List<MsoChannel> channels = new ArrayList<MsoChannel>();
 		for (CategoryChannel cc : ccs) {
-			//!!! fix query
 			MsoChannel channel = this.findById(cc.getChannelId());
 			if (channel != null && channel.getStatus() == MsoChannel.STATUS_SUCCESS && channel.getProgramCount() > 0) {
+				Category category  = categoryMngr.findById(cc.getCategoryId());
+				if (category != null) {
+					SubscriptionLog sublog = sublogMngr.findByMsoIdAndChannelId(category.getMsoId(), channel.getKey().getId());			
+				    if (sublog != null) {channel.setSubscriptionCount(sublog.getCount());}
+				}
 				channels.add(channel);
 			}
-		}
+		}				
+		
 		return channels;
 	}
 		
