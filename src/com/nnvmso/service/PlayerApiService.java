@@ -143,10 +143,10 @@ public class PlayerApiService {
 			return NnStatusMsg.inputMissing(locale);
 		}
 		if (!Pattern.matches("^\\d*$", grid1) || !Pattern.matches("^\\d*$", grid2)) {
-			return messageSource.getMessage("nnstatus.input_error", new Object[] {NnStatusCode.SUCCESS} , locale);
+			return messageSource.getMessage("nnstatus.input_error", new Object[] {NnStatusCode.INPUT_ERROR} , locale);
 		}		
 		NnUser user = userMngr.findByToken(userToken);
-		if (user == null) { return messageSource.getMessage("nnstatus.input_error", new Object[] {NnStatusCode.SUCCESS} , locale); }
+		if (user == null) { return messageSource.getMessage("nnstatus.user_invalid", new Object[] {NnStatusCode.USER_INVALID} , locale); }
 		
 		SubscriptionManager subMngr = new SubscriptionManager();
 		boolean success = subMngr.changeSeq(user.getKey().getId(), Integer.parseInt(grid1), Integer.parseInt(grid2));
@@ -311,7 +311,7 @@ public class PlayerApiService {
 		email = email.trim();
 		name = name.trim();
 		if (!Pattern.matches(regex, email.toLowerCase()) || password.length() < 6) {		
-			return messageSource.getMessage("nnstatus.input_error", new Object[] {NnStatusCode.SUCCESS} , locale);
+			return messageSource.getMessage("nnstatus.input_error", new Object[] {NnStatusCode.INPUT_ERROR} , locale);
 		}
 			
 		//find mso
