@@ -88,7 +88,6 @@ public class MsoChannel implements Serializable {
 	}
 	
 	public MsoChannel(String sourceUrl, long userId) {
-		if (sourceUrl != null) {sourceUrl.trim();}
 		this.sourceUrl = sourceUrl;
 		this.userId = userId;
 	}
