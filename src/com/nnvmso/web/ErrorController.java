@@ -10,6 +10,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.nnvmso.lib.NnLogUtil;
+
 @Controller
 @RequestMapping("")
 public class ErrorController {
@@ -22,15 +24,10 @@ public class ErrorController {
 		return viewRoot + "404";
 	}
 		
+	//final frontier
 	@RequestMapping("error")
 	public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
-		String detail = "";
-		StackTraceElement[] elements = ex.getStackTrace();
-		for (StackTraceElement elm:elements ) {
-			detail = detail + elm.toString() + "\n";			
-		}		
-		logger.severe("exception:" + ex.toString());
-		logger.severe("exception stacktrace:\n" + detail);
+		NnLogUtil.logException(ex);
 		String now = (new Date()).toString();
 		return new ModelAndView(viewRoot + "error", "now", now);
 	}
