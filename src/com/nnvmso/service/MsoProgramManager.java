@@ -56,9 +56,14 @@ public class MsoProgramManager {
 			this.storeInCache(cache, programs, program.getChannelId());
 		}				
 	}
-	
-	public MsoProgram save(MsoProgram program) {
-		program.setUpdateDate(new Date());
+ 
+	/**
+	 * @@@ IMPORTANT: 
+	 * updateDate is not set here.  
+	 * It's currently shared by pubDate from transcoding service.
+	 * 
+	 */
+	public MsoProgram save(MsoProgram program) {		
 		program = msoProgramDao.save(program);
 		Cache cache = CacheFactory.get();
 		if (cache != null) {
