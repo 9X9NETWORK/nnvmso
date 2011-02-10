@@ -23,6 +23,7 @@ public class PdrRawManager {
 		return pdrDao.save(pdr);
 	}		
 	
+	//!!! needs to be done in task
 	public void processPdr(String pdr, long userId, String sessionId) {
 		if (pdr == null) {return;}		
 		
