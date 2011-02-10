@@ -30,6 +30,10 @@ public class MsoProgramDao {
 		return program;
 	}
 	
+	/**
+	 * There will be no data in viewLog for now, meaning "the whole channel is always unwatched"
+	 * Keep the implementation since the requirement can be changed back again.  
+	 */
 	public List<MsoProgram> findNewProgramsByChannels(List<MsoChannel> channels, Hashtable<Long, HashSet<Long>> watchedTable) {
 		List<MsoProgram> programs = new ArrayList<MsoProgram>();
 		PersistenceManager pm = PMF.get().getPersistenceManager();
