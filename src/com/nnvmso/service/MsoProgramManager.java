@@ -31,7 +31,9 @@ public class MsoProgramManager {
 	public void create(MsoChannel channel, MsoProgram program) {		
 		Date now = new Date();
 		program.setCreateDate(now);
-		program.setUpdateDate(now);
+		if (program.getUpdateDate() == null) {
+			program.setUpdateDate(now);			
+		}
 		program.setChannelId(channel.getKey().getId());
 		msoProgramDao.save(program);
 
@@ -63,7 +65,8 @@ public class MsoProgramManager {
 	 * It's currently shared by pubDate from transcoding service.
 	 * 
 	 */
-	public MsoProgram save(MsoProgram program) {		
+	public MsoProgram save(MsoProgram program) {
+		System.out.println("date:" + program.getUpdateDate());
 		program = msoProgramDao.save(program);
 		Cache cache = CacheFactory.get();
 		if (cache != null) {
