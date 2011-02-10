@@ -1,5 +1,6 @@
 package com.nnvmso.web.admin;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -44,23 +45,41 @@ public class AdminMsoChannelController {
 		return "";
 	}
 	
+	//!!! all sorts of risk to listAll
 	@RequestMapping("list")
 	public ResponseEntity<String> list() {
 		List<MsoChannel> channels = channelMngr.findAll();
-		String[] title = {"key", "id", "name", "sourceUrl", "status", "programCount"};		
-		String result = "";
-		for (MsoChannel c:channels) {
-			String[] ori = {NnStringUtil.getKeyStr(c.getKey()),
-						    String.valueOf(c.getKey().getId()),
-						    c.getName(),
-							c.getSourceUrl(), 
-						    String.valueOf(c.getStatus()), 
-						    String.valueOf(c.getProgramCount())}; 						
-			result = result + NnStringUtil.getDelimitedStr(ori);		
-			result = result + "\n";
+		List<MsoChannel> bad = new ArrayList<MsoChannel>();		
+		for (MsoChannel c : channels) {
+			if (c.getName() == null || c.getStatus() != MsoChannel.STATUS_SUCCESS || 
+				c.isPublic() != true || c.getProgramCount() < 1 ) {
+				bad.add(c);
+			}
 		}
-		String output = NnStringUtil.getDelimitedStr(title) + "\n" + result;
+		String output = "Total count: " + channels.size() + "\n" + "Bad count(not public, name=null, status!=success, programCount < 1): " + bad.size();
+		output = output + "\n\n --------------- \n";
+		output = output + this.printChannelData(channels);				
+		output = output + "\n\n --------------- \n\n";
+		output = output + this.printChannelData(bad);
 		return NnNetUtil.textReturn(output);	
+	}
+	
+	private String printChannelData(List<MsoChannel> channels) {
+		String[] title = {"key", "id", "name", "sourceUrl", "isPublic", "status", "programCount"};		
+		String result = "";		
+		for (MsoChannel c : channels) {
+			String[] ori = {NnStringUtil.getKeyStr(c.getKey()),
+				    	    String.valueOf(c.getKey().getId()),
+				    	    c.getName(),
+				    	    c.getSourceUrl(), 
+				    	    String.valueOf(c.isPublic()),
+				    	    String.valueOf(c.getStatus()), 
+				    	    String.valueOf(c.getProgramCount())}; 						
+			result = result + NnStringUtil.getDelimitedStr(ori);		
+			result = result + "\n";			
+		}
+		String output = NnStringUtil.getDelimitedStr(title) + "\n" + result;		
+		return output;
 	}
 	
 	//add only, a channel's categories are accumulated
@@ -117,5 +136,12 @@ public class AdminMsoChannelController {
 		
 		channelMngr.save(channel);
 		return "OK";
+	}
+	
+	@RequestMapping("findUnUniqueSourceUrl")
+	public ResponseEntity<String> findUnUniqueSourceUrl() {
+		List<MsoChannel> channels = channelMngr.findUnUniqueSourceUrl();
+		String result = this.printChannelData(channels);;
+		return NnNetUtil.textReturn(result);
 	}
 }

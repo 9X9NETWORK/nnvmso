@@ -24,6 +24,7 @@ import com.google.appengine.api.taskqueue.TaskOptions;
 import com.nnvmso.lib.CookieHelper;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnNetUtil;
+import com.nnvmso.service.EmailService;
 import com.nnvmso.service.InitService;
 
 /**
@@ -35,10 +36,12 @@ public class AdminInitController {
 	protected static final Logger log = Logger.getLogger(AdminInitController.class.getName());		
 	
 	private final InitService initService;		
+	private final EmailService emailService;
 	
 	@Autowired
-	public AdminInitController(InitService initService) {
+	public AdminInitController(InitService initService, EmailService emailService) {
 		this.initService = initService;
+		this.emailService = emailService;
 	}		
 	
 	@ExceptionHandler(Exception.class)
@@ -185,4 +188,18 @@ public class AdminInitController {
 		CookieHelper.setCookie(resp, CookieHelper.MSO, mso);
 		return NnNetUtil.textReturn("OK");
 	}
+	
+	@RequestMapping("emailTest")
+	public ResponseEntity<String> emailTest() {
+		emailService.sendEmailToAdmin("email test done", "done");
+		return NnNetUtil.textReturn("OK");
+	}
+		
+	@RequestMapping("email")
+	public ResponseEntity<String> emailTask() {
+		QueueFactory.getDefaultQueue().add(
+			      TaskOptions.Builder.withUrl("/admin/init/emailTest"));
+		return NnNetUtil.textReturn("You will receive an email when it is done.");
+	}
+	
 }
