@@ -42,6 +42,10 @@ public class NnUserManager {
 		return nnUserDao.save(user);
 	}
 
+	/**
+	 * GAE can only write 5 records a sec, maybe safe enough to do so w/out DB retrieving.
+	 * taking the chance to speed up signin (meaning not to consult DB before creating the account).
+	 */
 	private String generateToken() {
 		String time = String.valueOf(new Date().getTime());
 		String random = RandomStringUtils.randomAlphabetic(10);

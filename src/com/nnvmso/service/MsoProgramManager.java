@@ -5,9 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import net.sf.jsr107cache.Cache;
@@ -144,8 +142,6 @@ public class MsoProgramManager {
 		//store a channel's program list
 		if (list != null) {
 			cache.put(this.getCacheProgramListKey(channelId), list);
-			List<Long> test = (List<Long>)cache.get(this.getCacheProgramListKey(channelId));
-			System.out.println("put list in cache " + test.size());
 		};
 	}
 	
@@ -188,13 +184,10 @@ public class MsoProgramManager {
 					if (temp == null) {temp = new ArrayList<MsoProgram>();}
 					temp.add(list.get(i));
 					map.put(list.get(i).getChannelId(), temp);
-				}								
-			    Iterator it = map.entrySet().iterator();
-			    while (it.hasNext()) {
-					Map.Entry pairs = (Map.Entry)it.next();
-			        System.out.println(pairs.getKey() + " = " + ((List<MsoProgram>)pairs.getValue()).size());
-			        this.storeInCache(cache, (List<MsoProgram>)pairs.getValue(), (Long)pairs.getKey());
-			    }											    
+				}				
+				for (Long key : map.keySet()) {
+					this.storeInCache(cache, map.get(key), key);				
+			    }
 			}			
 		}
 

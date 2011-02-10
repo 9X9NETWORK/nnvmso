@@ -38,7 +38,8 @@ public class MsoChannelManager {
 	 */
 	public void create(MsoChannel channel, List<Category> categories) {
 		Date now = new Date();
-		if (channel.getSourceUrl() != null) {channel.setSourceUrl(channel.getSourceUrl().toLowerCase());}
+		if (channel.getSourceUrl() != null) 
+			channel.setSourceUrl(channel.getSourceUrl().trim().toLowerCase());
 		channel.setCreateDate(now);
 		channel.setUpdateDate(now);
 		msoChannelDao.save(channel);
@@ -72,7 +73,8 @@ public class MsoChannelManager {
 	 * @@@ IMPORTANT: does not set updateDate here !!!      
 	 */
 	public MsoChannel save(MsoChannel channel) {
-		if (channel.getSourceUrl() != null) {channel.setSourceUrl(channel.getSourceUrl().toLowerCase());}
+		if (channel.getSourceUrl() != null)
+			channel.setSourceUrl(channel.getSourceUrl().trim().toLowerCase());
 		channel = msoChannelDao.save(channel);
 		//save to cache
 		Cache cache = CacheFactory.get();		
@@ -175,7 +177,8 @@ public class MsoChannelManager {
 	}	
 
 	public MsoChannel findBySourceUrl(String url) {
-		return msoChannelDao.findBySourceUrl(url);
+		if (url == null) {return null;}
+		return msoChannelDao.findBySourceUrl(url.trim().toLowerCase());
 	}
 
 	public MsoChannel findByName(String name) {
