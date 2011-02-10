@@ -62,13 +62,15 @@ public class SubscriptionManager {
 		SubscriptionLogManager sublogMngr = new SubscriptionLogManager();
 		for (Subscription s : subs) {
 			MsoChannel c = channelMngr.findById(s.getChannelId()); //!!!
-			c.setSeq(s.getSeq());
-			c.setType(s.getType());
-			if (msoId != 0) {
-				SubscriptionLog sublog = sublogMngr.findByMsoIdAndChannelId(msoId, c.getKey().getId());			
-				if (sublog != null) {c.setSubscriptionCount(sublog.getCount());}
-			}			
-			channels.add(c);
+			if ( c!= null) {
+				c.setSeq(s.getSeq());
+				c.setType(s.getType());
+				if (msoId != 0) {
+					SubscriptionLog sublog = sublogMngr.findByMsoIdAndChannelId(msoId, c.getKey().getId());			
+					if (sublog != null) {c.setSubscriptionCount(sublog.getCount());}
+				}			
+				channels.add(c);
+			}
 		}
 		return channels;			 
 	}
