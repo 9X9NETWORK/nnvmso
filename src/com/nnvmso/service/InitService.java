@@ -1072,7 +1072,7 @@ public class InitService {
 				"http://www.youtube.com/user/LoveSystems",				
 				"http://www.youtube.com/user/maaximumseduction",
 				"http://feeds.feedburner.com/rocknrolltv",
-				"http://vimeo.com/wspn/videos/rss",
+				"http://www.democracynow.org/podcast-video.xml",
 				"http://feeds.feedburner.com/earth-touch_featured_720p?format=xml",
 				"http://www.youtube.com/user/SHAYTARDS?feature=chclk",
 				"http://www.discovery.com/radio/xml/discovery_video.xml",
@@ -1227,7 +1227,6 @@ public class InitService {
 	
 	public String[] getMso1NPChannels() {
 		String[] urls = {			
-				"http://vimeo.com/wspn/videos/rss",
 				"http://www.democracynow.org/podcast-video.xml",
 				"http://feeds.theonion.com/OnionNewsNetwork",
 				"http://feeds.feedburner.com/Euronews-NoComment?format=xml"				
