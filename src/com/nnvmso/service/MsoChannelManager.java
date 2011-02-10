@@ -66,7 +66,9 @@ public class MsoChannelManager {
 	 * 1. when channel from public to non-public
 	 * 2. when channel from status success to non-success
 	 * Currently the counter is mainly dealt in MsoProgramManager.create() 
-	 * Will need to fix it in transaction     
+	 * Will need to fix it in transaction
+	 * 
+	 * @@@ IMPORTANT: does not set updateDate here !!!      
 	 */
 	public MsoChannel save(MsoChannel channel) {
 		channel = msoChannelDao.save(channel);
