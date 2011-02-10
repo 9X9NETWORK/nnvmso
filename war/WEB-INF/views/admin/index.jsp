@@ -115,6 +115,9 @@
       </li>
       <li>delete a channel's categories<br/>
           http://host/admin/channel/deleteCategories?channel=123&categories=111,112
+      </li>    
+      <li>find any not unique source url, for debugging purpose <br/>
+          http://host/admin/channel/findUnUniqueSourceUrl
       </li>
     </ul>
   </li>
