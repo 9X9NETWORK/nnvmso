@@ -182,7 +182,6 @@ public class TranscodingService {
 		}
 		if (item.getPubDate() != null) {
 			Date theDate = new Date(Long.parseLong(item.getPubDate())*1000);
-			System.out.println("theDate:" + theDate + ";pubDate:" + item.getPubDate());
 			program.setUpdateDate(theDate);
 		}
 		program.setPublic(true);

@@ -66,7 +66,6 @@ public class MsoProgramManager {
 	 * 
 	 */
 	public MsoProgram save(MsoProgram program) {
-		System.out.println("date:" + program.getUpdateDate());
 		program = msoProgramDao.save(program);
 		Cache cache = CacheFactory.get();
 		if (cache != null) {
