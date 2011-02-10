@@ -130,7 +130,7 @@ public class AdminInitController {
 		QueueFactory.getDefaultQueue().add(
 			      TaskOptions.Builder.withUrl("/admin/init/initMsoAndCategories")
 			          .param("debug", String.valueOf(debug)));
-		return NnNetUtil.textReturn("OK");
+		return NnNetUtil.textReturn("You will receive an email when it is done.");
 	}
 
 	@RequestMapping("initProStep3")
@@ -140,7 +140,7 @@ public class AdminInitController {
 			      TaskOptions.Builder.withUrl("/admin/init/initMso1Channels")
 			         .param("devel", String.valueOf(devel))
 			         .param("trans", String.valueOf(trans)));
-		return NnNetUtil.textReturn("OK");
+		return NnNetUtil.textReturn("You will receive an email when it is done.");
 	}
 
 	@RequestMapping("initProStep4")
@@ -149,9 +149,8 @@ public class AdminInitController {
 		QueueFactory.getDefaultQueue().add(
 			      TaskOptions.Builder.withUrl("/admin/init/initMso2Channels")
 			         .param("devel", String.valueOf(devel))
-			         .param("trans", String.valueOf(trans)));
-		
-		return NnNetUtil.textReturn("OK");
+			         .param("trans", String.valueOf(trans)));		
+		return NnNetUtil.textReturn("You will receive an email when it is done.\nDo no proceed to step5 until all the channels are ready.");
 	}
 
 	@RequestMapping("initProStep5")
@@ -165,7 +164,7 @@ public class AdminInitController {
 	      TaskOptions.Builder.withUrl("/admin/init/initMso2Ipg")
 	         .param("devel", String.valueOf(devel)));		
 		
-		return NnNetUtil.textReturn("OK");
+		return NnNetUtil.textReturn("You will receive an email when it is done.");
 	}
 	
 	/**
