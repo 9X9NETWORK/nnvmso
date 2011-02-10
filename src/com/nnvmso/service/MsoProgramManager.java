@@ -84,16 +84,19 @@ public class MsoProgramManager {
 		SubscriptionManager subMngr = new SubscriptionManager();
 		ViewLogManager watchedMngr = new ViewLogManager();
 		List<MsoChannel> channels = subMngr.findSubscribedChannels(userId, 0);
-		List<Long> list = new ArrayList<Long>();
+		List<MsoProgram> programs = new ArrayList<MsoProgram>();
+		List<Long> list = new ArrayList<Long>();		
 		for (int i=0; i< channels.size(); i++) {
 			list.add(channels.get(i).getKey().getId());
 		}
-		List<ViewLog> watchedList = watchedMngr.findAllByUserId(list);
-		Hashtable<Long, HashSet<Long>> watchedTable = new Hashtable<Long, HashSet<Long>>();
-		for (ViewLog w : watchedList) {
-			watchedTable.put(w.getChannelId(), w.getPrograms());
+		if (list != null) {
+			List<ViewLog> watchedList = watchedMngr.findAllByUserId(list);
+			Hashtable<Long, HashSet<Long>> watchedTable = new Hashtable<Long, HashSet<Long>>();
+			for (ViewLog w : watchedList) {
+				watchedTable.put(w.getChannelId(), w.getPrograms());
+			}
+			programs = msoProgramDao.findNewProgramsByChannels(channels, watchedTable);
 		}
-		List<MsoProgram> programs = msoProgramDao.findNewProgramsByChannels(channels, watchedTable);	
 		return programs;
 	} 
 		

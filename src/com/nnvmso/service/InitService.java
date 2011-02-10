@@ -397,6 +397,7 @@ public class InitService {
 															
 			MsoChannel channel5 = new MsoChannel("System Channel", "System Channel", "/WEB-INF/../images/logo_9x9.png", user.getKey().getId());
 			channel5.setPublic(true);
+			channel5.setSourceUrl("http://9x9pod.s3.amazonaws.com/default.mp4"); //to avoid the duplication
 			Category system = categoryMngr.findByName("Tech & Science");
 			List<Category> systemCategories = new ArrayList<Category>();
 			systemCategories.add(system);

@@ -1,6 +1,7 @@
 package com.nnvmso.service;
 
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Logger;
 
 import com.nnvmso.dao.PdrRawDao;
@@ -16,6 +17,7 @@ public class PdrRawManager {
 		Date now = new Date();
 		pdr.setCreateDate(now);
 		pdr.setUpdateDate(now);
+		pdrDao.save(pdr);
 	}
 	
 	public PdrRaw save(PdrRaw pdr) {
@@ -23,18 +25,22 @@ public class PdrRawManager {
 		return pdrDao.save(pdr);
 	}		
 	
-	//!!! needs to be done in task
+	/**
+	 * 	Keep the implementation since the requirement can be changed back again.
+	 *  @@@ IMPORTANT It needs to be done in task if there's viewLog process  
+	 */
 	public void processPdr(String pdr, long userId, String sessionId) {
 		if (pdr == null) {return;}		
 		
-		String[] lines = pdr.split("\n");
 		PdrRawManager pdrMngr = new PdrRawManager();
-		ViewLogManager viewLogMngr = new ViewLogManager();
 		//store raw data !!! change to blob type
 		if (pdr.length() > 500) { pdr = pdr.substring(0, 499);}
 		PdrRaw raw = new PdrRaw(userId, sessionId, 0, null, pdr);			
-		pdrMngr.save(raw);
+		pdrMngr.create(raw);
+		/*
 		//if the verb is watch, store the data in viewlog
+		String[] lines = pdr.split("\n");
+		ViewLogManager viewLogMngr = new ViewLogManager();
 		try {			
 			for (String line : lines) {						
 				String[] data = line.split("\t");			
@@ -46,7 +52,11 @@ public class PdrRawManager {
 		} catch (Exception e) {
 			log.info("exception catpures: " + e.getClass());
 		}
+		*/
 	}
 	
+	public List<PdrRaw> findAll() {
+		return pdrDao.findAll();
+	}
 	
 }

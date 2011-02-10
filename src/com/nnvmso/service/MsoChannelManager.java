@@ -2,6 +2,7 @@ package com.nnvmso.service;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -99,6 +100,21 @@ public class MsoChannelManager {
 		return qualified;
 	}
 	
+	public List<MsoChannel> findUnUniqueSourceUrl() {
+		List<MsoChannel> channels = this.findAll();
+		HashSet<String> set = new HashSet<String>();
+		List<MsoChannel> bad = new ArrayList<MsoChannel>();
+		for (MsoChannel c : channels) {
+			if (!set.contains(c.getSourceUrl())) {
+				set.add(c.getSourceUrl());
+			} else {
+				log.info("duplicate source url:" + c.getSourceUrl());
+				bad.add(c);
+			}
+		}
+		return bad;
+	}
+		
 	public MsoChannel initChannelSubmittedFromPlayer(String sourceUrl, NnUser user) {
 		MsoChannel channel = new MsoChannel(sourceUrl, user.getKey().getId());
 		channel.setContentType(this.getContentTypeByUrl(sourceUrl));
