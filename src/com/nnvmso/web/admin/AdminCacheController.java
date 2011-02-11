@@ -56,7 +56,7 @@ public class AdminCacheController {
 	 * currently doing cache all, delete all, and list all, probably not right 
 	 */
 	@RequestMapping("channel")
-	public ResponseEntity<String> cacheChannel(@RequestParam(required=false)Long channelId, 
+	public ResponseEntity<String> cacheChannel(@RequestParam(required=false)Long channel, 
 									           @RequestParam(required=false)boolean delete,
 									           @RequestParam(required=false)boolean list) {		
 		MsoChannelManager channelMngr = new MsoChannelManager();
@@ -80,17 +80,17 @@ public class AdminCacheController {
 	 * @param list 1 indicates listing
 	 */
 	@RequestMapping("program")
-	public ResponseEntity<String> cacheProgram(@RequestParam(required=true)Long channelId, 
+	public ResponseEntity<String> cacheProgram(@RequestParam(required=true)Long channel, 
 									           @RequestParam(required=false)boolean delete,
 									           @RequestParam(required=false)boolean list) {		
 		MsoProgramManager programMngr = new MsoProgramManager();
 		String output = "";
 		if (list) {
-			output = programMngr.findCacheByChannel(channelId);
+			output = programMngr.findCacheByChannel(channel);
 		} else if (delete) {			
-			programMngr.deleteCacheByChannel(channelId);
+			programMngr.deleteCacheByChannel(channel);
 		} else {
-			programMngr.cacheByChannelId(channelId);
+			programMngr.cacheByChannelId(channel);
 		}
 		return NnNetUtil.textReturn(output);
 	}	
