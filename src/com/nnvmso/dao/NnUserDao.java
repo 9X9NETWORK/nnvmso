@@ -89,6 +89,18 @@ public class NnUserDao {
 		return users;		
 	}
 	
+	public NnUser findById(long id) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		NnUser user = null;
+		try {
+			user = pm.getObjectById(NnUser.class, id);
+			user = pm.detachCopy(user);
+		} catch (JDOObjectNotFoundException e) {
+		}		
+		pm.close();
+		return user;		
+	}	
+	
 	public NnUser findByKey(Key key) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		NnUser user = null;
