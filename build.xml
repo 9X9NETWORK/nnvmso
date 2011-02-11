@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="Guestbook" default="datanucleusenhance">
-  <property name="appengine.sdk" location="..\lib\appengine-java-sdk-1.4.0" />
+<project name="nnvmso" default="datanucleusenhance">
+  <property name="appengine.sdk" location="C:\9x9tv.bin\appengine-java-sdk-1.4.0" />
 
   <import file="${appengine.sdk}/config/user/ant-macros.xml" />
 
@@ -16,8 +16,10 @@
 
   <target name="svnrevision"
       description="Get SVN revision number">
-    <exec executable="cmd">
-      <arg line="/c getrevision.bat"/>
+    <exec executable="curl">
+      <arg value="--output"/>
+      <arg value="SVNRevision.txt"/>
+      <arg value="http://everest.teltel.com:8080/cgi-bin/svnrev"/>
     </exec>
   </target>
 
