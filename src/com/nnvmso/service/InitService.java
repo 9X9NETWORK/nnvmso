@@ -587,6 +587,8 @@ public class InitService {
 			System.out.println(urls.length + seqs.length);
 			for (int i=0; i<urls.length; i++) {
 				MsoChannel c = cMngr.findBySourceUrl(urls[i]);
+				System.out.println("i=" + i + ";" + urls[i]);
+				System.out.println("channel=" + c.getName() + ";");				
 				MsoIpg msoIpg = new MsoIpg(mso.getKey().getId(), c.getKey().getId(), Integer.parseInt(seqs[i]), MsoIpg.TYPE_GENERAL);					
 				msoIpgMngr.create(msoIpg);					
 			}
@@ -1004,7 +1006,7 @@ public class InitService {
 	
 	private String[] getMso2IpgUrls() {
 		String[] urls = {
-				"http://www.youtube.com/user/NMANews",
+				"http://www.youtube.com/user/nmanews",
 				"http://www.youtube.com/user/InDeepCloud",
 				"http://www.youtube.com/user/2ojux",
 				"http://www.youtube.com/user/NBA",
@@ -1073,7 +1075,6 @@ public class InitService {
 				"http://www.youtube.com/user/SHAYTARDS?feature=chclk",
 				"http://www.discovery.com/radio/xml/discovery_video.xml",
 				"http://feeds.feedburner.com/SelfPsychologyPodcast?format=xml",
-				"http://www.youtube.com/user/nba",
 				"http://www.youtube.com/user/nba",
 				"http://feeds.feedburner.com/caliextralarge?format=xml",
 				"http://lltv.libsyn.com/rss"				
