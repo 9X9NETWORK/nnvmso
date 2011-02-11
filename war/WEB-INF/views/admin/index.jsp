@@ -16,7 +16,7 @@
     <ul>
       <li><a href="/admin/cache/deleteAll">deleteAll</a></li>      
       <li>cache category, one mso at a time. <br/>
-		  add, http://host/admin/cache/category?id=xx  <br/>
+		  add, http://host/admin/cache/category?mso=123  <br/>
 		  delete, http://host/admin/cache/category?id=123&delete=1  <br/>
 		  list, <a href="/admin/cache/category?list=1"> list </a> 
 	  </li>
@@ -31,9 +31,9 @@
 	      list all, http://host/admin/cache/channel?list=1<br/>
 	  </li>
 	  <li>cache programs <br/>
-	      add, http://host/admin/cache/program?channelId=123<br/>
-	      delete, http://host/admin/cache/program?channelId=123&delete=123<br/>
-	      list, http://host/admin/cache/program?channelId=123&list=1 <br/>
+	      add, http://host/admin/cache/program?channel=123<br/>
+	      delete, http://host/admin/cache/program?channel=123&delete=123<br/>
+	      list, http://host/admin/cache/program?channel=123&list=1 <br/>
 	  </li>	  	  
     </ul>
   </li>
