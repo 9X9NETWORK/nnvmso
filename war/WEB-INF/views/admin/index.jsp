@@ -12,29 +12,11 @@
 </ul>
 
 <ul>
-  <li>Cache
+  <li>Branding
     <ul>
-      <li><a href="/admin/cache/deleteAll">deleteAll</a></li>      
-      <li>cache category, one mso at a time. <br/>
-		  add, http://host/admin/cache/category?mso=123  <br/>
-		  delete, http://host/admin/cache/category?id=123&delete=1  <br/>
-		  list, <a href="/admin/cache/category?list=1"> list </a> 
-	  </li>
-	  <li>cache current mso [1. the host url is what current mso is 2. check config, current mso] <br/>
-	  	  add, http://host/admin/cache/mso <br/>
-	  	  delete, http://host/admin/cache/mso?delete=1 <br/>	  	  
-	  	  list, <a href="/admin/cache/mso?list=1"> list </a>
-	  </li>
-	  <li>cache channel <br/>
-	      add all,  http://host/admin/cache/channel<br/>
-	      delete all, http://host/admin/cache/channel?delete=1<br/>
-	      list all, http://host/admin/cache/channel?list=1<br/>
-	  </li>
-	  <li>cache programs <br/>
-	      add, http://host/admin/cache/program?channel=123<br/>
-	      delete, http://host/admin/cache/program?channel=123&delete=123<br/>
-	      list, http://host/admin/cache/program?channel=123&list=1 <br/>
-	  </li>	  	  
+      <li><a href="/admin/mso/list">mso listing</a></li>
+      <li>change data <br/>
+		  http://host/admin/mso/modify?id=123&logoUrl=xx&logoClickUrl=xx&jingleUrl=xx                       	   
     </ul>
   </li>
 </ul>
@@ -55,11 +37,11 @@
 </ul>
 
 <ul>
-  <li>Branding
+  <li>User
     <ul>
-      <li><a href="/admin/mso/list">mso listing</a></li>
-      <li>change data <br/>
-		  http://host/admin/mso/modify?id=123&logoUrl=xx&logoClickUrl=xx&jingleUrl=xx                       	   
+      <li>channels a user subscribe, query either by user id or user token<br/>
+		  http://host/admin/nnuser/subscription?id=123 <br/>                   	   
+		  http://host/admin/nnuser/subscription?token=910JYOJ19kJ1JOY71021 <br/>
     </ul>
   </li>
 </ul>
@@ -123,3 +105,30 @@
   </li>
 </ul>
 
+<ul>
+  <li>Cache
+    <ul>
+      <li><a href="/admin/cache/deleteAll">deleteAll</a></li>      
+      <li>cache category, one mso at a time. <br/>
+		  add, http://host/admin/cache/category?mso=123  <br/>
+		  delete, http://host/admin/cache/category?id=123&delete=1  <br/>
+		  list, <a href="/admin/cache/category?list=1"> list </a> 
+	  </li>
+	  <li>cache current mso [1. the host url is what current mso is 2. check config, current mso] <br/>
+	  	  add, http://host/admin/cache/mso <br/>
+	  	  delete, http://host/admin/cache/mso?delete=1 <br/>	  	  
+	  	  list, <a href="/admin/cache/mso?list=1"> list </a>
+	  </li>
+	  <li>cache channel <br/>
+	      add all,  http://host/admin/cache/channel<br/>
+	      delete all, http://host/admin/cache/channel?delete=1<br/>
+	      list all, http://host/admin/cache/channel?list=1<br/>
+	  </li>
+	  <li>cache programs <br/>
+	      add, http://host/admin/cache/program?channel=123<br/>
+	      delete, http://host/admin/cache/program?channel=123&delete=123<br/>
+	      list, http://host/admin/cache/program?channel=123&list=1 <br/>
+	  </li>	  	  
+    </ul>
+  </li>
+</ul>
