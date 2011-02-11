@@ -1,6 +1,7 @@
 package com.nnvmso.web;
 
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import java.lang.Long;
 
 import javax.servlet.http.HttpServletRequest;
@@ -28,14 +29,17 @@ public class ShareController {
 	}
 	
 	@RequestMapping("{ipgId}")
-	public String zooatomics(@PathVariable long ipgId, HttpServletRequest req, HttpServletResponse resp) {
-		System.out.println("/share/" + ipgId);
+	public String zooatomics(@PathVariable String ipgId, HttpServletRequest req, HttpServletResponse resp) {
+		log.info("/share/" + ipgId);
 		IpgManager ipgMngr = new IpgManager();
-		Ipg ipg = ipgMngr.findById(ipgId);
+		if (!Pattern.matches("^\\d*$", ipgId)) {
+			log.info("invalid ipg id");
+			return "redirect:/";
+		}				
+		Ipg ipg = ipgMngr.findById(Long.parseLong(ipgId));
 		if (ipg == null) {
-			return "error/404";
-		}		
-		System.out.println(Long.toString(ipgId));
+			return "redirect:/";
+		}
 		return "player/zooatomics";
 	}
 }
