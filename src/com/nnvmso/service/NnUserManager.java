@@ -89,5 +89,9 @@ public class NnUserManager {
 	public NnUser findByKey(Key key) {
 		return nnUserDao.findByKey(key);
 	}
+
+	public NnUser findById(long id) {
+		return nnUserDao.findById(id);
+	}
 	
 }
