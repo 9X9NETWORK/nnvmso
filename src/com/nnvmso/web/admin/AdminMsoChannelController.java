@@ -56,12 +56,12 @@ public class AdminMsoChannelController {
 				bad.add(c);
 			}
 		}
-		String output = "Total count: " + channels.size() + "\n" + "Bad count(not public, name=null, status!=success, programCount < 1): " + bad.size();
-		output = output + "\n\n --------------- \n";
+		String output = "Total count: " + channels.size() + "\n" + "Bad channel count(not public, name=null, status!=success, programCount < 1): " + bad.size();
+		output = output + "\n\n --------------- \n\n";
 		output = output + this.printChannelData(channels);				
 		output = output + "\n\n --------------- \n\n";
 		output = output + this.printChannelData(bad);
-		return NnNetUtil.textReturn(output);	
+		return NnNetUtil.textReturn(output);
 	}
 	
 	private String printChannelData(List<MsoChannel> channels) {
