@@ -681,7 +681,6 @@ public class InitService {
 				"http://www.youtube.com/user/fcbarcelona",
 				"http://www.youtube.com/user/NHLVideo",
 				"http://www.youtube.com/user/redbull",
-				"http://www.youtube.com/user/MotoGP",
 				"http://www.youtube.com/user/nikefootball",
 				"http://www.youtube.com/user/Hoopmixtape",
 				"http://www.youtube.com/user/TeamFlightBrothers",
@@ -811,7 +810,6 @@ public class InitService {
 				"http://www.youtube.com/user/sun57500",
 				"http://www.youtube.com/user/olivinej",
 				"http://www.youtube.com/user/Mmovies21",
-				"http://www.youtube.com/user/YTAnimalJP",
 				"http://www.youtube.com/user/gardea23",
 				"http://www.youtube.com/user/dogs101tw",
 				"http://www.youtube.com/user/Wearefordogs",
@@ -853,7 +851,6 @@ public class InitService {
 				"http://www.youtube.com/user/gd1104",
 				"http://www.youtube.com/user/3rdid8487",
 				"http://www.youtube.com/user/pepsi",
-				"http://www.youtube.com/user/Porche",
 				"http://www.youtube.com/user/Otakuarmy"				
 		};
 		return url;
@@ -943,7 +940,6 @@ public class InitService {
 				"http://www.youtube.com/user/chinatv",
 				"http://www.youtube.com/user/pts",                                                                                            
 				"http://www.youtube.com/user/zimeitao",
-				"http://www.youtube.com/user/TaiwanTalks4",
 				"http://www.youtube.com/user/trailers",
 				"http://www.youtube.com/user/twfoxmovies",
 				"http://www.youtube.com/user/2010jaychou",
@@ -1028,7 +1024,6 @@ public class InitService {
 				"http://www.youtube.com/user/chinatv",
 				"http://www.youtube.com/user/pts",
 				"http://www.youtube.com/user/ChinaTimes",
-				"http://www.youtube.com/user/TaiwanTalks4",
 				"http://www.youtube.com/user/SETTV",
 				"http://www.youtube.com/user/weatherrisk",
 				"http://www.youtube.com/user/kbsworld",
@@ -1078,7 +1073,8 @@ public class InitService {
 				"http://www.youtube.com/user/SHAYTARDS?feature=chclk",
 				"http://www.discovery.com/radio/xml/discovery_video.xml",
 				"http://feeds.feedburner.com/SelfPsychologyPodcast?format=xml",
-				"http://www.youtube.com/user/nba?blend=1&ob=4",
+				"http://www.youtube.com/user/nba",
+				"http://www.youtube.com/user/nba",
 				"http://feeds.feedburner.com/caliextralarge?format=xml",
 				"http://lltv.libsyn.com/rss"				
 		};
@@ -1100,7 +1096,7 @@ public class InitService {
 				"http://www.mevio.com/feeds/hdv.xml",
 				"http://feeds.drivingsports.com/dstv-extra?format=xml",
 				"http://www.youtube.com/user/TopGear",
-				"http://www.youtube.com/user/mercedesbenztv?blend=1&ob=4",
+				"http://www.youtube.com/user/mercedesbenztv",
 				"http://www.youtube.com/user/iconmotosports"				
 		};
 		return urls;
@@ -1125,7 +1121,7 @@ public class InitService {
 				"http://www.hbo.com/podcasts/true_blood/podcast.xml",
 				"http://podcast.msnbc.com/audio/podcast/MSNBC-MADDOW-NETCAST-M4V.xml",
 				"http://podcast.msnbc.com/audio/podcast/MSNBC-NN-NETCAST-M4V.xml",
-				"http://www.youtube.com/profile?user=richarddawkinsdotnet"				
+				"http://www.youtube.com/user/richarddawkinsdotnet"				
 		};
 		return urls;
 	}
@@ -1136,7 +1132,6 @@ public class InitService {
 				"http://www.youtube.com/user/TheInnovationNetwork",
 				"http://feeds.harvardbusiness.org/harvardbusiness/videoideacast",
 				"http://feeds.tvo.org/tvobigideasVideo?format=xml",
-				"http://ecorner.stanford.edu/VideoPodcastRssFeed.xml",
 				"http://podcast.msnbc.com/audio/podcast/MSNBC-COUNTDOWN-NETCAST-M4V.xml"				
 		};
 		return urls;
@@ -1164,8 +1159,8 @@ public class InitService {
 				"http://feeds.gametrailers.com/rss_ipod_gen.php?source=ps3",
 				"http://www.g4tv.com/xplay/podcasts/6/G4_TV__XPlay_Video_Podcast.xml",
 				"http://www.g4tv.com/attackoftheshow/podcasts/5/Attack_of_the_Show_Daily_Video_Podcast__G4_TV.xml",
-				"http://www.youtube.com/user/freddiew?blend=1&ob=4",
-				"http://www.youtube.com/user/huskystarcraft?blend=1&ob=4",				
+				"http://www.youtube.com/user/freddiew",
+				"http://www.youtube.com/user/huskystarcraft",				
 		};
 		return urls;
 	}
@@ -1206,7 +1201,6 @@ public class InitService {
 		String[] urls = {
 				"http://feeds.feedburner.com/rocknrolltv",
 				"http://www.youtube.com/user/maaximumseduction",
-				"http://www.chanelpodcast.com/RSS2",
 				"http://feeds.feedburner.com/fashionrocks",
 				"http://www.designfix.tv/design_fix.xml",
 				"http://downloads.designforlife.ie/podcasts/dfl_wmv/designforlife_windowsfeed.xml",
@@ -1247,7 +1241,7 @@ public class InitService {
 	public String[] getMso1PeopleChannels() {
 		String[] urls = {				
 				"http://www.youtube.com/user/SHAYTARDS?feature=chclk",
-				"http://www.youtube.com/user/charlieissocoollike?blend=1&ob=4",
+				"http://www.youtube.com/user/charlieissocoollike",
 				"http://www.youtube.com/user/CiNNtv1",
 				"http://www.youtube.com/user/mahmoodkhanpictures",
 				"http://www.youtube.com/user/PhilipDeFranco"				
@@ -1276,10 +1270,10 @@ public class InitService {
 	}
 	public String[] getMso1SportsChannels() {
 		String[] urls = {
-				"http://www.youtube.com/user/nba?blend=1&ob=4",
+				"http://www.youtube.com/user/nba",
 				"http://www.youtube.com/user/BigBlueChat",
 				"http://www.youtube.com/user/EpicMealTime",
-				"http://www.youtube.com/user/fcbarcelona?blend=1&ob=4",
+				"http://www.youtube.com/user/fcbarcelona",
 				"http://sports.espn.go.com/espnradio/podcast/feeds/itunes/podCast?id=3403194",
 				"http://www.youtube.com/user/UFC",
 				"http://www.youtube.com/user/wwwtvgolocom",
@@ -1329,7 +1323,7 @@ public class InitService {
 				"http://feeds.feedburner.com/earth-touch_featured_720p?format=xml",
 				"http://www.youtube.com/user/SHAYTARDS?feature=chclk",
 				"http://feeds.feedburner.com/SelfPsychologyPodcast?format=xml",
-				"http://www.youtube.com/user/nba?blend=1&ob=4",
+				"http://www.youtube.com/user/nba",
 				"http://feeds.feedburner.com/caliextralarge?format=xml",
 				"http://lltv.libsyn.com/rss"
 		};
