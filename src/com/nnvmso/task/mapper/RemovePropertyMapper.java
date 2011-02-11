@@ -15,8 +15,8 @@ public class RemovePropertyMapper extends AppEngineMapper<Key, Entity, NullWrita
 	@Override
 	public void map(Key key, Entity value, Context context) {
 		log.info("Adding key to deletion pool: " + key);
-		//
-		value.removeProperty("title");
+		String propertyName = context.getConfiguration().get("propertyName");		
+		value.removeProperty(propertyName);
 		DatastoreMutationPool mutationPool = this.getAppEngineContext(context).getMutationPool();
 		mutationPool.put(value);
 	}
