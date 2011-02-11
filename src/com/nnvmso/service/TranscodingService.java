@@ -230,6 +230,8 @@ public class TranscodingService {
 			env = "dev";
 		} else if (url.contains("9x9tvqa") || url.contains("qa.9x9.tv") || url.contains("qa.5f.tv")) {
 			env = "qa";
+		} else if (url.contains("9x9tvprod") || url.contains("prod.9x9.tv") || url.contains("prod.5f.tv")) {
+			env = "prod";
 		}
 		String transcodingServer = pro.getProperty(env);
 		String callbackServer = url;
