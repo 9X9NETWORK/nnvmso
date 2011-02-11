@@ -473,9 +473,10 @@ public class PlayerApiService {
 		}
 		return result;
 	}
-	
+
+	//http://localhost:8888/playerAPI/programInfo?ipg=27852&channel=*
 	public String findProgramInfo(String channelIds, String userToken, String ipgId, boolean userInfo) {
-		if (channelIds == null || (channelIds.equals("*") && userToken == null)) {
+		if (channelIds == null || (channelIds.equals("*") && userToken == null && ipgId == null)) {		   
 			return NnStatusMsg.inputMissing(locale);
 		}
 		MsoProgramManager programMngr = new MsoProgramManager();		
