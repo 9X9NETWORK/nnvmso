@@ -174,19 +174,31 @@ public class CategoryManager {
 	public List<Category> findAllByMsoId(long msoId) {
 		List<Category> categories = new ArrayList<Category>();
 		Cache cache = CacheFactory.get();
+		List<Long> notCachedIds = new ArrayList<Long>();
 		//find from cache
 		if (cache != null) {
 			@SuppressWarnings("unchecked")
 			List<Long> ids = (List<Long>)cache.get(this.getCacheCntKey(msoId));
 			if (ids != null) {
 				for (int i=0; i < ids.size(); i++) {
-					categories.add((Category)cache.get(this.getCacheKey(msoId, ids.get(i))));
+					Category c = (Category)cache.get(this.getCacheKey(msoId, ids.get(i)));
+					if (c != null) { 
+						categories.add(c);
+					} else {
+						notCachedIds.add(ids.get(i));
+					}										
 				}
-				return categories;
+				if (notCachedIds.size() ==0) {return categories;}				
 			}
 		}
 		//find
-		categories = categoryDao.findAllByMsoId(msoId);
+		if (notCachedIds.size() > 0) {
+			categories = this.findAllByIds(notCachedIds);
+			log.info("Categories are partial cached.");
+		} else {
+			categories = categoryDao.findAllByMsoId(msoId);
+			log.info("Categories never been cached");
+		}
 		//save in cache
 		if (cache != null) {
 			List<Long> ids = new ArrayList<Long>();
