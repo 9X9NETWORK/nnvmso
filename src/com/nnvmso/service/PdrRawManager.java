@@ -1,7 +1,6 @@
 package com.nnvmso.service;
 
 import java.util.Date;
-import java.util.List;
 import java.util.logging.Logger;
 
 import com.nnvmso.dao.PdrRawDao;
@@ -54,9 +53,5 @@ public class PdrRawManager {
 		}
 		*/
 	}
-	
-	public List<PdrRaw> findAll() {
-		return pdrDao.findAll();
-	}
-	
+		
 }
