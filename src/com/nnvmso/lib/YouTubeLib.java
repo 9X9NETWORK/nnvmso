@@ -17,17 +17,21 @@ public class YouTubeLib {
 	 *    http://www.youtube.com/<usrid>
 	 *    http://www.youtube.com/user/<usrid>
 	 *    http://www.youtube.com/profile?user=<usrid>
-	 */	
+	 * Examples: they should all become http://www.youtube.com/user/davidbrucehughes    
+	 *    http://www.youtube.com/profile?user=davidbrucehughes#g/u
+	 *    http://www.youtube.com/davidbrucehughes#g/a
+	 *    http://www.youtube.com/user/davidbrucehughes#g/p
+	 */		
 	public static String formatCheck(String url) {		
 		if (url == null) {return null;}
-		String[] dicStr = {"index", "videos", "watch",
-		        "entertainment", "music", "news", "movies",
-		        "comedy", "gaming", "sports", "education",
-		        "shows",  "trailers",   
-		        "store", "channels", "contests_main"};		
+		String[] invalid = {"index", "videos", "watch",
+		                    "entertainment", "music", "news", "movies",
+		                    "comedy", "gaming", "sports", "education",
+		                    "shows",  "trailers",   
+		                    "store", "channels", "contests_main"};		
 		HashSet<String> dic = new HashSet<String>();
-		for (int i=0; i<dicStr.length; i++) {
-			dic.add(dicStr[i]);
+		for (int i=0; i<invalid.length; i++) {
+			dic.add(invalid[i]);
 		}
 		String result = null;
 		String reg = "^(http|https)://?(\\w+\\.)?youtube.com/(user/|profile\\?user=)?([A-Za-z0-9]+)";
