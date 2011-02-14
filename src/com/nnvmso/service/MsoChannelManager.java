@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import com.google.appengine.api.datastore.Key;
 import com.nnvmso.dao.MsoChannelDao;
 import com.nnvmso.lib.CacheFactory;
+import com.nnvmso.lib.YouTubeLib;
 import com.nnvmso.model.Category;
 import com.nnvmso.model.CategoryChannel;
 import com.nnvmso.model.MsoChannel;
@@ -129,7 +130,17 @@ public class MsoChannelManager {
 		channel.setPublic(false);
 		return channel;
 	}
-				
+		
+	/** 
+	 * converge various formats to 1 
+	 * http://www.youtube.com/user/<usrid>
+	 * http://www.youtube.com/<usrid>
+	 * http://www.youtube.com/profile?user=<usrid>
+	 */
+	public String convergeYoutubeUrl(String url) {		
+		return "hello";
+	}
+	
 	public short getContentTypeByUrl(String url) {
 		short type = MsoChannel.CONTENTTYPE_PODCAST;
 		if (url.contains("http://www.youtube.com") || url.contains("https://www.youtube.com") || 
@@ -140,16 +151,18 @@ public class MsoChannelManager {
 		return type;
 	}		
 		
-	public boolean verifyPodcastUrl(MsoChannel channel) {
-		boolean valid = true;		
+	public String verifyUrl(String url) {
 		TranscodingService tranService = new TranscodingService();
-		if (channel.getContentType() == MsoChannel.CONTENTTYPE_PODCAST) {
-			String podcastInfo[] = tranService.getPodcastInfo(channel.getSourceUrl());			
+		short contentType = this.getContentTypeByUrl(url); 
+		if ( contentType == MsoChannel.CONTENTTYPE_PODCAST) {
+			String podcastInfo[] = tranService.getPodcastInfo(url);			
 			if (!podcastInfo[0].equals("200") || !podcastInfo[1].contains("xml")) {
-				valid = false;				
+				return null;
 			}
+		} else if (contentType == MsoChannel.CONTENTTYPE_YOUTUBE) {
+			url = YouTubeLib.formatCheck(url);
 		}
-		return valid;
+		return url;
 	}
 
 	public List<MsoChannel> findMsoDefaultChannels(long msoId) {		
