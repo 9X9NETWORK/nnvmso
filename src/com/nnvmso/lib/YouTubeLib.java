@@ -17,12 +17,13 @@ public class YouTubeLib {
 	 *    http://www.youtube.com/<usrid>
 	 *    http://www.youtube.com/user/<usrid>
 	 *    http://www.youtube.com/profile?user=<usrid>
+	 * 3. later need to add youtube api call !!!
 	 * Examples: they should all become http://www.youtube.com/user/davidbrucehughes    
 	 *    http://www.youtube.com/profile?user=davidbrucehughes#g/u
 	 *    http://www.youtube.com/davidbrucehughes#g/a
 	 *    http://www.youtube.com/user/davidbrucehughes#g/p
 	 */		
-	public static String formatCheck(String url) {		
+	public static String formatCheck(String url) {
 		if (url == null) {return null;}
 		String[] invalid = {"index", "videos", "watch",
 		                    "entertainment", "music", "news", "movies",
