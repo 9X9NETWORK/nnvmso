@@ -387,9 +387,9 @@ public class PlayerApiService {
 
 	public String createChannel(String categoryIds, String userToken, String url, String grid, HttpServletRequest req) {
 		//verify input
-		if (url == null || url.length() == 0 ||  grid == null || 
-			categoryIds == null || categoryIds.equals("undefined") ||
-			userToken== null || userToken.length() == 0 || grid.length() == 0) {
+		if (url == null || url.length() == 0 ||  grid == null || grid.length() == 0 ||
+			categoryIds == null || categoryIds.equals("undefined") || categoryIds.length() == 0 ||
+			userToken== null || userToken.length() == 0) {
 			return NnStatusMsg.inputMissing(locale);
 		}
 		url = url.trim();
@@ -406,32 +406,29 @@ public class PlayerApiService {
 		List<Category> categories = categoryMngr.findCategoriesByIdStr(categoryIds);
 		if (categories.size() == 0) { return messageSource.getMessage("nnstatus.category_invalid", new Object[] {NnStatusCode.CATEGORY_INVALID} , locale); }
 		
-		//verify whether a duplication
-		MsoChannelManager channelMngr = new MsoChannelManager();
-		MsoChannel channel = channelMngr.findBySourceUrl(url);
-		boolean duplicate = false;
-		if (channel != null) {
-			duplicate = true;
-			log.info("User submits a duplicate url:" + url);
-			//add categories if necessary
-			categoryMngr.changeCategory(channel.getKey().getId(), categories);
+		MsoChannelManager channelMngr = new MsoChannelManager();		
+		//verify url, also converge youtube url		
+		url = channelMngr.verifyUrl(url); 		
+		if (url == null) {
+			return messageSource.getMessage("nnstatus.channel_url_invalid", new Object[] {NnStatusCode.CHANNEL_URL_INVALID} , locale);			
 		}
 		
-		//verify whether it's a bad channel
-		if (duplicate && channel.getStatus() == MsoChannel.STATUS_ERROR) {
+		//verify channel status for existing channel
+		MsoChannel channel = channelMngr.findBySourceUrl(url);										
+		if (channel != null && channel.getStatus() == MsoChannel.STATUS_ERROR) {
 			return messageSource.getMessage("nnstatus.channel_status_error", new Object[] {NnStatusCode.CHANNEL_STATUS_ERROR} , locale);
 		}
 		
-		//verify source url
-		if (!duplicate) {
-			channel = channelMngr.initChannelSubmittedFromPlayer(url, user);
-			if (!channelMngr.verifyPodcastUrl(channel)) {
-				return messageSource.getMessage("nnstatus.channel_url_invalid", new Object[] {NnStatusCode.CHANNEL_URL_INVALID} , locale);				
-			}
+		if (channel != null) {
+			//add categories if necessary
+			log.info("User submits a duplicate url:" + url);
+			categoryMngr.changeCategory(channel.getKey().getId(), categories);
+		} else {				
 			//create a new channel
+			channel = channelMngr.initChannelSubmittedFromPlayer(url, user);
 			log.info("User throws a new url:" + url);
 			channelMngr.create(channel, categories);
-			if (channel.getKey() != null) {
+			if (channel.getKey() != null) { //!!!
 				TranscodingService tranService = new TranscodingService();
 				tranService.submitToTranscodingService(channel.getKey().getId(), url, req);
 			}
@@ -580,7 +577,8 @@ public class PlayerApiService {
 			String imageUrl = p.getImageUrl();
 			String imageLargeUrl = p.getImageLargeUrl();
 			if (imageUrl == null) {imageUrl = "";}
-			if (imageLargeUrl == null) {imageLargeUrl = "";}	
+			if (imageLargeUrl == null) {imageLargeUrl = "";}
+			System.out.println("config value:" + config.getValue());
 			if (config.getValue().equals(MsoConfig.CDN_AKAMAI)) {
 				url1 = url1.replaceFirst(regexCache, cache);
 				url1 = url1.replaceAll(regexPod, pod);
