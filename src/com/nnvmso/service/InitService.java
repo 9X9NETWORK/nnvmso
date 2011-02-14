@@ -1121,7 +1121,6 @@ public class InitService {
 				"http://feeds.feedburner.com/macappguide-hd?format=xml",
 				"http://www.hbo.com/podcasts/true_blood/podcast.xml",
 				"http://podcast.msnbc.com/audio/podcast/MSNBC-MADDOW-NETCAST-M4V.xml",
-				"http://podcast.msnbc.com/audio/podcast/MSNBC-NN-NETCAST-M4V.xml",
 				"http://www.youtube.com/user/richarddawkinsdotnet"				
 		};
 		return urls;
@@ -1132,8 +1131,7 @@ public class InitService {
 				"http://feeds.feedburner.com/cnet/buzzreport?format=xml",
 				"http://www.youtube.com/user/TheInnovationNetwork",
 				"http://feeds.harvardbusiness.org/harvardbusiness/videoideacast",
-				"http://feeds.tvo.org/tvobigideasVideo?format=xml",
-				"http://podcast.msnbc.com/audio/podcast/MSNBC-COUNTDOWN-NETCAST-M4V.xml"				
+				"http://feeds.tvo.org/tvobigideasVideo?format=xml",				
 		};
 		return urls;
 	}
@@ -1169,7 +1167,7 @@ public class InitService {
 	public String[] getMso1GLChannels() {
 		String[] urls = {		
 				"http://anyonebutme.blip.tv/rss/itunes",
-				"http://jengotv.com/player-content/video-myd.xml",
+				"http://jengotv.com/player-content/video-myd.xml", //!!!
 				"http://www.youtube.com/user/kateclinton",
 				"http://robsfeedtoday.blip.tv/rss"				
 		};
