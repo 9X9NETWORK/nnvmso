@@ -86,7 +86,8 @@
   <li>Channel listing
     <ul>
       <li><a href="/admin/channel/list">channel listing</a></li>
-      <li>channel modify <br/>
+      <li>channel modify [IMPORTANT: if you mark channel status failed, make sure this channel is not in MsoIpg.]<br/>
+          (status: 0 success; 1 error; 2 processing) <br/>
           http://host/admin/channel/modify?id=123&name=xx&status=1&programCount=123
       </li>            
       <li>a channel's categories<br/>
@@ -95,7 +96,7 @@
       <li>add a channel's categories<br/>
           http://host/admin/channel/addCategories?channel=123&categories=111,112
       </li>
-      <li>delete a channel's categories<br/>
+      <li>delete a channel's categories [NOTE: it is NOT channel deletion. delete please use modify, set status 1]<br/>
           http://host/admin/channel/deleteCategories?channel=123&categories=111,112
       </li>    
       <li>find any not unique source url, for debugging purpose <br/>
