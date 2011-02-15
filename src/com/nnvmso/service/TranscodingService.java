@@ -219,9 +219,11 @@ public class TranscodingService {
 	}
 	
 	public String[] getTranscodingEnv(HttpServletRequest req) {
+		//get environment
 		Properties pro = getTranscodingServerPro();
 		String url = NnNetUtil.getUrlRoot(req);
 		String env = "office";
+		String callback_env = "_callback";
 		if (url.contains("9x9tvalpha") || url.contains("alpha.9x9.tv") || url.contains("alpha.5f.tv")) {
 			env = "alpha";
 		} else if (url.contains("9x9tvbeta") || url.contains("beta.9x9.tv") || url.contains("beta.5f.tv")){
@@ -230,14 +232,19 @@ public class TranscodingService {
 			env = "dev";
 		} else if (url.contains("9x9tvqa") || url.contains("qa.9x9.tv") || url.contains("qa.5f.tv")) {
 			env = "qa";
-		} else if (url.contains("9x9tvprod") || url.contains("prod.9x9.tv") || url.contains("prod.5f.tv")) {
+		} else if (url.contains("9x9tvprod") || url.contains("prod.9x9.tv") || url.contains("prod.5f.tv") ||
+				   url.contains("9x9.tv") || url.contains("www.9x9.tv") || 
+				   url.contains("5f.tv") || url.contains("www.5f.tv")) {
 			env = "prod";
 		}
-		String transcodingServer = pro.getProperty(env);
+		callback_env = env + callback_env;
+		
+		//set transcoding server and callback urls
+		String transcodingServer = pro.getProperty(env);		
 		String callbackServer = url;
-		if (env.equals("office")) {
-			callbackServer = pro.getProperty("office_callback");
-		}		
+		if (pro.getProperty(callback_env).length() > 0) {
+			callbackServer = pro.getProperty(callback_env);
+		}
 		String devel = pro.getProperty("devel");
 		return new String[]{transcodingServer, callbackServer, devel};
 	}
