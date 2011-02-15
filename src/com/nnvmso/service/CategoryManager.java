@@ -79,33 +79,17 @@ public class CategoryManager {
 		return categories;
 	}
 
-	public boolean deleteCategory(long channelId, String categoryIds) {
-		System.out.println("categoryIds:" + categoryIds);
+	public void deleteCategory(MsoChannel channel, List<Category> categories) {
+		if (channel == null) {return;}
+		if (categories.size() == 0) {return;}
 		
-		MsoChannelManager channelMngr = new MsoChannelManager();
-		MsoChannel channel = channelMngr.findById(channelId);
-		if (channel == null) {return false;}
-		
-		//find requested categories
-		CategoryManager categoryMngr = new CategoryManager();		
-		List<Long> categoryIdList = new ArrayList<Long>();	
-		String[] arr = categoryIds.split(",");
-		for (int i=0; i<arr.length; i++) { categoryIdList.add(Long.parseLong(arr[i])); }		
-		List<Category> categories = categoryMngr.findAllByIds(categoryIdList);
-		if (categories.size() == 0) {return false;}
-		
-		CategoryChannelManager ccMngr = new CategoryChannelManager();
-		// --find existing categories
-		List<CategoryChannel> ccs = ccMngr.findAllByChannelId(channel.getKey().getId());
-		//a channel needs to be belonged to at least a category
-		if (ccs.size() <= categories.size()) {return false;}		
-		
-		//delete
+		CategoryChannelManager ccMngr = new CategoryChannelManager();		
 		for (Category c : categories) {	
-			CategoryChannel cc = ccMngr.findByCategoryIdAndChanelId(c.getKey().getId(), channelId);
-			ccMngr.delete(cc);
+			CategoryChannel cc = ccMngr.findByCategoryIdAndChanelId(c.getKey().getId(), channel.getKey().getId());
+			if (cc != null) {
+				ccMngr.delete(cc);
+			}
 		}		
-		return true;
 	}
 	
 	public List<Category> findCategoriesByIdStr(String categoryIds) {
