@@ -85,9 +85,15 @@ public class MsoChannelManager {
 		return channel;
 	}		
 	
+	/**
+	 * No deletion so we can keep track of bad urls 
+	 */
 	public void delete(MsoChannel channel) {
-		//category channelCount
-		//cache
+		//delete categories
+		//delete channel
+		//delete programs
+		//change category channelCount
+		//check cache
 	}
 	
 	//!!! model?
