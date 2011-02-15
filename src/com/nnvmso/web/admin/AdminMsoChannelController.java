@@ -16,6 +16,7 @@ import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.lib.NnStringUtil;
 import com.nnvmso.model.*;
+import com.nnvmso.service.CategoryChannelManager;
 import com.nnvmso.service.CategoryManager;
 import com.nnvmso.service.MsoChannelManager;
 
@@ -104,12 +105,14 @@ public class AdminMsoChannelController {
 		MsoChannel c = channelMngr.findById(channel);
 		if (c != null) {
 			//find all the categories
+			CategoryChannelManager ccMngr = new CategoryChannelManager();
 			CategoryManager categoryMngr = new CategoryManager();
 			List<Long> categoryIdList = new ArrayList<Long>();	
 			String[] arr = categories.split(",");
-			for (int i=0; i<arr.length; i++) { categoryIdList.add(Long.parseLong(arr[i])); }		
+			for (int i=0; i<arr.length; i++) { categoryIdList.add(Long.parseLong(arr[i])); }
+			//delete them in CategoryChannel table
 			List<Category> existing = categoryMngr.findAllByIds(categoryIdList);
-			categoryMngr.deleteCategory(c, existing);
+			ccMngr.deleteChannelCategory(c, existing);
 		}
 		return output;
 	}
