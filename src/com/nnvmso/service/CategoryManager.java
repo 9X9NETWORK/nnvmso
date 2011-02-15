@@ -78,19 +78,6 @@ public class CategoryManager {
 		System.out.println("category size:" + categories.size());
 		return categories;
 	}
-
-	public void deleteCategory(MsoChannel channel, List<Category> categories) {
-		if (channel == null) {return;}
-		if (categories.size() == 0) {return;}
-		
-		CategoryChannelManager ccMngr = new CategoryChannelManager();		
-		for (Category c : categories) {	
-			CategoryChannel cc = ccMngr.findByCategoryIdAndChanelId(c.getKey().getId(), channel.getKey().getId());
-			if (cc != null) {
-				ccMngr.delete(cc);
-			}
-		}		
-	}
 	
 	public List<Category> findCategoriesByIdStr(String categoryIds) {
 		List<Long> categoryIdList = new ArrayList<Long>();	
