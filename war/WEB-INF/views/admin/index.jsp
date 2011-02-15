@@ -57,7 +57,7 @@
 		  http://host/admin/category/modify?id=123&name=xxx&&isPublic=1&channelCount=123
 	  </li>
 	  <li>list every channel under a category <br/>
-	      http://host/admin/category/channelList?id=123 
+	      http://host/admin/category/channelList?category=123 
 	  </li>	      	                          	   
     </ul>
   </li>
