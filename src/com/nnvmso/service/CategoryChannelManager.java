@@ -6,6 +6,7 @@ import java.util.List;
 import com.nnvmso.dao.CategoryChannelDao;
 import com.nnvmso.model.Category;
 import com.nnvmso.model.CategoryChannel;
+import com.nnvmso.model.MsoChannel;
 
 public class CategoryChannelManager {
 	
@@ -24,6 +25,18 @@ public class CategoryChannelManager {
 		ccDao.delete(cc);
 		category.setChannelCount(category.getChannelCount()-1);
 		categoryMngr.save(category);
+	}
+	
+	public void deleteChannelCategory(MsoChannel channel, List<Category> categories) {
+		if (channel == null) {return;}
+		if (categories.size() == 0) {return;}
+				
+		for (Category c : categories) {	
+			CategoryChannel cc = this.findByCategoryIdAndChanelId(c.getKey().getId(), channel.getKey().getId());
+			if (cc != null) {
+				this.delete(cc);
+			}
+		}		
 	}
 	
 	public List<CategoryChannel> findAllByCategoryId(long categoryId) {
