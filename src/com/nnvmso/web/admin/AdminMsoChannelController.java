@@ -97,10 +97,20 @@ public class AdminMsoChannelController {
 	
 	@RequestMapping("deleteCategories")
 	public @ResponseBody String deleteCategories(@RequestParam(required=true)long channel, String categories) {
+		if (categories == null) {return "fail";}
 		String output = "success";
-		CategoryManager categoryMngr = new CategoryManager();
-		boolean success = categoryMngr.deleteCategory(channel, categories);
-		if (!success) {output = "failed";}
+		//find channel
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		MsoChannel c = channelMngr.findById(channel);
+		if (c != null) {
+			//find all the categories
+			CategoryManager categoryMngr = new CategoryManager();
+			List<Long> categoryIdList = new ArrayList<Long>();	
+			String[] arr = categories.split(",");
+			for (int i=0; i<arr.length; i++) { categoryIdList.add(Long.parseLong(arr[i])); }		
+			List<Category> existing = categoryMngr.findAllByIds(categoryIdList);
+			categoryMngr.deleteCategory(c, existing);
+		}
 		return output;
 	}
 		
@@ -108,14 +118,13 @@ public class AdminMsoChannelController {
 	public @ResponseBody String listCategories(@RequestParam(required=true)long channel) {
 		CategoryManager categoryMngr = new CategoryManager();
 		List<Category> categories = categoryMngr.findCategoriesByChannelId(channel);
-		System.out.print("list category size:" + categories.size());
 		String output = "";
 		for (Category c : categories) {
 			output = output + c.getKey().getId() + "\t" + c.getName() + "<br/>";
 		}
 		return output;
 	}
-	
+		
 	@RequestMapping("modify")
 	public @ResponseBody String modify(@RequestParam(required=true)  String id,
 	                                   @RequestParam(required=false) String name,
