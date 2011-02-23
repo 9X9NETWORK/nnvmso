@@ -74,7 +74,7 @@ public class MsoManager {
 	public String findMsoNameViaHttpReq(HttpServletRequest req) {
 		String url = NnNetUtil.getUrlRoot(req);
 		String msoName = "";
-		if (url.contains("5f.tv")) {
+		if (url.contains("9x9.tv/5f")) {
 			msoName = "5f";
 		} else if (url.contains("9x9.tv")) {
 			msoName = "9x9";
