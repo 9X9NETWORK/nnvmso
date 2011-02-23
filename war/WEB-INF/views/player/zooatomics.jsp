@@ -5076,6 +5076,7 @@ function unsubscribe_channel()
         $("#delete-layer").show();
         delete_mode = 'step2';
         delete_cursor = 1;
+        ipg_sync();
         }
       });
     }
