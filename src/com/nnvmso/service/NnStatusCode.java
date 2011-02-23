@@ -49,6 +49,10 @@ public class NnStatusCode {
 	public static final int IPG_ERROR = 450;
 	public static final int IPG_INVALID =451;
 	
+	//700 GAE error
+	public static final int GAE_ERROR = 700;
+	public static final int GAE_TIMEOUT = 701;
+	
 	//800 database error
 	public static final int DATABASE_ERROR = 900;
 	public static final int DATABASE_TIMEOUT = 901;
