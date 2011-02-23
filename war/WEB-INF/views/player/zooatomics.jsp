@@ -661,11 +661,7 @@ function fetch_programs()
     if (thumbing == 'ipg-wait')
       thumbing = 'ipg';
 
-    /* fetch_channels(); */
     setTimeout ("update_new_counters()", 0);
-
-    /* fix possible IE problem */
-    elastic();
     });
   }
 
@@ -759,12 +755,17 @@ function fetch_channels()
 
 function update_new_counters()
   {
+  redraw_ipg();
+  elastic();
+
   for (var channel in channelgrid)
     {
     var first = first_program_in (channel);
     channelgrid [channel]['new'] = programs_since (channel, lastlogin);
     }
+
   redraw_ipg();
+  elastic();
   }
 
 function programs_since (channel, timestamp)
@@ -1213,7 +1214,6 @@ function enter_channel (mode)
   $(".ep-list .age").show();
   $("#ep-layer").show();
   thumbing = mode;
-  turn_off_ancillaries();
   reset_osd_timex();
   }
 
@@ -1549,6 +1549,7 @@ function escape()
 
   if (thumbing == 'user')
     {
+    $("#body").focus();
     $("#signin-layer, #mask").hide();
     thumbing = 'ipg';
     return;
@@ -1624,12 +1625,6 @@ function notice_completed()
   thumbing = after_confirm;
   if (after_confirm_function)
     eval (after_confirm_function);
-  }
-
-function turn_off_ancillaries()
-  {
-  for (var v in { 'control-layer':'', 'ipg-layer':'' })
-    $("#" + v).hide();
   }
 
 function mousemove()
@@ -1842,8 +1837,6 @@ function keypress (keycode)
 
     case 45:
       /* Ins */
-      // if (thumbing == 'ipg')
-      //   ipg_preload (ipg_cursor);
       break;
 
     case 8:
@@ -1905,13 +1898,10 @@ function keypress (keycode)
 
     case 85:
       /* U */
-      if (thumbing == 'channel' || thumbing == 'program')
-        login_screen();
       break;
 
     case 87:
       /* W */
-      switch_to_whats_new();
       break;
 
     case 88:
@@ -2575,7 +2565,7 @@ function ipg_exit_delete_mode()
 
   thumbing = 'ipg';
 
-  $("#ep-tip").html ('<p></p>');
+  tip ('');
   ipg_sync();
   }
 
@@ -3108,6 +3098,7 @@ function ipg_play()
     {
     /* program is already started or in process of starting */
     /* note that since this navigation is disabled in the ipg, won't use this */
+    log ('using preload');
     fp_preloaded = '';
     physical_seek (0);
     physical_unmute();
@@ -5296,7 +5287,7 @@ function physical_stop()
 
     case "yt": log ('yt STOP');
                if (ytplayer)
-                 ytplayer.stopVideo();
+                 try { ytplayer.stopVideo(); } catch (error) {};
                break;
 
     }
@@ -6329,6 +6320,8 @@ function formatted_time (t)
 
 function switch_to_control_layer (epflag)
   {
+  log ('control layer');
+
   control_cursor = 2;
 
   if (epflag)
