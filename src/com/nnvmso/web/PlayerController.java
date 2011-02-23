@@ -15,7 +15,7 @@ import org.springframework.ui.Model;
 import com.nnvmso.lib.*;
 
 @Controller
-@RequestMapping("player")
+@RequestMapping("")
 public class PlayerController {
 
 	protected static final Logger logger = Logger.getLogger(PlayerController.class.getName());
@@ -26,14 +26,16 @@ public class PlayerController {
 		return "error/exception";				
 	}		
 	
-	@RequestMapping("zooatomics")
-	public String zooatomics(@RequestParam(value="mso",required=false) String mso, HttpServletRequest req, HttpServletResponse resp, Model model) {		
-		if (CookieHelper.getCookie(req, CookieHelper.PLATFORM) == null) {
-			CookieHelper.setCookie(resp, CookieHelper.PLATFORM, CookieHelper.PLATFORM_GAE);
-		}		
+	@RequestMapping("/")
+	public String index() {
+		return "redirect:9x9";
+	}
+	
+	@RequestMapping("9x9")
+	public String zooatomics(@RequestParam(value="mso",required=false) String mso, HttpServletRequest req, HttpServletResponse resp, Model model) {
+		CookieHelper.deleteCookie(resp, CookieHelper.MSO);
 		String now = (new SimpleDateFormat("MM.dd.yyyy")).format(new Date()).toString();
 		model.addAttribute("now", now);
-		CookieHelper.setCookie(resp, CookieHelper.MSO, mso);
 		return "player/zooatomics";
 	}
 
