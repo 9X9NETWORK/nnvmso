@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import com.google.appengine.api.datastore.DatastoreFailureException;
 import com.google.appengine.api.datastore.DatastoreNeedIndexException;
 import com.google.appengine.api.datastore.DatastoreTimeoutException;
+import com.google.apphosting.api.DeadlineExceededException;
 import com.nnvmso.lib.CookieHelper;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnStringUtil;
@@ -88,6 +89,8 @@ public class PlayerApiService {
 			output = NnStatusCode.DATABASE_ERROR + "\t" + "database internal error";
 		} else if (e.getClass().equals(DatastoreNeedIndexException.class)) {
 			output = NnStatusCode.DATABASE_NEED_INDEX + "\t" + "index is still building, fatal.";
+		} else if (e.getClass().equals(DeadlineExceededException.class)) {
+			output = NnStatusCode.GAE_TIMEOUT + "\t" + "GAE timeout";
 		}
 		NnLogUtil.logException((Exception) e);
 		return output;
@@ -578,7 +581,6 @@ public class PlayerApiService {
 			String imageLargeUrl = p.getImageLargeUrl();
 			if (imageUrl == null) {imageUrl = "";}
 			if (imageLargeUrl == null) {imageLargeUrl = "";}
-			System.out.println("config value:" + config.getValue());
 			if (config.getValue().equals(MsoConfig.CDN_AKAMAI)) {
 				url1 = url1.replaceFirst(regexCache, cache);
 				url1 = url1.replaceAll(regexPod, pod);
