@@ -14,7 +14,6 @@ import com.google.appengine.api.datastore.Key;
 import com.nnvmso.dao.MsoDao;
 import com.nnvmso.lib.CacheFactory;
 import com.nnvmso.lib.CookieHelper;
-import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.model.Mso;
 
 @Service
@@ -72,21 +71,10 @@ public class MsoManager {
 	}	
 	
 	public String findMsoNameViaHttpReq(HttpServletRequest req) {
-		String url = NnNetUtil.getUrlRoot(req);
-		String msoName = "";
-		if (url.contains("9x9.tv/5f")) {
-			msoName = "5f";
-		} else if (url.contains("9x9.tv")) {
-			msoName = "9x9";
-		} else {
-			msoName = req.getParameter("mso");
-			if (msoName == null) {
-				msoName = CookieHelper.getCookie(req, CookieHelper.MSO);
-			}
-			if (msoName == null) {
-				msoName = "9x9";
-			}
-		}
+		String msoName = "9x9";
+		msoName = CookieHelper.getCookie(req, CookieHelper.MSO);
+		if (msoName != null && msoName.equals("5f"))
+			msoName = "5f";		
 		return msoName;
 	}
 	
