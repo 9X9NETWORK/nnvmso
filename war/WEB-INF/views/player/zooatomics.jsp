@@ -178,6 +178,7 @@ var language_en =
   buffering: 'Buffering...',
   contribute: 'Contribute a video Podcast RSS / YouTube Channel(www.youtube.com/user/userid) URL',
   returningusers: 'Returning Users',
+  name: 'Name',
   password: 'Password',
   passverify: 'Verify password',
   email: 'Email',
