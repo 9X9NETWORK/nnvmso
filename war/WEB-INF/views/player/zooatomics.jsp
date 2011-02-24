@@ -734,10 +734,10 @@ function fetch_channels()
 
     if (readonly_ipg)
       {
-      var fields = lines[3].split ('\t');
+      var fields = lines[2].split ('\t');
       jumpstart_channel = fields [0];
       jumpstart_program = fields [1];
-      block_start_line = 5;
+      block_start_line = 4;
       }
 
     for (var i = block_start_line; i < lines.length; i++)
