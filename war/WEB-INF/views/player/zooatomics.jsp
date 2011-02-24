@@ -1798,6 +1798,8 @@ function keypress (keycode)
 
     case 13:
       /* enter */
+    case 121:
+      /* F10, remote control "OK" */
       if (thumbing == 'ipg')
         ipg_play();
       else if (thumbing == 'ipg-wait')
