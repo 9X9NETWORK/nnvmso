@@ -8,9 +8,9 @@
 <!-- FB Sharing meta data -->
 <meta name="title" content="My 9x9 Channel Guide ${now}" />
 <meta name="description" content="My 9x9 Channel Guide. Easily browse your favorite video podcasts on the 9x9 Player! Podcasts automatically download and update for you, bringing up to 81 channels of new videos daily." />
-<link rel="image_src" href="http://9x9ui.s3.amazonaws.com/9x9playerV38/images/9x9-facebook-icon.png" />
+<link rel="image_src" href="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/9x9-facebook-icon.png" />
 
-<link rel="stylesheet" href="http://9x9ui.s3.amazonaws.com/9x9playerV38/stylesheets/main.css" />
+<link rel="stylesheet" href="http://9x9ui.s3.amazonaws.com/9x9playerV39/stylesheets/main.css" />
 
 <script type="text/javascript" charset="utf-8" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.8/jquery-ui.min.js"></script>
@@ -18,9 +18,9 @@
 
 <script type="text/javascript" charset="utf-8" src="http://static.ak.fbcdn.net/connect/en_US/core.debug.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/scripts/swfobject.js"></script>
-<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/9x9playerV38/javascripts/jquery.swfobject.1-1-1.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/9x9playerV39/javascripts/jquery.swfobject.1-1-1.min.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/scripts/flowplayer-3.2.4.min.js"></script>
-<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/9x9playerV38/javascripts/whatsnew.js"></script>
+<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/9x9playerV39/javascripts/whatsnew.js"></script>
 
 <script>
 
@@ -164,7 +164,7 @@ var via_shared_ipg = false;
 /* reduced functionality if there is a valid user but he is visiting a shared ipg */
 var readonly_ipg = false;
 
-var root = 'http://9x9ui.s3.amazonaws.com/9x9playerV38/images/';
+var root = 'http://9x9ui.s3.amazonaws.com/9x9playerV39/images/';
 
 var language_en =
   {
@@ -1322,7 +1322,7 @@ function ep_html()
       if (thumbnail == '' || thumbnail == 'null' || thumbnail == 'false')
         thumbnail = bad_thumbnail;
 
-      html += '<li class="' + classes + '" id="p-li-' + i + '"><img src="' + root + bg_ep + '" class="bg-ep" id="bg-ep-' + i + '"><img src="' + thumbnail + '" class="thumbnail"><p class="age"><span>' + age + '</span></p><p class="duration"><span>' + duration + '</span></p></li>'
+      html += '<li class="' + classes + '" id="p-li-' + i + '"><img src="' + root + 'bg_ep_off.png" class="ep-off" id="ep-off-' + i + '"><img src="' + root + 'bg_ep_on.png" class="ep-on" id="ep-on-' + i + '"><img src="' + thumbnail + '" class="thumbnail"><p class="age"><span>' + age + '</span></p><p class="duration"><span>' + duration + '</span></p></li>'
       }
     }
 
@@ -2334,7 +2334,7 @@ function redraw_ipg()
         if (thumb == '' || thumb == 'null' || thumb == 'false')
           html += '<li class="clickable draggable" id="ipg-' + yx + '">' + bad_thumbnail + '</li>';
         else
-          html += '<li class="clickable draggable" id="ipg-' + yx + '"><img src="' + channelgrid [yx]['thumb'] + '">' + newbox + '</li>';
+          html += '<li class="clickable draggable" id="ipg-' + yx + '"><img src="' + channelgrid [yx]['thumb'] + '" class="thumbnail">' + newbox + '</li>';
         }
       else
         html += '<li class="clickable droppable" id="ipg-' + yx + '"><img src="' + root + 'add_channel.png" class="add-ch"></li>';
@@ -3173,6 +3173,9 @@ function ipg_play()
   clearTimeout (ipg_timex);
   clearTimeout (ipg_delayed_stop_timex);
 
+  $(".ep-list .age").hide();
+  $("#ep-meta").show();
+
   if (ipg_mode == 'episodes' && program_cursor != 1)
     {
     /* program is already started or in process of starting */
@@ -3349,15 +3352,11 @@ function ep_click (id)
 function ipg_episode_hover_in()
   {
   if (thumbing == 'program' || thumbing == 'control')
-    {
     $("#ep-list .clickable").removeClass ("on");
-    // $("#ep-list .bg-ep").attr ("src", root + 'bg_ep_off.png');
-    }
 
   $(this).addClass ("hover");
 
   var id = $(this).attr('id').replace (/^p-li-/, '');
-  // $("#bg-ep-" + id).attr ("src", root + 'bg_ep_on.png');
 
   var program = programgrid [program_line [id]];
 
@@ -3374,7 +3373,6 @@ function ipg_episode_hover_out()
   $(this).removeClass ("hover");
 
   var id = $(this).attr('id').replace (/^p-li-/, '');
-  // $("#bg-ep-" + id).attr ("src", root + 'bg_ep_off.png');
 
   var program = programgrid [program_line [program_cursor]];
 
@@ -3382,14 +3380,14 @@ function ipg_episode_hover_out()
   $("#ep-age").html (ageof (program ['timestamp']));
   $("#ep-length").html (durationof (program ['duration']));
 
-  $("#ep-meta").hide();
-  $(".ep-list .age").show();
+  if (thumbing == 'ipg' || thumbing == 'ipg-wait')
+    {
+    $("#ep-meta").hide();
+    $(".ep-list .age").show();
+    }
 
   if (thumbing == 'program' || thumbing == 'control')
-    {
     $("#p-li-" + program_cursor).addClass ("on");
-    // $("#bg-ep-" + program_cursor).attr ("src", root + 'bg_ep_on.png');
-    }
   }
 
 function truncated_name (name)
@@ -5527,7 +5525,7 @@ function ipg_preload (grid)
       plugins: { controls: null, content: fp_content },
       play: null, onBeforeKeypress: fpkp, onLoad: fp_onpreload,
       onError: function (in_code, in_msg) { log ("ERROR! " + in_code + " TEXT: " + in_msg); },
-      key: '#$f469b88194323deb943' });
+      key: ['#@02568d345b51c565a77', '#@094b173a0a25655269e', '#@8b75f0276f3becc2f3f', '#@5d96176a271ed2e10e8']  });
 
   start_preload = new Date();
   $("#preload").html ('Starting...');
@@ -5759,7 +5757,7 @@ function start_play_fp (url)
       clip: { onFinish: fp_ended, onStart: fp_onstart, bufferLength: 1, autoPlay: true, scaling: 'fit', onBufferEmpty: fp_buffering, onBufferFull: fp_notbuffering }, 
       plugins: { controls: null, content: fp_content },
       play: null, onBeforeKeypress: fpkp, onLoad: fp_onload,
-      key: '#$f469b88194323deb943' });
+      key: ['#@02568d345b51c565a77', '#@094b173a0a25655269e', '#@8b75f0276f3becc2f3f', '#@5d96176a271ed2e10e8'] });
 
   /* hack */
   if (thumbing != 'ipg' || ipg_mode != 'episodes')
@@ -5924,7 +5922,7 @@ function fp_preload_next (cursor)
           clip: { onFinish: fp_ended, onStart: fp_onstart, bufferLength: 1, autoPlay: true, scaling: 'fit', onBufferEmpty: fp_buffering, onBufferFull: fp_notbuffering }, 
           plugins: { controls: null, content: fp_content },
           play: null, onBeforeKeypress: fpkp, onLoad: fp_next_onload,
-          key: '#$f469b88194323deb943' });
+          key: ['#@02568d345b51c565a77', '#@094b173a0a25655269e', '#@8b75f0276f3becc2f3f', '#@5d96176a271ed2e10e8'] });
     }
   }
 
@@ -6873,12 +6871,12 @@ function noop (e)
   </div>
 
 <div id="ep-layer" style="display: none">
-  <img src="http://9x9ui.s3.amazonaws.com/9x9playerV38/images/ep_panel_off.png" id="ep-panel">
+  <img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/ep_panel_off.png" id="ep-panel">
   <div id="ep-tip"></div>
   <div id="ep-container">
     <p id="ep-indicator"><span id="episodes1">Episodes: </span><span id="epNum"></span></p>
-    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV38/images/arrow_right_off.png" id="arrow-right" style="display: none">
-    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV38/images/arrow_left_off.png" id="arrow-left" style="display: none">
+    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/arrow_right_off.png" id="arrow-right" style="display: none">
+    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/arrow_left_off.png" id="arrow-left" style="display: none">
     <ul class="ep-list" id="ep-list"></ul>
     <div id="ep-meta"><p><span class="ch-title" id="ep-layer-ch-title"></span> - <span class="ep-title" id="ep-layer-ep-title"></span> - <span class="age" id="ep-age"></span> - <span class="duration" id="ep-length"></span></p></div>
   </div>
@@ -6887,7 +6885,7 @@ function noop (e)
 <div id="ipg-layer" style="display: none">
   <div id="ipg-holder">
     <div id="header">
-      <img src="http://9x9ui.s3.amazonaws.com/9x9playerV38/images/logo.png" id="logo">
+      <img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/logo.png" id="logo">
       <p id="user-name"><span id="hello">Hello</span>, <span id="user">Guest</span></p>  
       <ul id="control-list"><li class="btn" id="ipg-btn-signin"><span id="solicit">Sign in / Sign up</span></li><li class="btn" id="ipg-btn-edit"><span id="edit-or-finish">Delete channel</span></li><li class="btn" id="ipg-btn-resume"><span id="resume1">Resume Watching</span></li></ul>
     </div>
@@ -6908,7 +6906,7 @@ function noop (e)
         <li id="preloading"><p><span class="hilite">Preload:</span> <span id="preload"></span></p></li>
       </ul>
       <div id="ipg-grid">
-        <p id="watermark"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV38/images/watermark.png"></p>
+        <p id="watermark"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/watermark.png"></p>
         <div id="list-holder">
         </div>
       </div>     
@@ -6920,7 +6918,7 @@ function noop (e)
   <div id="dir-holder">
 
   <div id="dir-header">
-    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV38/images/logo.png" id="dir-logo">
+    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/logo.png" id="dir-logo">
     <p id="chdirtxt">Channel Directory</p>  
   </div>
 
@@ -6936,20 +6934,20 @@ function noop (e)
   </div>
     <div class="br-panel" id="category-panel">
     <div class="sub-panel">
-      <p class="page-up"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV38/images/arrow_up.png"></p>
+      <p class="page-up"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/arrow_up.png"></p>
       <div class="sub-holder">
         <ul id="ch-catlist"></ul>
       </div>
-      <p class="page-down"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV38/images/arrow_down.png"></p>
+      <p class="page-down"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/arrow_down.png"></p>
     </div>
     <div class="content-panel">
-      <p class="page-up"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV38/images/arrow_up.png"></p>
+      <p class="page-up"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/arrow_up.png"></p>
       <div class="content-holder" style="display: block">
         <ul id="content-list"></ul>
       </div>
       <p id="ch-vacancy"></p>
       <!--a href="javascript:;" class="btn" id="btn-subscribeAll">Subscribe all</a-->
-      <p class="page-down"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV38/images/arrow_down.png"></p>
+      <p class="page-down"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/arrow_down.png"></p>
     </div>
   </div>
   
@@ -6961,8 +6959,8 @@ function noop (e)
           <li><a href="javascript:;" class="btn">Go</a></li>
         </ul>
     </div>
-    <p class="page-up"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV38/images/arrow_up.png"></p>
-    <p class="page-down"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV38/images/arrow_down.png"></p>
+    <p class="page-up"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/arrow_up.png"></p>
+    <p class="page-down"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/arrow_down.png"></p>
   </div>
   
   <div class="op-panel" id="add-panel">
@@ -7031,15 +7029,15 @@ function noop (e)
     <p>Press <span class="enlarge">&uarr;</span> to see your IPG</p>
   </div>
   <div id="controler">
-    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV38/images/bg_controler.png" id="controler-bg">
+    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/bg_controler.png" id="controler-bg">
     <ul id="control-bar">
-      <li id="btn-replay" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV38/images/btn_replay.png"></li>
-      <li id="btn-rewind" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV38/images/btn_rewind.png"></li>
-      <li id="btn-play" style="display: none" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV38/images/btn_play.png"></li>
-      <li id="btn-pause" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV38/images/btn_pause.png"></li>
-      <li id="btn-forward" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV38/images/btn_forward.png"></li>
+      <li id="btn-replay" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/btn_replay.png"></li>
+      <li id="btn-rewind" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/btn_rewind.png"></li>
+      <li id="btn-play" style="display: none" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/btn_play.png"></li>
+      <li id="btn-pause" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/btn_pause.png"></li>
+      <li id="btn-forward" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/btn_forward.png"></li>
       <li class="divider"></li>
-      <li id="btn-volume" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV38/images/btn_volume.png"></li>
+      <li id="btn-volume" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/btn_volume.png"></li>
       <li id="volume-constrain" class="on">
         <ul id="volume-bars">
           <li></li>
@@ -7052,9 +7050,9 @@ function noop (e)
         </ul>
       </li>
       <li class="divider"></li>
-      <li id="btn-facebook" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV38/images/btn_facebook.png"></li>
+      <li id="btn-facebook" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/btn_facebook.png"></li>
       <li class="divider"></li>
-      <li id="btn-close" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV38/images/btn_close.png"></li>
+      <li id="btn-close" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/btn_close.png"></li>
       <li id="play-time">-- / --</li>
       <li id="progress-bar">
         <p id="loaded" style="width: 100%;"></p>
@@ -7087,21 +7085,21 @@ function noop (e)
 
 <div id="waiting">
   <div class="waiting-holder">
-    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV38/images/loading.gif">
+    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/loading.gif">
     <p id="moment1">One moment...</p>
   </div>
 </div>
 
 <div id="buffering">
   <div class="waiting-holder">
-    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV38/images/loading.gif">
+    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/loading.gif">
     <p id="buffering1">Buffering...</p>
   </div>
 </div>
 
 <div id="dir-waiting">
   <div class="waiting-holder">
-    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV38/images/loading.gif">
+    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/loading.gif">
     <p id="moment2">One moment...</p>
   </div>
 </div>
@@ -7123,19 +7121,19 @@ function noop (e)
     <div id="sg-hint">
       <p class="section-title"><span>While Browsing Smart Guide</span></p>
       <ul class="hints-list">
-        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV38/images/arrow_keys.png" class="key-arrows"><span>Use arrow keys or mouse to navigate</span></li>
-        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV38/images/enter_key.png" class="key-enter"><span>Play episodes in the channel selected or add new channels</span></li>
+        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/arrow_keys.png" class="key-arrows"><span>Use arrow keys or mouse to navigate</span></li>
+        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/enter_key.png" class="key-enter"><span>Play episodes in the channel selected or add new channels</span></li>
       </ul>
     </div>
     <div id="ep-hint">
       <p class="section-title"><span>While Watching Episodes</span></p>
       <ul class="hints-list">
-        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV38/images/enter_key.png" class="key-enter"><span>Show control panel</span></li>
-        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV38/images/up_key.png" class="key-up"><span>Return to Smart Guide</span></li>
+        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/enter_key.png" class="key-enter"><span>Show control panel</span></li>
+        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/up_key.png" class="key-up"><span>Return to Smart Guide</span></li>
       </ul>
     </div>
     <div id="hint-bottom">
-      <p id="hint-remove" style="display: none"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV38/images/check_off.png" class="checkbox"><span>Don't show me this again</span></p>
+      <p id="hint-remove" style="display: none"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/check_off.png" class="checkbox"><span>Don't show me this again</span></p>
       <p class="btn" id="btn-closeHint" onclick="close_ipg_hint()"><span>Close this window</span></p>
     </div>
   </div>
