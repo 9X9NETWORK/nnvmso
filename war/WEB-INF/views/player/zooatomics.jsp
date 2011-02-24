@@ -1634,6 +1634,15 @@ function escape()
     return;
     }
 
+  if (thumbing == 'control')
+    {
+    $("#control-layer, #ep-layer").hide();
+    clear_osd_timex();
+    thumbing = 'program';
+    prepare_channel();
+    return;
+    }
+
   switch (thumbing)
     {
     case 'program': layer = $("#ep-layer");
@@ -2200,14 +2209,9 @@ function osd_timex_expired()
   {
   osd_timex = 0;
   log ('osd timex expired');
-
-  $("#ep-layer").hide();
-
-  if (thumbing == 'channel')
-    {
+  $("#ep-layer, #control-layer").hide();
+  if (thumbing == 'control')
     thumbing = 'program';
-    prepare_channel();
-    }
   }
 
 function extend_ep_layer()
@@ -4156,7 +4160,6 @@ function pre_login()
         var fields = lines[i].split ('\t');
         if (fields[0] == 'logoUrl')
           {
-          fields [1] = 'http://9x9ui.s3.amazonaws.com/images/logo_9x9.png';
           log ('logo: ' + fields[1]);
           $("#logo" ).attr ('src', fields[1]);
           $("#dir-logo").attr ('src', fields[1]);
@@ -4180,7 +4183,6 @@ function pre_login()
           {
           log ('language: ' + fields[1]);
           set_language (fields[1]);
-          //set_language ('zh');
           }
         else if (fields[0] == 'debug')
           {
@@ -6423,6 +6425,8 @@ function switch_to_control_layer (epflag)
 
   $(".cpclick").click (control_click);
   $(".cpclick").hover (control_hover_in, control_hover_out);
+
+  reset_osd_timex();
   }
 
 function control_volume()
@@ -6439,6 +6443,8 @@ function control_volume()
     }
 
   $("#volume-bars").html (html);
+
+  reset_osd_timex();
   }
 
 function control_left()
@@ -6451,6 +6457,7 @@ function control_left()
    control_cursor = control_buttons.length - 1;
 
   control_redraw();
+  reset_osd_timex();
   }
 
 function control_right()
@@ -6463,6 +6470,7 @@ function control_right()
     control_cursor = 0;
 
   control_redraw();
+  reset_osd_timex();
   }
 
 function control_redraw()
@@ -6528,12 +6536,14 @@ function control_hover_in()
   {
   $(".cpclick").removeClass ("on");
   $(this).addClass ("hover");
+  reset_osd_timex();
   }
 
 function control_hover_out()
   {
   $(this).removeClass ("hover");
   $('#' + control_buttons [control_cursor]).addClass ("on");
+  reset_osd_timex();
   }
 
 function control_click()
@@ -6545,6 +6555,8 @@ function control_click()
 
   if (id == 'btn-pause')
     id = 'btn-play';
+
+  reset_osd_timex();
 
   for (var i in control_buttons)
     {
@@ -6563,7 +6575,8 @@ function control_enter()
   switch (control_buttons [control_cursor])
     {
     case 'btn-close':       escape();
-                            break;
+                            /* return to avoid timex reset */
+                            return;
 
     case 'btn-play':
     case 'btn-pause':       pause();
@@ -6587,6 +6600,8 @@ function control_enter()
     case 'btn-forward':     fast_forward();
                             break;
     }
+
+  reset_osd_timex();
   }
 
 function yes_or_no (question, ifyes, ifno, defaultanswer)
