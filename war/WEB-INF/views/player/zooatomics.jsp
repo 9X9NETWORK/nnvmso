@@ -66,6 +66,8 @@ var user_cursor;
 var dir_requires_update = false;
 var nopreload = false;
 var divlog = false;
+var jumpstart_channel = '';
+var jumpstart_program = '';
 
 /* player data record */
 var pdr = '';
@@ -167,47 +169,46 @@ var root = 'http://9x9ui.s3.amazonaws.com/9x9playerV38/images/';
 var language_en =
   {
   hello: 'Hello',
-  signin: 'Sign in / Sign up',
-  signout: 'Sign out',
-  resume: 'Resume watching',
+  signin: 'Sign In / Sign Up',
+  signout: 'Sign Out',
+  resume: 'Resume Watching',
   episodes: 'Episodes',
   updated: 'Updated',
   onemoment: 'One moment...',
   buffering: 'Buffering...',
-  contribute: 'Contribute a Podcast / YouTube URL',
+  contribute: 'Contribute a video Podcast RSS / YouTube Channel(www.youtube.com/user/userid) URL',
   returningusers: 'Returning Users',
-  name: 'Name',
   password: 'Password',
-  passverify: 'Password verify',
+  passverify: 'Verify password',
   email: 'Email',
-  login: 'Log in',
-  deletetip: 'Highlight and then select a channel to delete it.',
-  findel: 'Finished deleting',
-  nochandel: 'No channels to delete!',
-  errormov: 'Error moving channel',
+  login: 'Sign in',
+  deletetip: 'Select a channel to delete it',
+  findel: 'Exit delete mode',
+  nochandel: 'No more channel to delete',
+  errormov: 'Moving channel error. Please try again.',
   notplaying: 'Nothing was playing',
-  noepchan: 'No episodes in channel',
+  noepchan: 'No episodes in this channel',
   thanx: 'Thank you for using 9x9.tv. You have signed out.',
-  logfail: 'Login failure',
+  logfail: 'Sign in failure',
   validmail: 'Please provide a valid email address.',
   passmatch: 'The two passwords you entered do not match.',
   sixchar: 'Please choose a password of at least six characters.',
   signupfail: 'Signup failure',
-  suberr: 'Error subscribing',
-  syschan: 'Cannot unsubscribe a system channel',
-  deletethis: 'Delete this channel?',
-  nochansquare: 'There is no channel in this square',
+  suberr: 'Cannot add the channel to Smart Guide now',
+  syschan: 'System channel cannot be deleted',
+  deletethis: 'Do you want to delete this channel?',
+  nochansquare: 'There is no channel in this spot.',
   internal: 'An internal error has occurred',
-  playthis: 'Play this channel?',
-  sharing: 'You will be sharing the Public section of your Smart Guide with your Facebook friends. Continue?',
-  noeps: 'There are no episodes in this channel',
-  addtip: 'Press ENTER or click to add a channel to this square',
+  playthis: 'Play this channel now?',
+  sharing: 'You will be sharing all the channels on your Smart Guide with your Facebook friends. Continue?',
+  noeps: 'There is no episode in this channel',
+  addtip: 'Select the empty spot to browse available channels',
   signuptip: 'Sign up to ensure your Smart Guide changes are saved',
   signouttip: 'Sign out',
   startdel: 'Select to start deleting channels',
   returnipg: 'Return to the channel you were watching before',
   browsetip: 'Browse the categories for available channels',
-  addrss: 'Can’t find what you like? Add your favorite video podcast RSS or Youtube channels!',
+  addrss: 'Can’t find what you like? Add your favorite video Podcast RSS or Youtube channels!',
   returnsmart: 'Return to Smart Guide',
   copypaste: 'Copy and paste video podcast RSS or Youtube channel URL here',
   threecat: 'Please select one to three categories',
@@ -215,22 +216,22 @@ var language_en =
   browsecats: 'Browse the categories for available channels',
   watchnow: 'Select this channel to watch it now',
   addsmart: 'Select this channel to add it to your Smart Guide',
-  enterwatch: 'Press ENTER to watch this channel, or continue browsing',
-  sharedipg: 'You cannot unsubscribe channels in a shared IPG',
-  suredel: 'Are you sure you want to delete',
+  enterwatch: 'Select to watch this channel now, or continue browsing',
+  sharedipg: "This is your friend's Smart Guide. You can only edit your own Smart Guide.",
+  suredel: 'Are you sure you want to delete this channel?',
   havedel: 'You have deleted channel',
   delmore: 'Delete More Channels',
   chandir: 'Channel Directory',
   delchan: 'Delete channel',
   subscribed: 'Subscribed',
-  entersub: 'Press ENTER to subscribe',
+  entersub: 'Select to subscribe',
   addchannel: 'Add Channel',
-  needcat: 'Please select a category for this channel',
+  needcat: 'Please select at least one category for this channel',
   needurl: 'Please provide a URL',
   pleasewait: 'Please wait...'
   };
 
-var language_zh =
+var language_tw =
   {
   hello: '您好',
   signin: '登入 / 註冊',
@@ -265,7 +266,7 @@ var language_zh =
   nochansquare: '空格中沒有頻道',
   internal: '內部錯誤發生，請重新嘗試',
   playthis: '要播放這個頻道嗎？',
-  sharing: '您的所有Facebook好友都會看到您的Smart Guide內容。請問是否要繼續？',
+  sharing: '您的所有Facebook好友都會看到您的Smart Guide內容。請問是否要繼續？ ',
   noeps: '此頻道中沒有節目，請觀看別的頻道',
   addtip: '選擇空格後，即可挑選新頻道並放入空格',
   signuptip: '註冊即可保證您的Smart Guide更新將會被妥善儲存',
@@ -285,14 +286,14 @@ var language_zh =
   suredel: '請問是否確定要刪除此頻道？',
   havedel: '您已刪除此頻道',
   delmore: '繼續刪除頻道',
-  chandir: 'Channel Directory',
-  delchan: 'Delete channel',
-  subscribed: 'Subscribed',
-  entersub: 'Press ENTER to subscribe',
-  addchannel: 'Add Channel',
-  needcat: 'Please select a category for this channel',
-  needurl: 'Please provide a URL',
-  pleasewait: 'Please wait...'
+  chandir: '頻道目錄',
+  delchan: '刪除頻道',
+  subscribed: '已訂閱',
+  entersub: '選擇即可訂閱',
+  addchannel: '新增頻道',
+  needcat: '請為此頻道至少挑選一個分類',
+  needurl: '請輸入URL',
+  pleasewait: '請稍待…'
   };
 
 var translations = language_en;
@@ -413,7 +414,7 @@ function align_jingle()
 function set_language (lang)
   {
   language = lang;
-  translations = (language == 'zh') ? language_zh : language_en;
+  translations = (language == 'zh' || language == 'zh-tw') ? language_tw : language_en;
   solicit();
   $("#hello").html (translations ['hello']);
   $("#resume1").html (translations ['resume']);
@@ -728,7 +729,17 @@ function fetch_channels()
       return;
       }
 
-    for (var i = 2; i < lines.length; i++)
+    var block_start_line = 2;
+
+    if (readonly_ipg)
+      {
+      var fields = lines[3].split ('\t');
+      jumpstart_channel = fields [0];
+      jumpstart_program = fields [1];
+      block_start_line = 5;
+      }
+
+    for (var i = block_start_line; i < lines.length; i++)
       {
       if (lines [i] != '')
         {
@@ -816,6 +827,12 @@ function activate()
   activated = true;
   elastic();
 
+  if (jumpstart_channel != '')
+    {
+    jumpstart()
+    return;
+    }
+
   current_channel = first_channel();
   program_cursor = 1;
   program_first = 1;
@@ -836,6 +853,67 @@ function activate()
   jw_play_nothing();
 
   $("body").focus();
+  }
+
+function jumpstart()
+  {
+  if (jumpstart_program in programgrid)
+    {
+    jumpstart_inner();
+    return;
+    }
+
+  log ('loading programs in jumpstart channel');
+  $("#waiting").show();
+
+  var query = "/playerAPI/programInfo?channel=" + jumpstart_channel + '&' + user_or_ipg();
+
+  var d = $.get (query, function (data)
+    {
+    parse_program_data (data);
+    $("#waiting").hide();
+    if (jumpstart_program in programgrid)
+      jumpstart_inner();
+    else
+      notice_ok (thumbing, translations ['internal'] + ': Jumpstart program not found', "");
+    });
+  }
+
+function jumpstart_inner()
+  {
+  current_channel = channels_by_id [jumpstart_channel]
+
+  /* temporarily first program */
+  current_program = first_program_in (current_channel);
+  program_cursor = 1;
+  program_first = 1;
+
+  enter_channel ('program');
+
+  /* now the real program */
+  current_program = jumpstart_program;
+
+  for (var i = 1; i <= n_program_line; i++)
+    {
+    if (program_line [i]['id'] == current_program)
+      {
+      program_cursor = i;
+      program_first = i;
+      break;
+      }
+    }
+
+  redraw_program_line();
+  physical_stop();
+
+  document.onkeydown=kp;
+  redraw_ipg();
+
+  $("#blue").hide();
+  preload_control_images()
+  $("body").focus();
+
+  play_program();
   }
 
 function preload_control_images()
@@ -6574,7 +6652,8 @@ function switch_to_facebook()
 
 function fb_yes()
   {
-  var query = "/playerAPI/saveIpg?user=" + user;
+  var channel = channelgrid [current_channel]['id'];
+  var query = "/playerAPI/saveIpg?user=" + user + '&' + 'channel=' + channel + '&' + 'program=' + current_program;
 
   $("#waiting").show();
 
