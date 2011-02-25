@@ -186,6 +186,10 @@ var language_en =
   signout: 'Sign Out',
   resume: 'Resume Watching',
   episodes: 'Episodes',
+  episode_lc: 'episode',
+  episodes_lc: 'episodes',
+  sub_lc: 'subscriber',
+  subs_lc: 'subscribers',
   updated: 'Updated',
   onemoment: 'One moment...',
   buffering: 'Buffering...',
@@ -242,7 +246,11 @@ var language_en =
   addchannel: 'Add Channel',
   needcat: 'Please select at least one category for this channel',
   needurl: 'Please provide a URL',
-  pleasewait: 'Please wait...'
+  pleasewait: 'Please wait...',
+  addrssyt: 'Add RSS / YouTube',
+  category: 'Category',
+  go: 'Go',
+  succpress: 'Successful! Press Enter to watch now'
   };
 
 var language_tw =
@@ -252,6 +260,10 @@ var language_tw =
   signout: '登出',
   resume: '繼續觀看節目',
   episodes: '節目集數',
+  episode_lc: '節目集數',
+  episodes_lc: '節目集數',
+  sub_lc: 'subscriber',
+  subs_lc: 'subscribers',
   updated: '已更新',
   onemoment: '稍待片刻...',
   buffering: '載入中...',
@@ -307,7 +319,11 @@ var language_tw =
   addchannel: '新增頻道',
   needcat: '請為此頻道至少挑選一個分類',
   needurl: '請輸入URL',
-  pleasewait: '請稍待…'
+  pleasewait: '請稍待…',
+  addrssyt: 'Add RSS / YouTube',
+  category: 'Category',
+  go: 'Go',
+  succpress: 'Successful! Press Enter to watch now'
   };
 
 var translations = language_en;
@@ -453,6 +469,11 @@ function set_language (lang)
   $("#buffering1").html (translations ['buffering']);
   $("#chdirtxt").html (translations ['chandir']);
   $("#edit-or-finish").html (translations ['delchan']);
+  $("#rsg1").html (translations ['returnsmart']);
+  $("#rsg2").html (translations ['returnsmart']);
+  $("#addrssyt").html (translations ['addrssyt']);
+  $("#category1").html (translations ['category']);
+  $("#succpress").html (translations ['succpress']);
   }
 
 function resize_fp()
@@ -4976,8 +4997,8 @@ function redraw_browse_content()
     html += '<li id="content-' + i + '" data-id="' + content['id'] + '"><img src=' + content['thumb'] + ' class="thumbnail">';
     html += '<p class="chdir-title">' + content['name'] + '</p>';
 
-    var eps = content['count'] + ' ' + ((content['count'] == 1) ? 'episode' : 'episodes');
-    var subs = content['subscribers'] + ' ' + ((content['subscribers'] == 1) ? 'subscriber' : 'subscribers');
+    var eps = content['count'] + ' ' + ((content['count'] == 1) ? translations ['episode_lc'] : translations ['episodes_lc']);
+    var subs = content['subscribers'] + ' ' + ((content['subscribers'] == 1) ? translations ['sub_lc'] : translations ['subs_lc']);
 
     html += '<p class="chdir-meta">' + eps + '<br>' + subs + '</p>';
     html += '<div class="msgbar">';
@@ -5087,7 +5108,7 @@ function continue_acceptance (position, channel_info)
   log ('accepting new channel ' + channel_info ['id'] + ' in grid location: ' + position);
   stop_preload();
 
-  $("#content-" + browser_y + " .msgbar").html ('<p class="successful">Successful! Press Enter to watch now</p>');
+  $("#content-" + browser_y + " .msgbar").html ('<p class="successful" id="succpress">Successful! Press Enter to watch now</p>');
   tip (translations ['enterwatch']);
 
   /* insert channel */
@@ -6689,6 +6710,8 @@ function switch_to_facebook()
 function fb_yes()
   {
   var channel = channelgrid [current_channel]['id'];
+  current_program = program_line [program_cursor];
+
   var query = "/playerAPI/saveIpg?user=" + user + '&' + 'channel=' + channel + '&' + 'program=' + current_program;
 
   $("#waiting").show();
@@ -6962,12 +6985,12 @@ function noop (e)
   <div id="main-panel">
     <ul>
       <!--<li id="featured"><p>Featured</p><span class="arrow">&raquo;</span></li>-->
-      <li id="main-1" class="selected"><p>Category</p><span class="arrow">&raquo;</span></li>
+      <li id="main-1" class="selected"><p id="category1">Category</p><span class="arrow">&raquo;</span></li>
       <!--<li id="most"><p>Most subscribed</p><span class="arrow">&raquo;</span></li>
       <li id="search"><p>Search</p><span class="arrow">&raquo;</span></li>-->
-      <li id="main-2"><p>Add RSS / YouTube</p><span class="arrow">&raquo;</span></li>
+      <li id="main-2"><p id="addrssyt">Add RSS / YouTube</p><span class="arrow">&raquo;</span></li>
     </ul>
-    <div class="btn" id="btn-returnIPG" onclick="browse_to_ipg()"><span>Return to Smart Guide</span></div>
+    <div class="btn" id="btn-returnIPG" onclick="browse_to_ipg()"><span id="rsg1">Return to Smart Guide</span></div>
   </div>
     <div class="br-panel" id="category-panel">
     <div class="sub-panel">
@@ -7166,7 +7189,7 @@ function noop (e)
       <p class="section-title"><span>While Watching Episodes</span></p>
       <ul class="hints-list">
         <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/enter_key.png" class="key-enter"><span>Show control panel</span></li>
-        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/up_key.png" class="key-up"><span>Return to Smart Guide</span></li>
+        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/up_key.png" class="key-up"><span id="rsg2">Return to Smart Guide</span></li>
       </ul>
     </div>
     <div id="hint-bottom">
