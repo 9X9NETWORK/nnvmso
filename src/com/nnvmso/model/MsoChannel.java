@@ -22,7 +22,10 @@ public class MsoChannel implements Serializable {
 		
 	@Persistent
 	private String name; 
-		
+	
+	@Persistent
+	private String nameSearch;
+
 	@Persistent
 	private String intro;
 	
@@ -50,24 +53,42 @@ public class MsoChannel implements Serializable {
 	@Persistent
 	private String sourceUrl;
 			
+	@Persistent
+	private String sourceUrlSearch;
+	
 	@NotPersistent
 	private short type; //Use with MsoIpg and Subscription, to define attributes such as MsoIpg.TYPE_READONLY
 
+	@Persistent
+	public short contentType;
 	public static short CONTENTTYPE_SYSTEM = 1;
 	public static short CONTENTTYPE_PODCAST = 2;
 	public static short CONTENTTYPE_YOUTUBE = 3;
-	@Persistent
-	public short contentType;
 	
+	@Persistent
+	private short status;
+	//general
 	public static short STATUS_SUCCESS = 0;
 	public static short STATUS_ERROR = 1;
 	public static short STATUS_PROCESSING = 2;
+	//invalid
+	public static short STATUS_INVALID_FORMAT = 51;
+	public static short STATUS_URL_NOT_FOUND = 53;
+	//quality
+	public static short STATUS_NO_VALID_EPISODE = 100;
+	public static short STATUS_BAD_QUALITY = 101;
+	//internal
+	public static short STATUS_TRANSCODING_DB_ERROR = 1000;
+	public static short STATUS_NNVMSO_JSON_ERROR = 1001;
+			
+	//enforce transcoding, could be used to assign special formats or bit rates
+	//currently 0 is no, 1 is yes
 	@Persistent
-	private short status;
+	private short enforceTranscoding; 
 		
 	@Persistent
 	private String errorReason;
-	
+		
 	@NotPersistent
 	private int seq; //use with subscription, to specify sequence in IPG. 
 		
@@ -80,6 +101,9 @@ public class MsoChannel implements Serializable {
 	@Persistent
 	private Date updateDate;
 			
+	@Persistent
+	private String transcodingUpdateDate; //timestamps from transcoding server
+		
 	public MsoChannel(String name, String intro, String imageUrl, long userId) {
 		this.name = name;
 		this.intro = intro;
@@ -250,5 +274,38 @@ public class MsoChannel implements Serializable {
 
 	public void setSubscriptionCount(int subscriptionCount) {
 		this.subscriptionCount = subscriptionCount;
-	}	
+	}
+
+	public String getNameSearch() {
+		return nameSearch;
+	}
+
+	public void setNameSearch(String nameSearch) {
+		this.nameSearch = nameSearch;
+	}
+
+	public String getSourceUrlSearch() {
+		return sourceUrlSearch;
+	}
+
+	public void setSourceUrlSearch(String sourceUrlSearch) {
+		this.sourceUrlSearch = sourceUrlSearch;
+	}
+
+	public void setTranscodingUpdateDate(String transcodingUpdateDate) {
+		this.transcodingUpdateDate = transcodingUpdateDate;
+	}
+
+	public short getEnforceTranscoding() {
+		return enforceTranscoding;
+	}
+
+	public void setEnforceTranscoding(short enforceTranscoding) {
+		this.enforceTranscoding = enforceTranscoding;
+	}
+
+	public String getTranscodingUpdateDate() {
+		return transcodingUpdateDate;
+	}
+	
 }
