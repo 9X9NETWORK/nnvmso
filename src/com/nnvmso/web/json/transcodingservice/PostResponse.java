@@ -10,6 +10,8 @@ public class PostResponse {
 
 	public static String ERROR_MSG_SUCCESS = "Success";
 	public static String ERROR_MSG_FAIL = "Fail";
+
+	public PostResponse() {}
 	
 	public PostResponse(String errorCode, String errorReason) {
 		this.errorCode = errorCode;

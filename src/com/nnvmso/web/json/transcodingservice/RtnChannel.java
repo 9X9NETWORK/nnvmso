@@ -10,6 +10,7 @@ public class RtnChannel {
 	private String title;
 	private String description;
 	private String pubDate;
+	private String lastUpdateTime;
 	private String image;
 	private String errorCode;
 	private String errorReason;
@@ -63,8 +64,14 @@ public class RtnChannel {
 	}
 	public void setErrorReason(String errorReason) {
 		this.errorReason = errorReason;
+	}	
+    public String getLastUpdateTime() {
+		return lastUpdateTime;
 	}
-    public String toString() {
+	public void setLastUpdateTime(String lastUpdateTime) {
+		this.lastUpdateTime = lastUpdateTime;
+	}
+	public String toString() {
         StringBuffer buffer = new StringBuffer();
         buffer.append("key: " + key + ";");
         buffer.append("title: " + title + ";");
