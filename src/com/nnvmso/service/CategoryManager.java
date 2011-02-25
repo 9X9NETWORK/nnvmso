@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import com.google.appengine.api.datastore.Key;
 import com.nnvmso.dao.CategoryDao;
 import com.nnvmso.lib.CacheFactory;
-import com.nnvmso.lib.NnStringUtil;
 import com.nnvmso.model.Category;
 import com.nnvmso.model.CategoryChannel;
 import com.nnvmso.model.MsoChannel;
@@ -29,7 +28,6 @@ public class CategoryManager {
 	public void create(Category category) {		
 		if (this.findByName(category.getName()) == null) {
 			Date now = new Date();
-			category.setName(NnStringUtil.capitalize(category.getName()));
 			category.setCreateDate(now);
 			category.setUpdateDate(now);
 			categoryDao.save(category);
@@ -49,8 +47,7 @@ public class CategoryManager {
 	}
 	
 	public Category save(Category category) {
-		category.setUpdateDate(new Date());
-		category.setName(NnStringUtil.capitalize(category.getName()));		
+		category.setUpdateDate(new Date());		
 		category = categoryDao.save(category);
 		//save to cache
 		Cache cache = CacheFactory.get();
