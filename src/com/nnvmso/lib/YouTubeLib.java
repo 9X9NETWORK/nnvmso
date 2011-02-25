@@ -19,7 +19,7 @@ public class YouTubeLib {
 	 *    http://www.youtube.com/<usrid>
 	 *    http://www.youtube.com/user/<usrid>
 	 *    http://www.youtube.com/profile?user=<usrid>
-	 * 3. later need to add youtube api call !!!
+	 * 3. youtube api call 
 	 * Examples: they should all become http://www.youtube.com/user/davidbrucehughes    
 	 *    http://www.youtube.com/profile?user=davidbrucehughes#g/u
 	 *    http://www.youtube.com/davidbrucehughes#g/a
@@ -46,13 +46,15 @@ public class YouTubeLib {
 			result = result.toLowerCase();
 			log.info("original url:" + url + ";result=" + result);			
 		}
-		//if (!youTubeCheck(result)) {return null;}
+		//if (!youTubeCheck(result)) {return null;} //till the function is fixed
 		return result;
 	}
 	
 	/**
 	 * YouTube API request format, http://gdata.youtube.com/feeds/api/users/androidcentral
 	 * This function currently checks only if the query status is not 200.
+	 * 
+	 * @@@ IMPORTANT: This code will be blocked by YouTube, need to add user's IP, indicating you are on behalf of the user.
 	 * 
 	 * @param urlStr support only format of http://www.youtube.com/user/android  
 	 */
