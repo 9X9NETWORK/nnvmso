@@ -38,10 +38,36 @@ public class AdminMsoProgramController {
 		return "error/exception";				
 	}	
 	
+	@RequestMapping(value="create")
+	public @ResponseBody String create(@RequestParam String channel) {		
+		//MsoProgram p = programMngr.findOldestByChannelId(Long.valueOf(id));
+		//System.out.println("p is " + p.getKey().getId());
+		return "OK";
+	}
+	
+	
+	@RequestMapping(value="delete")
+	public @ResponseBody String delete(@RequestParam(value="id") String id) {
+		MsoProgram p = programMngr.findById(Long.valueOf(id));
+		programMngr.delete(p);
+		return "OK";
+	}
+	
+	@RequestMapping("mp4")
+	public ResponseEntity<String> mp4(@RequestParam(value="channel")long channelId) {
+		//find all programs, including the not public ones
+		List<MsoProgram> programs = programMngr.findAllByChannelId(channelId);		
+		String result = "";
+		for (MsoProgram p:programs) {
+			result = result + p.getMpeg4FileUrl() + "\n";
+		}		
+		return NnNetUtil.textReturn(result);
+	}
+	
 	@RequestMapping("list")
 	public ResponseEntity<String> list(@RequestParam(value="channel")long channelId) {
 		//find all programs, including the not public ones
-		List<MsoProgram> programs = programMngr.findAllByChannelIdAndIsPublic(channelId);
+		List<MsoProgram> programs = programMngr.findAllByChannelId(channelId);
 		String[] title = {"id", "channelId", "isPublic", "status", "updateDate", "name"};		
 		String result = "";
 		for (MsoProgram p:programs) {
@@ -59,8 +85,9 @@ public class AdminMsoProgramController {
 	}
 	
 	@RequestMapping("modify")
-	public @ResponseBody String modify(@RequestParam(required=true)  String id,
-	                                   @RequestParam(required=false) String updateDate) {
+	public @ResponseBody String modify(@RequestParam(required=true)String id,
+							           @RequestParam(required=false)String status, 
+	                                   @RequestParam(required=false)String updateDate) {
 		
 		logger.info("updateDate: " + updateDate + " id: " + id);
 		MsoProgram program = programMngr.findById(Long.parseLong(id));
@@ -69,8 +96,13 @@ public class AdminMsoProgramController {
 		
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
 		try {
-			Date date = sdf.parse(updateDate);
-			program.setUpdateDate(date);
+			if (updateDate != null) {
+				Date date = sdf.parse(updateDate);
+				program.setUpdateDate(date);
+			}
+			if (status != null) {
+				program.setStatus(Short.valueOf(status));
+			}
 		} catch (ParseException e) {
 			return "Parsing Error";
 		}
@@ -78,4 +110,6 @@ public class AdminMsoProgramController {
 		programMngr.save(program);
 		return "OK";
 	}
+	
+	
 }
