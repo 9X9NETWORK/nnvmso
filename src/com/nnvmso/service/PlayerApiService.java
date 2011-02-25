@@ -115,14 +115,21 @@ public class PlayerApiService {
 		return output;
 	}
 	
-	public String saveIpg(String userToken) {
-		if (userToken == null || userToken.length() == 0 || userToken.equals("undefined")) {
+	public String saveIpg(String userToken, String channelId, String programId) {
+		if (userToken == null || userToken.length() == 0 || userToken.equals("undefined") ||
+			channelId == null || programId == null || channelId.length() == 0 || programId.length() == 0) {
 			return NnStatusMsg.inputMissing(locale);
 		}				
+		if (!Pattern.matches("^\\d*$", channelId) || !Pattern.matches("^\\d*$", programId)) {
+			return messageSource.getMessage("nnstatus.input_error", new Object[] {NnStatusCode.INPUT_ERROR} , locale);
+		}
+				
 		NnUser foundUser = userMngr.findByToken(userToken);				
 		if (foundUser == null) { return NnStatusMsg.userInvalid(locale);}
-		
+
 		Ipg ipg = new Ipg();
+		ipg.setChannelId(Long.parseLong(channelId));
+		ipg.setProgramId(Long.parseLong(programId));
 		IpgManager ipgMngr = new IpgManager();
 		ipgMngr.create(ipg, foundUser.getKey().getId());				
 		return NnStatusMsg.successStr(locale) + separatorStr + Long.toString(ipg.getId());				
@@ -133,12 +140,32 @@ public class PlayerApiService {
 		Ipg ipg = ipgMngr.findById(ipgId);
 		if (ipg == null) { return messageSource.getMessage("nnstatus.ipg_invalid", new Object[] {NnStatusCode.IPG_INVALID} , locale);} 
 		List<MsoChannel> channels = ipgMngr.findIpgChannels(ipg);
-		String output = NnStatusMsg.successStr(locale);
-		for (MsoChannel c : channels) {
-			output = output + this.composeChannelLineupStr(c, mso);
-			output = output + "\n";			
+		//first block: status
+		String status = NnStatusMsg.successStr(locale);
+		//second block: channel and episode information
+		//---channel info
+		String toPlay = separatorStr;
+//		MsoChannelManager channelMngr = new MsoChannelManager();		
+//		MsoChannel ipgChannel = channelMngr.findById(ipg.getChannelId());
+//		if (ipgChannel != null) {
+//			toPlay = toPlay + this.composeChannelLineupStr(ipgChannel, mso) + "\n";
+//		}
+		//---program info		
+		MsoProgramManager programMngr = new MsoProgramManager();
+		MsoProgram program = programMngr.findById(ipg.getProgramId());
+		if (program != null) {
+			List<MsoProgram> programs = new ArrayList<MsoProgram>();
+			programs.add(program);
+			MsoConfig config = new MsoConfigManager().findByMsoIdAndItem(mso.getKey().getId(), MsoConfig.CDN);
+			toPlay = toPlay + this.composeProgramInfoStr(programs, config);
 		}
-		return output;		
+		String channelLineup = separatorStr;
+		//third block: channelLineup 
+		for (MsoChannel c : channels) {
+			channelLineup = channelLineup + this.composeChannelLineupStr(c, mso);
+			channelLineup = channelLineup + "\n";			
+		}
+		return status + toPlay + channelLineup;		
 	}
 			
 	public String moveChannel(String userToken, String grid1, String grid2) {		
@@ -146,7 +173,9 @@ public class PlayerApiService {
 		if (userToken == null || userToken.length() == 0 || userToken.equals("undefined") || grid1 == null || grid2 == null) {
 			return NnStatusMsg.inputMissing(locale);
 		}
-		if (!Pattern.matches("^\\d*$", grid1) || !Pattern.matches("^\\d*$", grid2)) {
+		if (!Pattern.matches("^\\d*$", grid1) || !Pattern.matches("^\\d*$", grid2) ||
+			Integer.parseInt(grid1) < 0 || Integer.parseInt(grid1) > 81 ||
+			Integer.parseInt(grid2) < 0 || Integer.parseInt(grid2) > 81) {
 			return messageSource.getMessage("nnstatus.input_error", new Object[] {NnStatusCode.INPUT_ERROR} , locale);
 		}		
 		NnUser user = userMngr.findByToken(userToken);
@@ -395,6 +424,10 @@ public class PlayerApiService {
 			userToken== null || userToken.length() == 0) {
 			return NnStatusMsg.inputMissing(locale);
 		}
+		if (!Pattern.matches("^\\d*$", grid) || Integer.parseInt(grid) < 0 || Integer.parseInt(grid) > 81) {			
+			return messageSource.getMessage("nnstatus.input_error", new Object[] {NnStatusCode.INPUT_ERROR} , locale);
+		}
+		
 		url = url.trim();
 		
 		//verify user
@@ -410,15 +443,15 @@ public class PlayerApiService {
 		if (categories.size() == 0) { return messageSource.getMessage("nnstatus.category_invalid", new Object[] {NnStatusCode.CATEGORY_INVALID} , locale); }
 		
 		MsoChannelManager channelMngr = new MsoChannelManager();		
-		//verify url, also converge youtube url		
+		//verify url, also converge youtube url
 		url = channelMngr.verifyUrl(url); 		
 		if (url == null) {
 			return messageSource.getMessage("nnstatus.channel_url_invalid", new Object[] {NnStatusCode.CHANNEL_URL_INVALID} , locale);			
 		}
 		
 		//verify channel status for existing channel
-		MsoChannel channel = channelMngr.findBySourceUrl(url);										
-		if (channel != null && channel.getStatus() == MsoChannel.STATUS_ERROR) {
+		MsoChannel channel = channelMngr.findBySourceUrlSearch(url);										
+		if (channel != null && (channel.getStatus() != MsoChannel.STATUS_SUCCESS && channel.getStatus() != MsoChannel.STATUS_PROCESSING)) {
 			return messageSource.getMessage("nnstatus.channel_status_error", new Object[] {NnStatusCode.CHANNEL_STATUS_ERROR} , locale);
 		}
 		
@@ -496,9 +529,9 @@ public class PlayerApiService {
 		} else if (chArr.length > 1) {
 			List<Long> list = new ArrayList<Long>();
 			for (int i=0; i<chArr.length; i++) { list.add(Long.valueOf(chArr[i]));}
-			programs = programMngr.findAllByChannelIdsAndIsPublic(list, true);
+			programs = programMngr.findGoodProgramsByChannelIds(list);
 		} else {
-			programs = programMngr.findAllByChannelIdAndIsPublic(Long.parseLong(channelIds));
+			programs = programMngr.findGoodProgramsByChannelId(Long.parseLong(channelIds));
 		}		
 				
 		MsoConfig config = new MsoConfigManager().findByMsoIdAndItem(mso.getKey().getId(), MsoConfig.CDN);
@@ -603,7 +636,7 @@ public class PlayerApiService {
 				intro = intro.replaceAll("\\s", " ");				
 				intro = intro.substring(0, introLenth);
 			}
-					
+			
 			//the rest
 			String[] ori = {String.valueOf(p.getChannelId()), 
 					        String.valueOf(p.getKey().getId()), 
@@ -617,7 +650,7 @@ public class PlayerApiService {
 					        url2, 
 					        url3, 
 					        url4, 
-					        String.valueOf(p.getUpdateDate().getTime())};
+					        String.valueOf(p.getPubDate().getTime())};
 			output = output + NnStringUtil.getDelimitedStr(ori);
 			output = output.replaceAll("null", "");
 			output = output + "\n";
