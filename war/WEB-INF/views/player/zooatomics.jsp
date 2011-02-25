@@ -20,7 +20,6 @@
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/scripts/swfobject.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/9x9playerV39/javascripts/jquery.swfobject.1-1-1.min.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/scripts/flowplayer-3.2.4.min.js"></script>
-<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/9x9playerV39/javascripts/whatsnew.js"></script>
 
 <script type="text/javascript">
   var _gaq = _gaq || [];
@@ -144,9 +143,6 @@ var browse_cursor = 1;
 var max_programs_in_line = 9;
 var cat_query;
 
-/* what's new */
-whatsnew = [];
-
 /* timeout for program or channel index */
 var osd_timex = 0;
 
@@ -155,9 +151,6 @@ var fake_timex = 0;
 
 /* timeout for msg-layer */
 var msg_timex = 0;
-
-/* when end message enters whatsnew after 20 seconds */
-var edge_of_world_timex = 0;
 
 var dirty_delay;
 var dirty_channels = [];
@@ -262,7 +255,9 @@ var language_en =
   qno: 'No',
   cup: 'Press <span class="enlarge">&uarr;</span> to see your Smart Guide',
   cdown: 'Press <span class="enlarge">&darr;</span> for more episodes',
-  chcat: 'Channel category'
+  chcat: 'Channel category',
+  ytvid: 'Video disabled by Youtube',
+  eoe: 'End of episodes'
   };
 
 var language_tw =
@@ -274,8 +269,8 @@ var language_tw =
   episodes: '節目集數',
   episode_lc: '節目集數',
   episodes_lc: '節目集數',
-  sub_lc: 'subscriber',
-  subs_lc: 'subscribers',
+  sub_lc: '註冊用戶',
+  subs_lc: '註冊用戶',
   updated: '已更新',
   onemoment: '稍待片刻...',
   buffering: '載入中...',
@@ -332,22 +327,24 @@ var language_tw =
   needcat: '請為此頻道至少挑選一個分類',
   needurl: '請輸入URL',
   pleasewait: '請稍待…',
-  addrssyt: 'Add RSS / YouTube',
-  category: 'Category',
-  go: 'Go',
-  succpress: 'Successful! Press Enter to watch now',
-  hinstr: 'Instruction',
-  hwbsg: 'While Browsing Smart Guide',
-  hwwe: 'While Watching Episodes',
-  hctw: 'Close this window',
-  huak: 'Use arrow keys or mouse to navigate',
-  hpec: 'Play episodes in the channel selected or add new channels',
-  hscp: 'Show control panel',
-  qyes: 'Yes',
-  qno: 'No',
-  cup: 'Press <span class="enlarge">&uarr;</span> to see your Smart Guide',
-  cdown: 'Press <span class="enlarge">&darr;</span> for more episodes',
-  chcat: 'Channel category'
+  addrssyt: '新增 RSS / YouTube',
+  category: '頻道分類',
+  go: '提交',
+  succpress: '訂閱成功! 按'Enter'鍵即可開始觀看',
+  hinstr: '指令',
+  hwbsg: '當瀏覽Smart Guide時',
+  hwwe: '當觀看影片時',
+  hctw: '關閉此視窗',
+  huak: '使用方向鍵或鼠標導航',
+  hpec: '播放選定頻道的影片或添加新的頻道',
+  hscp: '顯示控制台',
+  qyes: '是',
+  qno: '否',
+  cup: '按 <span class="enlarge">&uarr;</span> 瀏覽您的Smart Guide',
+  cdown: '按 <span class="enlarge">&darr;</span> 觀看其它影片',
+  chcat: '頻道分類', 
+  ytvid: '此影片被Youtube禁播',
+  eoe: '所有節目播映完畢'
   };
 
 var translations = language_en;
@@ -389,7 +386,6 @@ function elastic_innards()
   ipg_fixup_margin();
   ipg_fixup_middle();
 
-  whatsnew_fixup_middle();
   episode_end_layer_fixup();
   dir_waiting_fixup();
   align_center();
@@ -423,11 +419,6 @@ function ipg_fixup_middle()
   try { $("#ipg-holder").css ("top", ($(window).height() - $("#ipg-holder").height()) / 2); } catch (error) {};
   try { $("#dir-holder").css ("top", ($(window).height() - $("#dir-holder").height()) / 2); } catch (error) {};
   try { $("#list-holder").css ("top", ($("#ipg-grid").height() - $("#list-holder").height()) / 2); } catch (error) {};
-  }
-
-function whatsnew_fixup_middle()
-  {
-  try { $("#new-holder").css ("top", ($(window).height() - $("#new-holder").height()) / 2); } catch (error) {};
   }
 
 function dir_waiting_fixup()
@@ -1078,11 +1069,6 @@ function clear_msg_timex()
     clearTimeout (msg_timex);
     msg_timex = 0;
     }
-  if (edge_of_world_timex != 0)
-    {
-    clearTimeout (edge_of_world_timex);
-    edge_of_world_timex = 0;
-    }
   $("#msg-layer").hide();
   $("#epend-layer").hide();
   }
@@ -1116,35 +1102,14 @@ function end_message (duration)
 
   thumbing = 'ipg-wait';
 
-  $("#msg-layer").html ('<p>End of programs</p>');
+  $("#msg-layer").html ('<p>' + translations ['eoe'] + '</p>');
   $("#msg-layer").show();
+  elastic();
 
   setTimeout ("switch_to_ipg()", 2500);
   stop_all_players();
 
   return;
-
-  var prev = previous_channel_square (current_channel);
-  var next = next_channel_square (current_channel);
-
-  $("#left-tease").attr ("src", channelgrid [prev]['thumb']);
-  $("#right-tease").attr ("src", channelgrid [next]['thumb']);
-
-  $("#epend-layer").show();
-
-  if (duration > 0)
-    msg_timex = setTimeout ("empty_channel_timeout()", duration);
-
-  edge_of_world_timex = setTimeout ("edge_of_world_idle()", 45000);
-
-  thumbing = 'end';
-  }
-
-function edge_of_world_idle()
-  {
-  edge_of_world_timex = 0;
-  if (thumbing == 'end')
-    switch_to_whats_new();
   }
 
 function play()
@@ -1847,9 +1812,7 @@ function keypress (keycode)
     {
     case 27:
       /* esc */
-      if (thumbing == 'whatsnew')
-        exit_whats_new();
-      else if (thumbing == 'confirm')
+      if (thumbing == 'confirm')
         notice_completed();
       else if (thumbing == 'ipg' && (ipg_mode == 'episodes' || ipg_mode == 'edit'))
         escape();
@@ -1884,8 +1847,6 @@ function keypress (keycode)
         switch_to_control_layer (false);
       else if (thumbing == 'control')
         control_enter();
-      else if (thumbing == 'whatsnew')
-        whatsnew_enter();
       else if (thumbing == 'confirm')
         escape();
       else if (thumbing == 'delete')
@@ -1908,8 +1869,6 @@ function keypress (keycode)
         ipg_left();
       else if (thumbing == 'control')
         control_left();
-      else if (thumbing == 'whatsnew')
-        PrevEp();
       else if (thumbing == 'browse')
         browse_left();
       else if (thumbing == 'user')
@@ -1934,8 +1893,6 @@ function keypress (keycode)
         ipg_right();
       else if (thumbing == 'control')
         control_right();
-      else if (thumbing == 'whatsnew')
-        NextEp();
       else if (thumbing == 'browse')
         browse_right();
       else if (thumbing == 'user')
@@ -1963,8 +1920,6 @@ function keypress (keycode)
         ipg_up();
       else if (thumbing == 'user')
         user_up()
-      else if (thumbing == 'whatsnew')
-        exit_whats_new();
       break;
 
     case 40:
@@ -1983,8 +1938,6 @@ function keypress (keycode)
         ipg_down();
       else if (thumbing == 'user')
         user_down()
-      else if (thumbing == 'whatsnew')
-        exit_whats_new();
       break;
 
     case 33:
@@ -2083,187 +2036,6 @@ function dump_configuration_to_log()
     var program = programgrid [p];
     log ('#' + p + ' ch:' + program ['channel'] + ' grid:' + channels_by_id [program ['channel']] + ' ' + program ['name'] + ' time:' + program ['timestamp'] + ' url: ' + best_url (p))
     }
-  }
-
-function switch_to_whats_new()
-  {
-  return;
-
-  whatsnew = [];
-
-  log ('whats new');
-  var bad_thumbnail = '<img src="http://9x9ui.s3.amazonaws.com/images/no_images.png">';
-
-  var query = "/playerAPI/whatsNew?user=" + user;
-
-  var d = $.get (query, function (data)
-    {
-    var lines = data.split ('\n');
-
-    var fields = lines[0].split ('\t');
-    if (fields [0] != '0')
-      {
-      log ('[whatsNew] server error: ' + lines [0]);
-      return;
-      }
-
-    log ('number of new programs obtained: ' + (lines.length - 3));
-
-    var wn = {};
-    var wn_count = 0;
-
-    for (var i = 2; i < lines.length; i++)
-      {
-      var program = lines [i].replace (/\s+$/, '');
-      if (program != '')
-        {
-        if (program in programgrid)
-          {
-          var real_channel = programgrid [program]['channel'];
-
-          if (! (real_channel in channels_by_id))
-            {
-            log ('program ' + program + ' is known but channel ' + real_channel + ' is not!');
-            continue;
-            }
-
-          if (! (real_channel in wn))
-            {
-            wn_count++;
-            wn [real_channel] = [];
-            }
-
-          wn [real_channel].push (program);
-
-          /* fixups */
-          programgrid [program]['age'] = ageof (programgrid [program]['timestamp']);
-          programgrid [program]['duration'] = durationof (programgrid [program]['duration']);
-
-          if (programgrid [program]['thumb'].match (/^(null|false)$/))
-            programgrid [program]['thumb'] = '';
-
-          if (programgrid [program]['snapshot'].match (/^(null|false)$/))
-            programgrid [program]['snapshot'] = '';
-
-          if (programgrid [program]['snapshot'] != '')
-            programgrid [program]['screenshot'] = programgrid [program]['snapshot'];
-          else
-            programgrid [program]['screenshot'] = programgrid [program]['thumb']
-          }
-        else
-          log ('program ' + program + ' not known');
-        }
-      }
-
-    if (wn_count == 0)
-      {
-      log ('nothing new');
-      return;
-      }
-
-    for (var y = 1; y <= 9; y++)
-      for (var x = 1; x <= 9; x++)
-        {
-        if (("" + y + "" + x) in channelgrid)
-          {
-          var channel = channelgrid ["" + y + "" + x]['id'];
-          if (channel in wn)
-            {
-            var grid = channels_by_id [channel];
-            log ('whatsnew :: ch:' + channel + ' grid: ' + grid + ' episodes:' + wn [channel].join());
-            whatsnew.push ({ 'channel': channel, 'grid': grid, 'episodes': wn [channel] });
-            }
-          }
-        }
-
-    if (whatsnew.length == 0)
-      {
-      log ('nothing new...');
-      return;
-      }
-    else
-      {
-      log ('channels with new things: ' + whatsnew.length);
-      }
-
-    stop_preload();
-    stop_all_players();
-
-    // try { force_pause(); } catch (error) { log ('exception in force_pause!'); };
-
-    // escape();
-    hide_layers();
-    thumbing = 'whatsnew';
-
-    log ('what is new?');
-
-    var html = '<p id="whatsnew-title">What\'s New</p>';
-
-    for (var y = 1; y <= 9; y++)
-      {
-      html += '<ul class="new-list">';
-
-      for (var x = 1; x <= 9; x++)
-        {
-        if ("" + y + "" + x in channelgrid)
-          {
-          var thumb = channelgrid ["" + y + "" + x]['thumb'];
-          var real_channel = channelgrid ["" + y + "" + x]['id'];
-
-          if (! (real_channel in wn))
-            html += '<li></li>';
-          else if (thumb == '' || thumb == 'null' || thumb == 'false')
-            html += '<li>' + bad_thumbnail + '</li>';
-          else
-            html += '<li><img src="' + channelgrid ["" + y + "" + x]['thumb'] + '"></li>';
-          }
-        else
-          html += '<li></li>';
-        }
-      html += '</ul>';
-      }
-
-    $("#new-holder").html (html);
-
-    elastic();
-    PlayWhatsNew();
-    });
-  }
-
-function exit_whats_new()
-  {
-  StopWhatsNew();
-  thumbing = 'program';
-  switch_to_ipg();
-  }
-
-function whatsnew_enter()
-  {
-  StopWhatsNew();
-
-  var grid = whatsnew [i]['grid'];
-  var episode = whatsnew [i]['episodes'][n];
-  var channel = whatsnew [i]['channel'];
-
-  log ('whatsnew enter: want to play episode ' + episode + ' in channel ' + channel + ' at grid location ' + grid)
-
-  current_channel = grid;
-  enter_channel ('program');
-
-  /* select episode */
-  for (var p = 1; p <= n_program_line; p++)
-    if (episode == program_line [p])
-      {
-      program_first = 1;
-      program_cursor = p;
-      current_program = episode;
-      prepare_channel();
-      play();
-      return;
-      }
-
-  log ('episode ' + episode + ' not found in channel ' + grid);
-  return;
   }
 
 function clear_osd_timex()
@@ -6134,14 +5906,8 @@ function yt_state (state)
 
 function yt_error (code)
   {
-  var errtext;
-
   var errors = { 100: 'Video not found', 101: 'Embedding not allowed', 150: 'Video not found' };
-
-  if (code in errors)
-    errtext = 'YouTube error ' + code + ': ' + errors [code];
-  else
-    errtext = 'YouTube unknown error: ' + code;
+  var errtext = translations ['ytvid'] + ': Code ' + code;
 
   if (fp_preloaded != 'yt' && (thumbing == 'program' || thumbing == 'channel'))
     {
