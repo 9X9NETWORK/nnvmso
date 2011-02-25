@@ -38,7 +38,7 @@ import com.nnvmso.service.PlayerApiService;
  * -- <br/>
  * token	a466D491UaaU245P412a <br/>
  * name	a
- * </p>8
+ * </p>
  */
 @Controller
 @RequestMapping("playerAPI")
@@ -53,18 +53,17 @@ public class PlayerApiController {
 		this.playerApiService= playerApiService;
 	}	
 	
-	//!!! if can't find any mso, all dead!
 	private void prepService(HttpServletRequest req) {
 		MsoManager msoMngr = new MsoManager();
 		Mso mso = msoMngr.findMsoViaHttpReq(req);
 		Locale locale = Locale.ENGLISH;
 		if (mso.getPreferredLangCode().equals(Mso.LANG_ZH_TW)){
 			locale = Locale.TRADITIONAL_CHINESE;
-		}		
+		}
 		playerApiService.setLocale(locale);
 		playerApiService.setMso(mso);
 		this.locale = locale;
-	}		
+	}
 	
 	/**
 	 * To be ignored  
@@ -80,8 +79,20 @@ public class PlayerApiController {
 	 * Get brand information. 
 	 * 	
 	 * @param mso mso name, optional 
-	 * @return Data returns in key and value pair. Key and value is tab separated. Each pair is \n separated.<br/> 
-	 * 		   keys include "key", "name", logoUrl", "jingleUrl", "preferredLangCode" "debug"<br/>
+	 * @return <p>Data returns in key and value pair. Key and value is tab separated. Each pair is \n separated.<br/> 
+	 * 		   keys include "key", "name", logoUrl", "jingleUrl", "preferredLangCode" "debug"<br/></p>
+	 *         <p>Example: <br/>
+	 *          0	success <br/>
+	 *          --<br/>
+	 *          key	1<br/>
+	 *          name	9x9<br/>
+	 *          title	9x9.tv<br/>
+	 *          logoUrl	/WEB-INF/../images/logo_9x9.png<br/>
+	 *          jingleUrl	/WEB-INF/../videos/opening.swf<br/>
+	 *          logoClickUrl	/<br/>
+	 *          preferredLangCode	en<br/>
+	 *          debug	1<br/>
+	 *         </p>
 	 */	
 	@RequestMapping(value="brandInfo")
 	public ResponseEntity<String> brandInfo(@RequestParam(value="mso", required=false)String brandName, HttpServletRequest req) {
@@ -95,7 +106,7 @@ public class PlayerApiController {
 		}
 		log.info(output);
 		return NnNetUtil.textReturn(output);
-	}	
+	}
 
 	/* ==========  CATEGORY: ACCOUNT RELATED ========== */
 	/**
@@ -431,11 +442,6 @@ public class PlayerApiController {
 		return NnNetUtil.textReturn(output);		
 	}					
 	
-	//tab = %09
-	//\n = %0A
-	//http://localhost:8888/playerAPI/pdr?user=2g9p42n5np51913F11gg&pdr=watched%098156%092%093%094%095%0Awatched%092%092%0A
-	//http://localhost:8888/playerAPI/pdr?user=2g9p42n5np51913F11gg&session=12345&pdr=1%09clicked%098156%098168%0A100%09clicked%098156%098168
-	//http://localhost:8888/playerAPI/pdr?user=2g9p42n5np51913F11gg&session=12345&pdr=1%09watched%09367%09371%0A
 	/**
 	 * Collecting PDR
 	 * 
@@ -537,15 +543,20 @@ public class PlayerApiController {
 	 * Save User IPG (snapshot)
 	 *
 	 * @param user user's unique identifier
+	 * @param channel channel id
+	 * @param program program id
 	 * @return     An unique IPG identifier
 	 */
 	@RequestMapping(value="saveIpg")
-	public ResponseEntity<String> saveIpg(@RequestParam(value="user") String userToken, HttpServletRequest req) {		
+	public ResponseEntity<String> saveIpg(@RequestParam(value="user", required=false) String userToken, 
+			                              @RequestParam(value="channel", required=false) String channelId, 
+			                              @RequestParam(value="program", required=false) String programId, 
+			                              HttpServletRequest req) {		
 		this.prepService(req);
 		log.info("saveIpg(" + userToken + ")");
 		String output = NnStatusMsg.errorStr(locale);		
 		try {
-			output = playerApiService.saveIpg(userToken);
+			output = playerApiService.saveIpg(userToken, channelId, programId);
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}
@@ -557,11 +568,13 @@ public class PlayerApiController {
 	 * Load User IPG (snapshot)
 	 *
 	 * @param ipg IPG's unique identifier
-	 * @return    please refer to channelLineup()
+	 * @return  2nd section returns one program info (format please reference programInfo format)
+	 *          3rd section returns ipg information (format please reference channelLineup)
 	 */
 	@RequestMapping(value="loadIpg")
-	public ResponseEntity<String> loadIpg(@RequestParam(value="ipg") Long ipgId, HttpServletRequest req) {		
-		log.info("saveIpg(" + ipgId + ")");		
+	public ResponseEntity<String> loadIpg(@RequestParam(value="ipg") Long ipgId, 
+										  HttpServletRequest req) {		
+		log.info("ipgId:" + ipgId);		
 		this.prepService(req);
 		String output = NnStatusMsg.errorStr(locale);		
 		try {
