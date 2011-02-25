@@ -142,15 +142,8 @@ public class PlayerApiService {
 		List<MsoChannel> channels = ipgMngr.findIpgChannels(ipg);
 		//first block: status
 		String status = NnStatusMsg.successStr(locale);
-		//second block: channel and episode information
-		//---channel info
+		//second block: episode information
 		String toPlay = separatorStr;
-//		MsoChannelManager channelMngr = new MsoChannelManager();		
-//		MsoChannel ipgChannel = channelMngr.findById(ipg.getChannelId());
-//		if (ipgChannel != null) {
-//			toPlay = toPlay + this.composeChannelLineupStr(ipgChannel, mso) + "\n";
-//		}
-		//---program info		
 		MsoProgramManager programMngr = new MsoProgramManager();
 		MsoProgram program = programMngr.findById(ipg.getProgramId());
 		if (program != null) {
