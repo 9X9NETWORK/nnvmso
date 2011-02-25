@@ -1,6 +1,8 @@
 package com.nnvmso.web;
 
- import java.util.Locale;
+ import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -10,10 +12,17 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.nnvmso.web.json.transcodingservice.*;
 import com.nnvmso.lib.NnLogUtil;
+import com.nnvmso.model.Mso;
+import com.nnvmso.model.MsoChannel;
+import com.nnvmso.model.MsoProgram;
+import com.nnvmso.service.MsoChannelManager;
+import com.nnvmso.service.MsoManager;
+import com.nnvmso.service.MsoProgramManager;
 import com.nnvmso.service.NnStatusCode;
 import com.nnvmso.service.NnStatusMsg;
 import com.nnvmso.service.TranscodingService;
@@ -85,6 +94,58 @@ public class TranscodingServiceController {
 			resp = transcodingService.handleException(e);
 		}
 		return resp;
+	}
+	
+	@RequestMapping("getIpgList")
+	public @ResponseBody ChannelInfo getIpgList(@RequestParam(value="page", required=false)String page, HttpServletRequest req) {
+		ChannelInfo info = new ChannelInfo();
+		try {
+			MsoManager msoMngr = new MsoManager();
+			Mso mso = msoMngr.findMsoViaHttpReq(req);
+			MsoChannelManager channelMngr = new MsoChannelManager();
+			List<MsoChannel> channels = channelMngr.findMsoDefaultChannels(mso.getKey().getId());		
+			String[] transcodingEnv = transcodingService.getTranscodingEnv(req);		
+			String callbackUrl = transcodingEnv[1];		
+			List<Channel> cs = new ArrayList<Channel>();
+			for (MsoChannel c : channels) {
+				cs.add(new Channel(String.valueOf(c.getKey().getId()), c.getSourceUrl(), c.getTranscodingUpdateDate(), String.valueOf(c.getEnforceTranscoding())));				
+			}
+			info.setErrorCode(String.valueOf(NnStatusCode.SUCCESS));
+			info.setErrorReason("Success");
+			info.setChannels(cs);
+			info.setCallBack(callbackUrl);
+		} catch (Exception e) {
+			PostResponse resp = transcodingService.handleException(e);
+			info.setErrorCode(resp.getErrorCode());
+			info.setErrorReason(resp.getErrorReason());
+		}
+		return info;
+	}
+	
+	@RequestMapping("getEpisodes")
+	public @ResponseBody ProgramInfo getEpisodes(@RequestParam(value="channel", required=false)String channel, HttpServletRequest req) {
+		if (channel == null)
+			return null;
+		ProgramInfo info = new ProgramInfo(channel);
+		try {		
+			MsoProgramManager programMngr = new MsoProgramManager();
+			List<MsoProgram> programs = programMngr.findAllByChannelId(Long.parseLong(info.getChannelId()));	
+			String[] transcodingEnv = transcodingService.getTranscodingEnv(req);		
+			String callback = transcodingEnv[1];		
+			info.setCallback(callback);
+			List<Program> ps = new ArrayList<Program>();
+			for (MsoProgram p : programs) {
+				ps.add(new Program(p.getAudioFileUrl(), p.getMpeg4FileUrl(), p.getWebMFileUrl(), p.getOtherFileUrl()));				
+			}
+			info.setErrorCode(String.valueOf(NnStatusCode.SUCCESS));
+			info.setErrorReason("Success");
+			info.setPrograms(ps);
+		} catch (Exception e) {
+			PostResponse resp = transcodingService.handleException(e);
+			info.setErrorCode(resp.getErrorCode());
+			info.setErrorReason(resp.getErrorReason());
+		}
+		return info;
 	}
 	
 	/**
