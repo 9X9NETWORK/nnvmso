@@ -18,6 +18,7 @@ import com.nnvmso.model.Category;
 import com.nnvmso.model.CategoryChannel;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoIpg;
+import com.nnvmso.model.MsoProgram;
 import com.nnvmso.model.NnUser;
 import com.nnvmso.model.SubscriptionLog;
 
@@ -41,7 +42,7 @@ public class MsoChannelManager {
 	public void create(MsoChannel channel, List<Category> categories) {
 		Date now = new Date();
 		if (channel.getSourceUrl() != null) 
-			channel.setSourceUrl(channel.getSourceUrl().trim().toLowerCase());
+			channel.setSourceUrl(channel.getSourceUrl().trim());
 		channel.setCreateDate(now);
 		channel.setUpdateDate(now);
 		msoChannelDao.save(channel);
@@ -71,12 +72,12 @@ public class MsoChannelManager {
 	 * 2. when channel from status success to non-success
 	 * Currently the counter is mainly dealt in MsoProgramManager.create() 
 	 * Will need to fix it in transaction
-	 * 
-	 * @@@ IMPORTANT: does not set updateDate here !!!      
+	 *       
 	 */
 	public MsoChannel save(MsoChannel channel) {
 		if (channel.getSourceUrl() != null)
-			channel.setSourceUrl(channel.getSourceUrl().trim().toLowerCase());
+			channel.setSourceUrl(channel.getSourceUrl().trim());
+		
 		channel = msoChannelDao.save(channel);
 		//save to cache
 		Cache cache = CacheFactory.get();		
@@ -86,7 +87,7 @@ public class MsoChannelManager {
 	}		
 	
 	/**
-	 * No deletion so we can keep track of bad urls 
+	 * No deletion so we can keep track of blacklist urls 
 	 */
 	public void delete(MsoChannel channel) {
 		//delete categories
@@ -94,6 +95,15 @@ public class MsoChannelManager {
 		//delete programs
 		//change category channelCount
 		//check cache
+	}
+
+	public void calculateAndSaveChannelCount(long channelId) {
+		MsoProgramManager programMngr = new MsoProgramManager();
+		List<MsoProgram> programs = programMngr.findGoodProgramsByChannelId(channelId);
+		MsoChannel channel = this.findById(channelId);
+		if (channel != null) 
+			channel.setProgramCount(programs.size());		
+		this.save(channel);		
 	}
 	
 	//!!! model?
@@ -106,6 +116,7 @@ public class MsoChannelManager {
 		}
 		return qualified;
 	}
+	
 	
 	public List<MsoChannel> findUnUniqueSourceUrl() {
 		List<MsoChannel> channels = this.findAll();
@@ -123,14 +134,12 @@ public class MsoChannelManager {
 	}
 		
 	public MsoChannel initChannelSubmittedFromPlayer(String sourceUrl, NnUser user) {
+		if (sourceUrl == null) {return null;}
 		MsoChannel channel = new MsoChannel(sourceUrl, user.getKey().getId());
 		channel.setContentType(this.getContentTypeByUrl(sourceUrl));
 		channel.setImageUrl("/WEB-INF/../images/processing.png");
-		if (channel.getContentType() == MsoChannel.CONTENTTYPE_PODCAST) {
-			channel.setName("Podcast Processing");
-		} else if (channel.getContentType() == MsoChannel.CONTENTTYPE_YOUTUBE) {
-			channel.setName("Youtube Processing");
-		}
+		channel.setName("Processing");
+		channel.setSourceUrlSearch(sourceUrl.toLowerCase());
 		channel.setStatus(MsoChannel.STATUS_PROCESSING);
 		channel.setUserId(user.getKey().getId());
 		channel.setPublic(false);
@@ -211,9 +220,10 @@ public class MsoChannelManager {
 		return msoChannelDao.findPublicChannels();				
 	}	
 
-	public MsoChannel findBySourceUrl(String url) {
+	//!!! here or dao
+	public MsoChannel findBySourceUrlSearch(String url) {
 		if (url == null) {return null;}
-		return msoChannelDao.findBySourceUrl(url.trim().toLowerCase());
+		return msoChannelDao.findBySourceUrlSearch(url.trim().toLowerCase());
 	}
 
 	public MsoChannel findByName(String name) {
@@ -231,7 +241,7 @@ public class MsoChannelManager {
 		List<MsoChannel> channels = new ArrayList<MsoChannel>();
 		for (CategoryChannel cc : ccs) {
 			MsoChannel channel = this.findById(cc.getChannelId());
-			if (channel != null && channel.getStatus() == MsoChannel.STATUS_SUCCESS && channel.getProgramCount() > 0) {
+			if (channel != null && channel.getStatus() == MsoChannel.STATUS_SUCCESS && channel.getProgramCount() > 0) { 
 				Category category  = categoryMngr.findById(cc.getCategoryId());
 				if (category != null) {
 					SubscriptionLog sublog = sublogMngr.findByMsoIdAndChannelId(category.getMsoId(), channel.getKey().getId());			
