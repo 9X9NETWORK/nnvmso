@@ -896,7 +896,7 @@ function jumpstart_inner()
 
   for (var i = 1; i <= n_program_line; i++)
     {
-    if (program_line [i]['id'] == current_program)
+    if (program_line [i] == current_program)
       {
       program_cursor = i;
       program_first = i;
