@@ -3,7 +3,6 @@ package com.nnvmso.dao;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -30,6 +29,15 @@ public class MsoProgramDao {
 		return program;
 	}
 	
+	public void delete(MsoProgram program) {
+		if (program != null) {
+			PersistenceManager pm = PMF.get().getPersistenceManager();		
+			pm.deletePersistent(program);
+			pm.close();
+		}
+		
+	}
+	
 	/**
 	 * There will be no data in viewLog for now, meaning "the whole channel is always unwatched"
 	 * Keep the implementation since the requirement can be changed back again.  
@@ -41,7 +49,7 @@ public class MsoProgramDao {
 			Query query = pm.newQuery(MsoProgram.class);
 			query.setFilter("channelId == channelIdParam");
 			query.declareParameters("long channelIdParam");
-	    	query.setOrdering("updateDate desc");	   
+	    	query.setOrdering("pubDate desc");	   
 	    	@SuppressWarnings("unchecked")
 	    	List<MsoProgram> results = (List<MsoProgram>) query.execute(c.getKey().getId());	    	 
 			int RECENT_SIZE = 3;	    			
@@ -94,34 +102,53 @@ public class MsoProgramDao {
 		return detached;
 	}
 	
-	public List<MsoProgram> findAllByChannelIdsAndIsPublic(List<Long> channelIds, boolean isPublic) {
+	/**
+	 * Good: reference findGoodProgramsByChannelId  
+	 */
+	public List<MsoProgram> findGoodProgramsByChannelIds(List<Long> channelIds) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Query q = pm.newQuery(MsoProgram.class, ":p.contains(channelId)");
+		q.setOrdering("channelId asc, pubDate desc");
 		@SuppressWarnings("unchecked")
-		List<MsoProgram> programs = ((List<MsoProgram>) q.execute(channelIds));
-		Iterator<MsoProgram> iter = programs.iterator();
-		while(iter.hasNext()) {
-		  MsoProgram p = iter.next();
-		  if (!p.isPublic()) {
-			  iter.remove();
-		  }
-		}
-		programs = (List<MsoProgram>) pm.detachCopyAll(programs);
+		List<MsoProgram> programs = ((List<MsoProgram>) q.execute(channelIds));		
+		List<MsoProgram> good = (List<MsoProgram>) pm.detachCopyAll(programs);
+		for (MsoProgram p : programs) {
+			  if (p.isPublic() && p.getStatus() != MsoProgram.STATUS_OK && p.getType() == MsoProgram.TYPE_VIDEO) {
+				  good.add(p);
+			  }			
+		}		
 		pm.close();
-		return programs;
+		return good;
 	}
 		
+	/**
+	 * Good: is Public, is STATUS_OK, is TYPE_VIDEO
+	 */
+	public List<MsoProgram> findGoodProgramsByChannelId(long channelId) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		Query q = pm.newQuery(MsoProgram.class);
+		q.setFilter("channelId == channelIdParam && status == statusParam && type == typeParam");
+		q.declareParameters("long channelIdParam, short statusParam, short typeParam");
+		q.setOrdering("pubDate desc");
+		@SuppressWarnings("unchecked")
+		List<MsoProgram> programs = (List<MsoProgram>)q.execute(channelId, MsoProgram.STATUS_OK, MsoProgram.TYPE_VIDEO);
+		List<MsoProgram> detached = (List<MsoProgram>)pm.detachCopyAll(programs);
+		pm.close();
+		return detached;
+	}
+	
 	public List<MsoProgram> findAllByChannelId(long channelId) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Query q = pm.newQuery(MsoProgram.class);
 		q.setFilter("channelId == channelIdParam");
 		q.declareParameters("long channelIdParam");
+		q.setOrdering("pubDate desc");
 		@SuppressWarnings("unchecked")
-		List<MsoProgram> programs = (List<MsoProgram>) q.execute(channelId);		
+		List<MsoProgram> programs = (List<MsoProgram>)q.execute(channelId);		
 		List<MsoProgram> detached = (List<MsoProgram>)pm.detachCopyAll(programs);
 		pm.close();
 		return detached;
-	}
+	}	
 	
 	public MsoProgram findById(long id) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
@@ -146,17 +173,19 @@ public class MsoProgramDao {
 		pm.close();
 		return program;		
 	}	
-	
-	public List<MsoProgram> findPublicPrograms() {
+
+	public MsoProgram findOldestByChannelId(long channelId) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Query q = pm.newQuery(MsoProgram.class);
-		q.setFilter("isPublic == isPublicParam");
-		q.declareParameters("boolean isPublicParam");
-		q.setOrdering("name asc");
+		q.setOrdering("pubDate asc");
 		@SuppressWarnings("unchecked")
-		List<MsoProgram> programs = (List<MsoProgram>) q.execute(true);
-		programs = (List<MsoProgram>)pm.detachCopyAll(programs);
+		List<MsoProgram> programs = (List<MsoProgram>) q.execute();
+		MsoProgram oldest = null;
+		if (programs.size() > 0) {
+			oldest = programs.get(0);
+			oldest = pm.detachCopy(oldest);
+		}		
 		pm.close();
-		return programs;
-	}
+		return oldest;		
+	}	
 }
