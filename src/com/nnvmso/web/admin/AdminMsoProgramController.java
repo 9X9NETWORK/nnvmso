@@ -39,9 +39,7 @@ public class AdminMsoProgramController {
 	}	
 	
 	@RequestMapping(value="create")
-	public @ResponseBody String create(@RequestParam String channel) {		
-		//MsoProgram p = programMngr.findOldestByChannelId(Long.valueOf(id));
-		//System.out.println("p is " + p.getKey().getId());
+	public @ResponseBody String create(@RequestParam String channel) {				
 		return "OK";
 	}
 	
@@ -52,10 +50,10 @@ public class AdminMsoProgramController {
 		programMngr.delete(p);
 		return "OK";
 	}
-	
-	@RequestMapping("mp4")
+			
+	//mainly for demo purpose, so someone can download all the mp4 files into box or something
+	@RequestMapping("mp4") 
 	public ResponseEntity<String> mp4(@RequestParam(value="channel")long channelId) {
-		//find all programs, including the not public ones
 		List<MsoProgram> programs = programMngr.findAllByChannelId(channelId);		
 		String result = "";
 		for (MsoProgram p:programs) {
