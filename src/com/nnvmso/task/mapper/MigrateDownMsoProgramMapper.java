@@ -12,6 +12,7 @@ public class MigrateDownMsoProgramMapper extends AppEngineMapper<Key, Entity, Nu
 	@Override
 	public void map(Key key, Entity value, Context context) {
 		value.removeProperty("pubDate");		
+		value.removeProperty("status");
 		DatastoreMutationPool mutationPool = this.getAppEngineContext(context).getMutationPool();
 		mutationPool.put(value);
 	}
