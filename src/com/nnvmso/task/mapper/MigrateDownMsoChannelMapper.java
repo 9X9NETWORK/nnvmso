@@ -14,9 +14,8 @@ public class MigrateDownMsoChannelMapper extends AppEngineMapper<Key, Entity, Nu
 		value.removeProperty("sourceUrlSearch");
 		value.removeProperty("nameSearch");
 		value.removeProperty("enforceTranscoding");
-		value.removeProperty("transcodingUpdateDate");
-				
-		DatastoreMutationPool mutationPool = this.getAppEngineContext(context).getMutationPool();
+		value.removeProperty("transcodingUpdateDate");		
+		DatastoreMutationPool mutationPool = this.getAppEngineContext(context).getMutationPool();				
 		mutationPool.put(value);
 	}
 }
