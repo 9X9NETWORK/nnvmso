@@ -29,8 +29,9 @@ public class MsoProgramManager {
 	public void create(MsoChannel channel, MsoProgram program) {		
 		Date now = new Date();
 		program.setCreateDate(now);
-		if (program.getUpdateDate() == null) {
-			program.setUpdateDate(now);			
+		program.setUpdateDate(now);
+		if (program.getPubDate() == null) {
+			program.setPubDate(now);
 		}
 		program.setChannelId(channel.getKey().getId());
 		msoProgramDao.save(program);
@@ -47,7 +48,7 @@ public class MsoProgramManager {
 			System.out.println("mso program manager, channel create, addChannelCount");
 			categoryMngr.addChannelCounter(channel);
 		}		
-		
+
 		//store in cache
 		Cache cache = CacheFactory.get();
 		if (cache != null) {
@@ -55,29 +56,41 @@ public class MsoProgramManager {
 			programs.add(program);
 			this.storeInCache(cache, programs, program.getChannelId());
 		}				
-	}
- 
-	/**
-	 * @@@ IMPORTANT: 
-	 * updateDate is not set here.  
-	 * It's currently shared by pubDate from transcoding service.
-	 * 
-	 */
+	} 
+
 	public MsoProgram save(MsoProgram program) {
+		program.setUpdateDate(new Date());
 		program = msoProgramDao.save(program);
 		Cache cache = CacheFactory.get();
 		if (cache != null) {
 			List<MsoProgram> programs = new ArrayList<MsoProgram>();
 			programs.add(program);
-			this.storeInCache(cache, programs, program.getChannelId());			
+			this.storeInCache(cache, programs, program.getChannelId());
 		}
+		//take the chance there's only 50 max per channel, shouldn't take too long, 
+		//and the performance of save is not a concern		
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		channelMngr.calculateAndSaveChannelCount(program.getChannelId());
 		return program;
 	}
-	
+
 	public void delete(MsoProgram program) {
-		//category channelCount 
-		//channel programCount
+		long id = program.getKey().getId();
+		long channelId = program.getChannelId();
+		//delete
+		msoProgramDao.delete(program);
+		//channel's program count
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		channelMngr.calculateAndSaveChannelCount(program.getChannelId());
 		//cache
+		Cache cache = CacheFactory.get();		
+		@SuppressWarnings("unchecked")
+		List<Long> list = (List<Long>)cache.get(this.getCacheProgramListKey(channelId));
+		if (list == null) { list = new ArrayList<Long>(); }
+		cache.put(this.getCacheKey(program.getKey().getId()), null);
+		if (list.contains(id))
+			list.remove(id);	
+		//!!! category channelCount should be taken care of too when the program count is 0 		
 	}
 	
 	public List<MsoProgram> findNew(long userId) {
@@ -101,10 +114,9 @@ public class MsoProgramManager {
 	} 
 		
 	/**	 
-	 * @@@ IMPORTANT: does not do isPublic handling yet, currently all programs are public
 	 * @@@ Cached
 	 */
-	public List<MsoProgram> findAllByChannelIdAndIsPublic(long channelId) {
+	public List<MsoProgram> findGoodProgramsByChannelId(long channelId) {
 		List<MsoProgram> programs = new ArrayList<MsoProgram>();
 		Cache cache = CacheFactory.get();
 		//find from cache
@@ -121,39 +133,35 @@ public class MsoProgramManager {
 			}
 		}
 		//find
-		programs = msoProgramDao.findAllByChannelId(channelId);
+		programs = msoProgramDao.findGoodProgramsByChannelId(channelId);
 		//store in cache
 		if (cache != null) { this.storeInCache(cache, programs, channelId); }				
-		return msoProgramDao.findAllByChannelId(channelId);
+		return programs;
 	}
-		
+
 	private void storeInCache(Cache cache, List<MsoProgram>programs, long channelId) {
-		@SuppressWarnings("unchecked")
-		List<Long> list = (List<Long>)cache.get(this.getCacheProgramListKey(channelId));
-		if (list == null) { list = new ArrayList<Long>(); }
+		if (cache == null) {return;}
 		//store individual program
-		System.out.println("store in cache with programs:" + programs.size());
 		for (MsoProgram p : programs) {
-			cache.put(this.getCacheKey(p.getKey().getId()), p);
-			MsoProgram pp = (MsoProgram)cache.get(getCacheKey(p.getKey().getId()));
-			System.out.println("put program in cache " + pp.getName());
-			
-			if (!list.contains(p.getKey().getId())) {
-				list.add(p.getKey().getId());
+			if (p.getStatus() != MsoProgram.STATUS_OK || p.getType() != MsoProgram.TYPE_VIDEO) {
+				cache.put(this.getCacheKey(p.getKey().getId()), null);
+			} else {
+				cache.put(this.getCacheKey(p.getKey().getId()), p);
 			}
 		}
-		//store a channel's program list
-		if (list != null) {
-			cache.put(this.getCacheProgramListKey(channelId), list);
-		};
+		//store a channel's program list, sorted by updateDate
+		List<MsoProgram>goodList = msoProgramDao.findGoodProgramsByChannelId(channelId);
+		List<Long> list = new ArrayList<Long>();
+		for (MsoProgram p : goodList) {
+			list.add(p.getKey().getId());
+		}
+		cache.put(this.getCacheProgramListKey(channelId), list);
 	}
 	
 	/**
 	 * @@@ Cached 
 	 */
-	public List<MsoProgram> findAllByChannelIdsAndIsPublic(List<Long>channelIds, boolean isPublic) {
-		//List<MsoProgram> programs = msoProgramDao.findAllByChannelIdsAndIsPublic(channelIds, isPublic);
-
+	public List<MsoProgram> findGoodProgramsByChannelIds(List<Long>channelIds) {
 		System.out.println("original channel size:" + channelIds.size());
 		List<MsoProgram> programs = new ArrayList<MsoProgram>();
 		List<Long> test = new ArrayList<Long>();
@@ -165,9 +173,9 @@ public class MsoProgramManager {
 				@SuppressWarnings("unchecked")
 				List<Long> list = (ArrayList<Long>)cache.get(this.getCacheProgramListKey(id));
 				if (list != null) {
+					System.out.println("list size:" + list.size());
 					for (Long l : list) {
 						MsoProgram p =  this.findById(l);
-						System.out.println("find from cache p:" + p.getName());
 						if (p!= null) {programs.add(p);}
 					}
 					channelIds.remove(id);					
@@ -177,7 +185,7 @@ public class MsoProgramManager {
 		System.out.println("remaining channel size:" + channelIds.size());
 		if (channelIds.size() > 0) {
 			//find
-			List<MsoProgram> list = msoProgramDao.findAllByChannelIdsAndIsPublic(channelIds, isPublic);
+			List<MsoProgram> list = msoProgramDao.findGoodProgramsByChannelIds(channelIds);
 			//store in cache
 			if (list.size() > 0) {
 				programs.addAll(list);
@@ -205,7 +213,8 @@ public class MsoProgramManager {
 		for (MsoChannel c : channels) {
 			channelIds.add(c.getKey().getId());
 		}		
-		programs = this.findAllByChannelIdsAndIsPublic(channelIds, true);
+		System.out.println(channelIds.size());
+		programs = this.findGoodProgramsByChannelIds(channelIds);
 		return programs;
 	}
 	
@@ -236,7 +245,17 @@ public class MsoProgramManager {
 	public MsoProgram findByKey(Key key) {
 		return msoProgramDao.findByKey(key);
 	}
-		
+	
+	public List<MsoProgram> findAllByChannelId(long channelId) {
+		return msoProgramDao.findAllByChannelId(channelId);
+	}
+
+	public MsoProgram findOldestByChannelId(long channelId) {
+		MsoProgram oldest = msoProgramDao.findOldestByChannelId(channelId); 
+		log.info("delete the oldest program:" + oldest.getKey().getId() + ";" + oldest.getName() + ";" + oldest.getStorageId() + ";" + oldest.getPubDate());		
+		return oldest;
+	}
+	
 	//example, program(1)
 	private String getCacheKey(long id) {
 		return "program(" + id + ")";		
@@ -245,8 +264,8 @@ public class MsoProgramManager {
 	//example, channel(1)program(1)
 	private String getCacheProgramListKey(long channelId) {
 		return "channel-programList(" + channelId + ")";		
-	}
-
+	}	
+	
 	public String findCacheByChannel(long channelId) {
 		Cache cache = CacheFactory.get();
 		String listStr = "";
@@ -257,7 +276,7 @@ public class MsoProgramManager {
 			if (list != null) {
 				for (Long l : list) { listStr = listStr + l + "\t"; }
 			}
-			List<MsoProgram> programs = msoProgramDao.findAllByChannelId(channelId);
+			List<MsoProgram> programs = msoProgramDao.findGoodProgramsByChannelId(channelId);
 			for (MsoProgram p : programs) {	
 				MsoProgram cacheP = (MsoProgram) cache.get(this.getCacheKey(p.getKey().getId())); 
 				if (cacheP != null) {
@@ -271,13 +290,13 @@ public class MsoProgramManager {
 	public void cacheByChannelId(long channelId) {
 		Cache cache = CacheFactory.get();
 		if (cache != null) {
-			this.findAllByChannelIdAndIsPublic(channelId);
+			this.findGoodProgramsByChannelId(channelId);
 		}
 	}
 	
 	public void deleteCacheByChannel(long channelId) {
 		Cache cache = CacheFactory.get();
-		List<MsoProgram> programs = this.findAllByChannelIdAndIsPublic(channelId);
+		List<MsoProgram> programs = this.findGoodProgramsByChannelId(channelId);
 		if (cache != null) {
 			for (MsoProgram c : programs) {				
 				cache.remove(this.getCacheKey(c.getKey().getId()));
