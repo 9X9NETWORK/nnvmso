@@ -97,6 +97,7 @@ var program_first = 1;
 
 var ipg_cursor;
 var ipg_entry_channel;
+var ipg_entry_program;
 var ipg_saved_cursor;
 var ipg_timex = 0;
 var ipg_delayed_stop_timex = 0;
@@ -882,28 +883,8 @@ function jumpstart()
 
 function jumpstart_inner()
   {
-  current_channel = channels_by_id [jumpstart_channel]
+  set_channel_and_program (channels_by_id [jumpstart_channel], jumpstart_program);
 
-  /* temporarily first program */
-  current_program = first_program_in (current_channel);
-  program_cursor = 1;
-  program_first = 1;
-
-  enter_channel ('program');
-
-  /* now the real program */
-  current_program = jumpstart_program;
-
-  for (var i = 1; i <= n_program_line; i++)
-    {
-    if (program_line [i] == current_program)
-      {
-      program_cursor = i;
-      break;
-      }
-    }
-
-  redraw_program_line();
   physical_stop();
 
   document.onkeydown=kp;
@@ -914,6 +895,36 @@ function jumpstart_inner()
   $("body").focus();
 
   play_program();
+  }
+
+function set_channel_and_program (channel, program)
+  {
+  log ('set channel (' + channel + ') and program (' + program + ')');
+
+  current_channel = channel;
+
+  /* temporarily first program */
+  current_program = first_program_in (channel);
+  program_cursor = 1;
+  program_first = 1;
+
+  enter_channel ('program');
+
+  /* now the real program */
+  current_program = program;
+
+  for (var i = 1; i <= n_program_line; i++)
+    {
+    if (program_line [i] == current_program)
+      {
+      log ('program found at: ' + i);
+      program_cursor = i;
+      redraw_program_line();
+      return;
+      }
+    }
+
+  notice_ok (thumbing, translations ['internal'] + ': Code 27', "");
   }
 
 function preload_control_images()
@@ -1208,7 +1219,6 @@ function update_bubble()
     {
     var channel_name = channelgrid [current_channel]['name'];
     if (channel_name.match (/^\s*$/)) { channel_name = '[no channel name]'; }
-
     $("#ep-layer-ch-title").html (channel_name);
     }
   else
@@ -1591,13 +1601,9 @@ function escape()
       {
       }
 
-    $("#ch-directory").hide();
-    $("#ipg-layer").hide();
+    $("#ipg-layer, #ch-directory").hide();
 
-    //thumbing = 'program';
-    //prepare_channel();
     ipg_play();
-
     return;
     }
 
@@ -2252,6 +2258,11 @@ function switch_to_ipg()
     ipg_cursor = '11';
 
   ipg_entry_channel = ipg_cursor;
+  if (program_cursor in program_line)
+    ipg_entry_program = program_line [program_cursor];
+  else
+    ipg_entry_program = '';
+
   redraw_ipg();
 
   $("#ipg-btn-signin, #ipg-btn-edit, #ipg-btn-resume").unbind();
@@ -2670,6 +2681,7 @@ function tip (text)
 
 function ipg_sync()
   {
+  log ('ipg_sync');
   if (ipg_mode == 'edit')
     {
     tip (translations ['deletetip']);
@@ -2972,7 +2984,7 @@ function ipg_resume()
   /* this may have received focus */
   $('#ipg-return-btn').blur();
 
-  if (current_tube == '' || ! (ipg_entry_channel in channelgrid) || programs_in_channel (ipg_entry_channel) < 1)
+  if (clips_played == 0 || current_tube == '' || ipg_entry_program == '' || ! (ipg_entry_channel in channelgrid) || programs_in_channel (ipg_entry_channel) < 1)
     {
     notice_ok (thumbing, translations ['notplaying'], "");
     return
@@ -2987,9 +2999,12 @@ function ipg_resume()
   stop_all_players();
 
   ipg_cursor = ipg_entry_channel;
-
   ipg_sync();
-  ipg_play();
+
+  set_channel_and_program (ipg_entry_channel, ipg_entry_program);
+
+  $("#ipg-layer").hide();
+  play_program();
   }
 
 function ipg_set_channel (grid)
@@ -3161,13 +3176,6 @@ function ipg_play()
     browse();
     return;
     }
-
-  // if (ipg_mode == 'tip')
-  //   {
-  //   ipg_mode = 'episodes';
-  //   ipg_sync();
-  //   return;
-  //   }
 
   if (programs_in_channel (ipg_cursor) < 1)
     {
@@ -3419,7 +3427,9 @@ function ipg_btn_hover_in()
 function ipg_btn_hover_out()
   {
   $(this).removeClass ("hover");
-  ipg_sync();
+  /* might have exited IPG via this button */
+  if (thumbing == 'ipg')
+    ipg_sync();
   }
 
 function ipg_btn_tip (cursor)
@@ -3870,6 +3880,8 @@ function notice_ok (whatnext, text, afterfunction)
   after_confirm = whatnext;
   after_confirm_function = afterfunction;
   thumbing = 'confirm';
+  $("#btn-cfclose").unbind();
+  $("#btn-cfclose").click (notice_completed);
   $("#confirm-text").html (text);
   $("#confirm-layer").show();
   elastic();
@@ -7092,7 +7104,7 @@ function noop (e)
 <div id="confirm-layer">
   <div class="confirm-holder" id="confirm-holder">
     <p id="confirm-text"></p>
-    <a href="javascript:notice_completed()" class="btn on" id="btn-cfclose"><span>Close</span></a>
+    <a class="btn on" id="btn-cfclose"><span>Close</span></a>
   </div>
 </div>
 
