@@ -2,8 +2,8 @@
   <li>USE WITH CAUTION: initialize (works only for small set of data)
     <ul>
       <li><a href="/admin/init/initDevel?debug=1">dev turn on debug</a></li>
-      <li><a href="/admin/init/initDevel?debug=0">dev turn off debug</a></li>          	   
-      [UNDER CONSTRUCTION]
+      <li><a href="/admin/init/initDevel?debug=0">dev turn off debug</a></li>
+      <li>[UNDER CONSTRUCTION]</li>          	   
       <li><a href="/admin/init/initProTask?devel=0&trans=1&debug=1">turn on production data, but debug=1</a></li>
       <li><a href="/admin/init/initProTask?devel=0&trans=1&debug=0">turn on production data, but debug=0</a></li>
       <li><a href="/admin/init/deleteAll">deleteAll</a></li>
@@ -104,6 +104,19 @@
       </li>
     </ul>
   </li>
+</ul>
+
+<ul>
+  <li>Program
+    <ul>
+      <li>program listing by channel<br/>
+          http://host/admin/program/list?channel=123
+      </li>              
+      <li>program modify <br/>
+          http://host/admin/program/modify?id=123&status=0&updateDate=yyyyMMddHHmmss          
+      </li>
+    </ul>  
+  </li>	
 </ul>
 
 <ul>
