@@ -23,7 +23,6 @@ public class IpgManager {
 		Date now = new Date();
 		ipg.setUpdateDate(now);
 		ipg.setCreateDate(now);
-		ipg.setUserId(userId);
 
 		Hashtable<Integer,Long> channels = new Hashtable<Integer, Long>();
 		SubscriptionManager sMngr = new SubscriptionManager();		
@@ -59,7 +58,7 @@ public class IpgManager {
 			Integer grid = (Integer)e.nextElement();
 			channelIds.add((long)hashTable.get(grid));
 		}		
-		return programMngr.findAllByChannelIdsAndIsPublic(channelIds, true);
+		return programMngr.findGoodProgramsByChannelIds(channelIds);
 	}
 		
 	public List<MsoChannel> findIpgChannels(Ipg ipg) {
