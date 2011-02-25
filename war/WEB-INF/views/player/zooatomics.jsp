@@ -250,7 +250,18 @@ var language_en =
   addrssyt: 'Add RSS / YouTube',
   category: 'Category',
   go: 'Go',
-  succpress: 'Successful! Press Enter to watch now'
+  succpress: 'Successful! Press Enter to watch now',
+  hinstr: 'Instruction',
+  hwbsg: 'While Browsing Smart Guide',
+  hwwe: 'While Watching Episodes',
+  hctw: 'Close this window',
+  huak: 'Use arrow keys or mouse to navigate',
+  hpec: 'Play episodes in the channel selected or add new channels',
+  hscp: 'Show control panel',
+  qyes: 'Yes',
+  qno: 'No',
+  cup: 'Press <span class="enlarge">&uarr;</span> to see your Smart Guide',
+  cdown: 'Press <span class="enlarge">&darr;</span> for more episodes'
   };
 
 var language_tw =
@@ -323,7 +334,18 @@ var language_tw =
   addrssyt: 'Add RSS / YouTube',
   category: 'Category',
   go: 'Go',
-  succpress: 'Successful! Press Enter to watch now'
+  succpress: 'Successful! Press Enter to watch now',
+  hinstr: 'Instruction',
+  hwbsg: 'While Browsing Smart Guide',
+  hwwe: 'While Watching Episodes',
+  hctw: 'Close this window',
+  huak: 'Use arrow keys or mouse to navigate',
+  hpec: 'Play episodes in the channel selected or add new channels',
+  hscp: 'Show control panel',
+  qyes: 'Yes',
+  qno: 'No',
+  cup: 'Press <span class="enlarge">&uarr;</span> to see your Smart Guide',
+  cdown: 'Press <span class="enlarge">&darr;</span> for more episodes'
   };
 
 var translations = language_en;
@@ -474,6 +496,17 @@ function set_language (lang)
   $("#addrssyt").html (translations ['addrssyt']);
   $("#category1").html (translations ['category']);
   $("#succpress").html (translations ['succpress']);
+  $("#hinstr").html (translations ['hinstr']);
+  $("#hwbsg").html (translations ['hwbsg']);
+  $("#hwwe").html (translations ['hwwe']);
+  $("#hctw").html (translations ['hctw']);
+  $("#huak").html (translations ['huak']);
+  $("#hpec").html (translations ['hpec']);
+  $("#hscp").html (translations ['hscp']);
+  $("#qyes").html (translations ['qyes']);
+  $("#qno").html (translations ['qno']);
+  $("#cup").html (translations ['cup']);
+  $("#cdown").html (translations ['cdown']);
   }
 
 function resize_fp()
@@ -7086,7 +7119,7 @@ function noop (e)
 
 <div id="control-layer">
   <div id="msg-up">
-    <p>Press <span class="enlarge">&uarr;</span> to see your IPG</p>
+    <p id="cup">Press <span class="enlarge">&uarr;</span> to see your Smart Guide</p>
   </div>
   <div id="controler">
     <img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/bg_controler.png" id="controler-bg">
@@ -7121,7 +7154,7 @@ function noop (e)
     </ul>
   </div>
   <div id="msg-down">
-    <p>Press <span class="enlarge">&darr;</span> for more episodes</p>
+    <p id="cdown">Press <span class="enlarge">&darr;</span> for more episodes</p>
   </div>
 </div>
 
@@ -7177,24 +7210,24 @@ function noop (e)
 
 <div id="hint-layer" style="display: none">
   <div class="hint-holder" id="hint-holder">
-    <p id="hint-title"><span>Instruction</span></p>
+    <p id="hint-title"><span id="hinstr">Instruction</span></p>
     <div id="sg-hint">
-      <p class="section-title"><span>While Browsing Smart Guide</span></p>
+      <p class="section-title"><span id="hwbsg">While Browsing Smart Guide</span></p>
       <ul class="hints-list">
-        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/arrow_keys.png" class="key-arrows"><span>Use arrow keys or mouse to navigate</span></li>
-        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/enter_key.png" class="key-enter"><span>Play episodes in the channel selected or add new channels</span></li>
+        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/arrow_keys.png" class="key-arrows"><span id="huak">Use arrow keys or mouse to navigate</span></li>
+        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/enter_key.png" class="key-enter"><span id="hpec">Play episodes in the channel selected or add new channels</span></li>
       </ul>
     </div>
     <div id="ep-hint">
-      <p class="section-title"><span>While Watching Episodes</span></p>
+      <p class="section-title"><span id="hwwe">While Watching Episodes</span></p>
       <ul class="hints-list">
-        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/enter_key.png" class="key-enter"><span>Show control panel</span></li>
+        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/enter_key.png" class="key-enter"><span id="hscp">Show control panel</span></li>
         <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/up_key.png" class="key-up"><span id="rsg2">Return to Smart Guide</span></li>
       </ul>
     </div>
     <div id="hint-bottom">
       <p id="hint-remove" style="display: none"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/check_off.png" class="checkbox"><span>Don't show me this again</span></p>
-      <p class="btn" id="btn-closeHint" onclick="close_ipg_hint()"><span>Close this window</span></p>
+      <p class="btn" id="btn-closeHint" onclick="close_ipg_hint()"><span id="hctw">Close this window</span></p>
     </div>
   </div>
 </div>
@@ -7207,8 +7240,8 @@ function noop (e)
   <div class="yesno-holder" id="yesno-holder">
     <p id="question"></p>
     <ul class="action-list">
-      <li><a href="javascript:yn_enter(1)" class="btn" id="btn-yes"><span>Yes</span></a></li>
-      <li><a href="javascript:yn_enter(2)" class="btn" id="btn-no"><span>No</span></a></li>
+      <li><a href="javascript:yn_enter(1)" class="btn" id="btn-yes"><span id="qyes">Yes</span></a></li>
+      <li><a href="javascript:yn_enter(2)" class="btn" id="btn-no"><span id="qno">No</span></a></li>
     </ul>
   </div>
 </div>
