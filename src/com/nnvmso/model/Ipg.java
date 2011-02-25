@@ -25,6 +25,12 @@ public class Ipg implements Serializable {
 	private long userId;
 	
 	@Persistent
+	private long channelId;
+	
+	@Persistent
+	private long programId;
+	
+	@Persistent
 	private Date createDate;
 	
 	@Persistent
@@ -72,5 +78,20 @@ public class Ipg implements Serializable {
 	public void setUserId(long userId) {
 		this.userId = userId;
 	}
-	
+
+	public long getChannelId() {
+		return channelId;
+	}
+
+	public void setChannelId(long channelId) {
+		this.channelId = channelId;
+	}
+
+	public long getProgramId() {
+		return programId;
+	}
+
+	public void setProgramId(long programId) {
+		this.programId = programId;
+	}	
 }
