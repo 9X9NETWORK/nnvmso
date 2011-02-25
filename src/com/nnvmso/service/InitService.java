@@ -140,8 +140,8 @@ public class InitService {
 		Mso mso = new Mso("5f", "5f", "mso@5f.tv", Mso.TYPE_MSO);
 		mso.setTitle("5f.tv");
 		mso.setPreferredLangCode(Mso.LANG_ZH_TW);
-		mso.setJingleUrl("/WEB-INF/../videos/5fLogo2.swf");
-		mso.setLogoUrl("/WEB-INF/../images/5floor-logo.png");
+		mso.setJingleUrl("/WEB-INF/../videos/opening.swf");
+		mso.setLogoUrl("/WEB-INF/../images/logo_9x9.png");
 		mso.setLogoClickUrl("/");
 		msoMngr.create(mso);
 		
@@ -510,7 +510,7 @@ public class InitService {
 		MsoChannelManager channelMngr = new MsoChannelManager();
 		CategoryManager categoryMngr = new CategoryManager();
 		for (String url : urls) {
-			MsoChannel channel = channelMngr.findBySourceUrl(url);
+			MsoChannel channel = channelMngr.findBySourceUrlSearch(url);
 			if (channel != null) {
 				categoryMngr.changeCategory(channel.getKey().getId(), categories);				
 			} else {
@@ -557,7 +557,7 @@ public class InitService {
 		} else {
 			String[] urls = this.getMso1DefaultIpg();
 			for (int i=0; i< urls.length; i++) {
-				MsoChannel c = channelMngr.findBySourceUrl(urls[i]);
+				MsoChannel c = channelMngr.findBySourceUrlSearch(urls[i]);
 				System.out.println("i=" + i + ";" + urls[i]);
 				System.out.println("channel=" + c.getName() + ";");
 				MsoIpg msoIpg = new MsoIpg(mso.getKey().getId(), c.getKey().getId(), i+1, MsoIpg.TYPE_GENERAL);			
@@ -586,7 +586,7 @@ public class InitService {
 			String[] seqs = this.getMso2IpgSeq();
 			System.out.println(urls.length + seqs.length);
 			for (int i=0; i<urls.length; i++) {
-				MsoChannel c = cMngr.findBySourceUrl(urls[i]);
+				MsoChannel c = cMngr.findBySourceUrlSearch(urls[i]);
 				System.out.println("i=" + i + ";" + urls[i]);
 				System.out.println("channel=" + c.getName() + ";");				
 				MsoIpg msoIpg = new MsoIpg(mso.getKey().getId(), c.getKey().getId(), Integer.parseInt(seqs[i]), MsoIpg.TYPE_GENERAL);					
