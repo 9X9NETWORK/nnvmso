@@ -70,13 +70,14 @@ public class MsoChannelDao {
 		return channel;				
 	}	
 	
-	public MsoChannel findBySourceUrl(String url) {
+	public MsoChannel findBySourceUrlSearch(String url) {
+		if (url == null) {return null;}
 		PersistenceManager pm = PMF.get().getPersistenceManager();		    	
 		Query q = pm.newQuery(MsoChannel.class);
-		q.setFilter("sourceUrl == sourceUrlParam");
-		q.declareParameters(Key.class.getName() + " sourceUrlParam");
+		q.setFilter("sourceUrlSearch == sourceUrlSearchParam");
+		q.declareParameters(Key.class.getName() + " sourceUrlSearchParam");
 		@SuppressWarnings("unchecked")
-		List<MsoChannel> channels = (List<MsoChannel>) q.execute(url);
+		List<MsoChannel> channels = (List<MsoChannel>) q.execute(url.toLowerCase());
 		MsoChannel channel = null;
 		if (channels.size() > 0) {
 			channel = pm.detachCopy(channels.get(0));
@@ -85,12 +86,13 @@ public class MsoChannelDao {
 		return channel;				
 	}		
 	
+	//!!! probably not used, otherwise need to add index
 	public List<MsoChannel> findPublicChannels() {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Query q = pm.newQuery(MsoChannel.class);
 		q.setFilter("isPublic == isPublicParam");
 		q.declareParameters("boolean isPublicParam");
-		q.setOrdering("name asc");
+		q.setOrdering("nameSearch asc");
 		@SuppressWarnings("unchecked")
 		List<MsoChannel> channels = (List<MsoChannel>) q.execute(true);
 		channels = (List<MsoChannel>)pm.detachCopyAll(channels);
