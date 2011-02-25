@@ -73,10 +73,9 @@ public class AdminMsoIpgController {
 	}
 	
 	@RequestMapping(value="delete")
-	public @ResponseBody String delete(@RequestParam(value="mso") String msoId,
-	                                   @RequestParam(value="channel") String channelId) {
-		
-		ipgMngr.deleteMsoIpg(Long.parseLong(msoId), Long.parseLong(channelId));
+	public @ResponseBody String delete(@RequestParam(value="mso") String mso,
+	                                   @RequestParam(value="channel") String channel) {		
+		ipgMngr.deleteMsoIpg(Long.parseLong(mso), Long.parseLong(channel));
 		return "OK";
 	}
 	
