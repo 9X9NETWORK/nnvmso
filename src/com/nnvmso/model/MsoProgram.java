@@ -49,12 +49,14 @@ public class MsoProgram implements Serializable {
 	@Persistent
 	private String errorCode;
 
-	@NotPersistent
+	@Persistent
+	//general
 	private short status;
 	public static short STATUS_OK = 0;
-	public static short STATUS_ERROR = 1;	
-	public static short STATUS_PROCESSING = 2;
-		
+	public static short STATUS_ERROR = 1;
+	//quality
+	public static short STATUS_BAD_QUALITY = 101;	
+	
 	@Persistent
 	private String duration;
 		
@@ -71,7 +73,10 @@ public class MsoProgram implements Serializable {
 		
 	@Persistent
 	private Date updateDate;
-		
+
+	@Persistent
+	private Date pubDate;
+	
 	public MsoProgram(String name, String intro, String imageUrl, short type) {
 		this.name = name;
 		this.intro = intro;
@@ -221,6 +226,14 @@ public class MsoProgram implements Serializable {
 
 	public void setStorageId(String storageId) {
 		this.storageId = storageId;
+	}
+
+	public Date getPubDate() {
+		return pubDate;
+	}
+
+	public void setPubDate(Date pubDate) {
+		this.pubDate = pubDate;
 	}
 
 }
