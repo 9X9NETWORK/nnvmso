@@ -34,8 +34,7 @@ public class TranscodingService {
 			resp.setErrorReason("oops, system does not define this error msg");						
 		} else if (e.getClass().equals(DatastoreFailureException.class)) {
 			resp.setErrorCode(String.valueOf(NnStatusCode.DATABASE_ERROR));
-			resp.setErrorReason("Database error");			
-			
+			resp.setErrorReason("Database error");
 		} else if (e.getClass().equals(DatastoreNeedIndexException.class)) {
 			resp.setErrorCode(String.valueOf(NnStatusCode.DATABASE_NEED_INDEX));
 			resp.setErrorReason("index is still building, fatal error");						
@@ -43,6 +42,26 @@ public class TranscodingService {
 		NnLogUtil.logException((Exception) e);
 		return resp;
 	}	
+	
+	private short convertStatus(short tranStatus) {
+		switch (tranStatus) {
+		  case 0: 
+			  return MsoChannel.STATUS_SUCCESS;
+		  case 1:
+			  return MsoChannel.STATUS_NNVMSO_JSON_ERROR;
+		  case 2:
+			  return MsoChannel.STATUS_INVALID_FORMAT;
+		  case 4:
+			  return MsoChannel.STATUS_TRANSCODING_DB_ERROR;
+		  case 5:
+			  return MsoChannel.STATUS_NO_VALID_EPISODE;
+		  case 6: 
+			  return MsoChannel.STATUS_URL_NOT_FOUND;
+		  case 7:
+			  return MsoChannel.STATUS_INVALID_FORMAT;
+		}
+		return MsoChannel.STATUS_SUCCESS;				
+	}
 	
 	public PostResponse updateChannel(RtnChannel podcast) {
 		MsoChannelManager channelMngr = new MsoChannelManager();
@@ -52,15 +71,17 @@ public class TranscodingService {
 		}
 		if (!podcast.getErrorCode().equals(String.valueOf(MsoChannel.STATUS_SUCCESS))) {
 			channel.setPublic(false);
-			channel.setStatus(MsoChannel.STATUS_ERROR);
+			channel.setStatus(this.convertStatus(Short.valueOf(podcast.getErrorCode())));
 			channel.setErrorReason(podcast.getErrorReason());
 			channelMngr.save(channel);
 			return new PostResponse(String.valueOf(NnStatusCode.SUCCESS), "SUCCESS"); 
 		}
-		String name = podcast.getTitle(); 
-		if (name != null) { name = NnStringUtil.capitalize(name);}
-		channel.setName(name);
-		
+		String name = podcast.getTitle();
+		//change status to success at the end
+		if (channel.getStatus() == MsoChannel.STATUS_PROCESSING) { 
+			channel.setName(name);
+			if (name != null) { channel.setNameSearch(name.toLowerCase()); };			
+		}
 		String intro = podcast.getDescription();
 		if (intro!= null && intro.length() > 500) {
 			intro = intro.substring(0, 499);
@@ -69,10 +90,12 @@ public class TranscodingService {
 		channel.setIntro(intro);
 		
 		channel.setImageUrl(podcast.getImage());
-		if (podcast.getPubDate() != null) {
-			channel.setUpdateDate(new Date(Long.parseLong(podcast.getPubDate())*1000));
+		if (podcast.getLastUpdateTime() != null) {
+			channel.setTranscodingUpdateDate(podcast.getLastUpdateTime());
 		}
 		channel.setStatus(MsoChannel.STATUS_SUCCESS);
+		channel.setPublic(true);
+		channel.setErrorReason("");
 		channelMngr.save(channel);		
 		return new PostResponse(String.valueOf(NnStatusCode.SUCCESS), "SUCCESS");
 	}
@@ -80,7 +103,7 @@ public class TranscodingService {
 	public String[] getPodcastInfo(String urlStr) {
         URL url;
         String podcastInfo[] = new String[3];
-        boolean retry = true;
+        boolean retry = true; //the "good" podcastUrl oftentimes comes after a redirect, giving it twice chance. 
         int counter = 1;
         while (retry) {
 			try {
@@ -112,7 +135,7 @@ public class TranscodingService {
 	public PostResponse updateProgram(RtnProgram rtnProgram) {
 		MsoProgramManager programMngr = new MsoProgramManager();
 		MsoChannelManager channelMngr = new MsoChannelManager();			
-		RtnProgramItem item = rtnProgram.getItems()[0]; //for now there's only one item		
+		RtnProgramItem item = rtnProgram.getItems()[0]; //for now there's only one item
 		log.info("updateProgramViaTranscodingService(): " + item.toString());
 		if (!Pattern.matches("^\\d*$", rtnProgram.getKey())) {
 			return new PostResponse(String.valueOf(NnStatusCode.CHANNEL_INVALID), "channel invalid");
@@ -123,10 +146,12 @@ public class TranscodingService {
 		}
 		
 		if (channel.getProgramCount() >= MsoChannelManager.MAX_CHANNEL_SIZE) {
-			return new PostResponse(String.valueOf(NnStatusCode.CHANNEL_MAXSIZE_EXCEEDED), "CHANNEL_MAXSIZE_EXCEEDED");			
+			MsoProgram oldest = programMngr.findOldestByChannelId(channel.getKey().getId());
+			System.out.println("delete the oldest one, which is :" + oldest.getKey().getId());
+			programMngr.delete(oldest); 			
 		}
 		
-		if (channel.isPublic() != true) {
+		if (channel.isPublic() != true && channel.getStatus() == MsoChannel.STATUS_SUCCESS) {
 			channel.setPublic(true);
 			channelMngr.save(channel);
 		}
@@ -182,7 +207,9 @@ public class TranscodingService {
 		}
 		if (item.getPubDate() != null) {
 			Date theDate = new Date(Long.parseLong(item.getPubDate())*1000);
-			program.setUpdateDate(theDate);
+			program.setPubDate(theDate);
+		} else {
+			program.setPubDate(new Date());
 		}
 		program.setPublic(true);
 		if (isNew) {
@@ -197,8 +224,7 @@ public class TranscodingService {
 		PostUrl postUrl = new PostUrl();
 		postUrl.setKey(String.valueOf(channelId));
 		postUrl.setRss(sourceUrl);	
-		TranscodingService tranService = new TranscodingService();
-		String[] transcodingEnv = tranService.getTranscodingEnv(req);
+		String[] transcodingEnv = this.getTranscodingEnv(req);
 		String transcodingServer = transcodingEnv[0];
 		String callbackUrl = transcodingEnv[1];
 		String devel = transcodingEnv[2];		
