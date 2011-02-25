@@ -81,13 +81,13 @@ public class TranscodingService {
 		if (channel.getStatus() == MsoChannel.STATUS_PROCESSING) { 
 			channel.setName(name);
 			if (name != null) { channel.setNameSearch(name.toLowerCase()); };			
+			String intro = podcast.getDescription();
+			if (intro!= null && intro.length() > 500) {
+				intro = intro.substring(0, 499);
+			}
+			if (intro != null) { intro = intro.replaceAll("\\s", " ");}
+			channel.setIntro(intro);
 		}
-		String intro = podcast.getDescription();
-		if (intro!= null && intro.length() > 500) {
-			intro = intro.substring(0, 499);
-		}
-		if (intro != null) { intro = intro.replaceAll("\\s", " ");}
-		channel.setIntro(intro);
 		
 		channel.setImageUrl(podcast.getImage());
 		if (podcast.getLastUpdateTime() != null) {
