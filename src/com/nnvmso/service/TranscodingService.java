@@ -147,7 +147,6 @@ public class TranscodingService {
 		
 		if (channel.getProgramCount() >= MsoChannelManager.MAX_CHANNEL_SIZE) {
 			MsoProgram oldest = programMngr.findOldestByChannelId(channel.getKey().getId());
-			System.out.println("delete the oldest one, which is :" + oldest.getKey().getId());
 			programMngr.delete(oldest); 			
 		}
 		
