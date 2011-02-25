@@ -149,7 +149,7 @@ public class MsoProgramManager {
 				cache.put(this.getCacheKey(p.getKey().getId()), p);
 			}
 		}
-		//store a channel's program list, sorted by updateDate
+        //store a channel's program list, sorted by pubDate
 		List<MsoProgram>goodList = msoProgramDao.findGoodProgramsByChannelId(channelId);
 		List<Long> list = new ArrayList<Long>();
 		for (MsoProgram p : goodList) {
@@ -252,7 +252,7 @@ public class MsoProgramManager {
 
 	public MsoProgram findOldestByChannelId(long channelId) {
 		MsoProgram oldest = msoProgramDao.findOldestByChannelId(channelId); 
-		log.info("delete the oldest program:" + oldest.getKey().getId() + ";" + oldest.getName() + ";" + oldest.getStorageId() + ";" + oldest.getPubDate());		
+		log.info("find the oldest program:" + oldest.getKey().getId() + ";" + oldest.getName() + ";" + oldest.getStorageId() + ";" + oldest.getPubDate());		
 		return oldest;
 	}
 	
