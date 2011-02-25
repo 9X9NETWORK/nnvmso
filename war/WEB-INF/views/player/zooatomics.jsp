@@ -261,7 +261,8 @@ var language_en =
   qyes: 'Yes',
   qno: 'No',
   cup: 'Press <span class="enlarge">&uarr;</span> to see your Smart Guide',
-  cdown: 'Press <span class="enlarge">&darr;</span> for more episodes'
+  cdown: 'Press <span class="enlarge">&darr;</span> for more episodes',
+  chcat: 'Channel category'
   };
 
 var language_tw =
@@ -345,7 +346,8 @@ var language_tw =
   qyes: 'Yes',
   qno: 'No',
   cup: 'Press <span class="enlarge">&uarr;</span> to see your Smart Guide',
-  cdown: 'Press <span class="enlarge">&darr;</span> for more episodes'
+  cdown: 'Press <span class="enlarge">&darr;</span> for more episodes',
+  chcat: 'Channel category'
   };
 
 var translations = language_en;
@@ -507,6 +509,7 @@ function set_language (lang)
   $("#qno").html (translations ['qno']);
   $("#cup").html (translations ['cup']);
   $("#cdown").html (translations ['cdown']);
+  $("#chcat").html (translations ['chcat'] + ':');
   }
 
 function resize_fp()
@@ -7064,7 +7067,7 @@ function noop (e)
       </ul>
     </div>
     <div class="cate-selector">
-      <p>Channel category:</p>
+      <p id="chcat">Channel category:</p>
       <ul class="cate-list" id="cate-list"></ul>
     </div>
     <div id="feedback" class="success"><p></p></div>
