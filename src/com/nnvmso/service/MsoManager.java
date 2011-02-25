@@ -71,10 +71,13 @@ public class MsoManager {
 	}	
 	
 	public String findMsoNameViaHttpReq(HttpServletRequest req) {
-		String msoName = "9x9";
-		msoName = CookieHelper.getCookie(req, CookieHelper.MSO);
-		if (msoName != null && msoName.equals("5f"))
-			msoName = "5f";		
+		String msoName = req.getParameter("mso"); //?mso=
+		if (msoName == null) {
+			msoName = CookieHelper.getCookie(req, CookieHelper.MSO);
+		}
+		if (msoName == null) {
+			msoName = "9x9";
+		}
 		return msoName;
 	}
 	
