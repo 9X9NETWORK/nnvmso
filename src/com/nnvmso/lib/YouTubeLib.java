@@ -1,5 +1,7 @@
 package com.nnvmso.lib;
 
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.HashSet;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -43,7 +45,36 @@ public class YouTubeLib {
 			result = "http://www.youtube.com/user/" + m.group(4);
 			result = result.toLowerCase();
 			log.info("original url:" + url + ";result=" + result);			
-		}		
+		}
+		//if (!youTubeCheck(result)) {return null;}
 		return result;
-	}	
+	}
+	
+	/**
+	 * YouTube API request format, http://gdata.youtube.com/feeds/api/users/androidcentral
+	 * This function currently checks only if the query status is not 200.
+	 * 
+	 * @param urlStr support only format of http://www.youtube.com/user/android  
+	 */
+	public static boolean youTubeCheck(String urlStr) {		
+		String[] splits = urlStr.split("/");
+		String apiReq = "http://gdata.youtube.com/feeds/api/users/" + splits[splits.length-1];
+
+		URL url;
+		try {
+			//HTTP GET
+			url = new URL(apiReq);
+	        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+	        connection.setDoOutput(true);
+	        int statusCode = connection.getResponseCode();
+	        if (statusCode != HttpURLConnection.HTTP_OK) {
+	        	log.info("yutube GET response not ok with url:" + urlStr + "; status code = " + connection.getResponseCode());
+	        	return false;
+	        }
+		} catch (Exception e) {
+			return false;
+		}
+		return true;
+	}
+	
 }
