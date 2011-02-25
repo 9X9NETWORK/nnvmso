@@ -899,7 +899,6 @@ function jumpstart_inner()
     if (program_line [i] == current_program)
       {
       program_cursor = i;
-      program_first = i;
       break;
       }
     }
@@ -3517,7 +3516,6 @@ function redraw_program_line()
     $("#ep-list img").error(function () { $(this).unbind("error").attr("src", "http://9x9ui.s3.amazonaws.com/images/no_images.png"); });
     }
 
-  log ('redraw program line');
 if (thumbing != 'ipg' && thumbing != 'ipg-wait')
   for (var i = program_first; i <= n_program_line && i < program_first + max_programs_in_line; i++)
     {
@@ -3526,7 +3524,6 @@ if (thumbing != 'ipg' && thumbing != 'ipg-wait')
       if (! $("#p-li-" + i).hasClass ("on"))
         {
         $("#p-li-" + i).addClass ("on");
-        // $("#bg-ep-" + i).attr ("src", root + 'bg_ep_on.png');
         }
       }
     else
@@ -3534,7 +3531,6 @@ if (thumbing != 'ipg' && thumbing != 'ipg-wait')
       if ($("#p-li-" + i).hasClass ("on"))
         {
         $("#p-li-" + i).removeClass ("on");
-        // $("#bg-ep-" + i).attr ("src", root + 'bg_ep_off.png');
         }
       }
     }
