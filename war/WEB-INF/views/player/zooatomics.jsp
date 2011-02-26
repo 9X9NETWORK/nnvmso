@@ -398,6 +398,9 @@ function elastic_innards()
 
   try { $("#film").css ({ "left": (vw - $("#film").width()) / 2, "top": (vh - $("#film").height()) / 2 }); } catch (error) {};
 
+  if ($.browser.msie)
+    $("#ipg-layer, #ch-directory, #msg-layer, #confirm-layer, #yesno-layer, #delete-layer, #hint-layer, #opening").css ({"width": vw, "height": vh});
+
   episode_clicks_and_hovers();
   }
 
@@ -437,7 +440,6 @@ function align_center()
   $("#new-holder").css     ("left", (ww - $("#new-holder").width())     / 2);
   $("#ep-layer").css       ("left", (ww - $("#ep-layer").width())       / 2);
   $("#epend-layer").css    ("left", (ww - $("#epend-layer").width())    / 2);
-  $("#msg-layer").css      ("left", (ww - $("#msg-layer").width())      / 2);
   $("#waiting").css        ("left", (ww - $("#waiting").width())        / 2);
   $("#buffering").css      ("left", (ww - $("#buffering").width())      / 2);
   $("#confirm-layer").css  ("left", (ww - $("#confirm-layer").width())  / 2);
@@ -445,6 +447,7 @@ function align_center()
   $("#control-layer").css  ("left", (ww - $("#control-layer").width())  / 2);
   $("#yesno-layer").css    ("left", (ww - $("#yesno-layer").width())    / 2);
 
+  $("#msg-holder").css     ("margin-top",  (wh - $("#msg-holder").height() - $("#ep-layer").height()) / 2);
   $("#hint-holder").css    ("margin-top",  (wh - $("#hint-holder").height()) / 2);
   $("#confirm-holder").css ("margin-top",  (wh - $("#confirm-holder").height()) / 2);
   $("#yesno-holder").css   ("margin-top",  (wh - $("#yesno-holder").height()) / 2);
