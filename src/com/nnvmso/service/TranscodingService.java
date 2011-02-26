@@ -76,9 +76,9 @@ public class TranscodingService {
 			channelMngr.save(channel);
 			return new PostResponse(String.valueOf(NnStatusCode.SUCCESS), "SUCCESS"); 
 		}
-		String name = podcast.getTitle();
 		//change status to success at the end
 		if (channel.getStatus() == MsoChannel.STATUS_PROCESSING) { 
+			String name = podcast.getTitle();
 			channel.setName(name);
 			if (name != null) { channel.setNameSearch(name.toLowerCase()); };			
 			String intro = podcast.getDescription();
@@ -87,9 +87,9 @@ public class TranscodingService {
 			}
 			if (intro != null) { intro = intro.replaceAll("\\s", " ");}
 			channel.setIntro(intro);
+			channel.setImageUrl(podcast.getImage());
 		}
 		
-		channel.setImageUrl(podcast.getImage());
 		if (podcast.getLastUpdateTime() != null) {
 			channel.setTranscodingUpdateDate(podcast.getLastUpdateTime());
 		}
@@ -160,28 +160,29 @@ public class TranscodingService {
 		if (program == null) {
 			isNew = true;
 			program = new MsoProgram("", "", "", MsoProgram.TYPE_VIDEO);
-		}					
-		if (item.getTitle() != null) { program.setName(item.getTitle()); }					
-		
-		String intro = item.getDescription();
-		if (intro != null && intro.length() > 500) {
-			intro = item.getDescription().substring(0, 499);
 		}
-		if (intro != null) {intro.replaceAll("\\s", " ");}
-		program.setIntro(intro);
-		
-		if (item.getThumbnail()!= null) {
-			program.setImageUrl(item.getThumbnail());
-		} else {
-			program.setImageUrl(channel.getImageUrl());
-		}		
-		
-		if (item.getThumbnail()!= null) {
-			program.setImageLargeUrl(item.getThumbnailLarge());
-		} else {
-			program.setImageUrl(channel.getImageUrl());
-		}		
-		
+		if (!isNew) {
+			if (item.getTitle() != null) { program.setName(item.getTitle()); }					
+
+			String intro = item.getDescription();
+			if (intro != null && intro.length() > 500) {
+				intro = item.getDescription().substring(0, 499);
+			}
+			if (intro != null) {intro.replaceAll("\\s", " ");}
+			program.setIntro(intro);
+			
+			if (item.getThumbnail()!= null) {
+				program.setImageUrl(item.getThumbnail());
+			} else {
+				program.setImageUrl(channel.getImageUrl());
+			}		
+			
+			if (item.getThumbnail()!= null) {
+				program.setImageLargeUrl(item.getThumbnailLarge());
+			} else {
+				program.setImageUrl(channel.getImageUrl());
+			}		
+		}
 		program.setStorageId(item.getItemId());	
 		
 		if (item.getMp4() != null) {			
