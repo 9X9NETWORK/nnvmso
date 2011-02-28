@@ -151,6 +151,7 @@ var fake_timex = 0;
 
 /* timeout for msg-layer */
 var msg_timex = 0;
+var yt_error_timex = 0;
 
 var dirty_delay;
 var dirty_channels = [];
@@ -212,7 +213,7 @@ var language_en =
   internal: 'An internal error has occurred',
   playthis: 'Play this channel now?',
   sharing: 'You will be sharing all the channels on your Smart Guide with your Facebook friends. Continue?',
-  noeps: 'There is no episode in this channel',
+  noeps: 'There are no episodes in this channel',
   addtip: 'Select the empty spot to browse available channels',
   signuptip: 'Sign up and create your own Smart Guide',
   signouttip: 'Sign out',
@@ -257,7 +258,11 @@ var language_en =
   cdown: 'Press <span class="enlarge">&darr;</span> for more episodes',
   chcat: 'Channel category',
   ytvid: 'Video disabled by Youtube',
-  eoe: 'End of episodes'
+  eoe: 'End of episodes',
+  close: 'Close',
+  oneempty: 'You still have one empty channel',
+  noempty: 'You have no empty channels!',
+  empties: 'You still have %1 empty channels'
   };
 
 var language_tw =
@@ -345,7 +350,11 @@ var language_tw =
   cdown: '按 <span class="enlarge">&darr;</span> 觀看其它影片',
   chcat: '頻道分類', 
   ytvid: '此影片被Youtube禁播',
-  eoe: '所有節目播映完畢'
+  eoe: '所有節目播映完畢',
+  close: '關閉',
+  oneempty: '您只剩下一個空位可放頻道。',
+  noempty: '您已填滿Smart Guide，請刪除現有頻道之後再新增',
+  empties: '您仍剩 %1個空位可放頻道'
   };
 
 var translations = language_en;
@@ -505,6 +514,7 @@ function set_language (lang)
   $("#cup").html (translations ['cup']);
   $("#cdown").html (translations ['cdown']);
   $("#chcat").html (translations ['chcat'] + ':');
+  $("#close1").html (translations ['close']);
   }
 
 function resize_fp()
@@ -636,13 +646,26 @@ function init()
 
   /* Initialize FB Javascript SDK */
 
-  FB.init (
+  if (true)
     {
-    appId: '110847978946712',
-    status: false, // check login status
-    cookie: false, // enable cookies to allow the server to access the session
-    xfbml: false   // parse XFBML
-    });
+    FB.init (
+      {
+      appId: '110847978946712',
+      status: false, // check login status
+      cookie: false, // enable cookies to allow the server to access the session
+      xfbml: false   // parse XFBML
+      });
+    }
+  else
+    {
+    FB.init (
+      {
+      appId: '110847978946712',
+      status: true, // check login status
+      cookie: true, // enable cookies to allow the server to access the session
+      xfbml: true   // parse XFBML
+      });
+    }
 
   if ((location+'').match (/preload=off/))
     nopreload = true;
@@ -1073,13 +1096,18 @@ function clear_msg_timex()
     clearTimeout (msg_timex);
     msg_timex = 0;
     }
+  if (yt_error_timex != 0)
+    {
+    clearTimeout (yt_error_timex);
+    yt_error_timex = 0;
+    }
   $("#msg-layer").hide();
   $("#epend-layer").hide();
   }
 
 function message (text, duration)
   {
-  $("#msg-layer").html ('<p>' + text + '</p>');
+  $("#msg-text").html (text);
   $("#msg-layer").show();
 
   if (duration > 0)
@@ -1106,7 +1134,7 @@ function end_message (duration)
 
   thumbing = 'ipg-wait';
 
-  $("#msg-layer").html ('<p>' + translations ['eoe'] + '</p>');
+  $("#msg-text").html (translations ['eoe']);
   $("#msg-layer").show();
   elastic();
 
@@ -1238,9 +1266,7 @@ function pause_callback()
 
 function empty_channel_timeout()
   {
-  msg_timex = 0;
-  $("#msg-layer").hide();
-  $("#epend-layer").hide();
+  clear_msg_timex();
   log ('auto-switching from empty channel');
   channel_right();
   }
@@ -1320,7 +1346,7 @@ function prepare_channel()
 
   $("#ep-layer").show();
   $("#ep-list").html (ep_html());
-  $("#ep-list img").error(function () { $(this).unbind("error").attr("src", "http://9x9ui.s3.amazonaws.com/images/no_images.png"); });
+  $("#ep-list img").error(function () { $(this).unbind("error").attr("src", "http://9x9ui.s3.amazonaws.com/9x9playerV39/images/error.png"); });
   $("#ep-list .clickable").bind ('click', function() { ep_click ($(this).attr('id')); });
 
   if (thumbing == 'ipg' && ipg_mode == 'episodes')
@@ -1348,7 +1374,7 @@ function ep_html()
   var html = '';
   var now = new Date();
 
-  var bad_thumbnail = 'http://9x9ui.s3.amazonaws.com/images/no_images.png';
+  var bad_thumbnail = 'http://9x9ui.s3.amazonaws.com/9x9playerV39/images/error.png';
 
   log ('(program html) program_first: ' + program_first + ' n_program_line: ' + n_program_line + ' program_cursor: ' + program_cursor);
   for (var i = program_first; i <= n_program_line && i < program_first + max_programs_in_line; i++)
@@ -2154,8 +2180,8 @@ function close_ipg_hint()
 function ipg_idle()
   {
   ipg_timex = 0;
-  if (thumbing == 'ipg')
-    switch_to_whats_new();
+  // if (thumbing == 'ipg')
+  //   switch_to_whats_new();
   }
 
 function extend_ipg_timex()
@@ -2169,7 +2195,7 @@ function redraw_ipg()
   {
   var html = "";
   
-  var bad_thumbnail = '<img src="http://9x9ui.s3.amazonaws.com/images/no_images.png">';
+  var bad_thumbnail = '<img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/error.png" class="thumbnail">';
 
   var newt = '<div style="z-index: 99; background-color: red; height: 20%; width: 20%; position: absolute; left: 0.2em; top: 0.2em; display: block; font-size: 0.36em">';
 
@@ -2205,7 +2231,7 @@ function redraw_ipg()
     }
 
   $("#list-holder").html (html);
-  $("#list-holder img").error(function () { $(this).unbind("error").attr("src", "http://9x9ui.s3.amazonaws.com/images/no_images.png"); });
+  $("#list-holder img").error(function () { $(this).unbind("error").attr("src", "http://9x9ui.s3.amazonaws.com/9x9playerV39/images/error.png"); });
   $("#list-holder .clickable").bind ('click', function () { ipg_click ($(this).attr ('id')); });
   $("#list-holder .clickable").hover (hover_in, hover_out);
 
@@ -2312,7 +2338,7 @@ function ipg_metainfo()
     var thumbnail = channelgrid [ipg_cursor]['thumb'];
 
     if (thumbnail == '' || thumbnail == 'null' || thumbnail == 'false')
-      thumbnail = 'http://9x9ui.s3.amazonaws.com/images/no_images.png'
+      thumbnail = 'http://9x9ui.s3.amazonaws.com/9x9playerV39/images/error.png'
 
     var name = channelgrid [ipg_cursor]['name'];
     if (name == '')
@@ -2590,7 +2616,7 @@ function arrow_click()
   redraw_program_line();
 
   $("#ep-list").html (ep_html());
-  $("#ep-list img").error(function () { $(this).unbind("error").attr("src", "http://9x9ui.s3.amazonaws.com/images/no_images.png"); });
+  $("#ep-list img").error(function () { $(this).unbind("error").attr("src", "http://9x9ui.s3.amazonaws.com/9x9playerV39/images/error.png"); });
 
   if (thumbing == 'ipg')
     $("#ep-list .clickable").removeClass ("on");
@@ -3361,14 +3387,14 @@ function redraw_program_line()
     {
     --program_first;
     $("#ep-list").html (ep_html());
-    $("#ep-list img").error(function () { $(this).unbind("error").attr("src", "http://9x9ui.s3.amazonaws.com/images/no_images.png"); });
+    $("#ep-list img").error(function () { $(this).unbind("error").attr("src", "http://9x9ui.s3.amazonaws.com/9x9playerV39/images/error.png"); });
     }
 
   while (program_cursor >= program_first + max_programs_in_line)
     {
     ++program_first;
     $("#ep-list").html (ep_html());
-    $("#ep-list img").error(function () { $(this).unbind("error").attr("src", "http://9x9ui.s3.amazonaws.com/images/no_images.png"); });
+    $("#ep-list img").error(function () { $(this).unbind("error").attr("src", "http://9x9ui.s3.amazonaws.com/9x9playerV39/images/error.png"); });
     }
 
 if (thumbing != 'ipg' && thumbing != 'ipg-wait')
@@ -4208,13 +4234,14 @@ function calculate_empties()
   var text;
 
   if (n == 1)
-    text = 'You still have one empty channel';
+    text = translations ['oneempty'];
   else if (n == 81)
-    text = 'You have no empty channels!'
+    text = translations ['noempty'];
   else
-    text = 'You still have ' + n + ' empty channels';
+    text = translations ['empties'].replace (/\%1/, n);
 
   $("#ch-vacancy").html (text);
+  $("#ch-vacancy").show();
   }
 
 function browse()
@@ -4240,7 +4267,7 @@ function browse()
     $("#waiting").hide();
     sanity_check_data ('categoryBrowse', data);
 
-    calculate_empties();
+    // calculate_empties();
 
     $("#add-panel").hide();
     $("#category-panel").show();
@@ -4724,6 +4751,7 @@ function browse_category (category_id)
   $("#dir-waiting").show();
 
   $("#content-list").html ('');
+  $("#ch-vacancy").hide();
 
   browser_cat = category_id;
 
@@ -4830,6 +4858,8 @@ function redraw_browse_content()
 
   if (browser_mode == 'category' && browser_x == 3)
     $("#content-" + browser_y).addClass ("on");
+
+  calculate_empties();
   }
 
 function browse_to_ipg()
@@ -5824,14 +5854,15 @@ function fp_tick (id)
 
 function setup_yt()
   {
-  log ('setting up youtube');
   unhide_player ("yt");
 
   current_tube = 'yt';
 
   if (!ytplayer)
     {
-    try { ytplayer.setSize ($(window).width(), $(window).height()) } catch (error) {};
+    log ('setting up youtube');
+
+    // try { ytplayer.setSize ($(window).width(), $(window).height()) } catch (error) {};
 
     var params = { allowScriptAccess: "always", wmode: "transparent", disablekb: "1" };
     var atts = { id: "myytplayer" };
@@ -5913,15 +5944,28 @@ function yt_error (code)
   var errors = { 100: 'Video not found', 101: 'Embedding not allowed', 150: 'Video not found' };
   var errtext = translations ['ytvid'] + ': Code ' + code;
 
-  if (fp_preloaded != 'yt' && (thumbing == 'program' || thumbing == 'channel'))
+  if (yt_error_timex != 0)
     {
-    log (errtext);
-    $("#msg-layer").html ('<p>' + errtext + '</p>');
+    log ('** YOUTUBE ERROR ' + code + ', BUT ALREADY PROCESSING AN ERROR **');
+    return;
+    }
+
+  if (fp_preloaded != 'yt' && thumbing == 'program')
+    {
+    log ('** YOUTUBE ERROR ** ' + errtext);
+
+    $("#msg-text").html (errtext);
     $("#msg-layer").show();
-    msg_timex = setTimeout ("yt_error_timeout()", 3000);
+    elastic();
+
+    /* unload the chromeless player, or bad things happen */
+    $("#yt1").css ("display", "none");
+    ytplayer = undefined;
+
+    yt_error_timex = setTimeout ("yt_error_timeout()", 3000);
     }
   else
-    log (errtext);
+    log ('** YOUTUBE ERROR ** ' + errtext);
   }
 
 function yt_error_timeout()
@@ -6440,9 +6484,6 @@ function control_enter()
     case 'btn-facebook':    switch_to_facebook();
                             break;
 
-    case 'btn-screensaver': switch_to_whats_new();
-                            break;
-
     case 'btn-rewind':      rewind();
                             break;
 
@@ -6517,6 +6558,7 @@ function fb_yes()
   {
   var channel = channelgrid [current_channel]['id'];
   current_program = program_line [program_cursor];
+  var thumb = programgrid [current_program]['thumb'];
 
   var query = "/playerAPI/saveIpg?user=" + user + '&' + 'channel=' + channel + '&' + 'program=' + current_program;
 
@@ -6532,7 +6574,37 @@ function fb_yes()
 
     if (fields[0] == "0")
       {
-      FB.ui ({ method: "stream.share", u: location.protocol + "//" + location.host + "/share/" + lines[2] });
+      if (true)
+        {
+        FB.ui ({ method: 'feed',
+                 name: 'My 9x9 Channel Guide ${now}',
+                 link: location.protocol + "//" + location.host + "/share/" + lines[2],
+                 picture: thumb,
+                 description: 'My 9x9 Channel Guide. Easily browse your favorite video Podcasts on the 9x9 Player! Podcasts automatically download and update for you, bringing up to 81 channels of new videos daily.'
+               },
+             function (response) { if (response && response.post_id) { log ('published'); } else { log ('not published'); } });
+        }
+      else
+        {
+        FB.ui(
+          {
+          method: 'feed',
+          name: 'Facebook Dialogs',
+          link: 'http://developers.facebook.com/docs/reference/dialogs/',
+          picture: 'http://fbrell.com/f8.jpg',
+          caption: 'Reference Documentation',
+          description: 'Dialogs provide a simple, consistent interface for applications to interface with users.',
+          message: 'Facebook Dialogs are easy!',
+          actions: [ { name: '我要參加', link: 'http://5f.tv/' } ]
+          },
+              function(response)
+                {
+                if (response && response.post_id)
+                  alert('Post was published.');
+                else
+                  alert('Post was not published.');
+                });
+        }
       }
 
     $("#control-layer").show();
@@ -6943,9 +7015,9 @@ function noop (e)
 </div>
 
 <div id="confirm-layer">
-  <div class="confirm-holder" id="confirm-holder">
+  <div class="confirm-holder" id="confirm-holder" style="z-index: 70">
     <p id="confirm-text"></p>
-    <a class="btn on" id="btn-cfclose"><span>Close</span></a>
+    <a class="btn on" id="btn-cfclose"><span id="close1">Close</span></a>
   </div>
 </div>
 
@@ -6971,7 +7043,9 @@ function noop (e)
 </div>
 
 <div id="msg-layer" style="display: none">
-  <p>No episodes in this channel</p>
+  <div class="msg-holder" id="#msg-holder">
+    <p id="msg-text">No episodes in this channel</p>
+  </div>
 </div>
 
 <div id="epend-layer" style="display: none">
@@ -7022,6 +7096,8 @@ function noop (e)
 <div id="log-layer" style="position: absolute; left: 0; top: 0; height: 100%; width: 100%; background: white; color: black; text-align: left; padding: 20px; overflow: scroll; z-index: 9999; display: none"></div>
 
 <div id="mask"></div>
+
+<div id="fb-root"></div>
 
 <!--/div-->
 </body>
