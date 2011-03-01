@@ -8,9 +8,9 @@
 <!-- FB Sharing meta data -->
 <meta name="title" content="My 9x9 Channel Guide ${now}" />
 <meta name="description" content="My 9x9 Channel Guide. Easily browse your favorite video podcasts on the 9x9 Player! Podcasts automatically download and update for you, bringing up to 81 channels of new videos daily." />
-<link rel="image_src" href="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/9x9-facebook-icon.png" />
+<link rel="image_src" href="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/9x9-facebook-icon.png" />
 
-<link rel="stylesheet" href="http://9x9ui.s3.amazonaws.com/9x9playerV39/stylesheets/main.css" />
+<link rel="stylesheet" href="http://9x9ui.s3.amazonaws.com/9x9playerV42/stylesheets/main.css" />
 
 <script type="text/javascript" charset="utf-8" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.8/jquery-ui.min.js"></script>
@@ -18,7 +18,7 @@
 
 <script type="text/javascript" charset="utf-8" src="http://static.ak.fbcdn.net/connect/en_US/core.debug.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/scripts/swfobject.js"></script>
-<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/9x9playerV39/javascripts/jquery.swfobject.1-1-1.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/9x9playerV42/javascripts/jquery.swfobject.1-1-1.min.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/scripts/flowplayer-3.2.4.min.js"></script>
 
 <script type="text/javascript">
@@ -171,7 +171,7 @@ var via_shared_ipg = false;
 /* reduced functionality if there is a valid user but he is visiting a shared ipg */
 var readonly_ipg = false;
 
-var root = 'http://9x9ui.s3.amazonaws.com/9x9playerV39/images/';
+var root = 'http://9x9ui.s3.amazonaws.com/9x9playerV42/images/';
 
 var language_en =
   {
@@ -252,6 +252,7 @@ var language_en =
   huak: 'Use arrow keys or mouse to navigate',
   hpec: 'Play episodes in the channel selected or add new channels',
   hscp: 'Show control panel',
+  hshow: 'Show episodes in this channel',
   qyes: 'Yes',
   qno: 'No',
   cup: 'Press <span class="enlarge">&uarr;</span> to see your Smart Guide',
@@ -262,7 +263,13 @@ var language_en =
   close: 'Close',
   oneempty: 'You still have one empty channel',
   noempty: 'You have no empty channels!',
-  empties: 'You still have %1 empty channels'
+  empties: 'You still have %1 empty channels',
+  aboutus: 'About Us',
+  about1: '9x9 is a cloud based video platform which allows internet content to be discovered and enjoyed through a Smart Guide on Smart TV, Smart Phone and Tablet Devices.',
+  about2: 'Discover the magic of the Smart Guide, a 9x9 grid which can be personalized and populated with up to 81 channels to satisfy your everyday online video appetite.',
+  about3: 'Watch your favorite podcasts, YouTube channels and other episodic content on 9x9 just like watching TV.',
+  about4: '9x9 is based in Santa Clara, California, USA.  We are a bunch of geeks passionate about revolutionizing online video discovery through a human powered network.',
+  about5: 'Our investors include venture capitalists, private investors and corporate investors including D-Link.  Contact us at <a href="mailto:feedback@9x9Cloud.tv">feedback@9x9Cloud.tv</a>.'
   };
 
 var language_tw =
@@ -344,6 +351,7 @@ var language_tw =
   huak: '使用方向鍵或鼠標導航',
   hpec: '播放選定頻道的影片或添加新的頻道',
   hscp: '顯示控制台',
+  hshow: '播放此頻道的節目',
   qyes: '是',
   qno: '否',
   cup: '按 <span class="enlarge">&uarr;</span> 瀏覽您的Smart Guide',
@@ -354,7 +362,13 @@ var language_tw =
   close: '關閉',
   oneempty: '您只剩下一個空位可放頻道。',
   noempty: '您已填滿Smart Guide，請刪除現有頻道之後再新增',
-  empties: '您仍剩 %1個空位可放頻道'
+  empties: '您仍剩 %1個空位可放頻道',
+  aboutus: '關於我們',
+  about1: '9x9 為雲端影片平台，用戶可透過9x9服務在智慧型電視、智慧型手機、平板設備上的Smart Guide發現與觀賞最新最有趣的網路影片內容。',
+  about2: 'Smart Guide 共有九九八十一格的空間，可以根據觀眾的興趣填入不同的頻道，滿足所有人不同的影片需求。',
+  about3: '您可在9x9上觀賞最喜歡的podcast，Youtube頻道，以及其它系列節目，就像看電視一樣的方便。',
+  about4: '9x9位於美國加州Santa Clara。我們是一群對改變網路影片生態極有熱情的科技人，透過發展人機合一的平台， 協助網路使用者獲取更好的觀看經驗。',
+  about5: '我們的投資人包括風險投資公司、私人投資者，以及企業投資者，包括D-Link。如欲與我們聯絡，請來信至<a href="mailto:feedback@9x9cloud.tv">feedback@9x9cloud.tv</a>。'
   };
 
 var translations = language_en;
@@ -457,10 +471,11 @@ function align_center()
   $("#control-layer").css  ("left", (ww - $("#control-layer").width())  / 2);
   $("#yesno-layer").css    ("left", (ww - $("#yesno-layer").width())    / 2);
 
+  $("#signin-holder").css  ("margin-top",  (wh - $("#signin-holder").height()) / 2);
   $("#msg-holder").css     ("margin-top",  (wh - $("#msg-holder").height() - $("#ep-layer").height()) / 2);
-  $("#hint-holder").css    ("margin-top",  (wh - $("#hint-holder").height()) / 2);
-  $("#confirm-holder").css ("margin-top",  (wh - $("#confirm-holder").height()) / 2);
-  $("#yesno-holder").css   ("margin-top",  (wh - $("#yesno-holder").height()) / 2);
+
+  for (var v in { signin:0, hint:0, confirm:0, yesno:0, about:0 })
+    $("#" + v + "-holder").css ("margin-top",  (wh - $("#" + v + "-holder").height()) / 2);
   }
 
 function align_jingle()
@@ -509,12 +524,19 @@ function set_language (lang)
   $("#huak").html (translations ['huak']);
   $("#hpec").html (translations ['hpec']);
   $("#hscp").html (translations ['hscp']);
+  $("#hshow").html (translations ['hshow']);
   $("#qyes").html (translations ['qyes']);
   $("#qno").html (translations ['qno']);
   $("#cup").html (translations ['cup']);
   $("#cdown").html (translations ['cdown']);
   $("#chcat").html (translations ['chcat'] + ':');
   $("#close1").html (translations ['close']);
+  $("#aboutus").html (translations ['aboutus']);
+  $("#about1").html (translations ['about1']);
+  $("#about2").html (translations ['about2']);
+  $("#about3").html (translations ['about3']);
+  $("#about4").html (translations ['about4']);
+  $("#about5").html (translations ['about5']);
   }
 
 function resize_fp()
@@ -1346,7 +1368,7 @@ function prepare_channel()
 
   $("#ep-layer").show();
   $("#ep-list").html (ep_html());
-  $("#ep-list img").error(function () { $(this).unbind("error").attr("src", "http://9x9ui.s3.amazonaws.com/9x9playerV39/images/error.png"); });
+  $("#ep-list img").error(function () { $(this).unbind("error").attr("src", "http://9x9ui.s3.amazonaws.com/9x9playerV42/images/error.png"); });
   $("#ep-list .clickable").bind ('click', function() { ep_click ($(this).attr('id')); });
 
   if (thumbing == 'ipg' && ipg_mode == 'episodes')
@@ -1374,7 +1396,7 @@ function ep_html()
   var html = '';
   var now = new Date();
 
-  var bad_thumbnail = 'http://9x9ui.s3.amazonaws.com/9x9playerV39/images/error.png';
+  var bad_thumbnail = 'http://9x9ui.s3.amazonaws.com/9x9playerV42/images/error.png';
 
   log ('(program html) program_first: ' + program_first + ' n_program_line: ' + n_program_line + ' program_cursor: ' + program_cursor);
   for (var i = program_first; i <= n_program_line && i < program_first + max_programs_in_line; i++)
@@ -1621,8 +1643,7 @@ function escape()
   var layer;
 
   log ('escape!');
-  $("#log-layer").hide();
-  $("#hint-layer").hide();
+  $("#log-layer, #hint-layer, #about-layer").hide();
 
   if (thumbing == 'browse-wait' || thumbing == 'ipg-wait')
     return;
@@ -1698,7 +1719,7 @@ function escape()
   if (thumbing == 'user')
     {
     $("#body").focus();
-    $("#signin-layer, #mask").hide();
+    $("#signin-layer").hide();
     thumbing = 'ipg';
     return;
     }
@@ -1849,7 +1870,7 @@ function keypress (keycode)
       else if (thumbing == 'ipg' && clips_played == 0)
         {
         /* do nothing */
-        $("#hint-layer").hide();
+        $("#hint-layer, #about-layer").hide();
         }
       else
         escape();
@@ -2136,15 +2157,17 @@ function switch_to_ipg()
 
   redraw_ipg();
 
-  $("#ipg-btn-signin, #ipg-btn-edit, #ipg-btn-resume").unbind();
+  $("#ipg-btn-signin, #ipg-btn-edit, #ipg-btn-resume, #ipg-btn-about").unbind();
 
   $("#ipg-btn-signin")  .removeClass ("on")  .hover (ipg_btn_hover_in, ipg_btn_hover_out); //  .click (sign_in_or_out);
   $("#ipg-btn-edit")    .removeClass ("on")  .hover (ipg_btn_hover_in, ipg_btn_hover_out); //  .click (ipg_delete_mode);
   $("#ipg-btn-resume")  .removeClass ("on")  .hover (ipg_btn_hover_in, ipg_btn_hover_out); //  .click (ipg_resume);
+  $("#ipg-btn-about")   .removeClass ("on")  .hover (ipg_btn_hover_in, ipg_btn_hover_out); //  .click (about);
 
   $("#ipg-btn-signin")  .bind ('click', sign_in_or_out);
   $("#ipg-btn-edit")    .bind ('click', ipg_delete_mode);
   $("#ipg-btn-resume")  .bind ('click', ipg_resume);
+  $("#ipg-btn-about")   .bind ('click', about);
 
   stop_preload();
   $("#buffering").hide();
@@ -2177,6 +2200,17 @@ function close_ipg_hint()
   $("#hint-layer").hide();
   }
 
+function about()
+  {
+  $("#about-layer").show();
+  elastic();
+  }
+
+function close_about()
+  {
+  $("#about-layer").hide();
+  }
+
 function ipg_idle()
   {
   ipg_timex = 0;
@@ -2195,7 +2229,7 @@ function redraw_ipg()
   {
   var html = "";
   
-  var bad_thumbnail = '<img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/error.png" class="thumbnail">';
+  var bad_thumbnail = '<img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/error.png" class="thumbnail">';
 
   var newt = '<div style="z-index: 99; background-color: red; height: 20%; width: 20%; position: absolute; left: 0.2em; top: 0.2em; display: block; font-size: 0.36em">';
 
@@ -2231,7 +2265,7 @@ function redraw_ipg()
     }
 
   $("#list-holder").html (html);
-  $("#list-holder img").error(function () { $(this).unbind("error").attr("src", "http://9x9ui.s3.amazonaws.com/9x9playerV39/images/error.png"); });
+  $("#list-holder img").error(function () { $(this).unbind("error").attr("src", "http://9x9ui.s3.amazonaws.com/9x9playerV42/images/error.png"); });
   $("#list-holder .clickable").bind ('click', function () { ipg_click ($(this).attr ('id')); });
   $("#list-holder .clickable").hover (hover_in, hover_out);
 
@@ -2338,7 +2372,7 @@ function ipg_metainfo()
     var thumbnail = channelgrid [ipg_cursor]['thumb'];
 
     if (thumbnail == '' || thumbnail == 'null' || thumbnail == 'false')
-      thumbnail = 'http://9x9ui.s3.amazonaws.com/9x9playerV39/images/error.png'
+      thumbnail = 'http://9x9ui.s3.amazonaws.com/9x9playerV42/images/error.png'
 
     var name = channelgrid [ipg_cursor]['name'];
     if (name == '')
@@ -2616,7 +2650,7 @@ function arrow_click()
   redraw_program_line();
 
   $("#ep-list").html (ep_html());
-  $("#ep-list img").error(function () { $(this).unbind("error").attr("src", "http://9x9ui.s3.amazonaws.com/9x9playerV39/images/error.png"); });
+  $("#ep-list img").error(function () { $(this).unbind("error").attr("src", "http://9x9ui.s3.amazonaws.com/9x9playerV42/images/error.png"); });
 
   if (thumbing == 'ipg')
     $("#ep-list .clickable").removeClass ("on");
@@ -2675,6 +2709,12 @@ function ipg_right()
       $("#ipg-btn-resume").addClass ("on");
       ipg_cursor = -3;
       }
+    else if (ipg_cursor == -3)
+      {
+      $("#ipg-btn-resume").removeClass ("on");
+      $("#ipg-btn-about").addClass ("on");
+      ipg_cursor = -4;
+      }
     ipg_sync();
     return;
     }
@@ -2716,7 +2756,13 @@ function ipg_left()
 
   if (ipg_cursor < 0)
     {
-    if (ipg_cursor == -3)
+    if (ipg_cursor == -4)
+      {
+      $("#ipg-btn-about").removeClass ("on");
+      $("#ipg-btn-resume").addClass ("on");
+      ipg_cursor = -3;
+      }
+    else if (ipg_cursor == -3)
       {
       $("#ipg-btn-resume").removeClass ("on");
       $("#ipg-btn-edit").addClass ("on");
@@ -2817,6 +2863,7 @@ function ipg_down()
     $("#ipg-btn-signin").removeClass ("on");
     $("#ipg-btn-edit").removeClass ("on");
     $("#ipg-btn-resume").removeClass ("on");
+    $("#ipg-btn-about").removeClass ("on");
     if (ipg_mode == 'edit')
       ipg_cursor = first_channel();
     else
@@ -3011,6 +3058,12 @@ function ipg_play()
     return;
     }
 
+  if ($("#about-layer").css ("display") == 'block')
+    {
+    close_about();
+    return;
+    }
+
   if (ipg_cursor < 0)
     {
     if (ipg_cursor == -1)
@@ -3024,6 +3077,10 @@ function ipg_play()
     else if (ipg_cursor == -3)
       {
       ipg_resume();
+      }
+    else if (ipg_cursor == -4)
+      {
+      about();
       }
 
     clearTimeout (ipg_timex);
@@ -3387,14 +3444,14 @@ function redraw_program_line()
     {
     --program_first;
     $("#ep-list").html (ep_html());
-    $("#ep-list img").error(function () { $(this).unbind("error").attr("src", "http://9x9ui.s3.amazonaws.com/9x9playerV39/images/error.png"); });
+    $("#ep-list img").error(function () { $(this).unbind("error").attr("src", "http://9x9ui.s3.amazonaws.com/9x9playerV42/images/error.png"); });
     }
 
   while (program_cursor >= program_first + max_programs_in_line)
     {
     ++program_first;
     $("#ep-list").html (ep_html());
-    $("#ep-list img").error(function () { $(this).unbind("error").attr("src", "http://9x9ui.s3.amazonaws.com/9x9playerV39/images/error.png"); });
+    $("#ep-list img").error(function () { $(this).unbind("error").attr("src", "http://9x9ui.s3.amazonaws.com/9x9playerV42/images/error.png"); });
     }
 
 if (thumbing != 'ipg' && thumbing != 'ipg-wait')
@@ -3536,7 +3593,13 @@ function login_screen()
 
   thumbing = 'user';
 
-  $("#signin-layer, #mask").show();
+  $("#signin-layer").show();
+
+  $("#btn-winclose").unbind();
+  $("#btn-winclose").hover (hover_in, hover_out);
+  $("#btn-winclose").click (escape);
+
+  elastic();
 
   $("#signin-layer .textfield").focus (user_focus);
   $("#signin-layer .textfield").blur (user_blur);
@@ -4241,7 +4304,6 @@ function calculate_empties()
     text = translations ['empties'].replace (/\%1/, n);
 
   $("#ch-vacancy").html (text);
-  $("#ch-vacancy").show();
   }
 
 function browse()
@@ -4860,6 +4922,11 @@ function redraw_browse_content()
     $("#content-" + browser_y).addClass ("on");
 
   calculate_empties();
+
+  if (n_browse_list > 0)
+    $("#ch-vacancy").show();
+  else
+    $("#ch-vacancy").hide();
   }
 
 function browse_to_ipg()
@@ -6809,12 +6876,12 @@ function noop (e)
   </div>
 
 <div id="ep-layer" style="display: none">
-  <img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/ep_panel_off.png" id="ep-panel">
+  <img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/ep_panel_off.png" id="ep-panel">
   <div id="ep-tip"></div>
   <div id="ep-container">
     <p id="ep-indicator"><span id="episodes1">Episodes: </span><span id="epNum"></span></p>
-    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/arrow_right_off.png" id="arrow-right" style="display: none">
-    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/arrow_left_off.png" id="arrow-left" style="display: none">
+    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/arrow_right_off.png" id="arrow-right" style="display: none">
+    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/arrow_left_off.png" id="arrow-left" style="display: none">
     <ul class="ep-list" id="ep-list"></ul>
     <div id="ep-meta"><p><span class="ch-title" id="ep-layer-ch-title"></span> - <span class="ep-title" id="ep-layer-ep-title"></span> - <span class="age" id="ep-age"></span> - <span class="duration" id="ep-length"></span></p></div>
   </div>
@@ -6823,9 +6890,10 @@ function noop (e)
 <div id="ipg-layer" style="display: none">
   <div id="ipg-holder">
     <div id="header">
-      <img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/logo.png" id="logo">
+      <img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/beta.png" id="beta">
+      <img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/logo.png" id="logo">
       <p id="user-name"><span id="hello">Hello</span>, <span id="user">Guest</span></p>  
-      <ul id="control-list"><li class="btn" id="ipg-btn-signin"><span id="solicit">Sign in / Sign up</span></li><li class="btn" id="ipg-btn-edit"><span id="edit-or-finish">Delete channel</span></li><li class="btn" id="ipg-btn-resume"><span id="resume1">Resume Watching</span></li></ul>
+      <ul id="control-list"><li class="btn" id="ipg-btn-signin"><span id="solicit">Sign in / Sign up</span></li><li class="btn" id="ipg-btn-edit"><span id="edit-or-finish">Delete channel</span></li><li class="btn" id="ipg-btn-resume"><span id="resume1">Resume Watching</span></li><li class="btn" id="ipg-btn-about"><span id="aboutus">About Us</span></li></ul>
     </div>
     <div id="ipg-content">
       <ul id="info-list">
@@ -6844,7 +6912,7 @@ function noop (e)
         <li id="preloading"><p><span class="hilite">Preload:</span> <span id="preload"></span></p></li>
       </ul>
       <div id="ipg-grid">
-        <p id="watermark"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/watermark.png"></p>
+        <p id="watermark"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/watermark.png"></p>
         <div id="list-holder">
         </div>
       </div>     
@@ -6856,7 +6924,7 @@ function noop (e)
   <div id="dir-holder">
 
   <div id="dir-header">
-    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/logo.png" id="dir-logo">
+    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/logo.png" id="dir-logo">
     <p id="chdirtxt">Channel Directory</p>  
   </div>
 
@@ -6872,20 +6940,20 @@ function noop (e)
   </div>
     <div class="br-panel" id="category-panel">
     <div class="sub-panel">
-      <p class="page-up"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/arrow_up.png"></p>
+      <p class="page-up"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/arrow_up.png"></p>
       <div class="sub-holder">
         <ul id="ch-catlist"></ul>
       </div>
-      <p class="page-down"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/arrow_down.png"></p>
+      <p class="page-down"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/arrow_down.png"></p>
     </div>
     <div class="content-panel">
-      <p class="page-up"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/arrow_up.png"></p>
+      <p class="page-up"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/arrow_up.png"></p>
       <div class="content-holder" style="display: block">
         <ul id="content-list"></ul>
       </div>
       <p id="ch-vacancy"></p>
       <!--a href="javascript:;" class="btn" id="btn-subscribeAll">Subscribe all</a-->
-      <p class="page-down"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/arrow_down.png"></p>
+      <p class="page-down"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/arrow_down.png"></p>
     </div>
   </div>
   
@@ -6897,8 +6965,8 @@ function noop (e)
           <li><a href="javascript:;" class="btn">Go</a></li>
         </ul>
     </div>
-    <p class="page-up"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/arrow_up.png"></p>
-    <p class="page-down"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/arrow_down.png"></p>
+    <p class="page-up"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/arrow_up.png"></p>
+    <p class="page-down"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/arrow_down.png"></p>
   </div>
   
   <div class="op-panel" id="add-panel">
@@ -6924,38 +6992,41 @@ function noop (e)
 </div>
 
 <div id="signin-layer" style="display: none">
-  <ul id="login-pannel">
-    <li><h2 id="returning1">Returning Users</h2></li>
-    <li>
-      <span id="email1">Email:</span>
-      <p class="textfieldbox"><input type="text" id="L-email" class="textfield" value=""></p>
-    </li>
-    <li>
-      <span id="pw1">Password:</span>
-      <p class="textfieldbox"><input type="password" id="L-password" class="textfield" value=""></p>
-    </li>
-    <li><a href="javascript:submit_login()" class="btn" id="L-button"><span id="loginbtn">Log in</span></a></li>
-  </ul>
-  <ul id="signup-pannel">
-    <li><h2>New Users</h2></li>
-    <li>
-      <span id="name2">Name:</span>
-      <p class="textfieldbox"><input type="text" id="S-name" class="textfield"></p>
-    </li>
-    <li>
-      <span id="email2">Email:</span>
-      <p class="textfieldbox"><input type="text" id="S-email" class="textfield"></p>
-    </li>
-    <li>
-      <span id="pw2">Password:</span>
-      <p class="textfieldbox"><input type="password" id="S-password" class="textfield"></p>
-    </li>
-    <li>
-      <span id="pwv2">Password verify:</span>
-      <p class="textfieldbox"><input type="password" id="S-password2" class="textfield"></p>
-    </li>
-    <li><a href="javascript:submit_signup()" class="btn" id="S-button"><span>Sign up</span></a></li>
-  </ul>
+  <div id="signin-holder">
+    <div id="btn-winclose"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/btn_winclose.png"></div>
+    <ul id="login-pannel">
+      <li><h2 id="returning1">Returning Users</h2></li>
+      <li>
+        <span id="email1">Email:</span>
+        <p class="textfieldbox"><input type="text" id="L-email" class="textfield" value=""></p>
+      </li>
+      <li>
+        <span id="pw1">Password:</span>
+        <p class="textfieldbox"><input type="password" id="L-password" class="textfield" value=""></p>
+      </li>
+      <li><a href="javascript:submit_login()" class="btn" id="L-button"><span id="loginbtn">Log in</span></a></li>
+    </ul>
+    <ul id="signup-pannel">
+      <li><h2>New Users</h2></li>
+      <li>
+        <span id="name2">Name:</span>
+        <p class="textfieldbox"><input type="text" id="S-name" class="textfield"></p>
+      </li>
+      <li>
+        <span id="email2">Email:</span>
+        <p class="textfieldbox"><input type="text" id="S-email" class="textfield"></p>
+      </li>
+      <li>
+        <span id="pw2">Password:</span>
+        <p class="textfieldbox"><input type="password" id="S-password" class="textfield"></p>
+      </li>
+      <li>
+        <span id="pwv2">Password verify:</span>
+        <p class="textfieldbox"><input type="password" id="S-password2" class="textfield"></p>
+      </li>
+      <li><a href="javascript:submit_signup()" class="btn" id="S-button"><span>Sign up</span></a></li>
+    </ul>
+  </div>
 </div>
 
 <div id="browse" style="display: none; z-index: 999"></div>
@@ -6967,15 +7038,15 @@ function noop (e)
     <p id="cup">Press <span class="enlarge">&uarr;</span> to see your Smart Guide</p>
   </div>
   <div id="controler">
-    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/bg_controler.png" id="controler-bg">
+    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/bg_controler.png" id="controler-bg">
     <ul id="control-bar">
-      <li id="btn-replay" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/btn_replay.png"></li>
-      <li id="btn-rewind" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/btn_rewind.png"></li>
-      <li id="btn-play" style="display: none" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/btn_play.png"></li>
-      <li id="btn-pause" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/btn_pause.png"></li>
-      <li id="btn-forward" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/btn_forward.png"></li>
+      <li id="btn-replay" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/btn_replay.png"></li>
+      <li id="btn-rewind" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/btn_rewind.png"></li>
+      <li id="btn-play" style="display: none" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/btn_play.png"></li>
+      <li id="btn-pause" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/btn_pause.png"></li>
+      <li id="btn-forward" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/btn_forward.png"></li>
       <li class="divider"></li>
-      <li id="btn-volume" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/btn_volume.png"></li>
+      <li id="btn-volume" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/btn_volume.png"></li>
       <li id="volume-constrain" class="on">
         <ul id="volume-bars">
           <li></li>
@@ -6988,9 +7059,9 @@ function noop (e)
         </ul>
       </li>
       <li class="divider"></li>
-      <li id="btn-facebook" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/btn_facebook.png"></li>
+      <li id="btn-facebook" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/btn_facebook.png"></li>
       <li class="divider"></li>
-      <li id="btn-close" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/btn_close.png"></li>
+      <li id="btn-close" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/btn_close.png"></li>
       <li id="play-time">-- / --</li>
       <li id="progress-bar">
         <p id="loaded" style="width: 100%;"></p>
@@ -7023,21 +7094,21 @@ function noop (e)
 
 <div id="waiting">
   <div class="waiting-holder">
-    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/loading.gif">
+    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/loading.gif">
     <p id="moment1">One moment...</p>
   </div>
 </div>
 
 <div id="buffering">
   <div class="waiting-holder">
-    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/loading.gif">
+    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/loading.gif">
     <p id="buffering1">Buffering...</p>
   </div>
 </div>
 
 <div id="dir-waiting">
   <div class="waiting-holder">
-    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/loading.gif">
+    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/loading.gif">
     <p id="moment2">One moment...</p>
   </div>
 </div>
@@ -7061,21 +7132,34 @@ function noop (e)
     <div id="sg-hint">
       <p class="section-title"><span id="hwbsg">While Browsing Smart Guide</span></p>
       <ul class="hints-list">
-        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/arrow_keys.png" class="key-arrows"><span id="huak">Use arrow keys or mouse to navigate</span></li>
-        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/enter_key.png" class="key-enter"><span id="hpec">Play episodes in the channel selected or add new channels</span></li>
+        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/arrow_keys.png" class="key-arrows"><span id="huak">Use arrow keys or mouse to navigate</span></li>
+        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/enter_key.png" class="key-enter"><span id="hpec">Play episodes in the channel selected or add new channels</span></li>
       </ul>
     </div>
     <div id="ep-hint">
       <p class="section-title"><span id="hwwe">While Watching Episodes</span></p>
       <ul class="hints-list">
-        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/enter_key.png" class="key-enter"><span id="hscp">Show control panel</span></li>
-        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/up_key.png" class="key-up"><span id="rsg2">Return to Smart Guide</span></li>
+        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/enter_key.png" class="key-enter"><span id="hscp">Show control panel</span></li>
+        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/up_key.png" class="key-up"><span id="rsg2">Return to Smart Guide</span></li>
+        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/left_key.png" class="key-left"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/right_key.png" class="key-right"><span id="hshow">Show episodes in this channel</span></li>
       </ul>
     </div>
     <div id="hint-bottom">
-      <p id="hint-remove" style="display: none"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV39/images/check_off.png" class="checkbox"><span>Don't show me this again</span></p>
+      <p id="hint-remove" style="display: none"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/check_off.png" class="checkbox"><span>Don't show me this again</span></p>
       <p class="btn" id="btn-closeHint" onclick="close_ipg_hint()"><span id="hctw">Close this window</span></p>
     </div>
+  </div>
+</div>
+
+<div id="about-layer">
+  <div class="about-holder" id="about-holder">
+    <p><span id="about1">9x9 is a cloud based video platform which allows internet content to be discovered and enjoyed through a Smart Guide on Smart TV, Smart Phone and Tablet Devices.</span></p>
+    <p><span id="about2">Discover the magic of the Smart Guide, a 9x9 grid which can be personalized and populated with up to 81 channels to satisfy your everyday online video appetite.</span></p>
+    <p><span id="about3">Watch your favorite podcasts, YouTube channels and other episodic content on 9x9 just like watching TV.</span></p>
+    <p><span id="about4">9x9 is based in Santa Clara, California, USA.  We are a bunch of geeks passionate about revolutionizing online video discovery through a human powered network.</span></p>
+    <p><span id="about5">Our investors include venture capitalists, private investors and corporate investors including D-Link.  Contact us at <a href="mailto:feedback@9x9Cloud.tv">feedback@9x9Cloud.tv</a>.</span></p>
+    <div id="btn-closeAbout"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/btn_winclose.png" onclick="close_about()"></div>
+    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/logo_about.png" id="about-logo">
   </div>
 </div>
 
