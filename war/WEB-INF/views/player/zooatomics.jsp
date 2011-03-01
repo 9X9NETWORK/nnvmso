@@ -71,6 +71,7 @@ var all_channels_fetched = false;
 var activated = false;
 var jingled = false;
 var jingle_timex = 0;
+var modal_box = false;
 var remembered_pause = false;
 var debug_mode = 1;
 var user_cursor;
@@ -1630,10 +1631,16 @@ function escape()
   var layer;
 
   log ('escape!');
-  $("#log-layer, #hint-layer, #about-layer").hide();
+  $("#log-layer, #hint-layer").hide();
 
   if (thumbing == 'browse-wait' || thumbing == 'ipg-wait')
     return;
+
+  if (modal_box)
+    {
+    close_about();
+    return;
+    }
 
   if (thumbing == 'browse')
     {
@@ -1828,6 +1835,13 @@ function keypress (keycode)
     extend_ipg_timex();
 
   report ('k', keycode);
+
+  if (modal_box)
+    {
+    if (keycode == 13 || keycode == 121 || keycode == 27)
+      close_about();
+    return;
+    }
 
   /* ensure osd is up */
 
@@ -2179,7 +2193,6 @@ function switch_to_ipg()
     }
 
   $("#ep-list .clickable").removeClass ("on");
-  // $("#ep-list .bg-ep").attr ("src", root + 'bg_ep_off.png');
   }
 
 function close_ipg_hint()
@@ -2189,20 +2202,23 @@ function close_ipg_hint()
 
 function about()
   {
+  modal_box = true;
   $("#about-layer").show();
+  $("#btn-closeAbout").unbind();
+  $("#btn-closeAbout").hover (hover_in, hover_out);
   elastic();
   }
 
 function close_about()
   {
   $("#about-layer").hide();
+  modal_box = false;
   }
 
 function ipg_idle()
   {
   ipg_timex = 0;
-  // if (thumbing == 'ipg')
-  //   switch_to_whats_new();
+  // if (thumbing == 'ipg') switch_to_whats_new();
   }
 
 function extend_ipg_timex()
