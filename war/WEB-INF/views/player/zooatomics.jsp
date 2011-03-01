@@ -3503,7 +3503,7 @@ function setup_ajax_error_handling()
 
     if (x.status == 0)
       {
-      log_and_alert ('No network!');
+      log ('** ERROR ** No network! **');
       }
     else if (x.status == 404)
       {
