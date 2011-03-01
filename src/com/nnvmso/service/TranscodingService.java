@@ -161,7 +161,7 @@ public class TranscodingService {
 			isNew = true;
 			program = new MsoProgram("", "", "", MsoProgram.TYPE_VIDEO);
 		}
-		if (!isNew) {
+		if (isNew) {
 			if (item.getTitle() != null) { program.setName(item.getTitle()); }					
 
 			String intro = item.getDescription();
