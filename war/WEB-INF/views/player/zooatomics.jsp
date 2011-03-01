@@ -668,26 +668,13 @@ function init()
 
   /* Initialize FB Javascript SDK */
 
-  if (true)
+  FB.init (
     {
-    FB.init (
-      {
-      appId: '110847978946712',
-      status: false, // check login status
-      cookie: false, // enable cookies to allow the server to access the session
-      xfbml: false   // parse XFBML
-      });
-    }
-  else
-    {
-    FB.init (
-      {
-      appId: '110847978946712',
-      status: true, // check login status
-      cookie: true, // enable cookies to allow the server to access the session
-      xfbml: true   // parse XFBML
-      });
-    }
+    appId: '110847978946712',
+    status: false, // check login status
+    cookie: false, // enable cookies to allow the server to access the session
+    xfbml: false   // parse XFBML
+    });
 
   if ((location+'').match (/preload=off/))
     nopreload = true;
@@ -3347,6 +3334,8 @@ function ipg_btn_hover_in()
     cursor = -2;
   else if (id == "ipg-btn-resume")
     cursor = -3;
+  else if (id == "ipg-btn-about")
+    cursor = -4;
 
   $(this).addClass ("hover");
   ipg_btn_tip (cursor);
@@ -3373,6 +3362,9 @@ function ipg_btn_tip (cursor)
     tip (translations ['startdel']);
   else if (cursor == -3)
     tip (translations ['returnipg']);
+  else if (cursor == -4)
+    tip (translations ['aboutus']);
+
   ipg_program_tip();
   }
 
@@ -6641,37 +6633,7 @@ function fb_yes()
 
     if (fields[0] == "0")
       {
-      if (true)
-        {
-        FB.ui ({ method: 'feed',
-                 name: 'My 9x9 Channel Guide ${now}',
-                 link: location.protocol + "//" + location.host + "/share/" + lines[2],
-                 picture: thumb,
-                 description: 'My 9x9 Channel Guide. Easily browse your favorite video Podcasts on the 9x9 Player! Podcasts automatically download and update for you, bringing up to 81 channels of new videos daily.'
-               },
-             function (response) { if (response && response.post_id) { log ('published'); } else { log ('not published'); } });
-        }
-      else
-        {
-        FB.ui(
-          {
-          method: 'feed',
-          name: 'Facebook Dialogs',
-          link: 'http://developers.facebook.com/docs/reference/dialogs/',
-          picture: 'http://fbrell.com/f8.jpg',
-          caption: 'Reference Documentation',
-          description: 'Dialogs provide a simple, consistent interface for applications to interface with users.',
-          message: 'Facebook Dialogs are easy!',
-          actions: [ { name: '我要參加', link: 'http://5f.tv/' } ]
-          },
-              function(response)
-                {
-                if (response && response.post_id)
-                  alert('Post was published.');
-                else
-                  alert('Post was not published.');
-                });
-        }
+      FB.ui ({ method: "stream.share", u: location.protocol + "//" + location.host + "/share/" + lines[2] });
       }
 
     $("#control-layer").show();
