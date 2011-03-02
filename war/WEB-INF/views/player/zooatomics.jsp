@@ -272,7 +272,9 @@ var language_en =
   about4: '9x9 is based in Santa Clara, California, USA.  We are a bunch of geeks passionate about revolutionizing online video discovery through a human powered network.',
   about5: 'Our investors include venture capitalists, private investors and corporate investors including D-Link.  Contact us at <a href="mailto:feedback@9x9Cloud.tv">feedback@9x9Cloud.tv</a>.',
   newusers: 'New Users',
-  signup: 'Sign up'
+  signup: 'Sign up',
+  successful: 'Successful!',
+  failed: 'FAILED'
   };
 
 var language_tw =
@@ -373,7 +375,9 @@ var language_tw =
   about4: '9x9位於美國加州Santa Clara。我們是一群對改變網路影片生態極有熱情的科技人，透過發展人機合一的平台， 協助網路使用者獲取更好的觀看經驗。',
   about5: '我們的投資人包括風險投資公司、私人投資者，以及企業投資者，包括D-Link。如欲與我們聯絡，請來信至<a href="mailto:feedback@9x9cloud.tv">feedback@9x9cloud.tv</a>。',
   newusers: '新用戶',
-  signup: '註冊'
+  signup: '註冊',
+  successful: '新增成功',
+  failed: '新增失敗'
   };
 
 var translations = language_en;
@@ -1034,7 +1038,7 @@ function preload_control_images()
   {
   var html = '';
 
-  for (var i in { 'bg_controler':'', 'btn_rewind':'', 'btn_pause':'', 'btn_play':'', 'btn_forward':'', 'btn_volume':'', 'btn_close':'', 'btn_on':'', 'btn_off':'', 'btn_facebook':'', 'btn_replay':'', 'btn_screensaver':'', 'bg_ep':'', 'bg_film':'' })
+  for (var i in { 'bg_controler':'', 'btn_rewind':'', 'btn_pause':'', 'btn_play':'', 'btn_forward':'', 'btn_volume':'', 'btn_close':'', 'btn_on':'', 'btn_off':'', 'btn_facebook':'', 'btn_replay':'', 'btn_screensaver':'' })
     html += '<img src="' + root + i + '.png">';
 
   $("#preload-control-images").html (html);
@@ -4021,7 +4025,7 @@ function submit_throw()
     var fields = lines[0].split ('\t');
     if (fields [0] == "0")
       {
-      feedback (true, 'Successful!');
+      feedback (true, translations ['successful']);
       dir_requires_update = true;
 
       log ('channelSubmit successful, returned: ' + data);
@@ -4034,7 +4038,7 @@ function submit_throw()
       }
     else
       {
-      feedback (false, 'FAILED: ' + fields[1]);
+      feedback (false, translations ['failed'] + ': ' + fields[1]);
       }
     $("#podcastRSS").html ('');
     })
