@@ -23,6 +23,7 @@ import com.google.appengine.api.datastore.DatastoreFailureException;
 import com.google.appengine.api.datastore.DatastoreNeedIndexException;
 import com.google.appengine.api.datastore.DatastoreTimeoutException;
 import com.google.apphosting.api.DeadlineExceededException;
+import com.nnvmso.dao.ShardedCounter;
 import com.nnvmso.lib.CookieHelper;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnStringUtil;
@@ -56,11 +57,19 @@ public class PlayerApiService {
 	public void setMso(Mso mso) {
 		this.mso = mso;
 	}	
-		
+	
+	public int addMsoInfoVisitCounter(String msoName) {
+		String counterName = msoName + "BrandInfo";
+		CounterFactory factory = new CounterFactory();
+		ShardedCounter counter = factory.getOrCreateCounter(counterName);
+		counter.increment();			
+		return counter.getCount(); 								
+	}
+	
 	public String findMsoInfo(HttpServletRequest req) {
 		Mso theMso = msoMngr.findMsoViaHttpReq(req);
 		if (theMso == null) {return NnStatusMsg.msoInvalid(locale);}
-		
+		int counter = this.addMsoInfoVisitCounter(theMso.getName());
 		MsoConfigManager configMngr = new MsoConfigManager();
 		MsoConfig config = configMngr.findByMsoIdAndItem(theMso.getKey().getId(), MsoConfig.DEBUG);
 		String debug = "1";
@@ -73,7 +82,9 @@ public class PlayerApiService {
 		results = results + this.assembleKeyValue("logoUrl", mso.getLogoUrl());
 		results = results + this.assembleKeyValue("jingleUrl", mso.getJingleUrl());
 		results = results + this.assembleKeyValue("logoClickUrl", mso.getLogoClickUrl());
-		results = results + this.assembleKeyValue("preferredLangCode", mso.getPreferredLangCode());		
+		results = results + this.assembleKeyValue("preferredLangCode", mso.getPreferredLangCode());
+		results = results + this.assembleKeyValue("jingleUrl", mso.getJingleUrl());
+		results = results + this.assembleKeyValue("brandInfoCounter", String.valueOf(counter));
 		results = results + this.assembleKeyValue("debug", debug);
 		
 		return results;
