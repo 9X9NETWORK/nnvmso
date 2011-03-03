@@ -8,7 +8,7 @@
 <!-- FB Sharing meta data -->
 <meta name="title" content="My 9x9 Channel Guide ${now}" />
 <meta name="description" content="My 9x9 Channel Guide. Easily browse your favorite video podcasts on the 9x9 Player! Podcasts automatically download and update for you, bringing up to 81 channels of new videos daily." />
-<link rel="image_src" href="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/9x9-facebook-icon.png" />
+<link rel="image_src" href="${fbImg}" />
 
 <link rel="stylesheet" href="http://9x9ui.s3.amazonaws.com/9x9playerV42/stylesheets/main.css" />
 
