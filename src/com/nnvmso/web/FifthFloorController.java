@@ -34,8 +34,10 @@ public class FifthFloorController {
 	@RequestMapping("")
 	public String zooatomics(@RequestParam(value="mso",required=false) String mso, HttpServletRequest req, HttpServletResponse resp, Model model) {		
 		CookieHelper.setCookie(resp, CookieHelper.MSO, "5f");
-		String now = (new SimpleDateFormat("MM.dd.yyyy")).format(new Date()).toString();
+		String now = (new SimpleDateFormat("MM.dd.yyyy")).format(new Date()).toString();		
+		String fbImg = "https://s3.amazonaws.com/9x9ui/images/5floor-logo.png";
 		model.addAttribute("now", now);
+		model.addAttribute("fbImg", fbImg);
 		return "player/zooatomics";
 	}
 

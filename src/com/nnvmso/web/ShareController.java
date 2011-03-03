@@ -43,8 +43,15 @@ public class ShareController {
 		if (ipg == null) {
 			return "redirect:/";
 		}
+		MsoProgramManager programMngr = new MsoProgramManager();
+		MsoProgram p = programMngr.findById(ipg.getProgramId()); 
 		String now = (new SimpleDateFormat("MM.dd.yyyy")).format(new Date()).toString();
-		model.addAttribute("now", now);
+		model.addAttribute("now", now);		
+		String fbImg = "http://9x9ui.s3.amazonaws.com/9x9playerV39/images/9x9-facebook-icon.png";
+		if (p != null && p.getImageUrl() != null && p.getImageUrl().length() > 0) {
+			fbImg = p.getImageUrl();
+		}
+		model.addAttribute("fbImg", fbImg);		
 		return "player/zooatomics";
 	}
 }

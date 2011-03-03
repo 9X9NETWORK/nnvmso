@@ -35,9 +35,11 @@ public class PlayerController {
 	
 	@RequestMapping("9x9")
 	public String zooatomics(@RequestParam(value="mso",required=false) String mso, HttpServletRequest req, HttpServletResponse resp, Model model) {
-		CookieHelper.deleteCookie(resp, CookieHelper.MSO);
+		//CookieHelper.deleteCookie(resp, CookieHelper.MSO);
 		String now = (new SimpleDateFormat("MM.dd.yyyy")).format(new Date()).toString();
+		String fbImg = "http://9x9ui.s3.amazonaws.com/9x9playerV39/images/9x9-facebook-icon.png";
 		model.addAttribute("now", now);
+		model.addAttribute("fbImg", fbImg);
 		return "player/zooatomics";
 	}
 
