@@ -462,7 +462,7 @@ public class PlayerApiController {
 									  HttpServletRequest req) {
 		this.prepService(req);
 		String output = NnStatusMsg.errorStr(locale);
-		log.info("user=" + userToken + ";session=" + session + ";pdr=" + pdr);
+		log.info("user=" + userToken + ";session=" + session);
 		try {
 			output = playerApiService.processPdr(userToken, pdr, session);
 		} catch (Exception e) {
