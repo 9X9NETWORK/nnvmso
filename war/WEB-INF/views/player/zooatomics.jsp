@@ -43,6 +43,7 @@ var ytplayer;
 var yt_video_id;
 var yt_timex = 0;
 var yt_previous_state = -2;
+var yt_quality = "medium";
 
 var jwplayer;
 var jw_video_file = 'nothing.flv';
@@ -692,6 +693,9 @@ function init()
 
   if ((location+'').match (/divlog=on/))
     divlog = true;
+
+  if ((location+'').match (/ytq=/))
+    yt_quality = (location+'').match (/ytq=([^&]+)/)[1];
 
   /* $("#fp1, #fp2, #yt1").mousemove (mousemove); */
   }
@@ -3757,7 +3761,6 @@ function user_blur()
   log ('user blur: ' + $(this).attr("id"));
   }
 
-
 function submit_login()
   {
   var things = [];
@@ -3958,7 +3961,7 @@ function feedback (success, text)
   {
   $("#feedback").addClass (success ? "success" : "fail");
   $("#feedback").removeClass (success ? "fail" : "success");
-  $("#feedback").html ('<p>' + text + '<p>');
+  $("#feedback p").text (text);
   $("#feedback").show();
   }
 
@@ -4017,9 +4020,11 @@ function submit_throw()
   log ('throw: ' + serialized);
 
   feedback (true, translations ['pleasewait']);
+  $("#feedback img").show();
 
   $.post ("/playerAPI/channelSubmit", serialized, function (data)
     {
+    $("#feedback img").hide();
     sanity_check_data ('podcastSubmit', data);
     var lines = data.split ('\n');
     var fields = lines[0].split ('\t');
@@ -4535,7 +4540,7 @@ function browse_set_cursor (x, y)
       }
     else if (browser_y == 2)
       {
-      $("#feedback").hide();
+      $("#feedback, #feedback img").hide();
       $("#add-go").removeClass ("on");
       $("#category-panel").hide();
       $("#add-panel").show();
@@ -5987,8 +5992,8 @@ function play_yt()
     try { ytplayer.addEventListener ('onStateChange', 'yt_state'); } catch (error) {};
     try { ytplayer.addEventListener ('onError', 'yt_error'); } catch (error) {};
 
-    /* small | medium | large | hd720 | hd1080 */
-    try { ytplayer.loadVideoById (yt_video_id, 0, "medium"); } catch (error) {};
+    /* yt_quality can be: small | medium | large | hd720 | hd1080 */
+    try { ytplayer.loadVideoById (yt_video_id, 0, yt_quality); } catch (error) {};
     }
   else
     alert ("ytplayer not ready");
@@ -6968,7 +6973,7 @@ function noop (e)
       <p id="chcat">Channel category:</p>
       <ul class="cate-list" id="cate-list"></ul>
     </div>
-    <div id="feedback" class="success"><p></p></div>
+    <div id="feedback" class="success"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/loading.gif"><p></p></div>
     <a href="javascript:submit_throw()" class="btn" id="add-go"><span>Go</span></a>
   </div>
   </div>
