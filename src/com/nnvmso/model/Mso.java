@@ -21,6 +21,8 @@ public class Mso implements Serializable {
 		
 	@Persistent 
 	private String name;
+	public static String NAME_9X9 = "9x9";
+	public static String NAME_5F = "5f";
 
 	@Persistent
 	private String title;
