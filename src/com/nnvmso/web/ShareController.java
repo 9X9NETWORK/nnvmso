@@ -42,16 +42,20 @@ public class ShareController {
 		}				
 		Ipg ipg = ipgMngr.findById(Long.parseLong(ipgId));
 		if (ipg == null) {
+			log.info("can not find ipg:" + ipgId);
 			return "redirect:/";
 		}
 		//find mso info of the user who shares the ipg
-		NnUser user = new NnUserManager().findById(ipg.getUserId());		
-		if (user != null) {
-			Mso mso = new MsoManager().findById(user.getMsoId());
-			if (mso != null && mso.getName().equals(Mso.NAME_5F)) {
-				CookieHelper.setCookie(resp, CookieHelper.MSO, Mso.NAME_5F);
-			} else {
-				CookieHelper.deleteCookie(resp, CookieHelper.MSO);
+		if (ipg.getUserId() != 0) { //old data does not have userId
+			NnUser user = new NnUserManager().findById(ipg.getUserId());		
+			if (user != null) {
+				log.info("This user," + user.getKey().getId() + ", shares ipg.");
+				Mso mso = new MsoManager().findById(user.getMsoId());
+				if (mso != null && mso.getName().equals(Mso.NAME_5F)) {
+					CookieHelper.setCookie(resp, CookieHelper.MSO, Mso.NAME_5F);
+				} else {
+					CookieHelper.deleteCookie(resp, CookieHelper.MSO);
+				}
 			}
 		}
 		//give fb icon
@@ -64,7 +68,7 @@ public class ShareController {
 			fbImg = p.getImageUrl();
 		}
 		model.addAttribute("fbImg", fbImg);
-		
+		log.info("fbImg set on share:" + fbImg);
 		return "player/zooatomics";
 	}
 }
