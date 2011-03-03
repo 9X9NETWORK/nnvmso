@@ -4169,7 +4169,6 @@ function pre_login()
           }
         else if (fields[0] == 'jingleUrl')
           {
-          fields[1] = 'http://9x9ui.s3.amazonaws.com/opening.swf';
           log ('jingle: ' + fields[1]);
           elastic();
           $("#blue").hide();
