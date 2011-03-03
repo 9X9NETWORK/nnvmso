@@ -41,6 +41,9 @@ public class PlayerController {
 		return "player/zooatomics";
 	}
 
+	/*
+	 * used for dns redirect watch dog 
+	 */
 	@RequestMapping("9x9/wd")
 	public ResponseEntity<String> watchdog() {		
 		return NnNetUtil.textReturn("OK");

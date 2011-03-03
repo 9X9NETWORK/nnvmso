@@ -39,6 +39,9 @@ public class FifthFloorController {
 		return "player/zooatomics";
 	}
 
+	/*
+	 * used for dns redirect watch dog 
+	 */
 	@RequestMapping("wd")
 	public ResponseEntity<String> watchdog() {		
 		return NnNetUtil.textReturn("OK");
