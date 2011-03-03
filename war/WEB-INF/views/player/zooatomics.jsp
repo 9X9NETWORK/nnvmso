@@ -253,7 +253,7 @@ var language_en =
   hctw: 'Close this window',
   huak: 'Use arrow keys or mouse to navigate',
   hpec: 'Play episodes in the channel selected or add new channels',
-  hscp: 'Show control panel',
+  hscp: 'Show playback controls',
   hshow: 'Show episodes in this channel',
   qyes: 'Yes',
   qno: 'No',
@@ -275,7 +275,14 @@ var language_en =
   newusers: 'New Users',
   signup: 'Sign up',
   successful: 'Successful!',
-  failed: 'FAILED'
+  failed: 'FAILED',
+  hour: 'hour',
+  minute: 'minute',
+  day: 'day',
+  month: 'month',
+  year: 'year',
+  ago: 'ago',
+  hence: 'hence'
   };
 
 var language_tw =
@@ -378,7 +385,14 @@ var language_tw =
   newusers: '新用戶',
   signup: '註冊',
   successful: '新增成功',
-  failed: '新增失敗'
+  failed: '新增失敗',
+  hour: '小時',
+  minute: '分鐘',
+  day: '天',
+  month: '月',
+  year: '年',
+  ago: '前',
+  hence: '後'
   };
 
 var translations = language_en;
@@ -683,9 +697,9 @@ function init()
   FB.init (
     {
     appId: '110847978946712',
-    status: false, // check login status
-    cookie: false, // enable cookies to allow the server to access the session
-    xfbml: false   // parse XFBML
+    status: true, // check login status
+    cookie: true, // enable cookies to allow the server to access the session
+    xfbml: true   // parse XFBML
     });
 
   if ((location+'').match (/preload=off/))
@@ -1316,7 +1330,7 @@ function update_bubble()
     {
     var program = programgrid [current_program];
     $("#ep-layer-ep-title").html (truncated_name (program ['name']));
-    $("#ep-age").html (ageof (program ['timestamp']));
+    $("#ep-age").html (ageof (program ['timestamp'], true));
     $("#ep-length").html (durationof (program ['duration']));
     $("#epNum").html (n_program_line);
     }
@@ -1407,9 +1421,7 @@ function ep_html()
       {
       var program = programgrid [program_line [i]];
 
-      var age = ageof (program ['timestamp']);
-      age = age.replace (/ ago$/, '');
-
+      var age = ageof (program ['timestamp'], false);
       var duration = durationof (program ['duration']);
 
       var classes = (i == program_cursor) ? 'on clickable' : 'clickable';
@@ -1440,18 +1452,18 @@ function durationof (duration)
   return duration;
   }
 
-function ageof (timestamp)
+function ageof (timestamp, flag)
   {
   var age = '';
   var now = new Date();
-  var ago_or_hence = 'ago';
+  var ago_or_hence = translations ['ago'];
 
   if (timestamp != '')
     {
     var d = new Date (Math.floor (timestamp));
 
     var minutes = Math.floor ((now.getTime() - d.getTime()) / 60 / 1000);
-    ago_or_hence = minutes < 0 ? "hence" : "ago";
+    ago_or_hence = minutes < 0 ? translations ['hence'] : translations ['ago'];
     minutes = Math.abs (minutes);
 
     if (minutes > 59)
@@ -1466,24 +1478,47 @@ function ageof (timestamp)
           if (months > 12)
             {
             var years = Math.floor ((months + 1) / 12);
-            age = years + (years == 1 ? ' year' : ' years');
+            if (language == 'en')
+              age = years + (years == 1 ? ' year' : ' years');
+            else
+              age = years + ' ' + translations ['year'];
             }
           else
-            age = months + (months == 1 ? ' month' : ' months');
+            {
+            if (language == 'en')
+              age = months + (months == 1 ? ' month' : ' months');
+            else
+              age = months + ' ' + translations ['month'];
+            }
           }
         else
-          age = days + (days == 1 ? ' day' : ' days');
+          {
+          if (language == 'en')
+            age = days + (days == 1 ? ' day' : ' days');
+          else
+            age = days + ' ' + translations ['day'];
+          }
         }
       else
-        age = hours + (hours == 1 ? ' hour' : ' hours');
+        {
+        if (language == 'en')
+          age = hours + (hours == 1 ? ' hour' : ' hours');
+        else
+          age = hours + ' ' + translations ['hour'];
+        }
       }
     else
-      age = minutes + (minutes == 1 ? ' minute' : ' minutes');
+      {
+      if (language == 'en')
+        age = minutes + (minutes == 1 ? ' minute' : ' minutes');
+      else
+        age = minutes + ' ' + translations ['minute'];
+      }
     }
   else
     age = 'long'
 
-  return age + ' ' + ago_or_hence;
+  return (flag || age == 'long') ? (age + ' ' + ago_or_hence) : age;
   }
 
 function next_channel_square (channel)
@@ -2440,7 +2475,7 @@ function ipg_metainfo()
     if (n_eps > 0)
       {
       var first = first_program_in (ipg_cursor);
-      $("#update-date").html (ageof (programgrid [first]['timestamp']));
+      $("#update-date").html (ageof (programgrid [first]['timestamp'], true));
       $("#update").show();
       }
     else
@@ -3319,7 +3354,7 @@ function ipg_episode_hover_in()
   var program = programgrid [program_line [id]];
 
   $("#ep-layer-ep-title").html (truncated_name (program ['name']));
-  $("#ep-age").html (ageof (program ['timestamp']));
+  $("#ep-age").html (ageof (program ['timestamp'], true));
   $("#ep-length").html (durationof (program ['duration']));
 
   $(".ep-list .age").hide();
@@ -3335,7 +3370,7 @@ function ipg_episode_hover_out()
   var program = programgrid [program_line [program_cursor]];
 
   $("#ep-layer-ep-title").html (truncated_name (program ['name']));
-  $("#ep-age").html (ageof (program ['timestamp']));
+  $("#ep-age").html (ageof (program ['timestamp'], true));
   $("#ep-length").html (durationof (program ['duration']));
 
   if (thumbing == 'ipg' || thumbing == 'ipg-wait')
@@ -6664,7 +6699,15 @@ function fb_yes()
 
     if (fields[0] == "0")
       {
-      FB.ui ({ method: "stream.share", u: location.protocol + "//" + location.host + "/share/" + lines[2] });
+      // FB.ui ({ method: "stream.share", u: location.protocol + "//" + location.host + "/share/" + lines[2] });
+
+      FB.ui ({ method: 'feed',
+               name: 'My 9x9 Channel Guide ${now}',
+               link: location.protocol + "//" + location.host + "/share/" + lines[2],
+               picture: thumb,
+               description: 'My 9x9 Channel Guide. Easily browse your favorite video Podcasts on the 9x9 Player! Podcasts automatically download and update for you, bringing up to 81 channels of new videos daily.'
+             },
+               function (response) { if (response && response.post_id) { log ('published'); } else { log ('not published'); } });
       }
 
     $("#control-layer").show();
