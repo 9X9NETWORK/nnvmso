@@ -34,6 +34,7 @@ public class ShareController {
 	@RequestMapping("{ipgId}")
 	public String zooatomics(@PathVariable String ipgId, HttpServletRequest req, HttpServletResponse resp, Model model) {
 		log.info("/share/" + ipgId);
+		//invalid ipgid
 		IpgManager ipgMngr = new IpgManager();
 		if (!Pattern.matches("^\\d*$", ipgId)) {
 			log.info("invalid ipg id");
@@ -43,6 +44,17 @@ public class ShareController {
 		if (ipg == null) {
 			return "redirect:/";
 		}
+		//find mso info of the user who shares the ipg
+		NnUser user = new NnUserManager().findById(ipg.getUserId());		
+		if (user != null) {
+			Mso mso = new MsoManager().findById(user.getMsoId());
+			if (mso != null && mso.getName().equals(Mso.NAME_5F)) {
+				CookieHelper.setCookie(resp, CookieHelper.MSO, Mso.NAME_5F);
+			} else {
+				CookieHelper.deleteCookie(resp, CookieHelper.MSO);
+			}
+		}
+		//give fb icon
 		MsoProgramManager programMngr = new MsoProgramManager();
 		MsoProgram p = programMngr.findById(ipg.getProgramId()); 
 		String now = (new SimpleDateFormat("MM.dd.yyyy")).format(new Date()).toString();
@@ -51,7 +63,8 @@ public class ShareController {
 		if (p != null && p.getImageUrl() != null && p.getImageUrl().length() > 0) {
 			fbImg = p.getImageUrl();
 		}
-		model.addAttribute("fbImg", fbImg);		
+		model.addAttribute("fbImg", fbImg);
+		
 		return "player/zooatomics";
 	}
 }
