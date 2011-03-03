@@ -135,7 +135,7 @@ public class TranscodingServiceController {
 			info.setCallback(callback);
 			List<Program> ps = new ArrayList<Program>();
 			for (MsoProgram p : programs) {
-				ps.add(new Program(p.getAudioFileUrl(), p.getMpeg4FileUrl(), p.getWebMFileUrl(), p.getOtherFileUrl()));				
+				ps.add(new Program(p.getAudioFileUrl(), p.getMpeg4FileUrl(), p.getOtherFileUrl(), p.getWebMFileUrl()));				
 			}
 			info.setErrorCode(String.valueOf(NnStatusCode.SUCCESS));
 			info.setErrorReason("Success");
