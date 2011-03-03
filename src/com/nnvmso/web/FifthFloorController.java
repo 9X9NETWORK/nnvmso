@@ -6,6 +6,8 @@ import java.text.SimpleDateFormat;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,5 +39,10 @@ public class FifthFloorController {
 		return "player/zooatomics";
 	}
 
+	@RequestMapping("wd")
+	public ResponseEntity<String> watchdog() {		
+		return NnNetUtil.textReturn("OK");
+	}
+	
 	
 }

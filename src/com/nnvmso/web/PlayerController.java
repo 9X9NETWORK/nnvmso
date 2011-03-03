@@ -6,6 +6,8 @@ import java.text.SimpleDateFormat;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,5 +41,10 @@ public class PlayerController {
 		return "player/zooatomics";
 	}
 
+	@RequestMapping("9x9/wd")
+	public ResponseEntity<String> watchdog() {		
+		return NnNetUtil.textReturn("OK");
+	}
+	
 	
 }
