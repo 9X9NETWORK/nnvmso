@@ -141,6 +141,7 @@ public class PlayerApiService {
 		Ipg ipg = new Ipg();
 		ipg.setChannelId(Long.parseLong(channelId));
 		ipg.setProgramId(Long.parseLong(programId));
+		ipg.setUserId(foundUser.getKey().getId());
 		IpgManager ipgMngr = new IpgManager();
 		ipgMngr.create(ipg, foundUser.getKey().getId());				
 		return NnStatusMsg.successStr(locale) + separatorStr + Long.toString(ipg.getId());				
