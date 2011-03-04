@@ -4150,7 +4150,7 @@ function submit_throw()
     }
 
   // $("#throw").serialize()
-  var serialized =  'url=' + url + '&' + 'user=' + user + '&' + mso() + 'grid=' + server_grid (position) + '&' + 'langCode=' + language + '&' + 'category=' + categories;
+  var serialized =  'url=' + url + '&' + 'user=' + user + mso() + '&' + 'grid=' + server_grid (position) + '&' + 'langCode=' + language + '&' + 'category=' + categories;
   log ('throw: ' + serialized);
 
   feedback (true, translations ['pleasewait']);
@@ -5165,7 +5165,7 @@ function browse_accept (channel)
       return;
       }
 
-    var cmd = "/playerAPI/subscribe?user=" + user + '&' + mso() + "channel=" + channel + '&' + "grid=" + server_grid (position);
+    var cmd = "/playerAPI/subscribe?user=" + user + mso() + '&' + "channel=" + channel + '&' + "grid=" + server_grid (position);
     var d = $.get (cmd, function (data)
       {
       $("#dir-waiting").hide();
@@ -6808,7 +6808,7 @@ function fb_yes()
   if (sitename == '5f')
     host = host.replace ('9x9.tv', '5f.tv');
 
-  var query = "/playerAPI/saveIpg?user=" + user + '&' + mso() + 'channel=' + channel + '&' + 'program=' + current_program;
+  var query = "/playerAPI/saveIpg?user=" + user + mso() + '&' + 'channel=' + channel + '&' + 'program=' + current_program;
 
   $("#waiting").show();
 
