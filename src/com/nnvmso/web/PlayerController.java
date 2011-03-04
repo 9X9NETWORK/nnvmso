@@ -1,20 +1,21 @@
 package com.nnvmso.web;
 
-import java.util.Date;
 import java.util.logging.Logger;
-import java.text.SimpleDateFormat;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.ui.Model;
 
-import com.nnvmso.lib.*;
+import com.nnvmso.lib.CookieHelper;
+import com.nnvmso.lib.NnLogUtil;
+import com.nnvmso.lib.NnNetUtil;
+import com.nnvmso.service.FBService;
 
 @Controller
 @RequestMapping("")
@@ -32,15 +33,16 @@ public class PlayerController {
 	public String index() {
 		return "redirect:9x9";
 	}
-	
+	/**
+	 * to become a 9x9 player, 1)delete cookie, 2)set fb info 
+	 */	
 	@RequestMapping("9x9")
 	public String zooatomics(@RequestParam(value="mso",required=false) String mso, HttpServletRequest req, HttpServletResponse resp, Model model) {
 		//delete 5f cookie
 		CookieHelper.deleteCookie(resp, CookieHelper.MSO);
-		String now = (new SimpleDateFormat("MM.dd.yyyy")).format(new Date()).toString();
-		String fbImg = "http://9x9ui.s3.amazonaws.com/9x9playerV39/images/9x9-facebook-icon.png";
-		model.addAttribute("now", now);
-		model.addAttribute("fbImg", fbImg);
+		//fb metadata
+		FBService fbService = new FBService();
+		model = fbService.setBrandMetadata(model, mso);
 		return "player/zooatomics";
 	}
 
