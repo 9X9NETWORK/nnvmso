@@ -6778,6 +6778,18 @@ function fb_yes()
   var channel = channelgrid [current_channel]['id'];
   current_program = program_line [program_cursor];
   var thumb = programgrid [current_program]['thumb'];
+  var name = 'My 9x9 Channel Guide ${now}';
+  var desc = 'My 9x9 Channel Guide. Easily browse your favorite video Podcasts on the 9x9 Player! Podcasts automatically download and update for you, bringing up to 81 channels of new videos daily.';
+
+  if (sitename == '5f')
+    {
+    name = '五樓電視－你的鄉民影視情報網';
+    desc = programgrid [current_program]['desc'];
+    }
+
+  var host = location.host;
+  if (sitename == '5f')
+    host = host.replace ('9x9.tv', '5f.tv');
 
   var query = "/playerAPI/saveIpg?user=" + user + '&' + 'channel=' + channel + '&' + 'program=' + current_program;
 
@@ -6791,15 +6803,19 @@ function fb_yes()
     var lines = data.split ('\n');
     var fields = lines[0].split ('\t');
 
+    var link = location.protocol + '//' + host + '/share/' + lines[2];
+    if (link.match ('//share/'))
+      link = link.replace ('//share/', '/share/');
+
+    log ('share link: ' + link);
+
     if (fields[0] == "0")
       {
-      // FB.ui ({ method: "stream.share", u: location.protocol + "//" + location.host + "/share/" + lines[2] });
-
       FB.ui ({ method: 'feed',
-               name: 'My 9x9 Channel Guide ${now}',
-               link: location.protocol + "//" + location.host + "/share/" + lines[2],
+               name: name,
+               link: link,
                picture: thumb,
-               description: 'My 9x9 Channel Guide. Easily browse your favorite video Podcasts on the 9x9 Player! Podcasts automatically download and update for you, bringing up to 81 channels of new videos daily.'
+               description: desc
              },
                function (response) { if (response && response.post_id) { log ('published'); } else { log ('not published'); } });
       }
