@@ -11,6 +11,7 @@
 <link rel="image_src" href="${fbImg}" />
 
 <link rel="stylesheet" href="http://9x9ui.s3.amazonaws.com/9x9playerV42/stylesheets/main.css" />
+<link rel="stylesheet" href="http://9x9ui.s3.amazonaws.com/contest/contest.css" />
 
 <script type="text/javascript" charset="utf-8" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.8/jquery-ui.min.js"></script>
@@ -65,6 +66,7 @@ var fp_content = { url: 'http://9x9ui.s3.amazonaws.com/flowplayer.content-3.2.0.
                    top: 0, left: 0, borderRadius: 0, padding: 0, height: '100%', width: '100%', opacity: 0 };
 
 var language = 'en';
+var sitename = '9x9';
 
 var timezero = 0;
 var all_programs_fetched = false;
@@ -73,6 +75,8 @@ var activated = false;
 var jingled = false;
 var jingle_timex = 0;
 var modal_box = false;
+var hint_seen = false;
+var contest_seen = false;
 var remembered_pause = false;
 var debug_mode = 1;
 var user_cursor;
@@ -500,6 +504,12 @@ function align_center()
 
   for (var v in { signin:0, hint:0, confirm:0, yesno:0, about:0 })
     $("#" + v + "-holder").css ("margin-top",  (wh - $("#" + v + "-holder").height()) / 2);
+
+  //if (sitename == '5f')
+    {
+    $("#contest-layer").css ("left", (ww - $("#contest-layer").width())  / 2);
+    $("#contest-layer").css ("top",  (wh - $("#contest-layer").height()) / 2);
+    }
   }
 
 function align_jingle()
@@ -832,7 +842,7 @@ function fetch_channels()
 
   var query;
 
-  if (readonly_ipg)
+  if (via_shared_ipg)
     query = "/playerAPI/loadIpg?ipg=" + get_ipg_id();
   else
     query = "/playerAPI/channelLineup?user=" + user;
@@ -858,7 +868,7 @@ function fetch_channels()
 
     var block_start_line = 2;
 
-    if (readonly_ipg)
+    if (via_shared_ipg)
       {
       var fields = lines[2].split ('\t');
       jumpstart_channel = fields [0];
@@ -1020,6 +1030,10 @@ function jumpstart_inner()
   $("body").focus();
 
   play_program();
+
+  hint();
+  if (sitename == '5f')
+    contest();
   }
 
 function set_channel_and_program (channel, program)
@@ -1056,7 +1070,7 @@ function preload_control_images()
   {
   var html = '';
 
-  for (var i in { 'bg_controler':'', 'btn_rewind':'', 'btn_pause':'', 'btn_play':'', 'btn_forward':'', 'btn_volume':'', 'btn_close':'', 'btn_on':'', 'btn_off':'', 'btn_facebook':'', 'btn_replay':'', 'btn_screensaver':'' })
+  for (var i in { 'bg_controler':'', 'btn_rewind':'', 'btn_pause':'', 'btn_play':'', 'btn_volume':'', 'btn_close':'', 'btn_on':'', 'btn_off':'', 'btn_facebook':'', 'btn_replay':'' })
     html += '<img src="' + root + i + '.png">';
 
   $("#preload-control-images").html (html);
@@ -1680,14 +1694,14 @@ function escape()
   var layer;
 
   log ('escape!');
-  $("#log-layer, #hint-layer").hide();
+  $("#log-layer").hide();
 
   if (thumbing == 'browse-wait' || thumbing == 'ipg-wait')
     return;
 
   if (modal_box)
     {
-    close_about();
+    close_box ('');
     return;
     }
 
@@ -1888,7 +1902,7 @@ function keypress (keycode)
   if (modal_box)
     {
     if (keycode == 13 || keycode == 121 || keycode == 27)
-      close_about();
+      close_box ('');
     return;
     }
 
@@ -1920,7 +1934,6 @@ function keypress (keycode)
       else if (thumbing == 'ipg' && clips_played == 0)
         {
         /* do nothing */
-        $("#hint-layer, #about-layer").hide();
         }
       else
         escape();
@@ -1940,8 +1953,6 @@ function keypress (keycode)
       /* F10, remote control "OK" */
       if (thumbing == 'ipg')
         ipg_play();
-      else if (thumbing == 'ipg-wait')
-        close_ipg_hint();
       else if (thumbing == 'browse')
         browse_enter();
       else if (thumbing == 'channel' || thumbing == 'program')
@@ -2233,20 +2244,13 @@ function switch_to_ipg()
   start_preload_timer();
   ipg_sync();
 
-  if (first_time_user == 1)
-    {
-    $("#hint-layer").show();
-    $("#btn-closeHint").addClass ("on");
-    elastic();
-    first_time_user = 2;
-    }
+  if (first_time_user == 1 || sitename == '5f')
+    hint();
+
+  if (sitename == '5f')
+    contest();
 
   $("#ep-list .clickable").removeClass ("on");
-  }
-
-function close_ipg_hint()
-  {
-  $("#hint-layer").hide();
   }
 
 function about()
@@ -2255,13 +2259,88 @@ function about()
   $("#about-layer").show();
   $("#btn-closeAbout").unbind();
   $("#btn-closeAbout").hover (hover_in, hover_out);
+  $("#btn-closeAbout").click (close_about);
   elastic();
   }
 
 function close_about()
   {
-  $("#about-layer").hide();
-  modal_box = false;
+  close_box ('#about-layer');
+  }
+
+function contest()
+  {
+  if (!contest_seen)
+    {
+    modal_box = true;
+    contest_seen = true;
+    $("#contest-layer").show();
+    $("#contest-close-btn").unbind();
+    $("#contest-close-btn").hover (hover_in, hover_out);
+    $("#contest-close-btn").click (close_contest);
+    elastic();
+    }
+  }
+
+function close_contest()
+  {
+  close_box ('#contest-layer');
+  }
+
+function hint()
+  {
+  if (!hint_seen)
+    {
+    modal_box = true;
+    hint_seen = true;
+    $("#hint-layer").show();
+    $("#btn-closeHint").addClass ("on");
+    modal_box = true;
+    elastic();
+    first_time_user = 2;
+    }
+  }
+
+function close_hint()
+  {
+  close_box ('#hint-layer');
+  }
+
+function close_box (box)
+  {
+  var n_open = 0;
+  var n_closed = 0;
+
+  var closables = { '#contest-layer':0, '#hint-layer':0, '#about-layer':0 };
+
+  log ('close box: "' + box + '"');
+
+  if (box == '')
+    {
+    /* close only the topmost closable */
+    for (var v in closables)
+      {
+      if (n_closed == 0 && $(v).css ("display") == 'block')
+        {
+        $(v).hide();
+        n_closed++;
+        }
+      }
+    }
+  else if ($(box).css ("display") == 'block')
+    {
+    $(box).hide();
+    n_closed++;
+    }
+
+  /* how many closables remain open */
+  for (var v in closables)
+    {
+    if ($(v).css ("display") == 'block')
+      n_open++;
+    }
+
+  modal_box = (n_open > 0);
   }
 
 function ipg_idle()
@@ -3063,6 +3142,9 @@ function ipg_click (id)
   else
     log ('CLICK');
 
+  if (modal_box)
+    return;
+
   if (thumbing == 'ipg')
     {
     id = id.replace (/^ipg-/, '');
@@ -3106,13 +3188,13 @@ function ipg_play()
 
   if ($("#hint-layer").css ("display") == 'block')
     {
-    close_ipg_hint();
+    close_box ('#hint-layer');
     return;
     }
 
   if ($("#about-layer").css ("display") == 'block')
     {
-    close_about();
+    close_box ('#about-layer');
     return;
     }
 
@@ -4193,6 +4275,19 @@ function pre_login()
             $("#preloading").show();
           else
             $("#preloading").hide();
+          }
+        else if (fields [0] == 'brandInfoCounter')
+          {
+          log ('counter: ' + fields[1]);
+          $("#nowserving").html (fields[1]);
+          }
+        else if (fields[0] == 'title')
+          {
+          document.title = fields[1];
+          }
+        else if (fields[0] == 'name')
+          {
+          sitename = fields[1];
           }
         }
       login();
@@ -7181,7 +7276,7 @@ function noop (e)
     </div>
     <div id="hint-bottom">
       <p id="hint-remove" style="display: none"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/check_off.png" class="checkbox"><span>Don't show me this again</span></p>
-      <p class="btn" id="btn-closeHint" onclick="close_ipg_hint()"><span id="hctw">Close this window</span></p>
+      <p class="btn" id="btn-closeHint" onclick="close_hint()"><span id="hctw">Close this window</span></p>
     </div>
   </div>
 </div>
@@ -7193,8 +7288,16 @@ function noop (e)
     <p><span id="about3">Watch your favorite podcasts, YouTube channels and other episodic content on 9x9 just like watching TV.</span></p>
     <p><span id="about4">9x9 is based in Santa Clara, California, USA.  We are a bunch of geeks passionate about revolutionizing online video discovery through a human powered network.</span></p>
     <p><span id="about5">Our investors include venture capitalists, private investors and corporate investors including D-Link.  Contact us at <a href="mailto:feedback@9x9Cloud.tv">feedback@9x9Cloud.tv</a>.</span></p>
-    <div id="btn-closeAbout"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/btn_winclose.png" onclick="close_about()"></div>
+    <div id="btn-closeAbout"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/btn_winclose.png"></div>
     <img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/logo_about.png" id="about-logo">
+  </div>
+</div>
+
+<div id="contest-layer">
+  <img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/btn_winclose.png" id="contest-close-btn">
+  <div id="contest-innards">
+        <a href="http://www.9x9.tv/5f/sharetowin.html"></a>
+    <p>&nbsp;&nbsp;現在有<span id="nowserving"></span>人完成任務</p>
   </div>
 </div>
 
