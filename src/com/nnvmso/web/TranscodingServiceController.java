@@ -96,14 +96,33 @@ public class TranscodingServiceController {
 		return resp;
 	}
 	
-	@RequestMapping("getIpgList")
-	public @ResponseBody ChannelInfo getIpgList(@RequestParam(value="page", required=false)String page, HttpServletRequest req) {
+	/** 
+	 * @param page
+	 * @param msoName * indicates to retrieve all the channels
+	 *                msoName indicates to retrieve a mso's Ipg
+	 * @return channel list
+	 */
+	@RequestMapping("getChannelList")
+	public @ResponseBody ChannelInfo getIpgList(@RequestParam(value="page", required=false)String page, 
+			                                    @RequestParam(value="msoName", required=false)String msoName,
+			                                    HttpServletRequest req) {
 		ChannelInfo info = new ChannelInfo();
 		try {
 			MsoManager msoMngr = new MsoManager();
-			Mso mso = msoMngr.findMsoViaHttpReq(req);
 			MsoChannelManager channelMngr = new MsoChannelManager();
-			List<MsoChannel> channels = channelMngr.findMsoDefaultChannels(mso.getKey().getId());		
+			List<MsoChannel> channels = new ArrayList<MsoChannel>();
+			if (!msoName.equals("*")) {
+				Mso mso = msoMngr.findByName(msoName);
+				if (mso == null) {
+					info.setErrorCode(String.valueOf(NnStatusCode.MSO_INVALID));
+					info.setErrorReason("mso does not exist");				
+					return info;
+				}
+				channels = channelMngr.findMsoDefaultChannels(mso.getKey().getId());
+			} else {
+				channels = channelMngr.findPublicChannels();
+			}
+					
 			String[] transcodingEnv = transcodingService.getTranscodingEnv(req);		
 			String callbackUrl = transcodingEnv[1];		
 			List<Channel> cs = new ArrayList<Channel>();
