@@ -1,7 +1,5 @@
 package com.nnvmso.web;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
@@ -19,6 +17,7 @@ import com.nnvmso.model.Ipg;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoProgram;
 import com.nnvmso.model.NnUser;
+import com.nnvmso.service.FBService;
 import com.nnvmso.service.IpgManager;
 import com.nnvmso.service.MsoManager;
 import com.nnvmso.service.MsoProgramManager;
@@ -50,30 +49,33 @@ public class ShareController {
 			log.info("can not find ipg:" + ipgId);
 			return "redirect:/";
 		}
+		
+		//fb: default values
+		FBService fbService = new FBService();
+		model = fbService.setBrandMetadata(model, Mso.NAME_9X9);
+		
 		//find mso info of the user who shares the ipg
 		if (ipg.getUserId() != 0) { //old data does not have userId
 			NnUser user = new NnUserManager().findById(ipg.getUserId());		
 			if (user != null) {
 				log.info("This user," + user.getKey().getId() + ", shares ipg.");
 				Mso mso = new MsoManager().findById(user.getMsoId());
+				//fb: change to 5f mode
 				if (mso != null && mso.getName().equals(Mso.NAME_5F)) {
 					CookieHelper.setCookie(resp, CookieHelper.MSO, Mso.NAME_5F);
+					model = fbService.setBrandMetadata(model, Mso.NAME_5F);
 				} else {
 					CookieHelper.deleteCookie(resp, CookieHelper.MSO);
 				}
 			}
 		}
-		//give fb icon
+
+		//fb: change to episode mode
 		MsoProgramManager programMngr = new MsoProgramManager();
-		MsoProgram p = programMngr.findById(ipg.getProgramId()); 
-		String now = (new SimpleDateFormat("MM.dd.yyyy")).format(new Date()).toString();
-		model.addAttribute("now", now);		
-		String fbImg = "http://9x9ui.s3.amazonaws.com/9x9playerV39/images/9x9-facebook-icon.png";
-		if (p != null && p.getImageUrl() != null && p.getImageUrl().length() > 0) {
-			fbImg = p.getImageUrl();
+		MsoProgram p = programMngr.findById(ipg.getProgramId()); 		
+		if (p != null) {
+			model = fbService.setEpisodeMetadata(model, p.getName(), p.getIntro(), p.getImageUrl());
 		}
-		model.addAttribute("fbImg", fbImg);
-		log.info("fbImg set on share:" + fbImg);
 		return "player/zooatomics";
 	}
 }
