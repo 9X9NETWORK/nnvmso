@@ -23,15 +23,24 @@
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/scripts/flowplayer-3.2.4.min.js"></script>
 
 <script type="text/javascript">
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-21595932-1']);
-  _gaq.push(['_setDomainName', '.9x9.tv']);
-  _gaq.push(['_trackPageview']);
-  (function() {
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-  })();
+var analytz = false;
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-21595932-1']);
+_gaq.push(['_setDomainName', '.9x9.tv']);
+_gaq.push(['_trackPageview']);
+function analytics()
+  {
+  if (!analytz)
+    {
+    log ('submitting analytics');
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    analytz = true;
+    }
+  }
 </script>
 
 <script>
@@ -66,7 +75,7 @@ var fp_content = { url: 'http://9x9ui.s3.amazonaws.com/flowplayer.content-3.2.0.
                    top: 0, left: 0, borderRadius: 0, padding: 0, height: '100%', width: '100%', opacity: 0 };
 
 var language = 'en';
-var sitename = '9x9';
+var sitename = '';
 
 var timezero = 0;
 var all_programs_fetched = false;
@@ -653,8 +662,8 @@ function report (type, arg)
     {
     n_pdr = 0;
 
-    var serialized = 'user=' + user + '&' + 'session=' + 
-           Math.floor (timezero/1000) + '&' + 'time=' + delta + '&' + 'pdr=' + encodeURIComponent (pdr);
+    var serialized = 'user=' + user + mso() + '&' + 'session=' + 
+             Math.floor (timezero/1000) + '&' + 'time=' + delta + '&' + 'pdr=' + encodeURIComponent (pdr);
 
     pdr = '';
 
@@ -742,11 +751,16 @@ function user_or_ipg()
   return readonly_ipg ? 'ipg=' + get_ipg_id() : 'user=' + user;
   }
 
+function mso()
+  {
+  return (sitename == '') ? '' : ('&' + 'mso=' + sitename);
+  }
+
 function fetch_programs_in (channel)
   {
   log ('obtaining programs for ' + channel);
 
-  var query = "/playerAPI/programInfo?channel=" + channel + '&' + user_or_ipg();
+  var query = "/playerAPI/programInfo?channel=" + channel + mso() + '&' + user_or_ipg();
 
   var d = $.get (query, function (data)
     {
@@ -784,7 +798,7 @@ function fetch_programs()
   {
   log ('obtaining programs');
 
-  var query = "/playerAPI/programInfo?channel=*" + '&' + user_or_ipg();
+  var query = "/playerAPI/programInfo?channel=*" + mso() + '&' + user_or_ipg();
 
   var d = $.get (query, function (data)
     {
@@ -843,9 +857,9 @@ function fetch_channels()
   var query;
 
   if (via_shared_ipg)
-    query = "/playerAPI/loadIpg?ipg=" + get_ipg_id();
+    query = "/playerAPI/loadIpg?ipg=" + get_ipg_id() + mso();
   else
-    query = "/playerAPI/channelLineup?user=" + user;
+    query = "/playerAPI/channelLineup?user=" + user + mso();
 
   var d = $.get (query, function (data)
     {
@@ -952,6 +966,9 @@ function activate()
   {
   log ('activate');
 
+  /* google analytics */
+  analytics();
+
   if (jingled)
     {
     log ('have already jingled');
@@ -1003,7 +1020,7 @@ function jumpstart()
   log ('loading programs in jumpstart channel');
   $("#waiting").show();
 
-  var query = "/playerAPI/programInfo?channel=" + jumpstart_channel + '&' + user_or_ipg();
+  var query = "/playerAPI/programInfo?channel=" + jumpstart_channel + mso() + '&' + user_or_ipg();
 
   var d = $.get (query, function (data)
     {
@@ -2464,7 +2481,7 @@ function move_channel (src, dst)
 
   $("#waiting").show();
 
-  var query = '/playerAPI/moveChannel?user=' + user + '&' +
+  var query = '/playerAPI/moveChannel?user=' + user + mso() + '&' +
       'grid1=' + server_grid (src) + '&' + 'grid2=' + server_grid (dst);
 
   var d = $.get (query, function (data)
@@ -3704,7 +3721,7 @@ function sign_in_or_out()
 
   if (username != 'Guest' && username != '')
     {
-    var d = $.get ("/playerAPI/signout?user=" + user, function (data)
+    var d = $.get ("/playerAPI/signout?user=" + user + mso(), function (data)
       {
       var lines = data.split ('\n');
 
@@ -3893,7 +3910,7 @@ function submit_login()
     things.push ( params [p] + '=' + v );
     }
 
-  var serialized = things.join ('&');
+  var serialized = things.join ('&') + mso();
   log ('login: ' + serialized);
   
   $("#waiting").show();
@@ -3999,7 +4016,7 @@ function submit_signup()
     return;
     }
 
-  var serialized = things.join ('&') + '&' + 'user=' + user;
+  var serialized = things.join ('&') + '&' + 'user=' + user + mso();
   log ('signup: ' + serialized);
 
   $("#waiting").show();
@@ -4133,7 +4150,7 @@ function submit_throw()
     }
 
   // $("#throw").serialize()
-  var serialized =  'url=' + url + '&' + 'user=' + user + '&' + 'grid=' + server_grid (position) + '&' + 'langCode=' + language + '&' + 'category=' + categories;
+  var serialized =  'url=' + url + '&' + 'user=' + user + '&' + mso() + 'grid=' + server_grid (position) + '&' + 'langCode=' + language + '&' + 'category=' + categories;
   log ('throw: ' + serialized);
 
   feedback (true, translations ['pleasewait']);
@@ -4193,7 +4210,7 @@ function dirty()
     return;
     }
 
-  var cmd = "/playerAPI/programInfo?channel=" + channels + '&' + "user=" + user;
+  var cmd = "/playerAPI/programInfo?channel=" + channels + '&' + "user=" + user + mso();
 
   var d = $.get (cmd, function (data)
     {
@@ -4328,7 +4345,7 @@ function login()
     {
     log ('user cookie exists, checking');
 
-    var d = $.get ("/playerAPI/userTokenVerify?token=" + u, function (data)
+    var d = $.get ("/playerAPI/userTokenVerify?token=" + u + mso(), function (data)
       {
       sanity_check_data ('userTokenVerify', data);
       log ('response to userTokenVerify: ' + data);
@@ -4389,7 +4406,7 @@ function login()
     if (via_shared_ipg)
       log ('jumpstarting from this ipg: ' + get_ipg_id());
 
-    args = via_shared_ipg ? '?ipg=' + get_ipg_id() : '';
+    args = via_shared_ipg ? ('?ipg=' + get_ipg_id() + mso()) : ('?mso=' + sitename);
 
     var d = $.get ("/playerAPI/guestRegister" + args, function (data)
       {
@@ -4476,7 +4493,7 @@ function browse()
 
   $("#ep-tip").html ('<p></p>');
 
-  var d = $.get ("/playerAPI/categoryBrowse?langCode=en", function (data)
+  var d = $.get ("/playerAPI/categoryBrowse?langCode=en" + mso(), function (data)
     {
     $("#waiting").hide();
     sanity_check_data ('categoryBrowse', data);
@@ -4971,7 +4988,7 @@ function browse_category (category_id)
 
   try { cat_query.abort(); } catch (error) {};
 
-  cat_query = "/playerAPI/channelBrowse?category=" + category_id;
+  cat_query = "/playerAPI/channelBrowse?category=" + category_id + mso();
 
   var d = $.get (cat_query, function (data)
     {
@@ -5148,7 +5165,7 @@ function browse_accept (channel)
       return;
       }
 
-    var cmd = "/playerAPI/subscribe?user=" + user + '&' + "channel=" + channel + '&' + "grid=" + server_grid (position);
+    var cmd = "/playerAPI/subscribe?user=" + user + '&' + mso() + "channel=" + channel + '&' + "grid=" + server_grid (position);
     var d = $.get (cmd, function (data)
       {
       $("#dir-waiting").hide();
@@ -5188,7 +5205,7 @@ function continue_acceptance (position, channel_info)
 
   log ('obtaining programs for: ' + channel_info ['id']);
 
-  var cmd = "/playerAPI/programInfo?channel=" + channel_info ['id'];
+  var cmd = "/playerAPI/programInfo?channel=" + channel_info ['id'] + mso();
 
   var d = $.get (cmd, function (data)
     {
@@ -5236,7 +5253,7 @@ function unsubscribe_channel()
     $("#delete-layer").hide();
     $("#waiting").show();
 
-    var cmd = "/playerAPI/unsubscribe?user=" + user + '&' + "channel=" + channel + '&' + "grid=" + grid;
+    var cmd = "/playerAPI/unsubscribe?user=" + user + mso() + '&' + "channel=" + channel + '&' + "grid=" + grid;
     var d = $.get (cmd, function (data)
       {
       dir_requires_update = true;
@@ -6791,7 +6808,7 @@ function fb_yes()
   if (sitename == '5f')
     host = host.replace ('9x9.tv', '5f.tv');
 
-  var query = "/playerAPI/saveIpg?user=" + user + '&' + 'channel=' + channel + '&' + 'program=' + current_program;
+  var query = "/playerAPI/saveIpg?user=" + user + '&' + mso() + 'channel=' + channel + '&' + 'program=' + current_program;
 
   $("#waiting").show();
 
