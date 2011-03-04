@@ -202,7 +202,7 @@ var language_en =
   updated: 'Updated',
   onemoment: 'One moment...',
   buffering: 'Buffering...',
-  contribute: 'Contribute a video Podcast RSS / YouTube Channel URL',
+  contribute: 'Contribute a video Podcast RSS / YouTube Channel (www.youtube.com/user/userid) URL:',
   returningusers: 'Returning Users',
   name: 'Name',
   password: 'Password',
@@ -312,7 +312,7 @@ var language_tw =
   updated: '已更新',
   onemoment: '稍待片刻...',
   buffering: '載入中...',
-  contribute: '加入新的Podcast或Youtube頻道 URL',
+  contribute: '請輸入Podcast RSS / Youtube 頻道連結 (www.youtube.com/user/userid):',
   returningusers: '已註冊用戶',
   name: '姓名',
   password: '密碼',
@@ -7329,7 +7329,7 @@ function noop (e)
 <div id="contest-layer">
   <img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/btn_winclose.png" id="contest-close-btn">
   <div id="contest-innards">
-        <a href="http://www.9x9.tv/5f/sharetowin.html"></a>
+        <a href="http://www.9x9.tv/5f/sharetowin.html" target="_blank"></a>
     <p>&nbsp;&nbsp;現在有<span id="nowserving"></span>人完成任務</p>
   </div>
 </div>
