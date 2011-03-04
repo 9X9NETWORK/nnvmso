@@ -21,7 +21,7 @@ public class ErrorController {
 	
 	@RequestMapping("not-found")
 	public String notFound() {
-		return viewRoot + "404";
+		return "redirect:/";
 	}
 		
 	//final frontier
