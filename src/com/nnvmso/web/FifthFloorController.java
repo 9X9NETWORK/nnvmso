@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.ui.Model;
@@ -42,6 +43,12 @@ public class FifthFloorController {
 		return "player/zooatomics";
 	}
 
+	//for 5f domain share redirect
+	@RequestMapping("share/{ipgId}")
+	public String share(@PathVariable String ipgId) {
+		return "redirect:/share/" + ipgId;		
+	}
+	
 	/*
 	 * used for dns redirect watch dog 
 	 */
