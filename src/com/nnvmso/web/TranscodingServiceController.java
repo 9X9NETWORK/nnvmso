@@ -103,7 +103,7 @@ public class TranscodingServiceController {
 	 * @return channel list
 	 */
 	@RequestMapping("getChannelList")
-	public @ResponseBody ChannelInfo getIpgList(@RequestParam(value="page", required=false)String page, 
+	public @ResponseBody ChannelInfo getChannelList(@RequestParam(value="page", required=false)String page, 
 			                                    @RequestParam(value="msoName", required=false)String msoName,
 			                                    HttpServletRequest req) {
 		ChannelInfo info = new ChannelInfo();
