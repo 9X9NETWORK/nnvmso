@@ -1,22 +1,21 @@
 package com.nnvmso.web;
 
-import java.util.Date;
 import java.util.logging.Logger;
-import java.text.SimpleDateFormat;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.ui.Model;
 
-import com.nnvmso.lib.*;
+import com.nnvmso.lib.CookieHelper;
+import com.nnvmso.lib.NnLogUtil;
+import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.model.Mso;
+import com.nnvmso.service.FBService;
 
 /** 
  * temporary controller, just used for routing, move to xml later,  
@@ -33,13 +32,14 @@ public class FifthFloorController {
 		return "error/exception";				
 	}		
 	
+	/**
+	 * to become a 5f player, 1)set cookie, 2)set fb info 
+	 */
 	@RequestMapping("")
-	public String zooatomics(@RequestParam(value="mso",required=false) String mso, HttpServletRequest req, HttpServletResponse resp, Model model) {		
+	public String zooatomics(HttpServletResponse resp, Model model) {		
 		CookieHelper.setCookie(resp, CookieHelper.MSO, Mso.NAME_5F);
-		String now = (new SimpleDateFormat("MM.dd.yyyy")).format(new Date()).toString();		
-		String fbImg = "https://s3.amazonaws.com/9x9ui/images/5floor-logo.png";
-		model.addAttribute("now", now);
-		model.addAttribute("fbImg", fbImg);
+		FBService fbService = new FBService();
+		model = fbService.setBrandMetadata(model, Mso.NAME_5F);
 		return "player/zooatomics";
 	}
 
