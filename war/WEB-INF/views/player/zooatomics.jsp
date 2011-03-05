@@ -2714,6 +2714,7 @@ function ipg_exit_delete_mode()
   thumbing = 'ipg';
 
   tip ('');
+  ipg_metainfo();
   ipg_sync();
   }
 
@@ -7329,7 +7330,7 @@ function noop (e)
 <div id="contest-layer">
   <img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/btn_winclose.png" id="contest-close-btn">
   <div id="contest-innards">
-        <a href="http://www.9x9.tv/5f/sharetowin.html" target="_blank"></a>
+        <a href="/sharetowin.html" target="_blank"></a>
     <p>&nbsp;&nbsp;現在有<span id="nowserving"></span>人完成任務</p>
   </div>
 </div>
