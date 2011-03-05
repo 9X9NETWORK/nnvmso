@@ -6801,7 +6801,7 @@ function fb_yes()
 
   if (sitename == '5f')
     {
-    name = '五樓電視－你的鄉民影視情報網';
+    name = programgrid [current_program]['name'];
     desc = programgrid [current_program]['desc'];
     }
 
