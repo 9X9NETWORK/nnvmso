@@ -23,6 +23,10 @@
     <property name="isPublic" direction="asc"/>
     <property name="name" direction="asc"/>    
   </datastore-index>  
+  <datastore-index kind="MsoChannel" ancestor="false" source="manual">
+    <property name="isPublic" direction="asc"/>
+    <property name="nameSearch" direction="asc"/>
+  </datastore-index>  
   <datastore-index kind="MsoConfig" ancestor="false" source="manual">
     <property name="__key__" direction="desc"/>
   </datastore-index>        
