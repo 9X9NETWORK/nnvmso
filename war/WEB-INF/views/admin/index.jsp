@@ -1,12 +1,7 @@
 <ul>
-  <li>USE WITH CAUTION: initialize (works only for small set of data)
+  <li>USE WITH CAUTION: initialize (works only for small set of data) <br/>
     <ul>
-      <li><a href="/admin/init/initDevel?debug=1">dev turn on debug</a></li>
-      <li><a href="/admin/init/initDevel?debug=0">dev turn off debug</a></li>
-      <li>[UNDER CONSTRUCTION]</li>          	   
-      <li><a href="/admin/init/initProTask?devel=0&trans=1&debug=1">turn on production data, but debug=1</a></li>
-      <li><a href="/admin/init/initProTask?devel=0&trans=1&debug=0">turn on production data, but debug=0</a></li>
-      <li><a href="/admin/init/deleteAll">deleteAll</a></li>
+      <li><a href="/admin/init/groundStart">dev turn on debug</a></li>
     </ul>
   </li> 
 </ul>
