@@ -441,36 +441,7 @@ public class PlayerApiController {
 		log.info(output);
 		return NnNetUtil.textReturn(output);		
 	}					
-	
-	/**
-	 * Collecting PDR
-	 * 
-	 * @param user user token
-	 * @param session indicates the session when user starts using the player
-	 * @param pdr pdr data
-	 * 		  <p> Expecting lines(separated by \n) of the following:<br/>  
-	 * 		  delta verb info <br/>
-	 * 		  Example: delta watched 1 1 2 3 <br/>
-	 * 		  Note: first 1 is channel, the rest are program ids. <br/>  
-	 * 		  Note: each field is separated by tab.
-	 * 		  </p> 
-	 */	
-	@RequestMapping(value="pdr")
-	public ResponseEntity<String> pdr(@RequestParam(value="user", required=false) String userToken,
-									  @RequestParam(value="session", required=false) String session,
-									  @RequestParam(value="pdr", required=false) String pdr,
-									  HttpServletRequest req) {
-		this.prepService(req);
-		String output = NnStatusMsg.errorStr(locale);
-		log.info("user=" + userToken + ";session=" + session);
-		try {
-			output = playerApiService.processPdr(userToken, pdr, session);
-		} catch (Exception e) {
-			output = playerApiService.handleException(e);
-		}
-		return NnNetUtil.textReturn(output);
-	}
-	
+		
 	/**
 	 * Get "new" program list. Current "new" definition: the latest 3 shows in a channel.   
 	 * 1. Latest 3 shows users haven't seen 
@@ -584,6 +555,56 @@ public class PlayerApiController {
 		}
 		log.info(output);
 		return NnNetUtil.textReturn(output);						
+	}
+
+	/**
+	 * Collecting PDR
+	 * 
+	 * @param user user token
+	 * @param session indicates the session when user starts using the player
+	 * @param pdr pdr data
+	 * 		  <p> Expecting lines(separated by \n) of the following:<br/>  
+	 * 		  delta verb info <br/>
+	 * 		  Example: delta watched 1 1 2 3 <br/>
+	 * 		  Note: first 1 is channel, the rest are program ids. <br/>  
+	 * 		  Note: each field is separated by tab.
+	 * 		  </p> 
+	 */	
+	@RequestMapping(value="pdr")
+	public ResponseEntity<String> pdr(@RequestParam(value="user", required=false) String userToken,
+									  @RequestParam(value="session", required=false) String session,
+									  @RequestParam(value="pdr", required=false) String pdr,
+									  HttpServletRequest req) {
+		this.prepService(req);
+		String output = NnStatusMsg.errorStr(locale);
+		log.info("user=" + userToken + ";session=" + session);
+		try {
+			output = playerApiService.processPdr(userToken, pdr, session);
+		} catch (Exception e) {
+			output = playerApiService.handleException(e);
+		}
+		return NnNetUtil.textReturn(output);
+	}
+
+	/**
+	 * Mark program bad when player sees it 
+	 * 
+	 * @param user user token, it's actually not necessary, but for reference and to somewhat avoid malicious acts.
+	 * @param program programId
+	 */	
+	@RequestMapping(value="programRemove")
+	public ResponseEntity<String> programRemove(@RequestParam(value="program", required=false) String programId,
+				                                @RequestParam(value="user", required=false) String userToken,
+				                                HttpServletRequest req) {
+		this.prepService(req);
+		String output = NnStatusMsg.errorStr(locale);
+		log.info("bad program:" + programId + ";reported by user:" + userToken);
+		try {
+			output = playerApiService.markBadProgram(programId, userToken);
+		} catch (Exception e) {
+			output = playerApiService.handleException(e);
+		}
+		return NnNetUtil.textReturn(output);
 	}
 	
 }
