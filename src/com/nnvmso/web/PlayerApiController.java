@@ -412,7 +412,6 @@ public class PlayerApiController {
 		} catch (Exception e){
 			output = playerApiService.handleException(e);
 		}
-		log.info(output);
 		return NnNetUtil.textReturn(output);
 	}	
 
@@ -498,6 +497,7 @@ public class PlayerApiController {
 									          @RequestParam(value="ipg", required = false) String ipgId,
 									          HttpServletRequest req) {
 		this.prepService(req);		
+		log.info("params: channel:" + channelIds + ";user:" + userToken + ";ipg:" + ipgId);
 		String output = NnStatusMsg.errorStr(locale);
 		boolean isUserInfo = Boolean.parseBoolean(userInfo);
 		try {
@@ -505,7 +505,6 @@ public class PlayerApiController {
 		} catch (Exception e){
 			output = playerApiService.handleException(e);
 		}
-		log.info(output);
 		return NnNetUtil.textReturn(output);
 	}
 	
@@ -587,7 +586,7 @@ public class PlayerApiController {
 	}
 
 	/**
-	 * Mark program bad when player sees it 
+	 * Mark a program bad when player sees it 
 	 * 
 	 * @param user user token, it's actually not necessary, but for reference and to somewhat avoid malicious acts.
 	 * @param program programId
