@@ -126,6 +126,23 @@ public class PlayerApiService {
 		return output;
 	}
 	
+	public String markBadProgram(String programId, String userToken) {		
+		if (programId == null || userToken == null) {
+			return NnStatusMsg.inputMissing(locale);
+		}
+		try {
+			MsoProgramManager programMngr = new MsoProgramManager();
+			MsoProgram program = programMngr.findById(Long.parseLong(programId));
+			program.setStatus(MsoProgram.STATUS_ERROR);
+			programMngr.save(program);
+		} catch (NumberFormatException e) {
+			log.info("pass invalid program id:" + programId);
+		} catch (NullPointerException e) {
+			log.info("program does not exist: " + programId);
+		}
+		return NnStatusMsg.successStr(locale);
+	}
+	
 	public String saveIpg(String userToken, String channelId, String programId) {
 		if (userToken == null || userToken.length() == 0 || userToken.equals("undefined") ||
 			channelId == null || programId == null || channelId.length() == 0 || programId.length() == 0) {
@@ -171,8 +188,8 @@ public class PlayerApiService {
 			channelLineup = channelLineup + "\n";			
 		}
 		return status + toPlay + channelLineup;		
-	}
-			
+	}			
+	
 	public String moveChannel(String userToken, String grid1, String grid2) {		
 		//verify input
 		if (userToken == null || userToken.length() == 0 || userToken.equals("undefined") || grid1 == null || grid2 == null) {
