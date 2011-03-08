@@ -43,13 +43,16 @@ public class AdminMsoProgramController {
 		return "OK";
 	}
 	
-	
+	/*
+	// there should no delete, we only mark a program "Bad"
 	@RequestMapping(value="delete")
 	public @ResponseBody String delete(@RequestParam(value="id") String id) {
+		Log.info("delete program: " + id);
 		MsoProgram p = programMngr.findById(Long.valueOf(id));
 		programMngr.delete(p);
 		return "OK";
 	}
+	*/
 			
 	//mainly for demo purpose, so someone can download all the mp4 files into box or something
 	@RequestMapping("mp4") 
