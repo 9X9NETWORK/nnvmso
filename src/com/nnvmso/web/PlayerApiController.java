@@ -354,13 +354,13 @@ public class PlayerApiController {
 	@RequestMapping(value="channelBrowse")
 	public ResponseEntity<String> channelBrowse(@RequestParam(value="category", required=false) String categoryIds, HttpServletRequest req) {
 		this.prepService(req);
+		log.info(categoryIds);		
 		String output = NnStatusMsg.errorStr(locale);
 		try {
 			output = playerApiService.findPublicChannelsByCategory(categoryIds);
 		} catch (Exception e){
 			output = playerApiService.handleException(e);
 		}
-		log.info(output);
 		return NnNetUtil.textReturn(output);
 	}	
 
@@ -379,7 +379,6 @@ public class PlayerApiController {
 		} catch (Exception e){
 			output = playerApiService.handleException(e);
 		}	
-		log.info(output);
 		return NnNetUtil.textReturn(output);
 	}
 
@@ -455,14 +454,12 @@ public class PlayerApiController {
 	public ResponseEntity<String> whatsNew(@RequestParam(value="user") String userToken, HttpServletRequest req) {
 		this.prepService(req);		
 		log.info("userToken=" + userToken);		
-		String output = NnStatusMsg.errorStr(locale);
-		
+		String output = NnStatusMsg.errorStr(locale);		
 		try {
 			output = playerApiService.findNewPrograms(userToken);
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}
-		log.info(output);
 		return NnNetUtil.textReturn(output);		
 	}	
 	
@@ -530,7 +527,6 @@ public class PlayerApiController {
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}
-		log.info(output);
 		return NnNetUtil.textReturn(output);
 	}	
 	
@@ -552,7 +548,6 @@ public class PlayerApiController {
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}
-		log.info(output);
 		return NnNetUtil.textReturn(output);						
 	}
 
