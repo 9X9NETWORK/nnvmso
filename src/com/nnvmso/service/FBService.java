@@ -24,7 +24,7 @@ public class FBService {
 		if (msoName.equals(Mso.NAME_5F)) {
 			fbName = "五樓電視－你的鄉民影視情報網 " + now;
 			fbDescription = "五樓電視嚴選批踢踢（PTT）熱門主題，不定時提供鄉民最愛的網路影視內容。使用9x9 SmartGuide將全世界的podcast與youtube頻道匯集訂閱於此，便可隨時follow所有您喜愛頻道的最新內容。訂閱、收看、分享您的SmartGuide，人人都是風格獨具、最專業的五樓電視台。";
-			fbImg = "http://s3.amazonaws.com/9x9ui/images/5floor-logo.png";			
+			fbImg = "http://s3.amazonaws.com/9x9ui/images/fbLogoC.jpg";			
 		}
 		model.addAttribute("fbName", fbName);
 		model.addAttribute("fbDescription", fbDescription);
