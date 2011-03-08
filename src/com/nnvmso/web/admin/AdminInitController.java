@@ -17,6 +17,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.google.appengine.api.taskqueue.QueueFactory;
@@ -29,6 +30,8 @@ import com.nnvmso.service.InitService;
 
 /**
  * for testing only, works only for small set of data
+ * 
+ * most of the functions are private, turned it on if you need them.
  */	
 @Controller
 @RequestMapping("admin/init")
@@ -53,33 +56,22 @@ public class AdminInitController {
 		}
 		return "error/exception";				
 	}
-
-	@RequestMapping("deleteAll")
-	public ResponseEntity<String> initialize(HttpServletRequest req) {
-		initService.setRequest(req);
-		initService.deleteAll();
-		this.sendEmail("step1 done: delete all");
-		return NnNetUtil.textReturn("OK");
-	}
- 
-	@RequestMapping("initMsoAndCategories")
-	public ResponseEntity<String> initMsoAndCategories(HttpServletRequest req, @RequestParam(value="debug")boolean debug) {
-		initService.setRequest(req);
-		initService.initMsoAndCategories(debug);
-		this.sendEmail("step2 done: initiate mso and categories");
-		return NnNetUtil.textReturn("OK");		
-	}
 		
-	/**
-	 * @param debug whether to turn on player's debugging information
-	 */
-	@RequestMapping("initDevel")
-	public ResponseEntity<String> initAllDevel(@RequestParam(value="debug")boolean debug, HttpServletRequest req) { 
-		initService.setRequest(req);
-		initService.initAll(true, debug, false);
-		return NnNetUtil.textReturn("OK");		
+	@RequestMapping(value="groundStart", method=RequestMethod.GET)
+	public String groundStartGet(HttpServletRequest req) {
+		return "admin/groundStart";
 	}
 	
+	@RequestMapping(value="groundStart", method=RequestMethod.POST)
+	public String groundStartPost(HttpServletRequest req) {
+		String host = NnNetUtil.getUrlRoot(req);
+		if (host.equals("http://localhost:8888")) {
+			initService.setRequest(req);
+			initService.initAll(true, true, false);
+		}
+		return "admin/groundStart";
+	}	
+
 	private void sendEmail(String subject) {
 		Properties props = new Properties();
         Session session = Session.getDefaultInstance(props, null);
@@ -97,7 +89,7 @@ public class AdminInitController {
 	}	
 	
 	@RequestMapping("initMso1Channels")
-	public ResponseEntity<String> initMso1Channels(@RequestParam boolean devel, @RequestParam boolean trans, HttpServletRequest req) {
+	private ResponseEntity<String> initMso1Channels(@RequestParam boolean devel, @RequestParam boolean trans, HttpServletRequest req) {
 		initService.setRequest(req);
 		initService.createMso1DefaultChannels(devel, trans);
 		this.sendEmail("step3 done: create 9x9 channels");
@@ -105,7 +97,7 @@ public class AdminInitController {
 	}
 	
 	@RequestMapping("initMso2Channels")
-	public ResponseEntity<String> initMso2Channels(@RequestParam boolean devel, @RequestParam boolean trans, HttpServletRequest req) {
+	private ResponseEntity<String> initMso2Channels(@RequestParam boolean devel, @RequestParam boolean trans, HttpServletRequest req) {
 		initService.setRequest(req);
 		initService.createMso2DefaultChannels(devel, trans);
 		this.sendEmail("step4 done: create 5f channels");
@@ -113,14 +105,14 @@ public class AdminInitController {
 	}
 	
 	@RequestMapping("initMso1Ipg")
-	public ResponseEntity<String> initMso1Ipg(@RequestParam boolean devel, HttpServletRequest req) {
+	private ResponseEntity<String> initMso1Ipg(@RequestParam boolean devel, HttpServletRequest req) {
 		initService.setRequest(req);
 		initService.createMso1DefaultIpg(devel);
 		return NnNetUtil.textReturn("OK");
 	}
 		
 	@RequestMapping("initMso2Ipg")
-	public ResponseEntity<String> initMso2Ipg(@RequestParam boolean devel, HttpServletRequest req) {
+	private ResponseEntity<String> initMso2Ipg(@RequestParam boolean devel, HttpServletRequest req) {
 		initService.setRequest(req);
 		initService.createMso2DefaultIpg(devel);
 		this.sendEmail("step5 done: 9x9 and 5f default ipgs");
@@ -128,7 +120,7 @@ public class AdminInitController {
 	}
 		
 	@RequestMapping("initProStep2")
-	public ResponseEntity<String> initProStep2(@RequestParam boolean devel, @RequestParam boolean trans, @RequestParam boolean debug, HttpServletRequest req) {
+	private ResponseEntity<String> initProStep2(@RequestParam boolean devel, @RequestParam boolean trans, @RequestParam boolean debug, HttpServletRequest req) {
 		initService.setRequest(req);
 		QueueFactory.getDefaultQueue().add(
 			      TaskOptions.Builder.withUrl("/admin/init/initMsoAndCategories")
@@ -137,7 +129,7 @@ public class AdminInitController {
 	}
 
 	@RequestMapping("initProStep3")
-	public ResponseEntity<String> initProStep3(@RequestParam boolean devel, @RequestParam boolean trans, @RequestParam boolean debug, HttpServletRequest req) {
+	private ResponseEntity<String> initProStep3(@RequestParam boolean devel, @RequestParam boolean trans, @RequestParam boolean debug, HttpServletRequest req) {
 		initService.setRequest(req);
 		QueueFactory.getDefaultQueue().add(
 			      TaskOptions.Builder.withUrl("/admin/init/initMso1Channels")
@@ -147,7 +139,7 @@ public class AdminInitController {
 	}
 
 	@RequestMapping("initProStep4")
-	public ResponseEntity<String> initProStep4(@RequestParam boolean devel, @RequestParam boolean trans, @RequestParam boolean debug, HttpServletRequest req) {
+	private ResponseEntity<String> initProStep4(@RequestParam boolean devel, @RequestParam boolean trans, @RequestParam boolean debug, HttpServletRequest req) {
 		initService.setRequest(req);
 		QueueFactory.getDefaultQueue().add(
 			      TaskOptions.Builder.withUrl("/admin/init/initMso2Channels")
@@ -157,7 +149,7 @@ public class AdminInitController {
 	}
 
 	@RequestMapping("initProStep5")
-	public ResponseEntity<String> initProStep5(@RequestParam boolean devel, @RequestParam boolean trans, @RequestParam boolean debug, HttpServletRequest req) {
+	private ResponseEntity<String> initProStep5(@RequestParam boolean devel, @RequestParam boolean trans, @RequestParam boolean debug, HttpServletRequest req) {
 		initService.setRequest(req);
 		QueueFactory.getDefaultQueue().add(
 	      TaskOptions.Builder.withUrl("/admin/init/initMso1Ipg")
@@ -171,12 +163,13 @@ public class AdminInitController {
 	}
 	
 	/**
+	 * Example: admin/init/initProTask?devel=0&trans=1&debug=1"	
 	 * @param debug whether to turn on player's debugging information
 	 * @param devel whether to use test data (versus data from PM)
 	 * @param trans whether to submit data to transcoding service. turn off for internal data integretiy testing.
 	 */	
 	@RequestMapping("initProStep1")
-	public ResponseEntity<String> initProTask(@RequestParam boolean devel, @RequestParam boolean trans, @RequestParam boolean debug, HttpServletRequest req) {
+	private ResponseEntity<String> initProTask(@RequestParam boolean devel, @RequestParam boolean trans, @RequestParam boolean debug, HttpServletRequest req) {
 		initService.setRequest(req);
 		QueueFactory.getDefaultQueue().add(
 			      TaskOptions.Builder.withUrl("/admin/init/deleteAll"));
@@ -184,22 +177,38 @@ public class AdminInitController {
 	}		
 	
 	@RequestMapping("changeMso")
-	public ResponseEntity<String> changeMso(@RequestParam(value="mso")String mso, HttpServletResponse resp) {
+	private ResponseEntity<String> changeMso(@RequestParam(value="mso")String mso, HttpServletResponse resp) {
 		CookieHelper.setCookie(resp, CookieHelper.MSO, mso);
 		return NnNetUtil.textReturn("OK");
 	}
 	
 	@RequestMapping("emailTest")
-	public ResponseEntity<String> emailTest() {
+	private ResponseEntity<String> emailTest() {
 		emailService.sendEmailToAdmin("email test done", "done");
 		return NnNetUtil.textReturn("OK");
 	}
 		
 	@RequestMapping("email")
-	public ResponseEntity<String> emailTask() {
+	private ResponseEntity<String> emailTask() {
 		QueueFactory.getDefaultQueue().add(
 			      TaskOptions.Builder.withUrl("/admin/init/emailTest"));
 		return NnNetUtil.textReturn("You will receive an email when it is done.");
+	}
+
+	@RequestMapping("deleteAll")
+	private ResponseEntity<String> initialize(HttpServletRequest req) {
+		initService.setRequest(req);
+		initService.deleteAll();
+		this.sendEmail("step1 done: delete all");
+		return NnNetUtil.textReturn("OK");
+	}
+ 
+	@RequestMapping("initMsoAndCategories")
+	private ResponseEntity<String> initMsoAndCategories(HttpServletRequest req, @RequestParam(value="debug")boolean debug) {
+		initService.setRequest(req);
+		initService.initMsoAndCategories(debug);
+		this.sendEmail("step2 done: initiate mso and categories");
+		return NnNetUtil.textReturn("OK");		
 	}
 	
 }
