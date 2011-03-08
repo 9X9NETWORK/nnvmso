@@ -4251,7 +4251,7 @@ function pre_login()
 
   log ('pre_login');
 
-  var d = $.get ("/playerAPI/brandInfo", function (data)
+  var d = $.get ("/playerAPI/brandInfo?mso=${brandInfo}", function (data)
     {
     var lines = data.split ('\n');
     var fields = lines[0].split ('\t');
