@@ -40,6 +40,7 @@ public class FifthFloorController {
 		CookieHelper.setCookie(resp, CookieHelper.MSO, Mso.NAME_5F);
 		FBService fbService = new FBService();
 		model = fbService.setBrandMetadata(model, Mso.NAME_5F);
+		model.addAttribute("brandInfo", "5f");
 		return "player/zooatomics";
 	}
 

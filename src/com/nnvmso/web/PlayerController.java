@@ -43,6 +43,7 @@ public class PlayerController {
 		//fb metadata
 		FBService fbService = new FBService();
 		model = fbService.setBrandMetadata(model, mso);
+		model.addAttribute("brandInfo", "9x9");
 		return "player/zooatomics";
 	}
 

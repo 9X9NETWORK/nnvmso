@@ -53,7 +53,7 @@ public class ShareController {
 		//fb: default values
 		FBService fbService = new FBService();
 		model = fbService.setBrandMetadata(model, Mso.NAME_9X9);
-		
+		model.addAttribute("brandInfo", "9x9");
 		//find mso info of the user who shares the ipg
 		if (ipg.getUserId() != 0) { //old data does not have userId
 			NnUser user = new NnUserManager().findById(ipg.getUserId());		
@@ -64,6 +64,7 @@ public class ShareController {
 				if (mso != null && mso.getName().equals(Mso.NAME_5F)) {
 					CookieHelper.setCookie(resp, CookieHelper.MSO, Mso.NAME_5F);
 					model = fbService.setBrandMetadata(model, Mso.NAME_5F);
+					model.addAttribute("brandInfo", "5f");
 				} else {
 					CookieHelper.deleteCookie(resp, CookieHelper.MSO);
 				}
