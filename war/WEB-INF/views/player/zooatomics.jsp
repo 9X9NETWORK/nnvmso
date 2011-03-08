@@ -6793,19 +6793,27 @@ function switch_to_facebook()
 
 function fb_yes()
   {
+  var months = { 0: 'January', 1: 'February', 2: 'March', 3: 'April', 4: 'May', 5: 'June',
+                 6: 'July', 7: 'August', 8: 'September', 9: 'October', 10: 'November', 11: 'December' };
+
+  var now = new Date();
+  var stringdate = months [now.getMonth()] + ' ' + now.getDate() + ', ' + now.getFullYear();
+
   var channel = channelgrid [current_channel]['id'];
   current_program = program_line [program_cursor];
   var thumb = programgrid [current_program]['thumb'];
-  var name = 'My 9x9 Channel Guide ${now}';
+  var name = 'My 9x9 Channel Guide: ' + stringdate;
   var desc = 'My 9x9 Channel Guide. Easily browse your favorite video Podcasts on the 9x9 Player! Podcasts automatically download and update for you, bringing up to 81 channels of new videos daily.';
 
   if (sitename == '5f')
     {
+    // name = '五樓電視－你的鄉民影視情報網';
     name = programgrid [current_program]['name'];
     desc = programgrid [current_program]['desc'];
     }
 
   var host = location.host;
+
   if (sitename == '5f')
     host = host.replace ('9x9.tv', '5f.tv');
 
@@ -6827,15 +6835,21 @@ function fb_yes()
 
     log ('share link: ' + link);
 
+    var parms = { method: 'feed', name: name, link: link, picture: thumb, description: desc };
+
+    if (sitename == '5f')
+      {
+      // parms ['actions'] = [ { name: '我要參加', link: 'http://5f.tv/' } ];
+      parms ['actions'] = [ { name: '有沒有抽全台第一台iPad2的八卦？', link: location.protocol + '//' + location.host + '/' + sitename + '/' + 'sharetowin.html' } ];
+      }
+
     if (fields[0] == "0")
       {
-      FB.ui ({ method: 'feed',
-               name: name,
-               link: link,
-               picture: thumb,
-               description: desc
-             },
-               function (response) { if (response && response.post_id) { log ('published'); } else { log ('not published'); } });
+      FB.ui (parms, function (response)
+        {
+        if (response && response.post_id)
+          { log ('published'); } else { log ('not published'); }
+        });
       }
 
     $("#control-layer").show();
@@ -7330,7 +7344,7 @@ function noop (e)
 <div id="contest-layer">
   <img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/btn_winclose.png" id="contest-close-btn">
   <div id="contest-innards">
-        <a href="/sharetowin.html" target="_blank"></a>
+        <a href="/5f/sharetowin.html" target="_blank"></a>
     <p>&nbsp;&nbsp;現在有<span id="nowserving"></span>人完成任務</p>
   </div>
 </div>
