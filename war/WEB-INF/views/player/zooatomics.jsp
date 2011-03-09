@@ -6148,7 +6148,7 @@ function play_yt()
 
 function yt_state (state)
   {
-  // unstarted (-1), ended (0), playing (1), paused (2), buffering (3), video cued (5).
+  // fail (-2), unstarted (-1), ended (0), playing (1), paused (2), buffering (3), video cued (5).
   log ('yt state: ' + state);
   if (fp_preloaded == 'yt' && state == 1)
     {
@@ -6200,6 +6200,8 @@ function yt_error (code)
     ytplayer = undefined;
 
     yt_error_timex = setTimeout ("yt_error_timeout()", 3000);
+
+    notify_server_bad_program();
     }
   else
     log ('** YOUTUBE ERROR ** ' + errtext);
@@ -6209,6 +6211,17 @@ function yt_error_timeout()
   {
   clear_msg_timex();
   program_right();
+  }
+
+function notify_server_bad_program()
+  {
+  var current_program = program_line [program_cursor];
+  var query = "/playerAPI/programRemove?user=" + user + mso() + '&' + 'program=' + current_program;
+
+  var d = $.get (query, function (data)
+    {
+    log ('programRemove returned: ' + data);
+    });
   }
 
 function physical_seek (offset)
