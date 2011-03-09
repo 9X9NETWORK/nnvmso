@@ -94,6 +94,8 @@ var nopreload = false;
 var divlog = false;
 var jumpstart_channel = '';
 var jumpstart_program = '';
+var bandwidth_measurement = 0;
+var bw_started = 0;
 
 /* player data record */
 var pdr = '';
@@ -1007,6 +1009,7 @@ function activate()
   jw_play_nothing();
 
   $("body").focus();
+  check_bandwidth();
   }
 
 function jumpstart()
@@ -1081,6 +1084,22 @@ function set_channel_and_program (channel, program)
     }
 
   notice_ok (thumbing, translations ['internal'] + ': Code 27', "");
+  }
+
+function check_bandwidth()
+  {
+  var i = new Image();
+  bw_started = new Date();
+  i.onload = check_bandwidth_completed;
+  i.src = 'http://9x9ui.s3.amazonaws.com/bandwidth.jpg?start=' + bw_started.getTime();
+  $("#bandwidth").html ("Testing...");
+  }
+
+function check_bandwidth_completed()
+  {
+  var bw_ended = new Date();
+  bandwidth_measurement = bw_ended.getTime() - bw_started.getTime();
+  $("#bandwidth").html (bandwidth_measurement + "ms");
   }
 
 function preload_control_images()
@@ -4290,9 +4309,9 @@ function pre_login()
           log ('debug: ' + fields[1]);
           debug_mode = parseInt (fields[1]) != 0;
           if (debug_mode)
-            $("#preloading").show();
+            $("#preloading, #bandwidthing").show();
           else
-            $("#preloading").hide();
+            $("#preloading, #bandwidthing").hide();
           }
         else if (fields [0] == 'brandInfoCounter')
           {
@@ -7101,6 +7120,7 @@ function noop (e)
           <p><span class="hilite" id="updated1">Updated:</span> <span id="update-date"></span></p>
         </li>
         <li id="preloading"><p><span class="hilite">Preload:</span> <span id="preload"></span></p></li>
+        <li id="bandwidthing"><p><span class="hilite">Bandwidth:</span> <span id="bandwidth">Not tested</span></p></li>
       </ul>
       <div id="ipg-grid">
         <p id="watermark"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV42/images/watermark.png"></p>
