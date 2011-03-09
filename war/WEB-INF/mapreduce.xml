@@ -36,6 +36,10 @@
       <name human="Property Value to Map Over">propertyValue</name>
       <value template="optinonal">String</value>
     </property>
+    <property>
+      <name human="Property Type (int, boolean, date, string)">propertyType</name>
+      <value template="optinonal">String</value>
+    </property>
   </configuration>  
 
   <configuration name="Remove property mapper">
@@ -176,6 +180,33 @@
     <property>
       <name human="Entity Kind to Map Over">mapreduce.mapper.inputformat.datastoreinputformat.entitykind</name>
       <value template="optional">PdrRaw</value>
+    </property>            
+  </configuration>
+
+  <configuration name="Migrate DefaultIpg Mapper">
+    <property>
+      <name>mapreduce.map.class</name>
+      <value>com.nnvmso.task.mapper.MigrateDefaultIpgMapper</value>
+    </property>
+    <property>
+      <name>mapreduce.inputformat.class</name>
+      <value>com.google.appengine.tools.mapreduce.DatastoreInputFormat</value>
+    </property>
+    <property>
+      <name human="Position">position</name>
+      <value template="optinonal">Integer</value>
+    </property>
+    <property>
+      <name human="Original Channel Id">oldChannelId</name>
+      <value template="optinonal">Long</value>
+    </property>
+    <property>
+      <name human="New Channel Id">newChannelId</name>
+      <value template="optinonal">Long</value>
+    </property>    
+    <property>
+      <name human="Entity Kind to Map Over">mapreduce.mapper.inputformat.datastoreinputformat.entitykind</name>
+      <value template="optional">Subscription</value>
     </property>            
   </configuration>
     
