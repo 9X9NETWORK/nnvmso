@@ -42,6 +42,16 @@
 </ul>
 
 <ul>
+  <li>counter
+    <ul>
+       <li>create counter: http://host/admin/counter/create?name=bla</li>
+       <li>add shard: http://host/admin/counter/addShard?name=bla</li>
+       <li>read counter: http://host/admin/counter/get?name=bla</li>
+    </ul>
+  </li>
+</ul>
+
+<ul>
   <li>Category Listing
     <ul>
       <li><a href="/admin/category/list">category listing</a></li>
