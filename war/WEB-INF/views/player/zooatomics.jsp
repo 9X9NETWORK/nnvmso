@@ -6214,10 +6214,10 @@ function yt_error (code)
     elastic();
 
     /* unload the chromeless player, or bad things happen */
-    $("#yt1").css ("display", "none");
-    ytplayer = undefined;
+    // $("#yt1").css ("display", "none");
+    // ytplayer = undefined;
 
-    yt_error_timex = setTimeout ("yt_error_timeout()", 3000);
+    yt_error_timex = setTimeout ("yt_error_timeout()", 3500);
 
     notify_server_bad_program();
     }
