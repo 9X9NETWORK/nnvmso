@@ -21,24 +21,30 @@ public class MsoProgramDao {
 	protected static final Logger log = Logger.getLogger(PlayerApiService.class.getName());	
 		
 	public MsoProgram save(MsoProgram program) {
-		if (program == null) {return null;}
+		if (program == null) {return null;}		
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		pm.makePersistent(program);
-		program = pm.detachCopy(program);
-		pm.close();		
+		try {
+			pm.makePersistent(program);
+			program = pm.detachCopy(program);
+		} finally {
+			pm.close();
+		}
 		return program;
 	}
 	
 	public void delete(MsoProgram program) {
-		if (program != null) {
-			PersistenceManager pm = PMF.get().getPersistenceManager();		
+		if (program == null) return;
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		try {
 			pm.deletePersistent(program);
+		} finally {
 			pm.close();
-		}
-		
+		}		
 	}
-	
+			
 	/**
+	 * Deprecated!
+	 * 
 	 * There will be no data in viewLog for now, meaning "the whole channel is always unwatched"
 	 * Keep the implementation since the requirement can be changed back again.  
 	 */
@@ -89,16 +95,19 @@ public class MsoProgramDao {
 	}
 
 	public MsoProgram findByStorageId(String storageId) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();		
-		Query query = pm.newQuery(MsoProgram.class);
-		query.setFilter("storageId == '" + storageId + "'");
-		@SuppressWarnings("unchecked")
-		List<MsoProgram> results = (List<MsoProgram>) query.execute();
 		MsoProgram detached = null;
-		if (results.size() > 0) {
-			detached = pm.detachCopy(results.get(0));
+		PersistenceManager pm = PMF.get().getPersistenceManager();		
+		try {
+			Query query = pm.newQuery(MsoProgram.class);
+			query.setFilter("storageId == '" + storageId + "'");
+			@SuppressWarnings("unchecked")
+			List<MsoProgram> results = (List<MsoProgram>) query.execute();
+			if (results.size() > 0) {
+				detached = pm.detachCopy(results.get(0));
+			}
+		} finally {
+			pm.close();
 		}
-		pm.close();
 		return detached;
 	}
 	
@@ -106,18 +115,22 @@ public class MsoProgramDao {
 	 * Good: reference findGoodProgramsByChannelId  
 	 */
 	public List<MsoProgram> findGoodProgramsByChannelIds(List<Long> channelIds) {
+		List<MsoProgram> good = new ArrayList<MsoProgram>();
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Query q = pm.newQuery(MsoProgram.class, ":p.contains(channelId)");
-		q.setOrdering("channelId asc, pubDate desc");
-		@SuppressWarnings("unchecked")
-		List<MsoProgram> programs = ((List<MsoProgram>) q.execute(channelIds));		
-		List<MsoProgram> good = (List<MsoProgram>) pm.detachCopyAll(programs);
-		for (MsoProgram p : programs) {
-			  if (p.isPublic() && p.getStatus() != MsoProgram.STATUS_OK && p.getType() == MsoProgram.TYPE_VIDEO) {
-				  good.add(p);
-			  }			
-		}		
-		pm.close();
+		try {
+			Query q = pm.newQuery(MsoProgram.class, ":p.contains(channelId)");
+			q.setOrdering("channelId asc, pubDate desc");
+			@SuppressWarnings("unchecked")
+			List<MsoProgram> programs = ((List<MsoProgram>) q.execute(channelIds));		
+			good = (List<MsoProgram>) pm.detachCopyAll(programs);
+			for (MsoProgram p : programs) {
+				  if (p.isPublic() && p.getStatus() != MsoProgram.STATUS_OK && p.getType() == MsoProgram.TYPE_VIDEO) {
+					  good.add(p);
+				  }			
+			}
+		} finally {
+			pm.close();
+		}
 		return good;
 	}
 		
@@ -125,67 +138,81 @@ public class MsoProgramDao {
 	 * Good: is Public, is STATUS_OK, is TYPE_VIDEO
 	 */
 	public List<MsoProgram> findGoodProgramsByChannelId(long channelId) {
+		List<MsoProgram> detached = new ArrayList<MsoProgram>();
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Query q = pm.newQuery(MsoProgram.class);
-		q.setFilter("channelId == channelIdParam && status == statusParam && type == typeParam");
-		q.declareParameters("long channelIdParam, short statusParam, short typeParam");
-		q.setOrdering("pubDate desc");
-		@SuppressWarnings("unchecked")
-		List<MsoProgram> programs = (List<MsoProgram>)q.execute(channelId, MsoProgram.STATUS_OK, MsoProgram.TYPE_VIDEO);
-		List<MsoProgram> detached = (List<MsoProgram>)pm.detachCopyAll(programs);
-		pm.close();
+		try {
+			Query q = pm.newQuery(MsoProgram.class);
+			q.setFilter("channelId == channelIdParam && status == statusParam && type == typeParam");
+			q.declareParameters("long channelIdParam, short statusParam, short typeParam");
+			q.setOrdering("pubDate desc");
+			@SuppressWarnings("unchecked")
+			List<MsoProgram> programs = (List<MsoProgram>)q.execute(channelId, MsoProgram.STATUS_OK, MsoProgram.TYPE_VIDEO);
+			detached = (List<MsoProgram>)pm.detachCopyAll(programs);
+		} finally {
+			pm.close();
+		}
 		return detached;
 	}
 	
 	public List<MsoProgram> findAllByChannelId(long channelId) {
+		List<MsoProgram> detached = new ArrayList<MsoProgram>();
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Query q = pm.newQuery(MsoProgram.class);
-		q.setFilter("channelId == channelIdParam");
-		q.declareParameters("long channelIdParam");
-		q.setOrdering("pubDate desc");
-		@SuppressWarnings("unchecked")
-		List<MsoProgram> programs = (List<MsoProgram>)q.execute(channelId);		
-		List<MsoProgram> detached = (List<MsoProgram>)pm.detachCopyAll(programs);
-		pm.close();
+		try {
+			Query q = pm.newQuery(MsoProgram.class);
+			q.setFilter("channelId == channelIdParam");
+			q.declareParameters("long channelIdParam");
+			q.setOrdering("pubDate desc");
+			@SuppressWarnings("unchecked")
+			List<MsoProgram> programs = (List<MsoProgram>)q.execute(channelId);		
+			detached = (List<MsoProgram>)pm.detachCopyAll(programs);
+		} finally {
+			pm.close();
+		}
 		return detached;
 	}	
 	
 	public MsoProgram findById(long id) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();
 		MsoProgram program = null;
+		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
 			program = pm.getObjectById(MsoProgram.class, id);
 			program = pm.detachCopy(program);
 		} catch (JDOObjectNotFoundException e) {
-		}		
-		pm.close();
+		} finally {
+			pm.close();
+		}
 		return program;		
 	}	
 	
 	public MsoProgram findByKey(Key key) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();
 		MsoProgram program = null;
+		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
 			program = pm.getObjectById(MsoProgram.class, key);
 			program = pm.detachCopy(program);
 		} catch (JDOObjectNotFoundException e) {
-		}		
-		pm.close();
+		} finally {
+			pm.close();			
+		}
 		return program;		
 	}	
 
 	public MsoProgram findOldestByChannelId(long channelId) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Query q = pm.newQuery(MsoProgram.class);
-		q.setOrdering("pubDate asc");
-		@SuppressWarnings("unchecked")
-		List<MsoProgram> programs = (List<MsoProgram>) q.execute();
 		MsoProgram oldest = null;
-		if (programs.size() > 0) {
-			oldest = programs.get(0);
-			oldest = pm.detachCopy(oldest);
-		}		
-		pm.close();
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		try {
+			Query q = pm.newQuery(MsoProgram.class);
+			q.setOrdering("pubDate asc");
+			q.setRange(0, 1);
+			@SuppressWarnings("unchecked")
+			List<MsoProgram> programs = (List<MsoProgram>) q.execute();
+			if (programs.size() > 0) {
+				oldest = programs.get(0);
+				oldest = pm.detachCopy(oldest);
+			}		
+		} finally {
+			pm.close();
+		}
 		return oldest;		
 	}	
 }

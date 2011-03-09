@@ -1,5 +1,6 @@
 package com.nnvmso.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.jdo.JDOObjectNotFoundException;
@@ -11,19 +12,24 @@ import com.nnvmso.model.CategoryChannel;
 
 public class CategoryChannelDao {
 
-	public CategoryChannel save(CategoryChannel cc) {
+	public CategoryChannel save(CategoryChannel cc) {		
 		if (cc == null) {return null;}
-		PersistenceManager pm = PMF.get().getPersistenceManager();		
-		pm.makePersistent(cc);
-		cc= pm.detachCopy(cc);
-		pm.close();		
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+	    try {
+			pm.makePersistent(cc);
+			cc= pm.detachCopy(cc);
+	    } finally {
+	    	pm.close();
+	    }
 		return cc;
 	}
 	
 	public void delete(CategoryChannel cc) {
-		if (cc!= null) {
-			PersistenceManager pm = PMF.get().getPersistenceManager();		
+		if (cc == null) {return;}
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		try {
 			pm.deletePersistent(cc);
+		} finally {
 			pm.close();
 		}
 	}
@@ -35,48 +41,60 @@ public class CategoryChannelDao {
 			cc = pm.getObjectById(CategoryChannel.class, id);
 			cc = pm.detachCopy(cc);
 		} catch (JDOObjectNotFoundException e) {
-		}		
-		pm.close();
+		} finally {
+			pm.close();			
+		}
 		return cc;		
 	}	
 	
 	public List<CategoryChannel> findAllByCategoryId(long categoryId) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Query q = pm.newQuery(CategoryChannel.class);
-		q.setFilter("categoryId == categoryIdParam");
-		q.declareParameters("long categoryIdParam");
-		@SuppressWarnings("unchecked")
-		List<CategoryChannel> ccs = (List<CategoryChannel>)q.execute(categoryId);
-		ccs = (List<CategoryChannel>)pm.detachCopyAll(ccs);		
-		pm.close();
-		return ccs;
+		List<CategoryChannel> detached = new ArrayList<CategoryChannel>();
+		try {
+			Query q = pm.newQuery(CategoryChannel.class);
+			q.setFilter("categoryId == categoryIdParam");
+			q.declareParameters("long categoryIdParam");
+			@SuppressWarnings("unchecked")
+			List<CategoryChannel> ccs = (List<CategoryChannel>)q.execute(categoryId);
+			detached = (List<CategoryChannel>)pm.detachCopyAll(ccs);
+		} finally {
+			pm.close();
+		}
+		return detached;
 	}	
 
 	public List<CategoryChannel> findAllByChannelId(long channelId) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Query q = pm.newQuery(CategoryChannel.class);
-		q.setFilter("channelId == channelIdParam");
-		q.declareParameters("long channelIdParam");
-		@SuppressWarnings("unchecked")
-		List<CategoryChannel> ccs = (List<CategoryChannel>)q.execute(channelId);
-		ccs = (List<CategoryChannel>)pm.detachCopyAll(ccs);		
-		pm.close();
-		return ccs;
+		List<CategoryChannel> detached = new ArrayList<CategoryChannel>();
+		try {
+			Query q = pm.newQuery(CategoryChannel.class);
+			q.setFilter("channelId == channelIdParam");
+			q.declareParameters("long channelIdParam");
+			@SuppressWarnings("unchecked")
+			List<CategoryChannel> ccs = (List<CategoryChannel>)q.execute(channelId);
+			detached = (List<CategoryChannel>)pm.detachCopyAll(ccs);
+		} finally {
+			pm.close();
+		}
+		return detached;
 	}	
 	
 	public CategoryChannel findByCategoryIdAndChannelId(long categoryId, long channelId) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();		
-		Query q = pm.newQuery(CategoryChannel.class);
-		q.setFilter("categoryId == categoryIdParam && channelId == channelIdParam");
-		q.declareParameters("long categoryIdParam, long channelIdParam");
-		@SuppressWarnings("unchecked")
-		List<CategoryChannel> ccs= (List<CategoryChannel>)q.execute(categoryId, channelId);
+		PersistenceManager pm = PMF.get().getPersistenceManager();
 		CategoryChannel cc = null;
-		if (ccs.size() > 0) {
-			cc = ccs.get(0);
-			cc = pm.detachCopy(cc);
-		}		
-		pm.close();
+		try {
+			Query q = pm.newQuery(CategoryChannel.class);
+			q.setFilter("categoryId == categoryIdParam && channelId == channelIdParam");
+			q.declareParameters("long categoryIdParam, long channelIdParam");
+			@SuppressWarnings("unchecked")
+			List<CategoryChannel> ccs= (List<CategoryChannel>)q.execute(categoryId, channelId);
+			if (ccs.size() > 0) {
+				cc = ccs.get(0);
+				cc = pm.detachCopy(cc);
+			}
+		} finally {
+			pm.close();
+		}
 		return cc;
 	}
 		

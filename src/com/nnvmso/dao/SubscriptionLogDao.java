@@ -9,29 +9,33 @@ import com.nnvmso.lib.PMF;
 import com.nnvmso.model.SubscriptionLog;
 
 public class SubscriptionLogDao {
-	public SubscriptionLog save(SubscriptionLog log) {
+	public SubscriptionLog save(SubscriptionLog log) {		
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		pm.makePersistent(log);
-		log = pm.detachCopy(log);
-		pm.close();		
+		try {
+			pm.makePersistent(log);
+			log = pm.detachCopy(log);
+		} finally {
+			pm.close();
+		}
 		return log;
 	}
 	
 	public SubscriptionLog findByMsoIdAndChannelId(long msoId, long channelId) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();		
-		Query q = pm.newQuery(SubscriptionLog.class);
-		q.setFilter("msoId == msoIdParam && channelId== channelIdParam");
-		q.declareParameters("long msoIdParam, long channelIdParam");
-		@SuppressWarnings("unchecked")
-		List<SubscriptionLog> subs = (List<SubscriptionLog>)q.execute(msoId, channelId);
 		SubscriptionLog s = null;
-		if (subs.size() > 0) {
-			s = subs.get(0);
-			s = pm.detachCopy(s);
-		}		
-		pm.close();
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		try {
+			Query q = pm.newQuery(SubscriptionLog.class);
+			q.setFilter("msoId == msoIdParam && channelId== channelIdParam");
+			q.declareParameters("long msoIdParam, long channelIdParam");
+			@SuppressWarnings("unchecked")
+			List<SubscriptionLog> subs = (List<SubscriptionLog>)q.execute(msoId, channelId);
+			if (subs.size() > 0) {
+				s = subs.get(0);
+				s = pm.detachCopy(s);
+			}
+		} finally {
+			pm.close();
+		}
 		return s;		
-	}
-	
-	
+	}		
 }

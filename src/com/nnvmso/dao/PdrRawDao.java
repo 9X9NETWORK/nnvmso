@@ -1,5 +1,6 @@
 package com.nnvmso.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.jdo.PersistenceManager;
@@ -13,22 +14,29 @@ public class PdrRawDao {
 
 	public PdrRaw save(PdrRaw pdr) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		pm.makePersistent(pdr);
-		pdr = pm.detachCopy(pdr);
-		pm.close();		
+		try {
+			pm.makePersistent(pdr);
+			pdr = pm.detachCopy(pdr);
+		} finally {
+			pm.close();
+		}
 		return pdr;
 	}
 	
 	public List<PdrRaw> findByUserId(long userId) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();		
-		Query q = pm.newQuery(PdrRaw.class);
-		q.setFilter("userId == userIdParam");
-		q.declareParameters(Key.class.getName() + " userIdParam");
-		@SuppressWarnings("unchecked")
-		List<PdrRaw> results = (List<PdrRaw>)q.execute(userId);
-		results = (List<PdrRaw>)pm.detachCopyAll(results);
-		pm.close();
-		return results;
+		List<PdrRaw> detached = new ArrayList<PdrRaw>();
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		try {
+			Query q = pm.newQuery(PdrRaw.class);
+			q.setFilter("userId == userIdParam");
+			q.declareParameters(Key.class.getName() + " userIdParam");
+			@SuppressWarnings("unchecked")
+			List<PdrRaw> results = (List<PdrRaw>)q.execute(userId);
+			detached = (List<PdrRaw>)pm.detachCopyAll(results);
+		} finally {
+			pm.close();
+		}
+		return detached;
 		
 	}
 

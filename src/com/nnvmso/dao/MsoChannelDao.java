@@ -1,5 +1,6 @@
 package com.nnvmso.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.jdo.JDOObjectNotFoundException;
@@ -15,20 +16,24 @@ public class MsoChannelDao {
 	public MsoChannel save(MsoChannel channel) {
 		if (channel == null) {return null;}
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		pm.makePersistent(channel);
-		pm.close();		
+		try {
+			pm.makePersistent(channel);
+		} finally {
+			pm.close();
+		}
 		return channel;
 	}
 	
 	public MsoChannel findById(long id) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();
+		PersistenceManager pm = PMF.get().getPersistenceManager();		
 		MsoChannel channel = null;
 		try {
 			channel = pm.getObjectById(MsoChannel.class, id);
 			channel = pm.detachCopy(channel);
 		} catch (JDOObjectNotFoundException e) {
-		}		
-		pm.close();
+		} finally {
+			pm.close();			
+		}
 		return channel;		
 	}	
 
@@ -39,64 +44,80 @@ public class MsoChannelDao {
 			channel = pm.getObjectById(MsoChannel.class, key);
 			channel = pm.detachCopy(channel);
 		} catch (JDOObjectNotFoundException e) {
-		}		
-		pm.close();
+		} finally {
+			pm.close();			
+		}
 		return channel;		
 	}	
 
 	//!!!
 	public List<MsoChannel> findAll() {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Query query = pm.newQuery(MsoChannel.class);
-		@SuppressWarnings("unchecked")
-		List<MsoChannel> results = (List<MsoChannel>) query.execute();
-		results = (List<MsoChannel>)pm.detachCopyAll(results);
-		pm.close();
-		return results;
-	}
-	
-	public MsoChannel findByName(String name) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();		    	
-		Query q = pm.newQuery(MsoChannel.class);
-		q.setFilter("name == nameParam");
-		q.declareParameters(Key.class.getName() + " nameParam");
-		@SuppressWarnings("unchecked")
-		List<MsoChannel> channels = (List<MsoChannel>) q.execute(name);
-		MsoChannel channel = null;
-		if (channels.size() > 0) {
-			channel = pm.detachCopy(channels.get(0));
+		List<MsoChannel> detached = new ArrayList<MsoChannel>();
+		try {
+			Query query = pm.newQuery(MsoChannel.class);
+			@SuppressWarnings("unchecked")
+			List<MsoChannel> results = (List<MsoChannel>) query.execute();
+			detached = (List<MsoChannel>)pm.detachCopyAll(results);
+		} finally {
+			pm.close();
 		}
-		pm.close();
+		return detached;
+	}
+
+	public MsoChannel findByName(String name) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		MsoChannel channel = null;
+		try {
+			Query q = pm.newQuery(MsoChannel.class);
+			q.setFilter("name == nameParam");
+			q.declareParameters(Key.class.getName() + " nameParam");
+			@SuppressWarnings("unchecked")
+			List<MsoChannel> channels = (List<MsoChannel>) q.execute(name);
+			if (channels.size() > 0) {
+				channel = pm.detachCopy(channels.get(0));
+			}
+		} finally {
+			pm.close();
+		}
 		return channel;				
 	}	
 	
+	//assuming no duplication, carefully deal with this later 
 	public MsoChannel findBySourceUrlSearch(String url) {
 		if (url == null) {return null;}
-		PersistenceManager pm = PMF.get().getPersistenceManager();		    	
-		Query q = pm.newQuery(MsoChannel.class);
-		q.setFilter("sourceUrlSearch == sourceUrlSearchParam");
-		q.declareParameters(Key.class.getName() + " sourceUrlSearchParam");
-		@SuppressWarnings("unchecked")
-		List<MsoChannel> channels = (List<MsoChannel>) q.execute(url.toLowerCase());
+		PersistenceManager pm = PMF.get().getPersistenceManager();
 		MsoChannel channel = null;
-		if (channels.size() > 0) {
-			channel = pm.detachCopy(channels.get(0));
+		try {
+			Query q = pm.newQuery(MsoChannel.class);
+			q.setFilter("sourceUrlSearch == sourceUrlSearchParam");
+			q.declareParameters(Key.class.getName() + " sourceUrlSearchParam");
+			@SuppressWarnings("unchecked")
+			List<MsoChannel> channels = (List<MsoChannel>) q.execute(url.toLowerCase());
+			if (channels.size() > 0) {
+				channel = pm.detachCopy(channels.get(0));
+			}
+		} finally {
+			pm.close();
 		}
-		pm.close();
 		return channel;				
 	}		
 	
 	//!!! probably not used, otherwise need to add index
 	public List<MsoChannel> findPublicChannels() {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Query q = pm.newQuery(MsoChannel.class);
-		q.setFilter("isPublic == isPublicParam");
-		q.declareParameters("boolean isPublicParam");
-		q.setOrdering("nameSearch asc");
-		@SuppressWarnings("unchecked")
-		List<MsoChannel> channels = (List<MsoChannel>) q.execute(true);
-		channels = (List<MsoChannel>)pm.detachCopyAll(channels);
-		pm.close();		
-		return channels;
+		List<MsoChannel> detached = new ArrayList<MsoChannel>(); 
+		try {
+			Query q = pm.newQuery(MsoChannel.class);
+			q.setFilter("isPublic == isPublicParam");
+			q.declareParameters("boolean isPublicParam");
+			q.setOrdering("nameSearch asc");
+			@SuppressWarnings("unchecked")
+			List<MsoChannel> channels = (List<MsoChannel>) q.execute(true);
+			detached = (List<MsoChannel>)pm.detachCopyAll(channels);
+		} finally {
+			pm.close();
+		}
+		return detached;
 	}	
 }

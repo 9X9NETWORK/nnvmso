@@ -1,5 +1,6 @@
 package com.nnvmso.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -19,36 +20,46 @@ public class MsoDao {
 	public Mso save(Mso mso) {
 		if (mso == null) {return null;}
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		pm.makePersistent(mso);
-		mso = pm.detachCopy(mso);
-		pm.close();		
+		try {
+			pm.makePersistent(mso);
+			mso = pm.detachCopy(mso);
+		} finally {
+			pm.close();
+		}
 		return mso;
 	}
 	
 	public Mso findByName(String name) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Query query = pm.newQuery(Mso.class);
-		name = name.toLowerCase();
-		query.setFilter("nameSearch == '" + name + "'");
-		@SuppressWarnings("unchecked")
-		List<Mso> results = (List<Mso>) query.execute(name);
 		Mso detached = null; 
-		if (results.size() > 0) {
-			detached = pm.detachCopy(results.get(0));
+		try {
+			Query query = pm.newQuery(Mso.class);
+			name = name.toLowerCase();
+			query.setFilter("nameSearch == '" + name + "'");
+			@SuppressWarnings("unchecked")
+			List<Mso> results = (List<Mso>) query.execute(name);
+			if (results.size() > 0) {
+				detached = pm.detachCopy(results.get(0));
+			}
+		} finally {
+			pm.close();
 		}
-		pm.close();	
 		return detached;
 	}
 	
 	public List<Mso> findByType(short type) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Query query = pm.newQuery(Mso.class);
-		query.setFilter("type == " + type);
-		@SuppressWarnings("unchecked")
-		List<Mso> results = (List<Mso>) query.execute(type);
-		results = (List<Mso>)pm.detachCopyAll(results);
-		pm.close();
-		return results;
+		List<Mso> detached = new ArrayList<Mso>();
+		try {
+			Query query = pm.newQuery(Mso.class);
+			query.setFilter("type == " + type);
+			@SuppressWarnings("unchecked")
+			List<Mso> results = (List<Mso>) query.execute(type);
+			detached = (List<Mso>)pm.detachCopyAll(results);
+		} finally {
+			pm.close();
+		}
+		return detached;
 	}
 	
 	public Mso findById(long id) {
@@ -59,19 +70,24 @@ public class MsoDao {
 			mso = pm.getObjectById(Mso.class, id);
 			mso = pm.detachCopy(mso);
 		} catch (JDOObjectNotFoundException e) {
-		}		
-		pm.close();
+		} finally {
+			pm.close();			
+		}
 		return mso;
 	}
 	
 	public List<Mso> findAll() {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Query query = pm.newQuery(Mso.class);
-		@SuppressWarnings("unchecked")
-		List<Mso> results = (List<Mso>) query.execute();
-		results = (List<Mso>)pm.detachCopyAll(results);
-		pm.close();
-		return results;
+		List<Mso> detached = new ArrayList<Mso>();
+		try {
+			Query query = pm.newQuery(Mso.class);
+			@SuppressWarnings("unchecked")
+			List<Mso> results = (List<Mso>) query.execute();
+			detached = (List<Mso>)pm.detachCopyAll(results);
+		} finally {
+			pm.close();
+		}
+		return detached;
 	}
 	
 	public Mso findByKey(Key key) {
@@ -81,8 +97,9 @@ public class MsoDao {
 			mso = pm.getObjectById(Mso.class, key);
 			mso = pm.detachCopy(mso);
 		} catch (JDOObjectNotFoundException e) {
+		} finally {
+			pm.close();			
 		}
-		pm.close();
 		return mso;
 	}
 }

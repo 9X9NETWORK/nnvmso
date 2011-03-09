@@ -16,10 +16,13 @@ import com.nnvmso.model.Category;
 public class CategoryDao {
 	
 	public Category save(Category category) {
-		if (category == null) {return null;}
+		if (category == null) {return null;}		
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		pm.makePersistent(category);
-		pm.close();
+		try {
+			pm.makePersistent(category);
+		} finally {
+			pm.close();
+		}
 		return category;
 	}
 
@@ -29,39 +32,50 @@ public class CategoryDao {
 	
 	public Category findByName(String name) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Query query = pm.newQuery(Category.class);
-		query.setFilter("name == '" + NnStringUtil.capitalize(name) + "'");		
-		@SuppressWarnings("unchecked")
-		List<Category> results = (List<Category>) query.execute();
 		Category detached = null;
-		if (results.size() > 0) {
-			detached = pm.detachCopy(results.get(0));
+		try {
+			Query query = pm.newQuery(Category.class);
+			query.setFilter("name == '" + NnStringUtil.capitalize(name) + "'");
+			@SuppressWarnings("unchecked")
+			List<Category> results = (List<Category>) query.execute();			
+			if (results.size() > 0) {
+				detached = pm.detachCopy(results.get(0));
+			}
+		} finally {
+			pm.close();
 		}
-		pm.close();
 		return detached;
 	}
 		
 	public List<Category> findAllByMsoId(long msoId) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Query q = pm.newQuery(Category.class);
-		q.setFilter("msoId == msoIdParam");
-		q.declareParameters("long msoIdParam");
-		q.setOrdering("name");
-		@SuppressWarnings("unchecked")
-		List<Category> categories = (List<Category>)q.execute(msoId);
-		categories = (List<Category>)pm.detachCopyAll(categories);
-		pm.close();
-		return categories;		
+		List<Category> detached = new ArrayList<Category>();
+		try {
+			Query q = pm.newQuery(Category.class);
+			q.setFilter("msoId == msoIdParam");
+			q.declareParameters("long msoIdParam");
+			q.setOrdering("name");
+			@SuppressWarnings("unchecked")
+			List<Category> categories = (List<Category>)q.execute(msoId);
+			detached = (List<Category>)pm.detachCopyAll(categories);
+		} finally {
+			pm.close();			
+		}
+		return detached;		
 	}
 	
 	public List<Category> findAll() {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		String query = "select from " + Category.class.getName() + " order by createDate";
-		@SuppressWarnings("unchecked")
-		List<Category> categories = (List<Category>) pm.newQuery(query).execute();
-		categories = (List<Category>)pm.detachCopyAll(categories);
-		pm.close();
-		return categories;				
+		List<Category> detached = new ArrayList<Category>();
+		try {
+			String query = "select from " + Category.class.getName() + " order by createDate";
+			@SuppressWarnings("unchecked")
+			List<Category> categories = (List<Category>) pm.newQuery(query).execute();
+			detached = (List<Category>)pm.detachCopyAll(categories);
+		} finally {
+			pm.close();
+		}
+		return detached;				
 	}
 	
 	public Category findById(long id) {
@@ -71,8 +85,9 @@ public class CategoryDao {
 			category = pm.getObjectById(Category.class, id);
 			category = pm.detachCopy(category);
 		} catch (JDOObjectNotFoundException e) {			
+		} finally {			
+			pm.close();
 		}
-		pm.close();
 		return category;		
 	}
 
@@ -83,8 +98,9 @@ public class CategoryDao {
 			category = pm.getObjectById(Category.class, key);
 			category = pm.detachCopy(category);
 		} catch (JDOObjectNotFoundException e) {			
+		} finally {
+			pm.close();			
 		}
-		pm.close();
 		return category;		
 	}
 	
@@ -92,13 +108,16 @@ public class CategoryDao {
 	public List<Category> findAllByIds(List<Long> ids) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		List<Category> categories= new ArrayList<Category>();
-		for (long id : ids) {
-			Category c = this.findById(id); 
-			if (c != null) {
-				categories.add(c);
+		try {
+			for (long id : ids) {
+				Category c = this.findById(id); 
+				if (c != null) {
+					categories.add(c);
+				}
 			}
+		} finally {
+			pm.close();		
 		}
-		pm.close();
 		return categories;
 	}
 			
