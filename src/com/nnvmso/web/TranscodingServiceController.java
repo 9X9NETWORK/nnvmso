@@ -1,13 +1,27 @@
 package com.nnvmso.web;
 
- import java.util.ArrayList;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
+import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.codec.binary.Base64;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.SerializationConfig.Feature;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,8 +29,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.nnvmso.web.json.transcodingservice.*;
+import com.google.appengine.api.taskqueue.QueueFactory;
+import com.google.appengine.api.taskqueue.TaskOptions;
 import com.nnvmso.lib.NnLogUtil;
+import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoProgram;
@@ -26,6 +42,13 @@ import com.nnvmso.service.MsoProgramManager;
 import com.nnvmso.service.NnStatusCode;
 import com.nnvmso.service.NnStatusMsg;
 import com.nnvmso.service.TranscodingService;
+import com.nnvmso.web.json.transcodingservice.Channel;
+import com.nnvmso.web.json.transcodingservice.ChannelInfo;
+import com.nnvmso.web.json.transcodingservice.PostResponse;
+import com.nnvmso.web.json.transcodingservice.Program;
+import com.nnvmso.web.json.transcodingservice.ProgramInfo;
+import com.nnvmso.web.json.transcodingservice.RtnChannel;
+import com.nnvmso.web.json.transcodingservice.RtnProgram;
 
 /**
  * <p>Serves for Transcoding Service.</p>
@@ -84,17 +107,37 @@ public class TranscodingServiceController {
  	 *      "itemkey":"item_key_id",<br/>
      *  } 
 	 */
+	//http://www.objectbiz.com/
 	@RequestMapping("itemUpdate")
 	public @ResponseBody PostResponse itemUpdate(@RequestBody RtnProgram rtnProgram, HttpServletRequest req) {
 		log.info(rtnProgram.toString());
-		PostResponse resp = new PostResponse(String.valueOf(NnStatusCode.ERROR), NnStatusMsg.errorStr(Locale.ENGLISH));
+		PostResponse resp = new PostResponse(String.valueOf(NnStatusCode.SUCCESS), NnStatusMsg.successStr(Locale.ENGLISH));		
+		try {
+			ObjectMapper mapper = new ObjectMapper();
+			byte[] data = mapper.writeValueAsBytes(rtnProgram);						
+			QueueFactory.getQueue("podcastAPI").add(
+					TaskOptions.Builder.withUrl("/podcastAPI/itemUpdateTask")
+			        .payload(data, "application/json")
+		    );
+		} catch (Exception e) {
+			e.printStackTrace();
+		}		 
+		return resp;
+	}
+	
+	@RequestMapping("itemUpdateTask")
+	public ResponseEntity<String> itemUpdateTask(@RequestBody RtnProgram rtnProgram, HttpServletRequest req) {
+		log.info(rtnProgram.toString());
+		PostResponse resp = new PostResponse(String.valueOf(NnStatusCode.SUCCESS), NnStatusMsg.successStr(Locale.ENGLISH));		
 		try {
 			resp = transcodingService.updateProgram(rtnProgram);
 		} catch (Exception e) {
 			resp = transcodingService.handleException(e);
 		}
-		return resp;
+		log.info(resp.getErrorCode());
+		return NnNetUtil.textReturn("OK");
 	}
+	
 	
 	/** 
 	 * @param page
@@ -122,7 +165,7 @@ public class TranscodingServiceController {
 			} else {
 				channels = channelMngr.findPublicChannels();
 			}
-					
+
 			String[] transcodingEnv = transcodingService.getTranscodingEnv(req);		
 			String callbackUrl = transcodingEnv[1];		
 			List<Channel> cs = new ArrayList<Channel>();
@@ -194,4 +237,22 @@ public class TranscodingServiceController {
 		return resp;
 	}
 
+	@RequestMapping("testTask")
+	public ResponseEntity<String> testTask() {
+		System.out.println("============== task executed ============");
+		return NnNetUtil.textReturn("OK");
+	}
+	
+	@RequestMapping("test")
+	public ResponseEntity<String> test() {
+		try {
+			QueueFactory.getDefaultQueue().add(
+					TaskOptions.Builder.withUrl("/podcastAPI/testTask")
+			);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}		 
+		return NnNetUtil.textReturn("OK");
+	}
+	
 }
