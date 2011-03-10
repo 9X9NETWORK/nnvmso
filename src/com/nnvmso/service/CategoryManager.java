@@ -63,16 +63,12 @@ public class CategoryManager {
 		
 		CategoryChannelManager ccMngr = new CategoryChannelManager();
 		CategoryManager categoryMngr = new CategoryManager();
-		List<CategoryChannel> ccs = ccMngr.findAllByChannelId(channel.getKey().getId());
-		
-		System.out.println("ccs size:" + ccs.size());
-		
+		List<CategoryChannel> ccs = ccMngr.findAllByChannelId(channel.getKey().getId());				
 		List<Category> categories = new ArrayList<Category>();		
 		for (CategoryChannel cc : ccs) {
 			Category c = categoryMngr.findById(cc.getCategoryId());
 			if (c != null) {categories.add(c);}
 		}
-		System.out.println("category size:" + categories.size());
 		return categories;
 	}
 	
@@ -90,7 +86,6 @@ public class CategoryManager {
 		MsoChannel channel = channelMngr.findById(channelId);
 		if (channel == null) {return new ArrayList<Category>();}		
 		if (categories.size() == 0) {return new ArrayList<Category>();}		
-		System.out.println("want to be in how many categories:" + categories.size());
 		
 		//update category if necessary
 		CategoryChannelManager ccMngr = new CategoryChannelManager();
@@ -127,7 +122,7 @@ public class CategoryManager {
 			ccs = ccMngr.findAllByChannelId(channel.getKey().getId());
 			for (CategoryChannel cc : ccs) {
 				Category c = this.findById(cc.getCategoryId());
-				System.out.println("count added: category id" + c.getKey().getId() + ";channelId " + channel.getKey().getId() + ";name " + channel.getName());
+				log.info("count added: category id" + c.getKey().getId() + ";channelId " + channel.getKey().getId() + ";name " + channel.getName());
 				c.setChannelCount(c.getChannelCount() + 1);
 				this.save(c);					
 			}
