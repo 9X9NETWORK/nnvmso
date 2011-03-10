@@ -49,7 +49,7 @@ public class NnNetUtil {
 	        mapper.writeValue(writer, obj);
 	        log.info("url fetch-json:" + mapper.writeValueAsString(obj));	        
 	        if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {	        	
-	        	System.out.println("response not ok!" + connection.getResponseCode());
+	        	log.info("response not ok!" + connection.getResponseCode());
 	        }
 	        writer.close();	        
 		} catch (Exception e) {
