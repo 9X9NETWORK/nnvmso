@@ -80,6 +80,7 @@ var sitename = '';
 var timezero = 0;
 var all_programs_fetched = false;
 var all_channels_fetched = false;
+var piece_count = 0;
 var activated = false;
 var jingled = false;
 var jingle_timex = 0;
@@ -914,6 +915,9 @@ function fetch_channels()
       redraw_ipg();
       elastic();
       }
+
+    if (!all_programs_fetched)
+      setTimeout ("fetch_programs_piecemeal()", 10000);
     });
   }
 
@@ -953,6 +957,40 @@ function programs_since (channel, timestamp)
   return n;
   }
 
+function fetch_programs_piecemeal()
+  {
+  if (!all_programs_fetched)
+    {
+    log ('fetching programs piecemeal (taking too long)');
+    var these = [];
+    piece_count = 0;
+    for (var ch in channelgrid)
+      {
+      these.push (channelgrid [ch]['id']);
+      if (these.length >= 5)
+        {
+        fetch_piece (these);
+        these = [];
+        }
+      }
+    if (these.length > 0)
+      fetch_piece (these);
+    }
+  }
+
+function fetch_piece (charray)
+  {
+  var query = "/playerAPI/programInfo?channel=" + charray.join (',') + mso() + '&' + user_or_ipg();
+  var d = $.get (query, function (data)
+    {
+    parse_program_data (data);
+    piece_count += charray.length;
+    var n_channels = 0;
+    for (var ch in channelgrid) { n_channels++; }
+    if (piece_count == n_channels)
+      all_programs_fetched = true;
+    });
+  }
 
 function browser_support()
   {
