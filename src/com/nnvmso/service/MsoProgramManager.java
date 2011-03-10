@@ -162,7 +162,7 @@ public class MsoProgramManager {
 	 * @@@ Cached 
 	 */
 	public List<MsoProgram> findGoodProgramsByChannelIds(List<Long>channelIds) {
-		System.out.println("original channel size:" + channelIds.size());
+		log.info("requested channelIds size:" + channelIds.size());
 		List<MsoProgram> programs = new ArrayList<MsoProgram>();
 		List<Long> test = new ArrayList<Long>();
 		test.addAll(channelIds); //!!!! test
@@ -173,7 +173,6 @@ public class MsoProgramManager {
 				@SuppressWarnings("unchecked")
 				List<Long> list = (ArrayList<Long>)cache.get(this.getCacheProgramListKey(id));
 				if (list != null) {
-					System.out.println("list size:" + list.size());
 					for (Long l : list) {
 						MsoProgram p =  this.findById(l);
 						if (p!= null) {programs.add(p);}
@@ -182,7 +181,7 @@ public class MsoProgramManager {
 				}
 			}
 		}
-		System.out.println("remaining channel size:" + channelIds.size());
+		log.info("remaining channel size not in the cache:" + channelIds.size());
 		if (channelIds.size() > 0) {
 			//find
 			List<MsoProgram> list = msoProgramDao.findGoodProgramsByChannelIds(channelIds);
