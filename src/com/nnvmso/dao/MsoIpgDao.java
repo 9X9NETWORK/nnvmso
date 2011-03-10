@@ -35,7 +35,6 @@ public class MsoIpgDao {
 	}
 
 	public List<MsoIpg> findAllByMsoId(long msoId) {
-		System.out.println("----findAllByMsoId----" + msoId);
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		List<MsoIpg> detached = new ArrayList<MsoIpg>(); 
 		try {
