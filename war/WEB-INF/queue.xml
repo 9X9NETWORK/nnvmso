@@ -2,6 +2,6 @@
 <!--Change the refresh rate of the default queue to 1/s-->
   <queue>
     <name>podcastAPI</name>
-    <rate>3/m</rate>
+    <rate>20/m</rate>
   </queue>
 </queue-entries>
