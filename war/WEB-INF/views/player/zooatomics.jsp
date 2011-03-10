@@ -829,7 +829,13 @@ function parse_program_data (data)
   if (lines.length > 0)
     {
     var fields = lines[0].split ('\t');
-    if (fields [0] != '0')
+    if (fields [0] == '710')
+      {
+      if (debug_mode)
+        log_and_alert ('server error: ' + lines [0]);
+      return;
+      }
+    else if (fields [0] != '0')
       {
       log_and_alert ('server error: ' + lines [0]);
       return;
