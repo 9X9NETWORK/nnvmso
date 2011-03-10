@@ -17,7 +17,7 @@
 <script type="text/javascript" charset="utf-8" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.8/jquery-ui.min.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.8/i18n/jquery-ui-i18n.min.js"></script>
 
-<script type="text/javascript" charset="utf-8" src="http://static.ak.fbcdn.net/connect/en_US/core.debug.js"></script>
+<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/all.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/scripts/swfobject.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/9x9playerV43/javascripts/jquery.swfobject.1-1-1.min.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/scripts/flowplayer-3.2.4.min.js"></script>
