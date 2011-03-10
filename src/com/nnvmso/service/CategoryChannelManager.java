@@ -2,6 +2,7 @@ package com.nnvmso.service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
 
 import com.nnvmso.dao.CategoryChannelDao;
 import com.nnvmso.model.Category;
@@ -10,7 +11,9 @@ import com.nnvmso.model.MsoChannel;
 
 public class CategoryChannelManager {
 	
-	private CategoryChannelDao ccDao = new CategoryChannelDao();
+	protected static final Logger log = Logger.getLogger(CategoryManager.class.getName());
+	
+	private CategoryChannelDao ccDao = new CategoryChannelDao();		
 	
 	public void create(CategoryChannel cc) {
 		Date now = new Date();

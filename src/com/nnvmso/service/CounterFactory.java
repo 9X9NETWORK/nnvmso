@@ -15,6 +15,8 @@
 
 package com.nnvmso.service;
 
+import java.util.logging.Logger;
+
 import com.nnvmso.dao.ShardedCounter;
 import com.nnvmso.model.Counter;
 
@@ -23,7 +25,8 @@ import com.nnvmso.model.Counter;
  *
  */
 public class CounterFactory {
-		
+  protected static final Logger log = Logger.getLogger(CategoryManager.class.getName());		
+	
   public ShardedCounter getOrCreateCounter(String name) {
     CounterFactory factory = new CounterFactory();
     ShardedCounter counter = factory.getCounter(name);
