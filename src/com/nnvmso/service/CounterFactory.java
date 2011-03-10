@@ -32,7 +32,7 @@ public class CounterFactory {
       counter = factory.createCounter(name);
       // Add a first shard to the counter.
       counter.addShard();
-      System.out.println("No counter named " + name + ", so we created one");
+      log.info("No counter named " + name + ", so we created one");
     }
     return counter;
   }
