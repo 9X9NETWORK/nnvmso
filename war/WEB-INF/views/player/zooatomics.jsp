@@ -1098,6 +1098,9 @@ function jumpstart_inner()
   hint();
   if (sitename == '5f')
     contest();
+
+  jumpstart_channel = '';
+  jumpstart_program = '';
   }
 
 function set_channel_and_program (channel, program)
