@@ -41,7 +41,7 @@ public class CategoryChannelManager {
 	
 	public List<CategoryChannel> findAllByCategoryId(long categoryId) {
 		List<CategoryChannel> ccs = ccDao.findAllByCategoryId(categoryId);
-		System.out.println("findByCategoryKey(): found " + ccs.size() + " with id " + categoryId);
+		log.info("findByCategoryKey(): found " + ccs.size() + " with id " + categoryId);
 		return ccs;
 	}
 	
