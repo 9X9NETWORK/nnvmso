@@ -5,12 +5,14 @@ public class Channel {
 	private String url;
 	private String forceEncoding;
 	private String lastUpdateTime;
+	private String subscriptionCnt;
 
-	public Channel(String channelId, String url, String lastUpdateTime, String forceEncoding) {
+	public Channel(String channelId, String url, String lastUpdateTime, String forceEncoding, String subscriptionCnt) {
 		this.channelId = channelId;
 		this.url = url;
 		this.lastUpdateTime = lastUpdateTime;
 		this.forceEncoding = forceEncoding;
+		this.subscriptionCnt = subscriptionCnt;
 	}
 	
 	public String getChannelId() {
@@ -39,5 +41,12 @@ public class Channel {
 	public void setForceEncoding(String forceEncoding) {
 		this.forceEncoding = forceEncoding;
 	}
-	
+
+	public String getSubscriptionCnt() {
+		return subscriptionCnt;
+	}
+
+	public void setSubscriptionCnt(String subscriptionCnt) {
+		this.subscriptionCnt = subscriptionCnt;
+	}	
 }
