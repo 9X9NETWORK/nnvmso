@@ -180,11 +180,11 @@ public class MsoChannelManager {
 		return url;
 	}
 
-	public List<MsoChannel> findMsoDefaultChannels(long msoId) {		
+	public List<MsoChannel> findMsoDefaultChannels(long msoId, boolean needSubscriptionCnt) {		
 		//find msoIpg
 		MsoIpgManager msoIpgMngr = new MsoIpgManager();
-		List<MsoIpg>msoIpg = msoIpgMngr.findAllByMsoId(msoId);				
-		
+		SubscriptionLogManager sublogMngr = new SubscriptionLogManager();		
+		List<MsoIpg>msoIpg = msoIpgMngr.findAllByMsoId(msoId);						
 		//retrieve channels
 		List<MsoChannel> channels = new ArrayList<MsoChannel>();
 		for (MsoIpg i : msoIpg) {
@@ -192,6 +192,10 @@ public class MsoChannelManager {
 			if (channel != null) {
 				channel.setType(i.getType());
 				channel.setSeq(i.getSeq());
+				if (needSubscriptionCnt) {
+					SubscriptionLog sublog = sublogMngr.findByMsoIdAndChannelId(msoId, channel.getKey().getId());
+					channel.setSubscriptionCount(sublog.getCount());
+				}
 				channels.add(channel);
 			}
 		}
@@ -216,8 +220,17 @@ public class MsoChannelManager {
 		return channel;
 	}
 	
-	public List<MsoChannel> findPublicChannels() {
-		return msoChannelDao.findPublicChannels();				
+	public List<MsoChannel> findPublicChannels(boolean needSubscriptionCnt) {
+		List<MsoChannel> channels = msoChannelDao.findPublicChannels();
+		SubscriptionLogManager sublogMngr = new SubscriptionLogManager();
+		//currently the counter is brand-unaware
+		if (needSubscriptionCnt) {
+			for (MsoChannel c : channels) {
+				SubscriptionLog sublog = sublogMngr.findByChannelId(c.getKey().getId());							
+				if (sublog != null) {c.setSubscriptionCount(sublog.getCount());}			
+			}
+		}
+		return channels;
 	}	
 
 	//!!! here or dao
