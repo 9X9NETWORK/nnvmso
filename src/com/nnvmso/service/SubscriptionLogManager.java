@@ -22,4 +22,8 @@ public class SubscriptionLogManager {
 		return subDao.findByMsoIdAndChannelId(msoId, channelId);
 	}
 
+	public SubscriptionLog findByChannelId(long channelId) {
+		return subDao.findByChannelId(channelId);
+	}
+	
 }
