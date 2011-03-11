@@ -70,7 +70,7 @@ public class NnUserManager {
 	
 	public void subscibeDefaultChannels(NnUser user) {
 		MsoChannelManager channelMngr = new MsoChannelManager();		
-		List<MsoChannel> channels = channelMngr.findMsoDefaultChannels(user.getMsoId());		
+		List<MsoChannel> channels = channelMngr.findMsoDefaultChannels(user.getMsoId(), false);		
 		SubscriptionManager subManager = new SubscriptionManager();
 		for (MsoChannel c : channels) {
 			subManager.subscribeChannel(user.getKey().getId(), c.getKey().getId(), c.getSeq(), c.getType(), user.getMsoId());
