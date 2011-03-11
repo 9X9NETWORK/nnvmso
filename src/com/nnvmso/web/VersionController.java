@@ -14,7 +14,7 @@ public class VersionController {
 	public ResponseEntity<String> current() {
 		String appVersion = "12";
 		String server = "alpha";
-		String svn = "";
+		String svn = "$Revision$";
 		String info = "app version: " + appVersion + "\n"; 
 		info = info + "app server: " + server + "\n";
 		info = info + "svn: " + svn;
