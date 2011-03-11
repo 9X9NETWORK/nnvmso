@@ -7,6 +7,16 @@ import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.google.appengine.tools.mapreduce.ConfigurationXmlUtil;
+import com.google.appengine.tools.mapreduce.DatastoreInputFormat;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.mapreduce.InputFormat;
+import org.apache.hadoop.mapreduce.Mapper;
+import com.nnvmso.task.mapper.DeleteAllMapper;
+
+import java.io.IOException;
+
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -149,16 +159,19 @@ public class TranscodingServiceController {
 					info.setErrorReason("mso does not exist");				
 					return info;
 				}
-				channels = channelMngr.findMsoDefaultChannels(mso.getKey().getId());
+				channels = channelMngr.findMsoDefaultChannels(mso.getKey().getId(), true);
 			} else {
-				channels = channelMngr.findPublicChannels();
+				channels = channelMngr.findPublicChannels(true);
 			}
-
 			String[] transcodingEnv = transcodingService.getTranscodingEnv(req);		
 			String callbackUrl = transcodingEnv[1];		
 			List<Channel> cs = new ArrayList<Channel>();
 			for (MsoChannel c : channels) {
-				cs.add(new Channel(String.valueOf(c.getKey().getId()), c.getSourceUrl(), c.getTranscodingUpdateDate(), String.valueOf(c.getEnforceTranscoding())));				
+				cs.add(new Channel(String.valueOf(c.getKey().getId()), 
+						           c.getSourceUrl(), 
+						           c.getTranscodingUpdateDate(), 
+						           String.valueOf(c.getEnforceTranscoding()),
+						           String.valueOf(c.getSubscriptionCount())));
 			}
 			info.setErrorCode(String.valueOf(NnStatusCode.SUCCESS));
 			info.setErrorReason("Success");
@@ -224,23 +237,26 @@ public class TranscodingServiceController {
 		}
 		return resp;
 	}
-
-	@RequestMapping("testTask")
-	public ResponseEntity<String> testTask() {
-		System.out.println("============== task executed ============");
+	
+	/**
+	 * Need security checking 
+	 */
+	@RequestMapping("cleanPdr")
+	public ResponseEntity<String> cleanPdr() throws IOException {
+	    Configuration conf = new Configuration(false);
+	    try {
+	    	conf.setClass("mapreduce.map.class", DeleteAllMapper.class, Mapper.class);
+	        conf.setClass("mapreduce.inputformat.class", DatastoreInputFormat.class, InputFormat.class);
+	    	conf.set(DatastoreInputFormat.ENTITY_KIND_KEY, "PdrRaw");	    		    	
+	    	String configXml = ConfigurationXmlUtil.convertConfigurationToXml(conf);
+			QueueFactory.getDefaultQueue().add(					                              
+					TaskOptions.Builder.withUrl("/mapreduce/start")
+					.param("configuration", configXml)
+			); 	
+	    } catch (Exception e) {	
+	    	log.info(e.getMessage());
+	    }
 		return NnNetUtil.textReturn("OK");
 	}
-	
-	@RequestMapping("test")
-	public ResponseEntity<String> test() {
-		try {
-			QueueFactory.getDefaultQueue().add(
-					TaskOptions.Builder.withUrl("/podcastAPI/testTask")
-			);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}		 
-		return NnNetUtil.textReturn("OK");
-	}
-	
+		
 }
