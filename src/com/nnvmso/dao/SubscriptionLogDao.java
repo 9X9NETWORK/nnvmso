@@ -37,5 +37,25 @@ public class SubscriptionLogDao {
 			pm.close();
 		}
 		return s;		
+	}
+	
+	public SubscriptionLog findByChannelId(long channelId) {
+		SubscriptionLog s = null;
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		try {
+			Query q = pm.newQuery(SubscriptionLog.class);
+			q.setFilter("channelId == channelIdParam");
+			q.declareParameters("long channelIdParam");
+			@SuppressWarnings("unchecked")
+			List<SubscriptionLog> subs = (List<SubscriptionLog>)q.execute(channelId);
+			if (subs.size() > 0) {
+				s = subs.get(0);
+				s = pm.detachCopy(s);
+			}
+		} finally {
+			pm.close();
+		}
+		return s;		
 	}		
+	
 }
