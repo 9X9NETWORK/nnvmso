@@ -87,6 +87,7 @@ var jingle_timex = 0;
 var modal_box = false;
 var hint_seen = false;
 var contest_seen = false;
+var popup_active = false;
 var remembered_pause = false;
 var debug_mode = 1;
 var user_cursor;
@@ -5769,7 +5770,7 @@ function yt_tick()
   if (tube() == "yt")
     update_progress_bar();
 
-  if (thumbing == 'program')
+  if (thumbing == 'program' && !popup_active)
     $("#body").focus();
 
   /* cancel ticking if player stopped */
@@ -6150,7 +6151,7 @@ function fp_tick (id)
   if (flowplayer (id).getState() == 1)
     clearTimeout (fp [id]['timex']);
 
-  if (thumbing == 'program')
+  if (thumbing == 'program' && !popup_active)
     $("#body").focus();
   }
 
@@ -6923,8 +6924,11 @@ function fb_yes()
 
     if (fields[0] == "0")
       {
+      popup_active = true;
       FB.ui (parms, function (response)
         {
+        popup_active = false;
+        $("#body").focus();
         if (response && response.post_id)
           { log ('published'); } else { log ('not published'); }
         });
@@ -7291,7 +7295,7 @@ function noop (e)
 <div id="preload-control-images" style="display: none"></div>
 
 <div id="control-layer">
-  <div id="msg-up">
+  <div id="msg-up" onclick="control_up()">
     <p id="cup">Press <span class="enlarge">&uarr;</span> to see your Smart Guide</p>
   </div>
   <div id="controler">
@@ -7326,7 +7330,7 @@ function noop (e)
       </li>
     </ul>
   </div>
-  <div id="msg-down">
+  <div id="msg-down" onclick="control_down()">
     <p id="cdown">Press <span class="enlarge">&darr;</span> for more episodes</p>
   </div>
 </div>
