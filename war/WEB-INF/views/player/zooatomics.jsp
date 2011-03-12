@@ -2652,17 +2652,23 @@ function ipg_metainfo()
       {
       $("#ch-thumb-img").attr ("src", "");
       $("#ch-name").html ('<p></p>');
+      $("#ep-name").html ('<p></p>');
       }
     else
       {
       $("#ch-thumb-img").attr ("src", "http://9x9ui.s3.amazonaws.com/images/default_channel.png");
       if (readonly_ipg)
+        {
         $("#ch-name").html ('<p></p>');
+        $("#ep-name").html ('<p></p>');
+        }
       else
+        {
         $("#ch-name").html ('<p>' + translations ['addchannel'] + '</p>');
+        $("#ep-name").html ('<p>' + translations ['addtip'] + '</p>');
+        }
       }
 
-    $("#ep-name").html ('<p></p>');
     $("#description").html ('<p></p>');
     $("#ep-number").hide();
     $("#update").hide();
@@ -4988,10 +4994,43 @@ function browse_down()
 
 function browse_page_up()
   {
+  if (browser_mode == 'category' && browser_x == 3)
+    browse_content_up();
+  }
+
+function browse_content_up()
+  {
+  browse_list_first -= 8;
+  if (browse_list_first < 1)
+    browse_list_first = 1;
+  if (browser_x == 3)
+    {
+    browser_y -= 8;
+    if (browser_y < 1)
+      browser_y = 1;
+    }
+  redraw_browse_content();
   }
 
 function browse_page_down()
-  { 
+  {
+  if (browser_mode == 'category' && browser_x == 3)
+    browse_content_down();
+  }
+
+function browse_content_down()
+  {
+  if (browse_list_first + 8 <= n_browse_list)
+    {
+    browse_list_first += 8;
+    if (browser_x == 3)
+      {
+      browser_y += 8;
+      if (browser_y > n_browse_list)
+        browser_y = n_browse_list;
+      }
+    redraw_browse_content();
+    }
   }
 
 function browse_click (column, id)
@@ -5148,6 +5187,16 @@ function redraw_browse_content()
     }
 
   $("#content-list").html (html);
+
+  if (browse_list_first > 1)
+    $("#content-up").show();
+  else
+    $("#content-up").hide();
+
+  if (browse_list_first + 8 < n_browse_list)
+    $("#content-down").show();
+  else
+    $("#content-down").hide();
 
   $("#content-list li").bind ('click', function () { browse_click (3, $(this).attr ('id')); });
   $("#content-list li").hover (hover_in, hover_out);
@@ -7208,13 +7257,13 @@ function noop (e)
       <p class="page-down"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV43/images/arrow_down.png"></p>
     </div>
     <div class="content-panel">
-      <p class="page-up"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV43/images/arrow_up.png"></p>
+      <p class="page-up" id="content-up" onclick="browse_content_up()"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV43/images/arrow_up.png"></p>
       <div class="content-holder" style="display: block">
         <ul id="content-list"></ul>
       </div>
       <p id="ch-vacancy"></p>
       <!--a href="javascript:;" class="btn" id="btn-subscribeAll">Subscribe all</a-->
-      <p class="page-down"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV43/images/arrow_down.png"></p>
+      <p class="page-down" id="content-down" onclick="browse_content_down()"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV43/images/arrow_down.png"></p>
     </div>
   </div>
   
