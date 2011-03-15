@@ -10,11 +10,6 @@ import com.nnvmso.model.Mso;
 public class FBService {
 
 	public Model setBrandMetadata(Model model, String msoName) {
-		if (msoName != null) {
-			msoName = msoName.toLowerCase();
-		} else {
-			msoName = Mso.NAME_9X9;
-		}
 		String now = (new SimpleDateFormat("MM.dd.yyyy")).format(new Date()).toString();
 		String fbImg = "http://9x9ui.s3.amazonaws.com/9x9playerV39/images/9x9-facebook-icon.png";
 		String fbName = "My 9x9 Channel Guide " + now;
