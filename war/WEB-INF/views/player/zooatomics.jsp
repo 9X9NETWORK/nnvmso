@@ -5312,6 +5312,7 @@ function continue_acceptance (position, channel_info)
 
   redraw_ipg();
   elastic();
+  calculate_empties();
 
   dir_requires_update = true;
 
