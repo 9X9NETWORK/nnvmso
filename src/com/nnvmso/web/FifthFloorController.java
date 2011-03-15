@@ -11,11 +11,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.nnvmso.lib.CookieHelper;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.model.Mso;
-import com.nnvmso.service.FBService;
+import com.nnvmso.service.PlayerService;
 
 /** 
  * temporary controller, just used for routing, move to xml later,  
@@ -37,10 +36,8 @@ public class FifthFloorController {
 	 */
 	@RequestMapping("")
 	public String zooatomics(HttpServletResponse resp, Model model) {		
-		CookieHelper.setCookie(resp, CookieHelper.MSO, Mso.NAME_5F);
-		FBService fbService = new FBService();
-		model = fbService.setBrandMetadata(model, Mso.NAME_5F);
-		model.addAttribute("brandInfo", "5f");
+		PlayerService service = new PlayerService();
+		model = service.prepareBrand(model, Mso.NAME_5F, resp);
 		return "player/zooatomics";
 	}
 

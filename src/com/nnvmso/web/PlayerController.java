@@ -12,10 +12,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.nnvmso.lib.CookieHelper;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnNetUtil;
-import com.nnvmso.service.FBService;
+import com.nnvmso.service.PlayerService;
 
 @Controller
 @RequestMapping("")
@@ -33,17 +32,14 @@ public class PlayerController {
 	public String index() {
 		return "redirect:9x9";
 	}
+	
 	/**
 	 * to become a 9x9 player, 1)delete cookie, 2)set fb info 
 	 */	
 	@RequestMapping("9x9")
 	public String zooatomics(@RequestParam(value="mso",required=false) String mso, HttpServletRequest req, HttpServletResponse resp, Model model) {
-		//delete 5f cookie
-		CookieHelper.deleteCookie(resp, CookieHelper.MSO);
-		//fb metadata
-		FBService fbService = new FBService();
-		model = fbService.setBrandMetadata(model, mso);
-		model.addAttribute("brandInfo", "9x9");
+		PlayerService service = new PlayerService();
+		model = service.prepareBrand(model, mso, resp);		
 		return "player/zooatomics";
 	}
 

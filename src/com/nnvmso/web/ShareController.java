@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.nnvmso.lib.CookieHelper;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.model.Ipg;
 import com.nnvmso.model.Mso;
@@ -22,6 +21,7 @@ import com.nnvmso.service.IpgManager;
 import com.nnvmso.service.MsoManager;
 import com.nnvmso.service.MsoProgramManager;
 import com.nnvmso.service.NnUserManager;
+import com.nnvmso.service.PlayerService;
 
 @Controller
 @RequestMapping("share")
@@ -50,28 +50,21 @@ public class ShareController {
 			return "redirect:/";
 		}
 		
-		//fb: default values
-		FBService fbService = new FBService();
-		model = fbService.setBrandMetadata(model, Mso.NAME_9X9);
-		model.addAttribute("brandInfo", "9x9");
+		PlayerService playerService = new PlayerService();		
+		String msoName = null;
 		//find mso info of the user who shares the ipg
 		if (ipg.getUserId() != 0) { //old data does not have userId
 			NnUser user = new NnUserManager().findById(ipg.getUserId());		
 			if (user != null) {
 				log.info("This user," + user.getKey().getId() + ", shares ipg.");
 				Mso mso = new MsoManager().findById(user.getMsoId());
-				//fb: change to 5f mode
-				if (mso != null && mso.getName().equals(Mso.NAME_5F)) {
-					CookieHelper.setCookie(resp, CookieHelper.MSO, Mso.NAME_5F);
-					model = fbService.setBrandMetadata(model, Mso.NAME_5F);
-					model.addAttribute("brandInfo", "5f");
-				} else {
-					CookieHelper.deleteCookie(resp, CookieHelper.MSO);
-				}
+				if (mso != null) msoName = mso.getNameSearch();
 			}
 		}
+		model = playerService.prepareBrand(model, msoName, resp);
 
 		//fb: change to episode mode
+		FBService fbService = new FBService();
 		MsoProgramManager programMngr = new MsoProgramManager();
 		MsoProgram p = programMngr.findById(ipg.getProgramId()); 		
 		if (p != null) {
