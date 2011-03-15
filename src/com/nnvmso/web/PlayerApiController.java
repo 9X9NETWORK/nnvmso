@@ -391,8 +391,8 @@ public class PlayerApiController {
 	 *         <p>Channel info has following fields: 
 	 *         <blockquote> grid id, channel id,  <br/>
 	 *         channel name, channel description, channel image url, <br/>
-	 *         program count, type(integer, see following), status(integer, see following), <br/>
-	 *         subscription count</blockquote>
+	 *         program count, type(integer, see following), status(integer, see following)
+	 *         </blockquote>
 	 *         <p>type: TYPE_GENERAL = 1; TYPE_READONLY = 2;</p>
 	 *         <p>status: STATUS_SUCCESS = 0; STATUS_ERROR = 1; 
 	 *         <p> Example: 1	1	Channel1	http://hostname/images/img.jpg	3	1 0</p>
