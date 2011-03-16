@@ -60,6 +60,29 @@
       <value template="optinonal">String</value>
     </property>        
   </configuration>
+
+  <configuration name="Search property mapper">
+    <property>
+      <name>mapreduce.map.class</name>      
+      <value>com.nnvmso.task.mapper.SearchPropertyMapper</value>
+    </property>
+    <property>
+      <name>mapreduce.inputformat.class</name>
+      <value>com.google.appengine.tools.mapreduce.DatastoreInputFormat</value>
+    </property>    
+    <property>
+      <name human="Entity Kind to Map Over">mapreduce.mapper.inputformat.datastoreinputformat.entitykind</name>
+      <value template="optional">KindName</value>      
+    </property>    
+    <property>
+      <name human="Property to Map Over">propertyName</name>
+      <value template="optinonal">String</value>
+    </property>
+    <property>
+      <name human="Property Value to Search">search</name>
+      <value template="optinonal">String</value>
+    </property>
+  </configuration>
   
   <!-- Migrate Up Mapper -->
   <configuration name="MigrateUp MsoProgram Mapper">
@@ -208,6 +231,31 @@
       <name human="Entity Kind to Map Over">mapreduce.mapper.inputformat.datastoreinputformat.entitykind</name>
       <value template="optional">Subscription</value>
     </property>            
+  </configuration>
+            
+  <!-- Data mining Mapper -->        
+  <configuration name="Data mining User Count mapper">
+    <property>
+      <name>mapreduce.map.class</name>      
+      <value>com.nnvmso.task.mapper.DMUserCounterMapper</value>
+    </property>
+    <property>
+      <name>mapreduce.inputformat.class</name>
+      <value>com.google.appengine.tools.mapreduce.DatastoreInputFormat</value>
+    </property>    
+    <property>
+      <name human="Entity Kind to Map Over">mapreduce.mapper.inputformat.datastoreinputformat.entitykind</name>
+      <value template="optional">NnUser</value>      
+    </property>    
+    <property>
+      <name human="Since(yyyyMMddHHmmss)">since</name>
+      <value template="optinonal">20090101000000</value>
+    </property>
+    <property>
+    	<!--  This is the URL to call after the entire Mapper has run -->
+    	<name>mapreduce.appengine.donecallback.url</name>
+    	<value>/task/datamining/userCountTaskCompleted</value>
+    </property>        
   </configuration>
     
 </configurations>
