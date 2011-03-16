@@ -6274,19 +6274,30 @@ function yt_state (state)
     $("#preload").html ('YT Preloaded');
     }
 
-  if (fp_preloaded != 'yt' && (state == 1 || state == 2 || state == 3) && yt_previous_state != state)
+  if (fp_preloaded != 'yt')
     {
-    log ('restarting yt timex');
-    clearTimeout (yt_timex);
-    yt_timex = setInterval ("yt_tick()", 333);
-    }
-  else if (fp_preloaded != 'yt' && state == 0 && (yt_previous_state == 1 || yt_previous_state == 2 || yt_previous_state == 3))
-    {
-    /* change this as soon as possible */
-    yt_previous_state = state;
-    log ('yt eof');
-    ended_callback();
-    return;
+    if ((state == 1 || state == 2 || state == 3) && yt_previous_state != state)
+      {
+      log ('restarting yt timex');
+      clearTimeout (yt_timex);
+      yt_timex = setInterval ("yt_tick()", 333);
+      }
+    else if (state == 0 && (yt_previous_state == 1 || yt_previous_state == 2 || yt_previous_state == 3))
+      {
+      /* change this as soon as possible */
+      yt_previous_state = state;
+      log ('yt eof');
+      ended_callback();
+      return;
+      }
+    else if (state == 0 && yt_previous_state == -1)
+      {
+      /* theoretically impossible, but sometimes happens under IE */
+      yt_previous_state = state;
+      log ('yt confused, switching to next channel');
+      ended_callback();
+      return;
+      }
     }
 
   yt_previous_state = state;
