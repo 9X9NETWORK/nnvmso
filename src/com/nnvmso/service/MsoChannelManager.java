@@ -268,6 +268,10 @@ public class MsoChannelManager {
 		return channels;
 	}
 		
+	public List<MsoChannel> findfindAllAfterTheDate(Date since) {
+		return msoChannelDao.findAllAfterTheDate(since);
+	}
+	
 	//!!! limit
 	public List<MsoChannel> findAll() {
 		return msoChannelDao.findAll();
@@ -290,7 +294,7 @@ public class MsoChannelManager {
 				if (cache.get(this.getCacheKey(c.getKey().getId())) != null) {
 					cachedChannels.add(c);
 				}
-			}			
+			}
 		}
 		return cachedChannels;
 	}
