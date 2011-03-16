@@ -1,11 +1,12 @@
 package com.nnvmso.web.json.transcodingservice;
 
+
 /**
  * Receive Podcast Program information from Transcoding Service 
  */
 public class RtnProgram {
 	private String action;
-	private String key; //channel key
+	private String key; //channel id
 	private String errorCode;
 	private String errorReason;
 	private RtnProgramItem[] items;
