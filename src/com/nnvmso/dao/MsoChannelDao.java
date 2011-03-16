@@ -1,6 +1,7 @@
 package com.nnvmso.dao;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.jdo.JDOObjectNotFoundException;
@@ -82,6 +83,24 @@ public class MsoChannelDao {
 		}
 		return channel;				
 	}	
+	
+	public List<MsoChannel> findAllAfterTheDate(Date date) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		List<MsoChannel> detached = new ArrayList<MsoChannel>(); 
+		try {
+			Query q = pm.newQuery(MsoChannel.class);
+			q.setFilter("createDate > createDateSince");
+			q.declareImports("import java.util.Date");
+			q.declareParameters("Date createDateSince");
+			q.setOrdering("createDate asc");
+			@SuppressWarnings("unchecked")
+			List<MsoChannel> channels = (List<MsoChannel>) q.execute(new Date());
+			detached = (List<MsoChannel>)pm.detachCopyAll(channels);
+		} finally {
+			pm.close();
+		}
+		return detached;
+	}
 	
 	//assuming no duplication, carefully deal with this later 
 	public MsoChannel findBySourceUrlSearch(String url) {
