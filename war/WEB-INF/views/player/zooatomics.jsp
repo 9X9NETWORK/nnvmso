@@ -519,6 +519,9 @@ function align_center()
   for (var v in { signin:0, hint:0, confirm:0, yesno:0, about:0 })
     $("#" + v + "-holder").css ("margin-top",  (wh - $("#" + v + "-holder").height()) / 2);
 
+  if ($.browser.msie && $.browser.version == 7)
+    $("#control-layer, #control-bar").css ("width", ww);
+
   //if (sitename == '5f')
     {
     $("#contest-layer").css ("left", (ww - $("#contest-layer").width())  / 2);
