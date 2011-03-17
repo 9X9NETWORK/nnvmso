@@ -7490,7 +7490,7 @@ function noop (e)
   <img src="http://9x9ui.s3.amazonaws.com/9x9playerV43/images/btn_winclose.png" id="contest-close-btn">
   <div id="contest-innards">
         <a href="/5f/sharetowin.html" target="_blank"></a>
-    <p>&nbsp;&nbsp;現在有<span id="nowserving"></span>人完成任務</p>
+    <p style="display: none">&nbsp;&nbsp;現在有<span id="nowserving"></span>人完成任務</p>
   </div>
 </div>
 
