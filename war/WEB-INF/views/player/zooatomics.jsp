@@ -4765,7 +4765,7 @@ function browse_set_cursor (x, y)
       $("#category-panel").hide();
       $("#add-panel").show();
       $(".btn").hover (hover_in, hover_out);
-      //$("#submit-url").val ("Paste a podcast or YouTube channel URL here");
+      $("#submit-url").val ("http://");
       browser_mode = 'add';
       }
     }
