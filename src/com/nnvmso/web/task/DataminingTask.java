@@ -70,16 +70,15 @@ public class DataminingTask {
 	public ResponseEntity<String> channelCountTask() throws IOException {
 		List<MsoChannel> list = new ArrayList<MsoChannel>();
     	Date now = new Date();
-    	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");    	
+    	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");    	
     	String since = sdf.format(now);
-    	since = since.substring(0, 9) + "000000";
-    	log.info("Count channel since:" + since);
+    	since = since + "000000";
 		try {
 			Date sinceDate = sdf.parse(since);
 	    	MsoChannelManager channelMngr = new MsoChannelManager();
 	    	list = channelMngr.findfindAllAfterTheDate(sinceDate);
 			EmailService emailService = new EmailService();			
-			String subject = since + " user account statistics";
+			String subject = since.substring(0, 8) + " new channels";
 			String msgBody = "New Channel Count:" + list.size() + "\n";
 			for (MsoChannel c : list) {
 				msgBody = msgBody + "name:" +  c.getName() + ";url=" + c.getSourceUrl();
