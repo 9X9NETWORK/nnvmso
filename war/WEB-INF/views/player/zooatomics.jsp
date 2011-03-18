@@ -7456,22 +7456,13 @@ function noop (e)
 <div id="control-layer" style="display: block;">
     <img src="http://9x9ui.s3.amazonaws.com/9x9playerV45/images/bg_controler.png" id="controler-bg">
     <ul id="control-bar">
-      <li id="btn-replay" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV45/images/btn_replay.png" title="Play from beginning"></li>
-      <li id="btn-rewind" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV45/images/btn_rewind.png" title="Rewind"></li>
-      <li id="btn-play" class="cpclick on"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV45/images/btn_play.png" title="Play"></li>
-      <li id="btn-pause" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV45/images/btn_pause.png" title="Pause"></li>
-      <li id="btn-forward" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV45/images/btn_forward.png" title="Fast forward" ></li>
-      <li class="divider"></li>
-      <li id="btn-sg" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV45/images/btn_sg.png" title="Return to Smart Guide "></li>
-      <li id="btn-facebook" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV45/images/btn_facebook.png" title="Share to Facebook"></li>
-      <li class="divider"></li>
-      <li id="instruction"><span id="cinstr">Mouse over the control bar to see episodes.</span></li>
-      <li id="play-time">00:52 / 01:32</li>
+      <li id="play-time">00:00 / 00:00</li>
       <li id="progress-bar">
         <p id="loaded" style="width: 100%"></p>
         <p id="played"></p>
       </li>
-      <li class="divider-r"></li>
+      <li class="divider"></li>
+      <li id="instruction"><span id="cinstr">Mouse over the control bar to see episodes.</span></li>
       <li id="volume-constrain" class="on">
         <ul id="volume-bars">
           <li></li>
@@ -7485,6 +7476,16 @@ function noop (e)
       </li>
       <li id="btn-volume" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV45/images/btn_volume.png" title="Volume"></li>
       <li id="btn-mute"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV45/images/btn_mute.png" title="Mute"></li>
+      <li class="divider-r">
+      <li id="btn-facebook" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV45/images/btn_facebook.png" title="Share to Facebook"></li>
+      <li id="btn-sg" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV45/images/btn_sg.png" title="Return to Smart Guide "></li>
+      <li class="divider-r">
+      <li id="btn-forward" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV45/images/btn_forward.png" title="Fast forward" ></li>
+      <li id="btn-pause" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV45/images/btn_pause.png" title="Pause"></li>
+      <li id="btn-play" class="cpclick on"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV45/images/btn_play.png" title="Play"></li>
+      <li id="btn-rewind" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV45/images/btn_rewind.png" title="Rewind"></li>
+      <li id="btn-replay" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV45/images/btn_replay.png" title="Play from beginning"></li>
+      <li class="divider-r"></li>
     </ul>
 </div>
 
