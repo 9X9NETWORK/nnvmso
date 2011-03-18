@@ -302,7 +302,17 @@ var language_en =
   ago: 'ago',
   hence: 'hence',
   expired: 'This episode has expired and is no longer available. Click OK to visit your Smart Guide where you may select another episode or channel.',
-  cinstr: 'Mouse over the control bar to see episodes'
+  cinstr: 'Mouse over the control bar to see episodes',
+  creplay: 'Play from the beginning',
+  crw: 'Rewind',
+  cplay: 'Play',
+  cpause: 'Pause',
+  cff: 'Fast forward',
+  cipg: 'Return to Smart Guide',
+  cfb: 'Share to Facebook',
+  cvol: 'Volume',
+  cmute: 'Mute',
+  cunmute: 'Unmute'
   };
 
 var language_tw =
@@ -414,7 +424,17 @@ var language_tw =
   ago: '前',
   hence: '後',
   expired: '本節目已經不存在，請點選OK進入Smart Guide，選擇其它頻道或節目開始觀看。',
-  cinstr: '將滑鼠移到這裡即可看到節目列表'
+  cinstr: '將滑鼠移到這裡即可看到節目列表',
+  creplay: '從頭開始播放',
+  crw: '回轉',
+  cplay: '播放',
+  cpause: '暫停',
+  cff: '快轉',
+  cipg: '回到 Smart Guide',
+  cfb: '分享至 Facebook',
+  cvol: '音量',
+  cmute: '靜音',
+  cunmute: '恢復音量'
   };
 
 var translations = language_en;
@@ -596,6 +616,16 @@ function set_language (lang)
   $("#newusers").html (translations ['newusers']);
   $("#signup").html (translations ['signup']);
   $("#cinstr").html (translations ['cinstr']);
+
+  $("#btn-volume img").attr ("title", translations ['cvol']);
+  $("#btn-mute img").attr ("title", translations ['cunmute']);
+  $("#btn-facebook img").attr ("title", translations ['cfb']);
+  $("#btn-sg img").attr ("title", translations ['cipg']);
+  $("#btn-forward img").attr ("title", translations ['cff']);
+  $("#btn-pause img").attr ("title", translations ['cpause']);
+  $("#btn-play img").attr ("title", translations ['cplay']);
+  $("#btn-rewind img").attr ("title", translations ['crw']);
+  $("#btn-replay img").attr ("title", translations ['creplay']);
   }
 
 function resize_fp()
@@ -2642,7 +2672,7 @@ function ipg_metainfo()
       if (debug_mode)
         display_eps = channelgrid [ipg_cursor]['count'] + ' [' + n_eps + ']';
 
-      if (! ('refetched' in channelgrid [ipg_cursor]))
+      if (ipg_mode != 'edit' && ! ('refetched' in channelgrid [ipg_cursor]))
         {
         channelgrid [ipg_cursor]['refetched'] = true;
 
