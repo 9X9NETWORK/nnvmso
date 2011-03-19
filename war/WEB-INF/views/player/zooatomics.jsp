@@ -4828,6 +4828,7 @@ function browse_set_cursor (x, y)
       $("#add-go").removeClass ("on");
       $("#category-panel").hide();
       $("#add-panel").show();
+      $("#submit-url").focus (submit_focus);
       $(".btn").hover (hover_in, hover_out);
       $("#submit-url").val ("http://");
       browser_mode = 'add';
@@ -4894,6 +4895,20 @@ function browse_set_cursor (x, y)
     dir_requires_update = false;
     redraw_browse_content();
     }
+  }
+
+function submit_focus()
+  {
+  if (! $("#submit-url-box").hasClass ("on"))
+    {
+    $("#submit-url-box").addClass ("on");
+    browse_set_cursor (2, 1);
+    }
+  }
+
+function submit_blur()
+  {
+  $("#submit-url-box").removeClass ("on");
   }
 
 function browse_left()
