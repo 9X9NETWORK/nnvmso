@@ -8,7 +8,7 @@ import com.nnvmso.model.PdrRaw;
 
 public class PdrRawManager {
 
-	protected static final Logger log = Logger.getLogger(NnUserManager.class.getName());
+	protected static final Logger log = Logger.getLogger(PdrRawManager.class.getName());
 	
 	private PdrRawDao pdrDao= new PdrRawDao();
 			

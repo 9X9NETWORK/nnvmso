@@ -15,7 +15,7 @@ import com.nnvmso.model.Subscription;
 
 public class IpgManager {
 
-	protected static final Logger log = Logger.getLogger(IpgDao.class.getName());
+	protected static final Logger log = Logger.getLogger(IpgManager.class.getName());
 	
 	private IpgDao ipgDao = new IpgDao();	
 	

@@ -10,7 +10,7 @@ import com.nnvmso.model.ViewLog;
 
 public class ViewLogManager {
 
-	protected static final Logger log = Logger.getLogger(NnUserManager.class.getName());
+	protected static final Logger log = Logger.getLogger(ViewLogManager.class.getName());
 	
 	private ViewLogDao watchedDao= new ViewLogDao();
 					

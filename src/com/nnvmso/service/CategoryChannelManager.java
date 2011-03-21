@@ -11,7 +11,7 @@ import com.nnvmso.model.MsoChannel;
 
 public class CategoryChannelManager {
 	
-	protected static final Logger log = Logger.getLogger(CategoryManager.class.getName());
+	protected static final Logger log = Logger.getLogger(CategoryChannelManager.class.getName());
 	
 	private CategoryChannelDao ccDao = new CategoryChannelDao();		
 	
