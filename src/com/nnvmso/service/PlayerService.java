@@ -20,13 +20,9 @@ public class PlayerService {
 		model = fbService.setBrandMetadata(model, msoName);
 		if (msoName.equals(Mso.NAME_5F)) {
 			model.addAttribute("brandInfo", "5f");
-			model.addAttribute("gaqAccount", "UA-21595932-2");		
-			model.addAttribute("gaqDomainName", "5f.tv");
 			CookieHelper.setCookie(resp, CookieHelper.MSO, Mso.NAME_5F);
 		} else {
 			model.addAttribute("brandInfo", "9x9");
-			model.addAttribute("gaqAccount", "UA-21595932-1");		
-			model.addAttribute("gaqDomainName", "9x9.tv");
 			CookieHelper.deleteCookie(resp, CookieHelper.MSO); //delete brand cookie
 		}
 		return model;		
