@@ -25,8 +25,8 @@
 <script type="text/javascript">
 var analytz = false;
 var _gaq = _gaq || [];
-_gaq.push(['_setAccount', '${gaqAccount}']);
-_gaq.push(['_setDomainName', '.${gaqDomainName}']);
+_gaq.push(['_setAccount', 'UA-21595932-1']);
+_gaq.push(['_setDomainName', '.9x9.tv']);
 _gaq.push(['_trackPageview']);
 function analytics()
   {
