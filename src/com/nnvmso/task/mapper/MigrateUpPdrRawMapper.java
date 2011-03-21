@@ -10,7 +10,7 @@ import com.google.appengine.tools.mapreduce.AppEngineMapper;
 import com.google.appengine.tools.mapreduce.DatastoreMutationPool;
 
 public class MigrateUpPdrRawMapper extends AppEngineMapper<Key, Entity, NullWritable, NullWritable>{
-	private static final Logger log = Logger.getLogger(AddPropertyMapper.class.getName());
+	private static final Logger log = Logger.getLogger(MigrateUpPdrRawMapper.class.getName());
 
 	@Override
 	public void map(Key key, Entity value, Context context) {
