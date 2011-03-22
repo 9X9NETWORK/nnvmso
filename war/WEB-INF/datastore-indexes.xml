@@ -49,6 +49,10 @@
   </datastore-index>   
   <datastore-index kind="MsoProgram" ancestor="false" source="manual">
     <property name="channelId" direction="asc"/>
+    <property name="pubDate" direction="asc"/>
+  </datastore-index>  
+  <datastore-index kind="MsoProgram" ancestor="false" source="manual">
+    <property name="channelId" direction="asc"/>
     <property name="pubDate" direction="desc"/>
   </datastore-index>  
   <datastore-index kind="MsoProgram" ancestor="false" source="manual">
@@ -81,4 +85,141 @@
   <datastore-index kind="ViewLog" ancestor="false" source="manual">
     <property name="__key__" direction="desc"/>
   </datastore-index>                
+  <!-- Used by Admin Portal -->
+  <datastore-index kind="MsoProgram" ancestor="false" source="auto">
+    <property name="channelId" direction="asc"/>
+    <property name="updateDate" direction="asc"/>
+  </datastore-index>
+  <datastore-index kind="MsoProgram" ancestor="false" source="auto">
+    <property name="channelId" direction="asc"/>
+    <property name="updateDate" direction="desc"/>
+  </datastore-index>
+  <datastore-index kind="MsoProgram" ancestor="false" source="auto">
+    <property name="channelId" direction="asc"/>
+    <property name="name" direction="asc"/>
+  </datastore-index>
+  <datastore-index kind="MsoProgram" ancestor="false" source="auto">
+    <property name="channelId" direction="asc"/>
+    <property name="name" direction="desc"/>
+  </datastore-index>
+  <datastore-index kind="MsoProgram" ancestor="false" source="auto">
+    <property name="channelId" direction="asc"/>
+    <property name="status" direction="asc"/>
+  </datastore-index>
+  <datastore-index kind="MsoProgram" ancestor="false" source="auto">
+    <property name="channelId" direction="asc"/>
+    <property name="status" direction="desc"/>
+  </datastore-index>
+  <datastore-index kind="MsoProgram" ancestor="false" source="auto">
+    <property name="channelId" direction="asc"/>
+    <property name="type" direction="asc"/>
+  </datastore-index>
+  <datastore-index kind="MsoProgram" ancestor="false" source="auto">
+    <property name="channelId" direction="asc"/>
+    <property name="type" direction="desc"/>
+  </datastore-index>
+  <datastore-index kind="MsoProgram" ancestor="false" source="auto">
+    <property name="channelId" direction="asc"/>
+    <property name="isPublic" direction="asc"/>
+  </datastore-index>
+  <datastore-index kind="MsoProgram" ancestor="false" source="auto">
+    <property name="channelId" direction="asc"/>
+    <property name="isPublic" direction="desc"/>
+  </datastore-index>
+  <datastore-index kind="CategoryChannel" ancestor="false" source="auto">
+    <property name="categoryId" direction="asc"/>
+    <property name="channelId" direction="asc"/>
+  </datastore-index>
+  <datastore-index kind="CategoryChannel" ancestor="false" source="auto">
+    <property name="categoryId" direction="asc"/>
+    <property name="channelId" direction="desc"/>
+  </datastore-index>
+  <datastore-index kind="CategoryChannel" ancestor="false" source="auto">
+    <property name="categoryId" direction="asc"/>
+    <property name="updateDate" direction="asc"/>
+  </datastore-index>
+  <datastore-index kind="CategoryChannel" ancestor="false" source="auto">
+    <property name="categoryId" direction="asc"/>
+    <property name="updateDate" direction="desc"/>
+  </datastore-index>
+  <datastore-index kind="CategoryChannel" ancestor="false" source="auto">
+    <property name="channelId" direction="asc"/>
+    <property name="updateDate" direction="asc"/>
+  </datastore-index>
+  <datastore-index kind="CategoryChannel" ancestor="false" source="auto">
+    <property name="channelId" direction="asc"/>
+    <property name="updateDate" direction="desc"/>
+  </datastore-index>
+  <datastore-index kind="CategoryChannel" ancestor="false" source="auto">
+    <property name="channelId" direction="asc"/>
+    <property name="categoryId" direction="asc"/>
+  </datastore-index>
+  <datastore-index kind="CategoryChannel" ancestor="false" source="auto">
+    <property name="channelId" direction="asc"/>
+    <property name="categoryId" direction="desc"/>
+  </datastore-index>
+  <datastore-index kind="MsoIpg" ancestor="false" source="auto">
+    <property name="msoId" direction="asc"/>
+    <property name="updateDate" direction="asc"/>
+  </datastore-index>
+  <datastore-index kind="MsoIpg" ancestor="false" source="auto">
+    <property name="msoId" direction="asc"/>
+    <property name="updateDate" direction="desc"/>
+  </datastore-index>
+  <datastore-index kind="MsoIpg" ancestor="false" source="auto">
+    <property name="msoId" direction="asc"/>
+    <property name="channelId" direction="asc"/>
+  </datastore-index>
+  <datastore-index kind="MsoIpg" ancestor="false" source="auto">
+    <property name="msoId" direction="asc"/>
+    <property name="channelId" direction="desc"/>
+  </datastore-index>
+  <datastore-index kind="MsoIpg" ancestor="false" source="auto">
+    <property name="msoId" direction="asc"/>
+    <property name="type" direction="asc"/>
+  </datastore-index>
+  <datastore-index kind="MsoIpg" ancestor="false" source="auto">
+    <property name="msoId" direction="asc"/>
+    <property name="type" direction="desc"/>
+  </datastore-index>
+  <datastore-index kind="MsoIpg" ancestor="false" source="auto">
+    <property name="msoId" direction="asc"/>
+    <property name="seq" direction="asc"/>
+  </datastore-index>
+  <datastore-index kind="MsoIpg" ancestor="false" source="auto">
+    <property name="msoId" direction="asc"/>
+    <property name="seq" direction="desc"/>
+  </datastore-index>
+  <datastore-index kind="Subscription" ancestor="false" source="auto">
+    <property name="userId" direction="asc"/>
+    <property name="updateDate" direction="asc"/>
+  </datastore-index>
+  <datastore-index kind="Subscription" ancestor="false" source="auto">
+    <property name="userId" direction="asc"/>
+    <property name="updateDate" direction="desc"/>
+  </datastore-index>
+  <datastore-index kind="Subscription" ancestor="false" source="auto">
+    <property name="userId" direction="asc"/>
+    <property name="channelId" direction="asc"/>
+  </datastore-index>
+  <datastore-index kind="Subscription" ancestor="false" source="auto">
+    <property name="userId" direction="asc"/>
+    <property name="channelId" direction="desc"/>
+  </datastore-index>
+  <datastore-index kind="Subscription" ancestor="false" source="auto">
+    <property name="userId" direction="asc"/>
+    <property name="seq" direction="asc"/>
+  </datastore-index>
+  <datastore-index kind="Subscription" ancestor="false" source="auto">
+    <property name="userId" direction="asc"/>
+    <property name="seq" direction="desc"/>
+  </datastore-index>
+  <datastore-index kind="Subscription" ancestor="false" source="auto">
+    <property name="userId" direction="asc"/>
+    <property name="type" direction="asc"/>
+  </datastore-index>
+  <datastore-index kind="Subscription" ancestor="false" source="auto">
+    <property name="userId" direction="asc"/>
+    <property name="type" direction="desc"/>
+  </datastore-index>
 </datastore-indexes>
