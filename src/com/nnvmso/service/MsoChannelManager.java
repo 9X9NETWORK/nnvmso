@@ -277,6 +277,22 @@ public class MsoChannelManager {
 		return msoChannelDao.findAll();
 	}
 	
+	public List<MsoChannel> list(int page, int limit, String sidx, String sord) {
+		return msoChannelDao.list(page, limit, sidx, sord);
+	}
+	
+	public List<MsoChannel> list(int page, int limit, String sidx, String sord, String filter) {
+		return msoChannelDao.list(page, limit, sidx, sord, filter);
+	}
+	
+	public int total() {
+		return msoChannelDao.total();
+	}
+	
+	public int total(String filter) {
+		return msoChannelDao.total(filter);
+	}
+	
 	public MsoChannel findByKey(Key key) {
 		return msoChannelDao.findByKey(key);
 	}

@@ -245,6 +245,22 @@ public class MsoProgramManager {
 		return msoProgramDao.findByKey(key);
 	}
 	
+	public List<MsoProgram> list(int page, int limit, String sidx, String sord) {
+		return msoProgramDao.list(page, limit, sidx, sord);
+	}
+	
+	public List<MsoProgram> list(int page, int limit, String sidx, String sord, String filter) {
+		return msoProgramDao.list(page, limit, sidx, sord, filter);
+	}
+	
+	public int total() {
+		return msoProgramDao.total();
+	}
+	
+	public int total(String filter) {
+		return msoProgramDao.total(filter);
+	}
+	
 	public List<MsoProgram> findAllByChannelId(long channelId) {
 		return msoProgramDao.findAllByChannelId(channelId);
 	}

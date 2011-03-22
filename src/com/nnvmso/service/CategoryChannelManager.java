@@ -35,7 +35,7 @@ public class CategoryChannelManager {
 		if (categories.size() == 0) {return;}
 				
 		for (Category c : categories) {	
-			CategoryChannel cc = this.findByCategoryIdAndChanelId(c.getKey().getId(), channel.getKey().getId());
+			CategoryChannel cc = this.findByCategoryIdAndChannelId(c.getKey().getId(), channel.getKey().getId());
 			if (cc != null) {
 				this.delete(cc);
 			}
@@ -53,11 +53,27 @@ public class CategoryChannelManager {
 		return ccs;
 	}
 
-	public CategoryChannel findByCategoryIdAndChanelId(long categoryId, long channelId) {
+	public CategoryChannel findByCategoryIdAndChannelId(long categoryId, long channelId) {
 		return ccDao.findByCategoryIdAndChannelId(categoryId, channelId);
 	}
 	
 	public CategoryChannel findById(long id) {
 		return ccDao.findById(id);
+	}
+	
+	public List<CategoryChannel> list(int page, int limit, String sidx, String sord) {
+		return ccDao.list(page, limit, sidx, sord);
+	}
+	
+	public List<CategoryChannel> list(int page, int limit, String sidx, String sord, String filter) {
+		return ccDao.list(page, limit, sidx, sord, filter);
+	}
+	
+	public int total() {
+		return ccDao.total();
+	}
+	
+	public int total(String filter) {
+		return ccDao.total(filter);
 	}
 }

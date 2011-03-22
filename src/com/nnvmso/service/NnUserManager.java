@@ -94,4 +94,20 @@ public class NnUserManager {
 		return nnUserDao.findById(id);
 	}
 	
+	public List<NnUser> list(int page, int limit, String sidx, String sord) {
+		return nnUserDao.list(page, limit, sidx, sord);
+	}
+	
+	public List<NnUser> list(int page, int limit, String sidx, String sord, String filter) {
+		return nnUserDao.list(page, limit, sidx, sord, filter);
+	}
+	
+	public int total() {
+		return nnUserDao.total();
+	}
+	
+	public int total(String filter) {
+		return nnUserDao.total(filter);
+	}
+	
 }

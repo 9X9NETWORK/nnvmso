@@ -132,7 +132,23 @@ public class CategoryManager {
 	public Category findByKey(Key key) {
 		return categoryDao.findByKey(key);
 	}
-
+	
+	public List<Category> list(int page, int limit, String sidx, String sord) {
+		return categoryDao.list(page, limit, sidx, sord);
+	}
+	
+	public List<Category> list(int page, int limit, String sidx, String sord, String filter) {
+		return categoryDao.list(page, limit, sidx, sord, filter);
+	}
+	
+	public int total() {
+		return categoryDao.total();
+	}
+	
+	public int total(String filter) {
+		return categoryDao.total(filter);
+	}
+	
 	//result will be cached
 	public List<Category> findAllByMsoId(long msoId) {
 		List<Category> categories = new ArrayList<Category>();

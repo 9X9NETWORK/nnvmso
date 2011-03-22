@@ -32,6 +32,11 @@ public class MsoIpgManager {
 		msoIpgDao.save(msoIpg);
 	}
 	
+	public void deleteMsoIpg(long msoIpgId) {
+		MsoIpg msoIpg = msoIpgDao.findById(msoIpgId);
+		if (msoIpg != null) { msoIpgDao.delete(msoIpg); }
+	}
+	
 	public void deleteMsoIpg(long msoId, long channelId) {
 		MsoIpg msoIpg = msoIpgDao.findByMsoIdAndChannelId(msoId, channelId);
 		if (msoIpg != null) { msoIpgDao.delete(msoIpg); }
@@ -48,4 +53,21 @@ public class MsoIpgManager {
 	public MsoIpg findByMsoIdAndSeq(long msoId, int seq) {
 		return msoIpgDao.findByMsoIdAndSeq(msoId, seq);
 	}
+	
+	public List<MsoIpg> list(int page, int limit, String sidx, String sord) {
+		return msoIpgDao.list(page, limit, sidx, sord);
+	}
+	
+	public List<MsoIpg> list(int page, int limit, String sidx, String sord, String filter) {
+		return msoIpgDao.list(page, limit, sidx, sord, filter);
+	}
+	
+	public int total() {
+		return msoIpgDao.total();
+	}
+	
+	public int total(String filter) {
+		return msoIpgDao.total(filter);
+	}
+	
 }

@@ -83,4 +83,21 @@ public class SubscriptionManager {
 		subDao.save(sub);
 		return true;
 	}
+	
+	public List<Subscription> list(int page, int limit, String sidx, String sord) {
+		return subDao.list(page, limit, sidx, sord);
+	}
+	
+	public List<Subscription> list(int page, int limit, String sidx, String sord, String filter) {
+		return subDao.list(page, limit, sidx, sord, filter);
+	}
+	
+	public int total() {
+		return subDao.total();
+	}
+	
+	public int total(String filter) {
+		return subDao.total(filter);
+	}
+	
 }
