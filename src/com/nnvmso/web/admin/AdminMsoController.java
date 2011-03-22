@@ -29,6 +29,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 import com.nnvmso.lib.*;
 import com.nnvmso.model.Mso;
+import com.nnvmso.model.NnUser;
 import com.nnvmso.service.*;
 
 @Controller
@@ -90,6 +91,7 @@ public class AdminMsoController {
 	                 @RequestParam(value = "sord") String       sortDirection,
 	                                               OutputStream out) {
 		
+		NnUserManager userMngr = new NnUserManager();
 		ObjectMapper mapper = new ObjectMapper();
 		List<Map> dataRows = new ArrayList<Map>();
 		
@@ -117,6 +119,7 @@ public class AdminMsoController {
 			cell.add(mso.getPreferredLangCode());
 			cell.add(mso.getContactEmail());
 			cell.add(mso.getIntro());
+			cell.add(userMngr.total("msoId == " + mso.getKey().getId() + " && email != '" + NnUser.GUEST_EMAIL + "'"));
 			
 			map.put("id", mso.getKey().getId());
 			map.put("cell", cell);

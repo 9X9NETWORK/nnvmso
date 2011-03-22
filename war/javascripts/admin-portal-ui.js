@@ -1049,6 +1049,16 @@ $(function()
               disabled: true,
               value:    '0:Unknown;1:System;2:Podcast;3:YouTube'
             }
+          },
+          {
+            label:    'Sub. Count',
+            name:     'subscriberCount',
+            index:    'subscriberCount',
+            width:    90,
+            align:    'center',
+            sortable: false,
+            hidden:   false,
+            editable: false
           }
         ],
         url:         '/admin/category/channelList?category=' + rowId,
@@ -1333,6 +1343,16 @@ $(function()
         {
           edithidden: true
         }
+      },
+      {
+        label:    'Viewers',
+        name:     'viewers',
+        index:    'viewwers',
+        width:    70,
+        align:    'center',
+        sortable: false,
+        hidden:   false,
+        editable: false
       }
     ],
     url:         '/admin/mso/list',

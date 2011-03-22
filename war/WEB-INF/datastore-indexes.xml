@@ -222,4 +222,8 @@
     <property name="userId" direction="asc"/>
     <property name="type" direction="desc"/>
   </datastore-index>
+  <datastore-index kind="NnUser" ancestor="false" source="manual">
+    <property name="msoId" direction="asc"/>
+    <property name="email" direction="desc"/>
+  </datastore-index>  
 </datastore-indexes>

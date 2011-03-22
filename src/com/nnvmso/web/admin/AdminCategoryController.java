@@ -36,10 +36,12 @@ import com.nnvmso.model.Category;
 import com.nnvmso.model.CategoryChannel;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
+import com.nnvmso.model.SubscriptionLog;
 import com.nnvmso.service.CategoryChannelManager;
 import com.nnvmso.service.CategoryManager;
 import com.nnvmso.service.MsoChannelManager;
 import com.nnvmso.service.MsoManager;
+import com.nnvmso.service.SubscriptionLogManager;
 
 @Controller
 @RequestMapping("admin/category")
@@ -94,10 +96,22 @@ public class AdminCategoryController {
 	                        @RequestParam(value = "sord")     String       sortDirection,
 	                                                          OutputStream out) {
 		
-		CategoryChannelManager ccMngr = new CategoryChannelManager();
-		MsoChannelManager channelMngr = new MsoChannelManager();
+		SubscriptionLogManager subLogMngr  = new SubscriptionLogManager();
+		CategoryChannelManager ccMngr      = new CategoryChannelManager();
+		MsoChannelManager      channelMngr = new MsoChannelManager();
+		
 		ObjectMapper mapper = new ObjectMapper();
 		List<Map> dataRows = new ArrayList<Map>();
+		
+		Category category = categoryMngr.findById(categoryId);
+		if (category == null) {
+			try {
+				mapper.writeValue(out, JqgridHelper.composeJqgridResponse(1, 1, 0, new ArrayList<Map>()));
+			} catch (IOException e) {
+				logger.warning(e.getMessage());
+			}
+			return;
+		}
 		
 		String filter = "categoryId == " + categoryId;
 		int totalRecords = ccMngr.total(filter);
@@ -113,6 +127,10 @@ public class AdminCategoryController {
 			List<Object> cell = new ArrayList<Object>();
 			
 			MsoChannel channel = channelMngr.findById(cc.getChannelId());
+			SubscriptionLog subLog = subLogMngr.findByMsoIdAndChannelId(category.getMsoId(), cc.getChannelId());
+			int subscribers = 0;
+			if (subLog != null)
+				subscribers = subLog.getCount();
 			
 			cell.add(cc.getCategoryId());
 			cell.add(cc.getChannelId());
@@ -121,6 +139,7 @@ public class AdminCategoryController {
 			cell.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(cc.getCreateDate()));
 			cell.add(channel.isPublic());
 			cell.add(channel.getType());
+			cell.add(subscribers);
 			
 			map.put("id", cc.getKey().getId());
 			map.put("cell", cell);
