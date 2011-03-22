@@ -32,6 +32,7 @@ import com.nnvmso.model.*;
 import com.nnvmso.service.CategoryChannelManager;
 import com.nnvmso.service.CategoryManager;
 import com.nnvmso.service.MsoChannelManager;
+import com.nnvmso.service.SubscriptionLogManager;
 
 @Controller
 @RequestMapping("admin/channel")
@@ -106,6 +107,7 @@ public class AdminMsoChannelController {
 	                 @RequestParam(value = "sord") String       sortDirection,
 	                                               OutputStream out) {
 		
+		SubscriptionLogManager subLogMngr = new SubscriptionLogManager();
 		ObjectMapper mapper = new ObjectMapper();
 		List<Map> dataRows = new ArrayList<Map>();
 		
@@ -131,6 +133,7 @@ public class AdminMsoChannelController {
 			cell.add(channel.getContentType());
 			cell.add(channel.isPublic());
 			cell.add(channel.getProgramCount());
+			cell.add(subLogMngr.findTotalCountByChannelId(channel.getKey().getId()));
 			cell.add(channel.getIntro());
 			
 			map.put("id", channel.getKey().getId());

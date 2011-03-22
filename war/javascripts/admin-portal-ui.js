@@ -176,6 +176,21 @@ $(function()
         }
       },
       {
+        label:    'Sub. Count',
+        name:     'subscriptionCount',
+        index:    'subscriptionCount',
+        width:    80,
+        align:    'center',
+        sortable: false,
+        hidden:   false,
+        editable: false,
+        editrules:
+        {
+          integer:    true,
+          edithidden: true
+        }
+      },
+      {
         label:    'Introduction',
         name:     'intro',
         index:    'intro',

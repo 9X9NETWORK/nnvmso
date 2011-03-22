@@ -39,6 +39,24 @@ public class SubscriptionLogDao {
 		return s;		
 	}
 	
+	public int findTotalCountByChannelId(long channelId) {
+		
+		int totalCount = 0;
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		try {
+			Query q = pm.newQuery(SubscriptionLog.class);
+			q.setFilter("channelId == channelIdParam");
+			q.declareParameters("long channelIdParam");
+			@SuppressWarnings("unchecked")
+			List<SubscriptionLog> subs = (List<SubscriptionLog>)q.execute(channelId);
+			for (SubscriptionLog s : subs)
+				totalCount += s.getCount();
+		} finally {
+			pm.close();
+		}
+		return totalCount;
+	}
+	
 	public SubscriptionLog findByChannelId(long channelId) {
 		SubscriptionLog s = null;
 		PersistenceManager pm = PMF.get().getPersistenceManager();
