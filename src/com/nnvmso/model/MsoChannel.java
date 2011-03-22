@@ -61,25 +61,25 @@ public class MsoChannel implements Serializable {
 
 	@Persistent
 	public short contentType;
-	public static short CONTENTTYPE_SYSTEM = 1;
-	public static short CONTENTTYPE_PODCAST = 2;
-	public static short CONTENTTYPE_YOUTUBE = 3;
+	public static final short CONTENTTYPE_SYSTEM = 1;
+	public static final short CONTENTTYPE_PODCAST = 2;
+	public static final short CONTENTTYPE_YOUTUBE = 3;
 	
 	@Persistent
 	private short status;
 	//general
-	public static short STATUS_SUCCESS = 0;
-	public static short STATUS_ERROR = 1;
-	public static short STATUS_PROCESSING = 2;
+	public static final short STATUS_SUCCESS = 0;
+	public static final short STATUS_ERROR = 1;
+	public static final short STATUS_PROCESSING = 2;
 	//invalid
-	public static short STATUS_INVALID_FORMAT = 51;
-	public static short STATUS_URL_NOT_FOUND = 53;
+	public static final short STATUS_INVALID_FORMAT = 51;
+	public static final short STATUS_URL_NOT_FOUND = 53;
 	//quality
-	public static short STATUS_NO_VALID_EPISODE = 100;
-	public static short STATUS_BAD_QUALITY = 101;
+	public static final short STATUS_NO_VALID_EPISODE = 100;
+	public static final short STATUS_BAD_QUALITY = 101;
 	//internal
-	public static short STATUS_TRANSCODING_DB_ERROR = 1000;
-	public static short STATUS_NNVMSO_JSON_ERROR = 1001;
+	public static final short STATUS_TRANSCODING_DB_ERROR = 1000;
+	public static final short STATUS_NNVMSO_JSON_ERROR = 1001;
 			
 	//enforce transcoding, could be used to assign special formats or bit rates
 	//currently 0 is no, 1 is yes

@@ -47,14 +47,14 @@ public class Mso implements Serializable {
 	
 	@Persistent
 	private short type;
-	public static short TYPE_NN = 1; //default mso, must have and must have ONLY one
-	public static short TYPE_MSO= 2;
+	public static final short TYPE_NN = 1; //default mso, must have and must have ONLY one
+	public static final short TYPE_MSO= 2;
 		
 	@Persistent
 	private String preferredLangCode;
-	public static String LANG_EN = "en"; 
-	public static String LANG_ZH = "zh";	
-	public static String LANG_ZH_TW = "zh-tw";	
+	public static final String LANG_EN = "en"; 
+	public static final String LANG_ZH = "zh";	
+	public static final String LANG_ZH_TW = "zh-tw";	
 	
 	@Persistent
 	private Date createDate;
