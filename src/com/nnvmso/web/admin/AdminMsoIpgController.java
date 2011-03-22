@@ -1,7 +1,18 @@
 package com.nnvmso.web.admin;
 
+import com.google.appengine.api.users.User;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.lang.Math;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +23,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import org.codehaus.jackson.map.ObjectMapper;
+
+import com.nnvmso.lib.JqgridHelper;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.lib.NnStringUtil;
@@ -25,10 +39,11 @@ import com.nnvmso.service.MsoManager;
 @Controller
 @RequestMapping("admin/msoIpg")
 public class AdminMsoIpgController {
-	protected static final Logger logger = Logger.getLogger(AdminMsoIpgController.class.getName());
-	public final MsoIpgManager ipgMngr;
+	protected static final Logger  logger = Logger.getLogger(AdminMsoIpgController.class.getName());
+	public final MsoIpgManager     ipgMngr;
 	public final MsoChannelManager channelMngr;
-	public final MsoManager msoMngr;
+	public final MsoManager        msoMngr;
+	public final UserService       userService;
 	
 	@ExceptionHandler(Exception.class)
 	public String exception(Exception e) {
@@ -40,9 +55,10 @@ public class AdminMsoIpgController {
 	public AdminMsoIpgController(MsoIpgManager ipgMngr,
 	                             MsoChannelManager channelMngr,
 	                             MsoManager msoMngr) {
-		this.ipgMngr = ipgMngr;		
+		this.ipgMngr     = ipgMngr;		
 		this.channelMngr = channelMngr;
-		this.msoMngr = msoMngr;
+		this.msoMngr     = msoMngr;
+		this.userService = UserServiceFactory.getUserService();
 	}	
 	
 	@RequestMapping("list")
@@ -72,63 +88,164 @@ public class AdminMsoIpgController {
 		return NnNetUtil.textReturn(output);
 	}
 	
-	@RequestMapping(value="delete")
-	public @ResponseBody String delete(@RequestParam(value="mso") String mso,
-	                                   @RequestParam(value="channel") String channel) {		
-		ipgMngr.deleteMsoIpg(Long.parseLong(mso), Long.parseLong(channel));
+	@RequestMapping(value = "list", params = {"mso", "page", "rows", "sidx", "sord"})
+	public void list(@RequestParam(value = "mso")  Long         msoId,
+	                 @RequestParam(value = "page") Integer      currentPage,
+	                 @RequestParam(value = "rows") Integer      rowsPerPage,
+	                 @RequestParam(value = "sidx") String       sortIndex,
+	                 @RequestParam(value = "sord") String       sortDirection,
+	                                               OutputStream out) {
+		
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		ObjectMapper mapper = new ObjectMapper();
+		List<Map> dataRows = new ArrayList<Map>();
+		
+		String filter = "msoId == " + msoId;
+		int totalRecords = ipgMngr.total(filter);
+		int totalPages = (int)Math.ceil((double)totalRecords / rowsPerPage);
+		if (currentPage > totalPages)
+			currentPage = totalPages;
+		
+		List<MsoIpg> results = ipgMngr.list(currentPage, rowsPerPage, sortIndex, sortDirection, filter);
+		
+		for (MsoIpg ipg : results) {
+			
+			Map<String, Object> map = new HashMap<String, Object>();
+			List<Object> cell = new ArrayList<Object>();
+			
+			MsoChannel channel = channelMngr.findById(ipg.getChannelId());
+			
+			cell.add(ipg.getChannelId());
+			cell.add(channel.getName());
+			cell.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(ipg.getUpdateDate()));
+			cell.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(ipg.getCreateDate()));
+			cell.add(ipg.getSeq());
+			cell.add(ipg.getType());
+			
+			map.put("id", ipg.getKey().getId());
+			map.put("cell", cell);
+			dataRows.add(map);
+		}
+		
+		try {
+			mapper.writeValue(out, JqgridHelper.composeJqgridResponse(currentPage, totalPages, totalRecords, dataRows));
+		} catch (IOException e) {
+			logger.warning(e.getMessage());
+		}
+	}
+	
+	@RequestMapping(value="delete", params = {"id"})
+	public @ResponseBody String delete(@RequestParam(value="id") Long msoIpgId) {		
+		
+		logger.info("admin = " + userService.getCurrentUser().getEmail());
+		
+		logger.info("msoIpgId = " + msoIpgId);
+		ipgMngr.deleteMsoIpg(msoIpgId);
+		return "OK";
+	}
+	
+	@RequestMapping(value="delete", params = {"mso", "channel"})
+	public @ResponseBody String delete(@RequestParam(value="mso")     Long msoId,
+	                                   @RequestParam(value="channel") Long channelId) {		
+		
+		logger.info("admin = " + userService.getCurrentUser().getEmail());
+		
+		logger.info("msoId = " + msoId);
+		logger.info("channelId = " + channelId);
+		ipgMngr.deleteMsoIpg(msoId, channelId);
 		return "OK";
 	}
 	
 	@RequestMapping(value="add")
-	public @ResponseBody String add(@RequestParam(required=true, value="mso") String msoId,
-	                                @RequestParam(required=true, value="channel") String channelId,
-	                                @RequestParam(required=true) String seq,
-	                                @RequestParam(required=true) String type) {
+	public @ResponseBody String add(@RequestParam(required=true, value="mso")     Long    msoId,
+	                                @RequestParam(required=true, value="channel") Long    channelId,
+	                                @RequestParam(required=true)                  Integer seq,
+	                                @RequestParam(required=true)                  Short   type) {
 		
-		if (Short.parseShort(type) != 1 && Short.parseShort(type) != 2)
-			return "Invalid Type";
+		logger.info("admin = " + userService.getCurrentUser().getEmail());
 		
-		MsoChannel channel = channelMngr.findById(Long.parseLong(channelId));
-		if (channel == null)
-			return "Channel Does Not Exist";
-		Mso mso = msoMngr.findById(Long.parseLong(msoId));
-		if (mso == null)
-			return "Mso Does Not Exist";
+		logger.info("type = " + type);
+		if (type != 1 && type != 2) {
+			String error = "Invalid Type";
+			logger.warning(error);
+			return error;
+		}
+		logger.info("channelId = " + channelId);
+		MsoChannel channel = channelMngr.findById(channelId);
+		if (channel == null) {
+			String error = "Channel Does Not Exist";
+			logger.warning(error);
+			return error;
+		}
+		logger.info("msoId = " + msoId);
+		Mso mso = msoMngr.findById(msoId);
+		if (mso == null) {
+			String error = "Mso Does Not Exist";
+			logger.warning(error);
+			return error;
+		}
+		if (ipgMngr.findByMsoIdAndChannelId(msoId, channelId) != null) {
+			String error = "Channel Is Already Subscribed";
+			logger.warning(error);
+			return error;
+		}
+		logger.info("seq = " + seq);
+		if (ipgMngr.findByMsoIdAndSeq(msoId, seq) != null) {
+			String error = "Seq Is Already In Used";
+			logger.warning(error);
+			return error;
+		}
 		
-		if (ipgMngr.findByMsoIdAndChannelId(Long.parseLong(msoId), Long.parseLong(channelId)) != null)
-			return "Channel Is Already Subscribed";
-		if (ipgMngr.findByMsoIdAndSeq(Long.parseLong(msoId), Integer.parseInt(seq)) != null)
-			return "Seq Is Already In Used";
-		
-		ipgMngr.create(new MsoIpg(Long.parseLong(msoId), Long.parseLong(channelId), Integer.parseInt(seq), Short.parseShort(type)));
+		ipgMngr.create(new MsoIpg(msoId, channelId, seq, type));
 		return "OK";
 	}
 	
 	@RequestMapping(value="modify")
-	public @ResponseBody String modify(@RequestParam(required=true, value="mso") String msoId,
-	                                   @RequestParam(required=true, value="channel") String channelId,
-	                                   @RequestParam(required=false) String seq,
-	                                   @RequestParam(required=false) String type) {
+	public @ResponseBody String modify(@RequestParam(required=true, value="mso")     Long    msoId,
+	                                   @RequestParam(required=true, value="channel") Long    channelId,
+	                                   @RequestParam(required=false)                 Integer seq,
+	                                   @RequestParam(required=false)                 Short   type) {
 		
-		MsoChannel channel = channelMngr.findById(Long.parseLong(channelId));
-		if (channel == null)
-			return "Channel Does Not Exist";
-		Mso mso = msoMngr.findById(Long.parseLong(msoId));
-		if (mso == null)
-			return "Mso Does Not Exist";
+		logger.info("admin = " + userService.getCurrentUser().getEmail());
 		
-		MsoIpg msoIpg = ipgMngr.findByMsoIdAndChannelId(Long.parseLong(msoId), Long.parseLong(channelId));
-		if (msoIpg == null)
-			return "Subscription Does Not Exist";
+		logger.info("channelId = " + channelId);
+		MsoChannel channel = channelMngr.findById(channelId);
+		if (channel == null) {
+			String error = "Channel Does Not Exist";
+			logger.warning(error);
+			return error;
+		}
+		logger.info("msoId = " + msoId);
+		Mso mso = msoMngr.findById(msoId);
+		if (mso == null) {
+			String error = "MSO Does Not Exist";
+			logger.warning(error);
+			return error;
+		}
+		MsoIpg msoIpg = ipgMngr.findByMsoIdAndChannelId(msoId, channelId);
+		if (msoIpg == null) {
+			String error = "Subscription Does Not Exist";
+			logger.warning(error);
+			return error;
+		}
 		if (seq != null) {
-			if (ipgMngr.findByMsoIdAndSeq(Long.parseLong(msoId), Integer.parseInt(seq)) != null)
-				return "Seq Is Already In Used";
-			msoIpg.setSeq(Integer.parseInt(seq));
+			logger.info("seq = " + seq);
+			MsoIpg msoIpgMatched = ipgMngr.findByMsoIdAndSeq(msoId, seq);
+			if (msoIpgMatched != null && msoIpgMatched.getKey().getId() != msoIpg.getKey().getId()) {
+				String error = "Seq Is Already In Used";
+				logger.warning(error);
+				return error;
+			}
+			msoIpg.setSeq(seq);
 		}
 		if (type != null) {
-			if (Short.parseShort(type) != 1 && Short.parseShort(type) != 2)
-				return "Invalid Type";
-			msoIpg.setType(Short.parseShort(type));
+			logger.info("type = " + type);
+			if (type != 1 && type != 2) {
+				String error = "Invalid Type";
+				logger.warning(error);
+				return error;
+			}
+			msoIpg.setType(type);
 		}
 		ipgMngr.save(msoIpg);
 		return "OK";

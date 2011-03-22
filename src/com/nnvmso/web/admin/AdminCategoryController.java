@@ -1,8 +1,22 @@
 package com.nnvmso.web.admin;
 
+import com.google.appengine.api.users.User;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.lang.Math;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.logging.Logger;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +26,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import org.codehaus.jackson.map.ObjectMapper;
+
+import com.nnvmso.lib.JqgridHelper;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.lib.NnStringUtil;
@@ -31,10 +48,12 @@ public class AdminCategoryController {
 	protected static final Logger logger = Logger.getLogger(AdminCategoryController.class.getName());
 	
 	private final CategoryManager categoryMngr;	
+	private final UserService     userService;
 	
 	@Autowired
 	public AdminCategoryController(CategoryManager categoryMngr) {
 		this.categoryMngr = categoryMngr;
+		this.userService  = UserServiceFactory.getUserService();
 	}	
 
 	@ExceptionHandler(Exception.class)
@@ -67,6 +86,53 @@ public class AdminCategoryController {
 		return NnNetUtil.textReturn(output);
 	}
 	
+	@RequestMapping(value = "channelList", params = {"category", "page", "rows", "sidx", "sord"})
+	public void channelList(@RequestParam(value = "category") Long         categoryId,
+	                        @RequestParam(value = "page")     Integer      currentPage,
+	                        @RequestParam(value = "rows")     Integer      rowsPerPage,
+	                        @RequestParam(value = "sidx")     String       sortIndex,
+	                        @RequestParam(value = "sord")     String       sortDirection,
+	                                                          OutputStream out) {
+		
+		CategoryChannelManager ccMngr = new CategoryChannelManager();
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		ObjectMapper mapper = new ObjectMapper();
+		List<Map> dataRows = new ArrayList<Map>();
+		
+		String filter = "categoryId == " + categoryId;
+		int totalRecords = ccMngr.total(filter);
+		int totalPages = (int)Math.ceil((double)totalRecords / rowsPerPage);
+		if (currentPage > totalPages)
+			currentPage = totalPages;
+		
+		List<CategoryChannel> results = ccMngr.list(currentPage, rowsPerPage, sortIndex, sortDirection, filter);
+		
+		for (CategoryChannel cc : results) {
+			
+			Map<String, Object> map = new HashMap<String, Object>();
+			List<Object> cell = new ArrayList<Object>();
+			
+			MsoChannel channel = channelMngr.findById(cc.getChannelId());
+			
+			cell.add(cc.getCategoryId());
+			cell.add(cc.getChannelId());
+			cell.add(channel.getName());
+			cell.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(cc.getUpdateDate()));
+			cell.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(cc.getCreateDate()));
+			cell.add(channel.isPublic());
+			cell.add(channel.getType());
+			
+			map.put("id", cc.getKey().getId());
+			map.put("cell", cell);
+			dataRows.add(map);
+		}
+		
+		try {
+			mapper.writeValue(out, JqgridHelper.composeJqgridResponse(currentPage, totalPages, totalRecords, dataRows));
+		} catch (IOException e) {
+			logger.warning(e.getMessage());
+		}
+	}
 	
 	@RequestMapping("list")
 	public ResponseEntity<String> list(@RequestParam(required=false)String mso) {
@@ -93,37 +159,133 @@ public class AdminCategoryController {
 		return NnNetUtil.textReturn(output);
 	}
 	
-	@RequestMapping("create")
-	public @ResponseBody String create(@RequestParam(required=true)String name,
-	                                   @RequestParam(required=true)String msoId) {
+	@RequestMapping(value = "list", params = {"page", "rows", "sidx", "sord"})
+	public void list(@RequestParam(value = "page") Integer      currentPage,
+	                 @RequestParam(value = "rows") Integer      rowsPerPage,
+	                 @RequestParam(value = "sidx") String       sortIndex,
+	                 @RequestParam(value = "sord") String       sortDirection,
+	                                               OutputStream out) {
 		
+		ObjectMapper mapper = new ObjectMapper();
+		List<Map> dataRows = new ArrayList<Map>();
+		
+		int totalRecords = categoryMngr.total();
+		int totalPages = (int)Math.ceil((double)totalRecords / rowsPerPage);
+		if (currentPage > totalPages)
+			currentPage = totalPages;
+		
+		List<Category> results = categoryMngr.list(currentPage, rowsPerPage, sortIndex, sortDirection);
+		
+		for (Category category : results) {
+			
+			Map<String, Object> map = new HashMap<String, Object>();
+			List<Object> cell = new ArrayList<Object>();
+			
+			cell.add(category.getMsoId());
+			cell.add(category.getKey().getId());
+			cell.add(category.getName());
+			cell.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(category.getUpdateDate()));
+			cell.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(category.getCreateDate()));
+			cell.add(category.isPublic());
+			cell.add(category.getChannelCount());
+			
+			map.put("id", category.getKey().getId());
+			map.put("cell", cell);
+			dataRows.add(map);
+		}
+		
+		try {
+			mapper.writeValue(out, JqgridHelper.composeJqgridResponse(currentPage, totalPages, totalRecords, dataRows));
+		} catch (IOException e) {
+			logger.warning(e.getMessage());
+		}
+	}
+	
+	@RequestMapping("create")
+	public @ResponseBody String create(@RequestParam(required=true)  String  name,
+	                                   @RequestParam(required=false) Boolean isPublic,
+	                                   @RequestParam(required=true)  Long    msoId) {
+		
+		logger.info("admin = " + userService.getCurrentUser().getEmail());
+		
+		logger.info("msoId = " + msoId);
+		logger.info("name = " + name);
 		MsoManager msoMngr = new MsoManager();
-		Mso mso = msoMngr.findById(Long.parseLong(msoId));
-		if (mso == null)
-			return "Invalid msoId";
-		categoryMngr.create(new Category(name, true, Long.parseLong(msoId)));
+		Mso mso = msoMngr.findById(msoId);
+		if (mso == null) {
+			String error = "Invalid msoId";
+			logger.warning(error);
+			return error;
+		}
+		if (isPublic == null)
+			isPublic = true;
+		categoryMngr.create(new Category(name, isPublic, msoId));
 		return "OK";
 	}
 	
 	@RequestMapping("modify")
-	public @ResponseBody String modify(@RequestParam(required=true)  long id,
-	                                   @RequestParam(required=false) String name,
-	                                   @RequestParam(required=false) String isPublic,
-	                                   @RequestParam(required=false) String channelCount) {
+	public @ResponseBody String modify(@RequestParam(required=true)  Long    id,
+	                                   @RequestParam(required=false) String  name,
+	                                   @RequestParam(required=false) Boolean isPublic,
+	                                   @RequestParam(required=false) Long    msoId,
+	                                   @RequestParam(required=false) Integer channelCount) {
 		
-		logger.info("name: " + name + " isPublic: " + isPublic + " channelCount: " + channelCount + " id: " + id);
+		logger.info("admin = " + userService.getCurrentUser().getEmail());
+		
+		logger.info("categoryId = " + id);
 		Category category = categoryMngr.findById(id);
-		if (category == null)
-			return "Category Not Found";
+		if (category == null) {
+			String error = "Category Not Found";
+			logger.warning(error);
+			return error;
+		}
 		
-		if (name != null)
+		if (msoId != null) {
+			MsoManager msoMngr = new MsoManager();
+			logger.info("msoId = " + msoId);
+			if (msoMngr.findById(msoId) == null) {
+				String error = "Invalid msoId";
+				logger.warning(error);
+				return error;
+			}
+			category.setMsoId(msoId);
+		}
+		if (name != null) {
+			logger.info("name = " + name);
 			category.setName(name);
-		if (isPublic != null)
-			category.setPublic(Boolean.valueOf(isPublic));
-		if (channelCount != null)
-			category.setChannelCount(Integer.parseInt(channelCount));
+		}
+		if (isPublic != null) {
+			logger.info("isPublic = " + isPublic);
+			category.setPublic(isPublic);
+		}
+		if (channelCount != null) {
+			logger.info("channelCount = " + channelCount);
+			category.setChannelCount(channelCount);
+		}
 		
 		categoryMngr.save(category);
 		return "OK";
+	}
+	
+	@RequestMapping("categoriesHtmlSelectOptions")
+	public void categoriesHtmlSelectOptions(HttpServletResponse response, OutputStream out) {
+		
+		response.setContentType("text/html;charset=utf-8");
+		OutputStreamWriter writer;
+		try {
+			writer = new OutputStreamWriter(out, "UTF-8");
+		} catch (java.io.UnsupportedEncodingException e) {
+			return;
+		}
+		List<Category> categories = categoryMngr.findAll();
+		try {
+			writer.write("<select>");
+			for (Category category : categories)
+				writer.write("<option value=\"" + category.getKey().getId() + "\">" + category.getName() + "</option>");
+			writer.write("</select>");
+			writer.close();
+		} catch (IOException e) {
+			return;
+		}
 	}
 }
