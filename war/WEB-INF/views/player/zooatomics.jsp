@@ -5475,6 +5475,8 @@ function unsubscribe_channel()
         delete_cursor = 1;
         ipg_sync();
         }
+
+      ipg_metainfo();
       });
     }
   }
