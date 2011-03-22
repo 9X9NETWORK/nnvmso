@@ -206,6 +206,9 @@ public class AdminMsoChannelController {
 		}
 		
 		ccMngr.create(new CategoryChannel(categoryId, channelId));
+		// add channel count
+		category.setChannelCount(category.getChannelCount() + 1);
+		categoryMngr.save(category);
 		return "OK";
 	}
 	
@@ -344,7 +347,7 @@ public class AdminMsoChannelController {
 		}
 		if (intro != null) {
 			logger.info("intro = " + intro);
-			if (intro.length() > 250)
+			if (intro.length() > 255)
 				return "Introduction Is Too Long";
 			channel.setIntro(intro);
 		}

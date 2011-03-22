@@ -712,6 +712,10 @@ $(function()
         editoptions:
         {
           disabled: true
+        },
+        editrules:
+        {
+          integer: true
         }
       }
     ],
@@ -898,10 +902,7 @@ $(function()
         editable: true,
         editrules:
         {
-          integer: true
-        },
-        editrules:
-        {
+          integer:    true,
           edithidden: true
         }
       }
@@ -1358,10 +1359,10 @@ $(function()
         }
       },
       {
-        label:    'Viewers',
+        label:    'Reg.',
         name:     'viewers',
-        index:    'viewwers',
-        width:    70,
+        index:    'viewers',
+        width:    60,
         align:    'center',
         sortable: false,
         hidden:   false,

@@ -188,7 +188,7 @@ public class AdminMsoProgramController {
 		}
 		if (intro != null) {
 			logger.info("intro: " + intro);
-			if (intro.length() > 250)
+			if (intro.length() > 255)
 				return "Introduction Is Too Long";
 			program.setIntro(intro);
 		}
