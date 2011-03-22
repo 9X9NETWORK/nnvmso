@@ -23,11 +23,12 @@ $(function()
       {
         label:    'Channel Logo',
         name:     'imageUrl',
-        index:    'ImageUrl',
+        index:    'imageUrl',
         width:    150,
         align:    'center',
         sortable: true,
         hidden:   true,
+        search:   false,
         editable: true,
         edittype: 'image',
         editoptions:
@@ -45,11 +46,16 @@ $(function()
         index:    'channel',
         width:    80,
         align:    'center',
+        search:   true,
         sortable: false,
         editable: true,
         editoptions:
         {
           disabled: true
+        },
+        searchoptions:
+        {
+          sopt: ['eq']
         }
       },
       {
@@ -58,6 +64,7 @@ $(function()
         index:    'name',
         width:    200,
         align:    'center',
+        search:   false,
         sortable: true,
         editable: true,
         editoptions:
@@ -71,6 +78,7 @@ $(function()
         index:    'updateDate',
         width:    140,
         align:    'center',
+        search:   false,
         sortable: true,
         editable: true,
         editoptions:
@@ -84,6 +92,7 @@ $(function()
         index:    'createDate',
         width:    140,
         align:    'center',
+        search:   false,
         sortable: true,
         editable: true,
         hidden:   true,
@@ -102,6 +111,7 @@ $(function()
         index:    'sourceUrl',
         width:    150,
         align:    'center',
+        search:   false,
         sortable: true,
         hidden:   true,
         editable: true,
@@ -120,6 +130,7 @@ $(function()
         index:     'status',
         width:     70,
         align:     'center',
+        search:    false,
         sortable:  true,
         formatter: 'select',
         editable:  true,
@@ -135,6 +146,7 @@ $(function()
         index:     'contentType',
         width:     70,
         align:     'center',
+        search:    false,
         sortable:  true,
         formatter: 'select',
         editable:  true,
@@ -151,6 +163,7 @@ $(function()
         index:     'isPublic',
         width:     70,
         align:     'center',
+        search:    false,
         sortable:  true,
         formatter: 'checkbox',
         editable:  true,
@@ -166,6 +179,7 @@ $(function()
         index:    'programCount',
         width:    90,
         align:    'center',
+        search:   false,
         sortable: true,
         hidden:   false,
         editable: true,
@@ -181,6 +195,7 @@ $(function()
         index:    'subscriptionCount',
         width:    80,
         align:    'center',
+        search:   false,
         sortable: false,
         hidden:   false,
         editable: false,
@@ -196,6 +211,7 @@ $(function()
         index:    'intro',
         width:    150,
         align:    'center',
+        search:   false,
         sortable: true,
         hidden:   true,
         editable: true,
@@ -589,19 +605,21 @@ $(function()
       });
       $('#' + subgridTableId).jqGrid('navGrid', '#' + subgridTableId + '_toppager',
       {
+        edit:   false,
+        add:    false,
+        del:    false,
         search: false,
-        edit: false,
-        add: false,
-        del: false
+        view:   false
       });
     }
   });
   $('#chn_table').jqGrid('navGrid', '#chn_table_toppager',
   {
-    search: false,
-    edit: false,
-    add: false,
-    del: false
+    edit:   false,
+    add:    false,
+    del:    false,
+    search: true,
+    view:   false
   });
 
   $('#cc_table').jqGrid(

@@ -101,22 +101,43 @@ public class AdminMsoChannelController {
 	 *
 	 */
 	@RequestMapping(value = "list", params = {"page", "rows", "sidx", "sord"})
-	public void list(@RequestParam(value = "page") Integer      currentPage,
-	                 @RequestParam(value = "rows") Integer      rowsPerPage,
-	                 @RequestParam(value = "sidx") String       sortIndex,
-	                 @RequestParam(value = "sord") String       sortDirection,
-	                                               OutputStream out) {
+	public void list(@RequestParam(value = "page")   Integer      currentPage,
+	                 @RequestParam(value = "rows")   Integer      rowsPerPage,
+	                 @RequestParam(value = "sidx")   String       sortIndex,
+	                 @RequestParam(value = "sord")   String       sortDirection,
+	                 @RequestParam(required = false) String       searchField,
+	                 @RequestParam(required = false) String       searchOper,
+	                 @RequestParam(required = false) String       searchString,
+	                                                 OutputStream out) {
 		
 		SubscriptionLogManager subLogMngr = new SubscriptionLogManager();
 		ObjectMapper mapper = new ObjectMapper();
 		List<Map> dataRows = new ArrayList<Map>();
 		
-		int totalRecords = channelMngr.total();
-		int totalPages = (int)Math.ceil((double)totalRecords / rowsPerPage);
-		if (currentPage > totalPages)
-			currentPage = totalPages;
-		
-		List<MsoChannel> results = channelMngr.list(currentPage, rowsPerPage, sortIndex, sortDirection);
+		List<MsoChannel> results;
+		int totalRecords, totalPages;
+		if (searchField != null && searchOper != null && searchString != null
+		    && searchOper.equals("eq") && searchField.equals("channel")) {
+			
+			logger.info("searchString = " + searchString);
+			totalRecords = 0;
+			totalPages = 1;
+			currentPage = 1;
+			results = new ArrayList<MsoChannel>();
+			if (searchString.matches("^[0-9]+$")) {
+				MsoChannel found = channelMngr.findById(Long.parseLong(searchString));
+				if (found != null) {
+					totalRecords++;
+					results.add(found);
+				}
+			}
+		} else {
+			totalRecords = channelMngr.total();
+			totalPages = (int)Math.ceil((double)totalRecords / rowsPerPage);
+			if (currentPage > totalPages)
+				currentPage = totalPages;
+			results = channelMngr.list(currentPage, rowsPerPage, sortIndex, sortDirection);
+		}
 		
 		for (MsoChannel channel : results) {
 			

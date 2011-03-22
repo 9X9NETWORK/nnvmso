@@ -65,7 +65,8 @@ public class GenericDao<T> {
 		List<T> results;
 		try {
 			Query query = pm.newQuery(daoClass);
-			query.setOrdering(sidx + " " + sord);
+			if (sidx != null && sidx != "" && sord != null && sord != "")
+				query.setOrdering(sidx + " " + sord);
 			query.setRange((page - 1) * limit, page * limit);
 			@SuppressWarnings("unchecked")
 			List<T> tmp = (List<T>)query.execute();
@@ -83,7 +84,8 @@ public class GenericDao<T> {
 			Query query = pm.newQuery(daoClass);
 			if (filter != null && filter != "")
 				query.setFilter(filter);
-			query.setOrdering(sidx + " " + sord);
+			if (sidx != null && sidx != "" && sord != null && sord != "")
+				query.setOrdering(sidx + " " + sord);
 			query.setRange((page - 1) * limit, page * limit);
 			@SuppressWarnings("unchecked")
 			List<T> tmp = (List<T>)query.execute();
