@@ -620,6 +620,11 @@ $(function()
     del:    false,
     search: true,
     view:   false
+  }, {}, {}, {},
+  {
+    closeAfterSearch: true,
+    closeAfterReset:  true,
+    closeOnEscape:    true
   });
 
   $('#cc_table').jqGrid(
@@ -1200,6 +1205,14 @@ $(function()
       $('#isPublic', formId).attr('checked', true);
     },
     afterComplete: callbackAfterSubmitForm
+  },
+  {
+    // 'search' properties
+  },
+  {
+    closeAfterSearch: true,
+    closeAfterReset:  true,
+    closeOnEscape:    true
   });
 
   //////// MSO Managment Tab ////////
@@ -1949,5 +1962,10 @@ $(function()
     del:    false,
     search: true,
     view:   false
+  }, {}, {}, {},
+  {
+    closeAfterSearch: true,
+    closeAfterReset:  true,
+    closeOnEscape:    true
   });
 });
