@@ -14,9 +14,13 @@ import com.nnvmso.lib.AuthLib;
 import com.nnvmso.lib.PMF;
 import com.nnvmso.model.NnUser;
 
-public class NnUserDao {
+public class NnUserDao extends GenericDao<NnUser> {
 
 	protected static final Logger log = Logger.getLogger(NnUserDao.class.getName());
+	
+	public NnUserDao() {
+		super(NnUser.class);
+	}
 	
 	public NnUser save(NnUser user) {
 		if (user == null) {return null;}

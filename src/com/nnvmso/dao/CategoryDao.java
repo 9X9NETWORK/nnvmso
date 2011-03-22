@@ -13,7 +13,11 @@ import com.nnvmso.lib.NnStringUtil;
 import com.nnvmso.lib.PMF;
 import com.nnvmso.model.Category;
 
-public class CategoryDao {
+public class CategoryDao extends GenericDao<Category> {
+	
+	public CategoryDao() {
+		super(Category.class);
+	}
 	
 	public Category save(Category category) {
 		if (category == null) {return null;}		

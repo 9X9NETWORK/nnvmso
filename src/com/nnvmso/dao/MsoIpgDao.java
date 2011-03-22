@@ -2,6 +2,7 @@ package com.nnvmso.dao;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -9,12 +10,19 @@ import javax.jdo.Query;
 import com.nnvmso.lib.PMF;
 import com.nnvmso.model.MsoIpg;
 
-public class MsoIpgDao {
-		
+public class MsoIpgDao extends GenericDao<MsoIpg> {
+	
+	protected static final Logger logger = Logger.getLogger(MsoIpgDao.class.getName());
+	
+	public MsoIpgDao() {
+		super(MsoIpg.class);
+	}
+	
 	public MsoIpg save(MsoIpg msoIpg) {
 		if (msoIpg == null) {return null;}
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
+			logger.info("save msoIpg (msoId = " + msoIpg.getMsoId() + ", channelId = " + msoIpg.getChannelId() + ")");
 			pm.makePersistent(msoIpg);
 			msoIpg = pm.detachCopy(msoIpg);
 		} finally {
@@ -25,6 +33,7 @@ public class MsoIpgDao {
 	
 	public void delete(MsoIpg msoIpg) {
 		if (msoIpg != null) {
+			logger.info("delete msoIpg (msoId = " + msoIpg.getMsoId() + ", channelId = " + msoIpg.getChannelId() + ")");
 			PersistenceManager pm = PMF.get().getPersistenceManager();
 			try {
 				pm.deletePersistent(msoIpg);

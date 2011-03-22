@@ -16,10 +16,14 @@ import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoProgram;
 import com.nnvmso.service.PlayerApiService;
 
-public class MsoProgramDao {
+public class MsoProgramDao extends GenericDao<MsoProgram> {
 	
 	protected static final Logger log = Logger.getLogger(PlayerApiService.class.getName());	
 		
+	public MsoProgramDao() {
+		super(MsoProgram.class);
+	}
+	
 	public MsoProgram save(MsoProgram program) {
 		if (program == null) {return null;}		
 		PersistenceManager pm = PMF.get().getPersistenceManager();

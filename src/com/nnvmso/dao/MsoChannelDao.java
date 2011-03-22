@@ -3,6 +3,7 @@ package com.nnvmso.dao;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
@@ -12,8 +13,14 @@ import com.google.appengine.api.datastore.Key;
 import com.nnvmso.lib.PMF;
 import com.nnvmso.model.MsoChannel;
 
-public class MsoChannelDao {
-		
+public class MsoChannelDao extends GenericDao<MsoChannel> {
+	
+	protected static final Logger logger = Logger.getLogger(MsoDao.class.getName());
+	
+	public MsoChannelDao() {
+		super(MsoChannel.class);
+	}
+	
 	public MsoChannel save(MsoChannel channel) {
 		if (channel == null) {return null;}
 		PersistenceManager pm = PMF.get().getPersistenceManager();

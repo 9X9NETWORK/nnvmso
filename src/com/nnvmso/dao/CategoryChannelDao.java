@@ -2,6 +2,7 @@ package com.nnvmso.dao;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
@@ -10,8 +11,14 @@ import javax.jdo.Query;
 import com.nnvmso.lib.PMF;
 import com.nnvmso.model.CategoryChannel;
 
-public class CategoryChannelDao {
-
+public class CategoryChannelDao extends GenericDao<CategoryChannel> {
+	
+	protected static final Logger logger = Logger.getLogger(CategoryChannelDao.class.getName());
+	
+	public CategoryChannelDao() {
+		super(CategoryChannel.class);
+	}
+	
 	public CategoryChannel save(CategoryChannel cc) {		
 		if (cc == null) {return null;}
 		PersistenceManager pm = PMF.get().getPersistenceManager();

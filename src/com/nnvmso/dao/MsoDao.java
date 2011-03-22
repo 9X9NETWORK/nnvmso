@@ -13,9 +13,13 @@ import com.google.appengine.api.datastore.Key;
 import com.nnvmso.lib.PMF;
 import com.nnvmso.model.Mso;
 
-public class MsoDao {
+public class MsoDao extends GenericDao<Mso> {
 	
 	protected static final Logger logger = Logger.getLogger(MsoDao.class.getName());
+	
+	public MsoDao() {
+		super(Mso.class);
+	}
 	
 	public Mso save(Mso mso) {
 		if (mso == null) {return null;}

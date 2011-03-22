@@ -3,6 +3,7 @@ package com.nnvmso.dao;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -10,7 +11,14 @@ import javax.jdo.Query;
 import com.nnvmso.lib.PMF;
 import com.nnvmso.model.Subscription;
 
-public class SubscriptionDao {
+public class SubscriptionDao extends GenericDao<Subscription>{
+	
+	protected static final Logger log = Logger.getLogger(SubscriptionDao.class.getName());
+	
+	public SubscriptionDao() {
+		super(Subscription.class);
+	}
+	
 	public Subscription save(Subscription sub) {
 		if (sub == null) {return null;}
 		PersistenceManager pm = PMF.get().getPersistenceManager();
