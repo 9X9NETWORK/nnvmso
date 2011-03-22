@@ -23,4 +23,18 @@ public class JqgridHelper {
 		return response;
 	}
 	
+	public static Map<String, String> getOpMap() {
+		
+		Map<String, String> response = new HashMap<String, String>();
+		
+		response.put("eq", "==");
+		response.put("ne", "!=");
+		response.put("lt", "<");
+		response.put("le", "<=");
+		response.put("gt", ">");
+		response.put("ge", ">=");
+		
+		return response;
+	}
+	
 }

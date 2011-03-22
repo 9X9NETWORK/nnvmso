@@ -790,6 +790,7 @@ $(function()
         index:     'msoId',
         width:     80,
         align:     'center',
+        search:    true,
         sortable:  true,
         editable:  true,
         edittype:  'select',
@@ -802,6 +803,11 @@ $(function()
         {
           required: true,
           number:   true
+        },
+        searchoptions:
+        {
+          sopt:    ['eq'],
+          dataUrl: '/admin/mso/msoHtmlSelectOptions',
         }
       },
       {
@@ -810,6 +816,7 @@ $(function()
         index:    'categoryId',
         width:    80,
         align:    'center',
+        search:   false,
         sortable: false
       },
       {
@@ -818,6 +825,7 @@ $(function()
         index:    'name',
         width:    200,
         align:    'center',
+        search:   false,
         sortable: true,
         editable: true,
         editoptions:
@@ -835,6 +843,7 @@ $(function()
         index:    'updateDate',
         width:    140,
         align:    'center',
+        search:   false,
         sortable: true,
         editable: false,
         editoptions:
@@ -848,6 +857,7 @@ $(function()
         index:    'createDate',
         width:    140,
         align:    'center',
+        search:   false,
         sortable: true,
         editable: false,
         hidden:   true,
@@ -866,6 +876,7 @@ $(function()
         index:     'isPublic',
         width:     70,
         align:     'center',
+        search:    false,
         sortable:  true,
         formatter: 'checkbox',
         editable:  true,
@@ -881,6 +892,7 @@ $(function()
         index:    'channelCount',
         width:    90,
         align:    'center',
+        search:   false,
         sortable: true,
         hidden:   false,
         editable: true,
@@ -1130,7 +1142,7 @@ $(function()
     edit:   false,
     add:    true,
     del:    false,
-    search: false,
+    search: true,
     view:   false,
     addtitle: 'Create A New Category'
   },
@@ -1187,6 +1199,7 @@ $(function()
         index:    'mso',
         width:    80,
         align:    'center',
+        stype:    'select',
         sortable: false,
         editable: true,
         editoptions:
@@ -1311,14 +1324,14 @@ $(function()
         }
       },
       {
-        label:     'Contact Email',
-        name:      'contactEmail',
-        index:     'contactEmail',
-        width:     70,
-        align:     'center',
-        hidden:    true,
-        sortable:  true,
-        editable:  true,
+        label:    'Contact Email',
+        name:     'contactEmail',
+        index:    'contactEmail',
+        width:    70,
+        align:    'center',
+        hidden:   true,
+        sortable: true,
+        editable: true,
         editrules:
         {
           edithidden: true,
@@ -1578,10 +1591,11 @@ $(function()
   });
   $('#mso_table').jqGrid('navGrid', '#mso_table_toppager',
   {
+    edit:   false,
+    add:    false,
+    del:    false,
     search: false,
-    edit: false,
-    add: false,
-    del: false
+    view:   false
   });
 
   //////// User Managment Tab ////////
@@ -1598,6 +1612,7 @@ $(function()
         align:    'center',
         sortable: true,
         hidden:   true,
+        search:   false,
         editable: true,
         edittype: 'image',
         editoptions:
@@ -1615,11 +1630,18 @@ $(function()
         index:    'msoId',
         width:    80,
         align:    'center',
+        search:   true,
+        stype:    'select',
         sortable: true,
         editable: true,
         editoptions:
         {
           disabled: true
+        },
+        searchoptions:
+        {
+          sopt:    ['eq'],
+          dataUrl: '/admin/mso/msoHtmlSelectOptions',
         }
       },
       {
@@ -1628,6 +1650,7 @@ $(function()
         index:    'userId',
         width:    80,
         align:    'center',
+        search:   false,
         sortable: false,
         editable: true,
         editoptions:
@@ -1641,6 +1664,7 @@ $(function()
         index:    'name',
         width:    100,
         align:    'center',
+        search:   false,
         sortable: true,
         editable: true,
         editoptions:
@@ -1652,8 +1676,9 @@ $(function()
         label:    'Email',
         name:     'email',
         index:    'email',
-        width:    120,
+        width:    130,
         align:    'center',
+        search:   false,
         sortable: true,
         editable: true,
         editoptions:
@@ -1667,6 +1692,7 @@ $(function()
         index:    'updateDate',
         width:    140,
         align:    'center',
+        search:   false,
         sortable: true,
         editable: true,
         editoptions:
@@ -1680,6 +1706,7 @@ $(function()
         index:    'createDate',
         width:    140,
         align:    'center',
+        search:   false,
         sortable: true,
         editable: true,
         hidden:   true,
@@ -1698,6 +1725,7 @@ $(function()
         index:     'type',
         width:     70,
         align:     'center',
+        search:    false,
         sortable:  true,
         formatter: 'select',
         editable:  true,
@@ -1715,6 +1743,7 @@ $(function()
         width:     70,
         align:     'center',
         hidden:    true,
+        search:    false,
         sortable:  true,
         editable:  true,
         editrules:
@@ -1728,6 +1757,7 @@ $(function()
         index:    'intro',
         width:    150,
         align:    'center',
+        search:   false,
         sortable: true,
         hidden:   true,
         editable: true,
@@ -1883,7 +1913,7 @@ $(function()
     edit:   false,
     add:    false,
     del:    false,
-    search: false,
+    search: true,
     view:   false
   });
 });
