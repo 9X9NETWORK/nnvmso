@@ -33,12 +33,11 @@ import com.nnvmso.model.MsoChannel;
 import com.nnvmso.service.EmailService;
 import com.nnvmso.service.MsoChannelManager;
 import com.nnvmso.task.mapper.DMUserCounterMapper;
-import com.nnvmso.web.admin.AdminInitController;
 
 @Controller
 @RequestMapping("task/datamining")
 public class DataminingTask {
-	protected static final Logger log = Logger.getLogger(AdminInitController.class.getName());		
+	protected static final Logger log = Logger.getLogger(DataminingTask.class.getName());		
 		
 	@RequestMapping("userCountTask")
 	public ResponseEntity<String> userCountTask() throws IOException {
@@ -67,7 +66,7 @@ public class DataminingTask {
 	
 	//mapreduce it somehow?	
 	@RequestMapping("channelCountTask")
-	public ResponseEntity<String> channelCountTask() throws IOException {
+	public ResponseEntity<String> channelCountTask(HttpServletRequest req) throws IOException {
 		List<MsoChannel> list = new ArrayList<MsoChannel>();
     	Date now = new Date();
     	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");    	
@@ -77,8 +76,9 @@ public class DataminingTask {
 			Date sinceDate = sdf.parse(since);
 	    	MsoChannelManager channelMngr = new MsoChannelManager();
 	    	list = channelMngr.findfindAllAfterTheDate(sinceDate);
-			EmailService emailService = new EmailService();			
-			String subject = since.substring(0, 8) + " new channels";
+			EmailService emailService = new EmailService();						
+	    	String host = NnNetUtil.getUrlRoot(req);
+			String subject = since.substring(0, 8) + " new channels(" + host + ")";			
 			String msgBody = "New Channel Count:" + list.size() + "\n";
 			for (MsoChannel c : list) {
 				msgBody = msgBody + "name:" +  c.getName() + ";url=" + c.getSourceUrl();
@@ -118,9 +118,9 @@ public class DataminingTask {
 	    	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 	    	Date now = new Date();
 	    	String since = sdf.format(now);
-			String subject = since + " user account statistics";
-			String msgBody = "";
-			
+	    	String host = NnNetUtil.getUrlRoot(req);
+			String subject = since + " user account statistics(" + host + ")";
+			String msgBody = "";			
 			msgBody = msgBody + "Total Count:" + totalAccountCount + "\n";
 			msgBody = msgBody + "Total Guest Count:" + totalGuestCount + "\n";
 			msgBody = msgBody + "Total User Count:" + totalUserCount + "\n";
