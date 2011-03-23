@@ -22,24 +22,72 @@ import com.nnvmso.service.NnStatusMsg;
 import com.nnvmso.service.PlayerApiService;
 
 /**
- * <p>Serves for Player.</p>
- * <p>Url examples: (notice method name is used at the end of URL) <br/> 
- * http://<hostname:port>/playerAPI/channelBrowse<br/>
- * http://<hostname:port>/podcastAPI/login<br/>
- * <p/>
- * <p>General rules:<br/>
- *    API always returns a string. <br/>
- *    First line is status code and status message, separated by tab. <br/>
- *    If there is another set of data, it will be separated from the status line by "--\n" <br/>
- *    Follows data listing if any, data is tab separated, different record is \n separated. <br/>    
- * </p>
- * <p>Example: <br/>
+ * This is API specification for 9x9 Player.
+ * <p>
+ * <b>In this document, method name is used as part of the URL</b>, examples:
+ * <p>   
+ * <blockquote>
+ * http://hostname:port/playerAPI/channelBrowse<br/>
+ * http://hostname:port/playerAPI/login<br/>
+ * </blockquote>
+ * <p>
+ * <b>API categories:</b
+ * <p>
+ * <blockquote>
+ * Brand information: brandInfo
+ * <p>
+ * Account related: guestRegister, signup, login, userTokenVerify, signout
+ * <p>
+ * Category listing: categoryBrowse
+ * <p>
+ * Channel and program listing: channelLineup, programInfo
+ * <p>
+ * IPG action: moveChannel, channelSubmit, subscribe, unsubscribe
+ * <p>
+ * IPG snapshot: saveIpg, loadIpg
+ * <p>
+ * Data collection: pdr, programRemove
+ * </blockquote>
+ * <p>
+ * <b>9x9 Player API always returns a string:</b>
+ * <p>
+ * First line is status code and status message, separated by tab.<br/>
+ * <p>
+ * Different sets of data are separated by "--\n".
+ * <p>
+ * Data representation is \t separated of each field, \n separated of each record.
+ * <p>
+ * <blockquote>
+ * Example 1: login <br/>
  * 0	success  <br/>
  * -- <br/>
  * token	a466D491UaaU245P412a <br/>
  * name	a
- * </p>
+ * <p>
+ * Example 2: categoryBrowse<br/>
+ * 0	success  <br/>
+ * -- <br/>
+ * 1201	Movie	5 <br/>
+ * 1203	TV	2 <br/>
+ * 1204 Sports 2 <br/>
+ * </blockquote>
+ * <p>     
+ * Please note each api's document omits status code and status message.
+ * <p>    
+ * <b>Basic API flows:</b>
+ * <blockquote>
+ * The first step is to call brandInfo to retrieve brand information. It returns brand id, brand logo, and any necessary brand information.
+ * <p>
+ * The next step depends on the UI requirement. Use categoryBrowse to find category listing based on the brand. 
+ * Or get an account first. Use userTokenVerify if there's an existing user token. 
+ * If there's no token at hand, either sign up for user as a guest(guestRegister) or ask user to signup(signup).
+ * <p>
+ * Channel and program listing(channelLineup and programInfo) would be ready after an account is registered.
+ * <p>
+ * </blockquote>
+ * 
  */
+
 @Controller
 @RequestMapping("playerAPI")
 public class PlayerApiController {
@@ -78,7 +126,7 @@ public class PlayerApiController {
 	/**
 	 * Get brand information. 
 	 * 	
-	 * @param mso mso name, optional 
+	 * @param mso mso name, optional, server returns default mso 9x9 if omiited
 	 * @return <p>Data returns in key and value pair. Key and value is tab separated. Each pair is \n separated.<br/> 
 	 * 		   keys include "key", "name", logoUrl", "jingleUrl", "preferredLangCode" "debug"<br/></p>
 	 *         <p>Example: <br/>
@@ -122,6 +170,12 @@ public class PlayerApiController {
 	 *            preference2 key name (tab) preference2 value (\n)<br/>
 	 *            preferences.....
 	 *         </p> 
+	 *         <p> Example: <br/>
+	 *         0	success <br/>
+	 *         --<br/>
+	 *         token	QQl0l208W2C4F008980F<br/>
+	 *         name	c<br/>
+	 *         lastLogin	1300822489194<br/>
 	 */	
 	@RequestMapping(value="login")
 	public ResponseEntity<String> login(HttpServletRequest req, HttpServletResponse resp) {
@@ -190,9 +244,7 @@ public class PlayerApiController {
 	}	
 
 	/**
-	 * Sign out
-	 * 
-	 * Clean the cookie
+	 * User cookie will be removed
 	 * 
 	 * @param user user key identifier 
 	 */		
@@ -211,8 +263,8 @@ public class PlayerApiController {
 	}	
 		
 	/**
-	 * Verify a user token <br/>
-	 * Example: http://<host>/playerAPI/userTokenVerify?token=aghubmUzdm1zb3INCxIGTm5Vc2VyGKsEDA
+	 * Verify user token <br/>
+	 * Example: http://host:port/playerAPI/userTokenVerify?token=QQl0l208W2C4F008980F
 	 * 
 	 * @param token user key 
 	 * @return Will delete the user cookie if token is invalid.<br/>
@@ -235,7 +287,7 @@ public class PlayerApiController {
 	}
 	
 	/**
-	 * Get user's language based on ip
+	 * @deprecated Get user's language based on ip
 	 * 
 	 * @return Language code, currently either zh or en. <br/>          
 	 */
@@ -257,12 +309,12 @@ public class PlayerApiController {
 	/**
 	 * User subscribes a channel on a designated grid location.
 	 * 
-	 * <p>Example: http://<host>/playerAPI/subscribe?user=aghubmUydm1zb3IMCxIGTm5Vc2VyGDkM&channel=51&grid=2</p>
+	 * <p>Example: http://host:port/playerAPI/subscribe?user=QQl0l208W2C4F008980F&channel=51&grid=2</p>
 	 * 
 	 * @param user user's unique identifier
 	 * @param channel channelId
 	 * @param grid grid location, from 1 to 81
-	 * @return basic message scheme.
+	 * @return status code and status message 
 	 */		
 	@RequestMapping(value="subscribe")
 	public ResponseEntity<String> subscribe(@RequestParam(value="user", required=false) String userToken, 
@@ -284,11 +336,11 @@ public class PlayerApiController {
 	/**
 	 * User unsubscribes a channel
 	 * 
-	 * <p>Example: http://localhost:8888/playerAPI/unsubscribe?user=aghubmUydm1zb3IMCxIGTm5Vc2VyGDkM&channel=51</p>
+	 * <p>Example: http://host:port/playerAPI/unsubscribe?user=QQl0l208W2C4F008980F&channel=51</p>
 	 * 
 	 * @param user user's unique identifier
 	 * @param channel channelId
-	 * @return basic message scheme.
+	 * @return status code and status message 
 	 */			
 	@RequestMapping(value="unsubscribe")
 	public ResponseEntity<String> unsubscribe(@RequestParam(value="user") String userToken, 
@@ -308,13 +360,13 @@ public class PlayerApiController {
 
 	/* ==========  CATEGORY: CHANNEL CREATE ========== */		
 	/**
-	 * Generate a channel based on a podcast RSS feed.
+	 * Generate a channel based on a podcast RSS feed or a YouTube URL.
 	 * 
 	 * <p>Only POST operation is supported.</p>
 	 *  
 	 * @param url a podcast RSS feed or a YouTube url
 	 * @param user user's unique identifier
-	 * @param grid grid location
+	 * @param grid grid location, 0 - 81
 	 * @param category category id
 	 * @param langCode language code, en or zh.
 	 * 
@@ -346,11 +398,17 @@ public class PlayerApiController {
 	 * 
 	 * @param category category id
 	 * @return Category info and channels info. <br/>
-	 *  	   First line is category info follows channels info. Each channel is \n separated.<br/>    
-	 *         Category info includes category id. <br/>
+	 *  	   First section is category info, follows channels info. Each channel is \n separated.<br/>    
+	 *         Category info has category id. <br/>
 	 *         Channel info includes channel id, channel name, channel image url, program count, subscription count <br/>
-	 *         Example: 1	Channel1	http://hostname/images/img.jpg	5	5
-	 */	
+	 *         Example: 	<br/>
+	 *         0	success<br/>
+	 *         --<br/>
+	 *         1174<br/>
+	 *         --<br/>
+	 *         0	1207	Etsy	http://s3.amazonaws.com/9x9chthumb/a.gif	2	2 <br/>
+	 *         0	1217	System	http://s3.amazonaws.com/9x9chthumb/b.gif	1	2 <br/>        
+	 */		
 	@RequestMapping(value="channelBrowse")
 	public ResponseEntity<String> channelBrowse(@RequestParam(value="category", required=false) String categoryIds, HttpServletRequest req) {
 		this.prepService(req);
@@ -368,7 +426,7 @@ public class PlayerApiController {
 	 * Browse categories.
 	 *  
 	 * @return Categories info. Each category is \n separated.<br/>
-	 *         Category info has category id, category name, langCode.<br/>
+	 *         Category info has category id, category name, channel count.<br/>
 	 */		
 	@RequestMapping(value="categoryBrowse")
 	public ResponseEntity<String> categoryBrowse(HttpServletRequest req) {
@@ -395,7 +453,10 @@ public class PlayerApiController {
 	 *         </blockquote>
 	 *         <p>type: TYPE_GENERAL = 1; TYPE_READONLY = 2;</p>
 	 *         <p>status: STATUS_SUCCESS = 0; STATUS_ERROR = 1; 
-	 *         <p> Example: 1	1	Channel1	http://hostname/images/img.jpg	3	1 0</p>
+	 *         <p> Example: <br/>
+	 *         0	success<br/>
+	 *         -- <br/>
+	 *         1	1207	Channel1	http://hostname/images/img.jpg	3	1 0<br/>
 	 *         </p>
 	 */		
 	@RequestMapping(value="channelLineup")
@@ -415,13 +476,13 @@ public class PlayerApiController {
 	}	
 
 	/**
-	 * Swap grid location 
+	 * Move a channel from grid 1 to grid2
 	 * 
 	 * @param user user's unique identifier
 	 * @param grid1
 	 * @param grid2
 	 * 
-	 * @return basic message scheme.
+	 * @return status code and status message
 	*/
 	@RequestMapping(value="moveChannel")
 	public ResponseEntity<String> moveChannel(@RequestParam(value="user", required=false) String userToken, 
@@ -441,6 +502,7 @@ public class PlayerApiController {
 	}					
 		
 	/**
+	 * @deprecated
 	 * Get "new" program list. Current "new" definition: the latest 3 shows in a channel.   
 	 * 1. Latest 3 shows users haven't seen 
 	 * 2. Latest 3 shows watched by user, if no unseen show in this channel
@@ -468,10 +530,10 @@ public class PlayerApiController {
 	 * 
 	 * <p>
 	 * Examples: <br/>
-	 *  http://<host>/playerAPI/programInfo?channel=*&user=aghubmUzdm1zb3INCxIGTm5Vc2VyGKsEDA <br/>
-	 *  http://<host>/playerAPI/programInfo?channel=*&ipg=13671109 <br/>
-	 *  http://<host>/playerAPI/programInfo?channel=153,158 <br/>
-	 *  http://<host>/playerAPI/programInfo?channel=153 <br/>
+	 *  http://host:port/playerAPI/programInfo?channel=*&user=QQl0l208W2C4F008980F <br/>
+	 *  http://host:port/playerAPI/programInfo?channel=*&ipg=13671109 <br/>
+	 *  http://host:port/playerAPI/programInfo?channel=153,158 <br/>
+	 *  http://host:port/playerAPI/programInfo?channel=153 <br/>
 	 * </p> 
 	 * @param  channel (1)Could be *, all the programs, e.g. channel=* (user is required for wildcard query). 
 	 * 		           (2)Could be a channel Id, e.g. channel=1 <br/>
@@ -485,7 +547,7 @@ public class PlayerApiController {
 	 *            programType, duration, <br/>
 	 *            programThumbnailUrl, programLargeThumbnailUrl, <br/>
 	 *            url1(mpeg4/slideshow), url2(webm), url3(flv more likely), url4(audio), <br/> 
-	 *            timestamp</p>
+	 *            publish date timestamp</p>
 	 */
 	@RequestMapping("programInfo")
 	public ResponseEntity<String> programInfo(@RequestParam(value="channel", required=false) String channelIds,
@@ -512,7 +574,7 @@ public class PlayerApiController {
 	 * @param user user's unique identifier
 	 * @param channel channel id
 	 * @param program program id
-	 * @return     An unique IPG identifier
+	 * @return A unique IPG identifier
 	 */
 	@RequestMapping(value="saveIpg")
 	public ResponseEntity<String> saveIpg(@RequestParam(value="user", required=false) String userToken, 
@@ -534,8 +596,9 @@ public class PlayerApiController {
 	 * Load User IPG (snapshot)
 	 *
 	 * @param ipg IPG's unique identifier
-	 * @return  2nd section returns one program info (format please reference programInfo format)
-	 *          3rd section returns ipg information (format please reference channelLineup)
+	 * @return  Returns a program to play follows ipg information.
+	 * 	        The program to play returns in the 2nd section, format please reference programInfo format.
+	 *          3rd section is ipg information, format please reference channelLineup.
 	 */
 	@RequestMapping(value="loadIpg")
 	public ResponseEntity<String> loadIpg(@RequestParam(value="ipg") Long ipgId, 
@@ -583,7 +646,7 @@ public class PlayerApiController {
 	/**
 	 * Mark a program bad when player sees it 
 	 * 
-	 * @param user user token, it's actually not necessary, but for reference and to somewhat avoid malicious acts.
+	 * @param user user token
 	 * @param program programId
 	 */	
 	@RequestMapping(value="programRemove")
