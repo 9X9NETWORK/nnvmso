@@ -22,14 +22,28 @@ import com.nnvmso.service.NnStatusMsg;
 import com.nnvmso.service.PlayerApiService;
 
 /**
- * This is API specification for 9x9 Player.
+ * <b>This is API specification for 9x9 Player.</b> Please note although the document is written in JavaDoc form, it is <b>generic Web Service API via HTTP request-response, no Java necessary</b>.
+ * <p>
+ * <blockquote>
+ * Example:
+ * <p>
+ * Player Request: <br/>
+ * http://qa.9x9.tv/playerAPI/brandInfo?mso=9x9
+ * <p>
+ * Service response:  <br/>
+ * 0	success<br/>
+ * --<br/>
+ * name		9x9<br/>
+ * title	9x9.tv<br/>
+ * </blockquote>
  * <p>
  * <b>In this document, method name is used as part of the URL</b>, examples:
  * <p>   
  * <blockquote>
- * http://hostname:port/playerAPI/channelBrowse<br/>
- * http://hostname:port/playerAPI/login<br/>
+ * http://hostname:port/playerAPI/channelBrowse?category=1<br/>
+ * http://hostname:port/playerAPI/brandInfo?mso=9x9<br/>
  * </blockquote>
+ * 
  * <p>
  * <b>API categories:</b
  * <p>
@@ -58,13 +72,15 @@ import com.nnvmso.service.PlayerApiService;
  * Data representation is \t separated of each field, \n separated of each record.
  * <p>
  * <blockquote>
- * Example 1: login <br/>
+ * Example 1: login 
+ * <p>
  * 0	success  <br/>
  * -- <br/>
  * token	a466D491UaaU245P412a <br/>
  * name	a
  * <p>
- * Example 2: categoryBrowse<br/>
+ * Example 2: categoryBrowse
+ * <p>
  * 0	success  <br/>
  * -- <br/>
  * 1201	Movie	5 <br/>
