@@ -312,7 +312,8 @@ var language_en =
   cfb: 'Share to Facebook',
   cvol: 'Volume',
   cmute: 'Mute',
-  cunmute: 'Unmute'
+  cunmute: 'Unmute',
+  uncaught: 'The system may be experiencing problems. Please try again later.'
   };
 
 var language_tw =
@@ -339,7 +340,7 @@ var language_tw =
   deletetip: '選擇要刪除的頻道',
   findel: '結束刪除頻道',
   nochandel: '所有頻道均已被刪除',
-  errormov: '無法搬移頻道',
+  errormov: '無法搬移頻道, 請稍後再試',
   notplaying: '沒有可繼續觀賞的節目',
   noepchan: '頻道中沒有節目，暫時無法播放',
   thanx: '您已登出，感謝您使用9x9.tv',
@@ -434,7 +435,8 @@ var language_tw =
   cfb: '分享至 Facebook',
   cvol: '音量',
   cmute: '靜音',
-  cunmute: '恢復音量'
+  cunmute: '恢復音量',
+  uncaught: '系統可能遇到問題。 請稍後再試。'
   };
 
 var translations = language_en;
@@ -3797,7 +3799,7 @@ function setup_ajax_error_handling()
       }
     else if (x.status == 500)
       {
-      log_and_alert ('500 Internal Server Error');
+      log_and_alert (translations ['uncaught'] + ' Code 500');
       }
     else if (e == 'timeout')
       {
