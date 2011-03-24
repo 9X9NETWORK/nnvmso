@@ -5219,8 +5219,16 @@ function browse_category (category_id)
           n_browse_list++;
 
           var name = fields[2];
-          if (name.length > 25)
-            name = name.substring (0, 22) + '...';
+          if (language == 'zh' || language == 'zh-tw')
+            {
+            if (name.length > 12)
+              name = name.substring (0, 12) + '...';
+            }
+          else
+            {
+            if (name.length > 25)
+              name = name.substring (0, 22) + '...';
+            }
 
           browse_content [fields[1]] = { 'id': fields[1], 'name': name, 'thumb': fields[3], 'count': fields[4], 'subscribers': fields[5] };
           browse_list [n_browse_list] = { 'id': fields[1], 'name': name, 'thumb': fields[3], 'count': fields[4], 'subscribers': fields[5] };
