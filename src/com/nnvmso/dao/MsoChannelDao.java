@@ -128,6 +128,23 @@ public class MsoChannelDao extends GenericDao<MsoChannel> {
 		}
 		return channel;				
 	}		
+
+	public List<MsoChannel> findProgramMoreThanMax() {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		List<MsoChannel> detached = new ArrayList<MsoChannel>(); 
+		try {
+			Query q = pm.newQuery(MsoChannel.class);
+			q.setFilter("programCount > programCountParam");
+			q.declareParameters("int programCountParam");
+			@SuppressWarnings("unchecked")
+			//List<MsoChannel> channels = (List<MsoChannel>) q.execute(MsoChannelManager.MAX_CHANNEL_SIZE);
+			List<MsoChannel> channels = (List<MsoChannel>) q.execute(30);
+			detached = (List<MsoChannel>)pm.detachCopyAll(channels);
+		} finally {
+			pm.close();
+		}
+		return detached;		
+	}	
 	
 	//!!! probably not used, otherwise need to add index
 	public List<MsoChannel> findPublicChannels() {
