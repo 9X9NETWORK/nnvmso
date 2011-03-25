@@ -265,6 +265,10 @@ public class MsoProgramManager {
 		return msoProgramDao.findAllByChannelId(channelId);
 	}
 
+	public int findAndDeleteProgramsOlderThanMax(long channelId) {
+		return msoProgramDao.findAndDeleteProgramsOlderThanMax(channelId);
+	}
+	
 	public MsoProgram findOldestByChannelId(long channelId) {
 		MsoProgram oldest = msoProgramDao.findOldestByChannelId(channelId); 
 		log.info("find the oldest program:" + oldest.getKey().getId() + ";" + oldest.getName() + ";" + oldest.getStorageId() + ";" + oldest.getPubDate());		
@@ -318,6 +322,6 @@ public class MsoProgramManager {
 			}
 			cache.remove(this.getCacheProgramListKey(channelId));
 		}
-	}
+	}	 
 	
 }
