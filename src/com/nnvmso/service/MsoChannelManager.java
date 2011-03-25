@@ -276,6 +276,10 @@ public class MsoChannelManager {
 	public List<MsoChannel> findAll() {
 		return msoChannelDao.findAll();
 	}
+
+	public List<MsoChannel> findProgramsMoreThanMax() {
+		return msoChannelDao.findProgramMoreThanMax();
+	}
 	
 	public List<MsoChannel> list(int page, int limit, String sidx, String sord) {
 		return msoChannelDao.list(page, limit, sidx, sord);
