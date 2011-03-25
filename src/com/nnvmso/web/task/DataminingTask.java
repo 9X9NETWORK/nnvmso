@@ -78,7 +78,7 @@ public class DataminingTask {
 	    	list = channelMngr.findfindAllAfterTheDate(sinceDate);
 			EmailService emailService = new EmailService();						
 	    	String host = NnNetUtil.getUrlRoot(req);
-			String subject = since.substring(0, 8) + " new channels(" + host + ")";			
+			String subject = since.substring(0, 8) + " new channels (" + host + ")";			
 			String msgBody = "New Channel Count:" + list.size() + "\n";
 			for (MsoChannel c : list) {
 				msgBody = msgBody + "name:" +  c.getName() + ";url=" + c.getSourceUrl();
@@ -119,7 +119,7 @@ public class DataminingTask {
 	    	Date now = new Date();
 	    	String since = sdf.format(now);
 	    	String host = NnNetUtil.getUrlRoot(req);
-			String subject = since + " user account statistics(" + host + ")";
+			String subject = since + " user account statistics (" + host + ")";
 			String msgBody = "";			
 			msgBody = msgBody + "Total Count:" + totalAccountCount + "\n";
 			msgBody = msgBody + "Total Guest Count:" + totalGuestCount + "\n";
