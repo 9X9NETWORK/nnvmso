@@ -608,7 +608,10 @@ public class PlayerApiService {
 					    imageUrl,
 					    String.valueOf(c.getProgramCount()),
 					    String.valueOf(c.getType()),
-					    String.valueOf(c.getStatus())};
+					    String.valueOf(c.getStatus()),
+					    String.valueOf(c.getContentType()),
+					    c.getSourceUrl()
+					    };
  					    
 		String output = NnStringUtil.getDelimitedStr(ori);
 		return output;
