@@ -14,6 +14,7 @@ import com.google.appengine.api.datastore.Key;
 import com.nnvmso.lib.PMF;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoProgram;
+import com.nnvmso.service.MsoChannelManager;
 import com.nnvmso.service.PlayerApiService;
 
 public class MsoProgramDao extends GenericDao<MsoProgram> {
@@ -201,15 +202,40 @@ public class MsoProgramDao extends GenericDao<MsoProgram> {
 		return program;		
 	}	
 
+	public int findAndDeleteProgramsOlderThanMax(long channelId) {
+		List<MsoProgram> list = new ArrayList<MsoProgram>();
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		try {
+			Query q = pm.newQuery(MsoProgram.class);
+			q.setOrdering("pubDate asc");
+			q.setFilter("channelId == channelIdParam");
+			q.declareParameters("long channelIdParam");			
+			@SuppressWarnings("unchecked")
+			List<MsoProgram> programs = (List<MsoProgram>) q.execute(channelId);			
+			if (programs.size() > MsoChannelManager.MAX_CHANNEL_SIZE) {
+				int over = programs.size() - MsoChannelManager.MAX_CHANNEL_SIZE;
+				list = programs.subList(0, over);				
+				log.info("Channel id, original size, delete size:" + channelId + "," + programs.size() + "," + list.size());
+				pm.deletePersistentAll(list);
+			}
+			return programs.size() - list.size(); 
+			
+		} finally {
+			pm.close();
+		}		
+	}	
+	
 	public MsoProgram findOldestByChannelId(long channelId) {
 		MsoProgram oldest = null;
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
 			Query q = pm.newQuery(MsoProgram.class);
+			q.setFilter("channelId == channelIdParam");
+			q.declareParameters("long channelIdParam");			
 			q.setOrdering("pubDate asc");
 			q.setRange(0, 1);
 			@SuppressWarnings("unchecked")
-			List<MsoProgram> programs = (List<MsoProgram>) q.execute();
+			List<MsoProgram> programs = (List<MsoProgram>) q.execute(channelId);
 			if (programs.size() > 0) {
 				oldest = programs.get(0);
 				oldest = pm.detachCopy(oldest);
