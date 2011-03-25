@@ -22,7 +22,7 @@ import com.nnvmso.service.NnStatusMsg;
 import com.nnvmso.service.PlayerApiService;
 
 /**
- * <b>This is API specification for 9x9 Player.</b> Please note although the document is written in JavaDoc form, it is <b>generic Web Service API via HTTP request-response, no Java necessary</b>.
+ * This is API specification for 9x9 Player. Please note although the document is written in JavaDoc form, it is generic Web Service API via HTTP request-response, no Java necessary.
  * <p>
  * <blockquote>
  * Example:
@@ -461,18 +461,25 @@ public class PlayerApiController {
 	 * 
 	 * @param user user's unique identifier
 	 * @param userInfo true or false. Whether to return user information as login. If asked, it will be returned after status code. 
-	 * @return <p>A string of all of the user's subscribed channels' information.</p>  
-	 *         <p>Channel info has following fields: 
+	 * @return A string of all of the user's subscribed channels' information.
+	 *         <p>  
+	 *         Channel info has following fields: 
 	 *         <blockquote> grid id, channel id,  <br/>
 	 *         channel name, channel description, channel image url, <br/>
-	 *         program count, type(integer, see following), status(integer, see following)
+	 *         program count, type(integer, see following), status(integer, see following),
+	 *         contentType(integer, see following), sourceUrl
 	 *         </blockquote>
-	 *         <p>type: TYPE_GENERAL = 1; TYPE_READONLY = 2;</p>
-	 *         <p>status: STATUS_SUCCESS = 0; STATUS_ERROR = 1; 
-	 *         <p> Example: <br/>
+	 *         <p>
+	 *         type: TYPE_GENERAL = 1; TYPE_READONLY = 2;
+	 *         <br/>
+	 *         status: STATUS_SUCCESS = 0; STATUS_ERROR = 1;
+	 *         <br/> 
+	 *         contentType: CONTENTTYPE_PODCAST = 2; CONTENTTYPE_YOUTUBE = 3;
+	 *         <p> 
+	 *         Example: <br/>
 	 *         0	success<br/>
 	 *         -- <br/>
-	 *         1	1207	Channel1	http://hostname/images/img.jpg	3	1 0<br/>
+	 *         1	1207	Channel1	http://hostname/images/img.jpg	3	1	0	3	http://www.youtube.com/user/android<br/>
 	 *         </p>
 	 */		
 	@RequestMapping(value="channelLineup")
