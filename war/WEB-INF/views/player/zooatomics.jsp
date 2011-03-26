@@ -6358,7 +6358,10 @@ function play_yt()
 function yt_state (state)
   {
   // fail (-2), unstarted (-1), ended (0), playing (1), paused (2), buffering (3), video cued (5).
-  log ('yt state: ' + state);
+
+  if (state != yt_previous_state)
+    log ('yt state: ' + state);
+
   if (fp_preloaded == 'yt' && state == 1)
     {
     log ('yt preloaded, setting visibility to hidden');
