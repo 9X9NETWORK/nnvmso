@@ -32,10 +32,20 @@ public class PdrRawManager {
 		if (pdr == null) {return;}		
 		
 		PdrRawManager pdrMngr = new PdrRawManager();
-		//store raw data !!! change to blob type
-		if (pdr.length() > 500) { pdr = pdr.substring(0, 499);}
-		PdrRaw raw = new PdrRaw(userId, sessionId, 0, null, pdr);			
-		pdrMngr.create(raw);
+		log.info("pdr length: " + pdr.length());
+		int times = Math.round(pdr.length() / 500) + 1;
+		int start = 0;
+		int end = 499;
+		if (pdr.length() < end) { end = pdr.length();}
+		for (int i=0; i<times; i++) {
+			String detail = pdr.substring(start, end);
+			PdrRaw raw = new PdrRaw(userId, sessionId, 0, null, detail);			
+			pdrMngr.create(raw);
+			start = start + 500;
+			end = end  + 499;
+			if (pdr.length() < end) { end = pdr.length();}
+		}		
+		
 		/*
 		//if the verb is watch, store the data in viewlog
 		String[] lines = pdr.split("\n");
