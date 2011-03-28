@@ -705,17 +705,7 @@ function report (type, arg)
   pdr += (delta + '\t' + type + '\t' + arg + '\n');
 
   if (++n_pdr >= 200)
-    {
-    n_pdr = 0;
-
-    var serialized = 'user=' + user + mso() + '&' + 'session=' + 
-             Math.floor (timezero/1000) + '&' + 'time=' + delta + '&' + 'pdr=' + encodeURIComponent (pdr);
-
-    pdr = '';
-
-    $.ajax ({ type: 'POST', url: "/playerAPI/pdr", data: serialized, 
-                dataType: 'text', success: report_, error: report_error_ });
-    }
+    report_submit_();
   }
 
 function report_ (data, textStatus, jqXHR)
@@ -731,6 +721,21 @@ function report_ (data, textStatus, jqXHR)
 function report_error_ (jqXHR, textStatus, errorThrown)
   {
   log ('[pdr] error: ' + textStatus);
+  }
+
+function report_submit_()
+  {
+  n_pdr = 0;
+
+  var delta = Math.floor ((new Date().getTime() - timezero) / 1000);
+
+  var serialized = 'user=' + user + mso() + '&' + 'session=' + 
+           Math.floor (timezero/1000) + '&' + 'time=' + delta + '&' + 'pdr=' + encodeURIComponent (pdr);
+
+  pdr = '';
+
+  $.ajax ({ type: 'POST', url: "/playerAPI/pdr", data: serialized, 
+              dataType: 'text', success: report_, error: report_error_ });
   }
 
 function report_program()
@@ -777,6 +782,8 @@ function init()
     yt_quality = (location+'').match (/ytq=([^&]+)/)[1];
 
   $("#fp1, #fp2, #yt1").mousemove (mousemove); // .mouseout (mouseaway);
+
+  $(window).unload (function() { report_submit_(); });
   }
 
 function started_from_shared_ipg()
