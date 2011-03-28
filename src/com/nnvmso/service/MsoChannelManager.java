@@ -172,6 +172,7 @@ public class MsoChannelManager {
 		if ( contentType == MsoChannel.CONTENTTYPE_PODCAST) {
 			String podcastInfo[] = tranService.getPodcastInfo(url);			
 			if (!podcastInfo[0].equals("200") || !podcastInfo[1].contains("xml")) {
+				log.info("invalid url:" + url);		
 				return null;
 			}
 		} else if (contentType == MsoChannel.CONTENTTYPE_YOUTUBE) {

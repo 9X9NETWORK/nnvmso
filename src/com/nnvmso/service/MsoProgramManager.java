@@ -79,6 +79,7 @@ public class MsoProgramManager {
 		long channelId = program.getChannelId();
 		//delete
 		msoProgramDao.delete(program);
+		log.info("delete program" + id);
 		//channel's program count
 		MsoChannelManager channelMngr = new MsoChannelManager();
 		channelMngr.calculateAndSaveChannelCount(program.getChannelId());
