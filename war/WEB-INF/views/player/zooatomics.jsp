@@ -867,6 +867,9 @@ function fetch_programs()
       thumbing = 'ipg';
 
     setTimeout ("update_new_counters()", 0);
+
+    /* we don't use these */
+    erase_all_unclean_youtube_channels()
     });
   }
 
@@ -955,7 +958,7 @@ function fetch_channels()
         {
         var fields = lines[i].split ('\t');
         log ("channel line " + i + ": " + conv [fields[0]] + ' = ' + lines [i]);
-        channelgrid [conv [fields[0]]] = { 'id': fields[1], 'name': fields[2], 'desc': fields[3], 'thumb': fields[4], 'count': fields[5], 'type': fields[6], 'status': fields[7] };
+        channelgrid [conv [fields[0]]] = { 'id': fields[1], 'name': fields[2], 'desc': fields[3], 'thumb': fields[4], 'count': fields[5], 'type': fields[6], 'status': fields[7], 'nature': fields[8], 'extra': fields[9] };
         channels_by_id [fields[1]] = conv [fields[0]];
         }
       else
@@ -1566,7 +1569,6 @@ function ep_html()
 
   var bad_thumbnail = root + 'error.png';
 
-  log ('(program html) program_first: ' + program_first + ' n_program_line: ' + n_program_line + ' program_cursor: ' + program_cursor);
   for (var i = program_first; i <= n_program_line && i < program_first + max_programs_in_line; i++)
     {
     if (i in program_line)
@@ -2644,6 +2646,94 @@ function move_channel (src, dst)
     });
   }
 
+function fetch_youtube_playlist (grid)
+  {
+  // var username = '095393D5B42B2266';
+  var username = channelgrid [ipg_cursor]['extra'];
+  $("#waiting").show();
+  log ("FETCHING YOUTUBE PLAYLIST: " + username);
+  var y = document.createElement ('script'); y.type = 'text/javascript'; y.async = true;
+  y.src = 'http://gdata.youtube.com/feeds/api/playlists/' + username + '?alt=json-in-script' + '&' + 'callback=yt_fetched';
+  var s = document.getElementsByTagName ('script')[0]; s.parentNode.insertBefore (y, s);
+  }
+
+function fetch_youtube_channel (grid)
+  {
+  // http://www.youtube.com/user/ktvu
+  var username = channelgrid [ipg_cursor]['extra'].match (/\/user\/([^\/]*)/)[1];
+  $("#waiting").show();
+  log ("FETCHING YOUTUBE CHANNEL: " + username);
+  var y = document.createElement ('script'); y.type = 'text/javascript'; y.async = true;
+  y.src = 'http://gdata.youtube.com/feeds/users/' + username + '/uploads?alt=json-in-script' + '&' + 'format=5' + '&' + 'callback=yt_fetched';
+  var s = document.getElementsByTagName ('script')[0]; s.parentNode.insertBefore (y, s);
+  }
+
+var feed;
+var entry;
+var yyprogram;
+function yt_fetched (data)
+  {
+  var channel = channelgrid [ipg_cursor]['id'];
+  log ("YOUTUBE FETCHED, channel " + channel);
+
+  feed = data.feed;
+  var entries = feed.entry || [];
+
+  erase_programs_in (channel);
+
+  for (var i = 0; i < entries.length; i++)
+    {
+    entry = entries[i];
+    var id = entry.id.$t;
+    var title = entry.title.$t;
+    var updated = entry.updated.$t;
+
+    var url = entry.media$group.media$content[0]['url'];
+    var duration = entry.media$group.media$content[0]['duration'];
+
+    duration = formatted_time (duration);
+
+    var video_id = '';
+    if (url.match (/\/v\//))
+      video_id = url.match (/\/v\/(...........)/)[1];
+
+    log ("YOUTUBE " + video_id + " EPISODE: " + title);
+
+    var thumb = entry.media$group.media$thumbnail[1]['url'];
+    var now = new Date();
+
+    programgrid [video_id] = { 'channel': channel, 'url1': 'fp:http://www.youtube.com/watch?v=' + video_id, 
+                               'url2': '', 'url3': '', 'url4': '', 'name': title, 'desc': '', 'type': '',
+                               'thumb': thumb, 'snapshot': thumb, 'timestamp': now.getTime(), 'duration': duration };
+    }
+
+  channelgrid [ipg_cursor]['youtubed'] = true;
+
+  enter_channel ('ipg');
+  ipg_metainfo();
+
+  $("#waiting").hide();
+  }
+
+function erase_programs_in (channel)
+  {
+  for (var p in programgrid)
+    {
+    if (programgrid [p]['channel'] == channel)
+      delete (programgrid [p]);
+    }
+  }
+
+function erase_all_unclean_youtube_channels()
+  {
+  for (var c in channelgrid)
+    {
+    var ch = channelgrid [c];
+    if ((ch ['nature'] == 3 || ch ['nature'] == 4) && ! ('youtubed' in ch))
+      erase_programs_in (ch ['id']);
+    }
+  }
+
 function ipg_metainfo()
   {
   if (ipg_cursor in channelgrid)
@@ -2670,6 +2760,23 @@ function ipg_metainfo()
     var n_eps = programs_in_channel (ipg_cursor);
     var display_eps = n_eps;
 
+    if (channelgrid [ipg_cursor]['nature'] == 3)
+      {
+      if (! ('youtubed' in channelgrid [ipg_cursor]))
+        {
+        fetch_youtube_channel (ipg_cursor);
+        return;
+        }
+      }
+    else if (channelgrid [ipg_cursor]['nature'] == 4)
+      {
+      if (! ('youtubed' in channelgrid [ipg_cursor]))
+        {
+        fetch_youtube_playlist (ipg_cursor);
+        return;
+        }
+      }
+
     if (channelgrid [ipg_cursor]['count'] == undefined)
       {
       /* brackets quietly indicate a data inconsistency */
@@ -2681,19 +2788,22 @@ function ipg_metainfo()
       if (debug_mode)
         display_eps = channelgrid [ipg_cursor]['count'] + ' [' + n_eps + ']';
 
-      if (ipg_mode != 'edit' && ! ('refetched' in channelgrid [ipg_cursor]))
+      if (ipg_mode != 'edit')
         {
-        channelgrid [ipg_cursor]['refetched'] = true;
+        if (! ('refetched' in channelgrid [ipg_cursor]))
+          {
+          channelgrid [ipg_cursor]['refetched'] = true;
 
-        if (thumbing == 'browse' || thumbing == 'browse-wait')
-          $("#dir-waiting").show();
-        else
-          $("#waiting").show();
+          if (thumbing == 'browse' || thumbing == 'browse-wait')
+            $("#dir-waiting").show();
+          else
+            $("#waiting").show();
 
-        if (thumbing == 'ipg')
-          thumbing = 'ipg-wait';
+          if (thumbing == 'ipg')
+            thumbing = 'ipg-wait';
 
-        fetch_programs_in (channelgrid [ipg_cursor]['id']);
+          fetch_programs_in (channelgrid [ipg_cursor]['id']);
+          }
         }
       }
     else
@@ -2942,6 +3052,8 @@ function arrow_click()
     $("#ep-list .clickable").removeClass ("on");
 
   episode_clicks_and_hovers();
+
+  report ('m', id + ' [' + thumbing + '] ' + id)
 
   if (thumbing == 'program')
     {
@@ -3294,8 +3406,6 @@ function ipg_click (id)
     log ('eating apparent false click');
     return;
     }
-  else
-    log ('CLICK');
 
   if (modal_box)
     return;
@@ -3315,6 +3425,8 @@ function ipg_click (id)
 
     ipg_cursor = id;
     ipg_sync();
+
+    report ('m', 'ipg-click [' + thumbing + '] ' + id)
 
     if (ipg_cursor != previous_cursor)
       {
@@ -3564,6 +3676,7 @@ function ep_click (id)
     log ('ep_click: ' + id);
     program_cursor = id;
     redraw_program_line();
+    report ('m', 'episode-click [' + thumbing + '] ' + id)
     physical_stop();
     if (thumbing == 'ipg')
       {
@@ -5125,6 +5238,7 @@ function browse_content_down()
 function browse_click (column, id)
   {
   log ('browse click :: ' + column + ', ' + id);
+  report ('m', 'browse-click [' + thumbing + '] ' + column + ' ' + id)
 
   if (column == 1)
     {
@@ -5364,6 +5478,7 @@ function browse_accept (channel)
         }
       }
 
+    report ('c', 'subscribe [' + thumbing + '] ' + channel + ' ' + position);
     log ('subscribe: ' + channel +  ' (at ' + server_grid (position) + ')');
 
     thumbing = 'browse-wait';
@@ -5475,6 +5590,8 @@ function unsubscribe_channel()
       delete (channels_by_id [channel]);
       redraw_ipg();
       elastic();
+
+      report ('c', 'unsubscribe [' + thumbing + '] ' + channel + ' ' + ipg_cursor);
 
       $("#waiting").hide();
 
