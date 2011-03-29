@@ -819,9 +819,7 @@ function fetch_programs_in (channel)
     {
     parse_program_data (data);
 
-    $("#waiting").hide();
-    $("#dir-waiting").hide();
-
+    $("#waiting, #dir-waiting").hide();
     if (thumbing == 'ipg-wait')
       thumbing = 'ipg';
 
@@ -2650,7 +2648,7 @@ function fetch_youtube_playlist (grid)
   {
   // var username = '095393D5B42B2266';
   var username = channelgrid [ipg_cursor]['extra'];
-  $("#waiting").show();
+  metainfo_wait();
   log ("FETCHING YOUTUBE PLAYLIST: " + username);
   var y = document.createElement ('script'); y.type = 'text/javascript'; y.async = true;
   y.src = 'http://gdata.youtube.com/feeds/api/playlists/' + username + '?alt=json-in-script' + '&' + 'callback=yt_fetched';
@@ -2661,7 +2659,7 @@ function fetch_youtube_channel (grid)
   {
   // http://www.youtube.com/user/ktvu
   var username = channelgrid [ipg_cursor]['extra'].match (/\/user\/([^\/]*)/)[1];
-  $("#waiting").show();
+  metainfo_wait();
   log ("FETCHING YOUTUBE CHANNEL: " + username);
   var y = document.createElement ('script'); y.type = 'text/javascript'; y.async = true;
   y.src = 'http://gdata.youtube.com/feeds/users/' + username + '/uploads?alt=json-in-script' + '&' + 'format=5' + '&' + 'callback=yt_fetched';
@@ -2676,35 +2674,38 @@ function yt_fetched (data)
   var channel = channelgrid [ipg_cursor]['id'];
   log ("YOUTUBE FETCHED, channel " + channel);
 
-  feed = data.feed;
-  var entries = feed.entry || [];
-
-  erase_programs_in (channel);
-
-  for (var i = 0; i < entries.length; i++)
+  if (data && data.feed)
     {
-    entry = entries[i];
-    var id = entry.id.$t;
-    var title = entry.title.$t;
-    var updated = entry.updated.$t;
+    feed = data.feed;
+    var entries = feed.entry || [];
 
-    var url = entry.media$group.media$content[0]['url'];
-    var duration = entry.media$group.media$content[0]['duration'];
+    erase_programs_in (channel);
 
-    duration = formatted_time (duration);
+    for (var i = 0; i < entries.length; i++)
+      {
+      entry = entries[i];
+      var id = entry.id.$t;
+      var title = entry.title.$t;
+      var updated = entry.updated.$t;
 
-    var video_id = '';
-    if (url.match (/\/v\//))
-      video_id = url.match (/\/v\/(...........)/)[1];
+      var url = entry.media$group.media$content[0]['url'];
+      var duration = entry.media$group.media$content[0]['duration'];
+      var timestamp = new Date (entry.updated.$t);
 
-    log ("YOUTUBE " + video_id + " EPISODE: " + title);
+      duration = formatted_time (duration);
 
-    var thumb = entry.media$group.media$thumbnail[1]['url'];
-    var now = new Date();
+      var video_id = '';
+      if (url.match (/\/v\//))
+        video_id = url.match (/\/v\/(...........)/)[1];
 
-    programgrid [video_id] = { 'channel': channel, 'url1': 'fp:http://www.youtube.com/watch?v=' + video_id, 
-                               'url2': '', 'url3': '', 'url4': '', 'name': title, 'desc': '', 'type': '',
-                               'thumb': thumb, 'snapshot': thumb, 'timestamp': now.getTime(), 'duration': duration };
+      log ("YOUTUBE " + video_id + " EPISODE: " + title);
+
+      var thumb = entry.media$group.media$thumbnail[1]['url'];
+
+      programgrid [video_id] = { 'channel': channel, 'url1': 'fp:http://www.youtube.com/watch?v=' + video_id, 
+                                 'url2': '', 'url3': '', 'url4': '', 'name': title, 'desc': '', 'type': '',
+                                 'thumb': thumb, 'snapshot': thumb, 'timestamp': timestamp.getTime(), 'duration': duration };
+      }
     }
 
   channelgrid [ipg_cursor]['youtubed'] = true;
@@ -2712,7 +2713,9 @@ function yt_fetched (data)
   enter_channel ('ipg');
   ipg_metainfo();
 
-  $("#waiting").hide();
+  $("#waiting, #dir-waiting").hide();
+  if (thumbing == 'ipg-wait')
+    thumbing = 'ipg';
   }
 
 function erase_programs_in (channel)
@@ -2793,15 +2796,7 @@ function ipg_metainfo()
         if (! ('refetched' in channelgrid [ipg_cursor]))
           {
           channelgrid [ipg_cursor]['refetched'] = true;
-
-          if (thumbing == 'browse' || thumbing == 'browse-wait')
-            $("#dir-waiting").show();
-          else
-            $("#waiting").show();
-
-          if (thumbing == 'ipg')
-            thumbing = 'ipg-wait';
-
+          metainfo_wait();
           fetch_programs_in (channelgrid [ipg_cursor]['id']);
           }
         }
@@ -2848,6 +2843,16 @@ function ipg_metainfo()
     $("#ep-number").hide();
     $("#update").hide();
     }
+  }
+
+function metainfo_wait()
+  {
+  if (thumbing == 'browse' || thumbing == 'browse-wait')
+    $("#dir-waiting").show();
+  else
+    $("#waiting").show();
+  if (thumbing == 'ipg')
+    thumbing = 'ipg-wait';
   }
 
 function stop_preload()
@@ -5563,6 +5568,8 @@ function unsubscribe_channel()
   if (readonly_ipg)
     {
     notice_ok (thumbing, translations ['sharedipg'], "");
+    if (ipg_mode == 'edit')
+      ipg_exit_delete_mode();
     return;
     }
 
