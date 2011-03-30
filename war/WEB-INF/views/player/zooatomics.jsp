@@ -2000,7 +2000,10 @@ function notice_completed()
 function mousemove()
   {
   if (thumbing == 'program')
+    {
     switch_to_control_layer (false);
+    report ('e', 'control-bar');
+    }
   }
 
 function mouseaway()
@@ -2337,6 +2340,7 @@ function delayed_video_stop()
 function switch_to_ipg()
   {
   log ('ipg');
+  report ('e', 'ipg');
 
   clear_msg_timex();
   clear_osd_timex()
@@ -4207,6 +4211,7 @@ function submit_login()
       $("#user").html (username);
       log ('[explicit login] welcome ' + username + ', AKA ' + user);
       solicit();
+      report ('u', 'login ' + user + ' ' + username);
 
       if (readonly_ipg)
         {
@@ -4313,6 +4318,8 @@ function submit_signup()
       $("#user").html (username);
       log ('[login via signup] welcome ' + username + ', AKA ' + user);
       solicit();
+
+      report ('u', 'signup ' + user + ' ' + username);
 
       if (readonly_ipg)
         {
@@ -4443,6 +4450,8 @@ function submit_throw()
       channels_by_id [fields[0]] = position;
       redraw_ipg();
       add_dirty_channel (fields[0]);
+
+      report ('c', 'throw ' + position + ' ' + fields[0]);
       }
     else
       {
@@ -4747,6 +4756,7 @@ function calculate_empties()
 function browse()
   {
   log ('channel directory browse');
+  report ('e', 'channel-directory');
 
   saved_thumbing = thumbing;
   thumbing = 'browse-wait';
@@ -6969,12 +6979,15 @@ function show_eps()
   {
   $("#ep-layer").css ("bottom", "1.75em");
   $("#ep-layer").show();
+
   if (sitename == '5f')
     {
     $("#f5-ipad").show();
     $("#f5-ipad").css ("left", $("#ep-indicator").offset().left);
     }
   episode_clicks_and_hovers();
+
+  report ('e', 'episode-bar');
   }
 
 function control_volume()
