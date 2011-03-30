@@ -23,7 +23,7 @@ public class MigrateUpMsoChannelMapper extends AppEngineMapper<Key, Entity, Null
 			sourceUrl = sourceUrl.toLowerCase();
 			if (sourceUrl.contains("http://www.youtube.com") || sourceUrl.contains("https://www.youtube.com") || 
 					sourceUrl.contains("http://youtube.com") || sourceUrl.contains("https://youtube.com")) {			
-				type = MsoChannel.CONTENTTYPE_YOUTUBE;
+				type = MsoChannel.CONTENTTYPE_YOUTUBE_CHANNEL;
 			} else if (sourceUrl.equals("http://9x9pod.s3.amazonaws.com/default.mp4")) {
 				type = MsoChannel.CONTENTTYPE_SYSTEM;
 			}
