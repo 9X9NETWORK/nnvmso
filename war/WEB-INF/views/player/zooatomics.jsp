@@ -3062,7 +3062,7 @@ function arrow_click()
 
   episode_clicks_and_hovers();
 
-  report ('m', id + ' [' + thumbing + '] ' + id)
+  report ('m', id + ' [' + thumbing + '] ' + id);
 
   if (thumbing == 'program')
     {
@@ -3435,7 +3435,7 @@ function ipg_click (id)
     ipg_cursor = id;
     ipg_sync();
 
-    report ('m', 'ipg-click [' + thumbing + '] ' + id)
+    report ('m', 'ipg-click [' + thumbing + '] ' + id);
 
     if (ipg_cursor != previous_cursor)
       {
@@ -3685,7 +3685,7 @@ function ep_click (id)
     log ('ep_click: ' + id);
     program_cursor = id;
     redraw_program_line();
-    report ('m', 'episode-click [' + thumbing + '] ' + id)
+    report ('m', 'episode-click [' + thumbing + '] ' + id);
     physical_stop();
     if (thumbing == 'ipg')
       {
@@ -5247,7 +5247,7 @@ function browse_content_down()
 function browse_click (column, id)
   {
   log ('browse click :: ' + column + ', ' + id);
-  report ('m', 'browse-click [' + thumbing + '] ' + column + ' ' + id)
+  report ('m', 'browse-click [' + thumbing + '] ' + column + ' ' + id);
 
   if (column == 1)
     {
@@ -7111,6 +7111,8 @@ function control_click()
   log ('control click: ' + id);
 
   $(".cpclick").removeClass ("on");
+
+  report ('m', 'control-click [' + thumbing + '] ' + id);
 
   if (id == 'btn-pause')
     id = 'btn-play';
