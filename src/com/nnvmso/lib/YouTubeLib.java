@@ -15,19 +15,34 @@ public class YouTubeLib {
 	
 	/** 
 	 * 1. remove those invalid keywords we already know.
-	 * 2. merge the following formats to one, http://www.youtube.com/user/<userid>
+	 * 2. merge the following youtube channel formats to one, http://www.youtube.com/user/<userid>
 	 *    http://www.youtube.com/<usrid>
 	 *    http://www.youtube.com/user/<usrid>
 	 *    http://www.youtube.com/profile?user=<usrid>
-	 * 3. youtube api call 
-	 * Examples: they should all become http://www.youtube.com/user/davidbrucehughes    
+	 * 3. merge the following youtube playlist formats to one, http://www.youtube.com/view_play_list?p=<pid>
+	 *    http://www.youtube.com/view_play_list?p=<pid>
+	 *    http://www.youtube.com/user/UCBerkeley#p/c/<pid>
+	 *    http://www.youtube.com/user/UCBerkeley#g/c/<pid>
+	 *    http://www.youtube.com/user/UCBerkeley#p/c/<pid>/0/-dQltKG3NlI
+	 *    http://www.youtube.com/profile?user=UCBerkeley#grid/user/<pid>
+	 *    http://www.youtube.com/watch?v=-dQltKG3NlI&p=<pid>
+	 * 4. youtube api call 
+	 * Example1: they should all become http://www.youtube.com/user/davidbrucehughes    
 	 *    http://www.youtube.com/profile?user=davidbrucehughes#g/u
 	 *    http://www.youtube.com/davidbrucehughes#g/a
 	 *    http://www.youtube.com/user/davidbrucehughes#g/p
+	 * Example2: they should all become http://www.youtube.com/user/view_play_list?p=03D59E2ECDDA66DF
+	 *    http://www.youtube.com/view_play_list?p=03D59E2ECDDA66DF
+	 *    http://www.youtube.com/user/UCBerkeley#p/c/03D59E2ECDDA66DF
+	 *    http://www.youtube.com/user/UCBerkeley#g/c/095393D5B42B2266
+	 *    http://www.youtube.com/user/UCBerkeley#p/c/03D59E2ECDDA66DF/0/-dQltKG3NlI
+	 *    http://www.youtube.com/profile?user=UCBerkeley#grid/user/03D59E2ECDDA66DF
+	 *    http://www.youtube.com/watch?v=-dQltKG3NlI&p=03D59E2ECDDA66DF
+     
 	 */		
-	public static String formatCheck(String url) {
-		if (url == null) {return null;}
-		String[] invalid = {"index", "videos", "watch",
+	public static String formatCheck(String urlStr) {
+		if (urlStr == null) {return null;}
+		String[] invalid = {"index", "videos",
 		                    "entertainment", "music", "news", "movies",
 		                    "comedy", "gaming", "sports", "education",
 		                    "shows",  "trailers",   
@@ -36,19 +51,57 @@ public class YouTubeLib {
 		for (int i=0; i<invalid.length; i++) {
 			dic.add(invalid[i]);
 		}
-		String result = null;
-		String reg = "^(http|https)://?(\\w+\\.)?youtube.com/(user/|profile\\?user=)?([A-Za-z0-9]+)";
+		String url = null;
+		String reg = "^(http|https)://?(\\w+\\.)?youtube.com/(user/|profile\\?user=)?(\\w+)";		
 		Pattern pattern = Pattern.compile(reg);
-		Matcher m = pattern.matcher(url);
+		Matcher m = pattern.matcher(urlStr);
 		while (m.find()) {
 			if (dic.contains(m.group(4))) {return null;}
-			result = "http://www.youtube.com/user/" + m.group(4);
-			result = result.toLowerCase();
-			log.info("original url:" + url + ";result=" + result);			
+			url = "http://www.youtube.com/user/" + m.group(4);
 		}
-		//if (!youTubeCheck(result)) {return null;} //till the function is fixed
-		return result;
+		reg = "^(http|https)://?(\\w+\\.)?youtube.com/(user/|profile\\?user=)?(\\w+)(#(p/c|g/c|grid/user)/(\\w+))";
+		pattern = Pattern.compile(reg);
+		m = pattern.matcher(urlStr);
+		while (m.find()) {
+			url = "http://www.youtube.com/view_play_list?p=" + m.group(7);
+		}
+		
+		reg = "^(http|https)://?(\\w+\\.)?youtube.com/view_play_list\\?p=(\\w+)";
+		pattern = Pattern.compile(reg);
+		m = pattern.matcher(urlStr);		
+		while (m.find()) {
+			url = "http://www.youtube.com/view_play_list?p=" + m.group(3);
+		}
+		
+		reg = "^(http|https)://?(\\w+\\.)?youtube.com/(.+)?p=(\\w+)";
+		pattern = Pattern.compile(reg);
+		m = pattern.matcher(urlStr);
+		while (m.find()) {
+			url = "http://www.youtube.com/view_play_list?p=" + m.group(4);
+		}
+		
+		if (url != null) { 
+			url = url.toLowerCase();
+			if (url.equals("http://www.youtube.com/user/watch")) {
+				url = null;
+			}
+		}
+		log.info("original url:" + urlStr + ";result=" + url);
+		
+		//if (!youTubeCheck(result)) {return null;} //till the function is fixed		
+		return url;		
 	}
+	
+	public static String getYouTubeChannelName(String urlStr) {
+		String channelUrl = "http://www.youtube.com/user/";
+		String playListUrl = "http://www.youtube.com/view_play_list?p=";
+		String name = urlStr.substring(channelUrl.length(), urlStr.length());		
+		if (urlStr.contains("view_play_list")) {
+			name = urlStr.substring(playListUrl.length(), urlStr.length()); 
+		}
+		return name;
+	}
+		
 	
 	/**
 	 * YouTube API request format, http://gdata.youtube.com/feeds/api/users/androidcentral
