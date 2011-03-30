@@ -2658,7 +2658,11 @@ function fetch_youtube_playlist (grid)
 function fetch_youtube_channel (grid)
   {
   // http://www.youtube.com/user/ktvu
-  var username = channelgrid [ipg_cursor]['extra'].match (/\/user\/([^\/]*)/)[1];
+
+  var username = channelgrid [ipg_cursor]['extra'];
+  if (username.match (/\//))
+    username = channelgrid [ipg_cursor]['extra'].match (/\/user\/([^\/]*)/)[1];
+
   metainfo_wait();
   log ("FETCHING YOUTUBE CHANNEL: " + username);
   var y = document.createElement ('script'); y.type = 'text/javascript'; y.async = true;
