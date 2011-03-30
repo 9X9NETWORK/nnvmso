@@ -118,6 +118,13 @@ public class PlayerApiController {
 	}	
 	
 	private void prepService(HttpServletRequest req) {
+		/*
+		String userAgent = req.getHeader("user-agent");
+		if ((userAgent.indexOf("CFNetwork") > -1) && (userAgent.indexOf("Darwin") > -1))	 {
+			playerApiService.setUserAgent(PlayerApiService.PLAYER_IOS);
+			log.info("from iOS");
+		}
+		*/
 		MsoManager msoMngr = new MsoManager();
 		Mso mso = msoMngr.findMsoViaHttpReq(req);
 		Locale locale = Locale.ENGLISH;
@@ -161,7 +168,7 @@ public class PlayerApiController {
 	@RequestMapping(value="brandInfo")
 	public ResponseEntity<String> brandInfo(@RequestParam(value="mso", required=false)String brandName, HttpServletRequest req) {
 		log.info("brandInfo:" + brandName);
-		this.prepService(req);
+		this.prepService(req);		
 		String output = NnStatusMsg.errorStr(locale);
 		try {
 			output = playerApiService.findMsoInfo(req);
