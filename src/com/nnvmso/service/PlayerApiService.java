@@ -27,6 +27,7 @@ import com.nnvmso.dao.ShardedCounter;
 import com.nnvmso.lib.CookieHelper;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnStringUtil;
+import com.nnvmso.lib.YouTubeLib;
 import com.nnvmso.model.Category;
 import com.nnvmso.model.Ipg;
 import com.nnvmso.model.Mso;
@@ -429,6 +430,9 @@ public class PlayerApiService {
 	
 	public String findAuthenticatedUser(String email, String password, HttpServletRequest req, HttpServletResponse resp) {		
 		log.info("login: email=" + email + "; mso=" + mso.getKey().getId() + ";password=" + password);
+		if (email == null || email.length() == 0 ||  password == null || password.length() == 0) {
+			return NnStatusMsg.inputMissing(locale);
+		}		
 		String output = messageSource.getMessage("nnstatus.user_login_failed", new Object[] {NnStatusCode.USER_LOGIN_FAILED} , locale);		
 		NnUser user = userMngr.findAuthenticatedUser(email, password, mso.getKey().getId());
 		if (user != null) {
@@ -601,6 +605,9 @@ public class PlayerApiService {
 			}
 		}
 
+		String channelName = "";
+		if (c.getSourceUrl() != null && c.getSourceUrl().contains("http://www.youtube.com"))
+			channelName = YouTubeLib.getYouTubeChannelName(c.getSourceUrl());
 		String[] ori = {Integer.toString(c.getSeq()), 
 					    String.valueOf(c.getKey().getId()),
 					    c.getName(),
@@ -610,7 +617,7 @@ public class PlayerApiService {
 					    String.valueOf(c.getType()),
 					    String.valueOf(c.getStatus()),
 					    String.valueOf(c.getContentType()),
-					    c.getSourceUrl()
+					    channelName
 					    };
  					    
 		String output = NnStringUtil.getDelimitedStr(ori);

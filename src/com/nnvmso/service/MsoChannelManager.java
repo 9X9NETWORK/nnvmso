@@ -145,37 +145,27 @@ public class MsoChannelManager {
 		channel.setPublic(false);
 		return channel;
 	}
-		
-	/** 
-	 * converge various formats to 1 
-	 * http://www.youtube.com/user/<usrid>
-	 * http://www.youtube.com/<usrid>
-	 * http://www.youtube.com/profile?user=<usrid>
-	 */
-	public String convergeYoutubeUrl(String url) {		
-		return "hello";
-	}
-	
+
+	//the url has to be verified(verifyUrl) first
 	public short getContentTypeByUrl(String url) {
 		short type = MsoChannel.CONTENTTYPE_PODCAST;
-		if (url.contains("http://www.youtube.com") || url.contains("https://www.youtube.com") || 
-			url.contains("http://youtube.com") || url.contains("https://youtube.com"))
-		{			
-			type = MsoChannel.CONTENTTYPE_YOUTUBE;
-		}
+		if (url.contains("http://www.youtube.com"))			
+			type = MsoChannel.CONTENTTYPE_YOUTUBE_CHANNEL;
+		if (url.contains("http://www.youtube.com/view_play_list?p="))
+			type = MsoChannel.CONTENTTYPE_YOUTUBE_PLAYLIST;
 		return type;
 	}		
 		
 	public String verifyUrl(String url) {
+		if (url == null) return null;
 		TranscodingService tranService = new TranscodingService();
-		short contentType = this.getContentTypeByUrl(url); 
-		if ( contentType == MsoChannel.CONTENTTYPE_PODCAST) {
+		if (!url.contains("youtube.com")) {
 			String podcastInfo[] = tranService.getPodcastInfo(url);			
 			if (!podcastInfo[0].equals("200") || !podcastInfo[1].contains("xml")) {
 				log.info("invalid url:" + url);		
 				return null;
 			}
-		} else if (contentType == MsoChannel.CONTENTTYPE_YOUTUBE) {
+		} else {
 			url = YouTubeLib.formatCheck(url);
 		}
 		return url;
