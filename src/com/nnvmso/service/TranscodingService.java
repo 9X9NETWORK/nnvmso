@@ -76,7 +76,7 @@ public class TranscodingService {
 			channelMngr.save(channel);
 			return new PostResponse(String.valueOf(NnStatusCode.SUCCESS), "SUCCESS"); 
 		}
-		//change status to success at the end
+		//change status to WAIT_FOR_APPROVAL at the end
 		if (channel.getStatus() == MsoChannel.STATUS_PROCESSING) { 
 			String name = podcast.getTitle();
 			channel.setName(name);
@@ -93,7 +93,7 @@ public class TranscodingService {
 		if (podcast.getLastUpdateTime() != null) {
 			channel.setTranscodingUpdateDate(podcast.getLastUpdateTime());
 		}
-		channel.setStatus(MsoChannel.STATUS_SUCCESS);
+		channel.setStatus(MsoChannel.STATUS_WAIT_FOR_APPROVAL);
 		channel.setPublic(true);
 		channel.setErrorReason("");
 		channelMngr.save(channel);		
