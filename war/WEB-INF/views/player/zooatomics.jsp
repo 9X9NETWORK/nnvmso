@@ -2655,7 +2655,7 @@ function fetch_youtube_playlist (grid)
   metainfo_wait();
   log ("FETCHING YOUTUBE PLAYLIST: " + username);
   var y = document.createElement ('script'); y.type = 'text/javascript'; y.async = true;
-  y.src = 'http://gdata.youtube.com/feeds/api/playlists/' + username + '?alt=json-in-script' + '&' + 'callback=yt_fetched';
+  y.src = 'http://gdata.youtube.com/feeds/api/playlists/' + username + '?v=2' + '&' + 'alt=json-in-script' + '&' + 'callback=yt_fetched';
   var s = document.getElementsByTagName ('script')[0]; s.parentNode.insertBefore (y, s);
   }
 
@@ -2670,7 +2670,7 @@ function fetch_youtube_channel (grid)
   metainfo_wait();
   log ("FETCHING YOUTUBE CHANNEL: " + username);
   var y = document.createElement ('script'); y.type = 'text/javascript'; y.async = true;
-  y.src = 'http://gdata.youtube.com/feeds/users/' + username + '/uploads?alt=json-in-script' + '&' + 'format=5' + '&' + 'callback=yt_fetched';
+  y.src = 'http://gdata.youtube.com/feeds/users/' + username + '/uploads?v=2' + '&' + 'alt=json-in-script' + '&' + 'format=5' + '&' + 'callback=yt_fetched';
   var s = document.getElementsByTagName ('script')[0]; s.parentNode.insertBefore (y, s);
   }
 
@@ -2681,6 +2681,8 @@ function yt_fetched (data)
   {
   var channel = channelgrid [ipg_cursor]['id'];
   log ("YOUTUBE FETCHED, channel " + channel);
+
+  var now = new Date();
 
   if (data && data.feed)
     {
@@ -2698,8 +2700,8 @@ function yt_fetched (data)
 
       var url = entry.media$group.media$content[0]['url'];
       var duration = entry.media$group.media$content[0]['duration'];
-      var timestamp = new Date (entry.updated.$t);
-
+      // var timestamp = new Date (entry.updated.$t);
+      var timestamp = new Date (entry.media$group.yt$uploaded.$t);
       duration = formatted_time (duration);
 
       var video_id = '';
@@ -2710,6 +2712,10 @@ function yt_fetched (data)
 
       var thumb = entry.media$group.media$thumbnail[1]['url'];
 
+      var ts = timestamp.getTime();
+      if (ts == undefined || ts == NaN || ts == Infinity)
+        ts = now.getTime();
+
       programgrid [video_id] = { 'channel': channel, 'url1': 'fp:http://www.youtube.com/watch?v=' + video_id, 
                                  'url2': '', 'url3': '', 'url4': '', 'name': title, 'desc': '', 'type': '',
                                  'thumb': thumb, 'snapshot': thumb, 'timestamp': timestamp.getTime(), 'duration': duration };
@@ -2718,7 +2724,8 @@ function yt_fetched (data)
 
   channelgrid [ipg_cursor]['youtubed'] = true;
 
-  enter_channel ('ipg');
+  ipg_sync();
+  // enter_channel ('ipg');
   ipg_metainfo();
 
   $("#waiting, #dir-waiting").hide();
