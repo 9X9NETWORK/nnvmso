@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletResponse;
 
 public class CookieHelper {
 
+	static public String GUEST = "guest";
 	static public String USER = "user";
 	static public String PLATFORM = "platform";
 	static public String PLATFORM_GAE = "gae";
