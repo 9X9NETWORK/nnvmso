@@ -181,7 +181,7 @@ public class PlayerApiController {
 
 	/* ==========  CATEGORY: ACCOUNT RELATED ========== */
 	/**
-	 * User login.
+	 * User login. A "user" cookie will be set.
 	 * 
 	 * <p>Only POST operation is supported.</p>
 	 * 
@@ -217,7 +217,7 @@ public class PlayerApiController {
 	}	
 
 	/**
-	 * Register a guest account. 
+	 * Register a guest account. A "guest" cookie will be set.
 	 * If ipg is provided, guest is automatically subscribed to all the channels in the ipg. 
 	 * 
 	 * @param ipg ipg identifier, it is optional
@@ -267,7 +267,7 @@ public class PlayerApiController {
 	}	
 
 	/**
-	 * User cookie will be removed
+	 * "user" cookie will be removed
 	 * 
 	 * @param user user key identifier 
 	 */		
@@ -299,8 +299,7 @@ public class PlayerApiController {
 
 		this.prepService(req);
 		String output = NnStatusMsg.errorStr(locale);
-
-		try {			
+		try {
 			output = playerApiService.findUserByToken(token, req, resp);
 		} catch (Exception e){
 			output = playerApiService.handleException(e);
