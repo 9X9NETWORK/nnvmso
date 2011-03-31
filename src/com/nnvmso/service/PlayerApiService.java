@@ -292,8 +292,8 @@ public class PlayerApiService {
 		}
 		
 		//prepare cookie and output
-		String output = this.prepareUserInfo(guest);
-		this.setUserCookie(resp, guest.getToken());
+		String output = this.prepareUserInfo(guest);	
+		this.setUserCookie(resp, CookieHelper.GUEST, guest.getToken());
 		return output;
 	}
 
@@ -311,8 +311,8 @@ public class PlayerApiService {
 		return output;
 	}
 	
-	public void setUserCookie(HttpServletResponse resp, String userId) {
-		CookieHelper.setCookie(resp, CookieHelper.USER, userId);
+	public void setUserCookie(HttpServletResponse resp, String cookieName, String userId) {		
+		CookieHelper.setCookie(resp, cookieName, userId);
 	}	
 		
 	public String unsubscribeChannel(String userToken, String channelId) {
@@ -410,20 +410,24 @@ public class PlayerApiService {
 		}
 		log.info("user, after user's created" + user.toString());			
 		String output = this.prepareUserInfo(user);
-		this.setUserCookie(resp, user.getToken());
+		this.setUserCookie(resp, CookieHelper.USER, user.getToken());
 		return output;
 	}
 	
 	public String findUserByToken(String token, HttpServletRequest req, HttpServletResponse resp) {
 		if (token == null) {return NnStatusMsg.inputMissing(locale);}
 		
-		NnUser found = userMngr.findByToken(token);	
-		
+		NnUser found = userMngr.findByToken(token);			
 		if (found == null || (found != null && found.getMsoId() != mso.getKey().getId())) {
 			CookieHelper.deleteCookie(resp, CookieHelper.USER);
 			return NnStatusMsg.userInvalid(locale);
 		}
-		this.setUserCookie(resp, found.getToken());
+		
+		if (found.getEmail().equals(NnUser.GUEST_EMAIL)) {
+			this.setUserCookie(resp, CookieHelper.GUEST, found.getToken());			
+		} else {
+			this.setUserCookie(resp, CookieHelper.USER, found.getToken());
+		}
 		userMngr.save(found); //change last login time (ie updateTime)
 		return this.prepareUserInfo(found);
 	}
@@ -438,7 +442,7 @@ public class PlayerApiService {
 		if (user != null) {
 			output = this.prepareUserInfo(user);
 			userMngr.save(user); //change last login time (ie updateTime)
-			this.setUserCookie(resp, user.getToken());
+			this.setUserCookie(resp, CookieHelper.USER, user.getToken());
 		}
 		return output;
 	}
