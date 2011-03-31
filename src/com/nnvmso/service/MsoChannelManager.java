@@ -224,6 +224,11 @@ public class MsoChannelManager {
 		return channels;
 	}	
 
+	public List<MsoChannel> findAllByStatus(short status) {
+		List<MsoChannel> channels = msoChannelDao.findAllByStatus(status);		
+		return channels;
+	}	
+		
 	//!!! here or dao
 	public MsoChannel findBySourceUrlSearch(String url) {
 		if (url == null) {return null;}
