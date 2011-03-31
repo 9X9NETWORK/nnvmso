@@ -145,6 +145,23 @@ public class MsoChannelDao extends GenericDao<MsoChannel> {
 		}
 		return detached;		
 	}	
+
+	public List<MsoChannel> findAllByStatus(short status) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		List<MsoChannel> detached = new ArrayList<MsoChannel>(); 
+		try {
+			Query q = pm.newQuery(MsoChannel.class);
+			q.setFilter("status == statusParam");
+			q.declareParameters("short statusParam");
+			q.setOrdering("createDate asc");
+			@SuppressWarnings("unchecked")
+			List<MsoChannel> channels = (List<MsoChannel>) q.execute(status);
+			detached = (List<MsoChannel>)pm.detachCopyAll(channels);
+		} finally {
+			pm.close();
+		}
+		return detached;
+	}	
 	
 	//!!! probably not used, otherwise need to add index
 	public List<MsoChannel> findPublicChannels() {
