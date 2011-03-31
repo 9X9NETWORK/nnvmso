@@ -1,19 +1,15 @@
 package com.nnvmso.web.admin;
 
-import com.google.appengine.api.users.User;
-import com.google.appengine.api.users.UserService;
-import com.google.appengine.api.users.UserServiceFactory;
-
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.Math;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 import java.util.logging.Logger;
 
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -22,13 +18,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import org.codehaus.jackson.map.ObjectMapper;
-
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
+import com.nnvmso.lib.JqgridHelper;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.lib.NnStringUtil;
-import com.nnvmso.lib.JqgridHelper;
-import com.nnvmso.model.*;
+import com.nnvmso.model.Category;
+import com.nnvmso.model.CategoryChannel;
+import com.nnvmso.model.MsoChannel;
 import com.nnvmso.service.CategoryChannelManager;
 import com.nnvmso.service.CategoryManager;
 import com.nnvmso.service.MsoChannelManager;
@@ -61,23 +59,31 @@ public class AdminMsoChannelController {
 				@RequestParam(value="userEmail")String email ) {				
 		return "";
 	}
-	
+
 	//!!! all sorts of risk to listAll
 	@RequestMapping("list")
-	public ResponseEntity<String> list() {
-		List<MsoChannel> channels = channelMngr.findAll();
-		List<MsoChannel> bad = new ArrayList<MsoChannel>();		
-		for (MsoChannel c : channels) {
-			if (c.getName() == null || c.getStatus() != MsoChannel.STATUS_SUCCESS || 
-				c.isPublic() != true || c.getProgramCount() < 1 ) {
-				bad.add(c);
+	public ResponseEntity<String> list(@RequestParam(value="status", required=false)String status) {
+		String output = "";
+		List<MsoChannel> channels = new ArrayList<MsoChannel>();
+		if (status == null) {
+			channels = channelMngr.findAll();
+			List<MsoChannel> bad = new ArrayList<MsoChannel>();		
+			for (MsoChannel c : channels) {
+				if (c.getName() == null || c.getStatus() != MsoChannel.STATUS_SUCCESS || 
+					c.isPublic() != true || c.getProgramCount() < 1 ) {
+					bad.add(c);
+				}
 			}
+			output = "Total count: " + channels.size() + "\n" + "Bad channel count(not public, name=null, status!=success, programCount < 1): " + bad.size();
+			output = output + "\n\n --------------- \n\n";
+			output = output + this.printChannelData(channels);				
+			output = output + "\n\n --------------- \n\n";
+			output = output + this.printChannelData(bad);			
+		} else {
+			channels = channelMngr.findAllByStatus(Short.valueOf(status));
+			output = output + this.printChannelData(channels);
 		}
-		String output = "Total count: " + channels.size() + "\n" + "Bad channel count(not public, name=null, status!=success, programCount < 1): " + bad.size();
-		output = output + "\n\n --------------- \n\n";
-		output = output + this.printChannelData(channels);				
-		output = output + "\n\n --------------- \n\n";
-		output = output + this.printChannelData(bad);
+		 
 		return NnNetUtil.textReturn(output);
 	}
 	
