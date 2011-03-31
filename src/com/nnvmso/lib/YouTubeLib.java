@@ -26,7 +26,8 @@ public class YouTubeLib {
 	 *    http://www.youtube.com/user/UCBerkeley#p/c/<pid>/0/-dQltKG3NlI
 	 *    http://www.youtube.com/profile?user=UCBerkeley#grid/user/<pid>
 	 *    http://www.youtube.com/watch?v=-dQltKG3NlI&p=<pid>
-	 * 4. youtube api call 
+	 *    http://www.youtube.com/watch?v=-dQltKG3NlI&playnext=1&list=<pid>
+	 * 4. youtube api call (disabled for now)
 	 * Example1: they should all become http://www.youtube.com/user/davidbrucehughes    
 	 *    http://www.youtube.com/profile?user=davidbrucehughes#g/u
 	 *    http://www.youtube.com/davidbrucehughes#g/a
@@ -38,7 +39,8 @@ public class YouTubeLib {
 	 *    http://www.youtube.com/user/UCBerkeley#p/c/03D59E2ECDDA66DF/0/-dQltKG3NlI
 	 *    http://www.youtube.com/profile?user=UCBerkeley#grid/user/03D59E2ECDDA66DF
 	 *    http://www.youtube.com/watch?v=-dQltKG3NlI&p=03D59E2ECDDA66DF
-     
+	 *    http://www.youtube.com/watch?v=-dQltKG3NlI&playnext=1&list=PL03D59E2ECDDA66DF
+	 *    http://www.youtube.com/watch?v=-dQltKG3NlI&playnext=1&list=PL03D59E2ECDDA66DF&feature=list_related
 	 */		
 	public static String formatCheck(String urlStr) {
 		if (urlStr == null) {return null;}
@@ -73,11 +75,11 @@ public class YouTubeLib {
 			url = "http://www.youtube.com/view_play_list?p=" + m.group(3);
 		}
 		
-		reg = "^(http|https)://?(\\w+\\.)?youtube.com/(.+)?p=(\\w+)";
+		reg = "^(http|https)://?(\\w+\\.)?youtube.com/(.+)?(p|list)=(\\w+)";
 		pattern = Pattern.compile(reg);
 		m = pattern.matcher(urlStr);
 		while (m.find()) {
-			url = "http://www.youtube.com/view_play_list?p=" + m.group(4);
+			url = "http://www.youtube.com/view_play_list?p=" + m.group(5);
 		}
 		
 		if (url != null) { 
