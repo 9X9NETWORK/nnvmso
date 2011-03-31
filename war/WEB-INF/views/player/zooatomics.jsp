@@ -1592,7 +1592,7 @@ function ep_html()
 
 function durationof (duration)
   {
-  if (duration == '' || duration == 'null' || duration == undefined || duration == NaN || duration == Infinity)
+  if (duration == '' || duration == 'null' || duration == undefined || isNaN (NaN) || duration == Infinity)
     return '0:00';
 
   if (duration.match (/^00:\d\d:\d\d/))
@@ -2670,7 +2670,7 @@ function fetch_youtube_channel (grid)
   metainfo_wait();
   log ("FETCHING YOUTUBE CHANNEL: " + username);
   var y = document.createElement ('script'); y.type = 'text/javascript'; y.async = true;
-  y.src = 'http://gdata.youtube.com/feeds/users/' + username + '/uploads?v=2' + '&' + 'alt=json-in-script' + '&' + 'format=5' + '&' + 'callback=yt_fetched';
+  y.src = 'http://gdata.youtube.com/feeds/api/users/' + username + '/uploads?v=2' + '&' + 'alt=json-in-script' + '&' + 'format=5' + '&' + 'callback=yt_fetched';
   var s = document.getElementsByTagName ('script')[0]; s.parentNode.insertBefore (y, s);
   }
 
@@ -2713,12 +2713,12 @@ function yt_fetched (data)
       var thumb = entry.media$group.media$thumbnail[1]['url'];
 
       var ts = timestamp.getTime();
-      if (ts == undefined || ts == NaN || ts == Infinity)
+      if (ts == undefined || isNaN (ts) || ts == Infinity)
         ts = now.getTime();
 
       programgrid [video_id] = { 'channel': channel, 'url1': 'fp:http://www.youtube.com/watch?v=' + video_id, 
                                  'url2': '', 'url3': '', 'url4': '', 'name': title, 'desc': '', 'type': '',
-                                 'thumb': thumb, 'snapshot': thumb, 'timestamp': timestamp.getTime(), 'duration': duration };
+                                 'thumb': thumb, 'snapshot': thumb, 'timestamp': ts, 'duration': duration };
       }
     }
 
