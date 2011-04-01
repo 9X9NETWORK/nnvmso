@@ -2100,7 +2100,7 @@ function keypress (keycode)
       else if (thumbing == 'browse')
         browse_enter();
       else if (thumbing == 'channel' || thumbing == 'program')
-        switch_to_control_layer (true);
+        switch_to_control_layer (false);
       else if (thumbing == 'control')
         control_enter();
       else if (thumbing == 'confirm')
@@ -2180,7 +2180,7 @@ function keypress (keycode)
 
     case 40:
       /* down arrow */
-      if (thumbing == 'control')
+      if (thumbing == 'control' || thumbing == 'program')
         control_down();
       else if (thumbing == 'end')
         {
@@ -4012,6 +4012,8 @@ function sign_in_or_out()
         return;
         }
 
+      log ('after signout, cookie is: ' + document.cookie);
+
       notice_ok ('ipg', translations ['thanx'], "login()");
       });
     }
@@ -4640,37 +4642,7 @@ function login()
 
       if (fields[0] == '0')
         {
-        log ('user token was valid');
-        first_time_user = 2;
-
-        for (var i = 2; i < lines.length; i++)
-          {
-          fields = lines [i].split ('\t');
-          if (fields [0] == 'token')
-            user = fields [1];
-          else if (fields [0] == 'name')
-            username = fields [1];
-          else if (fields [0] == 'lastLogin')
-            {
-            var one_day_ago = new Date().getTime() - (1000 * 60 * 60 * 24);
-            lastlogin = parseInt (fields [1]);
-            if (lastlogin < one_day_ago)
-              {
-              log ('lastlogin too old, using 24 hours');
-              lastlogin = one_day_ago;
-              }
-            }
-          }
-
-        $("#user").html (username);
-        solicit();
-
-        log ('[login via cookie] welcome ' + username + ', AKA ' + user);
-
-        if (via_shared_ipg)
-          readonly_ipg = true;
-
-        fetch_everything();
+        proceed_with_valid_login ('login via cookie', lines);
         }
       else
         {
@@ -4684,59 +4656,112 @@ function login()
     }
   else
     {
-    log ('user cookie does not exist, obtaining one');
     if (first_time_user < 2)
       first_time_user = 1;
 
     if (via_shared_ipg)
       log ('jumpstarting from this ipg: ' + get_ipg_id());
 
-    args = via_shared_ipg ? ('?ipg=' + get_ipg_id() + mso()) : ('?mso=' + sitename);
+    /* first, try the veal */
 
-    var d = $.get ("/playerAPI/guestRegister" + args, function (data)
+    var gcookie = getcookie ("guest");
+
+    if (gcookie)
       {
-      log ('response to guestRegister: ' + data);
-      var u = getcookie ("user");
-
-      var lines = data.split ('\n');
-      var fields = lines[0].split ('\t');
-
-      if (fields [0] == '0')
+      var d = $.get ("/playerAPI/userTokenVerify?token=" + gcookie + mso(), function (data)
         {
-        if (u)
-          log ('user cookie now exists');
-        else
-          log ('no "user" cookie, but login was successful')
+        log ('response to userTokenVerify: ' + data);
 
-        for (var i = 2; i < lines.length; i++)
+        var lines = data.split ('\n');
+        var fields = lines[0].split ('\t');
+
+        if (fields[0] == '0')
           {
-          fields = lines [i].split ('\t');
-          if (fields [0] == 'token')
-            user = fields [1];
-          else if (fields [0] == 'name')
-            username = fields [1];
+          proceed_with_valid_login ('login via saved guest cookie', lines);
           }
-
-        $("#user").html (username);
-        log ('[guest login, without cookie] welcome ' + username + ', AKA ' + user);
-        solicit();
-
-        fetch_everything();
-        }
-      else if (u)
-        {
-        log ('guest register failed, but user cookie now exists');
-        user = u;
-        username = u;
-        $("#user").html (username);
-        solicit();
-        via_shared_ipg = false;
-        fetch_everything();
-        }
-      else
-        panic ("was not able to get a user cookie");
-      });
+        else
+          {
+          log ('error occurred verifying guest token "' + gcookie + '": ' + fields[0]);
+          become_a_guest();
+          }
+        });
+      }
+    else
+      become_a_guest();
     }
+  }
+
+function proceed_with_valid_login (how, lines)
+  {
+  log ('user token was valid');
+  first_time_user = 2;
+
+  for (var i = 2; i < lines.length; i++)
+    {
+    fields = lines [i].split ('\t');
+    if (fields [0] == 'token')
+      user = fields [1];
+    else if (fields [0] == 'name')
+      username = fields [1];
+    else if (fields [0] == 'lastLogin')
+      {
+      var one_day_ago = new Date().getTime() - (1000 * 60 * 60 * 24);
+      lastlogin = parseInt (fields [1]);
+      if (lastlogin < one_day_ago)
+        {
+        log ('lastlogin too old, using 24 hours');
+        lastlogin = one_day_ago;
+        }
+      }
+    }
+
+  $("#user").html (username);
+  solicit();
+
+  log ('[' + how + '] welcome ' + username + ', AKA ' + user);
+
+  if (via_shared_ipg)
+    readonly_ipg = true;
+
+  fetch_everything();
+  }
+
+function become_a_guest()
+  {
+  log ('user cookie does not exist, obtaining one');
+
+  args = via_shared_ipg ? ('?ipg=' + get_ipg_id() + mso()) : ('?mso=' + sitename);
+
+  var d = $.get ("/playerAPI/guestRegister" + args, function (data)
+    {
+    log ('response to guestRegister: ' + data);
+    var u = getcookie ("user");
+
+    var lines = data.split ('\n');
+    var fields = lines[0].split ('\t');
+
+    if (fields [0] == '0')
+      {
+      if (u)
+        log ('user cookie now exists');
+      else
+        log ('no "user" cookie, but login was successful')
+
+      proceed_with_valid_login ('guest login', lines);
+      }
+    else if (u)
+      {
+      log ('guest register failed, but user cookie now exists');
+      user = u;
+      username = u;
+      $("#user").html (username);
+      solicit();
+      via_shared_ipg = false;
+      fetch_everything();
+      }
+    else
+      panic ("was not able to get a user cookie");
+    });
   }
 
 function calculate_empties()
@@ -6980,6 +7005,9 @@ function switch_to_control_layer (epflag)
   $(".cpclick").hover (control_hover_in, control_hover_out);
 
   reset_osd_timex();
+
+  if (epflag)
+    $(".cpclick").removeClass ("on");
   }
 
 function show_eps()
@@ -7028,6 +7056,12 @@ function volume_click()
 
 function control_left()
   {
+  if ($("#ep-layer").css ("display") != 'none')
+    {
+    program_left();
+    return;
+    }
+
   $(".cpclick").removeClass ("on");
 
   if (control_cursor > 0)
@@ -7041,6 +7075,12 @@ function control_left()
 
 function control_right()
   {
+  if ($("#ep-layer").css ("display") != 'none')
+    {
+    program_right();
+    return;
+    }
+
   $(".cpclick").removeClass ("on");
 
   if (control_cursor < control_buttons.length - 1)
@@ -7085,30 +7125,38 @@ function control_redraw()
 
 function control_up()
   {
-  if (control_buttons [control_cursor] == 'btn-volume')
-    {
-    var volume = physical_volume();
-    volume += 1/7;
-    if (volume > 1.0) volume = 1.0;
-    physical_set_volume (volume);
-    control_volume();
-    }
+  if (false)
+    if (control_buttons [control_cursor] == 'btn-volume')
+      {
+      var volume = physical_volume();
+      volume += 1/7;
+      if (volume > 1.0) volume = 1.0;
+      physical_set_volume (volume);
+      control_volume();
+      return;
+      }
+
+  if ($("#ep-layer").css ("display") == 'none')
+    switch_to_control_layer (true);
   else
     switch_to_ipg();
   }
 
 function control_down()
   {
-  if (control_buttons [control_cursor] == 'btn-volume')
-    {
-    var volume = physical_volume();
-    volume -= 1/7;
-    if (volume < 0) volume = 0;
-    physical_set_volume (volume);
-    control_volume();
-    }
-  else
-    enter_channel ('program');
+  if (false)
+    if (control_buttons [control_cursor] == 'btn-volume')
+      {
+      var volume = physical_volume();
+      volume -= 1/7;
+      if (volume < 0) volume = 0;
+      physical_set_volume (volume);
+      control_volume();
+      return;
+      }
+
+  if ($("#ep-layer").css ("display") != 'none')
+    switch_to_control_layer (false);
   }
 
 function control_hover_in()
