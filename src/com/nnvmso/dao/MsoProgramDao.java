@@ -178,6 +178,7 @@ public class MsoProgramDao extends GenericDao<MsoProgram> {
 	
 	public MsoProgram findById(long id) {
 		MsoProgram program = null;
+		if (id == 0) return program;
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
 			program = pm.getObjectById(MsoProgram.class, id);
