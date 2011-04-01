@@ -1,9 +1,22 @@
 the Project
 ==============
-This check-in does not guarantee everything's working. shameful but it's the nature of this project.
-Most of the time it's partially working, for various demo purpose.
-
 Goto "http://host/admin/index", click on "dev turn on debug" to initiate necessary data to begin with. 
+
+Related Project
+==============
+- Maintenance project, deployed on V1
+https://everest.teltel.com:8443/repos/misc/web/nnvmso-maintenance
+
+- datastore-admin, deployed as version datastore-admin
+It is based on python 2.5.2, Google App Engine SDK 1.4.1 
+https://everest.teltel.com:8443/repos/misc/web/datastore-admin
+
+deploy command example: 
+appcfg.py -A 9x9tvdev update C:\python\projects\datastore-admin
+
+remoteapi example: 
+https://datastore-admin.9x9tvprod3.appspot.com/_ah/remote_api
+
 
 API document
 =====
