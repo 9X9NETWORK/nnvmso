@@ -130,6 +130,21 @@
     </property>            
   </configuration>
 
+  <configuration name="MigrateUp Ipg Mapper2">
+    <property>
+      <name>mapreduce.map.class</name>
+      <value>com.nnvmso.task.mapper.MigrateUpIpgMapper2</value>
+    </property>
+    <property>
+      <name>mapreduce.inputformat.class</name>
+      <value>com.google.appengine.tools.mapreduce.DatastoreInputFormat</value>
+    </property>
+    <property>
+      <name human="Entity Kind to Map Over">mapreduce.mapper.inputformat.datastoreinputformat.entitykind</name>
+      <value template="optional">Ipg</value>      
+    </property>            
+  </configuration>
+
   <configuration name="MigrateUp PdrRaw Mapper">
     <property>
       <name>mapreduce.map.class</name>
@@ -180,6 +195,21 @@
     <property>
       <name>mapreduce.map.class</name>
       <value>com.nnvmso.task.mapper.MigrateDownIpgMapper</value>
+    </property>
+    <property>
+      <name>mapreduce.inputformat.class</name>
+      <value>com.google.appengine.tools.mapreduce.DatastoreInputFormat</value>
+    </property>
+    <property>
+      <name human="Entity Kind to Map Over">mapreduce.mapper.inputformat.datastoreinputformat.entitykind</name>
+      <value template="optional">Ipg</value>      
+    </property>            
+  </configuration>
+
+  <configuration name="MigrateDown Ipg Mapper2">
+    <property>
+      <name>mapreduce.map.class</name>
+      <value>com.nnvmso.task.mapper.MigrateDownIpgMapper2</value>
     </property>
     <property>
       <name>mapreduce.inputformat.class</name>
@@ -258,4 +288,27 @@
     </property>        
   </configuration>
     
+  <configuration name="Category Channel Counter mapper">
+    <property>
+      <name>mapreduce.map.class</name>      
+      <value>com.nnvmso.task.mapper.CategoryCounterMapper</value>
+    </property>
+    <property>
+      <name>mapreduce.inputformat.class</name>
+      <value>com.google.appengine.tools.mapreduce.DatastoreInputFormat</value>
+    </property>    
+    <property>
+      <name human="Entity Kind to Map Over">mapreduce.mapper.inputformat.datastoreinputformat.entitykind</name>
+      <value template="optional">CategoryCounter</value>      
+    </property>    
+    <property>
+      <name human="Since(yyyyMMddHHmmss)">since</name>
+      <value template="optinonal">20090101000000</value>
+    </property>
+    <property>
+    	<!--  This is the URL to call after the entire Mapper has run -->
+    	<name>mapreduce.appengine.donecallback.url</name>
+    	<value>/task/datamining/userCountTaskCompleted</value>
+    </property>        
+  </configuration>    
 </configurations>
