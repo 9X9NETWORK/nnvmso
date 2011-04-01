@@ -438,7 +438,8 @@ var language_tw =
   cff: '快轉',
   cipg: '回到 Smart Guide',
   cfb: '分享至 Facebook',
-  cvol: '音量',
+  cvolup: '音量大',
+  cvoldown: '音量小',
   cmute: '靜音',
   cunmute: '恢復音量',
   uncaught: '系統可能遇到問題。 請稍後再試。'
