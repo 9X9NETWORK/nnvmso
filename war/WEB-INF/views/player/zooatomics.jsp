@@ -101,6 +101,7 @@ var jumpstarted_channel = ''; /* past tense */
 var add_jumpstart_channel = false;
 var bandwidth_measurement = 0;
 var bw_started = 0;
+var user_closed_episode_bubble = false;
 
 /* player data record */
 var pdr = '';
@@ -7069,7 +7070,10 @@ function switch_to_control_layer (epflag)
   if (epflag)
     $(".cpclick").removeClass ("on");
 
-  $("#sg-bubble").hide();
+  if (user_closed_episode_bubble)
+    $("#sg-bubble").hide();
+  else
+    show_sg_bubble();
   }
 
 function show_eps()
@@ -7226,6 +7230,7 @@ function volume_down()
 function hide_sg_bubble()
   {
   $("#sg-bubble").hide();
+  user_closed_episode_bubble = true;
   }
 
 function control_hover_in()
@@ -7234,12 +7239,9 @@ function control_hover_in()
   $(this).addClass ("hover");
   reset_osd_timex();
 
-  if ($(this).attr ("id") == 'btn-sg')
-    {
-    $("#sg-bubble").show();
-    $("#btn-bubble-del").unbind();
-    $("#btn-bubble-del").click (hide_sg_bubble);
-    }
+  if (false)
+    if ($(this).attr ("id") == 'btn-sg')
+      show_sg_bubble();
   }
 
 function control_hover_out()
@@ -7247,6 +7249,13 @@ function control_hover_out()
   $(this).removeClass ("hover");
   $('#' + control_buttons [control_cursor]).addClass ("on");
   reset_osd_timex();
+  }
+
+function show_sg_bubble()
+  {
+  $("#sg-bubble").show();
+  $("#btn-bubble-del").unbind();
+  $("#btn-bubble-del").click (hide_sg_bubble);
   }
 
 function control_click()
