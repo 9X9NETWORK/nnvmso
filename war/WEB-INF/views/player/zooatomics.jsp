@@ -1194,6 +1194,7 @@ function subscribe_button()
     }
   else
     {
+    login_screen();
     }
   }
 
