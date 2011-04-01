@@ -149,7 +149,7 @@ public class PlayerApiService {
 			channelId == null || programId == null || channelId.length() == 0 || programId.length() == 0) {
 			return NnStatusMsg.inputMissing(locale);
 		}				
-		if (!Pattern.matches("^\\d*$", channelId) || !Pattern.matches("^\\d*$", programId)) {
+		if (!Pattern.matches("^\\d*$", channelId)) {
 			return messageSource.getMessage("nnstatus.input_error", new Object[] {NnStatusCode.INPUT_ERROR} , locale);
 		}
 				
@@ -158,7 +158,11 @@ public class PlayerApiService {
 
 		Ipg ipg = new Ipg();
 		ipg.setChannelId(Long.parseLong(channelId));
-		ipg.setProgramId(Long.parseLong(programId));
+		if (Pattern.matches("^\\d*$", programId)) {
+			ipg.setProgramId(Long.parseLong(programId));
+		} else {
+			ipg.setProgramIdStr(programId);
+		}
 		ipg.setUserId(foundUser.getKey().getId());
 		IpgManager ipgMngr = new IpgManager();
 		ipgMngr.create(ipg, foundUser.getKey().getId());				
@@ -182,7 +186,7 @@ public class PlayerApiService {
 			MsoConfig config = new MsoConfigManager().findByMsoIdAndItem(mso.getKey().getId(), MsoConfig.CDN);
 			toPlay = toPlay + this.composeProgramInfoStr(programs, config);
 		} else {
-			toPlay = ipg.getChannelId() + "\t" + ipg.getProgramId() + "\n";			
+			toPlay = toPlay + ipg.getChannelId() + "\t" + ipg.getProgramIdStr() + "\n";			
 		}
 		String channelLineup = separatorStr;
 		//third block: channelLineup 
