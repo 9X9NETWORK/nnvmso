@@ -181,6 +181,8 @@ public class PlayerApiService {
 			programs.add(program);
 			MsoConfig config = new MsoConfigManager().findByMsoIdAndItem(mso.getKey().getId(), MsoConfig.CDN);
 			toPlay = toPlay + this.composeProgramInfoStr(programs, config);
+		} else {
+			toPlay = ipg.getChannelId() + "\t" + ipg.getProgramId() + "\n";			
 		}
 		String channelLineup = separatorStr;
 		//third block: channelLineup 
