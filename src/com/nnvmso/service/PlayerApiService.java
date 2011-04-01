@@ -387,10 +387,11 @@ public class PlayerApiService {
 			log.info("user email taken:" + user.getEmail() + "; mso=" + mso.getName() + ";user token=" + user.getToken());
 			return messageSource.getMessage("nnstatus.user_email_taken", new Object[] {NnStatusCode.USER_EMAIL_TAKEN} , locale);
 		}
-		
+		boolean convertFromGuest = true;
 		//create user
 		if (userToken != null) { user = userMngr.findByToken(userToken);}
 		if (user == null ) {
+			convertFromGuest = false;
 			log.info("User signup userToken NOT FOUND. Token=" + userToken);
 			user = new NnUser(email, password, name, NnUser.TYPE_USER, mso.getKey().getId());
 			log.info("user, based on the input:" + user.toString());
@@ -410,6 +411,9 @@ public class PlayerApiService {
 		}
 		log.info("user, after user's created" + user.toString());			
 		String output = this.prepareUserInfo(user);
+		if (convertFromGuest) {
+			CookieHelper.deleteCookie(resp, CookieHelper.GUEST);
+		}
 		this.setUserCookie(resp, CookieHelper.USER, user.getToken());
 		return output;
 	}
