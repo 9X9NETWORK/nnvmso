@@ -97,6 +97,8 @@ var nopreload = false;
 var divlog = false;
 var jumpstart_channel = '';
 var jumpstart_program = '';
+var jumpstarted_channel = ''; /* past tense */
+var add_jumpstart_channel = false;
 var bandwidth_measurement = 0;
 var bw_started = 0;
 
@@ -242,6 +244,7 @@ var language_en =
   browsetip: 'Browse the categories for available channels',
   addrss: 'Can’t find what you like? Add your favorite video Podcast RSS or Youtube channels!',
   returnsmart: 'Return to Smart Guide',
+  rsbubble: 'Return to Smart Guide for more interesting content',
   copypaste: 'Copy and paste video podcast RSS or Youtube channel URL here',
   threecat: 'Please select one to three categories',
   processing: 'We will start processing the channel you contributed right after it is submitted',
@@ -366,6 +369,7 @@ var language_tw =
   browsetip: '瀏覽頻道分類，挑選新頻道',
   addrss: '找不到喜歡的頻道嗎？您可以加入喜歡的影片Podcast RSS 連結或Youtube頻道網址!',
   returnsmart: '返回Smart Guide',
+  rsbubble: '回Smart Guide可觀賞更多有趣內容',
   copypaste: '把Podcast RSS連結或Youtube頻道網址複製貼上',
   threecat: '請選擇一到三個分類',
   processing: '頻道送出後，我們立刻開始處理頻道',
@@ -619,6 +623,7 @@ function set_language (lang)
   $("#newusers").html (translations ['newusers']);
   $("#signup").html (translations ['signup']);
   $("#cinstr").html (translations ['cinstr']);
+  $("#rsbubble").html (translations ['rsbubble']);
 
   $("#btn-volume-up img").attr ("title", translations ['cvolup']);
   $("#btn-volume-down img").attr ("title", translations ['cvoldown']);
@@ -967,17 +972,28 @@ function fetch_channels()
 
     all_channels_fetched = true;
 
-    if (!activated)
-      activate();
-    else
+    if (add_jumpstart_channel)
       {
-      redraw_ipg();
-      elastic();
+      add_jumpstart_channel_inner();
+      return;
       }
 
-    if (!all_programs_fetched)
-      setTimeout ("fetch_programs_piecemeal()", 10000);
+    after_fetch_channels();
     });
+  }
+
+function after_fetch_channels()
+  {
+  if (!activated)
+    activate();
+  else
+    {
+    redraw_ipg();
+    elastic();
+    }
+
+  if (!all_programs_fetched)
+    setTimeout ("fetch_programs_piecemeal()", 10000);
   }
 
 function update_new_counters()
@@ -1155,8 +1171,29 @@ function jumpstart_inner()
       contest();
     }
 
+  if (sitename == '5f')
+    {
+    $("#btn-subscribe").show();
+    $("#btn-subscribe").unbind();
+    $("#btn-subscribe").click (subscribe_button);
+    }
+
+  jumpstarted_channel = jumpstart_channel;
+
   jumpstart_channel = '';
   jumpstart_program = '';
+  }
+
+function subscribe_button()
+  {
+  if (readonly_ipg)
+    {
+    add_jumpstart_channel = true;
+    login();
+    }
+  else
+    {
+    }
   }
 
 function set_channel_and_program (channel, program)
@@ -1310,7 +1347,7 @@ function message (text, duration)
 function hide_layers()
   {
   $("#ep-layer, #f5-ipad").hide();
-  $("#control-layer").hide();
+  $("#control-layer, #sg-bubble").hide();
   $("#msg-layer").hide();
   $("#epend-layer").hide();
   }
@@ -1553,7 +1590,7 @@ function enter_channel (mode)
   {
   $("#epend-layer").hide();
   prepare_channel();
-  //$("#control-layer, #f5-ipad").hide();
+  //$("#control-layer, #f5-ipad, #sg-bubble").hide();
   redraw_program_line();
   $("#ep-meta").hide();
   $(".ep-list .age").show();
@@ -2316,7 +2353,7 @@ function osd_timex_expired()
   osd_timex = 0;
   log ('osd timex expired');
   if (thumbing != 'ipg')
-    $("#ep-layer, #control-layer, #f5-ipad").hide();
+    $("#ep-layer, #control-layer, #f5-ipad, #sg-bubble").hide();
   if (thumbing == 'control')
     thumbing = 'program';
   }
@@ -2382,7 +2419,7 @@ function switch_to_ipg()
   stop_preload();
   $("#buffering").hide();
 
-  $("#control-layer, #f5-ipad").hide();
+  $("#control-layer, #f5-ipad, #sg-bubble, #btn-subscribe").hide();
   $("#ch-directory").hide();
 
   $("#ep-layer").css ("bottom", "0");
@@ -5598,17 +5635,36 @@ function continue_acceptance (position, channel_info)
     });
   }
 
-function accepted_return_ipg()
+function add_jumpstart_channel_inner()
   {
-  $("#content-" + browser_y + " .msgbar").html ('<p class="status">Subscribed</p>');
-  escape()
-  redraw_ipg();
-  elastic();
-  }
+  add_jumpstart_channel = false;
 
-function accepted_continue_browsing()
-  {
-  $("#content-" + browser_y + " .msgbar").html ('<p class="status">Subscribed</p>');
+  /* use 10, to permit the first channel, 11, to be used */
+  position = next_free_square (10);
+  if (!position)
+    {
+    log_and_alert ('no free squares');
+    return;
+    }
+
+  var cmd = "/playerAPI/subscribe?user=" + user + mso() + '&' + "channel=" + jumpstarted_channel + '&' + "grid=" + server_grid (position);
+  var d = $.get (cmd, function (data)
+    {
+    $("#waiting").hide();
+    thumbing = 'ipg-wait';
+    log ('subscribe raw result: ' + data);
+    var fields = data.split ('\t');
+    if (fields [0] == '0')
+      {
+      $("#waiting").show();
+      fetch_channels();
+      }
+    else
+      {
+      notice_ok ('ipg', translations ['suberr'] + ': ' + fields [1], "");
+      after_fetch_channels();
+      }
+    });
   }
 
 function unsubscribe_channel()
@@ -6956,7 +7012,7 @@ function exit_control_layer()
   if (thumbing == 'control' || thumbing == 'program')
     {
     thumbing = 'program';
-    $("#control-layer, #ep-layer, #f5-ipad").hide();
+    $("#control-layer, #ep-layer, #f5-ipad, #sg-bubble").hide();
     clear_osd_timex();
     // prepare_channel();
     }
@@ -7010,6 +7066,8 @@ function switch_to_control_layer (epflag)
 
   if (epflag)
     $(".cpclick").removeClass ("on");
+
+  $("#sg-bubble").hide();
   }
 
 function show_eps()
@@ -7061,6 +7119,7 @@ function control_left()
   if ($("#ep-layer").css ("display") != 'none')
     {
     program_left();
+    $("#sg-bubble").hide();
     return;
     }
 
@@ -7072,6 +7131,8 @@ function control_left()
    control_cursor = control_buttons.length - 1;
 
   control_redraw();
+  $("#sg-bubble").hide();
+
   reset_osd_timex();
   }
 
@@ -7080,6 +7141,7 @@ function control_right()
   if ($("#ep-layer").css ("display") != 'none')
     {
     program_right();
+    $("#sg-bubble").hide();
     return;
     }
 
@@ -7091,6 +7153,8 @@ function control_right()
     control_cursor = 0;
 
   control_redraw();
+  $("#sg-bubble").hide();
+
   reset_osd_timex();
   }
 
@@ -7157,11 +7221,23 @@ function volume_down()
   control_volume();
   }
 
+function hide_sg_bubble()
+  {
+  $("#sg-bubble").hide();
+  }
+
 function control_hover_in()
   {
   $(".cpclick").removeClass ("on");
   $(this).addClass ("hover");
   reset_osd_timex();
+
+  if ($(this).attr ("id") == 'btn-sg')
+    {
+    $("#sg-bubble").show();
+    $("#btn-bubble-del").unbind();
+    $("#btn-bubble-del").click (hide_sg_bubble);
+    }
   }
 
 function control_hover_out()
@@ -7294,7 +7370,7 @@ function delete_no()
 
 function switch_to_facebook()
   {
-  $("#ep-layer, #control-layer, #f5-ipad").hide();
+  $("#ep-layer, #control-layer, #f5-ipad, #sg-bubble").hide();
   yes_or_no (translations ['sharing'], "fb_yes()", "fb_no()", 2);
   }
 
@@ -7857,6 +7933,10 @@ function noop (e)
 </div>
 
 <div id="f5-ipad" onclick="contest_click()" style="display: none"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/5f_ipad.png" title="點下看活動詳情"></div>
+
+<div id="sg-bubble"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/bg_bubble.png"><div id="btn-bubble-del"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/btn_delete_off.png" class="off"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/btn_delete_on.png" class="on"></div><p><span id="rsbubble">Return to Smart Guide for more interesting content</span></p></div>
+
+<div id="btn-subscribe" style="z-index: 300; display: none"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/btn_subscribe_off.png" class="off"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/btn_subscribe_on.png" class="on"></div>
 
 <div id="opening" style="display: block; z-index: 999">
   <div class="opening-holder" id="splash"></div>
