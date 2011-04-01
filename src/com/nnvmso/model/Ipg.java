@@ -31,6 +31,9 @@ public class Ipg implements Serializable {
 	private long programId;
 	
 	@Persistent
+	private String programIdStr;
+	
+	@Persistent
 	private Date createDate;
 	
 	@Persistent
@@ -93,5 +96,14 @@ public class Ipg implements Serializable {
 
 	public void setProgramId(long programId) {
 		this.programId = programId;
+	}
+
+	public String getProgramIdStr() {
+		return programIdStr;
+	}
+
+	public void setProgramIdStr(String programIdStr) {
+		this.programIdStr = programIdStr;
 	}	
+	
 }
