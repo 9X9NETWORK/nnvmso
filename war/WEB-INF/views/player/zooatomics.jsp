@@ -99,6 +99,7 @@ var jumpstart_channel = '';
 var jumpstart_program = '';
 var jumpstarted_channel = ''; /* past tense */
 var add_jumpstart_channel = false;
+var shared_but_is_now_logged_in = false;
 var bandwidth_measurement = 0;
 var bw_started = 0;
 var user_closed_episode_bubble = false;
@@ -165,6 +166,7 @@ var control_saved_thumbing = '';
 var browse_cursor = 1;
 var max_programs_in_line = 9;
 var cat_query;
+var pending_queries = [];
 
 /* timeout for program or channel index */
 var osd_timex = 0;
@@ -799,7 +801,7 @@ function started_from_shared_ipg()
   {
   var pathname = location.pathname;
   var split = pathname.split ('/');
-  return (split.length == 3 && split[2].match(/^[0-9]+$/));
+  return (!shared_but_is_now_logged_in && split.length == 3 && split[2].match(/^[0-9]+$/));
   }
 
 function get_ipg_id()
@@ -980,14 +982,28 @@ function fetch_channels()
       return;
       }
 
-    after_fetch_channels();
+    after_fetch_channels (false);
     });
   }
 
-function after_fetch_channels()
+function after_fetch_channels (ipg_flag)
   {
+  log ('after fetch channels');
+
+  log ('----- ipg_flag: ' + ipg_flag);
+  log ('----- activated: ' + activated);
+  log ('----- shared_but_is_now_logged_in: ' + shared_but_is_now_logged_in);
+  log ('----- add_jumpstart_channel: ' + add_jumpstart_channel);
+  log ('----- via_shared_ipg: ' + via_shared_ipg);
+  log ('----- readonly_ipg: ' + readonly_ipg);
+
   if (!activated)
     activate();
+  else if (ipg_flag || shared_but_is_now_logged_in)
+    {
+    shared_but_is_now_logged_in = false;
+    switch_to_ipg();
+    }
   else
     {
     redraw_ipg();
@@ -1067,6 +1083,16 @@ function fetch_piece (charray)
     if (piece_count == n_channels)
       all_programs_fetched = true;
     });
+  pending_queries.push (d);
+  }
+
+function abort_pending_queries()
+  {
+  for (var i in pending_queries)
+    {
+    try { pending_queries[i].abort(); } catch (error) {};
+    }
+  pending_queries = [];
   }
 
 function browser_support()
@@ -1138,17 +1164,27 @@ function jumpstart()
   log ('loading programs in jumpstart channel');
   $("#waiting").show();
 
-  var query = "/playerAPI/programInfo?channel=" + jumpstart_channel + mso() + '&' + user_or_ipg();
+  var nature = channelgrid [channels_by_id [jumpstart_channel]]['nature'];
 
-  var d = $.get (query, function (data)
+  if (nature != '3' && nature != '4')
     {
-    parse_program_data (data);
-    $("#waiting").hide();
-    if (jumpstart_program in programgrid)
-      jumpstart_inner();
-    else
-      notice_ok (thumbing, translations ['expired'], "switch_to_ipg()");
-    });
+    var query = "/playerAPI/programInfo?channel=" + jumpstart_channel + mso() + '&' + user_or_ipg();
+  
+    var d = $.get (query, function (data)
+      {
+      parse_program_data (data);
+      $("#waiting").hide();
+      if (jumpstart_program in programgrid)
+        jumpstart_inner();
+      else
+        notice_ok (thumbing, translations ['expired'], "switch_to_ipg()");
+      });
+    }
+  else
+    {
+    ipg_cursor = channels_by_id [jumpstart_channel];
+    fetch_youtube (ipg_cursor);
+    }
   }
 
 function jumpstart_inner()
@@ -1188,13 +1224,27 @@ function jumpstart_inner()
 
 function subscribe_button()
   {
+  via_shared_ipg = false;
+  shared_but_is_now_logged_in = true;
+
+  /* pending programInfo queries interfere with login */
+  abort_pending_queries();
+
   if (readonly_ipg)
     {
+    readonly_ipg = false;
+    log ('SUBSCRIBE BUTTON HIT, with readonly ipg');
+    var uu = getcookie ("user");
+    if (uu)
+      log ('previously stored user cookie is: ' + uu);
+    else
+      log ('no previously stored user cookie!');
     add_jumpstart_channel = true;
     login();
     }
   else
     {
+    log ('SUBSCRIBE BUTTON HIT, a new user');
     login_screen();
     }
   }
@@ -2690,10 +2740,32 @@ function move_channel (src, dst)
     });
   }
 
+function fetch_youtube (cursor)
+  {
+  if (channelgrid [cursor]['nature'] == 3)
+    {
+    if (! ('youtubed' in channelgrid [cursor]))
+      {
+      fetch_youtube_channel (cursor);
+      return true;
+      }
+    }
+  else if (channelgrid [cursor]['nature'] == 4)
+    {
+    if (! ('youtubed' in channelgrid [cursor]))
+      {
+      fetch_youtube_playlist (cursor);
+      return true;
+      }
+    }
+
+  return false;
+  }
+
 function fetch_youtube_playlist (grid)
   {
   // var username = '095393D5B42B2266';
-  var username = channelgrid [ipg_cursor]['extra'];
+  var username = channelgrid [grid]['extra'];
   metainfo_wait();
   log ("FETCHING YOUTUBE PLAYLIST: " + username);
   var y = document.createElement ('script'); y.type = 'text/javascript'; y.async = true;
@@ -2705,9 +2777,9 @@ function fetch_youtube_channel (grid)
   {
   // http://www.youtube.com/user/ktvu
 
-  var username = channelgrid [ipg_cursor]['extra'];
+  var username = channelgrid [grid]['extra'];
   if (username.match (/\//))
-    username = channelgrid [ipg_cursor]['extra'].match (/\/user\/([^\/]*)/)[1];
+    username = channelgrid [grid]['extra'].match (/\/user\/([^\/]*)/)[1];
 
   metainfo_wait();
   log ("FETCHING YOUTUBE CHANNEL: " + username);
@@ -2773,6 +2845,9 @@ function yt_fetched (data)
   $("#waiting, #dir-waiting").hide();
   if (thumbing == 'ipg-wait')
     thumbing = 'ipg';
+
+  if (jumpstart_channel != '')
+    jumpstart_inner();
   }
 
 function erase_programs_in (channel)
@@ -2820,22 +2895,8 @@ function ipg_metainfo()
     var n_eps = programs_in_channel (ipg_cursor);
     var display_eps = n_eps;
 
-    if (channelgrid [ipg_cursor]['nature'] == 3)
-      {
-      if (! ('youtubed' in channelgrid [ipg_cursor]))
-        {
-        fetch_youtube_channel (ipg_cursor);
-        return;
-        }
-      }
-    else if (channelgrid [ipg_cursor]['nature'] == 4)
-      {
-      if (! ('youtubed' in channelgrid [ipg_cursor]))
-        {
-        fetch_youtube_playlist (ipg_cursor);
-        return;
-        }
-      }
+    if (fetch_youtube (ipg_cursor))
+      return;
 
     if (channelgrid [ipg_cursor]['count'] == undefined)
       {
@@ -5390,9 +5451,9 @@ function browse_category (category_id)
 
   try { cat_query.abort(); } catch (error) {};
 
-  cat_query = "/playerAPI/channelBrowse?category=" + category_id + mso();
+  var query = "/playerAPI/channelBrowse?category=" + category_id + mso();
 
-  var d = $.get (cat_query, function (data)
+  cat_query = $.get (query, function (data)
     {
     $("#dir-waiting").hide();
     sanity_check_data ('channelBrowse', data);
@@ -5650,6 +5711,15 @@ function add_jumpstart_channel_inner()
     return;
     }
 
+  if (jumpstarted_channel in channels_by_id)
+    {
+    log_and_alert ('ALREADY SUBSCRIBED TO: ' + jumpstarted_channel + ', in grid location: ' + channels_by_id [jumpstarted_channel]);
+    after_fetch_channels (true);
+    return;
+    }
+
+  log ('subscribing to jumpstart channel: ' + jumpstarted_channel);
+
   var cmd = "/playerAPI/subscribe?user=" + user + mso() + '&' + "channel=" + jumpstarted_channel + '&' + "grid=" + server_grid (position);
   var d = $.get (cmd, function (data)
     {
@@ -5664,8 +5734,8 @@ function add_jumpstart_channel_inner()
       }
     else
       {
-      notice_ok ('ipg', translations ['suberr'] + ': ' + fields [1], "");
-      after_fetch_channels();
+      notice_ok (thumbing, translations ['suberr'] + ': ' + fields [1], "");
+      after_fetch_channels (true);
       }
     });
   }
