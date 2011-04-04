@@ -7,8 +7,6 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.nnvmso.service.PlayerApiService;
-
 public class YouTubeLib {
 	
 	protected static final Logger log = Logger.getLogger(YouTubeLib.class.getName());
@@ -75,11 +73,11 @@ public class YouTubeLib {
 			url = "http://www.youtube.com/view_play_list?p=" + m.group(3);
 		}
 		
-		reg = "^(http|https)://?(\\w+\\.)?youtube.com/(.+)?(p|list)=(\\w+)";
+		reg = "^(http|https)://?(\\w+\\.)?youtube.com/(.+)?(p|list)=(PL)?(\\w+)";
 		pattern = Pattern.compile(reg);
 		m = pattern.matcher(urlStr);
 		while (m.find()) {
-			url = "http://www.youtube.com/view_play_list?p=" + m.group(5);
+			url = "http://www.youtube.com/view_play_list?p=" + m.group(6);
 		}
 		
 		if (url != null) { 
