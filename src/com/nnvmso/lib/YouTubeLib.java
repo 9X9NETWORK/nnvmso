@@ -11,7 +11,7 @@ import com.nnvmso.service.PlayerApiService;
 
 public class YouTubeLib {
 	
-	protected static final Logger log = Logger.getLogger(PlayerApiService.class.getName());
+	protected static final Logger log = Logger.getLogger(YouTubeLib.class.getName());
 	
 	/** 
 	 * 1. remove those invalid keywords we already know.
