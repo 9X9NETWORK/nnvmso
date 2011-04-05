@@ -55,6 +55,7 @@ var yt_video_id;
 var yt_timex = 0;
 var yt_previous_state = -2;
 var yt_quality = "medium";
+var fetch_yt_timex = 0;
 
 var jwplayer;
 var jw_video_file = 'nothing.flv';
@@ -824,6 +825,22 @@ function fetch_programs_in (channel)
   {
   log ('obtaining programs for ' + channel);
 
+  var position = channels_by_id [channel];
+  var nature = channelgrid [position]['nature'];
+  if (nature == '3' || nature == '4')
+    {
+    log ('(obtaining: youtube)');
+    if (fetch_youtube (position) == false)
+      {
+      /* already fetched */
+      $("#waiting, #dir-waiting").hide();
+      if (thumbing == 'ipg-wait')
+        thumbing = 'ipg';
+      }
+    return;
+    }
+
+  log ('(obtaining: standard)');
   var query = "/playerAPI/programInfo?channel=" + channel + mso() + '&' + user_or_ipg();
 
   var d = $.get (query, function (data)
@@ -956,8 +973,14 @@ function fetch_channels()
     if (via_shared_ipg)
       {
       var fields = lines[2].split ('\t');
+      // for (var i in fields)
+      //  {
+      //  log ('field #' + i + ' = ' + fields [i]);
+      //  }
       jumpstart_channel = fields [0];
       jumpstart_program = fields [1];
+      if (fields [10].match (/^http:\/\/www\.youtube\.com\//))
+        jumpstart_program = fields [10].match (/v=([^&]+)/)[1];
       block_start_line = 4;
       }
 
@@ -1189,7 +1212,21 @@ function jumpstart()
 
 function jumpstart_inner()
   {
-  set_channel_and_program (channels_by_id [jumpstart_channel], jumpstart_program);
+  var grid = channels_by_id [jumpstart_channel];
+
+  log ('-- js -- jumpstart_channel: ' + jumpstart_channel);
+  log ('-- js -- jumpstart_program: ' + jumpstart_program);
+  log ('-- js --  at grid location: ' + grid);
+  log ('-- js --    programs there: ' + programs_in_channel (grid));
+  log ('-- js --   in program grid: ' + (jumpstart_program in programgrid));
+
+  if (! (jumpstart_program in programgrid))
+    {
+    notice_ok (thumbing, translations ['expired'], "switch_to_ipg()");
+    return;
+    }
+
+  set_channel_and_program (grid, jumpstart_program);
 
   physical_stop();
 
@@ -1313,7 +1350,7 @@ function best_url (program)
 
   if (! (program in programgrid))
     {
-    log ('program not in programgrid!');
+    log ('program "' + program + '" not in programgrid!');
     return '';
     }
 
@@ -2007,7 +2044,7 @@ function escape()
     {
     $("#body").focus();
     $("#signin-layer").hide();
-    thumbing = 'ipg';
+    switch_to_ipg();
     return;
     }
 
@@ -2742,7 +2779,7 @@ function move_channel (src, dst)
 
 function fetch_youtube (cursor)
   {
-  if (channelgrid [cursor]['nature'] == 3)
+  if (channelgrid [cursor]['nature'] == '3')
     {
     if (! ('youtubed' in channelgrid [cursor]))
       {
@@ -2750,7 +2787,7 @@ function fetch_youtube (cursor)
       return true;
       }
     }
-  else if (channelgrid [cursor]['nature'] == 4)
+  else if (channelgrid [cursor]['nature'] == '4')
     {
     if (! ('youtubed' in channelgrid [cursor]))
       {
@@ -2769,8 +2806,10 @@ function fetch_youtube_playlist (grid)
   metainfo_wait();
   log ("FETCHING YOUTUBE PLAYLIST: " + username);
   var y = document.createElement ('script'); y.type = 'text/javascript'; y.async = true;
-  y.src = 'http://gdata.youtube.com/feeds/api/playlists/' + username + '?v=2' + '&' + 'alt=json-in-script' + '&' + 'callback=yt_fetched';
+  y.src = 'http://gdata.youtube.com/feeds/api/playlists/' + username + '?v=2' + '&' + 'alt=json-in-script' + '&' + 'orderby=published' + '&' + 'start-index=1' + '&' + 'max-results=50' + '&' + 'callback=yt_fetched';
   var s = document.getElementsByTagName ('script')[0]; s.parentNode.insertBefore (y, s);
+
+  fetch_yt_timex = setTimeout ("fetch_youtube_fin(" + grid + ")", 30000);
   }
 
 function fetch_youtube_channel (grid)
@@ -2784,8 +2823,11 @@ function fetch_youtube_channel (grid)
   metainfo_wait();
   log ("FETCHING YOUTUBE CHANNEL: " + username);
   var y = document.createElement ('script'); y.type = 'text/javascript'; y.async = true;
-  y.src = 'http://gdata.youtube.com/feeds/api/users/' + username + '/uploads?v=2' + '&' + 'alt=json-in-script' + '&' + 'format=5' + '&' + 'callback=yt_fetched';
+  y.src = 'http://gdata.youtube.com/feeds/api/users/' + username + '/uploads?v=2' + '&' + 'alt=json-in-script' + '&' + 'orderby=published' + '&' + 'start-index=1' + '&' + 'max-results=50' + '&' + 'callback=yt_fetched';
+
   var s = document.getElementsByTagName ('script')[0]; s.parentNode.insertBefore (y, s);
+
+  fetch_yt_timex = setTimeout ("fetch_youtube_fin(" + grid + ")", 30000);
   }
 
 var feed;
@@ -2793,7 +2835,9 @@ var entry;
 var yyprogram;
 function yt_fetched (data)
   {
-  var channel = channelgrid [ipg_cursor]['id'];
+  var grid = ipg_cursor;
+  var channel = channelgrid [grid]['id'];
+
   log ("YOUTUBE FETCHED, channel " + channel);
 
   var now = new Date();
@@ -2801,6 +2845,19 @@ function yt_fetched (data)
   if (data && data.feed)
     {
     feed = data.feed;
+
+    var name = feed.author[0].name.$t;
+    for (var c in channelgrid)
+      {
+      if (channelgrid [c]['extra'] == name)
+        {
+        log ('youtube fetched "' + name + '" channel info for grid: ' + c);
+        grid = c;
+        channel = channelgrid [grid]['id'];
+        break;
+        }
+      }
+
     var entries = feed.entry || [];
 
     erase_programs_in (channel);
@@ -2822,7 +2879,7 @@ function yt_fetched (data)
       if (url.match (/\/v\//))
         video_id = url.match (/\/v\/(...........)/)[1];
 
-      log ("YOUTUBE " + video_id + " EPISODE: " + title);
+      // log ("YOUTUBE " + video_id + " EPISODE: " + title);
 
       var thumb = entry.media$group.media$thumbnail[1]['url'];
 
@@ -2834,9 +2891,21 @@ function yt_fetched (data)
                                  'url2': '', 'url3': '', 'url4': '', 'name': title, 'desc': '', 'type': '',
                                  'thumb': thumb, 'snapshot': thumb, 'timestamp': ts, 'duration': duration };
       }
-    }
 
-  channelgrid [ipg_cursor]['youtubed'] = true;
+    log ('youtube programs fetched for ' + channel + '(grid ' + grid + '): ' + entries.length);
+    }
+  else
+    log ('***** youtube fetch, data was incomplete ****');
+
+  fetch_youtube_fin (grid);
+  }
+
+function fetch_youtube_fin (grid)
+  {
+  clearTimeout (fetch_yt_timex);
+  log ('fetch youtube fin');
+
+  channelgrid [grid]['youtubed'] = true;
 
   ipg_sync();
   // enter_channel ('ipg');
@@ -2847,7 +2916,12 @@ function yt_fetched (data)
     thumbing = 'ipg';
 
   if (jumpstart_channel != '')
+    {
+    log ('youtube fetch (' + grid + ') completed, continuing jumpstart');
     jumpstart_inner();
+    }
+  else
+    log ('jumpstart not in progress, proceeding');
   }
 
 function erase_programs_in (channel)
@@ -4132,6 +4206,7 @@ function login_screen()
   stop_preload();
   stop_all_players();
 
+  saved_thumbing = thumbing;
   thumbing = 'user';
 
   $("#signin-layer").show();
@@ -4823,8 +4898,11 @@ function proceed_with_valid_login (how, lines)
 
   log ('[' + how + '] welcome ' + username + ', AKA ' + user);
 
-  if (via_shared_ipg)
+  if (via_shared_ipg && username != 'Guest')
+    {
+    log ('setting readonly_ipg');
     readonly_ipg = true;
+    }
 
   fetch_everything();
   }
@@ -5708,6 +5786,12 @@ function add_jumpstart_channel_inner()
   if (!position)
     {
     log_and_alert ('no free squares');
+    return;
+    }
+
+  if (username == 'Guest')
+    {
+    login_screen();
     return;
     }
 
