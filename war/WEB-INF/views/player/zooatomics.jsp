@@ -979,7 +979,7 @@ function fetch_channels()
       //  }
       jumpstart_channel = fields [0];
       jumpstart_program = fields [1];
-      if (fields [10].match (/^http:\/\/www\.youtube\.com\//))
+      if (fields [10] && fields [10].match (/^http:\/\/www\.youtube\.com\//))
         jumpstart_program = fields [10].match (/v=([^&]+)/)[1];
       block_start_line = 4;
       }
