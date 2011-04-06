@@ -491,7 +491,7 @@ public class PlayerApiService {
 		
 		//verify channel status for existing channel
 		MsoChannel channel = channelMngr.findBySourceUrlSearch(url);										
-		if (channel != null && (channel.getStatus() != MsoChannel.STATUS_SUCCESS && channel.getStatus() != MsoChannel.STATUS_PROCESSING)) {
+		if (channel != null && (channel.getStatus() == MsoChannel.STATUS_ERROR)) {
 			return messageSource.getMessage("nnstatus.channel_status_error", new Object[] {NnStatusCode.CHANNEL_STATUS_ERROR} , locale);
 		}
 		
