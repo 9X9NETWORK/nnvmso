@@ -1267,6 +1267,8 @@ function subscribe_button()
   via_shared_ipg = false;
   shared_but_is_now_logged_in = true;
 
+  $("#btn-subscribe").hide();
+
   /* pending programInfo queries interfere with login */
   abort_pending_queries();
 
