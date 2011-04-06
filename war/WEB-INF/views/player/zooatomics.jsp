@@ -56,6 +56,7 @@ var yt_timex = 0;
 var yt_previous_state = -2;
 var yt_quality = "medium";
 var fetch_yt_timex = 0;
+var setup_yt_timex = 0;
 
 var jwplayer;
 var jw_video_file = 'nothing.flv';
@@ -321,7 +322,8 @@ var language_en =
   cvoldown: 'Volume Down',
   cmute: 'Mute',
   cunmute: 'Unmute',
-  uncaught: 'The system may be experiencing problems. Please try again later.'
+  uncaught: 'The system may be experiencing problems. Please try again later.',
+  alreadysub: 'You were already subscribed to this channel.'
   };
 
 var language_tw =
@@ -446,7 +448,8 @@ var language_tw =
   cvoldown: '音量小',
   cmute: '靜音',
   cunmute: '恢復音量',
-  uncaught: '系統可能遇到問題。 請稍後再試。'
+  uncaught: '系統可能遇到問題。 請稍後再試。',
+  alreadysub: '您已經添加過該頻道。'
   };
 
 var translations = language_en;
@@ -1721,7 +1724,7 @@ function ep_html()
 
 function durationof (duration)
   {
-  if (duration == '' || duration == 'null' || duration == undefined || isNaN (NaN) || duration == Infinity)
+  if (duration == '' || duration == 'null' || duration == undefined || duration == Infinity)
     return '0:00';
 
   if (duration.match (/^00:\d\d:\d\d/))
@@ -1921,7 +1924,7 @@ function first_channel()
       if (("" + y + "" + x) in channelgrid)
         return "" + y + "" + x;
       }
-  panic ("no channels");
+  log ("first_channel(): no channels!");
   }
 
 function first_program_in (channel)
@@ -5797,8 +5800,8 @@ function add_jumpstart_channel_inner()
 
   if (jumpstarted_channel in channels_by_id)
     {
-    log_and_alert ('ALREADY SUBSCRIBED TO: ' + jumpstarted_channel + ', in grid location: ' + channels_by_id [jumpstarted_channel]);
-    after_fetch_channels (true);
+    log ('ALREADY SUBSCRIBED TO: ' + jumpstarted_channel + ', in grid location: ' + channels_by_id [jumpstarted_channel]);
+    notice_ok (thumbing, translations ['alreadysub'], "after_fetch_channels (true)");
     return;
     }
 
@@ -6700,20 +6703,27 @@ function setup_yt()
     {
     log ('setting up youtube');
 
-    // try { ytplayer.setSize ($(window).width(), $(window).height()) } catch (error) {};
-
     var params = { allowScriptAccess: "always", wmode: "transparent", disablekb: "1" };
     var atts = { id: "myytplayer" };
     var url = "http://www.youtube.com/apiplayer?version=3&enablejsapi=1";
 
     swfobject.embedSWF (url, "ytapiplayer", "100%", "100%", "8", null, null, params, atts);
+
+    setup_yt_timex = setTimeout ("setup_yt_timeout()", 10000);
     }
   else
     play_yt();
   }
 
+function setup_yt_timeout()
+  {
+  notice_ok (thumbing, "A problem was encountered trying to start the video", "switch_to_ipg()");
+  switch_to_ipg();
+  }
+
 function onYouTubePlayerReady (playerId)
   {
+  clearTimeout (setup_yt_timex);
   ytplayer = document.getElementById ("myytplayer");
   log ("yt ready, id is: " + playerId);
   try { ytplayer.setSize ($(window).width(), $(window).height()) } catch (error) {};
