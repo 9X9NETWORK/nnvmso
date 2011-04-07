@@ -6711,7 +6711,7 @@ function setup_yt()
 
     swfobject.embedSWF (url, "ytapiplayer", "100%", "100%", "8", null, null, params, atts);
 
-    setup_yt_timex = setTimeout ("setup_yt_timeout()", 10000);
+    setup_yt_timex = setTimeout ("setup_yt_timeout()", 30000);
     }
   else
     play_yt();
@@ -6719,8 +6719,12 @@ function setup_yt()
 
 function setup_yt_timeout()
   {
-  notice_ok (thumbing, "A problem was encountered trying to start the video", "switch_to_ipg()");
-  switch_to_ipg();
+  var pathname = location.pathname;
+  if (thumbing != 'ipg' && $("#yt1").css ("display") != 'none' && pathname.match (/share/))
+    {
+    notice_ok (thumbing, "A temporary problem was encountered trying to start the video.", "switch_to_ipg()");
+    switch_to_ipg();
+    }
   }
 
 function onYouTubePlayerReady (playerId)
