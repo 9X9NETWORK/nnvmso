@@ -527,27 +527,47 @@ public class PlayerApiService {
 		return NnStatusMsg.successStr(locale) + separatorStr + output;
 	}
 				
-	public String findSubscribedChannels(String userToken, boolean userInfo) {
+	public String findChannelInfo(String userToken, boolean userInfo, String channelIds) {
 		//verify input
-		if (userToken == null) {return NnStatusMsg.inputMissing(locale);}
-		
-		//verify user
-		NnUser user = userMngr.findByToken(userToken);
-		if (user == null) {return NnStatusMsg.userInvalid(locale);}
+		if ((userToken == null && userInfo == true) || (userToken == null && channelIds == null)) {
+			return NnStatusMsg.inputMissing(locale);
+		}		
+		NnUser user = null;
+		if (userToken != null) {
+			//verify user
+			user = userMngr.findByToken(userToken);
+			if (user == null) {return NnStatusMsg.userInvalid(locale);}
+		}
 		
 		String result = NnStatusMsg.successStr(locale) + separatorStr;
-		if (userInfo) { result = this.prepareUserInfo(user) + separatorStr;	}
-		
-		//find subscribed channels 
-		SubscriptionManager subMngr = new SubscriptionManager();
-		List<MsoChannel> channels = subMngr.findSubscribedChannels(user.getKey().getId(), mso.getKey().getId());
+		if (userInfo) {
+			result = this.prepareUserInfo(user) + separatorStr;	}
+		List<MsoChannel> channels = new ArrayList<MsoChannel>();
+		if (channelIds == null) {
+			//find subscribed channels 
+			SubscriptionManager subMngr = new SubscriptionManager();
+			channels = subMngr.findSubscribedChannels(user.getKey().getId(), mso.getKey().getId());
+		} else {
+			//find specific channels
+			MsoChannelManager channelMngr = new MsoChannelManager();
+			String[] chArr = channelIds.split(",");
+			//check format
+			if (chArr.length > 1) {
+				List<Long> list = new ArrayList<Long>();
+				for (int i=0; i<chArr.length; i++) { list.add(Long.valueOf(chArr[i]));}
+				channels = channelMngr.findAllByChannelIds(list);
+			} else {
+				MsoChannel channel = channelMngr.findById(Long.parseLong(channelIds));
+				channels.add(channel);
+			}
+		}			
 		for (MsoChannel c : channels) {
 			result = result + this.composeChannelLineupStr(c, mso);
 			result = result + "\n";
-		}
+		}	
 		return result;
 	}
-
+	
 	//http://localhost:8888/playerAPI/programInfo?ipg=27852&channel=*
 	public String findProgramInfo(String channelIds, String userToken, String ipgId, boolean userInfo) {
 		if (channelIds == null || (channelIds.equals("*") && userToken == null && ipgId == null)) {		   
