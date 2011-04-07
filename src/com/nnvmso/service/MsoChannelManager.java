@@ -211,6 +211,15 @@ public class MsoChannelManager {
 		return channel;
 	}
 	
+	public List<MsoChannel> findAllByChannelIds(List<Long> channelIds) {
+		List<MsoChannel> channels = new ArrayList<MsoChannel>();
+		for (Long id : channelIds) {
+			MsoChannel channel = this.findById(id);
+			if (channel != null) channels.add(channel);
+		}
+		return channels;		
+	}
+	
 	public List<MsoChannel> findPublicChannels(boolean needSubscriptionCnt) {
 		List<MsoChannel> channels = msoChannelDao.findPublicChannels();
 		SubscriptionLogManager sublogMngr = new SubscriptionLogManager();
