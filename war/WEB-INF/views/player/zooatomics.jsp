@@ -607,7 +607,6 @@ function set_language (lang)
   $("#rsg2").html (translations ['returnsmart']);
   $("#addrssyt").html (translations ['addrssyt']);
   $("#category1").html (translations ['category']);
-  $("#succpress").html (translations ['succpress']);
   $("#hinstr").html (translations ['hinstr']);
   $("#hwbsg").html (translations ['hwbsg']);
   $("#hwwe").html (translations ['hwwe']);
@@ -643,6 +642,8 @@ function set_language (lang)
   $("#btn-play img").attr ("title", translations ['cplay']);
   $("#btn-rewind img").attr ("title", translations ['crw']);
   $("#btn-replay img").attr ("title", translations ['creplay']);
+
+  log ('language information set');
   }
 
 function resize_fp()
@@ -5751,7 +5752,7 @@ function continue_acceptance (position, channel_info)
   log ('accepting new channel ' + channel_info ['id'] + ' in grid location: ' + position);
   stop_preload();
 
-  $("#content-" + browser_y + " .msgbar").html ('<p class="successful" id="succpress">Successful! Press Enter to watch now</p>');
+  $("#content-" + browser_y + " .msgbar").html ('<p class="successful">' + translations ['succpress'] + '</p>');
   tip (translations ['enterwatch']);
 
   /* insert channel */
