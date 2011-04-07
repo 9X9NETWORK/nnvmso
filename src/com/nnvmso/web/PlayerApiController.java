@@ -491,13 +491,14 @@ public class PlayerApiController {
 	@RequestMapping(value="channelLineup")
 	public ResponseEntity<String> channelLineup(@RequestParam(value="user", required=false) String userToken,
 												@RequestParam(value="userInfo", required=false) String userInfo,
+												@RequestParam(value="channel", required=false) String channelIds,
 											    HttpServletRequest req) {
 		this.prepService(req);
 		log.info("userToken=" + userToken + ";isUserInfo:" + userInfo);				
 		boolean isUserInfo = Boolean.parseBoolean(userInfo);
 		String output = NnStatusMsg.errorStr(locale);
 		try {
-			output = playerApiService.findSubscribedChannels(userToken, isUserInfo);
+			output = playerApiService.findChannelInfo(userToken, isUserInfo, channelIds);
 		} catch (Exception e){
 			output = playerApiService.handleException(e);
 		}
