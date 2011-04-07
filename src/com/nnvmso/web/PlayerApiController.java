@@ -466,7 +466,8 @@ public class PlayerApiController {
 	 * Get all of a user's subscriptions. 
 	 * 
 	 * @param user user's unique identifier
-	 * @param userInfo true or false. Whether to return user information as login. If asked, it will be returned after status code. 
+	 * @param userInfo true or false. Whether to return user information as login. If asked, it will be returned after status code.
+	 * @param channel channel id, can be one or multiple;  example, channel=1 or channel=1,2,3 
 	 * @return A string of all of the user's subscribed channels' information.
 	 *         <p>  
 	 *         Channel info has following fields: 
@@ -480,7 +481,7 @@ public class PlayerApiController {
 	 *         <br/>
 	 *         status: STATUS_SUCCESS = 0; STATUS_ERROR = 1;
 	 *         <br/> 
-	 *         contentType: CONTENTTYPE_PODCAST = 2; CONTENTTYPE_YOUTUBE = 3;
+	 *         contentType: SYSTEM_CHANNEL=1; PODCAST=2; YOUTUBE_CHANNEL=3; YOUTUBE_PLAYERLIST=4
 	 *         <p> 
 	 *         Example: <br/>
 	 *         0	success<br/>
