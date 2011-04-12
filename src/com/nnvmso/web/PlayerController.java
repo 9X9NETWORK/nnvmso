@@ -43,6 +43,16 @@ public class PlayerController {
 		return "player/zooatomics";
 	}
 
+	/**
+	 * to become a 9x9 player, 1)delete cookie, 2)set fb info 
+	 */	
+	@RequestMapping("daai")
+	public String daiah(@RequestParam(value="mso",required=false) String mso, HttpServletRequest req, HttpServletResponse resp, Model model) {
+		PlayerService service = new PlayerService();
+		model = service.prepareBrand(model, mso, resp);		
+		return "player/antelope";
+	}
+	
 	/*
 	 * used for dns redirect watch dog 
 	 */
