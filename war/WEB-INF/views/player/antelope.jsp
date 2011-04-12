@@ -44,6 +44,10 @@ function analytics()
   }
 </script>
 
+<script type="text/javascript">
+var brandinfo = "${brandInfo}";
+</script>
+
 <script>
 
 /* players */
@@ -126,6 +130,8 @@ var yn_saved_state;
 var channelgrid = {};
 var channels_by_id = {}
 
+var pool = {};
+
 var programgrid = {};
 var program_line = [];
 var n_program_line = 0;
@@ -141,6 +147,7 @@ var ipg_delayed_stop_timex = 0;
 var ipg_preload_timex = 0;
 var ipg_mode = '';
 
+var zoom_page = '';
 var zoom_cursor;
 var zoom_saved_cursor;
 
@@ -329,6 +336,7 @@ var language_en =
   alreadysub: 'You were already subscribed to this channel.',
   pva: 'Your Personal Video Album',
   moresets: 'More Sets',
+  addset: 'Add This Set',
   follow: 'Follow These Channels',
   curchan: 'Current Channel'
   };
@@ -459,12 +467,18 @@ var language_tw =
   alreadysub: '您已經添加過該頻道。',
   pva: 'Your Personal Video Album',
   moresets: 'More Sets',
+  addset: 'Add This Set',
   follow: 'Follow These Channels',
   curchan: 'Current Channel',
   featchan: 'Featured Channels'
   };
 
 var translations = language_en;
+
+var landing_pages =
+  {
+  daai: [ 0, 0, 0, 0, 1499, 1503, 0, 0, 0 ]
+  };
 
 $(document).ready (function()
  {
@@ -552,13 +566,9 @@ function align_center()
   var ww = $(window).width();
   var wh = $(window).height();
 
-  $("#ipg-holder").css     ("left", (ww - $("#ipg-holder").width())     / 2);
-  $("#sg-holder").css      ("left", (ww - $("#sg-holder").width())      / 2);
-  $("#dir-holder").css     ("left", (ww - $("#dir-holder").width())     / 2);
-  $("#new-holder").css     ("left", (ww - $("#new-holder").width())     / 2);
-  $("#ep-layer").css       ("left", (ww - $("#ep-layer").width())       / 2);
-  $("#epend-layer").css    ("left", (ww - $("#epend-layer").width())    / 2);
-  $("#waiting").css        ("left", (ww - $("#waiting").width())        / 2);
+  for (var v in { 'ipg-holder':0, 'sg-holder':0, 'dir-holder':0, 'new-holder':0, 'ep-layer':0, 'epend-layer':0, 'waiting':0 })
+    $("#" + v).css ("left", (ww - $("#" + v).width()) / 2);
+
   $("#buffering").css      ("left", (ww - $("#buffering").width())      / 2);
   $("#confirm-layer").css  ("left", (ww - $("#confirm-layer").width())  / 2);
   $("#signin-layer").css   ("left", (ww - $("#signin-layer").width())   / 2);
@@ -594,7 +604,6 @@ function set_language (lang)
   language = lang;
   translations = (language == 'zh' || language == 'zh-tw') ? language_tw : language_en;
   solicit();
-  $("#hello").html (translations ['hello']);
   $("#resume1").html (translations ['resume']);
   $("#episodes1").html (translations ['episodes'] + ': ');
   $("#episodes2").html (translations ['episodes'] + ':');
@@ -608,10 +617,8 @@ function set_language (lang)
   $("#email2").html (translations ['email'] + ':');
   $("#name2").html (translations ['name'] + ':');
   $("#loginbtn").html (translations ['login']);
-  $("#suredel").html (translations ['suredel']);
-  $("#havedel").html (translations ['havedel']);
+
   $("#delrsg").html (translations ['returnsmart']);
-  $("#delmore").html (translations ['delmore']);
   $("#moment1").html (translations ['onemoment']);
   $("#moment2").html (translations ['onemoment']);
   $("#buffering1").html (translations ['buffering']);
@@ -619,32 +626,17 @@ function set_language (lang)
   $("#edit-or-finish").html (translations ['delchan']);
   $("#rsg1").html (translations ['returnsmart']);
   $("#rsg2").html (translations ['returnsmart']);
-  $("#addrssyt").html (translations ['addrssyt']);
   $("#category1").html (translations ['category']);
-  $("#hinstr").html (translations ['hinstr']);
-  $("#hwbsg").html (translations ['hwbsg']);
-  $("#hwwe").html (translations ['hwwe']);
-  $("#hctw").html (translations ['hctw']);
-  $("#huak").html (translations ['huak']);
-  $("#hpec").html (translations ['hpec']);
-  $("#hscp").html (translations ['hscp']);
-  $("#hshow").html (translations ['hshow']);
-  $("#qyes").html (translations ['qyes']);
-  $("#qno").html (translations ['qno']);
-  $("#cup").html (translations ['cup']);
-  $("#cdown").html (translations ['cdown']);
-  $("#chcat").html (translations ['chcat'] + ':');
   $("#close1").html (translations ['close']);
-  $("#aboutus").html (translations ['aboutus']);
-  $("#about1").html (translations ['about1']);
-  $("#about2").html (translations ['about2']);
-  $("#about3").html (translations ['about3']);
-  $("#about4").html (translations ['about4']);
-  $("#about5").html (translations ['about5']);
-  $("#newusers").html (translations ['newusers']);
-  $("#signup").html (translations ['signup']);
-  $("#cinstr").html (translations ['cinstr']);
-  $("#rsbubble").html (translations ['rsbubble']);
+
+  for (var s in { 'hello':0, 'suredel':0, 'havedel':0, 'delmore':0, 'addrssyt':0, 'chcat':0 })
+    $("#" + s).html (translations [s]);
+  for (var s in { 'hinstr':0, 'hwbsg':0, 'hwwe':0, 'hctw':0, 'huak':0, 'hshow':0, 'qno':0, 'qyes':0 })
+    $("#" + s).html (translations [s]);
+  for (var s in { 'cup':0, 'cdown':0, 'aboutus':0, 'about1':0, 'about2':0, 'about3':0, 'about4':0, 'about5':0 })
+    $("#" + s).html (translations [s]);
+  for (var s in { 'newusers':0, 'signup':0, 'cinstr':0, 'rsbubble':0 })
+    $("#" + s).html (translations [s]);
 
   $("#btn-volume-up img").attr ("title", translations ['cvolup']);
   $("#btn-volume-down img").attr ("title", translations ['cvoldown']);
@@ -689,32 +681,6 @@ function log (text)
   catch (error)
     {
     }
-  }
-
-function logblob (text)
-  {
-  var appendage = '';
-  var lines = text.split ('\n');
-
-  for (var i = 0; i < lines.length; i++)
-    {
-    try
-      {
-      if (window.console && console.log)
-        console.log (lines [i]);
-      }
-    catch (error)
-      {
-      }
-
-    appendage += lines [i] + '<br>';
-    }
-
-  if (!loglayer)
-    loglayer = document.getElementById ("log-layer");
-
-  loglayer.innerHTML += appendage;
-  return;
   }
 
 function log_and_alert (text)
@@ -991,10 +957,6 @@ function fetch_channels()
     if (via_shared_ipg)
       {
       var fields = lines[2].split ('\t');
-      // for (var i in fields)
-      //  {
-      //  log ('field #' + i + ' = ' + fields [i]);
-      //  }
       jumpstart_channel = fields [0];
       jumpstart_program = fields [1];
       if (fields [10] && fields [10].match (/^http:\/\/www\.youtube\.com\//))
@@ -1182,9 +1144,18 @@ function activate()
   document.onkeydown=kp;
   redraw_ipg();
 
-  log ('activate: ipg');
-  // switch_to_ipg();
-  switch_to_zoom();
+  var path = location.pathname;
+  path = path.replace (/^\//, '');
+  if (path in landing_pages)
+    {
+    zoom_page = path;
+    if (!channels_in_landing_loaded (zoom_page))
+      load_then_zoom()
+    else
+      switch_to_zoom();
+    }
+  else
+    switch_to_ipg();
 
   $("#blue").hide();
   preload_control_images()
@@ -1335,6 +1306,67 @@ function set_channel_and_program (channel, program)
     }
 
   notice_ok (thumbing, translations ['internal'] + ': Code 27', "");
+  }
+
+function channels_in_landing_loaded (page)
+  {
+  if (page in landing_pages)
+    {
+    for (var i in landing_pages [page])
+      {
+      var id = landing_pages [page][i];
+      if (id != '0' && ! (id in pool))
+        return false;
+      }
+    }
+  return true;
+  }
+
+function load_then_zoom()
+  {
+  log ("LOAD THEN ZOOM");
+
+  switch_to_zoom();
+  thumbing = 'zoom-wait';
+
+  $("#waiting").show();
+
+  var channels = [];
+  for (var i in landing_pages [zoom_page])
+    {
+    if (landing_pages [zoom_page].hasOwnProperty(i))
+      {
+      var c = landing_pages [zoom_page][i];
+      if (c != 0)
+        channels.push (c);
+      }
+    }
+
+  var d = $.get ("/playerAPI/channelLineup?channel=" + channels + mso(), function (data)
+    {
+    var lines = data.split ('\n');
+    log ('number of channels obtained: ' + (lines.length - 3));
+
+    var fields = lines[0].split ('\t');
+    if (fields [0] != '0')
+      {
+      log_and_alert ('server error: ' + lines [0]);
+      return;
+      }
+
+    for (var i = 2; i < lines.length; i++)
+      {
+      if (lines [i] != '')
+        {
+        var fields = lines[i].split ('\t');
+        pool [fields[1]] = { 'id': fields[1], 'name': fields[2], 'desc': fields[3], 'thumb': fields[4], 'count': fields[5], 'type': fields[6], 'status': fields[7], 'nature': fields[8], 'extra': fields[9] };
+        }
+      }
+
+    redraw_zoom();
+    $("#waiting").hide();
+    thumbing = 'zoom';
+    });
   }
 
 function check_bandwidth()
@@ -2580,14 +2612,10 @@ function switch_to_zoom()
   zoom_cursor = '11';
 
   redraw_zoom();
-  zoom_cursor_on();
+  zoom_cursor_on (zoom_cursor);
 
   $("#ipg-btn-signin, #ipg-btn-edit, #ipg-btn-resume, #ipg-btn-about").unbind();
-
-  $("#ipg-btn-signin")  .removeClass ("on")  .hover (ipg_btn_hover_in, ipg_btn_hover_out); //  .click (sign_in_or_out);
-  $("#ipg-btn-edit")    .removeClass ("on")  .hover (ipg_btn_hover_in, ipg_btn_hover_out); //  .click (ipg_delete_mode);
-  $("#ipg-btn-resume")  .removeClass ("on")  .hover (ipg_btn_hover_in, ipg_btn_hover_out); //  .click (ipg_resume);
-  $("#ipg-btn-about")   .removeClass ("on")  .hover (ipg_btn_hover_in, ipg_btn_hover_out); //  .click (about);
+  $("#ipg-btn-signin, #ipg-btn-edit, #ipg-btn-resume, #ipg-btn-about").removeClass ("on").hover (ipg_btn_hover_in, ipg_btn_hover_out);
 
   $("#ipg-btn-signin")  .bind ('click', sign_in_or_out);
   $("#ipg-btn-edit")    .bind ('click', ipg_delete_mode);
@@ -2605,8 +2633,25 @@ function switch_to_zoom()
   elastic();
   extend_ipg_timex();
   thumbing = 'zoom';
-  //start_preload_timer();
-  //ipg_sync();
+
+  $("#btn-follow").unbind();
+  $("#btn-follow").click (follow_these);
+  }
+
+function follow_these()
+  {
+  log ("FOLLOW THESE");
+  for (var i in landing_pages [zoom_page])
+    {
+    if (landing_pages [zoom_page].hasOwnProperty(i))
+      {
+      if (landing_pages [zoom_page][i] in channels_by_id)
+        {
+        notice_ok (thumbing, "Some channels already subscribed!", "");
+        return;
+        }
+      }
+    }
   }
 
 function about()
@@ -2793,30 +2838,49 @@ function redraw_zoom()
   
   var bad_thumbnail = '<img src="' + root + 'error.png" class="thumbnail">';
 
-  for (var y = 1; y <= 3; y++)
+  if (zoom_page != '')
     {
-    for (var x = 1; x <= 3; x++)
+    for (var y = 1; y <= 3; y++)
       {
-      var yx = y * 10 + x;
-      if (yx in channelgrid)
+      for (var x = 1; x <= 3; x++)
         {
-        var channel = channelgrid [yx]
+        var yx = y * 10 + x;
+        var linear = ((y-1) * 3) + (x-1);
 
-        var thumb = channel ['thumb'];
+        log ('linear: ' + linear + ' yx: ' + yx);
 
-        if (thumb == '' || thumb == 'null' || thumb == 'false')
-          html += '<li id="zoom-' + yx + '">' + bad_thumbnail + '</li>';
+        if (linear in landing_pages [zoom_page])
+          {
+          var id = landing_pages [zoom_page][linear];
+          if (id == '0')
+            html += '<li id="zoom-' + yx + '"></li>';
+          else if (id in pool)
+            {
+            var channel = pool [id];
+            var thumb = channel ['thumb'];
+
+            if (thumb == '' || thumb == 'null' || thumb == 'false')
+              html += '<li id="zoom-' + yx + '">' + bad_thumbnail + '</li>';
+            else
+              html += '<li id="zoom-' + yx + '"><img src="' + thumb + '" class="thumbnail"></li>';
+            }
+          else
+            html += '<li id="zoom-' + yx + '">' + bad_thumbnail + '</li>';
+          }
         else
-          html += '<li id="zoom-' + yx + '"><img src="' + channelgrid [yx]['thumb'] + '" class="thumbnail"></li>';
+          html += '<li id="zoom-' + yx + '"></li>';
         }
-      else
-        html += '<li id="zoom-' + yx + '"></li>';
       }
 
     html += '</ul>';
     }
 
   $("#grid-3x3").html (html);
+
+  $("#grid-3x3 li").unbind();
+  $("#grid-3x3 li").hover (hover_in, hover_out);
+
+  zoom_cursor_on (zoom_cursor);
   }
 
 function cursor_on (cursor)
@@ -2924,7 +2988,6 @@ function fetch_youtube (cursor)
 
 function fetch_youtube_playlist (grid)
   {
-  // var username = '095393D5B42B2266';
   var username = channelgrid [grid]['extra'];
   metainfo_wait();
   log ("FETCHING YOUTUBE PLAYLIST: " + username);
@@ -2937,8 +3000,6 @@ function fetch_youtube_playlist (grid)
 
 function fetch_youtube_channel (grid)
   {
-  // http://www.youtube.com/user/ktvu
-
   var username = channelgrid [grid]['extra'];
   if (username.match (/\//))
     username = channelgrid [grid]['extra'].match (/\/user\/([^\/]*)/)[1];
@@ -2994,7 +3055,6 @@ function yt_fetched (data)
 
       var url = entry.media$group.media$content[0]['url'];
       var duration = entry.media$group.media$content[0]['duration'];
-      // var timestamp = new Date (entry.updated.$t);
       var timestamp = new Date (entry.media$group.yt$uploaded.$t);
       duration = formatted_time (duration);
 
@@ -3031,7 +3091,6 @@ function fetch_youtube_fin (grid)
   channelgrid [grid]['youtubed'] = true;
 
   ipg_sync();
-  // enter_channel ('ipg');
   ipg_metainfo();
 
   $("#waiting, #dir-waiting").hide();
@@ -3411,8 +3470,6 @@ function ipg_right()
     return;
     }
 
-  var iclass = (ipg_mode == 'edit') ? 'editcursor' : 'on';
-
   if (ipg_cursor < 0)
     {
     if (ipg_cursor == -1)
@@ -3661,7 +3718,7 @@ function zoom_up()
     {
     return;
     }
-  else if (parseInt (zoom_cursor) >= 11 && parseInt (zoom_cursor) <= 13)
+  else if (false && parseInt (zoom_cursor) >= 11 && parseInt (zoom_cursor) <= 13)
     {
     zoom_cursor_off (zoom_cursor);
     $("#ipg-btn-signin").addClass ("on");
@@ -3688,10 +3745,7 @@ function ipg_down()
 
   if (ipg_cursor < 0)
     {
-    $("#ipg-btn-signin").removeClass ("on");
-    $("#ipg-btn-edit").removeClass ("on");
-    $("#ipg-btn-resume").removeClass ("on");
-    $("#ipg-btn-about").removeClass ("on");
+    $("#ipg-btn-signin, #ipg-btn-edit, #ipg-btn-resume, #ipg-btn-about").removeClass ("on");
     if (ipg_mode == 'edit')
       ipg_cursor = first_channel();
     else
@@ -3731,10 +3785,7 @@ function zoom_down()
 
   if (zoom_cursor < 0)
     {
-    $("#ipg-btn-signin").removeClass ("on");
-    $("#ipg-btn-edit").removeClass ("on");
-    $("#ipg-btn-resume").removeClass ("on");
-    $("#ipg-btn-about").removeClass ("on");
+    $("#ipg-btn-signin, #ipg-btn-edit, #ipg-btn-resume, #ipg-btn-about").removeClass ("on");
     zoom_cursor = zoom_saved_cursor;
     }
   else if (zoom_cursor > 30)
@@ -4038,8 +4089,7 @@ function ipg_delete_channel()
     $("#btn-delNo").addClass ("on");
     delete_mode = 'step1';
     delete_cursor = 2;
-    $("#delete-title-1").html (channelgrid [ipg_cursor]['name']);
-    $("#delete-title-2").html (channelgrid [ipg_cursor]['name']);
+    $("#delete-title-1, #delete-title-2").html (channelgrid [ipg_cursor]['name']);
     thumbing = 'delete';
     $("#delete-layer, #mask").show();
     }
@@ -4719,9 +4769,7 @@ function submit_signup()
   for (var p in params)
     {
     var v = $('#' + p).val();
-    // log ("value1: " + v);
     v = encodeURIComponent (v);
-    // log ("value2: " + v);
     things.push ( params [p] + '=' + v );
     }
 
@@ -4973,15 +5021,9 @@ function dirty()
 
 function pre_login()
   {
-  // key	agg5eDl0dmRldnIKCxIDTXNvGOg-DA
-  // name	9x9
-  // logoUrl	/WEB-INF/../images/logo_9x9.png
-  // jingleUrl	/WEB-INF/../videos/logo2.swf
-  // preferredLangCode	en
-
   log ('pre_login');
 
-  var d = $.get ("/playerAPI/brandInfo?mso=${brandInfo}", function (data)
+  var d = $.get ("/playerAPI/brandInfo?mso=" + brandinfo, function (data)
     {
     var lines = data.split ('\n');
     var fields = lines[0].split ('\t');
@@ -6178,7 +6220,6 @@ function tube()
 function force_pause()
   {
   remembered_pause = physical_is_paused();
-
   if (!remembered_pause)
     pause();
   }
@@ -6217,45 +6258,32 @@ function unhide_player (player)
     {
     case "jw":
 
-      $("#v").hide();
-      $("#fp1").hide();
-      $("#fp2").hide();
+      $("#v, #fp1, #fp2").hide();
       $("#jw2").show();
       break;
 
     case "fp":
 
-      $("#v").hide();
-      $("#jw2").hide();
-      $("#yt1").hide();
+      $("#v, jw2, #yt1").hide();
 
       if (fp_player == 'player1')
         {
-        //$("#fp2").css ("visibility", "hidden");
-        //$("#fp2").css ("visibility", "visible");
-        //$("#fp1").css ("visibility", "visible");
         $("#fp1").css ("z-index", "2");
         $("#fp2").css ("z-index", "1");
         }
       else if (fp_player == 'player2')
         {
-        //$("#fp1").css ("visibility", "hidden");
-        //$("#fp1").css ("visibility", "visible");
-        //$("#fp2").css ("visibility", "visible");
         $("#fp2").css ("z-index", "2");
         $("#fp1").css ("z-index", "1");
         }
 
-      $("#fp1").css ("display", "block");
-      $("#fp2").css ("display", "block");
+      $("#fp1, #fp2").css ("display", "block");
 
       break;
 
     case "yt":
 
-      $("#v").hide();
-      $("#fp1").hide();
-      $("#fp2").hide();
+      $("#v, #fp1, #fp2").hide();
       $("#yt1").show();
       $("#yt1").css ("visibility", "visible");
       break;
@@ -6410,10 +6438,7 @@ function jw_state_change()
   if (state == 'COMPLETED' && previous != 'COMPLETED')
     {
     log ('jw now completed');
-    log ("jw STOP");
-    //jwplayer.sendEvent ('STOP');
     physical_stop();
-    // $("#buffering").hide();
     ended_callback();
     }
 
@@ -6421,9 +6446,7 @@ function jw_state_change()
     {
     log ('jw now idle');
     log ("jw STOP");
-    //jwplayer.sendEvent ('STOP');
     physical_stop();
-    // $("#buffering").hide();
     ended_callback();
     }
 
@@ -6484,16 +6507,12 @@ function ipg_preload (grid)
 
   if (fp_preloaded == 'player1')
     {
-    //$("#fp1").css ("visibility", "visible");
-    //$("#fp2").css ("visibility", "hidden");
     $("#fp1").css ("z-index", "2");
     $("#fp2").css ("z-index", "1");
     try { flowplayer ("player2").stop(); } catch (error) {};
     }
   else
     {
-    //$("#fp1").css ("visibility", "hidden");
-    //$("#fp2").css ("visibility", "visible");
     $("#fp1").css ("z-index", "1");
     $("#fp2").css ("z-index", "2");
     try { flowplayer ("player1").stop(); } catch (error) {};
@@ -7602,17 +7621,6 @@ function control_redraw()
   if (control_buttons [control_cursor] == 'btn-play')
     $('#btn-pause').addClass ("on");
 
-  if (control_buttons [control_cursor] == 'btn-volume')
-    {
-    $("#msg-up").html ('<p>Press <span class="enlarge">&uarr;</span> to increase volume</p>');
-    $("#msg-down").html ('<p>Press <span class="enlarge">&darr;</span> to decrease volume</p>');
-    }
-  else
-    {
-    $("#msg-up").html ('<p>Press <span class="enlarge">&uarr;</span> to see your Smart Guide</p>');
-    $("#msg-down").html ('<p>Press <span class="enlarge">&darr;</span> for more episodes</p>');
-    }
-
   if (physical_is_paused())
     {
     $("#btn-pause").hide();
@@ -7831,7 +7839,6 @@ function fb_yes()
 
   if (sitename == '5f')
     {
-    // name = '五樓電視－你的鄉民影視情報網';
     name = programgrid [current_program]['name'];
     desc = programgrid [current_program]['desc'];
     }
@@ -7863,7 +7870,6 @@ function fb_yes()
 
     if (sitename == '5f')
       {
-      // parms ['actions'] = [ { name: '我要參加', link: 'http://5f.tv/' } ];
       parms ['actions'] = [ { name: '有沒有抽全台第一台iPad2的八卦？', link: location.protocol + '//' + location.host + '/' + sitename + '/' + 'sharetowin.html' } ];
       }
 
@@ -8037,7 +8043,6 @@ function noop (e)
 
 <div id="yt1" style="width: 100%; height: 100%; z-index: 1; visibility: visible; position: absolute; left: 0; top: 0; overflow: hidden;">
   <div id="ytapiplayer">
-    <!-- You need Flash player 8+ and JavaScript enabled to view this video.-->
   </div>
 </div>
 
@@ -8151,17 +8156,7 @@ function noop (e)
           <img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/tab_more_on.png" class="on">
           <p><span>More Sets</span></p>
         </div>
-        <ul id="grid-3x3">
-          <li class="on"><img src="thumb/01.jpg" class="thumbnail"><img src="images/icon_play.png" class="icon-play"></li>
-          <li><img src="thumb/02.jpg" class="thumbnail"></li>
-          <li></li>
-          <li></li>
-          <li></li>
-          <li></li>
-          <li></li>
-          <li></li>
-          <li></li>
-        </ul>
+        <ul id="grid-3x3"></ul>
       </div>
       <div id="channel-info">
         <p id="section-title"><span>Current Channel</span></p>
