@@ -428,7 +428,9 @@ var language_tw =
 
 var translations = language_en;
 
-var landing_pages =
+var landing_pages = {};
+
+var landing_pages_office =
   {
   daai: 
     {
@@ -439,6 +441,54 @@ var landing_pages =
     splashed: false
     }
   };
+
+var landing_pages_qa =
+  {
+  daai: 
+    {
+    name: 'Da Ai TV March Golden Selection',
+    shortname: 'Da Ai',
+    logo: 'http://9x9ui.s3.amazonaws.com/9x9playerV48/images/logo_tzuchi.png',
+    grid: [ 7002, 15597, 12643, 3025, 6024, 12419, 14, 3018, 0 ],
+    splashed: false
+    }
+  };
+
+var landing_pages_dev =
+  {
+  daai: 
+    {
+    name: 'Da Ai TV March Golden Selection',
+    shortname: 'Da Ai',
+    logo: 'http://9x9ui.s3.amazonaws.com/9x9playerV48/images/logo_tzuchi.png',
+    grid: [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    splashed: false
+    }
+  };
+
+var landing_pages_prod =
+  {
+  daai: 
+    {
+    name: 'Da Ai TV March Golden Selection',
+    shortname: 'Da Ai',
+    logo: 'http://9x9ui.s3.amazonaws.com/9x9playerV48/images/logo_tzuchi.png',
+    grid: [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    splashed: false
+    }
+  };
+
+function set_landing_page()
+  {
+  if (location.host == '64.124.66.254')
+    landing_pages = landing_pages_office;
+  else if (location.host == 'dev.9x9.tv')
+    landing_pages = landing_pages_dev;
+  else if (location.host == 'qa.9x9.tv')
+    landing_pages = landing_pages_qa;
+  else
+    landing_pages = landing_pages_prod;
+  }
 
 $(document).ready (function()
  {
@@ -746,6 +796,8 @@ function init()
   $("#fp1, #fp2, #yt1").mousemove (mousemove); // .mouseout (mouseaway);
 
   $(window).unload (function() { report_submit_(); });
+
+  set_landing_page();
   }
 
 function started_from_shared_ipg()
@@ -1315,7 +1367,7 @@ function load_then_zoom()
   var d = $.get ("/playerAPI/channelLineup?channel=" + channels + mso(), function (data)
     {
     var lines = data.split ('\n');
-    log ('number of channels obtained: ' + (lines.length - 3));
+    log ('number of zoom channels obtained: ' + (lines.length - 3));
 
     var fields = lines[0].split ('\t');
     if (fields [0] != '0')
@@ -1334,6 +1386,8 @@ function load_then_zoom()
       }
 
     redraw_zoom();
+    zoom_metainfo();
+
     $("#waiting").hide();
     thumbing = 'zoom';
     });
@@ -2017,10 +2071,13 @@ function first_program_in_real_channel (real_channel)
     return 0;
     }
 
+  log ('programs unsorted: ' + programs);
+
   // unshift here is to match what is in program_line
   programs = programs.sort (function (a,b) { return Math.floor (programgrid [b]['timestamp']) - Math.floor (programgrid [a]['timestamp']) });
   programs.unshift ('');
 
+  log ('programs sorted: ' + programs);
   return programs [1];
   }
 
@@ -2482,8 +2539,9 @@ function keypress (keycode)
 
     case 73:
       /* I */
-      if (thumbing == 'channel' || thumbing == 'program')
-        dump_configuration_to_log();
+      switch_to_ipg();
+      // if (thumbing == 'channel' || thumbing == 'program')
+      //   dump_configuration_to_log();
       break;
 
     case 85:
@@ -2599,7 +2657,7 @@ function switch_to_ipg()
   stop_preload();
   $("#buffering").hide();
 
-  $("#control-layer, #f5-ipad, #sg-bubble, #btn-subscribe").hide();
+  $("#control-layer, #f5-ipad, #sg-bubble, #btn-subscribe, #sg-layer, #ad-layer").hide();
   $("#ch-directory").hide();
 
   $("#ep-layer").css ("bottom", "0");
@@ -2723,7 +2781,10 @@ function follow_these()
     log ('subscribe raw result: ' + data);
     var fields = data.split ('\t');
     if (fields [0] == '0')
-      notice_ok (thumbing, "Subscription successful!", "");
+      {
+      fetch_channels();
+      notice_ok (thumbing, "Subscription successful!", "switch_to_ipg()");
+      }
     else
       notice_ok (thumbing, translations ['suberr'] + ': ' + fields [1], "");
     });
@@ -3120,7 +3181,7 @@ function fetch_youtube_playlist (why, grid)
   metainfo_wait();
   log ("FETCHING YOUTUBE PLAYLIST: " + username);
   var y = document.createElement ('script'); y.type = 'text/javascript'; y.async = true;
-  y.src = 'http://gdata.youtube.com/feeds/api/playlists/' + username + '?v=2' + '&' + 'alt=json-in-script' + '&' + 'orderby=published' + '&' + 'start-index=1' + '&' + 'max-results=50' + '&' + 'callback=yt_fetched';
+  y.src = 'http://gdata.youtube.com/feeds/api/playlists/' + username + '?v=2' + '&' + 'alt=json-in-script' + '&' + 'format=5' + '&' + 'orderby=published' + '&' + 'start-index=1' + '&' + 'max-results=50' + '&' + 'callback=yt_fetched';
   var s = document.getElementsByTagName ('script')[0]; s.parentNode.insertBefore (y, s);
 
   fetch_yt_timex = setTimeout ("fetch_youtube_fin(" + why + "," + grid + ")", 30000);
@@ -3139,11 +3200,11 @@ function fetch_youtube_channel (why, grid)
   metainfo_wait();
   log ("FETCHING YOUTUBE CHANNEL: " + username);
   var y = document.createElement ('script'); y.type = 'text/javascript'; y.async = true;
-  y.src = 'http://gdata.youtube.com/feeds/api/users/' + username + '/uploads?v=2' + '&' + 'alt=json-in-script' + '&' + 'orderby=published' + '&' + 'start-index=1' + '&' + 'max-results=50' + '&' + 'callback=yt_fetched';
+  y.src = 'http://gdata.youtube.com/feeds/api/users/' + username + '/uploads?v=2' + '&' + 'alt=json-in-script' + '&' + 'format=5' + '&' + 'orderby=published' + '&' + 'start-index=1' + '&' + 'max-results=50' + '&' + 'callback=yt_fetched';
 
   var s = document.getElementsByTagName ('script')[0]; s.parentNode.insertBefore (y, s);
 
-  fetch_yt_timex = setTimeout ("fetch_youtube_fin(" + why + "," + grid + ")", 30000);
+  fetch_yt_timex = setTimeout ('fetch_youtube_fin("' + why + '","' + grid + '")', 30000);
   }
 
 var feed;
@@ -3201,16 +3262,21 @@ function yt_fetched (data)
       var title = entry.title.$t;
       var updated = entry.updated.$t;
 
-      var url = entry.media$group.media$content[0]['url'];
-      var duration = entry.media$group.media$content[0]['duration'];
+      // if (! ("media$content" in entry.media$group))
+      //   continue;
+
+      // var url = entry.media$group.media$content[0]['url'];
+      var video_id = entry.media$group.yt$videoid.$t;
+      var duration = entry.media$group.yt$duration.seconds;
+      // var duration = entry.media$group.media$content[0]['duration'];
       var timestamp = new Date (entry.media$group.yt$uploaded.$t);
       duration = formatted_time (duration);
 
-      var video_id = '';
-      if (url.match (/\/v\//))
-        video_id = url.match (/\/v\/(...........)/)[1];
+      // var video_id = '';
+      // if (url.match (/\/v\//))
+      //   video_id = url.match (/\/v\/(...........)/)[1];
 
-      // log ("YOUTUBE " + video_id + " EPISODE: " + title);
+      log ("YOUTUBE " + video_id + " EPISODE: " + title);
 
       var thumb = entry.media$group.media$thumbnail[1]['url'];
 
@@ -3305,15 +3371,20 @@ function zoom_metainfo()
   var id = landing_pages [zoom_page]['grid'][linear(zoom_cursor)];
   if (id != '0')
     {
-    var channel = pool [id];
-    $("#channel-title span").html (channel ['name']);
-    $("#channel-description span").html (channel ['desc']);
-    $("#eps-number").html (translations ['episodes'] + ': ' + channel ['count']);
-    $("#updates").html (translations ['updated'] + ': ' + "Today");
-    $("#channel-info").show();
+    if (id in pool)
+      {
+      var channel = pool [id];
+      $("#channel-title span").html (channel ['name']);
+      $("#channel-description span").html (channel ['desc']);
+      $("#eps-number").html (translations ['episodes'] + ': ' + channel ['count']);
+      $("#updates").html (translations ['updated'] + ': ' + "Today");
+      $("#channel-info").show();
 
-    if (fetch_youtube ('zoom', id))
-      return;
+      if (fetch_youtube ('zoom', id))
+        return;
+      }
+    else
+      log ('zoom_metainfo: channel not in pool: ' + id);
     }
   else
     {
@@ -5352,9 +5423,15 @@ function jingle_completed()
 function solicit()
   {
   if (username == 'Guest' || username == '')
+    {
     $("#solicit").html (translations ['signin']);
+    $("#btn-signin span").html (translations ['signin']);
+    }
   else
+    {
     $("#solicit").html (translations ['signout']);
+    $("#btn-signin span").html (translations ['signout']);
+    }
   }
 
 function login()
