@@ -101,7 +101,13 @@ import com.nnvmso.service.PlayerApiService;
  * Channel and program listing(channelLineup and programInfo) would be ready after an account is registered.
  * <p>
  * </blockquote>
- * 
+ * <p>
+ * <b>Guideline</b> 
+ * <blockquote>
+ * If there's any API change in terms of return value, new fields will be added to the end of the line, or present in the next block.
+ * <p>
+ * Please prepare your player being able to handle it. i.e. existing player should NOT have to modify your code to be able to work with this kind of API change.
+ * </blockquote>
  */
 
 @Controller
@@ -336,7 +342,8 @@ public class PlayerApiController {
 	 * @param user user's unique identifier
 	 * @param channel channelId
 	 * @param grid grid location, from 1 to 81
-	 * @return status code and status message 
+	 * @return status code and status message for the first block; <br/>
+	 *         second block shows channel id, status code and status message
 	 */		
 	@RequestMapping(value="subscribe")
 	public ResponseEntity<String> subscribe(@RequestParam(value="user", required=false) String userToken, 
@@ -509,8 +516,8 @@ public class PlayerApiController {
 	 * Move a channel from grid 1 to grid2
 	 * 
 	 * @param user user's unique identifier
-	 * @param grid1
-	 * @param grid2
+	 * @param grid1 "from" grid
+	 * @param grid2 "to" grid
 	 * 
 	 * @return status code and status message
 	*/
