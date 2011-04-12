@@ -3,14 +3,14 @@
 <meta charset="UTF-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
-<!-- $Revision: 1184 $ -->
+<!-- $Revision: 1082 $ -->
 
 <!-- FB Sharing meta data -->
 <meta name="title" content="${fbName}" />
 <meta name="description" content="${fbDescription}" />
 <link rel="image_src" href="${fbImg}" />
 
-<link rel="stylesheet" href="http://9x9ui.s3.amazonaws.com/9x9playerV47/stylesheets/main.css" />
+<link rel="stylesheet" href="http://9x9ui.s3.amazonaws.com/9x9playerV48/stylesheets/main.css" />
 <link rel="stylesheet" href="http://9x9ui.s3.amazonaws.com/contest/contest.css" />
 
 <script type="text/javascript" charset="utf-8" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
@@ -19,7 +19,7 @@
 
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/all.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/scripts/swfobject.js"></script>
-<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/9x9playerV47/javascripts/jquery.swfobject.1-1-1.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/9x9playerV48/javascripts/jquery.swfobject.1-1-1.min.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/scripts/flowplayer-3.2.4.min.js"></script>
 
 <script type="text/javascript">
@@ -323,7 +323,11 @@ var language_en =
   cmute: 'Mute',
   cunmute: 'Unmute',
   uncaught: 'The system may be experiencing problems. Please try again later.',
-  alreadysub: 'You were already subscribed to this channel.'
+  alreadysub: 'You were already subscribed to this channel.',
+  pva: 'Your Personal Video Album',
+  moresets: 'More Sets',
+  follow: 'Follow These Channels',
+  curchan: 'Current Channel'
   };
 
 var language_tw =
@@ -449,7 +453,12 @@ var language_tw =
   cmute: '靜音',
   cunmute: '恢復音量',
   uncaught: '系統可能遇到問題。 請稍後再試。',
-  alreadysub: '您已經添加過該頻道。'
+  alreadysub: '您已經添加過該頻道。',
+  pva: 'Your Personal Video Album',
+  moresets: 'More Sets',
+  follow: 'Follow These Channels',
+  curchan: 'Current Channel',
+  featchan: 'Featured Channels'
   };
 
 var translations = language_en;
@@ -541,6 +550,7 @@ function align_center()
   var wh = $(window).height();
 
   $("#ipg-holder").css     ("left", (ww - $("#ipg-holder").width())     / 2);
+  $("#sg-holder").css      ("left", (ww - $("#sg-holder").width())      / 2);
   $("#dir-holder").css     ("left", (ww - $("#dir-holder").width())     / 2);
   $("#new-holder").css     ("left", (ww - $("#new-holder").width())     / 2);
   $("#ep-layer").css       ("left", (ww - $("#ep-layer").width())       / 2);
@@ -551,6 +561,7 @@ function align_center()
   $("#signin-layer").css   ("left", (ww - $("#signin-layer").width())   / 2);
   $("#control-layer").css  ("left", (ww - $("#control-layer").width())  / 2);
   $("#yesno-layer").css    ("left", (ww - $("#yesno-layer").width())    / 2);
+  $("#ad-layer").css       ("left", (ww - $("#ad-layer").width())       / 2);
 
   $("#signin-holder").css  ("margin-top",  (wh - $("#signin-holder").height()) / 2);
   $("#msg-holder").css     ("margin-top",  (wh - $("#msg-holder").height() - $("#ep-layer").height()) / 2);
@@ -1169,7 +1180,8 @@ function activate()
   redraw_ipg();
 
   log ('activate: ipg');
-  switch_to_ipg();
+  // switch_to_ipg();
+  switch_to_zoom();
 
   $("#blue").hide();
   preload_control_images()
@@ -2532,6 +2544,64 @@ function switch_to_ipg()
 
   // if (sitename == '5f')
   //   contest();
+
+  $("#ep-list .clickable").removeClass ("on");
+  }
+
+function switch_to_zoom()
+  {
+  log ('zoom');
+  report ('e', 'zoom');
+
+  clear_msg_timex();
+  clear_osd_timex()
+
+  physical_stop();
+  ipg_delayed_stop_timex = setTimeout ("delayed_video_stop()", 5000);
+
+  if (current_channel in channelgrid)
+    ipg_cursor = current_channel;
+
+  if (! (ipg_cursor in channelgrid))
+    ipg_cursor = first_channel();
+
+  if (! (ipg_cursor in channelgrid))
+    ipg_cursor = '11';
+
+  ipg_entry_channel = ipg_cursor;
+  if (program_cursor in program_line)
+    ipg_entry_program = program_line [program_cursor];
+  else
+    ipg_entry_program = '';
+
+  redraw_ipg();
+
+  $("#ipg-btn-signin, #ipg-btn-edit, #ipg-btn-resume, #ipg-btn-about").unbind();
+
+  $("#ipg-btn-signin")  .removeClass ("on")  .hover (ipg_btn_hover_in, ipg_btn_hover_out); //  .click (sign_in_or_out);
+  $("#ipg-btn-edit")    .removeClass ("on")  .hover (ipg_btn_hover_in, ipg_btn_hover_out); //  .click (ipg_delete_mode);
+  $("#ipg-btn-resume")  .removeClass ("on")  .hover (ipg_btn_hover_in, ipg_btn_hover_out); //  .click (ipg_resume);
+  $("#ipg-btn-about")   .removeClass ("on")  .hover (ipg_btn_hover_in, ipg_btn_hover_out); //  .click (about);
+
+  $("#ipg-btn-signin")  .bind ('click', sign_in_or_out);
+  $("#ipg-btn-edit")    .bind ('click', ipg_delete_mode);
+  $("#ipg-btn-resume")  .bind ('click', ipg_resume);
+  $("#ipg-btn-about")   .bind ('click', about);
+
+  stop_preload();
+  $("#buffering").hide();
+
+  $("#control-layer, #f5-ipad, #sg-bubble, #btn-subscribe, #ipg-layer").hide();
+  $("#ch-directory").hide();
+
+  // $("#ep-layer").css ("bottom", "0");
+  $("#sg-layer, #ad-layer").show();
+
+  elastic();
+  extend_ipg_timex();
+  thumbing = 'zoom';
+  //start_preload_timer();
+  //ipg_sync();
 
   $("#ep-list .clickable").removeClass ("on");
   }
@@ -4733,9 +4803,8 @@ function pre_login()
         if (fields[0] == 'logoUrl')
           {
           log ('logo: ' + fields[1]);
-          $("#logo" ).attr ('src', fields[1]);
-          $("#dir-logo").attr ('src', fields[1]);
-          $("#logo3").attr ('src', fields[1]);
+          for (var v in { 'logo':0, 'sg-logo':0, 'dir-logo':0, 'logo3':0 })
+            $("#" + v).attr ('src', fields[1]);
           }
         else if (fields[0] == 'jingleUrl')
           {
@@ -7822,12 +7891,12 @@ function noop (e)
   </div>
 
 <div id="ep-layer" style="display: none">
-  <img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/ep_panel_off.png" id="ep-panel">
+  <img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/ep_panel_off.png" id="ep-panel">
   <div id="ep-tip"></div>
   <div id="ep-container">
     <p id="ep-indicator"><span id="episodes1">Episodes: </span><span id="epNum"></span></p>
-    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/arrow_right_off.png" id="arrow-right" style="display: none">
-    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/arrow_left_off.png" id="arrow-left" style="display: none">
+    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/arrow_right_off.png" id="arrow-right" style="display: none">
+    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/arrow_left_off.png" id="arrow-left" style="display: none">
     <ul class="ep-list" id="ep-list"></ul>
     <div id="ep-meta"><p><span class="ch-title" id="ep-layer-ch-title"></span> - <span class="ep-title" id="ep-layer-ep-title"></span> - <span class="age" id="ep-age"></span> - <span class="duration" id="ep-length"></span></p></div>
   </div>
@@ -7836,8 +7905,8 @@ function noop (e)
 <div id="ipg-layer" style="display: none">
   <div id="ipg-holder">
     <div id="header">
-      <img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/beta.png" id="beta">
-      <img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/logo.png" id="logo">
+      <img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/beta.png" id="beta">
+      <img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/logo.png" id="logo">
       <p id="user-name"><span id="hello">Hello</span>, <span id="user">Guest</span></p>  
       <ul id="control-list"><li class="btn" id="ipg-btn-signin"><span id="solicit">Sign in / Sign up</span></li><li class="btn" id="ipg-btn-edit"><span id="edit-or-finish">Delete channel</span></li><li class="btn" id="ipg-btn-resume"><span id="resume1">Resume Watching</span></li><li class="btn" id="ipg-btn-about"><span id="aboutus">About Us</span></li></ul>
     </div>
@@ -7859,7 +7928,7 @@ function noop (e)
         <li id="bandwidthing"><p><span class="hilite">Bandwidth:</span> <span id="bandwidth">Not tested</span></p></li>
       </ul>
       <div id="ipg-grid">
-        <p id="watermark"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/watermark.png"></p>
+        <p id="watermark"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/watermark.png"></p>
         <div id="list-holder">
         </div>
       </div>     
@@ -7867,11 +7936,85 @@ function noop (e)
   </div>
 </div>
 
+<div id="sg-layer" style="display: none">
+  <div id="sg-holder">
+    <div id="sg-header">
+      <img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/beta.png" id="sg-beta">
+      <img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/logo.png" id="sg-logo">
+      <p id="slogen"><span>Your Personal Video Album</span></p>  
+      <ul id="menu-list">
+        <li id="btn-signin"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/icon_signin.png" id="icon-signin"><span>Sign in / Sign up</span></li>
+        <li id="btn-signout"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/icon_signin.png" id="icon-signin"><span>Sign out</span></li>
+        <li id="btn-about"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/icon_about.png" id="icon-about"><span>About Us</span></li>
+        <li id="btn-help"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/icon_help.png" id="icon-help"><span>Help</span></li>
+      </ul>
+    </div>
+    <div id="sg-content">
+      <p class="btn-big" id="btn-follow"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/icon_follow.png" id="icon-follow"><span>Follow These Channels</span></p>
+      <p id="follow-hint"><span>Click to receive the latest episodes from these channels.</span></p>
+      <img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/logo_tzuchi.png" id="branding-logo">
+      <div id="landing">
+        <img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/bg_3x3.png" id="bg-folder">
+        <p id="set-title"><span>Da Ai TV March Golden Selection</span></p>
+        <div id="tab-more">
+          <img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/tab_more_off.png" class="off">
+          <img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/tab_more_on.png" class="on">
+          <p><span>More Sets</span></p>
+        </div>
+        <ul id="grid-3x3">
+          <li class="on"><img src="thumb/01.jpg" class="thumbnail"><img src="images/icon_play.png" class="icon-play"></li>
+          <li><img src="thumb/02.jpg" class="thumbnail"></li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+          <li></li>
+        </ul>
+      </div>
+      <div id="channel-info">
+        <p id="section-title"><span>Current Channel</span></p>
+        <p id="channel-title"><span>Golden Drama</span></p>
+        <p id="channel-description"><span>Last installment from my "Making Money from Podcasting" series...</span></p>
+        <p>
+          <span id="eps-number">Episodes: 12</span><br>
+          <span id="updates">Updated: Today</span>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="ad-layer" style="display: none">
+  <img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/ep_panel_on.png" id="ad-panel">
+  <p id="ad-title"><span>Featured Channels</span></p>
+  <div id="featured-set">
+    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/bg_featured_set.png" id="bg-featured-set">
+    <ul id="featured-list">
+      <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/thumb/13.jpg"></li>
+      <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/thumb/14.jpeg"></li>
+      <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/thumb/15.jpg"></li>
+      <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/thumb/16.jpg"></li>
+      <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/thumb/18.jpg"></li>
+      <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/thumb/20.jpg"></li>
+      <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/thumb/abc.jpg"></li>
+      <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/thumb/22.jpg"></li>
+      <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/thumb/12.jpg"></li>
+    </ul>
+  </div>
+  <p id="featured-meta">
+    <span id="featured-title">BHG Production</span><br>
+    <span id="featured-brief">BHG Production is  well known in the media field. It shares 9 most watched channel to all 9x9 users..</span>
+  </p>
+  <div id="btn-add-featured"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/btn_add_featured_off.png" class="off"><img src="images/btn_add_featured_on.png" class="on"><p><span>Add This Set</span></p></div>
+</div>
+
 <div id="ch-directory">
   <div id="dir-holder">
 
   <div id="dir-header">
-    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/logo.png" id="dir-logo">
+    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/logo.png" id="dir-logo">
     <p id="chdirtxt">Channel Directory</p>  
   </div>
 
@@ -7887,20 +8030,20 @@ function noop (e)
   </div>
     <div class="br-panel" id="category-panel">
     <div class="sub-panel">
-      <p class="page-up"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/arrow_up.png"></p>
+      <p class="page-up"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/arrow_up.png"></p>
       <div class="sub-holder">
         <ul id="ch-catlist"></ul>
       </div>
-      <p class="page-down"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/arrow_down.png"></p>
+      <p class="page-down"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/arrow_down.png"></p>
     </div>
     <div class="content-panel">
-      <p class="page-up" id="content-up" onclick="browse_content_up()"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/arrow_up.png"></p>
+      <p class="page-up" id="content-up" onclick="browse_content_up()"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/arrow_up.png"></p>
       <div class="content-holder" style="display: block">
         <ul id="content-list"></ul>
       </div>
       <p id="ch-vacancy"></p>
       <!--a href="javascript:;" class="btn" id="btn-subscribeAll">Subscribe all</a-->
-      <p class="page-down" id="content-down" onclick="browse_content_down()"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/arrow_down.png"></p>
+      <p class="page-down" id="content-down" onclick="browse_content_down()"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/arrow_down.png"></p>
     </div>
   </div>
   
@@ -7912,8 +8055,8 @@ function noop (e)
           <li><a href="javascript:;" class="btn">Go</a></li>
         </ul>
     </div>
-    <p class="page-up"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/arrow_up.png"></p>
-    <p class="page-down"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/arrow_down.png"></p>
+    <p class="page-up"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/arrow_up.png"></p>
+    <p class="page-down"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/arrow_down.png"></p>
   </div>
   
   <div class="op-panel" id="add-panel">
@@ -7927,7 +8070,7 @@ function noop (e)
       <p id="chcat">Channel category:</p>
       <ul class="cate-list" id="cate-list"></ul>
     </div>
-    <div id="feedback" class="success"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/loading.gif"><p></p></div>
+    <div id="feedback" class="success"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/loading.gif"><p></p></div>
     <a href="javascript:submit_throw()" class="btn" id="add-go"><span>Go</span></a>
   </div>
   </div>
@@ -7940,7 +8083,7 @@ function noop (e)
 
 <div id="signin-layer" style="display: none">
   <div id="signin-holder">
-    <div id="btn-winclose"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/btn_winclose.png"></div>
+    <div id="btn-winclose"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/btn_winclose.png"></div>
     <ul id="login-pannel">
       <li><h2 id="returning1">Returning Users</h2></li>
       <li>
@@ -7981,7 +8124,7 @@ function noop (e)
 <div id="preload-control-images" style="display: none"></div>
 
 <div id="control-layer" style="display: block;">
-    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/bg_controler.png" id="controler-bg">
+    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/bg_controler.png" id="controler-bg">
     <ul id="control-bar">
       <li id="play-time">00:00 / 00:00</li>
       <li id="progress-bar">
@@ -7990,7 +8133,7 @@ function noop (e)
       </li>
       <li class="divider"></li>
       <li id="instruction"><span id="cinstr">Mouse over the control bar to see episodes.</span></li>
-      <li id="btn-volume-up" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/btn_volume_up.png" title="Volume Up"></li>
+      <li id="btn-volume-up" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/btn_volume_up.png" title="Volume Up"></li>
       <li id="volume-constrain" class="on">
         <ul id="volume-bars">
           <li></li>
@@ -8002,17 +8145,17 @@ function noop (e)
           <li></li>
         </ul>
       </li>
-      <li id="btn-volume-down" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/btn_volume_down.png" title="Volume Down"></li>
-      <!--li id="btn-mute"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/btn_mute.png" title="Mute"></li-->
+      <li id="btn-volume-down" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/btn_volume_down.png" title="Volume Down"></li>
+      <!--li id="btn-mute"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/btn_mute.png" title="Mute"></li-->
       <li class="divider-r">
-      <li id="btn-facebook" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/btn_facebook.png" title="Share to Facebook"></li>
-      <li id="btn-sg" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/btn_sg.png" title="Return to Smart Guide "></li>
+      <li id="btn-facebook" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/btn_facebook.png" title="Share to Facebook"></li>
+      <li id="btn-sg" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/btn_sg.png" title="Return to Smart Guide "></li>
       <li class="divider-r">
-      <li id="btn-forward" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/btn_forward.png" title="Fast forward" ></li>
-      <li id="btn-pause" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/btn_pause.png" title="Pause"></li>
-      <li id="btn-play" class="cpclick on"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/btn_play.png" title="Play"></li>
-      <li id="btn-rewind" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/btn_rewind.png" title="Rewind"></li>
-      <li id="btn-replay" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/btn_replay.png" title="Play from beginning"></li>
+      <li id="btn-forward" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/btn_forward.png" title="Fast forward" ></li>
+      <li id="btn-pause" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/btn_pause.png" title="Pause"></li>
+      <li id="btn-play" class="cpclick on"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/btn_play.png" title="Play"></li>
+      <li id="btn-rewind" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/btn_rewind.png" title="Rewind"></li>
+      <li id="btn-replay" class="cpclick"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/btn_replay.png" title="Play from beginning"></li>
       <li class="divider-r"></li>
     </ul>
 </div>
@@ -8037,21 +8180,21 @@ function noop (e)
 
 <div id="waiting">
   <div class="waiting-holder">
-    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/loading.gif">
+    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/loading.gif">
     <p id="moment1">One moment...</p>
   </div>
 </div>
 
 <div id="buffering">
   <div class="waiting-holder">
-    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/loading.gif">
+    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/loading.gif">
     <p id="buffering1">Buffering...</p>
   </div>
 </div>
 
 <div id="dir-waiting">
   <div class="waiting-holder">
-    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/loading.gif">
+    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/loading.gif">
     <p id="moment2">One moment...</p>
   </div>
 </div>
@@ -8075,20 +8218,20 @@ function noop (e)
     <div id="sg-hint">
       <p class="section-title"><span id="hwbsg">While Browsing Smart Guide</span></p>
       <ul class="hints-list">
-        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/arrow_keys.png" class="key-arrows"><span id="huak">Use arrow keys or mouse to navigate</span></li>
-        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/enter_key.png" class="key-enter"><span id="hpec">Play episodes in the channel selected or add new channels</span></li>
+        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/arrow_keys.png" class="key-arrows"><span id="huak">Use arrow keys or mouse to navigate</span></li>
+        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/enter_key.png" class="key-enter"><span id="hpec">Play episodes in the channel selected or add new channels</span></li>
       </ul>
     </div>
     <div id="ep-hint">
       <p class="section-title"><span id="hwwe">While Watching Episodes</span></p>
       <ul class="hints-list">
-        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/enter_key.png" class="key-enter"><span id="hscp">Show control panel</span></li>
-        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/up_key.png" class="key-up"><span id="rsg2">Return to Smart Guide</span></li>
-        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/left_key.png" class="key-left"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV44/images/right_key.png" class="key-right"><span id="hshow">Show episodes in this channel</span></li>
+        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/enter_key.png" class="key-enter"><span id="hscp">Show control panel</span></li>
+        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/up_key.png" class="key-up"><span id="rsg2">Return to Smart Guide</span></li>
+        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/left_key.png" class="key-left"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV44/images/right_key.png" class="key-right"><span id="hshow">Show episodes in this channel</span></li>
       </ul>
     </div>
     <div id="hint-bottom">
-      <p id="hint-remove" style="display: none"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/check_off.png" class="checkbox"><span>Don't show me this again</span></p>
+      <p id="hint-remove" style="display: none"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/check_off.png" class="checkbox"><span>Don't show me this again</span></p>
       <p class="btn" id="btn-closeHint" onclick="close_hint()"><span id="hctw">Close this window</span></p>
     </div>
   </div>
@@ -8101,24 +8244,24 @@ function noop (e)
     <p><span id="about3">Watch your favorite podcasts, YouTube channels and other episodic content on 9x9 just like watching TV.</span></p>
     <p><span id="about4">9x9 is based in Santa Clara, California, USA.  We are a bunch of geeks passionate about revolutionizing online video discovery through a human powered network.</span></p>
     <p><span id="about5">Our investors include venture capitalists, private investors and corporate investors including D-Link.  Contact us at <a href="mailto:feedback@9x9Cloud.tv">feedback@9x9Cloud.tv</a>.</span></p>
-    <div id="btn-closeAbout"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/btn_winclose.png"></div>
-    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/logo_about.png" id="about-logo">
+    <div id="btn-closeAbout"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/btn_winclose.png"></div>
+    <img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/logo_about.png" id="about-logo">
   </div>
 </div>
 
 <div id="contest-layer">
-  <img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/btn_winclose.png" id="contest-close-btn">
+  <img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/btn_winclose.png" id="contest-close-btn">
   <div id="contest-innards">
         <a href="/5f/sharetowin.html" target="_blank"></a>
     <p style="display: none">&nbsp;&nbsp;現在有<span id="nowserving"></span>人完成任務</p>
   </div>
 </div>
 
-<div id="f5-ipad" onclick="contest_click()" style="display: none"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/5f_ipad.png" title="點下看活動詳情"></div>
+<div id="f5-ipad" onclick="contest_click()" style="display: none"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/5f_ipad.png" title="點下看活動詳情"></div>
 
-<div id="sg-bubble"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/bg_bubble.png"><div id="btn-bubble-del"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/btn_delete_off.png" class="off"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/btn_delete_on.png" class="on"></div><p><span id="rsbubble">Return to Smart Guide for more interesting content</span></p></div>
+<div id="sg-bubble"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/bg_bubble.png"><div id="btn-bubble-del"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/btn_delete_off.png" class="off"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/btn_delete_on.png" class="on"></div><p><span id="rsbubble">Return to Smart Guide for more interesting content</span></p></div>
 
-<div id="btn-subscribe" style="z-index: 300; display: none"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/btn_subscribe_off.png" class="off"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/btn_subscribe_on.png" class="on"></div>
+<div id="btn-subscribe" style="z-index: 300; display: none"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/btn_subscribe_off.png" class="off"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/btn_subscribe_on.png" class="on"></div>
 
 <div id="opening" style="display: block; z-index: 999">
   <div class="opening-holder" id="splash"></div>
