@@ -163,7 +163,6 @@ var brandinfo = "${brandInfo}";
       <p id="slogen"><span>Your Personal Video Album</span></p>  
       <ul id="menu-list">
         <li id="btn-signin"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/icon_signin.png" id="icon-signin"><span>Sign in / Sign up</span></li>
-        <li id="btn-signout"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/icon_signin.png" id="icon-signin"><span>Sign out</span></li>
         <li id="btn-about"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/icon_about.png" id="icon-about"><span>About Us</span></li>
         <li id="btn-help"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV48/images/icon_help.png" id="icon-help"><span>Help</span></li>
       </ul>
