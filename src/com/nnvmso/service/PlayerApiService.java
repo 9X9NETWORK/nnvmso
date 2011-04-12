@@ -150,7 +150,7 @@ public class PlayerApiService {
 			return NnStatusMsg.inputMissing(locale);
 		}				
 		if (!Pattern.matches("^\\d*$", channelId)) {
-			return messageSource.getMessage("nnstatus.input_error", new Object[] {NnStatusCode.INPUT_ERROR} , locale);
+			return NnStatusMsg.inputError(locale);
 		}
 				
 		NnUser foundUser = userMngr.findByToken(userToken);				
@@ -205,7 +205,7 @@ public class PlayerApiService {
 		if (!Pattern.matches("^\\d*$", grid1) || !Pattern.matches("^\\d*$", grid2) ||
 			Integer.parseInt(grid1) < 0 || Integer.parseInt(grid1) > 81 ||
 			Integer.parseInt(grid2) < 0 || Integer.parseInt(grid2) > 81) {
-			return messageSource.getMessage("nnstatus.input_error", new Object[] {NnStatusCode.INPUT_ERROR} , locale);
+			return NnStatusMsg.inputError(locale);
 		}		
 		NnUser user = userMngr.findByToken(userToken);
 		if (user == null) { return messageSource.getMessage("nnstatus.user_invalid", new Object[] {NnStatusCode.USER_INVALID} , locale); }
@@ -343,30 +343,51 @@ public class PlayerApiService {
 		return NnStatusMsg.successStr(locale);
 	}
 	
-	public String subscribeChannel(String userToken, String channelId, String grid) {
+	public String subscribeChannel(String userToken, String channelIds, String gridIds) {
 		//verify input
-		if (userToken == null || channelId == null || grid == null || userToken.equals("undefined")) {			
+		if (userToken == null || channelIds == null || gridIds == null || userToken.equals("undefined")) {			
 			return NnStatusMsg.inputMissing(locale);
 		}
-		if (!Pattern.matches("^\\d*$", channelId) || !Pattern.matches("^\\d*$", grid)) {
-			return NnStatusMsg.inputError(locale);
-		}		
-		//verify user and channel
 		String output = messageSource.getMessage("nnstatus.channel_or_user_invalid", new Object[] {NnStatusCode.CHANNEL_OR_USER_INVALID} , locale);		
 		NnUser user = new NnUserManager().findByToken(userToken);
-		if (user == null) {return output;}		
-		MsoChannel channel = new MsoChannelManager().findById(Long.parseLong(channelId));
-		if (channel == null || channel.getStatus() == MsoChannel.STATUS_ERROR) { return output;}			
-				
+		if (user == null) {return output;}	
+		
+		//verify channel and grid
+		String[] chArr = channelIds.split(",");
+		String[] gridArr = gridIds.split(",");
+		List<Long> chList = new ArrayList<Long>();
+		List<Short> gridList = new ArrayList<Short>();
+		try {
+			for (int i=0; i<chArr.length; i++) { chList.add(Long.valueOf(chArr[i]));}		
+			for (int i=0; i<gridArr.length; i++) { gridList.add(Short.valueOf(gridArr[i]));}
+		} catch (NumberFormatException e){
+			return NnStatusMsg.inputError(locale);
+		}
+		if (chArr.length != gridArr.length) { return NnStatusMsg.inputError(locale); }
+		
+		if (chList.size() == 1) { //should do all, omit the work for now
+			MsoChannel channel = new MsoChannelManager().findById(chList.get(0));			
+			if (channel == null || channel.getStatus() == MsoChannel.STATUS_ERROR) { 
+				return messageSource.getMessage("nnstatus.subscription_duplicate_channel", new Object[] {NnStatusCode.CHANNEL_STATUS_ERROR} , locale);
+			}
+		}
+
 		//subscribe
 		SubscriptionManager subMngr = new SubscriptionManager();
-		boolean status = subMngr.subscribeChannel(user.getKey().getId(), channel.getKey().getId(), Integer.valueOf(grid), MsoIpg.TYPE_GENERAL, mso.getKey().getId());
-		if (status) {
-			output = NnStatusMsg.successStr(locale);
-		} else {
-			output = messageSource.getMessage("nnstatus.subscription_duplicate_channel", new Object[] {NnStatusCode.SUBSCRIPTION_DUPLICATE_CHANNEL} , locale);
+		String detail = separatorStr;
+		output = NnStatusMsg.successStr(locale);
+		for (int i=0; i<chList.size(); i++) {
+			boolean status = subMngr.subscribeChannel(user.getKey().getId(), chList.get(i), gridList.get(i), MsoIpg.TYPE_GENERAL, mso.getKey().getId());			
+			if (!status) {
+				//the general status shows error even there's only one error
+				output = messageSource.getMessage("nnstatus.subscription_duplicate_channel", new Object[] {NnStatusCode.SUBSCRIPTION_DUPLICATE_CHANNEL} , locale);
+				detail = detail + chList.get(i) + "\t" + output;  
+			} else {
+				detail = detail + chList.get(i) + "\t" + NnStatusMsg.successStr(locale);
+			}
 		}
-		return output;		
+		if (chList.size() > 0) {output = output + detail;}		
+		return output;
 	}
 
 	public String createUser(String email, String password, String name, String userToken, 
@@ -381,7 +402,7 @@ public class PlayerApiService {
 		email = email.trim();
 		name = name.trim();
 		if (!Pattern.matches(regex, email.toLowerCase()) || password.length() < 6) {		
-			return messageSource.getMessage("nnstatus.input_error", new Object[] {NnStatusCode.INPUT_ERROR} , locale);
+			return NnStatusMsg.inputError(locale);
 		}
 			
 		//find mso
@@ -465,7 +486,7 @@ public class PlayerApiService {
 			return NnStatusMsg.inputMissing(locale);
 		}
 		if (!Pattern.matches("^\\d*$", grid) || Integer.parseInt(grid) < 0 || Integer.parseInt(grid) > 81) {			
-			return messageSource.getMessage("nnstatus.input_error", new Object[] {NnStatusCode.INPUT_ERROR} , locale);
+			return NnStatusMsg.inputError(locale);
 		}
 		
 		url = url.trim();
