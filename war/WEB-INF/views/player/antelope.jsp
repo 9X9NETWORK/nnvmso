@@ -141,6 +141,9 @@ var ipg_delayed_stop_timex = 0;
 var ipg_preload_timex = 0;
 var ipg_mode = '';
 
+var zoom_cursor;
+var zoom_saved_cursor;
+
 var delete_mode;
 var delete_cursor = 0;
 
@@ -2066,6 +2069,11 @@ function escape()
     return;
     }
 
+  if (thumbing == 'zoom')
+    {
+    return;
+    }
+
   if (thumbing == 'control' || thumbing == 'program')
     {
     exit_control_layer();
@@ -2244,6 +2252,8 @@ function keypress (keycode)
       /* F10, remote control "OK" */
       if (thumbing == 'ipg')
         ipg_play();
+      else if (thumbing == 'zoom')
+        zoom_enter();
       else if (thumbing == 'browse')
         browse_enter();
       else if (thumbing == 'channel' || thumbing == 'program')
@@ -2270,6 +2280,8 @@ function keypress (keycode)
         program_left();
       else if (thumbing == 'ipg')
         ipg_left();
+      else if (thumbing == 'zoom')
+        zoom_left();
       else if (thumbing == 'control')
         control_left();
       else if (thumbing == 'browse')
@@ -2294,6 +2306,8 @@ function keypress (keycode)
         program_right();
       else if (thumbing == 'ipg')
         ipg_right();
+      else if (thumbing == 'zoom')
+        zoom_right();
       else if (thumbing == 'control')
         control_right();
       else if (thumbing == 'browse')
@@ -2321,6 +2335,8 @@ function keypress (keycode)
         browse_up();
       else if (thumbing == 'ipg')
         ipg_up();
+      else if (thumbing == 'zoom')
+        zoom_up();
       else if (thumbing == 'user')
         user_up()
       break;
@@ -2339,6 +2355,8 @@ function keypress (keycode)
         browse_down();
       else if (thumbing == 'ipg')
         ipg_down();
+      else if (thumbing == 'zoom')
+        zoom_down();
       else if (thumbing == 'user')
         user_down()
       break;
@@ -2559,22 +2577,10 @@ function switch_to_zoom()
   physical_stop();
   ipg_delayed_stop_timex = setTimeout ("delayed_video_stop()", 5000);
 
-  if (current_channel in channelgrid)
-    ipg_cursor = current_channel;
+  zoom_cursor = '11';
 
-  if (! (ipg_cursor in channelgrid))
-    ipg_cursor = first_channel();
-
-  if (! (ipg_cursor in channelgrid))
-    ipg_cursor = '11';
-
-  ipg_entry_channel = ipg_cursor;
-  if (program_cursor in program_line)
-    ipg_entry_program = program_line [program_cursor];
-  else
-    ipg_entry_program = '';
-
-  redraw_ipg();
+  redraw_zoom();
+  zoom_cursor_on();
 
   $("#ipg-btn-signin, #ipg-btn-edit, #ipg-btn-resume, #ipg-btn-about").unbind();
 
@@ -2591,10 +2597,9 @@ function switch_to_zoom()
   stop_preload();
   $("#buffering").hide();
 
-  $("#control-layer, #f5-ipad, #sg-bubble, #btn-subscribe, #ipg-layer").hide();
+  $("#control-layer, #f5-ipad, #sg-bubble, #btn-subscribe, #ipg-layer, #ep-layer").hide();
   $("#ch-directory").hide();
 
-  // $("#ep-layer").css ("bottom", "0");
   $("#sg-layer, #ad-layer").show();
 
   elastic();
@@ -2602,8 +2607,6 @@ function switch_to_zoom()
   thumbing = 'zoom';
   //start_preload_timer();
   //ipg_sync();
-
-  $("#ep-list .clickable").removeClass ("on");
   }
 
 function about()
@@ -2780,6 +2783,40 @@ function redraw_ipg()
 
   ipg_fixup_margin();
   ipg_fixup_middle();
+
+  redraw_zoom(); /* FIX */
+  }
+
+function redraw_zoom()
+  {
+  var html = "";
+  
+  var bad_thumbnail = '<img src="' + root + 'error.png" class="thumbnail">';
+
+  for (var y = 1; y <= 3; y++)
+    {
+    for (var x = 1; x <= 3; x++)
+      {
+      var yx = y * 10 + x;
+      if (yx in channelgrid)
+        {
+        var channel = channelgrid [yx]
+
+        var thumb = channel ['thumb'];
+
+        if (thumb == '' || thumb == 'null' || thumb == 'false')
+          html += '<li id="zoom-' + yx + '">' + bad_thumbnail + '</li>';
+        else
+          html += '<li id="zoom-' + yx + '"><img src="' + channelgrid [yx]['thumb'] + '" class="thumbnail"></li>';
+        }
+      else
+        html += '<li id="zoom-' + yx + '"></li>';
+      }
+
+    html += '</ul>';
+    }
+
+  $("#grid-3x3").html (html);
   }
 
 function cursor_on (cursor)
@@ -2794,6 +2831,16 @@ function cursor_off (cursor)
   $("#ipg-" + cursor).removeClass ((ipg_mode == 'edit') ? "editcursor" : "on");
   if (cursor in channelgrid && ('new' in channelgrid [cursor]) && channelgrid [cursor]['new'] > 0)
     $("#dot-" + cursor).attr ("src", root + "icon_reddot_off.png");
+  }
+
+function zoom_cursor_on (cursor)
+  {
+  $("#zoom-" + cursor).addClass ("on");
+  }
+
+function zoom_cursor_off (cursor)
+  {
+  $("#zoom-" + cursor).removeClass ("on");
   }
 
 function drag_cleanup()
@@ -3415,6 +3462,48 @@ function ipg_right()
   ipg_sync();
   }
 
+function zoom_right()
+  {
+  log ("ZOOM RIGHT: old zoom cursor: " + zoom_cursor);
+
+  if (zoom_cursor < 0)
+    {
+    if (zoom_cursor == -1)
+      {
+      $("#ipg-btn-signin").removeClass ("on");
+      $("#ipg-btn-edit").addClass ("on");
+      zoom_cursor = -2;
+      }
+    else if (zoom_cursor == -2)
+      {
+      $("#ipg-btn-edit").removeClass ("on");
+      $("#ipg-btn-resume").addClass ("on");
+      zoom_cursor = -3;
+      }
+    else if (zoom_cursor == -3)
+      {
+      $("#ipg-btn-resume").removeClass ("on");
+      $("#ipg-btn-about").addClass ("on");
+      zoom_cursor = -4;
+      }
+    return;
+    }
+
+  zoom_cursor_off (zoom_cursor);
+
+  if (parseInt (zoom_cursor) == 33)
+    zoom_cursor = 11;
+  else if (parseInt (zoom_cursor) % 10 == 3)
+    zoom_cursor = parseInt (zoom_cursor) + 8; /* 33 -> 41 */
+  else
+    zoom_cursor = parseInt (zoom_cursor) + 1;
+
+  log ("new zoom cursor: " + zoom_cursor);
+
+  zoom_cursor_on (zoom_cursor);
+  ipg_metainfo();
+  }
+
 function ipg_left()
   {
   log ("IPG LEFT: old ipg cursor: " + ipg_cursor);
@@ -3471,6 +3560,48 @@ function ipg_left()
   ipg_sync();
   }
 
+function zoom_left()
+  {
+  log ("ZOOM LEFT: old zoom cursor: " + zoom_cursor);
+
+  if (zoom_cursor < 0)
+    {
+    if (zoom_cursor == -4)
+      {
+      $("#ipg-btn-about").removeClass ("on");
+      $("#ipg-btn-resume").addClass ("on");
+      zoom_cursor = -3;
+      }
+    else if (zoom_cursor == -3)
+      {
+      $("#ipg-btn-resume").removeClass ("on");
+      $("#ipg-btn-edit").addClass ("on");
+      zoom_cursor = -2;
+      }
+    else if (zoom_cursor == -2)
+      {
+      $("#ipg-btn-edit").removeClass ("on");
+      $("#ipg-btn-signin").addClass ("on");
+      zoom_cursor = -1;
+      }
+    return;
+    }
+
+  zoom_cursor_off (zoom_cursor);
+
+  if (parseInt (zoom_cursor) == 11)
+    zoom_cursor = 33;
+  else if (parseInt (zoom_cursor) % 10 == 1)
+    zoom_cursor = parseInt (zoom_cursor) - 8; /* 31 -> 23 */
+  else
+    zoom_cursor = parseInt (zoom_cursor) - 1;
+
+  log ("new zoom cursor: " + zoom_cursor);
+
+  zoom_cursor_on (zoom_cursor);
+  ipg_metainfo();
+  }
+
 function ipg_up()
   {
   log ("IPG UP: old ipg cursor: " + ipg_cursor);
@@ -3522,6 +3653,32 @@ function ipg_up()
   ipg_sync();
   }
 
+function zoom_up()
+  {
+  log ("ZOOM UP: old zoom cursor: " + zoom_cursor);
+
+  if (parseInt (zoom_cursor) < 0)
+    {
+    return;
+    }
+  else if (parseInt (zoom_cursor) >= 11 && parseInt (zoom_cursor) <= 13)
+    {
+    zoom_cursor_off (zoom_cursor);
+    $("#ipg-btn-signin").addClass ("on");
+    zoom_saved_cursor = zoom_cursor;
+    zoom_cursor = -1;
+    }
+  else if (parseInt (zoom_cursor) > 20)
+    {
+    zoom_cursor_off (zoom_cursor);
+    zoom_cursor = parseInt (zoom_cursor) - 10;
+    zoom_cursor_on (zoom_cursor);
+    }
+
+  log ("new zoom cursor: " + zoom_cursor);
+  ipg_metainfo();
+  }
+
 function ipg_down()
   {
   log ("IPG DOWN: old ipg cursor: " + ipg_cursor);
@@ -3566,6 +3723,39 @@ function ipg_down()
   start_preload_timer();
 
   ipg_sync();
+  }
+
+function zoom_down()
+  {
+  log ("ZOOM DOWN: old zoom cursor: " + zoom_cursor);
+
+  if (zoom_cursor < 0)
+    {
+    $("#ipg-btn-signin").removeClass ("on");
+    $("#ipg-btn-edit").removeClass ("on");
+    $("#ipg-btn-resume").removeClass ("on");
+    $("#ipg-btn-about").removeClass ("on");
+    zoom_cursor = zoom_saved_cursor;
+    }
+  else if (zoom_cursor > 30)
+    {
+    /* bottom row */
+    }
+  else
+    {
+    zoom_cursor_off (zoom_cursor);
+    zoom_cursor = parseInt (zoom_cursor) + 10;
+    }
+
+  log ("new zoom cursor: " + zoom_cursor);
+
+  zoom_cursor_on (zoom_cursor);
+  ipg_metainfo();
+  }
+
+function zoom_enter()
+  {
+  log ("ZOOM ENTER");
   }
 
 function ipg_resume()
