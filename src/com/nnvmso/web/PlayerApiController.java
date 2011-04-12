@@ -340,14 +340,14 @@ public class PlayerApiController {
 	 */		
 	@RequestMapping(value="subscribe")
 	public ResponseEntity<String> subscribe(@RequestParam(value="user", required=false) String userToken, 
-			                                @RequestParam(value="channel", required=false) String channelId, 
-			                                @RequestParam(value="grid", required=false) String grid, 
+			                                @RequestParam(value="channel", required=false) String channelIds, 
+			                                @RequestParam(value="grid", required=false) String gridIds, 
 			                                HttpServletRequest req ) {		
-		log.info("subscribe: userToken=" + userToken+ "; channel=" + channelId + "; grid=" + grid);
+		log.info("subscribe: userToken=" + userToken+ "; channel=" + channelIds + "; grid=" + gridIds);
 		this.prepService(req);
 		String output = NnStatusMsg.errorStr(locale);
 		try {
-			output = playerApiService.subscribeChannel(userToken, channelId, grid);
+			output = playerApiService.subscribeChannel(userToken, channelIds, gridIds);
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}
@@ -467,11 +467,10 @@ public class PlayerApiController {
 	 * 
 	 * @param user user's unique identifier
 	 * @param userInfo true or false. Whether to return user information as login. If asked, it will be returned after status code.
-	 * @param channel channel id, can be one or multiple;  example, channel=1 or channel=1,2,3 
+	 * @param channel channel id, optional, can be one or multiple;  example, channel=1 or channel=1,2,3 
 	 * @return A string of all of the user's subscribed channels' information.
 	 *         <p>  
-	 *         Channel info has following fields: 
-	 *         <blockquote> grid id, channel id,  <br/>
+	 *         Channel info has following fields:
 	 *         channel name, channel description, channel image url, <br/>
 	 *         program count, type(integer, see following), status(integer, see following),
 	 *         contentType(integer, see following), sourceUrl
