@@ -259,7 +259,7 @@ public class MsoChannelManager {
 		List<MsoChannel> channels = new ArrayList<MsoChannel>();
 		for (CategoryChannel cc : ccs) {
 			MsoChannel channel = this.findById(cc.getChannelId());
-			if (channel != null && channel.getStatus() == MsoChannel.STATUS_SUCCESS && channel.getProgramCount() > 0) { 
+			if (channel != null && channel.getStatus() == MsoChannel.STATUS_SUCCESS && channel.getProgramCount() > 0 && channel.isPublic()) { 
 				//category is used to find this channel's mso, then find corresponding subscription count
 				Category category  = categoryMngr.findById(cc.getCategoryId());
 				if (category != null) {
