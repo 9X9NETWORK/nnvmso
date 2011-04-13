@@ -159,7 +159,7 @@ var via_shared_ipg = false;
 /* reduced functionality if there is a valid user but he is visiting a shared ipg */
 var readonly_ipg = false;
 
-var root = 'http://9x9ui.s3.amazonaws.com/9x9playerV48/images/';
+var root = 'http://9x9ui.s3.amazonaws.com/9x9playerV49/images/';
 
 var language_en =
   {
@@ -436,7 +436,7 @@ var landing_pages_office =
     {
     name: 'Da Ai TV March Golden Selection',
     shortname: 'Da Ai',
-    logo: 'http://9x9ui.s3.amazonaws.com/9x9playerV48/images/logo_tzuchi.png',
+    logo: 'http://9x9ui.s3.amazonaws.com/9x9playerV49/images/logo_tzuchi.png',
     grid: [ 0, 0, 0, 0, 1980, 1503, 0, 0, 0 ],
     splashed: false
     }
@@ -448,7 +448,7 @@ var landing_pages_qa =
     {
     name: 'Da Ai TV March Golden Selection',
     shortname: 'Da Ai',
-    logo: 'http://9x9ui.s3.amazonaws.com/9x9playerV48/images/logo_tzuchi.png',
+    logo: 'http://9x9ui.s3.amazonaws.com/9x9playerV49/images/logo_tzuchi.png',
     grid: [ 7002, 15597, 12643, 3025, 6024, 12419, 14, 3018, 0 ],
     splashed: false
     }
@@ -458,10 +458,10 @@ var landing_pages_dev =
   {
   daai: 
     {
-    name: 'Da Ai TV March Golden Selection',
-    shortname: 'Da Ai',
-    logo: 'http://9x9ui.s3.amazonaws.com/9x9playerV48/images/logo_tzuchi.png',
-    grid: [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    name: 'Game Bonanza Picks',
+    shortname: 'Game Bonanza',
+    logo: 'http://9x9ui.s3.amazonaws.com/9x9playerV49/images/logo_tzuchi.png',
+    grid: [ 2017, 6018, 14, 3018, 2016, 0, 0, 0, 0 ],
     splashed: false
     }
   };
@@ -472,7 +472,7 @@ var landing_pages_prod =
     {
     name: 'Da Ai TV March Golden Selection',
     shortname: 'Da Ai',
-    logo: 'http://9x9ui.s3.amazonaws.com/9x9playerV48/images/logo_tzuchi.png',
+    logo: 'http://9x9ui.s3.amazonaws.com/9x9playerV49/images/logo_tzuchi.png',
     grid: [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
     splashed: false
     }
@@ -537,10 +537,8 @@ function elastic_innards()
   if (thumbing == 'ipg')
     extend_ipg_timex();
 
-  try { $("#film").css ({ "left": (vw - $("#film").width()) / 2, "top": (vh - $("#film").height()) / 2 }); } catch (error) {};
-
   if ($.browser.msie)
-    $("#ipg-layer, #ch-directory, #msg-layer, #confirm-layer, #yesno-layer, #delete-layer, #hint-layer, #opening").css ({"width": vw, "height": vh});
+    $("#sg-layer, #ch-directory, #msg-layer, #confirm-layer, #yesno-layer, #delete-layer, #hint-layer, #opening").css ({"width": vw, "height": vh});
 
   offset = $("#landing").offset();
   $("#temp-holder").css ({ "left": offset.left, "top": offset.top });
@@ -553,7 +551,7 @@ function episode_end_layer_fixup()
   var wh = $(window).height();
   var eh = $("#epend-layer").height();
   var et = (wh-eh)/2;
-  $("#epend-layer").css("top",et);
+  $("#epend-layer").css ("top",et);
   }
 
 function ipg_fixup_margin()
@@ -588,6 +586,7 @@ function align_center()
   $("#control-layer").css  ("left", (ww - $("#control-layer").width())  / 2);
   $("#yesno-layer").css    ("left", (ww - $("#yesno-layer").width())    / 2);
   $("#ad-layer").css       ("left", (ww - $("#ad-layer").width())       / 2);
+  $("#sg-holder").css      ("left", (ww - $("#sg-holder").width())      / 2);
 
   $("#signin-holder").css  ("margin-top",  (wh - $("#signin-holder").height()) / 2);
   $("#msg-holder").css     ("margin-top",  (wh - $("#msg-holder").height() - $("#ep-layer").height()) / 2);
@@ -1534,7 +1533,7 @@ function message (text, duration)
 function hide_layers()
   {
   $("#ep-layer, #f5-ipad").hide();
-  $("#control-layer, #sg-bubble").hide();
+  $("#control-layer, #ear-left, #ear-right, #sg-bubble").hide();
   $("#msg-layer").hide();
   $("#epend-layer").hide();
   }
@@ -1710,6 +1709,11 @@ function update_bubble()
     if (channel_name.match (/^\s*$/)) { channel_name = '[no channel name]'; }
     $("#ep-layer-ch-title").html (channel_name);
     }
+  else if (we_are_zoom)
+    {
+    var channel = pool [zoom_channel];
+    $("#ep-layer-ch-title").html (channel ['name']);
+    }
   else
     $("#ep-layer-ch-title").html ('');
 
@@ -1727,6 +1731,87 @@ function update_bubble()
     $("#ep-age").html ('');
     $("#ep-length").html ('');
     }
+
+  update_ears();
+  }
+
+function update_ears()
+  {
+  var previous;
+  var next;
+
+  if (we_are_zoom)
+    {
+    previous = zoom_channel_left();
+    next = zoom_channel_right();
+    }
+  else
+    {
+    previous = channelgrid [previous_channel_square (current_channel)];
+    next = channelgrid [next_channel_square (current_channel)];
+    }
+
+  $("#ear-left-img").attr ("src", previous ['thumb']);
+  $("#ear-right-img").attr ("src", next ['thumb']);
+  $("#ear-left-name").html (previous ['name']);
+  $("#ear-right-name").html (next ['name']);
+  }
+
+function ear_left()
+  {
+  if (we_are_zoom)
+    {
+    zoom_left();
+    zoom_play();
+    }
+  else
+    channel_left();
+  }
+
+function ear_right()
+  {
+  if (we_are_zoom)
+    {
+    zoom_right();
+    zoom_play();
+    }
+  else
+    channel_right();
+  }
+
+function zoom_channel_left()
+  {
+  var id = cur;
+
+  var cur = linear (zoom_cursor);
+  var grid = landing_pages [zoom_page]['grid'];
+
+  if ((cur - 1) in grid)
+    id = grid [cur - 1];
+  else
+    {
+    var trry = grid.length - 1;
+    while (trry in grid && grid [trry] == '0')
+      trry--;
+    id = grid [trry];
+    }
+
+  return pool [id];
+  }
+
+function zoom_channel_right()
+  {
+  var id = cur;
+
+  var cur = linear (zoom_cursor);
+  var grid = landing_pages [zoom_page]['grid'];
+
+  if ((cur + 1) in grid)
+    id = grid [cur + 1];
+  else
+    id = grid [0];
+
+  return pool [id];
   }
 
 function prepare_channel()
@@ -2042,6 +2127,17 @@ function first_channel()
   log ("first_channel(): no channels!");
   }
 
+function first_empty_channel()
+  {
+  for (var y = 1; y <= 9; y++)
+    for (var x = 1; x <= 9; x++)
+      {
+      if (! (("" + y + "" + x) in channelgrid))
+        return "" + y + "" + x;
+      }
+  log ("no empty channels!");
+  }
+
 function first_program_in (channel)
   {
   if (! (channel in channelgrid))
@@ -2071,13 +2167,10 @@ function first_program_in_real_channel (real_channel)
     return 0;
     }
 
-  log ('programs unsorted: ' + programs);
-
   // unshift here is to match what is in program_line
   programs = programs.sort (function (a,b) { return Math.floor (programgrid [b]['timestamp']) - Math.floor (programgrid [a]['timestamp']) });
   programs.unshift ('');
 
-  log ('programs sorted: ' + programs);
   return programs [1];
   }
 
@@ -2135,7 +2228,7 @@ function escape()
       {
       }
 
-    $("#ipg-layer, #ch-directory").hide();
+    $("#sg-layer, #ch-directory").hide();
 
     ipg_play();
     return;
@@ -2191,7 +2284,7 @@ function escape()
 
     case 'channel': return;
 
-    case 'ipg':     layer = $("#ipg-layer");
+    case 'ipg':     layer = $("#sg-layer");
                     break;
 
     case 'user':    layer = $("#signin-layer");
@@ -2227,7 +2320,7 @@ function escape()
     {
     thumbing = saved_thumbing;
     if (thumbing == 'control')
-      $("#control-layer").show();
+      $("#control-layer, #ear-left, #ear-right").show();
     }
 
   else if (thumbing == 'ipg' || thumbing == 'control' || thumbing == 'channel')
@@ -2612,6 +2705,26 @@ function delayed_video_stop()
     }
   }
 
+function add_more_channels()
+  {
+  if (ipg_cursor in channelgrid)
+    {
+    var fec = first_empty_channel();
+    if (fec)
+      {
+      cursor_off (ipg_cursor);
+      ipg_cursor = fec;
+      cursor_on (ipg_cursor);
+      }
+    else
+      {
+      notice_ok (thumbing, "No place for a new channel!", "");
+      return;
+      }
+    }
+  browse();
+  }
+
 function switch_to_ipg()
   {
   log ('ipg');
@@ -2654,14 +2767,19 @@ function switch_to_ipg()
   $("#ipg-btn-resume")  .bind ('click', ipg_resume);
   $("#ipg-btn-about")   .bind ('click', about);
 
+  $("#btn-add-channels").unbind();
+  $("#btn-add-channels").click (add_more_channels);
+
   stop_preload();
   $("#buffering").hide();
 
-  $("#control-layer, #f5-ipad, #sg-bubble, #btn-subscribe, #sg-layer, #ad-layer").hide();
+  $("#control-layer, #ear-left, #ear-right, #f5-ipad, #sg-bubble, #btn-subscribe, #ad-layer").hide();
   $("#ch-directory").hide();
 
   $("#ep-layer").css ("bottom", "0");
-  $("#ipg-layer").show();
+
+  $("#landing, #branding-elements").hide();
+  $("#sg-9x9, #sg-elements, #sg-layer").show();
 
   elastic();
   extend_ipg_timex();
@@ -2715,10 +2833,10 @@ function switch_to_zoom()
   stop_preload();
   $("#buffering").hide();
 
-  $("#control-layer, #f5-ipad, #sg-bubble, #btn-subscribe, #ipg-layer, #ep-layer").hide();
+  $("#control-layer, #ear-left, #ear-right, #f5-ipad, #sg-bubble, #btn-subscribe, #ipg-layer, #ep-layer, #sg-elements").hide();
   $("#ch-directory").hide();
 
-  $("#sg-layer, #ad-layer").show();
+  $("#sg-layer, #branding-elements, #landing, #ad-layer").show();
 
   elastic();
   extend_ipg_timex();
@@ -2793,14 +2911,14 @@ function follow_these()
 function first_empty_cluster()
   {
   var cluster;
-  var top_rights = [11, 14, 17, 41, 44, 47, 71, 74, 77];
+  var top_lefts = [11, 14, 17, 41, 44, 47, 71, 74, 77];
 
-  for (var i in top_rights)
+  for (var i in top_lefts)
     {
     cluster = [];
 
-    var ty = Math.floor (top_rights[i] / 10);
-    var tx = top_rights[i] % 10;
+    var ty = Math.floor (top_lefts[i] / 10);
+    var tx = top_lefts[i] % 10;
 
     for (y = ty; y < ty + 3; y++)
       for (x = tx; x < tx + 3; x++)
@@ -2931,6 +3049,78 @@ function redraw_ipg()
   var bad_thumbnail = '<img src="' + root + 'error.png" class="thumbnail">';
   var add_channel = (language == 'zh' || language == 'zh-tw') ? 'add_channel_cn.png' : 'add_channel.png';
 
+  var top_lefts = [11, 14, 17, 41, 44, 47, 71, 74, 77];
+
+  for (var i in top_lefts)
+    {
+    if (!top_lefts.hasOwnProperty (i))
+      continue;
+
+    var ty = Math.floor (top_lefts[i] / 10);
+    var tx = top_lefts[i] % 10;
+
+    html += '<div id="box-"' + top_lefts[i] + '">';
+    html += '<img src="' + root + 'bg_9x9.png" class="bg-9x9">';
+    html += '<p class="set-title"><span>Untitled</span></p>';
+    html += '<ul>';
+
+    for (y = ty; y < ty + 3; y++)
+      for (x = tx; x < tx + 3; x++)
+         {
+         var yx = y * 10 + x;
+         if (yx in channelgrid)
+           {
+           var channel = channelgrid [yx];
+           var thumb = channel ['thumb'];
+           var hasnew = channel ['updated'] > lastlogin; // channel ['new'] contains new count
+           if (thumb == '' || thumb == 'null' || thumb == 'false')
+             html += '<li class="clickable draggable" id="ipg-' + yx + '">' + bad_thumbnail + '</li>';
+           else
+             html += '<li class="clickable draggable" id="ipg-' + yx + '"><img src="' + thumb + '" class="thumbnail"></li>';
+           }
+         else
+           html += '<li class="clickable droppable" id="ipg-' + yx + '"><img src="' + root + add_channel + '" class="add-ch"></li>';
+         }
+
+    html += '</ul>';
+    html += '</div>';
+    }
+
+  $("#sg-9x9").html (html);
+  $("#sg-9x9 img").error(function () { $(this).unbind("error").attr("src", root + "error.png"); });
+  $("#sg-9x9 .clickable").unbind();
+  $("#sg-9x9 .clickable").bind ('click', function () { ipg_click ($(this).attr ('id')); });
+  $("#sg-9x9 .clickable").hover (hover_in, hover_out);
+
+  $(function()
+    {
+    $( "#list-holder .draggable" ).draggable({ zIndex: 9999, opacity: 1 });
+    $( "#list-holder .droppable" ).droppable
+         ({
+             revert: "invalid",
+             activate: function() { if (!dragging) { dragging = true; log ('dragstart'); } },
+             deactivate: function() { setTimeout ("drag_cleanup()", 200); },
+             accept: ".draggable",
+             activeClass: "ui-state-hover",
+             hoverClass: "ui-state-active",
+             drop: function (event, ui)
+                      { setTimeout ('move_channel ("' + ui.draggable.attr('id') + '", "' + $(this).attr('id') + '")', 20); }
+         });
+    });
+
+  if (ipg_cursor > 0)
+    cursor_on (ipg_cursor);
+
+  ipg_metainfo();
+
+  ipg_fixup_margin();
+  ipg_fixup_middle();
+
+  redraw_zoom(); /* FIX */
+  }
+
+function OLD_redraw_ipg()
+  {
   for (var y = 1; y <= 9; y++)
     {
     html += '<ul class="ipg-list" id="row-' + y + '">';
@@ -2943,7 +3133,6 @@ function redraw_ipg()
         var channel = channelgrid [yx]
 
         var thumb = channel ['thumb'];
-        var hasnew = channel ['updated'] > lastlogin;
 
         var newbox = '';
 
@@ -3409,11 +3598,17 @@ function ipg_metainfo()
     $("#ch-name").html ('<p>' + name + '</p>');
     $("#ep-name").html ('');
 
+    /* new */
+    $("#channel-title span").html (name);
+
     var desc = channelgrid [ipg_cursor]['desc'];
     if (desc == undefined || desc == 'null')
       desc = '';
 
     $("#description").html ('<p>' + desc + '</p>');
+
+    /* new */
+    $("#channel-description span").html (desc);
 
     var n_eps = programs_in_channel (ipg_cursor);
     var display_eps = n_eps;
@@ -3450,12 +3645,23 @@ function ipg_metainfo()
       var first = first_program_in (ipg_cursor);
       $("#update-date").html (ageof (programgrid [first]['timestamp'], true));
       $("#update").show();
+      /* new */
+      $("#updates").html (translations ['updated'] + ': ' + ageof (programgrid [first]['timestamp'], true));
+      $("#updates").show();
       }
     else
+      {
       $("#update").hide();
+      $("#updates").hide();
+      }
 
     $("#ch-episodes").html (display_eps);
     $("#ep-number").show();
+
+    $("#eps-number").html (translations ['episodes'] + ': ' + display_eps);
+    $("#eps-number").show();
+
+    $("#channel-info").show();
     }
   else
     {
@@ -3483,6 +3689,8 @@ function ipg_metainfo()
     $("#description").html ('<p></p>');
     $("#ep-number").hide();
     $("#update").hide();
+
+    $("#channel-info").hide();
     }
   }
 
@@ -4153,7 +4361,7 @@ function ipg_resume()
 
   set_channel_and_program (ipg_entry_channel, ipg_entry_program);
 
-  $("#ipg-layer").hide();
+  $("#sg-layer").hide();
   play_program();
   }
 
@@ -4173,7 +4381,7 @@ function ipg_set_channel (grid)
   if (saved == 'ipg')
     {
     thumbing = 'ipg';
-    $("#ipg-layer").show();
+    $("#sg-layer").show();
     }
 
   clear_osd_timex();
@@ -4362,7 +4570,7 @@ function ipg_play()
     physical_unmute();
     physical_play();
     unhide_player (current_tube);
-    $("#ipg-layer").hide();
+    $("#sg-layer").hide();
     switch_to_control_layer (true);
     thumbing = 'program';
     stop_all_other_players();
@@ -4385,7 +4593,7 @@ function ipg_play()
 
 function ipg_play_grid (cursor)
   {
-  $("#ipg-layer").hide();
+  $("#sg-layer").hide();
   switch_to_control_layer (true);
 
   current_channel = cursor;
@@ -4514,7 +4722,7 @@ function ep_click (id)
     if (thumbing == 'ipg')
       {
       thumbing = 'program';
-      $("#ipg-layer").hide();
+      $("#sg-layer").hide();
       switch_to_control_layer (true);
       if (program_cursor == 1)
         {
@@ -7005,7 +7213,7 @@ function ipg_preload_play()
 
   enter_channel ('program');
   update_bubble();
-  $("#ipg-layer").hide();
+  $("#sg-layer").hide();
   switch_to_control_layer (true);
 
   program_cursor = 1;
@@ -7790,7 +7998,7 @@ function exit_control_layer()
   if (thumbing == 'control' || thumbing == 'program')
     {
     thumbing = 'program';
-    $("#control-layer, #ep-layer, #f5-ipad, #sg-bubble").hide();
+    $("#control-layer, #ear-left, #ear-right, #ep-layer, #f5-ipad, #sg-bubble").hide();
     clear_osd_timex();
     // prepare_channel();
     }
@@ -7820,21 +8028,20 @@ function switch_to_control_layer (epflag)
 
   if (epflag)
     $("#ep-layer").css ("bottom", "1.75em");
-  $("#control-layer").show();
+  $("#control-layer, #ear-left, #ear-right").show();
 
-  $("#control-layer").unbind();
+  $("#control-layer, #ear-left, #ear-right").unbind();
   $("#control-layer").mousemove (show_eps);
+  $("#ear-left").click (ear_left);
+  $("#ear-right").click (ear_right);
 
-  $("#ipg-layer").hide();
-  $("#new-layer").hide();
+  $("#sg-layer").hide();
 
   control_saved_thumbing = thumbing;
   thumbing = 'control';
 
   control_volume();
   control_redraw();
-
-  $("#control-layer").show();
 
   $(".cpclick").unbind();
   $(".cpclick").click (control_click);
@@ -8157,7 +8364,7 @@ function delete_no()
 
 function switch_to_facebook()
   {
-  $("#ep-layer, #control-layer, #f5-ipad, #sg-bubble").hide();
+  $("#ep-layer, #control-layer, #ear-left, #ear-right, #f5-ipad, #sg-bubble").hide();
   yes_or_no (translations ['sharing'], "fb_yes()", "fb_no()", 2);
   }
 
@@ -8223,13 +8430,13 @@ function fb_yes()
         });
       }
 
-    $("#ep-layer, #control-layer").show();
+    $("#ep-layer, #control-layer, #ear-left, #ear-right").show();
     });
   }
 
 function fb_no()
   {
-  $("#ep-layer, #control-layer").show();
+  $("#ep-layer, #control-layer, #ear-left, #ear-right").show();
   }
 
 function yn_left()
