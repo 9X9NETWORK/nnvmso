@@ -7,7 +7,17 @@
   </cron>
   <cron>
     <url>/task/datamining/channelCountTask</url>
-    <description>User Daily Report</description>
+    <description>Channel Count Daily Report</description>
     <schedule>every day 03:30</schedule>
-  </cron>  
+  </cron>
+  <cron>
+    <url>/task/calibration/programsRemoveEntry</url>    
+    <description>Program Remove Calibration</description>
+    <schedule>every day 08:00</schedule>
+  </cron>
+  <cron>
+    <url>/task/calibration/categoryChannelCount</url>    
+    <description>Category Channel Count Calibration</description>
+    <schedule>every day 09:00</schedule>
+  </cron>            
 </cronentries>
