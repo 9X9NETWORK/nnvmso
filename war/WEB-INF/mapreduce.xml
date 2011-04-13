@@ -310,5 +310,26 @@
     	<name>mapreduce.appengine.donecallback.url</name>
     	<value>/task/datamining/userCountTaskCompleted</value>
     </property>        
-  </configuration>    
+  </configuration>
+  
+  <configuration name="Bump Counter Mapper">
+    <property>
+      <name>mapreduce.map.class</name>      
+      <value>com.nnvmso.task.mapper.BumpCounterMapper</value>
+    </property>
+    <property>
+      <name>mapreduce.inputformat.class</name>
+      <value>com.google.appengine.tools.mapreduce.DatastoreInputFormat</value>
+    </property>    
+    <property>
+      <name human="Entity Kind to Map Over">mapreduce.mapper.inputformat.datastoreinputformat.entitykind</name>
+      <value template="optional">SubscriptionLog</value>      
+    </property>    
+    <property>
+      <name human="MsoId">msoId</name>
+      <value template="optinonal">8001</value>
+    </property>
+  </configuration>  
+  
+      
 </configurations>
