@@ -381,6 +381,7 @@ public class AdminMsoChannelController {
 				return "Introduction Is Too Long";
 			channel.setIntro(intro);
 		}
+		//!!! change counter implementation
 		if (status != null) {
 			logger.info("status = " + status);
 			channel.setStatus(status);
@@ -392,9 +393,23 @@ public class AdminMsoChannelController {
 		if (programCount != null) {
 			logger.info("programCount = " + programCount);
 			channel.setProgramCount(programCount);
-		}
-		
+		}		
 		channelMngr.save(channel);
+		if (status != null) {
+			CategoryManager categoryMngr = new CategoryManager();
+			CategoryChannelManager ccMngr = new CategoryChannelManager();
+			List<CategoryChannel> ccList = ccMngr.findAllByChannelId(channel.getKey().getId());
+			List<Long> categoryIds = new ArrayList<Long>();
+			for (CategoryChannel cc : ccList) {
+				categoryIds.add(cc.getCategoryId());
+			}
+			List<Category> categories = categoryMngr.findAllByIds(categoryIds);
+			for (Category c : categories) {
+				List<MsoChannel> channels = channelMngr.findPublicChannelsByCategoryId(c.getKey().getId());
+				c.setChannelCount(channels.size());
+				categoryMngr.save(c);				
+			}			
+		}
 		return "OK";
 	}
 	
