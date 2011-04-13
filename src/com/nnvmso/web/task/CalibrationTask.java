@@ -14,10 +14,8 @@ import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
 import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.model.Category;
-import com.nnvmso.model.CategoryChannel;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoProgram;
-import com.nnvmso.service.CategoryChannelManager;
 import com.nnvmso.service.CategoryManager;
 import com.nnvmso.service.MsoChannelManager;
 import com.nnvmso.service.MsoProgramManager;
@@ -69,12 +67,13 @@ public class CalibrationTask {
 	public ResponseEntity<String> runCategoryChannels(HttpServletRequest req) {
 		int categoryId = Integer.parseInt(req.getParameter("category"));
 		CategoryManager cMngr = new CategoryManager();
-		CategoryChannelManager ccMngr = new CategoryChannelManager();
 		Category category = cMngr.findById(categoryId);
-		List<CategoryChannel> list = ccMngr.findAllByCategoryId(categoryId);
-		category.setChannelCount(list.size());
+		
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		List<MsoChannel> channels = channelMngr.findPublicChannelsByCategoryId(category.getKey().getId());
+		category.setChannelCount(channels.size());
 		cMngr.save(category);
-		log.info("calibrat category:" + category.getName() + "(" + category.getKey().getId() + ") with " + list.size() + " channels.");
+		log.info("calibrat category:" + category.getName() + "(" + category.getKey().getId() + ") with " + channels.size() + " channels.");
 		return NnNetUtil.textReturn("OK");
 	}	
 
