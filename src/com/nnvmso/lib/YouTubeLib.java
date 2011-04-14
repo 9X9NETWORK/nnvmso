@@ -45,35 +45,35 @@ public class YouTubeLib {
 		String[] invalid = {"index", "videos",
 		                    "entertainment", "music", "news", "movies",
 		                    "comedy", "gaming", "sports", "education",
-		                    "shows",  "trailers",   
+		                    "shows",  "trailers", 
 		                    "store", "channels", "contests_main"};		
 		HashSet<String> dic = new HashSet<String>();
 		for (int i=0; i<invalid.length; i++) {
 			dic.add(invalid[i]);
 		}
 		String url = null;
-		String reg = "^(http|https)://?(\\w+\\.)?youtube.com/(user/|profile\\?user=)?(\\w+)";		
+		String reg = "^(http|https)://?(www.)?youtube.com/(user/|profile\\?user=)?(\\w+)";		
 		Pattern pattern = Pattern.compile(reg);
 		Matcher m = pattern.matcher(urlStr);
 		while (m.find()) {
 			if (dic.contains(m.group(4))) {return null;}
 			url = "http://www.youtube.com/user/" + m.group(4);
 		}
-		reg = "^(http|https)://?(\\w+\\.)?youtube.com/(user/|profile\\?user=)?(\\w+)(#(p/c|g/c|grid/user)/(\\w+))";
+		reg = "^(http|https)://?(www.)?youtube.com/(user/|profile\\?user=)?(\\w+)(#(p/c|g/c|grid/user)/(\\w+))";
 		pattern = Pattern.compile(reg);
 		m = pattern.matcher(urlStr);
 		while (m.find()) {
 			url = "http://www.youtube.com/view_play_list?p=" + m.group(7);
 		}
 		
-		reg = "^(http|https)://?(\\w+\\.)?youtube.com/view_play_list\\?p=(\\w+)";
+		reg = "^(http|https)://?(www.)?youtube.com/view_play_list\\?p=(\\w+)";
 		pattern = Pattern.compile(reg);
 		m = pattern.matcher(urlStr);		
 		while (m.find()) {
 			url = "http://www.youtube.com/view_play_list?p=" + m.group(3);
 		}
 		
-		reg = "^(http|https)://?(\\w+\\.)?youtube.com/(.+)?(p|list)=(PL)?(\\w+)";
+		reg = "^(http|https)://?(www.)?youtube.com/(.+)?(p|list)=(PL)?(\\w+)";
 		pattern = Pattern.compile(reg);
 		m = pattern.matcher(urlStr);
 		while (m.find()) {
