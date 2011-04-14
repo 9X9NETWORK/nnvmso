@@ -1182,6 +1182,7 @@ function activate()
     $("#logo-tzuchi").attr ('src', landing_pages [path]['logo']);
     $("#announcing span").html ("Watch " + landing_pages [path]['shortname'] + " on");
     $("#branding-msg span").html (landing_pages [path]['motto']);
+    $("#date span").html ("Friday April 15, 2011");
     if (!channels_in_landing_loaded (zoom_page))
       load_then_zoom()
     else
@@ -2995,10 +2996,12 @@ function follow_these()
     if (fields [0] == '0')
       {
       fetch_channels();
+      $(".success-holder").css ("margin-top",  ($(window).height()- $(".success-holder").height()) / 2);
       $("#success-data").html (channels.length + ' ' + landing_pages [zoom_page]['shortname']);
       $("#success-goto").unbind();
       $("#success-goto").click (follow_these_ok);
       $("#success-layer").show();
+      $(".success-holder").css ("margin-top",  ($(window).height()- $(".success-holder").height()) / 2);
       // notice_ok (thumbing, "Subscription successful!", "switch_to_ipg()");
       set_titles [empties[0]] = landing_pages [zoom_page]['name'];
       }
@@ -3166,7 +3169,7 @@ function redraw_ipg()
 
     var title = "Untitled";
     if (top_lefts [i] in set_titles)
-      title = top_lefts [i];
+      title = set_titles [top_lefts [i]];
 
     html += '<div id="box-"' + top_lefts[i] + '">';
     html += '<img src="' + root + 'bg_9x9.png" class="bg-9x9">';
@@ -3530,6 +3533,12 @@ function yt_fetched (data)
 
     var name = feed.author[0].name.$t;
 
+    // playlists are different
+    // "tag:youtube.com,2008:playlist:45f1353372bc22eb"
+    var ytid = feed.id.$t;
+    if (ytid.match (/playlist:/))
+      name = ytid.match (/playlist:(.*)$/)[1];
+
     /* first, check the check pool, it must receive precedence */
     for (var c in pool)
       {
@@ -3556,6 +3565,9 @@ function yt_fetched (data)
           break;
           }
         }
+
+    if (why == '')
+      log ("******** unable to determine where channel goes: " + name);
 
     var entries = feed.entry || [];
 
@@ -3623,8 +3635,11 @@ function fetch_youtube_fin (why, grid)
     }
   else
     {
-    pool [grid]['youtubed'] = true;
-    zoom_metainfo();
+    if (grid)
+      {
+      pool [grid]['youtubed'] = true;
+      zoom_metainfo();
+      }
     }
 
   $("#waiting, #dir-waiting").hide();
