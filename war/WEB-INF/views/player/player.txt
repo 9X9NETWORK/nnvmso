@@ -9,6 +9,7 @@ var yt_previous_state = -2;
 var yt_quality = "medium";
 var fetch_yt_timex = 0;
 var setup_yt_timex = 0;
+var fetch_yt_callbacks = {};
 
 var jwplayer;
 var jw_video_file = 'nothing.flv';
@@ -77,6 +78,7 @@ var yn_saved_state;
 
 var channelgrid = {};
 var channels_by_id = {}
+var set_titles = {};
 
 var pool = {};
 
@@ -458,10 +460,10 @@ var landing_pages_dev =
   {
   daai: 
     {
-    name: 'Game Bonanza Picks',
-    shortname: 'Game Bonanza',
+    name: 'Da Ai TV March Golden Selection',
+    shortname: 'Da Ai',
     logo: 'http://9x9ui.s3.amazonaws.com/9x9playerV49/images/logo_tzuchi.png',
-    grid: [ 2017, 6018, 14, 3018, 2016, 0, 0, 0, 0 ],
+    grid: [ 218361, 1121639, 1123646, 1124665, 1122659, 1122672, 0, 0, 0 ],
     splashed: false
     }
   };
@@ -831,7 +833,7 @@ function fetch_programs_in (channel)
   if (nature == '3' || nature == '4')
     {
     log ('(obtaining: youtube)');
-    if (fetch_youtube ('grid', position) == false)
+    if (fetch_youtube ('grid', position, "") == false)
       {
       /* already fetched */
       $("#waiting, #dir-waiting").hide();
@@ -1217,7 +1219,7 @@ function jumpstart()
   else
     {
     ipg_cursor = channels_by_id [jumpstart_channel];
-    fetch_youtube ('grid', ipg_cursor);
+    fetch_youtube ('grid', ipg_cursor, "");
     }
   }
 
@@ -1711,8 +1713,11 @@ function update_bubble()
     }
   else if (we_are_zoom)
     {
-    var channel = pool [zoom_channel];
-    $("#ep-layer-ch-title").html (channel ['name']);
+    if (zoom_channel in pool)
+      {
+      var channel = pool [zoom_channel];
+      $("#ep-layer-ch-title").html (channel ['name']);
+      }
     }
   else
     $("#ep-layer-ch-title").html ('');
@@ -1751,17 +1756,25 @@ function update_ears()
     next = channelgrid [next_channel_square (current_channel)];
     }
 
-  $("#ear-left-img").attr ("src", previous ['thumb']);
-  $("#ear-right-img").attr ("src", next ['thumb']);
-  $("#ear-left-name").html (previous ['name']);
-  $("#ear-right-name").html (next ['name']);
+  if (previous)
+    {
+    $("#ear-left-img").attr ("src", previous ['thumb']);
+    $("#ear-left-name").html (previous ['name']);
+    }
+
+  if (next)
+    {
+    $("#ear-right-img").attr ("src", next ['thumb']);
+    $("#ear-right-name").html (next ['name']);
+    }
   }
 
 function ear_left()
   {
   if (we_are_zoom)
     {
-    zoom_left();
+    zoom_cursor = previous_zoom_channel_square (zoom_cursor);
+    log ('EAR RIGHT. new zoom cursor: ' + zoom_cursor);
     zoom_play();
     }
   else
@@ -1772,7 +1785,8 @@ function ear_right()
   {
   if (we_are_zoom)
     {
-    zoom_right();
+    zoom_cursor = next_zoom_channel_square (zoom_cursor);
+    log ('EAR LEFT. new zoom cursor: ' + zoom_cursor);
     zoom_play();
     }
   else
@@ -1806,7 +1820,7 @@ function zoom_channel_right()
   var cur = linear (zoom_cursor);
   var grid = landing_pages [zoom_page]['grid'];
 
-  if ((cur + 1) in grid)
+  if ((cur + 1) in grid && grid [cur + 1] != '0')
     id = grid [cur + 1];
   else
     id = grid [0];
@@ -2022,6 +2036,33 @@ function next_channel_square (channel)
   panic ("No next channel! (for " + channel + ")")
   }
 
+function next_zoom_channel_square (cursor)
+  {
+  for (var i = parseInt (cursor) + 1; i <= 33; i++)
+    {
+    var index = linear (i);
+    if (index >= 0)
+      {
+      var channel_id = landing_pages [zoom_page]['grid'][index];
+      if (channel_id in pool)
+        return i;
+      }
+    }
+
+  for (var i = 11; i <= parseInt (cursor); i++)
+    {
+    var index = linear (i);
+    if (index >= 0)
+      {
+      var channel_id = landing_pages [zoom_page]['grid'][index];
+      if (channel_id in pool)
+        return i;
+      }
+    }
+
+  return -1;
+  }
+
 function next_free_square (channel)
   {
   for (var i = parseInt (channel) + 1; i <= 99; i++)
@@ -2083,17 +2124,22 @@ function down_channel_square (channel)
 
 function programs_in_channel (channel)
   {
-  var num_programs = 0;
-
   if (channel in channelgrid)
     {
     var real_channel = channelgrid [channel]['id'];
+    return programs_in_real_channel (real_channel);
+    }
+  return 0;
+  }
 
-    for (p in programgrid)
-      {
-      if (programgrid [p]['channel'] == real_channel)
-        num_programs++;
-      }
+function programs_in_real_channel (real_channel)
+  {
+  var num_programs = 0;
+
+  for (p in programgrid)
+    {
+    if (programgrid [p]['channel'] == real_channel)
+      num_programs++;
     }
 
   return num_programs;
@@ -2114,6 +2160,33 @@ function previous_channel_square (channel)
     }
 
   panic ("No previous channel!")
+  }
+
+function previous_zoom_channel_square (cursor)
+  {
+  for (var i = parseInt (cursor) - 1; i > 10; i--)
+    {
+    var index = linear (i);
+    if (index >= 0)
+      {
+      var channel_id = landing_pages [zoom_page]['grid'][index];
+      if (channel_id in pool)
+        return i;
+      }
+    }
+
+  for (var i = 33; i >= parseInt (cursor); i--)
+    {
+    var index = linear (i);
+    if (index >= 0)
+      {
+      var channel_id = landing_pages [zoom_page]['grid'][index];
+      if (channel_id in pool)
+        return i;
+      }
+    }
+
+  return -1;
   }
 
 function first_channel()
@@ -2812,7 +2885,7 @@ function switch_to_zoom()
   if (!landing_pages [zoom_page]['splashed'])
     {
     $("#branding-temp").show();
-    branding_timex = setTimeout ("hide_branding_temp()", 13000);
+    // branding_timex = setTimeout ("hide_branding_temp()", 90000);
     $("#btn-watch").unbind();
     $("#btn-watch").click (hide_branding_temp);
     landing_pages [zoom_page]['splashed'] = true;
@@ -2902,6 +2975,7 @@ function follow_these()
       {
       fetch_channels();
       notice_ok (thumbing, "Subscription successful!", "switch_to_ipg()");
+      set_titles [empties[0]] = landing_pages [zoom_page]['name'];
       }
     else
       notice_ok (thumbing, translations ['suberr'] + ': ' + fields [1], "");
@@ -3059,9 +3133,13 @@ function redraw_ipg()
     var ty = Math.floor (top_lefts[i] / 10);
     var tx = top_lefts[i] % 10;
 
+    var title = "Untitled";
+    if (top_lefts [i] in set_titles)
+      title = top_lefts [i];
+
     html += '<div id="box-"' + top_lefts[i] + '">';
     html += '<img src="' + root + 'bg_9x9.png" class="bg-9x9">';
-    html += '<p class="set-title"><span>Untitled</span></p>';
+    html += '<p class="set-title" id="title-' + top_lefts[i] + '"><span>' + title + '</span></p>';
     html += '<ul>';
 
     for (y = ty; y < ty + 3; y++)
@@ -3331,7 +3409,7 @@ function move_channel (src, dst)
     });
   }
 
-function fetch_youtube (why, cursor)
+function fetch_youtube (why, cursor, callback)
   {
   var channel;
 
@@ -3344,6 +3422,7 @@ function fetch_youtube (why, cursor)
     {
     if (! ('youtubed' in channel))
       {
+      fetch_yt_callbacks [channel['id']] = callback;
       fetch_youtube_channel (why, cursor);
       return true;
       }
@@ -3352,6 +3431,7 @@ function fetch_youtube (why, cursor)
     {
     if (! ('youtubed' in channel))
       {
+      fetch_yt_callbacks [channel['id']] = callback;
       fetch_youtube_playlist (why, cursor);
       return true;
       }
@@ -3526,6 +3606,14 @@ function fetch_youtube_fin (why, grid)
       }
     else
       log ('jumpstart not in progress, proceeding');
+
+    if (channelgrid [grid]['id'] in fetch_yt_callbacks)
+      eval (fetch_yt_callbacks [channelgrid [grid]['id']]);
+    }
+  else if (why == 'zoom')
+    {
+    if (grid in fetch_yt_callbacks)
+      eval (fetch_yt_callbacks [grid]);
     }
   }
 
@@ -3543,41 +3631,58 @@ function erase_all_unclean_youtube_channels()
   for (var c in channelgrid)
     {
     var ch = channelgrid [c];
-    if ((ch ['nature'] == 3 || ch ['nature'] == 4) && ! ('youtubed' in ch))
-      erase_programs_in (ch ['id']);
+    var id = ch ['id'];
+    var youtubed = (('youtubed' in ch) || ((id in pool) && ('youtubed' in pool [id])));
+    if ((ch ['nature'] == 3 || ch ['nature'] == 4) && !youtubed)
+      erase_programs_in (id)
+    }
+
+  for (var id in pool)
+    {
+    var ch = pool [id];
+    var youtubed = (('youtubed' in ch) || ((id in channels_by_id) && ('youtubed' in channelgrid [channels_by_id[id]])));
+    if ((ch ['nature'] == 3 || ch ['nature'] == 4) && !youtubed)
+      erase_programs_in (id);
     }
   }
 
 function linear (cursor)
   {
-  var y = Math.floor (parseInt (cursor) / 10);
-  var x = zoom_cursor % 10;
-  return ((y-1) * 3) + (x-1);
+  // Calculating this way does not take into account invalid square cursor locations
+  // var y = Math.floor (parseInt (cursor) / 10);
+  // var x = zoom_cursor % 10;
+  // return ((y-1) * 3) + (x-1);
+
+  var conv = { 11:0, 12:1, 13:2, 21:3, 22:4, 23:5, 31:6, 32:7, 33:8 };
+  return (cursor in conv) ? conv [cursor] : -1;
   }
 
 function zoom_metainfo()
   {
-  var id = landing_pages [zoom_page]['grid'][linear(zoom_cursor)];
-  if (id != '0')
+  if (zoom_page in landing_pages)
     {
-    if (id in pool)
+    var id = landing_pages [zoom_page]['grid'][linear(zoom_cursor)];
+    if (id != '0')
       {
-      var channel = pool [id];
-      $("#channel-title span").html (channel ['name']);
-      $("#channel-description span").html (channel ['desc']);
-      $("#eps-number").html (translations ['episodes'] + ': ' + channel ['count']);
-      $("#updates").html (translations ['updated'] + ': ' + "Today");
-      $("#channel-info").show();
+      if (id in pool)
+        {
+        var channel = pool [id];
+        $("#channel-title span").html (channel ['name']);
+        $("#channel-description span").html (channel ['desc']);
+        $("#eps-number").html (translations ['episodes'] + ': ' + channel ['count']);
+        $("#updates").html (translations ['updated'] + ': ' + "Today");
+        $("#channel-info").show();
 
-      if (fetch_youtube ('zoom', id))
-        return;
+        if (fetch_youtube ('zoom', id, ""))
+          return;
+        }
+      else
+        log ('zoom_metainfo: channel not in pool: ' + id);
       }
     else
-      log ('zoom_metainfo: channel not in pool: ' + id);
-    }
-  else
-    {
-    $("#channel-info").hide();
+      {
+      $("#channel-info").hide();
+      }
     }
   }
 
@@ -3613,7 +3718,7 @@ function ipg_metainfo()
     var n_eps = programs_in_channel (ipg_cursor);
     var display_eps = n_eps;
 
-    if (fetch_youtube ('grid', ipg_cursor))
+    if (fetch_youtube ('grid', ipg_cursor, ""))
       return;
 
     if (channelgrid [ipg_cursor]['count'] == undefined)
@@ -3692,6 +3797,8 @@ function ipg_metainfo()
 
     $("#channel-info").hide();
     }
+
+  zoom_metainfo();
   }
 
 function metainfo_wait()
@@ -4294,6 +4401,19 @@ function zoom_play()
 
   we_are_zoom = true;
   zoom_channel = landing_pages [zoom_page]['grid'][linear(zoom_cursor)];
+
+  if (fetch_youtube ('zoom', zoom_channel, "zoom_play_inner()"))
+    {
+    thumbing = 'zoom-play-wait';
+    return;
+    }
+
+  zoom_play_inner();
+  }
+
+function zoom_play_inner()
+  {
+  log ('zoom_play_inner');
 
   $("#sg-layer, #ad-layer").hide();
   switch_to_control_layer (true);
@@ -8047,6 +8167,7 @@ function switch_to_control_layer (epflag)
   $(".cpclick").click (control_click);
   $(".cpclick").hover (control_hover_in, control_hover_out);
 
+  log ("CONTROL CLICK ON");
   reset_osd_timex();
 
   if (epflag)
