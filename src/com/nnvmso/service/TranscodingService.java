@@ -88,12 +88,12 @@ public class TranscodingService {
 			if (intro != null) { intro = intro.replaceAll("\\s", " ");}
 			channel.setIntro(intro);
 			channel.setImageUrl(podcast.getImage());
+			channel.setStatus(MsoChannel.STATUS_WAIT_FOR_APPROVAL);
 		}
 		
 		if (podcast.getLastUpdateTime() != null) {
 			channel.setTranscodingUpdateDate(podcast.getLastUpdateTime());
 		}
-		channel.setStatus(MsoChannel.STATUS_WAIT_FOR_APPROVAL);
 		channel.setPublic(true);
 		channel.setErrorReason("");
 		channelMngr.save(channel);		
