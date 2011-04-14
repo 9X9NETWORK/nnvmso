@@ -161,7 +161,7 @@ var via_shared_ipg = false;
 /* reduced functionality if there is a valid user but he is visiting a shared ipg */
 var readonly_ipg = false;
 
-var root = 'http://9x9ui.s3.amazonaws.com/9x9playerV49/images/';
+var root = 'http://9x9ui.s3.amazonaws.com/9x9playerV50/images/';
 
 var language_en =
   {
@@ -172,6 +172,7 @@ var language_en =
   episodes: 'Episodes',
   episode_lc: 'episode',
   episodes_lc: 'episodes',
+  episodeunits: 'episodes',
   sub_lc: 'subscriber',
   subs_lc: 'subscribers',
   updated: 'Updated',
@@ -292,7 +293,8 @@ var language_en =
   addset: 'Add This Set',
   follow: 'Follow These Channels',
   followhint: 'Click to receive the latest episodes from these channels',
-  curchan: 'Current Channel'
+  curchan: 'Current Channel',
+  plzreg: 'Please register to use this feature.'
   };
 
 var language_tw =
@@ -304,6 +306,7 @@ var language_tw =
   episodes: '節目集數',
   episode_lc: '節目集數',
   episodes_lc: '節目集數',
+  episodeunits: '個節目',
   sub_lc: '訂閱人數',
   subs_lc: '訂閱人數',
   updated: '已更新',
@@ -425,7 +428,8 @@ var language_tw =
   follow: 'Follow These Channels',
   followhint: 'Click to receive the latest episodes from these channels',
   curchan: 'Current Channel',
-  featchan: 'Featured Channels'
+  featchan: 'Featured Channels',
+  plzreg: 'Please register to use this feature.'
   };
 
 var translations = language_en;
@@ -438,7 +442,8 @@ var landing_pages_office =
     {
     name: 'Da Ai TV March Golden Selection',
     shortname: 'Da Ai',
-    logo: 'http://9x9ui.s3.amazonaws.com/9x9playerV49/images/logo_tzuchi.png',
+    motto: '善的接力，清流的堅持<br>看大愛，行大愛',
+    logo: 'http://9x9ui.s3.amazonaws.com/9x9playerV50/images/logo_tzuchi.png',
     grid: [ 0, 0, 0, 0, 1980, 1503, 0, 0, 0 ],
     splashed: false
     }
@@ -450,8 +455,9 @@ var landing_pages_qa =
     {
     name: 'Da Ai TV March Golden Selection',
     shortname: 'Da Ai',
-    logo: 'http://9x9ui.s3.amazonaws.com/9x9playerV49/images/logo_tzuchi.png',
-    grid: [ 7002, 15597, 12643, 3025, 6024, 12419, 14, 3018, 0 ],
+    motto: '善的接力，清流的堅持<br>看大愛，行大愛',
+    logo: 'http://9x9ui.s3.amazonaws.com/9x9playerV50/images/logo_tzuchi.png',
+    grid: [ 218361, 672121, 654190, 668213, 696069, 656169, 0, 0, 0 ],
     splashed: false
     }
   };
@@ -462,7 +468,8 @@ var landing_pages_dev =
     {
     name: 'Da Ai TV March Golden Selection',
     shortname: 'Da Ai',
-    logo: 'http://9x9ui.s3.amazonaws.com/9x9playerV49/images/logo_tzuchi.png',
+    motto: '善的接力，清流的堅持<br>看大愛，行大愛',
+    logo: 'http://9x9ui.s3.amazonaws.com/9x9playerV50/images/logo_tzuchi.png',
     grid: [ 218361, 1121639, 1123646, 1124665, 1122659, 1122672, 0, 0, 0 ],
     splashed: false
     }
@@ -474,8 +481,9 @@ var landing_pages_prod =
     {
     name: 'Da Ai TV March Golden Selection',
     shortname: 'Da Ai',
-    logo: 'http://9x9ui.s3.amazonaws.com/9x9playerV49/images/logo_tzuchi.png',
-    grid: [ 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    logo: 'http://9x9ui.s3.amazonaws.com/9x9playerV50/images/logo_tzuchi.png',
+    motto: '善的接力，清流的堅持<br>看大愛，行大愛',
+    grid: [ 49, 1735890, 5054, 1724654, 1734236, 1211626, 1735779, 1219088, 0 ],
     splashed: false
     }
   };
@@ -540,7 +548,7 @@ function elastic_innards()
     extend_ipg_timex();
 
   if ($.browser.msie)
-    $("#sg-layer, #ch-directory, #msg-layer, #confirm-layer, #yesno-layer, #delete-layer, #hint-layer, #opening").css ({"width": vw, "height": vh});
+    $("#sg-layer, #ch-directory, #msg-layer, #confirm-layer, #yesno-layer, #delete-layer, #hint-layer, #opening, #success-layer").css ({"width": vw, "height": vh});
 
   offset = $("#landing").offset();
   $("#temp-holder").css ({ "left": offset.left, "top": offset.top });
@@ -592,6 +600,7 @@ function align_center()
 
   $("#signin-holder").css  ("margin-top",  (wh - $("#signin-holder").height()) / 2);
   $("#msg-holder").css     ("margin-top",  (wh - $("#msg-holder").height() - $("#ep-layer").height()) / 2);
+  $(".success-holder").css ("margin-top",  (wh - $(".success-holder").height()) / 2);
 
   for (var v in { signin:0, hint:0, confirm:0, yesno:0, about:0 })
     $("#" + v + "-holder").css ("margin-top",  (wh - $("#" + v + "-holder").height()) / 2);
@@ -1172,6 +1181,7 @@ function activate()
     $("#branding-logo").attr ('src', landing_pages [path]['logo']);
     $("#logo-tzuchi").attr ('src', landing_pages [path]['logo']);
     $("#announcing span").html ("Watch " + landing_pages [path]['shortname'] + " on");
+    $("#branding-msg span").html (landing_pages [path]['motto']);
     if (!channels_in_landing_loaded (zoom_page))
       load_then_zoom()
     else
@@ -1771,6 +1781,9 @@ function update_ears()
 
 function ear_left()
   {
+  $("#ear-left, #ear-right").css ("visibility", "hidden");
+  setTimeout ("ears_visible()", 5000);
+
   if (we_are_zoom)
     {
     zoom_cursor = previous_zoom_channel_square (zoom_cursor);
@@ -1783,6 +1796,9 @@ function ear_left()
 
 function ear_right()
   {
+  $("#ear-left, #ear-right").css ("visibility", "hidden");
+  setTimeout ("ears_visible()", 5000);
+
   if (we_are_zoom)
     {
     zoom_cursor = next_zoom_channel_square (zoom_cursor);
@@ -1791,6 +1807,11 @@ function ear_right()
     }
   else
     channel_right();
+  }
+
+function ears_visible()
+  {
+  $("#ear-left, #ear-right").css ("visibility", "visible");
   }
 
 function zoom_channel_left()
@@ -1897,7 +1918,6 @@ function enter_channel (mode)
   {
   $("#epend-layer").hide();
   prepare_channel();
-  //$("#control-layer, #f5-ipad, #sg-bubble").hide();
   redraw_program_line();
   $("#ep-meta").hide();
   $(".ep-list .age").show();
@@ -2755,7 +2775,7 @@ function osd_timex_expired()
   osd_timex = 0;
   log ('osd timex expired');
   if (thumbing != 'ipg')
-    $("#ep-layer, #control-layer, #f5-ipad, #sg-bubble").hide();
+    $("#ep-layer, #control-layer, #ear-left, #ear-right, #f5-ipad, #sg-bubble").hide();
   if (thumbing == 'control')
     thumbing = 'program';
   }
@@ -2948,7 +2968,8 @@ function follow_these()
         {
         if (c in channels_by_id)
           {
-          notice_ok (thumbing, c + " is already subscribed!", "");
+          log (c + " is already subscribed!");
+          notice_ok (thumbing, "You already have this set in your Smart Guide!", "switch_to_ipg()");
           return;
           }
         else
@@ -2974,12 +2995,22 @@ function follow_these()
     if (fields [0] == '0')
       {
       fetch_channels();
-      notice_ok (thumbing, "Subscription successful!", "switch_to_ipg()");
+      $("#success-data").html (channels.length + ' ' + landing_pages [zoom_page]['shortname']);
+      $("#success-goto").unbind();
+      $("#success-goto").click (follow_these_ok);
+      $("#success-layer").show();
+      // notice_ok (thumbing, "Subscription successful!", "switch_to_ipg()");
       set_titles [empties[0]] = landing_pages [zoom_page]['name'];
       }
     else
       notice_ok (thumbing, translations ['suberr'] + ': ' + fields [1], "");
     });
+  }
+
+function follow_these_ok()
+  {
+  $("#success-layer").hide();
+  switch_to_ipg();
   }
 
 function first_empty_cluster()
@@ -3265,6 +3296,8 @@ function redraw_zoom()
   {
   var html = "";
   var temp_html = "";
+
+  var temp_count = 0;
  
   var bad_thumbnail = '<img src="' + root + 'error.png" class="thumbnail">';
   var play_overlay_icon  = '<img src="' + root + 'icon_play.png" class="icon-play">';
@@ -3284,7 +3317,6 @@ function redraw_zoom()
           if (id == '0')
             {
             html += '<li id="zoom-' + yx + '"></li>';
-            temp_html += '<li></li>';
             }
           else if (id in pool)
             {
@@ -3299,13 +3331,18 @@ function redraw_zoom()
             else
               {
               html += '<li id="zoom-' + yx + '"><img src="' + thumb + '" class="thumbnail">' + play_overlay_icon + '</li>';
-              temp_html += '<li><img src="' + thumb + '"><p>' + linear + '</p></li>';
+              if (++temp_count <= 4)
+                {
+                temp_html += '<li><img src="' + thumb + '"><span class="chName">' + channel ['name'] + '</span>';
+                temp_html += '<span class="divider">-</span>';
+                temp_html += '<span class="epNum">' + channel ['count'] + '</span>';
+                temp_html += '<span>' + translations ['episodeunits'] + '</span></li>';
+                }
               }
             }
           else
             {
             html += '<li id="zoom-' + yx + '">' + bad_thumbnail + '</li>';
-            temp_html += '<li></li>';
             }
           }
         else
@@ -3608,7 +3645,10 @@ function fetch_youtube_fin (why, grid)
       log ('jumpstart not in progress, proceeding');
 
     if (channelgrid [grid]['id'] in fetch_yt_callbacks)
+      {
+      log ("CALLBACK1: " + fetch_yt_callbacks [channelgrid [grid]['id']]);
       eval (fetch_yt_callbacks [channelgrid [grid]['id']]);
+      }
     }
   else if (why == 'zoom')
     {
@@ -4818,6 +4858,18 @@ function delete_enter (cursor)
 function channel_right()
   {
   current_channel = next_channel_square (current_channel);
+  log ('outer: current channel is: ' + current_channel);
+
+  if (fetch_youtube ('grid', current_channel, "channel_right_inner(" + current_channel + ")"))
+    return;
+
+  channel_right_inner (current_channel);
+  }
+
+function channel_right_inner (channel)
+  {
+  current_channel = channel;
+  log ('inner: current channel is: ' + current_channel);
   enter_channel ('program');
   play_first_program_in (current_channel);
   }
@@ -4825,6 +4877,16 @@ function channel_right()
 function channel_left()
   {
   current_channel = previous_channel_square (current_channel);
+
+  if (fetch_youtube ('grid', current_channel, "channel_left_inner(" + current_channel + ")"))
+    return;
+
+  channel_left_inner (current_channel);
+  }
+
+function channel_left_inner (channel)
+  {
+  current_channel = channel;
   enter_channel ('program');
   play_first_program_in (current_channel);
   }
@@ -8167,7 +8229,6 @@ function switch_to_control_layer (epflag)
   $(".cpclick").click (control_click);
   $(".cpclick").hover (control_hover_in, control_hover_out);
 
-  log ("CONTROL CLICK ON");
   reset_osd_timex();
 
   if (epflag)
@@ -8485,8 +8546,13 @@ function delete_no()
 
 function switch_to_facebook()
   {
-  $("#ep-layer, #control-layer, #ear-left, #ear-right, #f5-ipad, #sg-bubble").hide();
-  yes_or_no (translations ['sharing'], "fb_yes()", "fb_no()", 2);
+  if (we_are_zoom)
+    notice_ok (thumbing, translations ['plzreg'], "");
+  else
+    {
+    $("#ep-layer, #control-layer, #ear-left, #ear-right, #f5-ipad, #sg-bubble").hide();
+    yes_or_no (translations ['sharing'], "fb_yes()", "fb_no()", 2);
+    }
   }
 
 function fb_yes()
