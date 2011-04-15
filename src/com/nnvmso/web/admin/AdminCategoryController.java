@@ -138,7 +138,7 @@ public class AdminCategoryController {
 			cell.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(cc.getUpdateDate()));
 			cell.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(cc.getCreateDate()));
 			cell.add(channel.isPublic());
-			cell.add(channel.getType());
+			cell.add(channel.getContentType());
 			cell.add(subscribers);
 			
 			map.put("id", cc.getKey().getId());

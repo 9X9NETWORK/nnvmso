@@ -4,6 +4,27 @@ $(function()
   $('#ui_tabs').tabs();
   $.jgrid.no_legacy_api = true;
 
+  var channelContentType = {
+    0: 'Unknwon',
+    1: 'System',
+    2: 'Podcast',
+    3: 'YouTube Channel',
+    4: 'YouTube Playlist'
+  };
+
+  var channelStatus = {
+    0:    'Success',
+    1:    'Error',
+    2:    'Processing',
+    3:    'Wait For Approval',
+    51:   'Invalid format',
+    53:   'URL Not Found',
+    100:  'No Valid Episode',
+    101:  'Bad Quality',
+    1000: 'Tanscoding DB Error',
+    1001: 'NNVMSO Json Error'
+  }
+
   function callbackAfterSubmitForm(response, postData, formId)
   {
     if (response.responseText != 'OK') {
@@ -137,14 +158,14 @@ $(function()
         edittype:  'select',
         editoptions:
         {
-          value: '0:Success;1:Error;2:Processing;51:Invalid Format;53:URL Not Found;100:No Valid Episode;101:Bad Quality;1000:Tanscoding DB Error;1001:NNVMSO Json Error'
+          value: channelStatus
         }
       },
       {
         label:     'Type',
         name:      'contentType',
         index:     'contentType',
-        width:     70,
+        width:     90,
         align:     'center',
         search:    false,
         sortable:  true,
@@ -154,7 +175,7 @@ $(function()
         editoptions:
         {
           disabled: true,
-          value:    '0:Unknown;1:System;2:Podcast;3:YouTube'
+          value:    channelContentType
         }
       },
       {
@@ -1089,7 +1110,7 @@ $(function()
             label:     'Type',
             name:      'contentType',
             index:     'contentType',
-            width:     70,
+            width:     90,
             align:     'center',
             sortable:  false,
             formatter: 'select',
@@ -1098,7 +1119,7 @@ $(function()
             editoptions:
             {
               disabled: true,
-              value:    '0:Unknown;1:System;2:Podcast;3:YouTube'
+              value:    channelContentType
             }
           },
           {
