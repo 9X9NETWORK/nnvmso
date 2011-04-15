@@ -31,6 +31,26 @@
     <property name="status" direction="asc"/>
     <property name="createDate" direction="asc"/>
   </datastore-index>
+  <datastore-index kind="MsoChannel" ancestor="false" source="manual">
+    <property name="status" direction="asc"/>
+    <property name="updateDate" direction="desc"/>
+  </datastore-index>
+  <datastore-index kind="MsoChannel" ancestor="false" source="manual">
+    <property name="contentType" direction="asc"/>
+    <property name="updateDate" direction="desc"/>
+  </datastore-index>
+  <datastore-index kind="MsoChannel" ancestor="false" source="manual">
+    <property name="isPublic" direction="asc"/>
+    <property name="updateDate" direction="desc"/>
+  </datastore-index>
+  <datastore-index kind="MsoChannel" ancestor="false" source="manual">
+    <property name="sourceUrlSearch" direction="asc"/>
+    <property name="updateDate" direction="desc"/>
+  </datastore-index>
+  <datastore-index kind="MsoChannel" ancestor="false" source="manual">
+    <property name="nameSearch" direction="asc"/>
+    <property name="updateDate" direction="desc"/>
+  </datastore-index>
   <datastore-index kind="MsoConfig" ancestor="false" source="manual">
     <property name="__key__" direction="desc"/>
   </datastore-index>        

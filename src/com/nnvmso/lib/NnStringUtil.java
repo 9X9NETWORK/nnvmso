@@ -40,4 +40,9 @@ public class NnStringUtil {
 		return result.toString();
 	}
 	
+	public static String escapedQuote(String str) {
+		
+		return "'" + str.replaceAll("'", "''") + "'";
+	}
+	
 }

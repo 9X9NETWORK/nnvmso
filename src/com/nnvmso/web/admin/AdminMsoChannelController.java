@@ -137,6 +137,22 @@ public class AdminMsoChannelController {
 					results.add(found);
 				}
 			}
+		} else if (searchField != null && searchOper != null && searchString != null
+		           && searchOper.equals("eq")
+		           && (searchField.equals("status") || searchField.equals("contentType") || searchField.equals("isPublic") || searchField.equals("sourceUrl") || searchField.equals("name"))) {
+			
+			if (searchField.equals("sourceUrl") || searchField.equals("name")) {
+				searchString = NnStringUtil.escapedQuote(searchString.toLowerCase());
+				searchField += "Search";
+			}
+			
+			String filter = searchField + " == " + searchString;
+			logger.info("filter = " + filter);
+			totalRecords = channelMngr.total(filter);
+			totalPages = (int)Math.ceil((double)totalRecords / rowsPerPage);
+			if (currentPage > totalPages)
+				currentPage = totalPages;
+			results = channelMngr.list(currentPage, rowsPerPage, "updateDate", "desc", filter);
 		} else {
 			totalRecords = channelMngr.total();
 			totalPages = (int)Math.ceil((double)totalRecords / rowsPerPage);

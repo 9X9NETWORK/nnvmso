@@ -85,12 +85,16 @@ $(function()
         index:    'name',
         width:    200,
         align:    'center',
-        search:   false,
+        search:   true,
         sortable: true,
         editable: true,
         editoptions:
         {
           maxlength: 100
+        },
+        searchoptions:
+        {
+          sopt: ['eq']
         }
       },
       {
@@ -132,7 +136,7 @@ $(function()
         index:    'sourceUrl',
         width:    150,
         align:    'center',
-        search:   false,
+        search:   true,
         sortable: true,
         hidden:   true,
         editable: true,
@@ -143,6 +147,11 @@ $(function()
         editrules:
         {
           edithidden: true
+        },
+        searchoptions:
+        {
+          sopt: ['eq'],
+          searchhidden: true
         }
       },
       {
@@ -151,13 +160,19 @@ $(function()
         index:     'status',
         width:     70,
         align:     'center',
-        search:    false,
+        search:    true,
         sortable:  true,
+        stype:     'select',
         formatter: 'select',
         editable:  true,
         edittype:  'select',
         editoptions:
         {
+          value: channelStatus
+        },
+        searchoptions:
+        {
+          sopt:  ['eq'],
           value: channelStatus
         }
       },
@@ -167,7 +182,8 @@ $(function()
         index:     'contentType',
         width:     90,
         align:     'center',
-        search:    false,
+        search:    true,
+        stype:     'select',
         sortable:  true,
         formatter: 'select',
         editable:  true,
@@ -176,6 +192,11 @@ $(function()
         {
           disabled: true,
           value:    channelContentType
+        },
+        searchoptions:
+        {
+          sopt:  ['eq'],
+          value: channelContentType
         }
       },
       {
@@ -184,14 +205,24 @@ $(function()
         index:     'isPublic',
         width:     70,
         align:     'center',
-        search:    false,
+        search:    true,
+        stype:     'select',
         sortable:  true,
         formatter: 'checkbox',
         editable:  true,
         edittype:  'checkbox',
         editoptions:
         {
-          value:    'true:false'
+          value: 'true:false'
+        },
+        searchoptions:
+        {
+          sopt:  ['eq'],
+          value:
+          {
+            true:  'true',
+            false: 'false'
+          }
         }
       },
       {
