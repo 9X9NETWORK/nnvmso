@@ -2878,7 +2878,13 @@ function yt_fetched (data)
       var url = entry.media$group.media$content[0]['url'];
       var duration = entry.media$group.media$content[0]['duration'];
       // var timestamp = new Date (entry.updated.$t);
-      var timestamp = new Date (entry.media$group.yt$uploaded.$t);
+      var dtime = entry.media$group.yt$uploaded.$t;
+
+      if ($.browser.msie)
+        dtime = ie_rearrange_date (dtime);
+
+      var timestamp = new Date (dtime);
+
       duration = formatted_time (duration);
 
       var video_id = '';
@@ -2904,6 +2910,19 @@ function yt_fetched (data)
     log ('***** youtube fetch, data was incomplete ****');
 
   fetch_youtube_fin (grid);
+  }
+
+function ie_rearrange_date (dt)
+  {
+  /* IE does not understand the YouTube date format. Transform:
+     2011-03-03T04:04:01.000Z -> 3 March 2011 04:04:01 */
+
+  var months = { 1: 'January', 2: 'February', 3: 'March', 4: 'April', 5: 'May', 6: 'June',
+                 7: 'July', 8: 'August', 9: 'September', 10: 'October', 11: 'November', 12: 'December' };
+
+  var mo = months [Math.floor (dt.substring(5,7))];
+
+  return (Math.floor (dt.substring(8,10)) + ' ' + mo + ' ' + dt.substring(0,4) + ' ' + dt.substring (11,19));
   }
 
 function fetch_youtube_fin (grid)
