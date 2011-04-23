@@ -2853,6 +2853,13 @@ function yt_fetched (data)
     feed = data.feed;
 
     var name = feed.author[0].name.$t;
+
+    // playlists are different
+    // "tag:youtube.com,2008:playlist:45f1353372bc22eb"
+    var ytid = feed.id.$t;
+    if (ytid.match (/playlist:/))
+      name = ytid.match (/playlist:(.*)$/)[1];
+
     for (var c in channelgrid)
       {
       if (channelgrid [c]['extra'] == name)
@@ -2875,8 +2882,11 @@ function yt_fetched (data)
       var title = entry.title.$t;
       var updated = entry.updated.$t;
 
-      var url = entry.media$group.media$content[0]['url'];
-      var duration = entry.media$group.media$content[0]['duration'];
+      // var url = entry.media$group.media$content[0]['url'];
+      var video_id = entry.media$group.yt$videoid.$t;
+      var duration = entry.media$group.yt$duration.seconds;
+      // var duration = entry.media$group.media$content[0]['duration'];
+
       // var timestamp = new Date (entry.updated.$t);
       var dtime = entry.media$group.yt$uploaded.$t;
 
@@ -2887,9 +2897,9 @@ function yt_fetched (data)
 
       duration = formatted_time (duration);
 
-      var video_id = '';
-      if (url.match (/\/v\//))
-        video_id = url.match (/\/v\/(...........)/)[1];
+      // var video_id = '';
+      // if (url.match (/\/v\//))
+      //   video_id = url.match (/\/v\/(...........)/)[1];
 
       // log ("YOUTUBE " + video_id + " EPISODE: " + title);
 
