@@ -59,7 +59,7 @@ public class YouTubeLib {
 			if (dic.contains(m.group(4))) {return null;}
 			url = "http://www.youtube.com/user/" + m.group(4);
 		}
-		reg = "^(http|https)://?(www.)?youtube.com/(user/|profile\\?user=)?(\\w+)(#(p/c|g/c|grid/user)/(\\w+))";
+		reg = "^(http|https)://?(www.)?youtube.com/(user/|profile\\?user=)?(.+)(#(p/c|g/c|grid/user)/(\\w+))";
 		pattern = Pattern.compile(reg);
 		m = pattern.matcher(urlStr);
 		while (m.find()) {
