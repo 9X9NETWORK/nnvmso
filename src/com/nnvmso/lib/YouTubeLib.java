@@ -2,14 +2,26 @@ package com.nnvmso.lib;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.gdata.client.youtube.YouTubeService;
+import com.google.gdata.data.youtube.VideoEntry;
+import com.google.gdata.data.youtube.YouTubeMediaGroup;
+import com.google.gdata.data.media.mediarss.MediaThumbnail;
+import com.google.gdata.data.media.mediarss.MediaGroup;
+
 public class YouTubeLib {
 	
 	protected static final Logger log = Logger.getLogger(YouTubeLib.class.getName());
+	
+	private static final String YOUTUBE_CLIENT_ID = "9x9.tv";
+	private static final String YOUTUBE_DEVELOPER_KEY = "AI39si5AKUCeyI23OTiunkacaJ_kRzR_VPxVhTJn2Rw7rJYE2mpKKVITytE22jpws7W6L1IBAA6EEf6_B8Pp2y0hG-zM5jtGFw";
 	
 	/** 
 	 * 1. remove those invalid keywords we already know.
@@ -90,6 +102,32 @@ public class YouTubeLib {
 		
 		//if (!youTubeCheck(result)) {return null;} //till the function is fixed		
 		return url;		
+	}
+	
+	public static Map<String, String> getYouTubeVideoEntry(String videoIdStr) {
+		
+		Map<String, String> results = new HashMap<String, String>();
+		YouTubeService youtubeService = new YouTubeService(YOUTUBE_CLIENT_ID, YOUTUBE_DEVELOPER_KEY);
+		
+		try {
+			String videoEntryUrl = "http://gdata.youtube.com/feeds/api/videos/" + videoIdStr;
+			VideoEntry videoEntry = youtubeService.getEntry(new URL(videoEntryUrl), VideoEntry.class);
+			
+			String title = videoEntry.getTitle().getPlainText();
+			results.put("title", title);
+			
+			YouTubeMediaGroup mediaGroup = videoEntry.getMediaGroup();
+			String description = mediaGroup.getDescription().getPlainTextContent();
+			results.put("description", description);
+			
+			List<MediaThumbnail> thumbnails = mediaGroup.getThumbnails();
+			if (thumbnails.size() > 0) {
+				String thumbnailUrl = thumbnails.get(0).getUrl();
+				results.put("thumbnail", thumbnailUrl);
+			}
+		} catch (Exception e) {
+		}
+		return results;
 	}
 	
 	public static String getYouTubeChannelName(String urlStr) {

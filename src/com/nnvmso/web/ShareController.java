@@ -1,5 +1,6 @@
 package com.nnvmso.web;
 
+import java.util.Map;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.nnvmso.lib.NnLogUtil;
+import com.nnvmso.lib.YouTubeLib;
 import com.nnvmso.model.Ipg;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoProgram;
@@ -69,6 +71,13 @@ public class ShareController {
 		MsoProgram p = programMngr.findById(ipg.getProgramId()); 		
 		if (p != null) {
 			model = fbService.setEpisodeMetadata(model, p.getName(), p.getIntro(), p.getImageUrl());
+		} else {
+			// client approach without programId but programIdStr instead
+			String programIdStr = ipg.getProgramIdStr();
+			if (programIdStr != null && programIdStr.length() > 0) {
+				Map<String, String> videoEntry = YouTubeLib.getYouTubeVideoEntry(programIdStr);
+				model = fbService.setEpisodeMetadata(model, videoEntry.get("title"), videoEntry.get("description"), videoEntry.get("thumbnail"));
+			}
 		}
 		return "player/zooatomics";
 	}
