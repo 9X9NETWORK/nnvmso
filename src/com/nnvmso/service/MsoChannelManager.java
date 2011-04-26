@@ -160,6 +160,9 @@ public class MsoChannelManager {
 		if (url == null) return null;
 		TranscodingService tranService = new TranscodingService();
 		if (!url.contains("youtube.com")) {
+			if (url.contains("deimos3.apple.com")) { //temp fix for demo
+				return url;
+			}			
 			String podcastInfo[] = tranService.getPodcastInfo(url);			
 			if (!podcastInfo[0].equals("200") || !podcastInfo[1].contains("xml")) {
 				log.info("invalid url:" + url);		
