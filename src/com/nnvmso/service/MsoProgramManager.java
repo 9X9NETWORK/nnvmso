@@ -59,7 +59,8 @@ public class MsoProgramManager {
 	} 
 
 	public MsoProgram save(MsoProgram program) {
-		program.setUpdateDate(new Date());
+		
+		program.setUpdateDate(new Date()); // NOTE: a trying to modify program update time (from admin) will be omitted by this
 		program = msoProgramDao.save(program);
 		Cache cache = CacheFactory.get();
 		if (cache != null) {
