@@ -79,6 +79,7 @@ var yn_saved_state;
 var channelgrid = {};
 var channels_by_id = {}
 var set_titles = {};
+var set = 0;
 
 var pool = {};
 
@@ -161,7 +162,7 @@ var via_shared_ipg = false;
 /* reduced functionality if there is a valid user but he is visiting a shared ipg */
 var readonly_ipg = false;
 
-var root = 'http://9x9ui.s3.amazonaws.com/9x9playerV50/images/';
+var root = 'http://9x9ui.s3.amazonaws.com/9x9playerV52/images/';
 
 var language_en =
   {
@@ -443,7 +444,7 @@ var landing_pages_office =
     name: 'Da Ai TV March Golden Selection',
     shortname: 'Da Ai',
     motto: '善的接力，清流的堅持<br>看大愛，行大愛',
-    logo: 'http://9x9ui.s3.amazonaws.com/9x9playerV50/images/logo_tzuchi.png',
+    logo: 'http://9x9ui.s3.amazonaws.com/9x9playerV52/images/logo_tzuchi.png',
     grid: [ 0, 0, 0, 0, 1980, 1503, 0, 0, 0 ],
     splashed: false
     }
@@ -456,7 +457,7 @@ var landing_pages_qa =
     name: 'Da Ai TV March Golden Selection',
     shortname: 'Da Ai',
     motto: '善的接力，清流的堅持<br>看大愛，行大愛',
-    logo: 'http://9x9ui.s3.amazonaws.com/9x9playerV50/images/logo_tzuchi.png',
+    logo: 'http://9x9ui.s3.amazonaws.com/9x9playerV52/images/logo_tzuchi.png',
     grid: [ 218361, 672121, 654190, 668213, 696069, 656169, 0, 0, 0 ],
     splashed: false
     }
@@ -469,7 +470,7 @@ var landing_pages_dev =
     name: 'Da Ai TV March Golden Selection',
     shortname: 'Da Ai',
     motto: '善的接力，清流的堅持<br>看大愛，行大愛',
-    logo: 'http://9x9ui.s3.amazonaws.com/9x9playerV50/images/logo_tzuchi.png',
+    logo: 'http://9x9ui.s3.amazonaws.com/9x9playerV52/images/logo_tzuchi.png',
     grid: [ 218361, 1121639, 1123646, 1124665, 1122659, 1122672, 0, 0, 0 ],
     splashed: false
     }
@@ -481,7 +482,7 @@ var landing_pages_prod =
     {
     name: 'Da Ai TV March Golden Selection',
     shortname: 'Da Ai',
-    logo: 'http://9x9ui.s3.amazonaws.com/9x9playerV50/images/logo_tzuchi.png',
+    logo: 'http://9x9ui.s3.amazonaws.com/9x9playerV52/images/logo_tzuchi.png',
     motto: '善的接力，清流的堅持<br>看大愛，行大愛',
     grid: [ 49, 1735890, 5054, 1724654, 1734236, 1211626, 1735779, 1219088, 0 ],
     splashed: false
@@ -596,7 +597,6 @@ function align_center()
   $("#control-layer").css  ("left", (ww - $("#control-layer").width())  / 2);
   $("#yesno-layer").css    ("left", (ww - $("#yesno-layer").width())    / 2);
   $("#ad-layer").css       ("left", (ww - $("#ad-layer").width())       / 2);
-  $("#sg-holder").css      ("left", (ww - $("#sg-holder").width())      / 2);
 
   $("#signin-holder").css  ("margin-top",  (wh - $("#signin-holder").height()) / 2);
   $("#msg-holder").css     ("margin-top",  (wh - $("#msg-holder").height() - $("#ep-layer").height()) / 2);
@@ -1168,6 +1168,13 @@ function activate()
 
   enter_channel ('program');
 
+  if (location.host == 'ocw.9x9.tv')
+    {
+    set_titles [11] = "MIT Open Course Ware";
+    set_titles [14] = "U-M Open Course Ware";
+    set_titles [17] = "Space Science";
+    }
+
   $("#ep-layer, #f5-ipad").hide();
   document.onkeydown=kp;
   redraw_ipg();
@@ -1181,7 +1188,7 @@ function activate()
     $("#branding-logo").attr ('src', landing_pages [path]['logo']);
     $("#logo-tzuchi").attr ('src', landing_pages [path]['logo']);
     $("#announcing span").html ("Watch " + landing_pages [path]['shortname'] + " on");
-    $("#branding-msg span").html (landing_pages [path]['motto']);
+    $("#branding-msg span").html ('<b>' + landing_pages [path]['motto'] + '</b>');
     $("#date span").html ("Friday April 15, 2011");
     if (!channels_in_landing_loaded (zoom_page))
       load_then_zoom()
@@ -2246,6 +2253,8 @@ function first_program_in (channel)
 
 function first_program_in_real_channel (real_channel)
   {
+  foo(); /* god, why */
+
   var programs = [];
   var n_programs = 0;
 
@@ -2819,6 +2828,11 @@ function add_more_channels()
   browse();
   }
 
+function foo()
+  {
+  $("#sg-holder").css ("left", ($(window).width() - $("#sg-holder").width()) / 2);
+  }
+
 function switch_to_ipg()
   {
   log ('ipg');
@@ -2826,6 +2840,8 @@ function switch_to_ipg()
 
   clear_msg_timex();
   clear_osd_timex()
+
+  // setInterval ("foo()", 200);
 
   physical_stop();
   ipg_delayed_stop_timex = setTimeout ("delayed_video_stop()", 5000);
@@ -2861,6 +2877,8 @@ function switch_to_ipg()
   $("#ipg-btn-resume")  .bind ('click', ipg_resume);
   $("#ipg-btn-about")   .bind ('click', about);
 
+  $("#btn-signin")      .bind ('click', sign_in_or_out);
+
   $("#btn-add-channels").unbind();
   $("#btn-add-channels").click (add_more_channels);
 
@@ -2873,7 +2891,9 @@ function switch_to_ipg()
   $("#ep-layer").css ("bottom", "0");
 
   $("#landing, #branding-elements").hide();
+  // foo();
   $("#sg-9x9, #sg-elements, #sg-layer").show();
+  // foo();
 
   elastic();
   extend_ipg_timex();
@@ -3171,8 +3191,8 @@ function redraw_ipg()
     if (top_lefts [i] in set_titles)
       title = set_titles [top_lefts [i]];
 
-    html += '<div id="box-"' + top_lefts[i] + '">';
-    html += '<img src="' + root + 'bg_9x9.png" class="bg-9x9">';
+    html += '<div id="box-' + top_lefts[i] + '">';
+    html += '<img src="' + root + 'bg_set.png" class="bg-set">';
     html += '<p class="set-title" id="title-' + top_lefts[i] + '"><span>' + title + '</span></p>';
     html += '<ul>';
 
@@ -3198,11 +3218,14 @@ function redraw_ipg()
     html += '</div>';
     }
 
-  $("#sg-9x9").html (html);
-  $("#sg-9x9 img").error(function () { $(this).unbind("error").attr("src", root + "error.png"); });
-  $("#sg-9x9 .clickable").unbind();
-  $("#sg-9x9 .clickable").bind ('click', function () { ipg_click ($(this).attr ('id')); });
-  $("#sg-9x9 .clickable").hover (hover_in, hover_out);
+  $("#slider").html (html);
+  foo();
+
+  $("#slider .clickable img").error(function () { $(this).unbind("error").attr("src", root + "error.png"); });
+  $("#slider .clickable").unbind();
+  $("#slider .clickable").bind ('click', function () { ipg_click ($(this).attr ('id')); });
+  $("#slider .clickable").hover (hover_in, hover_out);
+  $("#slider .set-title").bind ('click', function() { title_click ($(this).attr ('id')); });
 
   $(function()
     {
@@ -3228,7 +3251,8 @@ function redraw_ipg()
   ipg_fixup_margin();
   ipg_fixup_middle();
 
-  redraw_zoom(); /* FIX */
+  if (thumbing == 'zoom')
+    redraw_zoom(); /* FIX */
   }
 
 function OLD_redraw_ipg()
@@ -3587,7 +3611,12 @@ function yt_fetched (data)
       var video_id = entry.media$group.yt$videoid.$t;
       var duration = entry.media$group.yt$duration.seconds;
       // var duration = entry.media$group.media$content[0]['duration'];
-      var timestamp = new Date (entry.media$group.yt$uploaded.$t);
+
+      var dtime = entry.media$group.yt$uploaded.$t;
+      if ($.browser.msie)
+        dtime = ie_rearrange_date (dtime);
+      var timestamp = new Date (dtime);
+ 
       duration = formatted_time (duration);
 
       // var video_id = '';
@@ -3626,6 +3655,7 @@ function fetch_youtube_fin (why, grid)
   {
   clearTimeout (fetch_yt_timex);
   log ('fetch youtube fin');
+  foo();
 
   if (why == 'grid')
     {
@@ -3672,6 +3702,19 @@ function fetch_youtube_fin (why, grid)
     }
   }
 
+function ie_rearrange_date (dt)
+  {
+  /* IE does not understand the YouTube date format. Transform:
+     2011-03-03T04:04:01.000Z -> 3 March 2011 04:04:01 */
+ 
+  var months = { 1: 'January', 2: 'February', 3: 'March', 4: 'April', 5: 'May', 6: 'June',
+                 7: 'July', 8: 'August', 9: 'September', 10: 'October', 11: 'November', 12: 'December' };
+ 
+  var mo = months [Math.floor (dt.substring(5,7))];
+ 
+  return (Math.floor (dt.substring(8,10)) + ' ' + mo + ' ' + dt.substring(0,4) + ' ' + dt.substring (11,19));
+  }
+ 
 function erase_programs_in (channel)
   {
   for (var p in programgrid)
@@ -3714,6 +3757,9 @@ function linear (cursor)
 
 function zoom_metainfo()
   {
+  if (thumbing != 'zoom')
+    return;
+
   if (zoom_page in landing_pages)
     {
     var id = landing_pages [zoom_page]['grid'][linear(zoom_cursor)];
@@ -4136,7 +4182,9 @@ function ipg_right()
 
   cursor_off (ipg_cursor);
 
-  if (ipg_mode == 'edit')
+  if ($("#sg-grid").hasClass ("x3"))
+    ipg_cursor = ipg_3x3_right();
+  else if (ipg_mode == 'edit')
     {
     log ('edit, ipg right, cursor: ' + ipg_cursor + ', next: ' + next_channel_square (parseInt (ipg_cursor)));
     ipg_cursor = next_channel_square (ipg_cursor);
@@ -4157,6 +4205,20 @@ function ipg_right()
   start_preload_timer();
 
   ipg_sync();
+  }
+
+function ipg_3x3_right()
+  {
+  var top_lefts = [11, 14, 17, 41, 44, 47, 71, 74, 77];
+
+  var top_left = top_lefts [set];
+
+  if (ipg_cursor == top_left + 22)
+    return top_left;
+  else if (ipg_cursor == top_left + 2 || ipg_cursor == top_left + 12)
+    return parseInt (ipg_cursor) + 8;
+  else
+    return parseInt (ipg_cursor) + 1;
   }
 
 function zoom_right()
@@ -4237,7 +4299,9 @@ function ipg_left()
 
   cursor_off (ipg_cursor);
 
-  if (ipg_mode == 'edit')
+  if ($("#sg-grid").hasClass ("x3"))
+    ipg_cursor = ipg_3x3_left();
+  else if (ipg_mode == 'edit')
     ipg_cursor = previous_channel_square (ipg_cursor);
   else if (parseInt (ipg_cursor) == 11)
     ipg_cursor = 99;
@@ -4299,6 +4363,20 @@ function zoom_left()
   zoom_metainfo();
   }
 
+function ipg_3x3_left()
+  {
+  var top_lefts = [11, 14, 17, 41, 44, 47, 71, 74, 77];
+
+  var top_left = top_lefts [set];
+
+  if (ipg_cursor == top_left)
+    return top_left + 22;
+  else if (ipg_cursor == top_left + 10 || ipg_cursor == top_left + 20)
+    return parseInt (ipg_cursor) - 8;
+  else
+    return parseInt (ipg_cursor) - 1;
+  }
+
 function ipg_up()
   {
   log ("IPG UP: old ipg cursor: " + ipg_cursor);
@@ -4312,6 +4390,10 @@ function ipg_up()
   if (parseInt (ipg_cursor) < 0)
     {
     return;
+    }
+  else if ($("#sg-grid").hasClass ("x3"))
+    {
+    ipg_3x3_up();
     }
   else if (ipg_mode == 'edit')
     {
@@ -4348,6 +4430,24 @@ function ipg_up()
     start_preload_timer();
 
   ipg_sync();
+  }
+
+function ipg_3x3_up()
+  {
+  var top_lefts = [11, 14, 17, 41, 44, 47, 71, 74, 77];
+
+  var top_left = top_lefts [set];
+
+  if (Math.floor ((parseInt (ipg_cursor) / 10)) == Math.floor (top_left / 10))
+    {
+    /* eventually navigate to buttons -- later */
+    }
+  else
+    {
+    cursor_off (ipg_cursor);
+    ipg_cursor = parseInt (ipg_cursor) - 10;
+    cursor_on (ipg_cursor);
+    }
   }
 
 function zoom_up()
@@ -4391,6 +4491,10 @@ function ipg_down()
     else
       ipg_cursor = ipg_saved_cursor;
     }
+  else if ($("#sg-grid").hasClass ("x3"))
+    {
+    ipg_3x3_down();
+    }
   else if (ipg_cursor > 90)
     {
     /* bottom row */
@@ -4417,6 +4521,23 @@ function ipg_down()
   start_preload_timer();
 
   ipg_sync();
+  }
+
+function ipg_3x3_down()
+  {
+  var top_lefts = [11, 14, 17, 41, 44, 47, 71, 74, 77];
+
+  var top_left = top_lefts [set];
+
+  if (Math.floor ((parseInt (ipg_cursor) / 10)) == (Math.floor (top_left / 10) + 2))
+    {
+    /* bottom row */
+    }
+  else
+    {
+    cursor_off (ipg_cursor);
+    ipg_cursor = parseInt (ipg_cursor) + 10;
+    }
   }
 
 function zoom_down()
@@ -4614,6 +4735,56 @@ function ipg_program_index()
   $("#ep-tip").hide();
   $("#ep-container").show();
   $("#ep-panel").attr ("src", root + 'ep_panel_on.png');
+  }
+
+function title_click (id)
+  {
+  id = id.replace (/^title-/, '');
+  log ('title_click: ' + id);
+
+  var top_lefts = [11, 14, 17, 41, 44, 47, 71, 74, 77];
+
+  for (var i in top_lefts)
+    {
+    if (id == top_lefts [i])
+      {
+      $("#sg-grid").removeClass("x9").addClass("x3");
+      log ('set now ' + i);
+      set = i;
+      SetMove (set);
+      CheckSet();
+      $("#btn-smart-guide").unbind();
+      $("#btn-smart-guide").click (function() 
+        {
+        Reset();
+	$("#prev-set, #next-set").hide();
+        $("#sg-grid").removeClass("x3").addClass("x9");
+        $("#btn-smart-guide").unbind();
+        });
+      $("#next-set").unbind();
+      $("#next-set").click  (function()
+        {
+	if (set < 8 ) 
+          SetMove (++set);
+        });
+      $("#prev-set").unbind();
+      $("#prev-set").click (function()
+        {
+        if (set > 0)
+	  SetMove (--set); 
+        });
+      $("#pagination .pdot").bind ('click', function() { pdot_click ($(this).attr ('id')); });
+      return;
+      }
+    }
+  }
+
+function pdot_click (id)
+  {
+  id = id.replace (/^pdot-/, '');
+  log ('pdot_click: ' + id);
+  set = id - 1;
+  SetMove (set);
   }
 
 function ipg_click (id)
@@ -5436,7 +5607,7 @@ function submit_login()
           username = fields [1];
         }
 
-      $("#user").html (username);
+      $("#user, #sg-user").html (username);
       log ('[explicit login] welcome ' + username + ', AKA ' + user);
       solicit();
       report ('u', 'login ' + user + ' ' + username);
@@ -5541,7 +5712,7 @@ function submit_signup()
           username = fields [1];
         }
 
-      $("#user").html (username);
+      $("#user, #sg-user").html (username);
       log ('[login via signup] welcome ' + username + ', AKA ' + user);
       solicit();
 
@@ -5931,7 +6102,7 @@ function proceed_with_valid_login (how, lines)
       }
     }
 
-  $("#user").html (username);
+  $("#user, #sg-user").html (username + "'s");
   solicit();
 
   log ('[' + how + '] welcome ' + username + ', AKA ' + user);
@@ -5973,7 +6144,7 @@ function become_a_guest()
       log ('guest register failed, but user cookie now exists');
       user = u;
       username = u;
-      $("#user").html (username);
+      $("#user, #sg-user").html (username);
       solicit();
       via_shared_ipg = false;
       fetch_everything();
@@ -8772,3 +8943,93 @@ function noop (e)
   // flowplayer (fp_player).pause();
   }
 
+
+
+
+
+
+
+
+
+  $("#btn-smart-guide").click(function() {
+	Reset();
+	$("#sg-grid").removeClass("x3").addClass("x9");
+  });
+  
+  $(".set-title").click(function() {
+    $("#sg-grid").removeClass("x9").addClass("x3");
+	set = $(".set-title").index(this);
+	SetMove(set);
+  });
+  
+  
+  // Slide //
+  
+  CheckSet();
+  
+  function Reset() {
+    set = 0;
+	$("#slider").css("left","0");
+	$("#next-set, #prev-set").hide();
+  }
+  
+  function SetMove(set) {
+    distance = "-" + 33.25*(set) + "em";
+    $("#slider").animate({"left":distance}, 500, CheckSet);
+    reset_set_cursor();
+  }
+  
+  $("#next-set").click(function() {
+	if (set < 8 ) {
+	  set = set +1;
+      SetMove(set);
+	} 							
+  });
+  
+  $("#prev-set").click(function() {
+    if (set > 0 ) {
+	  set = set - 1;
+	  SetMove(set); 
+	} 
+  });
+  
+  function CheckSet() {
+    if (set == 0) {
+      $("#prev-set").hide();
+      $("#next-set").show();
+    } else if (set == 8) {
+	  $("#prev-set").show();
+	  $("#next-set").hide();
+	} else {
+	  $("#prev-set").show();
+	  $("#next-set").show();
+	}
+	Pagination();
+  }
+  
+  function Pagination() {
+	p = $("#pagination li");
+    $(p).removeClass("on");
+	$(p[set]).addClass("on");
+  }
+
+function reset_set_cursor()
+  {
+  var top_lefts = [11, 14, 17, 41, 44, 47, 71, 74, 77];
+  var top_left = top_lefts [set];
+
+  var new_ipg_cursor = ipg_cursor;
+
+  var inthebox = [0, 1, 2, 10, 11, 12, 20, 22, 23];
+
+  for (var i in inthebox)
+    if (parseInt (ipg_cursor) == top_left + inthebox [i])
+      return;
+
+  cursor_off (ipg_cursor);
+  ipg_cursor = top_left;
+  cursor_on (ipg_cursor);
+
+  ipg_metainfo();
+  ipg_sync();
+  }
