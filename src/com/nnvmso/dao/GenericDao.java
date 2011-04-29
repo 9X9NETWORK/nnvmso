@@ -1,5 +1,6 @@
 package com.nnvmso.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -9,14 +10,38 @@ import javax.jdo.Query;
 
 import com.google.appengine.api.datastore.Key;
 import com.nnvmso.lib.PMF;
+import com.nnvmso.model.MsoProgram;
+import com.nnvmso.model.NnUser;
 
 public class GenericDao<T> {
 	
-	protected static final Logger log = Logger.getLogger(GenericDao.class.getName());
+	protected static final Logger logger = Logger.getLogger(GenericDao.class.getName());
 	private Class<T> daoClass;
 	
 	public GenericDao(Class<T> daoClass) {
 		this.daoClass = daoClass;
+	}
+	
+	public T save(T dao) {
+		if (dao == null) {return null;}
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		try {
+			pm.makePersistent(dao);
+			dao = pm.detachCopy(dao);
+		} finally {
+			pm.close();
+		}
+		return dao;
+	}
+	
+	public void delete(T dao) {
+		if (dao == null) return;
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		try {
+			pm.deletePersistent(dao);
+		} finally {
+			pm.close();
+		}
 	}
 	
 	/**
@@ -93,6 +118,21 @@ public class GenericDao<T> {
 		} finally {
 			pm.close();
 		}
+		return results;
+	}
+	
+	public List<T> findAllByIds(List<Long> ids) {
+		
+		List<T> results = new ArrayList<T>();
+		
+		for (Long id : ids) {
+			T dao = null;
+			dao = this.findById(id);
+			if (dao != null) {
+				results.add(dao);
+			}
+		}
+		
 		return results;
 	}
 	
