@@ -35,7 +35,7 @@ $(function()
     }
   }
 
-  //////// Channel Managment Tab ////////
+  //////// Channel Management Tab ////////
 
   $('#chn_table').jqGrid(
   {
@@ -220,8 +220,8 @@ $(function()
           sopt:  ['eq'],
           value:
           {
-            true:  'true',
-            false: 'false'
+            'true':  'true',
+            'false': 'false'
           }
         }
       },
@@ -270,7 +270,7 @@ $(function()
         edittype: 'textarea',
         editoptions:
         {
-          rows: '3',
+          rows: '3'
         },
         editrules:
         {
@@ -901,7 +901,7 @@ $(function()
         searchoptions:
         {
           sopt:    ['eq'],
-          dataUrl: '/admin/mso/msoHtmlSelectOptions',
+          dataUrl: '/admin/mso/msoHtmlSelectOptions'
         }
       },
       {
@@ -1449,7 +1449,7 @@ $(function()
         edittype: 'textarea',
         editoptions:
         {
-          rows: '3',
+          rows: '3'
         },
         editrules:
         {
@@ -1740,7 +1740,7 @@ $(function()
         searchoptions:
         {
           sopt:    ['eq'],
-          dataUrl: '/admin/mso/msoHtmlSelectOptions',
+          dataUrl: '/admin/mso/msoHtmlSelectOptions'
         }
       },
       {
@@ -1863,7 +1863,7 @@ $(function()
         edittype: 'textarea',
         editoptions:
         {
-          rows: '3',
+          rows: '3'
         },
         editrules:
         {
