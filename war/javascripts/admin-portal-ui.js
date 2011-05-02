@@ -24,6 +24,22 @@ $(function()
     1000: 'Tanscoding DB Error',
     1001: 'NNVMSO Json Error'
   }
+  
+  var msoType = {
+    0: 'Unknown',
+    1: 'NN',
+    2: 'MSO',
+    3: '3X3'
+  }
+  
+  var userType = {
+    1: 'Admin',
+    2: 'TBC',
+    3: 'TCO',
+    4: 'User',
+    5: 'NN',
+    6: '3x3'
+  }
 
   function callbackAfterSubmitForm(response, postData, formId)
   {
@@ -1404,7 +1420,7 @@ $(function()
         editoptions:
         {
           disabled: true,
-          value:    '0:Unknown;1:NN;2:MSO'
+          value:    msoType
         }
       },
       {

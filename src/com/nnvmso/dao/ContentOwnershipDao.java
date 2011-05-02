@@ -22,7 +22,7 @@ public class ContentOwnershipDao extends GenericDao<ContentOwnership> {
 	public List<ContentOwnership> findByMsoIdAndContentType(long msoId, short contentType) {
 		
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		List<ContentOwnership> detachedOwnershipList = new ArrayList<ContentOwnership>();
+		List<ContentOwnership> detached = new ArrayList<ContentOwnership>();
 		
 		try {
 			Query query = pm.newQuery();
@@ -32,10 +32,10 @@ public class ContentOwnershipDao extends GenericDao<ContentOwnership> {
 			query.declareParameters("short comtentTypeParam");
 			@SuppressWarnings("unchecked")
 			List<ContentOwnership> list = (List<ContentOwnership>)query.execute(msoId, contentType);
-			detachedOwnershipList = (List<ContentOwnership>)pm.detachCopyAll(list);
+			detached = (List<ContentOwnership>)pm.detachCopyAll(list);
 		} catch (JDOObjectNotFoundException e) {
 		}
 		
-		return detachedOwnershipList;
+		return detached;
 	}
 }

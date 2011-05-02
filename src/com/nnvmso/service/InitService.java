@@ -89,6 +89,33 @@ public class InitService {
 		list = dumper.findAll(ViewLog.class, "createDate");
 		dumper.deleteAll(ViewLog.class, list);
 		
+		list = dumper.findAll(AreaOwnership.class, "createDate");
+		dumper.deleteAll(AreaOwnership.class, list);
+		
+		list = dumper.findAll(BrandAdmin.class, "createDate");
+		dumper.deleteAll(BrandAdmin.class, list);
+		
+		list = dumper.findAll(ChannelAutosharing.class, "createDate");
+		dumper.deleteAll(ChannelAutosharing.class, list);
+		
+		list = dumper.findAll(ChannelSetAutosharing.class, "createDate");
+		dumper.deleteAll(ChannelSetAutosharing.class, list);
+		
+		list = dumper.findAll(SnsAuth.class, "createDate");
+		dumper.deleteAll(SnsAuth.class, list);
+		
+		list = dumper.findAll(CategoryChannelSet.class, "createDate");
+		dumper.deleteAll(CategoryChannelSet.class, list);
+		
+		list = dumper.findAll(ChannelSet.class, "createDate");
+		dumper.deleteAll(ChannelSet.class, list);
+		
+		list = dumper.findAll(ChannelSetChannel.class, "createDate");
+		dumper.deleteAll(ChannelSetChannel.class, list);
+		
+		list = dumper.findAll(ContentOwnership.class, "createDate");
+		dumper.deleteAll(ContentOwnership.class, list);
+		
 		log.info("delete all is done");
 	}
 	
