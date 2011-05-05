@@ -68,6 +68,10 @@ public class NnUserManager {
 		return nnUserDao.findAuthenticatedUser(email.toLowerCase(), password, msoId);
 	}
 	
+	public NnUser findAuthenticatedMsoUser(String email, String password, long msoId) {
+		return nnUserDao.findAuthenticatedMsoUser(email.toLowerCase(), password, msoId);
+	}
+	
 	public void subscibeDefaultChannels(NnUser user) {
 		MsoChannelManager channelMngr = new MsoChannelManager();		
 		List<MsoChannel> channels = channelMngr.findMsoDefaultChannels(user.getMsoId(), false);		
