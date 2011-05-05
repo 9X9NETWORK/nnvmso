@@ -1,6 +1,5 @@
 package com.nnvmso.web.admin;
 
-import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 
@@ -93,7 +92,7 @@ public class AdminMsoController {
 		
 		NnUserManager userMngr = new NnUserManager();
 		ObjectMapper mapper = new ObjectMapper();
-		List<Map> dataRows = new ArrayList<Map>();
+		List<Map<String, Object>> dataRows = new ArrayList<Map<String, Object>>();
 		
 		int totalRecords = msoMngr.total();
 		int totalPages = (int)Math.ceil((double)totalRecords / rowsPerPage);

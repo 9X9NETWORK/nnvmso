@@ -7,9 +7,7 @@ import java.util.logging.Logger;
 
 import org.springframework.stereotype.Service;
 
-import com.nnvmso.dao.ChannelSetChannelDao;
 import com.nnvmso.dao.ChannelSetDao;
-import com.nnvmso.dao.MsoChannelDao;
 import com.nnvmso.model.ChannelSet;
 import com.nnvmso.model.ChannelSetChannel;
 import com.nnvmso.model.MsoChannel;

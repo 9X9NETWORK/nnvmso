@@ -10,8 +10,6 @@ import javax.jdo.Query;
 
 import com.google.appengine.api.datastore.Key;
 import com.nnvmso.lib.PMF;
-import com.nnvmso.model.MsoProgram;
-import com.nnvmso.model.NnUser;
 
 public class GenericDao<T> {
 	
@@ -140,7 +138,6 @@ public class GenericDao<T> {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		T dao = null;
 		try {
-			@SuppressWarnings("unchecked")
 			T tmp = (T)pm.getObjectById(daoClass, id);
 			dao = (T)pm.detachCopy(tmp);
 		} catch (JDOObjectNotFoundException e) {
@@ -154,7 +151,6 @@ public class GenericDao<T> {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		T dao = null;
 		try {
-			@SuppressWarnings("unchecked")
 			T tmp = (T)pm.getObjectById(daoClass, key);
 			dao = (T)pm.detachCopy(tmp);
 		} catch (JDOObjectNotFoundException e) {

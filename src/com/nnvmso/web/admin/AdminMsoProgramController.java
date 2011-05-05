@@ -1,6 +1,5 @@
 package com.nnvmso.web.admin;
 
-import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 
@@ -109,7 +108,7 @@ public class AdminMsoProgramController {
 	                                                  OutputStream out) {
 		
 		ObjectMapper mapper = new ObjectMapper();
-		List<Map> dataRows = new ArrayList<Map>();
+		List<Map<String, Object>> dataRows = new ArrayList<Map<String, Object>>();
 		
 		String filter = "channelId == " + channelId;
 		int totalRecords = programMngr.total(filter);

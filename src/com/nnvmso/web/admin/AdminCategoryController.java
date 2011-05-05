@@ -1,6 +1,5 @@
 package com.nnvmso.web.admin;
 
-import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 
@@ -8,7 +7,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.lang.Math;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -101,12 +99,12 @@ public class AdminCategoryController {
 		MsoChannelManager      channelMngr = new MsoChannelManager();
 		
 		ObjectMapper mapper = new ObjectMapper();
-		List<Map> dataRows = new ArrayList<Map>();
+		List<Map<String, Object>> dataRows = new ArrayList<Map<String, Object>>();
 		
 		Category category = categoryMngr.findById(categoryId);
 		if (category == null) {
 			try {
-				mapper.writeValue(out, JqgridHelper.composeJqgridResponse(1, 1, 0, new ArrayList<Map>()));
+				mapper.writeValue(out, JqgridHelper.composeJqgridResponse(1, 1, 0, new ArrayList<Map<String, Object>>()));
 			} catch (IOException e) {
 				logger.warning(e.getMessage());
 			}
@@ -189,7 +187,7 @@ public class AdminCategoryController {
 	                                                 OutputStream out) {
 		
 		ObjectMapper mapper = new ObjectMapper();
-		List<Map> dataRows = new ArrayList<Map>();
+		List<Map<String, Object>> dataRows = new ArrayList<Map<String, Object>>();
 		
 		String filter = "";
 		if (searchField != null && searchOper != null && searchString != null) {

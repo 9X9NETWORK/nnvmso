@@ -1,13 +1,11 @@
 package com.nnvmso.web.admin;
 
-import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.Math;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -98,7 +96,7 @@ public class AdminMsoIpgController {
 		
 		MsoChannelManager channelMngr = new MsoChannelManager();
 		ObjectMapper mapper = new ObjectMapper();
-		List<Map> dataRows = new ArrayList<Map>();
+		List<Map<String, Object>> dataRows = new ArrayList<Map<String, Object>>();
 		
 		String filter = "msoId == " + msoId;
 		int totalRecords = ipgMngr.total(filter);

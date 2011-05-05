@@ -118,7 +118,7 @@ public class AdminMsoChannelController {
 		
 		SubscriptionLogManager subLogMngr = new SubscriptionLogManager();
 		ObjectMapper mapper = new ObjectMapper();
-		List<Map> dataRows = new ArrayList<Map>();
+		List<Map<String, Object>> dataRows = new ArrayList<Map<String, Object>>();
 		
 		List<MsoChannel> results;
 		int totalRecords, totalPages;
@@ -319,12 +319,12 @@ public class AdminMsoChannelController {
 		CategoryManager categoryMngr = new CategoryManager();
 		CategoryChannelManager ccMngr = new CategoryChannelManager();
 		ObjectMapper mapper = new ObjectMapper();
-		List<Map> dataRows = new ArrayList<Map>();
+		List<Map<String, Object>> dataRows = new ArrayList<Map<String, Object>>();
 		
 		// no channel was specified
 		if (channelId == 0) {
 			try {
-				mapper.writeValue(out, JqgridHelper.composeJqgridResponse(1, 1, 0, new ArrayList<Map>()));
+				mapper.writeValue(out, JqgridHelper.composeJqgridResponse(1, 1, 0, new ArrayList<Map<String, Object>>()));
 			} catch (IOException e) {
 				logger.warning(e.getMessage());
 			}
