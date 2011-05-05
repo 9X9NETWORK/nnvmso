@@ -1,6 +1,7 @@
 package com.nnvmso.service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -11,6 +12,7 @@ import com.nnvmso.dao.ContentOwnershipDao;
 import com.nnvmso.dao.MsoChannelDao;
 import com.nnvmso.model.ChannelSet;
 import com.nnvmso.model.ContentOwnership;
+import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
 
 @Service
@@ -45,4 +47,27 @@ public class ContentOwnershipManager {
 		}
 		return channelDao.findAllByIds(channelIds);
 	}
+	
+	public void create(ContentOwnership own, Mso mso, MsoChannel channel) {
+		
+		own.setContentType(ContentOwnership.TYPE_CHANNEL);
+		own.setContentId(channel.getKey().getId());
+		own.setMsoId(mso.getKey().getId());
+		own.setCreateDate(new Date());
+		own.setCreateMode(ContentOwnership.MODE_UPLOAD);
+		
+		ownershipDao.save(own);
+	}
+
+	public void create(ContentOwnership own, Mso mso, ChannelSet channelSet) {
+		
+		own.setContentType(ContentOwnership.TYPE_CHANNELSET);
+		own.setContentId(channelSet.getKey().getId());
+		own.setMsoId(mso.getKey().getId());
+		own.setCreateDate(new Date());
+		own.setCreateMode(ContentOwnership.MODE_CURATE);
+		
+		ownershipDao.save(own);
+	}
+	
 }

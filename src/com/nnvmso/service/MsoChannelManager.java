@@ -43,6 +43,8 @@ public class MsoChannelManager {
 		Date now = new Date();
 		if (channel.getSourceUrl() != null) 
 			channel.setSourceUrl(channel.getSourceUrl().trim());
+		if (channel.getName() != null)
+			channel.setNameSearch(channel.getName().trim().toLowerCase());
 		channel.setCreateDate(now);
 		channel.setUpdateDate(now);
 		msoChannelDao.save(channel);
@@ -77,6 +79,8 @@ public class MsoChannelManager {
 	public MsoChannel save(MsoChannel channel) {
 		if (channel.getSourceUrl() != null)
 			channel.setSourceUrl(channel.getSourceUrl().trim());
+		if (channel.getName() != null)
+			channel.setNameSearch(channel.getName().trim().toLowerCase());
 		
 		channel = msoChannelDao.save(channel);
 		//save to cache

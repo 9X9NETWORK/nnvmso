@@ -19,7 +19,7 @@ public class ChannelSet implements Serializable {
 	private Key key;
 	
 	@Persistent
-	private long msoId; // don't use this, refer to ContentOwnership
+	private long msoId; // don't use this, please refer to class ContentOwnership
 	
 	@Persistent
 	private String name;
@@ -51,6 +51,13 @@ public class ChannelSet implements Serializable {
 	@Persistent
 	private Date updateDate;
 	
+	public ChannelSet(long msoId, String name, String intro, boolean isPublic) {
+		this.msoId = msoId;
+		this.name = name;
+		this.intro = intro;
+		this.isPublic = isPublic;
+	}
+
 	public Key getKey() {
 		return key;
 	}

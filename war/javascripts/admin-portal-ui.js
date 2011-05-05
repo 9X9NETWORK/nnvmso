@@ -33,6 +33,7 @@ $(function()
   }
   
   var userType = {
+    0: 'Unknown',
     1: 'Admin',
     2: 'TBC',
     3: 'TCO',
@@ -1848,7 +1849,7 @@ $(function()
         editoptions:
         {
           disabled: true,
-          value:    { 1: 'Admin', 2: 'TBC', 3: 'TCO', 4: 'User', 5: 'NN' }
+          value:    userType
         }
       },
       {

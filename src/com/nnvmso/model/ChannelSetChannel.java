@@ -23,7 +23,7 @@ public class ChannelSetChannel implements Serializable {
 	private long channelSetId;
 	
 	@Persistent
-	private short seq;
+	private int seq;
 	
 	@Persistent
 	private Date createDate;
@@ -31,11 +31,17 @@ public class ChannelSetChannel implements Serializable {
 	@Persistent
 	private Date updateDate;
 	
+	public ChannelSetChannel(long channelSetId, long channelId, int seq) {
+		this.channelSetId = channelSetId;
+		this.channelId = channelId;
+		this.seq = seq;
+	}
+
 	public Date getUpdateDate() {
 		return updateDate;
 	}
 	
-	public void ssetUpdateDate(Date updateDate) {
+	public void setUpdateDate(Date updateDate) {
 		this.updateDate = updateDate;
 	}
 	
@@ -47,11 +53,11 @@ public class ChannelSetChannel implements Serializable {
 		this.createDate = createDate;
 	}
 	
-	public short getSeq() {
+	public int getSeq() {
 		return seq;
 	}
 	
-	public void setSeq(short seq) {
+	public void setSeq(int seq) {
 		this.seq = seq;
 	}
 	

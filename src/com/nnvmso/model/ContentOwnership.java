@@ -7,6 +7,12 @@ import javax.jdo.annotations.*;
 
 import com.google.appengine.api.datastore.Key;
 
+/**
+ * The ownership between mso and channel/channelset/program
+ * 
+ * @author louis
+ *
+ */
 @PersistenceCapable(detachable = "true")
 public class ContentOwnership implements Serializable {
 	

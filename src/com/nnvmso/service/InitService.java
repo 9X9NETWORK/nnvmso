@@ -31,15 +31,19 @@ public class InitService {
 		deleteAll();		
 		initializeMso1AndCategories(debug);
 		initializeMso2AndCategories(debug);	
+		initializeMso3AndCategories(debug); //Mso3 is daai 3x3 owner
 		createMso1DefaultChannels(devel, trans);
 		createMso2DefaultChannels(devel, trans);	
+		createMso3OwnedChannels(devel, trans);
 		createMso1DefaultIpg(devel);
 		createMso2DefaultIpg(devel);		
+		createMso3ChannelSet(devel);
 	}
 	
 	public void initMsoAndCategories(boolean debug) {
 		initializeMso1AndCategories(debug);
 		initializeMso2AndCategories(debug);	
+		initializeMso3AndCategories(debug);
 	}	
 	
 	public void deleteAll() {
@@ -198,6 +202,44 @@ public class InitService {
 		}
 		log.info("initializeMso2AndCategories is done");
 	}		
+	
+	private void initializeMso3AndCategories(boolean debug) {
+		//a default 3x3 owner (MSO)
+		MsoManager msoMngr = new MsoManager();
+		Mso mso = new Mso("daai", "daai", "daai@9x9.tv", Mso.TYPE_3X3);
+		mso.setTitle("Da Ai TV");
+		mso.setPreferredLangCode(Mso.LANG_ZH_TW);
+		mso.setJingleUrl("/WEB-INF/../videos/opening.swf");
+		mso.setLogoUrl("http://9x9ui.s3.amazonaws.com/9x9playerV52/images/logo_tzuchi.png");
+		mso.setLogoClickUrl("/");
+		msoMngr.create(mso);
+		
+		//config
+		MsoConfigManager configMngr = new MsoConfigManager();
+		MsoConfig config = new MsoConfig(mso.getKey().getId(), MsoConfig.CDN, MsoConfig.CDN_AKAMAI);
+		configMngr.create(config);
+		String debugStr = "1";
+		if (!debug) {debugStr = "0";}
+		MsoConfig config1 = new MsoConfig(mso.getKey().getId(), MsoConfig.DEBUG, debugStr);
+		configMngr.create(config1);		
+		
+		//a default 3x3 user (MSO)
+		NnUserManager userMngr = new NnUserManager();
+		NnUser user = new NnUser("daai@9x9.tv", "daaimso", "daai", NnUser.TYPE_3X3);		
+		user.setMsoId(mso.getKey().getId()); //!!! constructor, or create
+		userMngr.create(user);
+		
+		//initialize default categories
+		String[] categoryStr = {
+			"慈濟大愛電視"
+		};
+		
+		CategoryManager categoryMngr = new CategoryManager();
+		for (String name : categoryStr) {			
+			categoryMngr.create(new Category(name, true, mso.getKey().getId()));
+		}
+		log.info("initializeMso3AndCategories is done");
+	}
 		
 	public void createMso1DefaultChannels(boolean devel, boolean trans){
 		//prepare data
@@ -532,6 +574,97 @@ public class InitService {
 		log.info("prepareMso2DefaultChannels is done");		
 	}
 	
+	public void createMso3OwnedChannels(boolean devel, boolean trans) {
+		//prepare data
+		Mso mso = new MsoManager().findByName("daai");
+		NnUserManager userMngr = new NnUserManager();
+		NnUser user = userMngr.findByEmailAndMso("daai@9x9.tv", mso);
+		List<Category> categories = new ArrayList<Category>();
+		List<MsoChannel> channels = new ArrayList<MsoChannel>();
+		
+		if (devel) {
+			//create channel1
+			CategoryManager categoryMngr = new CategoryManager();
+			Category category = categoryMngr.findByName("慈濟大愛電視");
+			MsoChannelManager channelMngr = new MsoChannelManager();
+			MsoChannel channel1 = new MsoChannel("大愛電視", "慈濟大愛電視台", "http://podcast.daaitv.org/Daai_TV_Podcast/da_ai_dian_shi/da_ai_dian_shi_files/shapeimage_3.png", user.getKey().getId());
+			channel1.setSourceUrl("http://podcast.daaitv.org/Daai_TV_Podcast/da_ai_dian_shi/rss.xml");
+			channel1.setPublic(true);
+			channel1.setContentType(MsoChannel.CONTENTTYPE_PODCAST);
+			categories.add(category);
+			channelMngr.create(channel1, categories);
+			
+			//channel1 ownership
+			ContentOwnershipManager ownershipMngr = new ContentOwnershipManager();
+			channel1 = channelMngr.findByName("大愛電視");
+			ownershipMngr.create(new ContentOwnership(), mso, channel1);
+			channels.add(channel1);
+			
+			//create channel2
+			MsoChannel channel2 = new MsoChannel("靜思語", "大愛靜思語", "http://podcast.daaitv.org/Daai_TV_Podcast/jing_si_yu/jing_si_yu_files/shapeimage_4.png", user.getKey().getId());
+			channel2.setSourceUrl("http://podcast.daaitv.org/Daai_TV_Podcast/jing_si_yu/rss.xml");
+			channel2.setPublic(true);
+			channel2.setContentType(MsoChannel.CONTENTTYPE_PODCAST);
+			channelMngr.create(channel2, categories);
+			
+			//channel2 ownership
+			channel2 = channelMngr.findByName("靜思語");
+			ownershipMngr.create(new ContentOwnership(), mso, channel2);
+			channels.add(channel2);
+			
+			// -- create program1
+			MsoProgramManager programMngr = new MsoProgramManager();
+			MsoProgram program1 = new MsoProgram("環保迎新春", "環保迎新春", "http://podcast.daaitv.org/Daai_TV_Podcast/da_ai_dian_shi/Media/DaAiTV_2011newyear_children.jpg", MsoProgram.TYPE_VIDEO);
+			program1.setImageLargeUrl("http://podcast.daaitv.org/Daai_TV_Podcast/da_ai_dian_shi/Media/DaAiTV_2011newyear_children.jpg");
+			program1.setMpeg4FileUrl("http://9x9pod.s3.amazonaws.com/8c5f1a679bfff2359465a2af93c519bbbada8568_1296553894.m4v");
+			program1.setPublic(true);
+			programMngr.create(channel1, program1);
+			
+			MsoProgram program2 = new MsoProgram("初一特別節目", "初一特別節目", "http://podcast.daaitv.org/Daai_TV_Podcast/da_ai_dian_shi/Media/DaAiTV_2011newyear_0101.jpg", MsoProgram.TYPE_VIDEO);
+			program2.setImageLargeUrl("http://podcast.daaitv.org/Daai_TV_Podcast/da_ai_dian_shi/Media/DaAiTV_2011newyear_0101.jpg");
+			program2.setMpeg4FileUrl("http://9x9pod.s3.amazonaws.com/3b9cfb9c433a6b06c54612dbaeeb5bf08b6469b7_1296458603.m4v");
+			program2.setPublic(true);
+			programMngr.create(channel1, program2);
+			
+			MsoProgram program3 = new MsoProgram("365天", "365天", "http://podcast.daaitv.org/Daai_TV_Podcast/da_ai_dian_shi/Media/DaAiTV_2011newyear_MV.jpg", MsoProgram.TYPE_VIDEO);
+			program3.setImageLargeUrl("http://podcast.daaitv.org/Daai_TV_Podcast/da_ai_dian_shi/Media/DaAiTV_2011newyear_MV.jpg");
+			program3.setMpeg4FileUrl("http://9x9pod.s3.amazonaws.com/3b9cfb9c433a6b06c54612dbaeeb5bf08b6469b7_1296458603.m4v");
+			program3.setPublic(true);
+			programMngr.create(channel1, program3);
+			
+			MsoProgram program4 = new MsoProgram("遇事 若能平心面對", "遇事，若能平心面對，很快就會度過。", "http://podcast.daaitv.org/Daai_TV_Podcast/jing_si_yu/Media/STILL_20100601_40.jpg", MsoProgram.TYPE_VIDEO);
+			program4.setImageLargeUrl("http://podcast.daaitv.org/Daai_TV_Podcast/jing_si_yu/Media/STILL_20100601_40.jpg");
+			program4.setMpeg4FileUrl("http://9x9pod.s3.amazonaws.com/70c1e2711487e956509ddbbf8c4e8134bc98dfbb_1280201357.m4v");
+			program4.setPublic(true);
+			programMngr.create(channel2, program4);
+			
+			MsoProgram program5 = new MsoProgram("面對困難 當下盡心", "面對困難，當下盡心、盡力、盡人事就對了。", "http://podcast.daaitv.org/Daai_TV_Podcast/jing_si_yu/Media/STILL_20100601_32.jpg", MsoProgram.TYPE_VIDEO);
+			program5.setImageLargeUrl("http://podcast.daaitv.org/Daai_TV_Podcast/jing_si_yu/Media/STILL_20100601_32.jpg");
+			program5.setMpeg4FileUrl("http://9x9pod.s3.amazonaws.com/d17ffaf0fbb1d46d44cb3004478846af245c1f20_1279520261.m4v");
+			program5.setPublic(true);
+			programMngr.create(channel2, program5);
+			
+			MsoProgram program6 = new MsoProgram("心無雜念 凡事樂觀", "心無雜念、凡事樂觀、踏實做事，就會有智慧。", "http://podcast.daaitv.org/Daai_TV_Podcast/jing_si_yu/Media/STILL_20100601_29.jpg", MsoProgram.TYPE_VIDEO);
+			program6.setImageLargeUrl("http://podcast.daaitv.org/Daai_TV_Podcast/jing_si_yu/Media/STILL_20100601_29.jpg");
+			program6.setMpeg4FileUrl("http://9x9pod.s3.amazonaws.com/e871b2fa5c68425b96fe2875b51e299161e9fc3b_1279258807.m4v");
+			program6.setPublic(true);
+			programMngr.create(channel2, program6);
+		} else {
+			CategoryManager categoryMngr = new CategoryManager();
+			MsoChannelManager channelMngr = new MsoChannelManager();
+			ContentOwnershipManager ownershipMngr = new ContentOwnershipManager();
+			Category category = categoryMngr.findByName("慈濟大愛電視");
+			categories.add(category);
+			String[] urls = this.getMso3OwnedChannels();
+			this.channelsCreate(urls, categories, user.getKey().getId(), trans);
+			for (String url : urls) {
+				MsoChannel channel = channelMngr.findBySourceUrlSearch(url);
+				ownershipMngr.create(new ContentOwnership(), mso, channel);
+			}
+		}
+		log.info("prepareMso3DefaultChannels is done");
+	}
+	
 	private void channelsCreate(String[] urls, List<Category>categories, long userId, boolean trans) {
 		TranscodingService tranService = new TranscodingService();
 		MsoChannelManager channelMngr = new MsoChannelManager();
@@ -542,6 +675,7 @@ public class InitService {
 				categoryMngr.changeCategory(channel.getKey().getId(), categories);				
 			} else {
 				MsoChannel c = new MsoChannel(url, userId);
+				c.setContentType(channelMngr.getContentTypeByUrl(url));
 				channelMngr.create(c, categories);
 				System.out.println(c.getSourceUrl());
 				System.out.println(c.getKey().getId());
@@ -623,7 +757,48 @@ public class InitService {
 		}
 		log.info("prepareMso2DefaultIpg is done");
 	}
+	
+	private void createMso3ChannelSet(boolean devel) {
 		
+		Mso mso = new MsoManager().findByName("daai");
+		ChannelSetManager channelSetMngr = new ChannelSetManager();
+		List<MsoChannel> channels = new ArrayList<MsoChannel>();
+		
+		if (devel) {
+			CategoryManager categoryMngr = new CategoryManager();
+			Category category = categoryMngr.findByName("慈濟大愛電視");
+			channels = new MsoChannelManager().findPublicChannelsByCategoryId(category.getKey().getId());
+			for (int i = 0; i < channels.size(); i++) {
+				channels.get(i).setSeq(i);
+			}
+		} else {
+			MsoChannelManager channelMngr = new MsoChannelManager();
+			String[] urls = this.getMso3ChannelSetUrls();
+			String[] seqs = this.getMso3ChannelSetSeqs();
+			log.info(urls.length + " " + seqs.length);
+			for (int i = 0; i < urls.length; i++) {
+				MsoChannel channel = channelMngr.findBySourceUrlSearch(urls[i]);
+				log.info("i=" + i + ";" + urls[i]);
+				log.info("channel=" + channel.getName() + ";");
+				channel.setSeq(Integer.parseInt(seqs[i]));
+				
+				channels.add(channel);
+			}
+			log.info("channels length: " + channels.size());
+		}
+		
+		ChannelSet channelSet = new ChannelSet(mso.getKey().getId(), "大愛3x3", "大愛3x3", true);
+		channelSet.setDefaultUrl("12345678"); // ugly url http://9x9.tv/12345678
+		channelSet.setBeautifulUrl("daai"); // beautiful url http://9x9.tv/daai
+		channelSetMngr.create(channelSet, channels);
+		
+		//channelSet ownership
+		ContentOwnershipManager ownershipMngr = new ContentOwnershipManager();
+		ownershipMngr.create(new ContentOwnership(), mso, channelSet);
+		
+		log.info("prepareMso3ChannelSet is done");
+	}
+	
 	private String[] getUrlMovie() {
 		String[] url = {
 				"http://www.youtube.com/user/rtvshow19",
@@ -1083,6 +1258,26 @@ public class InitService {
 	    return seq;
 	}
 	
+	private String[] getMso3ChannelSetUrls() {
+		String[] urls = {
+				"http://podcast.daaitv.org/Daai_TV_Podcast/ren_jian_pu_ti/rss.xml",
+				"http://podcast.daaitv.org/Daai_TV_Podcast/jing_si_chen_yu/rss.xml",
+				"http://podcast.daaitv.org/Daai_TV_Podcast/jing_si_yu/rss.xml",
+				"http://podcast.daaitv.org/Daai_TV_Podcast/fa_pi_ru_shui/rss.xml",
+				"http://podcast.daaitv.org/Daai_TV_Podcast/da_ai_dian_shi/rss.xml",
+				"http://www.youtube.com/playlist?p=236DA856894AFC8E",
+				"http://www.youtube.com/user/DaAiVideo"
+		};
+		return urls;
+	}
+	
+	private String[] getMso3ChannelSetSeqs() {
+		String[] seqs ={
+				"1", "2", "3", "4", "5", "6", "7"
+		};
+		return seqs;
+	}
+	
 	public String[] getMso1DefaultIpg() {
 		String[] urls = {
 				"http://feeds.visionontv.net/visionontv/Olympics?format=xml",
@@ -1354,6 +1549,22 @@ public class InitService {
 				"http://lltv.libsyn.com/rss"
 		};
 		
+		return urls;
+	}
+	
+	private String[] getMso3OwnedChannels() {
+		String[] urls = {
+				"http://podcast.daaitv.org/Daai_TV_Podcast/ren_jian_pu_ti/rss.xml",
+				"http://podcast.daaitv.org/Daai_TV_Podcast/jing_si_chen_yu/rss.xml",
+				"http://podcast.daaitv.org/Daai_TV_Podcast/jing_si_yu/rss.xml",
+				"http://podcast.daaitv.org/Daai_TV_Podcast/fa_pi_ru_shui/rss.xml",
+				"http://podcast.daaitv.org/Daai_TV_Podcast/da_ai_dian_shi/rss.xml",
+				"http://www.youtube.com/view_play_list?p=236DA856894AFC8E",
+				"http://www.youtube.com/user/DaAiVideo",
+				"http://www.youtube.com/user/TzuChiUSA",
+				"http://www.youtube.com/user/happyshanshia",
+				"http://www.youtube.com/user/tzuchicanada"
+		};
 		return urls;
 	}
 	

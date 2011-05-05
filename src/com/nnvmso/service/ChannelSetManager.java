@@ -1,13 +1,16 @@
 package com.nnvmso.service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
 import org.springframework.stereotype.Service;
 
 import com.nnvmso.dao.ChannelSetChannelDao;
+import com.nnvmso.dao.ChannelSetDao;
 import com.nnvmso.dao.MsoChannelDao;
+import com.nnvmso.model.ChannelSet;
 import com.nnvmso.model.ChannelSetChannel;
 import com.nnvmso.model.MsoChannel;
 
@@ -16,16 +19,41 @@ public class ChannelSetManager {
 	
 	protected static final Logger logger = Logger.getLogger(ChannelSetManager.class.getName());
 	
-	private MsoChannelDao channelDao = new MsoChannelDao();
-	private ChannelSetChannelDao cscDao = new ChannelSetChannelDao();
+	private ChannelSetDao channelSetDao = new ChannelSetDao();
 	
-	public List<MsoChannel> findChannelsById(long channelSetId) {
+	public void create(ChannelSet channelSet, List<MsoChannel> channels) {
+		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
 		
-		List<ChannelSetChannel> channelSets = cscDao.findByChannelSetId(channelSetId);
+		if (this.findByName(channelSet.getName()) != null) {
+			logger.warning("channelSet already exists, name: " + channelSet.getName());
+			return;
+		}
+		channelSet.setNameSearch(channelSet.getName().trim().toLowerCase());
+		Date now = new Date();
+		channelSet.setCreateDate(now);
+		channelSet.setUpdateDate(now);
+		
+		channelSetDao.save(channelSet);
+		
+		for (MsoChannel channel : channels) {
+			ChannelSetChannel csc = new ChannelSetChannel(channelSet.getKey().getId(), channel.getKey().getId(), channel.getSeq());
+			cscMngr.create(csc);
+		}
+	}
+	
+	private Object findByName(String name) {
+		return channelSetDao.findByNameSearch(name.trim().toLowerCase());
+	}
+
+	public List<MsoChannel> findChannelsById(long channelSetId) {
+		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		
+		List<ChannelSetChannel> channelSets = cscMngr.findByChannelSetId(channelSetId); 
 		ArrayList<MsoChannel> results = new ArrayList<MsoChannel>();
 		
 		for (ChannelSetChannel csc : channelSets) {
-			MsoChannel channel = channelDao.findById(csc.getChannelId());
+			MsoChannel channel = channelMngr.findById(csc.getChannelId());
 			if (channel != null) {
 				channel.setSeq(csc.getSeq());
 				results.add(channel);
@@ -33,4 +61,5 @@ public class ChannelSetManager {
 		}
 		return results;
 	}
+
 }
