@@ -12,9 +12,8 @@ import com.nnvmso.model.MsoChannel;
 public class CmsApiService {
 	protected static final Logger logger = Logger.getLogger(CmsApiService.class.getName());
 	
-	ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
-	ChannelSetManager channelSetMngr = new ChannelSetManager();
-	ContentOwnershipManager ownershipMngr = new ContentOwnershipManager();
+	private ChannelSetManager channelSetMngr = new ChannelSetManager();
+	private ContentOwnershipManager ownershipMngr = new ContentOwnershipManager();
 	
 	public ChannelSet getDefaultChannelSet(long msoId) {
 		List<ChannelSet> ownedChannelSets = ownershipMngr.findOwnedChannelSetsByMsoId(msoId);
@@ -27,4 +26,5 @@ public class CmsApiService {
 	public List<MsoChannel> findChannelsByChannelSetId(long channelSetId) {
 		return channelSetMngr.findChannelsById(channelSetId);
 	}
+	
 }
