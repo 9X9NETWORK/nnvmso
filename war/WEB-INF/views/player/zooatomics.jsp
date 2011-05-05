@@ -55,6 +55,7 @@ var yt_video_id;
 var yt_timex = 0;
 var yt_previous_state = -2;
 var yt_quality = "medium";
+var yt_key = "AI39si5AKUCeyI23OTiunkacaJ_kRzR_VPxVhTJn2Rw7rJYE2mpKKVITytE22jpws7W6L1IBAA6EEf6_B8Pp2y0hG-zM5jtGFw";
 var fetch_yt_timex = 0;
 var setup_yt_timex = 0;
 
@@ -2812,7 +2813,7 @@ function fetch_youtube_playlist (grid)
   metainfo_wait();
   log ("FETCHING YOUTUBE PLAYLIST: " + username);
   var y = document.createElement ('script'); y.type = 'text/javascript'; y.async = true;
-  y.src = 'http://gdata.youtube.com/feeds/api/playlists/' + username + '?v=2' + '&' + 'alt=json-in-script' + '&' + 'format=5' + '&' + 'orderby=published' + '&' + 'start-index=1' + '&' + 'max-results=50' + '&' + 'callback=yt_fetched';
+  y.src = 'http://gdata.youtube.com/feeds/api/playlists/' + username + '?v=2' + '&' + 'alt=json-in-script' + '&' + 'format=5' + '&' + 'orderby=published' + '&' + 'start-index=1' + '&' + 'max-results=50' + '&' + 'key=' + yt_key + '&' + 'callback=yt_fetched';
 
   var s = document.getElementsByTagName ('script')[0]; s.parentNode.insertBefore (y, s);
 
@@ -2830,7 +2831,7 @@ function fetch_youtube_channel (grid)
   metainfo_wait();
   log ("FETCHING YOUTUBE CHANNEL: " + username);
   var y = document.createElement ('script'); y.type = 'text/javascript'; y.async = true;
-  y.src = 'http://gdata.youtube.com/feeds/api/users/' + username + '/uploads?v=2' + '&' + 'alt=json-in-script' + '&' + 'format=5' + '&' + 'orderby=published' + '&' + 'start-index=1' + '&' + 'max-results=50' + '&' + 'callback=yt_fetched';
+  y.src = 'http://gdata.youtube.com/feeds/api/users/' + username + '/uploads?v=2' + '&' + 'alt=json-in-script' + '&' + 'format=5' + '&' + 'orderby=published' + '&' + 'start-index=1' + '&' + 'max-results=50' + '&' + 'key=' + yt_key + '&' + 'callback=yt_fetched';
 
   var s = document.getElementsByTagName ('script')[0]; s.parentNode.insertBefore (y, s);
 
