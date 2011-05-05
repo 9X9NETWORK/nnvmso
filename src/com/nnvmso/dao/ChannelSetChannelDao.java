@@ -37,4 +37,26 @@ public class ChannelSetChannelDao extends GenericDao<ChannelSetChannel> {
 		}
 		return detached;
 	}
+	
+	public ChannelSetChannel findByChannelSetIdAndSeq(long channelSetId, int seq) {
+		
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		ChannelSetChannel result = null;
+		
+		try {
+			Query query = pm.newQuery(ChannelSetChannel.class);
+			query.setFilter("ChannelSetId == ChannelSetIdParam");
+			query.setFilter("seq == seqParam");
+			query.declareParameters("long ChannelSetIdParam");
+			query.declareParameters("int seqParam");
+			@SuppressWarnings("unchecked")
+			List<ChannelSetChannel> list = (List<ChannelSetChannel>)query.execute(channelSetId, seq);
+			if (list.size() > 0)
+				result = pm.detachCopy(list.get(0));
+		} catch (JDOObjectNotFoundException e) {
+		} finally {
+			pm.close();
+		}
+		return result;
+	}
 }
