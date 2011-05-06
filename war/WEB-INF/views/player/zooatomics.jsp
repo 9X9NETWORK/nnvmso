@@ -11,7 +11,6 @@
 <link rel="image_src" href="${fbImg}" />
 
 <link rel="stylesheet" href="http://9x9ui.s3.amazonaws.com/9x9playerV47/stylesheets/main.css" />
-<link rel="stylesheet" href="http://9x9ui.s3.amazonaws.com/contest/contest.css" />
 
 <script type="text/javascript" charset="utf-8" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.8/jquery-ui.min.js"></script>
@@ -90,7 +89,6 @@ var jingled = false;
 var jingle_timex = 0;
 var modal_box = false;
 var hint_seen = false;
-var contest_seen = false;
 var popup_active = false;
 var remembered_pause = false;
 var debug_mode = 1;
@@ -561,13 +559,6 @@ function align_center()
 
   if ($.browser.msie && $.browser.version == 7)
     $("#control-layer, #control-bar").css ("width", ww);
-
-  if (sitename == '5f')
-    {
-    $("#contest-layer").css ("left", (ww - $("#contest-layer").width())  / 2);
-    $("#contest-layer").css ("top",  (wh - $("#contest-layer").height()) / 2);
-    $("#f5-ipad").css ("left", $("#ep-indicator").offset().left);
-    }
   }
 
 function align_jingle()
@@ -1165,7 +1156,7 @@ function activate()
 
   enter_channel ('program');
 
-  $("#ep-layer, #f5-ipad").hide();
+  $("#ep-layer").hide();
   document.onkeydown=kp;
   redraw_ipg();
 
@@ -1245,11 +1236,7 @@ function jumpstart_inner()
   play_program();
 
   if (false)
-    {
     hint();
-    if (sitename == '5f')
-      contest();
-    }
 
   if (sitename == '5f')
     {
@@ -1443,7 +1430,7 @@ function message (text, duration)
 
 function hide_layers()
   {
-  $("#ep-layer, #f5-ipad").hide();
+  $("#ep-layer").hide();
   $("#control-layer, #sg-bubble").hide();
   $("#msg-layer").hide();
   $("#epend-layer").hide();
@@ -1480,7 +1467,7 @@ function play()
   if (url == '')
     {
     log ('current program ' + current_program + ' has no URL, assuming empty channel, displaying notice for 3 seconds')
-    $("#ep-layer, #f5-ipad").hide();
+    $("#ep-layer").hide();
     end_message (10000);
     return;
     }
@@ -1687,7 +1674,7 @@ function enter_channel (mode)
   {
   $("#epend-layer").hide();
   prepare_channel();
-  //$("#control-layer, #f5-ipad, #sg-bubble").hide();
+  //$("#control-layer, #sg-bubble").hide();
   redraw_program_line();
   $("#ep-meta").hide();
   $(".ep-list .age").show();
@@ -2450,7 +2437,7 @@ function osd_timex_expired()
   osd_timex = 0;
   log ('osd timex expired');
   if (thumbing != 'ipg')
-    $("#ep-layer, #control-layer, #f5-ipad, #sg-bubble").hide();
+    $("#ep-layer, #control-layer, #sg-bubble").hide();
   if (thumbing == 'control')
     thumbing = 'program';
   }
@@ -2516,7 +2503,7 @@ function switch_to_ipg()
   stop_preload();
   $("#buffering").hide();
 
-  $("#control-layer, #f5-ipad, #sg-bubble, #btn-subscribe").hide();
+  $("#control-layer, #sg-bubble, #btn-subscribe").hide();
   $("#ch-directory").hide();
 
   $("#ep-layer").css ("bottom", "0");
@@ -2530,9 +2517,6 @@ function switch_to_ipg()
 
   // if (first_time_user == 1 || sitename == '5f')
   //   hint();
-
-  // if (sitename == '5f')
-  //   contest();
 
   $("#ep-list .clickable").removeClass ("on");
   }
@@ -2550,30 +2534,6 @@ function about()
 function close_about()
   {
   close_box ('#about-layer');
-  }
-
-function contest()
-  {
-  if (!contest_seen)
-    {
-    modal_box = true;
-    contest_seen = true;
-    $("#contest-layer").show();
-    $("#contest-close-btn").unbind();
-    $("#contest-close-btn").hover (hover_in, hover_out);
-    $("#contest-close-btn").click (close_contest);
-    elastic();
-    }
-  }
-
-function contest_click()
-  {
-  window.open ("/5f/sharetowin.html", "_blank");
-  }
-
-function close_contest()
-  {
-  close_box ('#contest-layer');
   }
 
 function hint()
@@ -2600,7 +2560,7 @@ function close_box (box)
   var n_open = 0;
   var n_closed = 0;
 
-  var closables = { '#contest-layer':0, '#hint-layer':0, '#about-layer':0 };
+  var closables = { '#hint-layer':0, '#about-layer':0 };
 
   log ('close box: "' + box + '"');
 
@@ -7217,7 +7177,7 @@ function exit_control_layer()
   if (thumbing == 'control' || thumbing == 'program')
     {
     thumbing = 'program';
-    $("#control-layer, #ep-layer, #f5-ipad, #sg-bubble").hide();
+    $("#control-layer, #ep-layer, #sg-bubble").hide();
     clear_osd_timex();
     // prepare_channel();
     }
@@ -7232,15 +7192,10 @@ function switch_to_control_layer (epflag)
   if (epflag)
     {
     $("#ep-layer").show();
-    if (sitename == '5f')
-      {
-      $("#f5-ipad").show();
-      $("#f5-ipad").css ("left", $("#ep-indicator").offset().left);
-      }
     episode_clicks_and_hovers();
     }
   else
-    $("#ep-layer, #f5-ipad").hide();
+    $("#ep-layer").hide();
 
   /* do this twice */
   control_redraw();
@@ -7283,11 +7238,6 @@ function show_eps()
   $("#ep-layer").css ("bottom", "1.75em");
   $("#ep-layer").show();
 
-  if (sitename == '5f')
-    {
-    $("#f5-ipad").show();
-    $("#f5-ipad").css ("left", $("#ep-indicator").offset().left);
-    }
   episode_clicks_and_hovers();
 
   report ('e', 'episode-bar');
@@ -7583,7 +7533,7 @@ function delete_no()
 
 function switch_to_facebook()
   {
-  $("#ep-layer, #control-layer, #f5-ipad, #sg-bubble").hide();
+  $("#ep-layer, #control-layer, #sg-bubble").hide();
   yes_or_no (translations ['sharing'], "fb_yes()", "fb_no()", 2);
   }
 
@@ -7633,7 +7583,7 @@ function fb_yes()
 
     var parms = { method: 'feed', name: name, link: link, picture: thumb, description: desc };
 
-    if (sitename == '5f')
+    if (false && sitename == '5f')
       {
       // parms ['actions'] = [ { name: '我要參加', link: 'http://5f.tv/' } ];
       parms ['actions'] = [ { name: '有沒有抽全台第一台iPad2的八卦？', link: location.protocol + '//' + location.host + '/' + sitename + '/' + 'sharetowin.html' } ];
@@ -8136,16 +8086,6 @@ function noop (e)
     <img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/logo_about.png" id="about-logo">
   </div>
 </div>
-
-<div id="contest-layer">
-  <img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/btn_winclose.png" id="contest-close-btn">
-  <div id="contest-innards">
-        <a href="/5f/sharetowin.html" target="_blank"></a>
-    <p style="display: none">&nbsp;&nbsp;現在有<span id="nowserving"></span>人完成任務</p>
-  </div>
-</div>
-
-<div id="f5-ipad" onclick="contest_click()" style="display: none"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/5f_ipad.png" title="點下看活動詳情"></div>
 
 <div id="sg-bubble"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/bg_bubble.png"><div id="btn-bubble-del"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/btn_delete_off.png" class="off"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV47/images/btn_delete_on.png" class="on"></div><p><span id="rsbubble">Return to Smart Guide for more interesting content</span></p></div>
 
