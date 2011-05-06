@@ -47,6 +47,31 @@
         debug="on" />
   </target>
 
+  <target name="tests" depends="compile" description="Run tests">
+    <junit printsummary="on"
+           fork="false"
+           haltonfailure="false"
+           failureproperty="tests.failed"
+           showoutput="true">
+      <classpath refid="project.classpath"/>
+      <formatter type="brief" usefile="false"/>
+      <batchtest>
+        <fileset dir="war/WEB-INF/classes">
+          <include name="**/*Test.*"/>
+        </fileset>
+      </batchtest>
+    </junit>
+
+    <fail if="tests.failed">
+      tests.failed=${tests.failed}
+      ***********************************************************
+      ***********************************************************
+      ****  One or more tests failed!  Check the output ...  ****
+      ***********************************************************
+      ***********************************************************
+    </fail>
+  </target>
+
   <target name="datanucleusenhance" depends="compile"
       description="Performs JDO enhancement on compiled data classes.">
     <enhance_war war="war" />
