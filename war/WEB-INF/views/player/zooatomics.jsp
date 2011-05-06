@@ -54,7 +54,7 @@ var yt_video_id;
 var yt_timex = 0;
 var yt_previous_state = -2;
 var yt_quality = "medium";
-var yt_key = "AI39si5AKUCeyI23OTiunkacaJ_kRzR_VPxVhTJn2Rw7rJYE2mpKKVITytE22jpws7W6L1IBAA6EEf6_B8Pp2y0hG-zM5jtGFw";
+var yt_key = "AI39si7Gw7v2e3wx77OwR983hYItdtKMPiR-D5-8ueI9MGExMLRVY6iTRReo5TsK7yimSAmkXvKAtLthQ6EAQC5g09gY8wHo0Q";
 var fetch_yt_timex = 0;
 var setup_yt_timex = 0;
 
