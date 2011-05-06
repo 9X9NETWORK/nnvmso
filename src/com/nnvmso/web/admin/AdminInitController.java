@@ -122,7 +122,25 @@ public class AdminInitController {
 		this.sendEmail("step5 done: 9x9 and 5f default ipgs");
 		return NnNetUtil.textReturn("OK");
 	}
-		
+	
+	@SuppressWarnings("unused")
+	@RequestMapping("initMso3Channels")
+	private ResponseEntity<String> initMso3Channels(@RequestParam boolean devel, @RequestParam boolean trans, HttpServletRequest req) {
+		initService.setRequest(req);
+		initService.createMso3OwnedChannels(devel, trans);
+		this.sendEmail("step6 done: create daai channels");
+		return NnNetUtil.textReturn("OK");
+	}
+	
+	@SuppressWarnings("unused")
+	@RequestMapping("initMso3ChannelSet")
+	private ResponseEntity<String> initMso3ChannelSet(@RequestParam boolean devel, HttpServletRequest req) {
+		initService.setRequest(req);
+		initService.createMso3ChannelSet(devel);
+		this.sendEmail("step7 done: daai channel set");
+		return NnNetUtil.textReturn("OK");
+	}
+	
 	@SuppressWarnings("unused")
 	@RequestMapping("initProStep2")
 	private ResponseEntity<String> initProStep2(@RequestParam boolean devel, @RequestParam boolean trans, @RequestParam boolean debug, HttpServletRequest req) {
@@ -166,6 +184,29 @@ public class AdminInitController {
 		QueueFactory.getDefaultQueue().add(
 	      TaskOptions.Builder.withUrl("/admin/init/initMso2Ipg")
 	         .param("devel", String.valueOf(devel)));		
+		
+		return NnNetUtil.textReturn("You will receive an email when it is done.");
+	}
+	
+	@SuppressWarnings("unused")
+	@RequestMapping("initProStep6")
+	private ResponseEntity<String> initProStep6(@RequestParam boolean devel, @RequestParam boolean trans, @RequestParam boolean debug, HttpServletRequest req) {
+		initService.setRequest(req);
+		QueueFactory.getDefaultQueue().add(
+			      TaskOptions.Builder.withUrl("/admin/init/initMso3Channels")
+			         .param("devel", String.valueOf(devel))
+			         .param("trans", String.valueOf(trans)));
+		
+		return NnNetUtil.textReturn("You will receive an email when it is done.\nDo no proceed to step7 until all the channels are ready.");
+	}
+	
+	@SuppressWarnings("unused")
+	@RequestMapping("initProStep7")
+	private ResponseEntity<String> initProStep7(@RequestParam boolean devel, @RequestParam boolean trans, @RequestParam boolean debug, HttpServletRequest req) {
+		initService.setRequest(req);
+		QueueFactory.getDefaultQueue().add(
+			      TaskOptions.Builder.withUrl("/admin/init/initMso3ChannelSet")
+			         .param("devel", String.valueOf(devel)));
 		
 		return NnNetUtil.textReturn("You will receive an email when it is done.");
 	}

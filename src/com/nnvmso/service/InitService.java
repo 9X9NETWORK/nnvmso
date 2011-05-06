@@ -758,7 +758,7 @@ public class InitService {
 		log.info("prepareMso2DefaultIpg is done");
 	}
 	
-	private void createMso3ChannelSet(boolean devel) {
+	public void createMso3ChannelSet(boolean devel) {
 		
 		Mso mso = new MsoManager().findByName("daai");
 		ChannelSetManager channelSetMngr = new ChannelSetManager();
@@ -1552,7 +1552,7 @@ public class InitService {
 		return urls;
 	}
 	
-	private String[] getMso3OwnedChannels() {
+	public String[] getMso3OwnedChannels() {
 		String[] urls = {
 				"http://podcast.daaitv.org/Daai_TV_Podcast/ren_jian_pu_ti/rss.xml",
 				"http://podcast.daaitv.org/Daai_TV_Podcast/jing_si_chen_yu/rss.xml",
@@ -1560,10 +1560,14 @@ public class InitService {
 				"http://podcast.daaitv.org/Daai_TV_Podcast/fa_pi_ru_shui/rss.xml",
 				"http://podcast.daaitv.org/Daai_TV_Podcast/da_ai_dian_shi/rss.xml",
 				"http://www.youtube.com/view_play_list?p=236DA856894AFC8E",
+				"http://www.youtube.com/watch?v=bldfbrAp4hU&playnext=1&list=PL40E8E32DDA356BD2",
+				"http://www.youtube.com/user/bearchen000#grid/user/B061246345E7F5C3",
+				"http://www.youtube.com/user/bearchen000#grid/user/4DD808A8C9595946",
 				"http://www.youtube.com/user/DaAiVideo",
 				"http://www.youtube.com/user/TzuChiUSA",
 				"http://www.youtube.com/user/happyshanshia",
-				"http://www.youtube.com/user/tzuchicanada"
+				"http://www.youtube.com/user/tzuchicanada",
+				"http://www.youtube.com/daaitvnews",
 		};
 		return urls;
 	}
