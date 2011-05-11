@@ -1440,7 +1440,7 @@ function end_message (duration)
   {
   $("#buffering").hide();
 
-  if (thumbing != 'program' && thumbing != 'channel' && thumbing != 'control')
+  if (thumbing != 'program' && thumbing != 'control')
     return;
 
   log ('end!');
@@ -1552,7 +1552,7 @@ function ended_callback()
   var type = thumbing;
   if (type == 'control') type = control_saved_thumbing;
 
-  if (type == 'program' || type == 'channel')
+  if (type == 'program')
     {
     log ('** ended event fired, moving program right (cursor at ' + program_cursor + ')');
     program_right();
@@ -2094,7 +2094,7 @@ function escape()
       $("#control-layer").show();
     }
 
-  else if (thumbing == 'ipg' || thumbing == 'control' || thumbing == 'channel')
+  else if (thumbing == 'ipg' || thumbing == 'control')
     {
     thumbing = 'program';
     prepare_channel();
@@ -2104,7 +2104,7 @@ function escape()
   $("#msg-layer").hide();
   $("#epend-layer").hide();
 
-  if (thumbing == 'channel' || thumbing == 'program')
+  if (thumbing == 'program')
     {
     if (layer.css ("display") == "none")
       clear_osd_timex();
@@ -2210,7 +2210,7 @@ function keypress (keycode)
       /* space */
     case 178:
       /* google TV play/pause */
-      if (thumbing == 'channel' || thumbing == 'program')
+      if (thumbing == 'program' || thumbing == 'control')
         pause();
       break;
 
@@ -2222,7 +2222,7 @@ function keypress (keycode)
         ipg_play();
       else if (thumbing == 'browse')
         browse_enter();
-      else if (thumbing == 'channel' || thumbing == 'program')
+      else if (thumbing == 'program')
         switch_to_control_layer (false);
       else if (thumbing == 'control')
         control_enter();
@@ -2388,8 +2388,6 @@ function keypress (keycode)
 
     case 73:
       /* I */
-      if (thumbing == 'channel' || thumbing == 'program')
-        dump_configuration_to_log();
       break;
 
     case 85:
@@ -6790,9 +6788,9 @@ function yt_state (state)
       {
       /* theoretically impossible, but sometimes happens under IE */
       yt_previous_state = state;
-      log ('yt confused, pausing for two seconds, then retry');
-      setTimeout ('yt_confusion()', 2000);
-      ended_callback();
+      log ('yt confused, ignoring this event');
+      // setTimeout ('yt_confusion()', 2000);
+      // ended_callback();
       return;
       }
     }
@@ -6817,7 +6815,7 @@ function yt_error (code)
     return;
     }
 
-  if (fp_preloaded != 'yt' && thumbing == 'program')
+  if (fp_preloaded != 'yt' && (thumbing == 'program' || thumbing == 'control'))
     {
     log ('** YOUTUBE ERROR ** ' + errtext);
 
