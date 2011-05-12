@@ -24,16 +24,20 @@ public class ContentOwnershipDao extends GenericDao<ContentOwnership> {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		List<ContentOwnership> detached = new ArrayList<ContentOwnership>();
 		
+		logger.info("msoId = " + msoId + ", contentType = " + contentType);
+		
 		try {
-			Query query = pm.newQuery();
-			query.setFilter("msoId == msoIdParam");
-			query.setFilter("contentType == contentTypeParam");
-			query.declareParameters("long msoIdParam");
-			query.declareParameters("short comtentTypeParam");
+			Query query = pm.newQuery(ContentOwnership.class);
+			query.setFilter("msoId == msoIdParam && contentType == contentTypeParam");
+			query.declareParameters("long msoIdParam, short contentTypeParam");
 			@SuppressWarnings("unchecked")
 			List<ContentOwnership> list = (List<ContentOwnership>)query.execute(msoId, contentType);
-			detached = (List<ContentOwnership>)pm.detachCopyAll(list);
+			if (list.size() > 0)
+				detached = (List<ContentOwnership>)pm.detachCopyAll(list);
+			logger.info("found = " + list.size());
 		} catch (JDOObjectNotFoundException e) {
+		} finally {
+			pm.close();
 		}
 		
 		return detached;
