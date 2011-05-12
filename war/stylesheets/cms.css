@@ -1,0 +1,138 @@
+@charset "UTF-8";
+/* CSS Document */
+* {
+  margin:0;
+  padding:0;
+}
+p,h1,h2,h3,h4,ul,li{ padding:0; margin:0;}
+ul,li{ list-style:none;}
+a img { border:none}
+a{ outline:none;}
+
+body{ background:url(/images/cms/bg.jpg) top left repeat-x #dfe2e4; padding:0; margin:0 auto; min-width:1000px; }
+
+.floatL{ float:left}
+.floatR{ float:right;}
+.clear{ clear:both;}
+
+.header{ height:80px; padding:10px 0 0 10px; width:990px; margin:0 auto;}
+.header .floatR a{padding-right:10px;}
+.header p{ color:#FFF; float:left; line-height:30px; padding-right:30px; font-size:1.1em}
+.header .setup{ background:url(/images/cms/header_setup.png) no-repeat; width:38px; height:56px; display:block; float:left}
+.header .logout{ background:url(/images/cms/header_logout.png) no-repeat; width:38px; height:56px; display:block; float:left}
+.header img{ height: 65px; }
+
+.menuA:hover , .menuA_active{ background:url(/images/cms/menu.png) no-repeat 0 0; width:90px; height:55px; display:block;}
+.menuA{background:url(/images/cms/menu.png) no-repeat 0 -59px; width:90px; height:55px; display:block; }
+.menuB:hover , .menuB_active{background:url(/images/cms/menu.png) no-repeat -90px 0; width:89px; height:55px; display:block;}
+.menuB{background:url(/images/cms/menu.png) no-repeat -90px -59px; width:89px; height:55px;  display:block;}
+.menuC:hover , .menuC_active{background:url(/images/cms/menu.png) no-repeat -179px 0; width:89px; height:55px; display:block;}
+.menuC{background:url(/images/cms/menu.png) no-repeat -179px -59px; width:89px; height:55px; display:block; }
+.menuD:hover , .menuD_active{background:url(/images/cms/menu.png) no-repeat -268px 0; width:89px; height:55px; display:block;}
+.menuD{background:url(/images/cms/menu.png) no-repeat -268px -59px; width:89px; height:55px; display:block;}
+.menuE:hover , .menuE_active{background:url(/images/cms/menu.png) no-repeat -357px 0; width:95px; height:55px; display:block;}
+.menuE{background:url(/images/cms/menu.png) no-repeat -357px -59px; width:95px; height:55px; display:block; }
+
+.content{ width:1000px; margin:0 auto; }
+
+.left_content{ background:url(/images/cms/left_content.jpg) repeat-y; width:452px; }
+.left_content li{ float:left;}
+.left_body{ height:556px; padding:0 0 0 10px;}
+.left_footer{ background:url(/images/cms/left_content_footer.jpg) no-repeat; width:452px; height:19px;}
+.right_content{ background:url(/images/cms/right_content_header.jpg) no-repeat top center; padding-top:11px; width:538px;}
+.right_body{height:600px; background:url(/images/cms/right_content.jpg) repeat-y; padding:0 0 0 18px;}
+.right_footer{ background:url(/images/cms/right_content_footer.jpg) no-repeat; height:19px; width:538px;}
+p.hint_title{ text-align:right; color:#2e2e2e; font-size:0.8em; padding-right:20px;}
+.left_title , .right_title{ color:#fff; font-size:1.2em;}
+.left_title{ background:url(/images/cms/left_title.jpg) no-repeat; width:417px; height:35px; padding:10px 0 0 10px;}
+.right_title{ background:url(/images/cms/right_title.jpg) no-repeat; width:480px; height:35px; padding:10px 0 0 10px; border-left:1px solid #ccc; border-right:1px solid #ccc;}
+
+.red{color:#ff3000;}
+.gray { color:#666; font-size:0.9em; padding:10px 0;}
+
+.setAlbum{ border:none;}
+.uploadImg{float:left; padding:0 0 15px 10px;}
+.uploadImg img{ padding:3px; border:2px solid #dadada;}
+.imgBtn{ padding-left:10px;}
+.uploadBtn{ background:url(/images/cms/btn_upload.png) no-repeat; width:95px; height:32px; display:block;}
+
+form label{ color:#161616; font-size:0.9em; text-align:right; padding-right:15px; width:70px; clear:left;}
+.addthis_toolbox{ padding-left:10px;}
+.bg_input{ background:url(/images/cms/bg_input.jpg) no-repeat; width:304px; height:28px; padding:5px 0 0 10px;}
+.bg_input input{ border:none; background:none;}
+.bg_textarea{ background:url(/images/cms/bg_textarea.jpg) no-repeat; width:302px; height:93px; padding:5px 0 0 10px;}
+.bg_textarea textarea{ border:none; background:none;}
+.hint{font-size:0.9em; color:#666; padding-left:80px;}
+
+.sys_directory{margin-bottom:10px; font-size:0.9em}
+.ch_arrange{
+border-left:1px solid #ccc; border-right:1px solid #ccc; border-bottom:1px solid #ccc;
+width:410px; height:257px;
+-moz-border-radius:0 0 8px 8px; 
+-webkit-border-radius:0 0 8px 8px;  
+border-radius-radius:0 0 8px 8px; 
+padding:10px 0 0 80px;
+}
+
+.ch_bg{ background:url(/images/cms/bg_album.jpg) no-repeat; width:331px; height:239px;}
+.ch_none{ background:url(/images/cms/ch_bg.jpg) no-repeat; width:93px; height:56px;}
+.ch_bg li{ float:left; margin:5px; cursor:move; *margin:3px;}
+.ch_bg ul{ padding:30px 0 0 10px;}
+h2.popTitle{ border-bottom:1px dashed #b3b3b3; padding-bottom:10px;}
+.ch_sub_title{ font-size:1.1em; padding:10px 0;}
+.ch_sub_title span{ color:#5f5f5f; font-size:0.9em; padding-left:10px;}
+
+.ch_pool img{ width:85px; height:50px; border:1px solid #b7b7b7;}
+#slidesContainer li{ float:left; width:103px; height:83px; text-align:center; padding: 5px 0 0 2px;}
+.ch_name{ padding:2px 2px 0 0px; width:90px; font-size:0.9em;}
+#slidesContainer li img{ width:80px; height:45px;}
+.ch_normal{ background:url(/images/cms/ch_normal.jpg) no-repeat 5px 0px; width:86px; height:73px; cursor:move;}
+.ch_normal:hover{background:url(/images/cms/ch_hover.jpg) no-repeat 5px 0px; width:86px; height:73px;}
+.ch_disable{background:url(/images/cms/ch_disable.jpg) no-repeat 5px 0px; width:76px; height:73px;}
+.slide ul{ padding:10px 0 0 0;}
+
+/* Slideshow style rules.*/
+#slideshow {
+	width:500px;
+	height:263px;
+	/*background:transparent url(/images/cms/bg_slideshow.jpg) no-repeat 0 0;*/
+	position:relative;
+}
+#slideshow #slidesContainer {
+  margin:0 auto;
+  width:410px;
+  height:263px;
+  overflow:auto; /* allow scrollbar */
+  position:relative;
+}
+#slideshow #slidesContainer .slide {
+  margin:0 auto;
+  width:390px; /* reduce by 20 pixels of #slidesContainer to avoid horizontal scroll */
+  height:263px;
+}
+
+p{ margin-left:5px;}
+
+.control {
+  display:block;
+  width:39px;
+  height:263px;
+  text-indent:-10000px;
+  position:absolute;
+  cursor: pointer;
+}
+#leftControl {
+  top:0;
+  left:0;
+  background:transparent url(/images/cms/control_left.jpg) no-repeat 0 0;
+}
+#rightControl {
+  top:0;
+  right:0;
+  background:transparent url(/images/cms/control_right.jpg) no-repeat 0 0;
+}
+
+#pageContainer {
+  margin:0 auto;
+  width:960px;
+}

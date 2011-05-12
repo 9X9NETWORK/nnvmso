@@ -1,0 +1,16 @@
+
+/* Doc Styles */
+
+table{
+	margin:auto;
+	display:table;
+	border-collapse:collapse;
+	border-spacing:0px;
+	empty-cells:show;
+}
+div.page{
+	margin:0px auto;
+}
+.button{
+	display:table-cell;
+}
