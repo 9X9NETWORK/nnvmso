@@ -11,11 +11,13 @@
 <link href="/stylesheets/cms.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.0/jquery.min.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.bubble.js"></script>
+<script type="text/javascript" src="/javascripts/jquery.textTruncate.js"></script>
 <script type="text/javascript" src="/javascripts/cms.js"></script>
-<title>Insert title here</title>
+<title><spring:message code="cms.channel_set_management.title"/></title>
 </head>
 <body>
 <div class="header">
+  <input type="hidden" id="msoId" value="${msoId}"/>
   <div class="floatL"><img alt="" src="${mso.logoUrl}"/></div>
   <div class="floatR">
     <p><spring:message code="cms.header.welcome"/> <span><c:out value="${mso.contactEmail}"/></span></p>
@@ -105,7 +107,7 @@
         <div class="ch_arrange">
           <div class="ch_bg">
             <ul>
-              <li class="ch_none ch_exsist"></li>
+              <li class="ch_none ch_exsist"><img src="http://i2.ytimg.com/vi/qxwPtIOs9Q8/default.jpg" width="93" height="56" alt=""/></li>
               <li class="ch_none"></li>
               <li class="ch_none"></li>
               <li class="ch_none"></li>
@@ -122,81 +124,6 @@
           <p class="ch_sub_title">請選擇頻道拖曳至頻道網<span>將頻道拖曳回來即可從頻道網中移除</span></p>
           <div id="slideshow">
             <div id="slidesContainer">
-              <div class="slide">
-                <ul>
-                  <li class="ch_normal">
-                    <img alt="" src="/images/cms/ch_img.jpg"/>
-                    <p class="ch_name">頻道名稱名...</p><!--10 letters , if  channel name is more than 10 letters, please use "..." -->
-                  </li>
-                  <li class="ch_normal">
-                    <img alt="" src="/images/cms/ch_img.jpg"/>
-                    <p class="ch_name">頻道名稱名...</p><!--10 letters , if  channel name is more than 10 letters, please use "..." -->
-                  </li>
-                  <li class="ch_normal">
-                    <img alt="" src="/images/cms/ch_img.jpg"/>
-                    <p class="ch_name">頻道名稱名...</p><!--10 letters , if  channel name is more than 10 letters, please use "..." -->
-                  </li>
-                  <li class="ch_normal">
-                    <img alt="" src="/images/cms/ch_img.jpg"/>
-                    <p class="ch_name">頻道名稱名...</p><!--10 letters , if  channel name is more than 10 letters, please use "..." -->
-                  </li>
-                  <li class="ch_normal">
-                    <img alt="" src="/images/cms/ch_img.jpg"/>
-                    <p class="ch_name">頻道名稱名...</p><!--10 letters , if  channel name is more than 10 letters, please use "..." -->
-                  </li>
-                  <div style="clear:both"/>
-                </ul>
-              </div>
-              <div class="slide">
-                <ul>
-                  <li class="ch_normal">
-                    <img alt="" src="/images/cms/ch_img.jpg"/>
-                    <p class="ch_name">頻道名稱名...</p><!--10 letters , if  channel name is more than 10 letters, please use "..." -->
-                  </li>
-                  <li class="ch_normal">
-                    <img alt="" src="/images/cms/ch_img.jpg"/>
-                    <p class="ch_name">頻道名稱名...</p><!--10 letters , if  channel name is more than 10 letters, please use "..." -->
-                  </li>
-                  <li class="ch_normal">
-                    <img alt="" src="/images/cms/ch_img.jpg"/>
-                    <p class="ch_name">頻道名稱名...</p><!--10 letters , if  channel name is more than 10 letters, please use "..." -->
-                  </li>
-                  <li class="ch_normal">
-                    <img alt="" src="/images/cms/ch_img.jpg"/>
-                    <p class="ch_name">頻道名稱名...</p><!--10 letters , if  channel name is more than 10 letters, please use "..." -->
-                  </li>
-                  <li class="ch_normal">
-                    <img alt="" src="/images/cms/ch_img.jpg"/>
-                    <p class="ch_name">頻道名稱名...</p><!--10 letters , if  channel name is more than 10 letters, please use "..." -->
-                  </li>
-                  <div style="clear:both"/>
-                </ul>
-              </div>
-              <div class="slide">
-                <ul>
-                  <li class="ch_normal">
-                    <img alt="" src="/images/cms/ch_img.jpg"/>
-                    <p class="ch_name">頻道名稱名...</p><!--10 letters , if  channel name is more than 10 letters, please use "..." -->
-                  </li>
-                  <li class="ch_normal">
-                    <img alt="" src="/images/cms/ch_img.jpg"/>
-                    <p class="ch_name">頻道名稱名...</p><!--10 letters , if  channel name is more than 10 letters, please use "..." -->
-                  </li>
-                  <li class="ch_normal">
-                    <img alt="" src="/images/cms/ch_img.jpg"/>
-                    <p class="ch_name">頻道名稱名...</p><!--10 letters , if  channel name is more than 10 letters, please use "..." -->
-                  </li>
-                  <li class="ch_normal">
-                    <img alt="" src="/images/cms/ch_img.jpg"/>
-                    <p class="ch_name">頻道名稱名...</p><!--10 letters , if  channel name is more than 10 letters, please use "..." -->
-                  </li>
-                  <li class="ch_normal">
-                    <img alt="" src="/images/cms/ch_img.jpg"/>
-                    <p class="ch_name">頻道名稱名...</p><!--10 letters , if  channel name is more than 10 letters, please use "..." -->
-                  </li>
-                  <div style="clear:both"/>
-                </ul>
-              </div>
             </div>
           </div>
         </div>

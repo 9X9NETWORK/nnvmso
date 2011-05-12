@@ -38,6 +38,7 @@ public class CmsController {
 			return "error/404";
 		
 		model.addAttribute("mso", mso);
+		model.addAttribute("msoId", mso.getKey().getId());
 		
 		return "cms/channelSetManagement";
 	}
