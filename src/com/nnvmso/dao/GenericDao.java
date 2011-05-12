@@ -159,5 +159,22 @@ public class GenericDao<T> {
 		}
 		return dao;		
 	}
+
+	public List<T> findAll() {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		List<T> results = new ArrayList<T>();
+		
+		try {
+			Query query = pm.newQuery(daoClass);
+			@SuppressWarnings("unchecked")
+			List<T> tmp = (List<T>)query.execute();
+			if (tmp.size() > 0)
+				results = (List<T>) pm.detachCopyAll(tmp);
+		} catch (JDOObjectNotFoundException e) {
+		} finally {
+			pm.close();
+		}
+		return results;
+	}
 	
 }

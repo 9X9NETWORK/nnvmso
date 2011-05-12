@@ -69,5 +69,39 @@ public class ContentOwnershipManager {
 		
 		ownershipDao.save(own);
 	}
+
+	public List<ContentOwnership> findAllByMsoId(long msoId) {
+		
+		return ownershipDao.findAllByMsoId(msoId);
+	}
+
+	public List<MsoChannel> create(Mso mso, List<MsoChannel> channelList) {
+		
+		List<MsoChannel> results = new ArrayList<MsoChannel>();
+		
+		for (MsoChannel channel : channelList) {
+			ContentOwnership ownership = this.findByMsoIdAndChannelId(mso.getKey().getId(), channel.getKey().getId());
+			if (ownership != null) {
+				logger.warning("channel " + channel.getKey().getId() + " is already owned by mso " + mso.getKey().getId());
+				continue;
+			}
+			this.create(new ContentOwnership(), mso, channel);
+			results.add(channel);
+		}
+		
+		return results;
+	}
+	
+	public List<ContentOwnership> findAll() {
+		return ownershipDao.findAll();
+	}
+	
+	public ContentOwnership findByMsoIdAndChannelId(long msoId, long channelId) {
+		return ownershipDao.findByMsoIdAndChannelId(msoId, channelId);
+	}
+
+	public void delete(ContentOwnership ownership) {
+		ownershipDao.delete(ownership);
+	}
 	
 }

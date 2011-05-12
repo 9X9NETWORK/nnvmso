@@ -350,6 +350,16 @@ public class MsoChannelManager {
 				cache.remove(this.getCacheKey(c.getKey().getId()));
 			}						
 		}
+	}	
+
+	public List<MsoChannel> findChannelsByIdStr(String channelIds) {
+		List<Long> channelIdList = new ArrayList<Long>();	
+		String[] arr = channelIds.split(",");
+		for (int i = 0; i < arr.length; i++) {
+			channelIdList.add(Long.parseLong(arr[i]));
+		}
+		List<MsoChannel> channels = msoChannelDao.findAllByIds(channelIdList);
+		return channels;
 	}
 	
 }
