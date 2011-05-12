@@ -1,12 +1,20 @@
 package com.nnvmso.web;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.nnvmso.lib.NnLogUtil;
+import com.nnvmso.model.MsoChannel;
+import com.nnvmso.service.ContentOwnershipManager;
 
 @Controller
 @RequestMapping("CMSAPI")
@@ -26,4 +34,11 @@ public class CmsApiController {
 		return "error/blank";
 	}
 	
+	@RequestMapping("listOwnedChannels")
+	public @ResponseBody List<MsoChannel> listOwnedChannels(@RequestParam Long msoId) {
+		
+		logger.info("msoId = " + msoId);
+		
+		return new ContentOwnershipManager().findOwnedChannelsByMsoId(msoId);
+	}
 }

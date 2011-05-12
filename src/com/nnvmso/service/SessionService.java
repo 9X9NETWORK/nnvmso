@@ -23,6 +23,10 @@ public class SessionService {
 	
 	private HttpSession session;
 	
+	public SessionService() {
+		session = null;
+	}
+	
 	public SessionService(HttpServletRequest request) {
 		session = request.getSession();
 		Cache cache = CacheFactory.get();
