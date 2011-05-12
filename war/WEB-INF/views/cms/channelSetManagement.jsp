@@ -104,10 +104,13 @@
   <div class="right_content floatL">
     <div class="right_body">
       <div class="right_title">編排頻道網</div>
-        <div class="ch_arrange">
+        <div class="ch_arrange" id="channel_set_area">
           <div class="ch_bg">
             <ul>
-              <li class="ch_none ch_exsist"><img src="http://i2.ytimg.com/vi/qxwPtIOs9Q8/default.jpg" width="93" height="56" alt=""/></li>
+              <!--
+              <li class="ch_none ch_exist"><img src="http://i2.ytimg.com/vi/qxwPtIOs9Q8/default.jpg" width="93" height="56" alt=""/></li>
+              -->
+              <li class="ch_none"></li>
               <li class="ch_none"></li>
               <li class="ch_none"></li>
               <li class="ch_none"></li>

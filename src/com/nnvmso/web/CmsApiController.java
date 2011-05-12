@@ -1,5 +1,6 @@
 package com.nnvmso.web;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -10,7 +11,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.nnvmso.lib.NnLogUtil;
+import com.nnvmso.model.ChannelSet;
 import com.nnvmso.model.MsoChannel;
+import com.nnvmso.service.CmsApiService;
 import com.nnvmso.service.ContentOwnershipManager;
 
 @Controller
@@ -37,5 +40,14 @@ public class CmsApiController {
 		logger.info("msoId = " + msoId);
 		
 		return new ContentOwnershipManager().findOwnedChannelsByMsoId(msoId);
+	}
+	
+	@RequestMapping("defaultChannelSetChannels")
+	public @ResponseBody List<MsoChannel> defaultChannelSetChannels(@RequestParam Long msoId) {
+		CmsApiService cmsService = new CmsApiService();
+		ChannelSet channelSet = cmsService.getDefaultChannelSet(msoId);
+		if (channelSet == null)
+			return new ArrayList<MsoChannel>();
+		return cmsService.findChannelsByChannelSetId(channelSet.getKey().getId());
 	}
 }

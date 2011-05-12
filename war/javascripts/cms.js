@@ -1,15 +1,49 @@
 /**
  * 
  */
-
-function initChannelPool()
+ 
+var bubblePopupProperties = 
 {
-  var msoId = $('#msoId').val();
-  $.getJSON('/CMSAPI/listOwnedChannels?msoId=' + msoId, function(channels)
+  'position':  'top',
+  'align':     'center',
+  //'innerHtml': innerHtml,
+  'innerHtmlStyle':
+  {
+    'color':      '#292929',
+    'text-align': 'left',
+    'font-size':  '0.8em'
+  },
+  'themeName': 'all-black',
+  'themePath': '/images/cms'
+};
+
+var populateBubbleContent = function(channel)
+{
+  var span = $('<span></span>');
+  var h2 = $('<h2 class="popTitle"></h2>').text(channel.name).textTruncate(20, '...').appendTo(span);
+  var updateDate = new Date(channel.updateDate);
+  var year = updateDate.getFullYear();
+  var month = updateDate.getMonth();
+  var date = updateDate.getDate();
+  var hour = updateDate.getHours();
+  var minute = updateDate.getMinutes().toString();
+  var second = updateDate.getSeconds().toString();
+  if (minute.length < 2)
+    minute = "0" + minute;
+  if (second.length < 2)
+    second = "0" + second;
+  
+  var innerHtml = span.html();
+  innerHtml += '<br/>節目數量 ：' + channel.programCount;
+  innerHtml += '<br/>更新時間 ：' + year + '/' + month + '/' + date + '&nbsp;' + hour + ':' + minute + ':' + second;
+  
+  return innerHtml;
+}
+
+var initChannelPool = function()
+{
+  $.getJSON('/CMSAPI/listOwnedChannels?msoId=' + $('#msoId').val(), function(channels)
     {
-      if (channels == null) {
-        return;
-      }
       for (var i = 0; i < channels.length; i = i + 8)
       {
         var slide = $('<div class="slide"><ul></ul></div>');
@@ -20,21 +54,8 @@ function initChannelPool()
           var p = $('<p class="ch_name"></p>').text(channels[j].name).textTruncate(20, '...');
           item.append(img).append(p).appendTo(slide);
           
-          var span = $('<span></span>');
-          var h2 = $('<h2 class="popTitle"></h2>').text(channels[j].name).textTruncate(20, '...').appendTo(span);
-          var updateDate = new Date(channels[j].updateDate);
-          var year = updateDate.getFullYear();
-          var month = updateDate.getMonth();
-          var date = updateDate.getDate();
-          var hour = updateDate.getHours();
-          var minute = updateDate.getMinutes();
-          var second = updateDate.getSeconds();
-          
-          var innerHtml = span.html();
-          innerHtml += '<br/>節目數量 : ' + channels[j].programCount;
-          innerHtml += ' <br/> 更新時間 ：' + year + '/' + month + '/' + date + '&nbsp;' + hour + ':' + minute + ':' + second;
-          span.html(innerHtml);
-          span.hide().appendTo(item);
+          var innerHtml = populateBubbleContent(channels[j]);
+          $('<span></span>').html(innerHtml).hide().appendTo(item);
           
         }
         $('#slidesContainer').append(slide);
@@ -44,20 +65,6 @@ function initChannelPool()
       var slideWidth = 410;
       var slides = $('.slide');
       var numberOfSlides = slides.length;
-      var bubblePopupProperties = 
-        {
-          'position':  'top',
-          'align':     'center',
-          //'innerHtml': innerHtml,
-          'innerHtmlStyle':
-          {
-            'color':      '#292929',
-            'text-align': 'left',
-            'font-size':  '0.8em'
-          },
-          'themeName': 'all-black',
-          'themePath': '/images/cms'
-        };
       
       // Remove scrollbar in JS
       $('#slidesContainer').css('overflow', 'hidden');
@@ -119,9 +126,27 @@ function initChannelPool()
     });
 }
 
+var initChannelSetArea = function()
+{
+  $.getJSON('/CMSAPI/defaultChannelSetChannels?msoId=' + $('#msoId').val(), function(channels)
+    {
+      //alert(channels.length);
+      for (var i = 0; i < channels.length; i++)
+      {
+        var seq = channels[i].seq;
+        var img = $('<img/>').attr('src', channels[i].imageUrl);
+        var dom = $('#channel_set_area li').get(seq);
+        $(dom).addClass('ch_exist').append(img);
+        bubblePopupProperties['innerHtml'] = populateBubbleContent(channels[i]);
+        $(dom).CreateBubblePopup(bubblePopupProperties);
+      }
+    });
+}
+
 $(document).ready(function()
 {
   
   initChannelPool();
+  initChannelSetArea();
   
 });

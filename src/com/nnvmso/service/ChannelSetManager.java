@@ -47,10 +47,10 @@ public class ChannelSetManager {
 		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
 		MsoChannelManager channelMngr = new MsoChannelManager();
 		
-		List<ChannelSetChannel> channelSets = cscMngr.findByChannelSetId(channelSetId); 
+		List<ChannelSetChannel> cscs = cscMngr.findByChannelSetId(channelSetId); 
 		ArrayList<MsoChannel> results = new ArrayList<MsoChannel>();
 		
-		for (ChannelSetChannel csc : channelSets) {
+		for (ChannelSetChannel csc : cscs) {
 			MsoChannel channel = channelMngr.findById(csc.getChannelId());
 			if (channel != null) {
 				channel.setSeq(csc.getSeq());

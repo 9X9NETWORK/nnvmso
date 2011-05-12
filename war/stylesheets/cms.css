@@ -76,7 +76,9 @@ padding:10px 0 0 80px;
 
 .ch_bg{ background:url(/images/cms/bg_album.jpg) no-repeat; width:331px; height:239px;}
 .ch_none{ background:url(/images/cms/ch_bg.jpg) no-repeat; width:93px; height:56px;}
-.ch_bg li{ float:left; margin:5px; cursor:move; *margin:3px;}
+.ch_exist{cursor:move}
+.ch_exist img { width:93px; height: 56px; }
+.ch_bg li{ float:left; margin:5px; *margin:3px;}
 .ch_bg ul{ padding:30px 0 0 10px;}
 h2.popTitle{ border-bottom:1px dashed #b3b3b3; padding-bottom:10px;}
 .ch_sub_title{ font-size:1.1em; padding:10px 0;}
