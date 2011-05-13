@@ -12,10 +12,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.model.Category;
+import com.nnvmso.model.CategoryChannelSet;
 import com.nnvmso.model.ChannelSet;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
+import com.nnvmso.service.CategoryChannelSetManager;
 import com.nnvmso.service.CategoryManager;
+import com.nnvmso.service.ChannelSetManager;
 import com.nnvmso.service.CmsApiService;
 import com.nnvmso.service.ContentOwnershipManager;
 import com.nnvmso.service.MsoManager;
@@ -99,4 +102,54 @@ public class CmsApiController {
 		return catMngr.findAllByMsoId(nnmso.getKey().getId());
 	}
 	
+	@RequestMapping("saveChannelSet")
+	public @ResponseBody String saveChannelSet(@RequestParam Long channelSetId,
+	                                           @RequestParam String imageUrl,
+	                                           @RequestParam String name,
+	                                           @RequestParam String intro,
+	                                           @RequestParam String tag,
+	                                           @RequestParam Long categoryId) {
+		
+		logger.info("channelSetId = " + channelSetId);
+		logger.info("imageUrl = " + imageUrl);
+		logger.info("name = " + name);
+		logger.info("intro = " + intro);
+		logger.info("tag = " + tag);
+		logger.info("categoryId = " + categoryId);
+		
+		CmsApiService cmsApiService = new CmsApiService();
+		ChannelSetManager channelSetMngr = new ChannelSetManager();
+		ChannelSet channelSet = channelSetMngr.findById(channelSetId);
+		CategoryChannelSetManager ccsMngr = new CategoryChannelSetManager();
+		
+		if (channelSet == null)
+			return "Invalid ChannelSetId";
+		
+		channelSet.setName(name);
+		channelSet.setTag(tag);
+		channelSet.setImageUrl(imageUrl);
+		channelSet.setIntro(intro);
+		channelSetMngr.save(channelSet);
+		
+		List<CategoryChannelSet> ccss = cmsApiService.whichCCSContainingTheChannelSet(channelSetId);
+		
+		// NOTE: channel set can only in one system category
+		for (CategoryChannelSet ccs : ccss) {
+			if (ccs.getCategoryId() != categoryId) {
+				ccsMngr.delete(ccs);
+				ccss.remove(ccs);
+			}
+		}
+		
+		logger.info("ccss size = " + ccss.size());
+		
+		if (ccss.isEmpty()) {
+			// create a new CategoryChannelSet
+			CategoryChannelSet ccs = new CategoryChannelSet(channelSetId, categoryId);
+			ccsMngr.create(ccs);
+			logger.info("create new CategoryChannelSet channelSetId = " + channelSetId + ", categoryId = " + categoryId);
+		}
+		
+		return "OK";
+	}
 }

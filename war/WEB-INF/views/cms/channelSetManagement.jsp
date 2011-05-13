@@ -43,6 +43,7 @@
       <p class="hint_title"><span class="red">＊</span>為必填資訊</p>
       <form>
         <fieldset class="setAlbum">
+          <input type="hidden" id="cc_id" value="0"/>
           <label class="floatL"><span class="red">＊</span>圖示</label>
           <div class="uploadImg">
             <img alt="" id="cc_image" src="/images/cms/upload_img.jpg" class="floatL"/>
@@ -54,8 +55,8 @@
           </div>
           <label class="floatL">網址</label>
           <div class="floatL">
-          <a href="#" id="channel_set_promote_url" target="_player"></a>
-          &nbsp;<a id="addthis_button"><img src="http://cache.addthiscdn.com/icons/v1/thumbs/addthis.gif"/></a>
+            <a href="#" id="channel_set_promote_url" target="_player"></a>
+            <a id="addthis_button"><img src="http://cache.addthiscdn.com/icons/v1/thumbs/addthis.gif"/></a>
           </div>
           <div class="clear"></div><br/>
           <label class="floatL"><span class="red">＊</span>名稱</label>
@@ -135,7 +136,7 @@
         </div>
       </div>
       <div class="right_footer"></div>
-      <input type="button" id="channel_set_publish" value="醜醜的發佈"/>
+      <input type="button" id="publish_channel_set" value="醜醜的發佈按鈕"/>
     </div>
   <div class="clear"></div>
 </div>

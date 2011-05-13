@@ -24,7 +24,7 @@ public class ChannelSetManager {
 		
 		if (this.findByName(channelSet.getName()) != null) {
 			logger.warning("channelSet already exists, name: " + channelSet.getName());
-			return;
+			//return;
 		}
 		channelSet.setNameSearch(channelSet.getName().trim().toLowerCase());
 		Date now = new Date();
@@ -37,6 +37,15 @@ public class ChannelSetManager {
 			ChannelSetChannel csc = new ChannelSetChannel(channelSet.getKey().getId(), channel.getKey().getId(), channel.getSeq());
 			cscMngr.create(csc);
 		}
+	}
+	
+	public ChannelSet save(ChannelSet channelSet) {
+		
+		//NOTE check name existence if needed
+		channelSet.setUpdateDate(new Date());
+		channelSetDao.save(channelSet);
+		
+		return channelSet;
 	}
 	
 	private Object findByName(String name) {
@@ -58,6 +67,10 @@ public class ChannelSetManager {
 			}
 		}
 		return results;
+	}
+
+	public ChannelSet findById(long channelSetId) {
+		return channelSetDao.findById(channelSetId);
 	}
 	
 }

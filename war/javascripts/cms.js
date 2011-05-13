@@ -150,7 +150,7 @@ var initChannelSetInfo = function()
       for (var i = 0; i < categories.length; i++)
       {
         $('<option></option>')
-          .val(categories[i].key.id)
+          .attr('value', categories[i].key.id)
           .text(categories[i].name)
           .appendTo('#sys_directory');
       }
@@ -185,16 +185,67 @@ var initChannelSetInfo = function()
             if (channelSet.imageUrl != null) {
               $('#cc_image').attr('src', channelSet.imageUrl);
             }
+            
+            $('#cc_id').val(channelSet.key.id);
           }
           
         });
     });
 }
 
-var uploadImage = function() {
+var uploadImage = function()
+{
   var imageUrl = prompt('上傳功能將在稍後開通，請暫以輸入圖片網址取代', $('#cc_image').attr('src'));
   if (imageUrl != null)
     $('#cc_image').attr('src', imageUrl);
+}
+
+var publishChannelSet = function()
+{
+  var categoryId = $('#sys_directory').val();
+  if (categoryId == 0) {
+    alert('你必需選一個系統分類');
+    return;
+  }
+  var intro = $('#cc_intro').text();
+  if (intro.length > 200) {
+    alert('"介紹"超過字數限制');
+    return;
+  }
+  var name = $('#cc_name').val();
+  if (name.length > 40) {
+    alert('"名稱"超過字數限制');
+    return;
+  } else if (name.length == 0) {
+    alert('"名稱"不可以為空');
+    return;
+  }
+  var tag = $('#cc_tag').val();
+  if (tag.length > 200) {
+    alert('"標籤“超過長度');
+    return;
+  }
+  var imageUrl = $('#cc_image').attr('src');
+  if (imageUrl.length == 0 || imageUrl == '/images/cms/upload_img.jpg')
+    return alert('"圖示“不可以為空');
+  
+  var parameters = {
+    'channelSetId': $('#cc_id').val(),
+    'imageUrl':     imageUrl,
+    'name':         name,
+    'intro':        intro,
+    'tag':          tag,
+    'categoryId':   categoryId
+  };
+  
+  $.post('/CMSAPI/saveChannelSet', parameters, function(response)
+    {
+      if (response != 'OK')
+        alert('儲存資料時發生錯誤');
+      else
+        alert('發佈成功');
+    }, 'text');
+  
 }
 
 $(document).ready(function()
@@ -205,5 +256,6 @@ $(document).ready(function()
   initChannelSetInfo();
   
   $('#upload_image').click(uploadImage);
+  $('#publish_channel_set').click(publishChannelSet);
   
 });

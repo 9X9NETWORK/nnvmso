@@ -34,6 +34,11 @@ public class CategoryChannelSet implements Serializable {
 	@Persistent
 	private Date updateDate;
 
+	public CategoryChannelSet(long channelSetId, long categoryId) {
+		this.channelSetId = channelSetId;
+		this.categoryId = categoryId;
+	}
+
 	public void setKey(Key key) {
 		this.key = key;
 	}
