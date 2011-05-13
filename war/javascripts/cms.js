@@ -130,7 +130,6 @@ var initChannelSetArea = function()
 {
   $.getJSON('/CMSAPI/defaultChannelSetChannels?msoId=' + $('#msoId').val(), function(channels)
     {
-      //alert(channels.length);
       for (var i = 0; i < channels.length; i++)
       {
         var seq = channels[i].seq;
@@ -143,10 +142,68 @@ var initChannelSetArea = function()
     });
 }
 
+var initChannelSetInfo = function()
+{
+  
+  $.getJSON('/CMSAPI/systemCategories', function(categories)
+    {
+      for (var i = 0; i < categories.length; i++)
+      {
+        $('<option></option>')
+          .val(categories[i].key.id)
+          .text(categories[i].name)
+          .appendTo('#sys_directory');
+      }
+      $.getJSON('/CMSAPI/defaultChannelSetCategory?msoId=' + $('#msoId').val(), function(category)
+        {
+          if (category != null)
+          {
+            $('#sys_directory').val(category.key.id);
+          }
+        });
+      $.getJSON('/CMSAPI/defaultChannelSetInfo?msoId=' + $('#msoId').val(), function(channelSet)
+        {
+          if (channelSet != null)
+          {
+            addthis_config['pubid'] = $('#msoId').val();
+            var url = 'http://' + ((location.host == 'www.9x9.tv') ? '9x9.tv' : location.host) + '/';
+            var addthis_share = 
+              {
+                'title': channelSet.name,
+                'description': channelSet.intro
+              }
+            url += ((channelSet.beautifulUrl != null) ? channelSet.beautifulUrl : channelSet.defaultUrl);
+            if (channelSet.beautifulUrl != null || channelSet.defaultUrl != null)
+            {
+              $('#channel_set_promote_url').text(url).attr('href', url);
+              addthis_share['url'] = url;
+              addthis.button('#addthis_button', null, addthis_share);
+            }
+            $('#cc_name').val(channelSet.name);
+            $('#cc_tag').val(channelSet.tag);
+            $('#cc_intro').text(channelSet.intro);
+            if (channelSet.imageUrl != null) {
+              $('#cc_image').attr('src', channelSet.imageUrl);
+            }
+          }
+          
+        });
+    });
+}
+
+var uploadImage = function() {
+  var imageUrl = prompt('上傳功能將在稍後開通，請暫以輸入圖片網址取代', $('#cc_image').attr('src'));
+  if (imageUrl != null)
+    $('#cc_image').attr('src', imageUrl);
+}
+
 $(document).ready(function()
 {
   
   initChannelPool();
   initChannelSetArea();
+  initChannelSetInfo();
+  
+  $('#upload_image').click(uploadImage);
   
 });

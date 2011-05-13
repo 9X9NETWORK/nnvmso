@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
@@ -29,9 +30,29 @@ public class CategoryChannelSetDao extends GenericDao<CategoryChannelSet> {
 			@SuppressWarnings("unchecked")
 			List<CategoryChannelSet> ccs = (List<CategoryChannelSet>)query.execute(categoryId);
 			detached = (List<CategoryChannelSet>)pm.detachCopyAll(ccs);
+		} catch (JDOObjectNotFoundException e) {
 		} finally {
 			pm.close();
 		}
 		return detached;
+	}
+	
+	public CategoryChannelSet findByChannelSetIdAndCategoryId(long channelSetId, long categoryId) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		CategoryChannelSet result = null;
+		try {
+			Query query = pm.newQuery(CategoryChannelSet.class);
+			query.setFilter("categoryId == categoryIdParam");
+			query.setFilter("channelSetId == channelSetIdParam");
+			query.declareParameters("long categoryIdParam");
+			@SuppressWarnings("unchecked")
+			List<CategoryChannelSet> ccss = (List<CategoryChannelSet>)query.execute(categoryId);
+			if (ccss.size() > 0)
+				result = pm.detachCopy(ccss.get(0));
+		} catch (JDOObjectNotFoundException e) {
+		} finally {
+			pm.close();
+		}
+		return result;
 	}
 }

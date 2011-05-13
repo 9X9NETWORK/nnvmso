@@ -3,12 +3,15 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:f="http://java.sun.com/jsf/core" xmlns:h="http://java.sun.com/jsf/html">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <link href="/stylesheets/jquery.bubble.css" rel="stylesheet" type="text/css"/>
 <link href="/stylesheets/cms-doc.css" rel="stylesheet" type="text/css"/>
 <link href="/stylesheets/cms.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4dcccc98718a5dbe"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.0/jquery.min.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.bubble.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.textTruncate.js"></script>
@@ -42,40 +45,39 @@
         <fieldset class="setAlbum">
           <label class="floatL"><span class="red">＊</span>圖示</label>
           <div class="uploadImg">
-            <img alt="" src="/images/cms/upload_img.jpg" class="floatL"/>
+            <img alt="" id="cc_image" src="/images/cms/upload_img.jpg" class="floatL"/>
             <div class="floatL imgBtn">
               <p class="gray">多螢幕最佳顯示品質建議<br/>解析度至少為720x480</p>
-              <a href="#" class="uploadBtn"></a>
+              <a href="#" id="upload_image" class="uploadBtn"></a>
             </div>
             <div class="clear"></div>
           </div>
           <label class="floatL">網址</label>
-          <a href="#" class="floatL">http://www.9x9.tv/daai</a>
-          <!-- AddThis Button BEGIN -->
-          <div class="addthis_toolbox addthis_default_style floatL">
-            <a class="addthis_button_compact"></a>
+          <div class="floatL">
+          <a href="#" id="channel_set_promote_url" target="_player"></a>
+          &nbsp;<a id="addthis_button"><img src="http://cache.addthiscdn.com/icons/v1/thumbs/addthis.gif"/></a>
           </div>
-          <!-- AddThis Button END -->
           <div class="clear"></div><br/>
           <label class="floatL"><span class="red">＊</span>名稱</label>
-          <div class="bg_input floatL"><input type="text" size="50" maxlength="40"/></div>
+          <div class="bg_input floatL"><input type="text" id="cc_name" name="cc_name" size="50" maxlength="40"/></div>
           <div class="clear"></div>
           <p class="hint">限40字元</p>
           <br/>
           <label class="floatL">介紹</label>
-          <div class="bg_textarea floatL"><textarea name="" cols="37" rows="4"></textarea></div>
+          <div class="bg_textarea floatL"><textarea name="cc_intro" id="cc_intro" cols="37" rows="4"></textarea></div>
           <div class="clear"></div>
           <p class="hint">限200字元</p>
           <br/>
           <label class="floatL">標籤</label>
-          <div class="bg_input floatL"><input type="text" size="50" maxlength="40"/></div>
+          <div class="bg_input floatL"><input name="cc_tag" id="cc_tag" type="text" size="50" maxlength="40"/></div>
           <div class="clear"></div>
           <p class="hint">請用“ , ”分開</p>
           <br/>
           <label class="floatL"><span class="red">＊</span>系統分類</label>
           <div class="floatL">
-            <select name="" class="sys_directory">
-              <option selected="selected">請選擇分類</option>
+            <select id="sys_directory" name="sys_directory" class="sys_directory">
+              <option value="0" selected="selected">請選擇分類</option>
+              <!--
               <option>新聞 / 政治</option>
               <option>財經企管</option>
               <option>影視娛樂</option>
@@ -92,6 +94,7 @@
               <option>企業品牌 / 社團單位</option>
               <option>宗教 / 心靈</option>
               <option>其他</option>
+              -->
             </select>
           </div>
           <div class="clear"></div>
@@ -132,6 +135,7 @@
         </div>
       </div>
       <div class="right_footer"></div>
+      <input type="button" id="channel_set_publish" value="醜醜的發佈"/>
     </div>
   <div class="clear"></div>
 </div>

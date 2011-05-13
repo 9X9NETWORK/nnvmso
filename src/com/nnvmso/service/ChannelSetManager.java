@@ -42,7 +42,7 @@ public class ChannelSetManager {
 	private Object findByName(String name) {
 		return channelSetDao.findByNameSearch(name.trim().toLowerCase());
 	}
-
+	
 	public List<MsoChannel> findChannelsById(long channelSetId) {
 		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
 		MsoChannelManager channelMngr = new MsoChannelManager();
@@ -59,5 +59,5 @@ public class ChannelSetManager {
 		}
 		return results;
 	}
-
+	
 }
