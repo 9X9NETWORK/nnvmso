@@ -39,8 +39,11 @@ public class ChannelSetManager {
 		}
 	}
 	
-	public ChannelSet save(ChannelSet channelSet) {
-		
+	public ChannelSet findBybeautifulUrl(String url) {
+		return channelSetDao.findByBeautifulUrl(url);
+	}
+
+	public ChannelSet save(ChannelSet channelSet) {	
 		//NOTE check name existence if needed
 		channelSet.setUpdateDate(new Date());
 		channelSetDao.save(channelSet);
@@ -54,8 +57,7 @@ public class ChannelSetManager {
 	
 	public List<MsoChannel> findChannelsById(long channelSetId) {
 		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
-		MsoChannelManager channelMngr = new MsoChannelManager();
-		
+		MsoChannelManager channelMngr = new MsoChannelManager();		
 		List<ChannelSetChannel> cscs = cscMngr.findByChannelSetId(channelSetId); 
 		ArrayList<MsoChannel> results = new ArrayList<MsoChannel>();
 		
