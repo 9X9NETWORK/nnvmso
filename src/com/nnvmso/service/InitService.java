@@ -769,7 +769,7 @@ public class InitService {
 			Category category = categoryMngr.findByName("慈濟大愛電視");
 			channels = new MsoChannelManager().findPublicChannelsByCategoryId(category.getKey().getId());
 			for (int i = 0; i < channels.size(); i++) {
-				channels.get(i).setSeq(i);
+				channels.get(i).setSeq(i+1);
 			}
 		} else {
 			MsoChannelManager channelMngr = new MsoChannelManager();
