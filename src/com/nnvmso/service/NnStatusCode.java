@@ -40,6 +40,7 @@ public class NnStatusCode {
 	//350 subscription related
 	public static final int SUBSCRIPTION_ERROR = 350;
 	public static final int SUBSCRIPTION_DUPLICATE_CHANNEL = 351;
+	public static final int SUBSCRIPTION_SET_OCCUPIED = 352;
 	
 	//400 category related
 	public static final int CATEGORY_ERROR = 400;
@@ -49,6 +50,10 @@ public class NnStatusCode {
 	public static final int IPG_ERROR = 450;
 	public static final int IPG_INVALID =451;
 	
+	//500 set related
+	public static final int SET_ERROR = 450;
+	public static final int SET_INVALID =451;
+
 	//700 GAE error
 	public static final int GAE_ERROR = 700;
 	public static final int GAE_TIMEOUT = 701;
