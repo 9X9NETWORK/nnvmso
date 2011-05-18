@@ -19,8 +19,7 @@ public class AreaOwnershipDao extends GenericDao<AreaOwnership> {
 		super(AreaOwnership.class);
 	}
 	
-	public List<AreaOwnership> findByUserId(long userId) {
-		
+	public List<AreaOwnership> findByUserId(long userId) {		
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		ArrayList<AreaOwnership> detached = new ArrayList<AreaOwnership>();
 		
@@ -31,6 +30,25 @@ public class AreaOwnershipDao extends GenericDao<AreaOwnership> {
 			@SuppressWarnings("unchecked")
 			List<AreaOwnership> tmp = (List<AreaOwnership>)query.execute(userId);
 			detached = (ArrayList<AreaOwnership>) pm.detachCopyAll(tmp);
+		} catch (JDOObjectNotFoundException e) {
+		} finally {
+			pm.close();
+		}
+		return detached;
+	}
+
+	public AreaOwnership findByUserIdAndAreaNo(long userId, short areaNo) {		
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		AreaOwnership detached = null;		
+		try {
+			Query query = pm.newQuery(AreaOwnership.class);
+			query.setFilter("userId == userIdParam && areaNo == areaNoParam");
+			query.declareParameters("long userIdParam, short areaNoParam");
+			@SuppressWarnings("unchecked")
+			List<AreaOwnership> result = (List<AreaOwnership>)query.execute(userId, areaNo);
+			if (result.size() > 0) {
+				detached = pm.detachCopy(result.get(0));
+			} 
 		} catch (JDOObjectNotFoundException e) {
 		} finally {
 			pm.close();
