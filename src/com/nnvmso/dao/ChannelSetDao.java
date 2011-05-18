@@ -18,10 +18,41 @@ public class ChannelSetDao extends GenericDao<ChannelSet> {
 		super(ChannelSet.class);
 	}
 
-//	public ChannelSet findByName(String name) {
-//		return this.findByNameSearch(name.trim().toLowerCase());
-//	}
-
+	public ChannelSet findById(long id) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();		
+		ChannelSet cs = null;
+		try {
+			cs = pm.getObjectById(ChannelSet.class, id);
+			cs = pm.detachCopy(cs);
+		} catch (JDOObjectNotFoundException e) {
+		} finally {
+			pm.close();			
+		}
+		return cs;
+	}
+	
+	public ChannelSet findByBeautifulUrl(String url) {		
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		ChannelSet detached = null;
+		
+		try {
+			Query query = pm.newQuery(ChannelSet.class);
+			query.setFilter("beautifulUrl == beautifulUrlParam");
+			query.declareParameters("String beautifulUrlParam");
+			@SuppressWarnings("unchecked")
+			List<ChannelSet> channelSets = (List<ChannelSet>) query.execute(url);
+			if (channelSets.size() > 0) {
+				detached = pm.detachCopy(channelSets.get(0));
+			}
+		} catch (JDOObjectNotFoundException e) {
+		} finally {
+			pm.close();
+		}
+		
+		return detached;
+	}
+	
+	
 	public ChannelSet findByNameSearch(String nameSearch) {
 		
 		PersistenceManager pm = PMF.get().getPersistenceManager();
