@@ -65,6 +65,7 @@ public class MsoChannel implements Serializable {
 	public static final short CONTENTTYPE_PODCAST = 2;
 	public static final short CONTENTTYPE_YOUTUBE_CHANNEL = 3;
 	public static final short CONTENTTYPE_YOUTUBE_PLAYLIST = 4;
+	public static final short CONTENTTYPE_FACEBOOK = 5;
 	
 	@Persistent
 	private short status;
