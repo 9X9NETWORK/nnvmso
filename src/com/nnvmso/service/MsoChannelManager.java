@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import com.google.appengine.api.datastore.Key;
 import com.nnvmso.dao.MsoChannelDao;
 import com.nnvmso.lib.CacheFactory;
+import com.nnvmso.lib.FacebookLib;
 import com.nnvmso.lib.YouTubeLib;
 import com.nnvmso.model.Category;
 import com.nnvmso.model.CategoryChannel;
@@ -141,8 +142,16 @@ public class MsoChannelManager {
 		if (sourceUrl == null) {return null;}
 		MsoChannel channel = new MsoChannel(sourceUrl, user.getKey().getId());
 		channel.setContentType(this.getContentTypeByUrl(sourceUrl));
-		channel.setImageUrl("/WEB-INF/../images/processing.png");
-		channel.setName("Processing");
+		if (channel.getContentType() == MsoChannel.CONTENTTYPE_FACEBOOK) {
+			FacebookLib lib = new FacebookLib();
+			String[] info = lib.getFanpageInfo(sourceUrl);			
+			channel.setName(info[0]);
+			channel.setImageUrl(info[1]);
+			//channel.setImageUrl("/WEB-INF/../images/facebook-icon.gif");			
+		} else {
+			channel.setImageUrl("/WEB-INF/../images/processing.png");
+			channel.setName("Processing");
+		}
 		channel.setSourceUrlSearch(sourceUrl.toLowerCase());
 		channel.setStatus(MsoChannel.STATUS_PROCESSING);
 		channel.setUserId(user.getKey().getId());
@@ -157,6 +166,8 @@ public class MsoChannelManager {
 			type = MsoChannel.CONTENTTYPE_YOUTUBE_CHANNEL;
 		if (url.contains("http://www.youtube.com/view_play_list?p="))
 			type = MsoChannel.CONTENTTYPE_YOUTUBE_PLAYLIST;
+		if (url.contains("facebook.com")) 
+			type = MsoChannel.CONTENTTYPE_FACEBOOK;
 		return type;
 	}		
 		
@@ -166,7 +177,10 @@ public class MsoChannelManager {
 		if (!url.contains("youtube.com")) {
 			if (url.contains("deimos3.apple.com")) { //temp fix for demo
 				return url;
-			}			
+			}
+			if (url.contains("facebook.com")) {
+				return url;
+			}
 			String podcastInfo[] = tranService.getPodcastInfo(url);			
 			if (!podcastInfo[0].equals("200") || !podcastInfo[1].contains("xml")) {
 				log.info("invalid url:" + url);		
