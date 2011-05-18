@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -36,22 +37,24 @@ public class PlayerController {
 	/**
 	 * to become a 9x9 player, 1)delete cookie, 2)set fb info 
 	 */	
-	@RequestMapping("9x9")
+	@RequestMapping("{name}")
 	public String zooatomics(@RequestParam(value="mso",required=false) String mso, HttpServletRequest req, HttpServletResponse resp, Model model) {
 		PlayerService service = new PlayerService();
-		model = service.prepareBrand(model, mso, resp);		
+		model = service.prepareBrand(model, mso, resp);
 		return "player/zooatomics";
 	}
-
+	
 	/**
 	 * to become a 9x9 player, 1)delete cookie, 2)set fb info 
 	 */	
+	/*
 	@RequestMapping("daai")
-	public String daiah(@RequestParam(value="mso",required=false) String mso, HttpServletRequest req, HttpServletResponse resp, Model model) {
+	public String daai(@RequestParam(value="mso",required=false) String mso, HttpServletRequest req, HttpServletResponse resp, Model model) {
 		PlayerService service = new PlayerService();
 		model = service.prepareBrand(model, mso, resp);		
 		return "player/antelope";
 	}
+	*/
 	
 	/*
 	 * used for dns redirect watch dog 
