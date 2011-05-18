@@ -26,7 +26,13 @@ public class AreaOwnership implements Serializable {
 	private long userId;
 	
 	@Persistent
-	private long msoId;
+	private long setId;
+	
+	@Persistent
+	private String setName;
+
+	@Persistent
+	private String setImageUrl;
 	
 	@Persistent
 	private short areaNo;
@@ -58,12 +64,20 @@ public class AreaOwnership implements Serializable {
 		return userId;
 	}
 
-	public void setMsoId(long msoId) {
-		this.msoId = msoId;
+	public long getSetId() {
+		return setId;
 	}
 
-	public long getMsoId() {
-		return msoId;
+	public void setSetId(long setId) {
+		this.setId = setId;
+	}
+
+	public String getSetName() {
+		return setName;
+	}
+
+	public void setSetName(String setName) {
+		this.setName = setName;
 	}
 
 	public void setAreaNo(short areaNo) {
@@ -97,4 +111,13 @@ public class AreaOwnership implements Serializable {
 	public Date getUpdateDate() {
 		return updateDate;
 	}
+
+	public String getSetImageUrl() {
+		return setImageUrl;
+	}
+
+	public void setSetImageUrl(String setImageUrl) {
+		this.setImageUrl = setImageUrl;
+	}
+		
 }
