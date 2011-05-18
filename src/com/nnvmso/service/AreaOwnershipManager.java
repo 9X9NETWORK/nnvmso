@@ -33,5 +33,7 @@ public class AreaOwnershipManager {
 		return areaDao.findByUserId(userId);
 	}
 	
-	
+	public AreaOwnership findByUserIdAndAreaNo(long userId, short areaNo) {
+		return areaDao.findByUserIdAndAreaNo(userId, areaNo);
+	}	
 }
