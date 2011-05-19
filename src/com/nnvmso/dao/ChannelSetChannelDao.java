@@ -45,10 +45,8 @@ public class ChannelSetChannelDao extends GenericDao<ChannelSetChannel> {
 		
 		try {
 			Query query = pm.newQuery(ChannelSetChannel.class);
-			query.setFilter("channelSetId == channelSetIdParam");
-			query.setFilter("seq == seqParam");
-			query.declareParameters("long channelSetIdParam");
-			query.declareParameters("int seqParam");
+			query.setFilter("channelSetId == channelSetIdParam && seq == seqParam");
+			query.declareParameters("long channelSetIdParam, int seqParam");
 			@SuppressWarnings("unchecked")
 			List<ChannelSetChannel> list = (List<ChannelSetChannel>)query.execute(channelSetId, seq);
 			if (list.size() > 0)

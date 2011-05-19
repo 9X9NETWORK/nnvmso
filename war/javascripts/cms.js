@@ -17,6 +17,26 @@ var bubblePopupProperties =
   'themePath': '/images/cms'
 };
 
+var draggableProperties =
+  {
+    'start': function()
+    {
+      $('.ch_exist').RemoveBubblePopup();
+      $('.ch_normal').RemoveBubblePopup();
+    },
+    'stop': function()
+    {
+      channelSetArea.initBubbles();
+      channelPool.manageControls();
+    },
+    'appendTo': '#channel_set_area ul',
+    'disabled': false,
+    'opacity':  0.5,
+    'helper':   "clone",
+    'scroll':   false,
+    'revert':   'invalid'
+  };
+
 var populateBubbleContent = function(channel)
 {
   var span = $('<span></span>');
@@ -40,107 +60,176 @@ var populateBubbleContent = function(channel)
   return innerHtml;
 }
 
-var initChannelPool = function()
+var channelPool =
 {
-  $.getJSON('/CMSAPI/listOwnedChannels?msoId=' + $('#msoId').val(), function(channels)
+  'currentPosition': 0,
+  'slideWidth':      410,
+  'slides':          null,
+  'numberOfSlides':  null,
+  'populateSlides': function(channels)
+  {
+    for (var i = 0; i < channels.length; i = i + 8)
     {
-      for (var i = 0; i < channels.length; i = i + 8)
+      var slide = $('<div class="slide"><ul></ul></div>');
+      for (var j = i; j < channels.length && j < i + 8; j++)
       {
-        var slide = $('<div class="slide"><ul></ul></div>');
-        for (var j = i; j < channels.length && j < i + 8; j++)
-        {
-          var item = $('<li class="ch_normal"></li>');
-          var img = $('<img/>').attr('src', channels[j].imageUrl);
-          var p = $('<p class="ch_name"></p>').text(channels[j].name).textTruncate(20, '...');
-          item.append(img).append(p).appendTo(slide);
-          
-          var innerHtml = populateBubbleContent(channels[j]);
-          $('<span></span>').html(innerHtml).hide().appendTo(item);
-          
-        }
-        $('#slidesContainer').append(slide);
+        var item = $('<li class="ch_normal"></li>');
+        var img = $('<img/>').attr('src', channels[j].imageUrl);
+        var p = $('<p class="ch_name"></p>').text(channels[j].name).textTruncate(20, '...');
+        var hidden = $('<input type="hidden" name="channelId"/>').val(channels[j].key.id);
+        item.append(img).append(p).append(hidden).appendTo(slide);
+        item.draggable(draggableProperties);
+        
+        var innerHtml = populateBubbleContent(channels[j]);
+        $('<span></span>').html(innerHtml).hide().appendTo(item);
+        
       }
-      
-      var currentPosition = 0;
-      var slideWidth = 410;
-      var slides = $('.slide');
-      var numberOfSlides = slides.length;
-      
-      // Remove scrollbar in JS
-      $('#slidesContainer').css('overflow', 'hidden');
-      
-      // Wrap all .slides with #slideInner div
-      // Float left to display horizontally, readjust .slides width
-      slides
-        .wrapAll('<div id="slideInner"></div>')
-        .css({ 'float': 'left', 'width': slideWidth });
-      
-      // Set #slideInner width equal to total width of all slides
-      $('#slideInner').css('width', slideWidth * numberOfSlides);
-      
-      // Insert controls in the DOM
-      $('#slideshow')
-        .prepend('<span class="control" id="leftControl">Clicking moves left</span>')
-        .append('<span class="control" id="rightControl">Clicking moves right</span>');
-      
-      // Hide left arrow control on first load
-      manageControls(currentPosition);
-      
-      // Create event listeners for .controls clicks
-      $('.control').bind('click', function()
+      $('#slidesContainer').append(slide);
+    }
+    this.slides = $('.slide');
+    this.numberOfSlides = this.slides.length;
+  },
+  'init': function()
+  {
+    $.getJSON('/CMSAPI/listOwnedChannels?msoId=' + $('#msoId').val(), function(channels)
       {
-        // Determine new position
-        currentPosition = ($(this).attr('id') == 'rightControl') ? currentPosition + 1 : currentPosition - 1;
-        // Hide / show controls
-        manageControls(currentPosition);
-        // Move slideInner using margin-left
-        $('#slideInner').animate(
+        channelPool.populateSlides(channels);
+        
+        // Remove scrollbar in JS
+        $('#slidesContainer').css('overflow', 'hidden');
+        
+        // Wrap all .slides with #slideInner div
+        // Float left to display horizontally, readjust .slides width
+        $('.slide')
+          .wrapAll('<div id="slideInner"></div>')
+          .css({ 'float': 'left', 'width': channelPool.slideWidth });
+        
+        // Set #slideInner width equal to total width of all slides
+        $('#slideInner').css('width', channelPool.slideWidth * channelPool.numberOfSlides);
+        
+        // Insert controls in the DOM
+        $('#slideshow')
+          .prepend('<span class="control" id="leftControl">Clicking moves left</span>')
+          .append('<span class="control" id="rightControl">Clicking moves right</span>');
+        
+        // Hide left arrow control on first load
+        channelPool.manageControls();
+        
+        // Create event listeners for .controls clicks
+        $('.control').click(function(event)
         {
-          'marginLeft': slideWidth * (-currentPosition)
-        });
-      });
-      
-      // manageControls: Hides and Shows controls depending on currentPosition
-      function manageControls(position)
-      {
-        // Hide left arrow if position is first slide
-        if(position == 0) {
-          $('#leftControl').hide();
-        } else {
-          $('#leftControl').show();
-        }
-        // Hide right arrow if position is last slide
-        if(position == numberOfSlides - 1) {
-          $('#rightControl').hide();
-        } else {
-          $('#rightControl').show();
-        }
-        $('.ch_normal').RemoveBubblePopup();
-        var slideDom = $('#slideInner .slide').get(position);
-        $(slideDom).find('li').each(function(index, element)
+          // Determine new position
+          channelPool.currentPosition = ($(event.target).attr('id') == 'rightControl') ? channelPool.currentPosition + 1 : channelPool.currentPosition - 1;
+          // Hide / show controls
+          channelPool.manageControls();
+          // Move slideInner using margin-left
+          $('#slideInner').animate(
           {
-            bubblePopupProperties['innerHtml'] = $(this).find('span').html();
-            $(this).CreateBubblePopup(bubblePopupProperties);
+            'marginLeft': channelPool.slideWidth * (-channelPool.currentPosition)
           });
-      }
-    });
-}
+        });
+        
+        $('#slidesContainer').droppable(
+          {
+            'accept': '.ch_exist',
+            'drop': function(event, ui)
+            {
+              var seq = $(ui.draggable).index('#channel_set_area li.ch_none') + 1;
+              var parameters = {
+                'channelSetId': $('#cc_id').val(),
+                'seq':          seq
+              }
+              $.post('/CMSAPI/removeChannelSetChannel', parameters, function() { channelSetArea.reload(); });
+            }
+          });
+      });
+  },
+  // manageControls: Hides and Shows controls depending on currentPosition
+  'manageControls': function ()
+  {
+    // Hide left arrow if position is first slide
+    if(this.currentPosition == 0) {
+      $('#leftControl').hide();
+    } else {
+      $('#leftControl').show();
+    }
+    // Hide right arrow if position is last slide
+    if(this.currentPosition == this.numberOfSlides - 1) {
+      $('#rightControl').hide();
+    } else {
+      $('#rightControl').show();
+    }
+    $('.ch_normal').RemoveBubblePopup();
+    var slideDom = $('#slideInner .slide').get(this.currentPosition);
+    $(slideDom).find('li').each(function(index, element)
+      {
+        bubblePopupProperties['innerHtml'] = $(this).find('span').html();
+        $(this).CreateBubblePopup(bubblePopupProperties);
+      });
+  }
+};
 
-var initChannelSetArea = function()
+var channelSetArea =
 {
-  $.getJSON('/CMSAPI/defaultChannelSetChannels?msoId=' + $('#msoId').val(), function(channels)
+  'reload': function()
+  {
+    $('.ch_exist').each(function()
+      {
+        $(this).RemoveBubblePopup();
+      });
+    $('.ch_exist').html('').removeClass('ch_exist').draggable({ 'disabled': true });
+    this.init();
+  },
+  'initBubbles': function()
+  {
+    $('.ch_exist').each(function()
+      {
+        bubblePopupProperties['innerHtml'] = $(this).find('span').html();
+        $(this).CreateBubblePopup(bubblePopupProperties);
+      });
+  },
+  'init': function()
+  {
+    $.getJSON('/CMSAPI/defaultChannelSetChannels?msoId=' + $('#msoId').val(), function(channels)
     {
       for (var i = 0; i < channels.length; i++)
       {
         var seq = channels[i].seq;
         var img = $('<img/>').attr('src', channels[i].imageUrl);
-        var dom = $('#channel_set_area li').get(seq);
+        var dom = $('#channel_set_area li').get(seq - 1);
         $(dom).addClass('ch_exist').append(img);
-        bubblePopupProperties['innerHtml'] = populateBubbleContent(channels[i]);
-        $(dom).CreateBubblePopup(bubblePopupProperties);
+        $('<span></span>').hide().html(populateBubbleContent(channels[i])).appendTo(dom);
+        channelSetArea.initBubbles();
+        $(dom).draggable(draggableProperties);
       }
+      $('.ch_none').droppable(
+        {
+          accept: 'li',
+          drop: function(event, ui)
+          {
+            var from = $(ui.draggable).index('#channel_set_area li.ch_none') + 1;
+            var to = $(event.target).index('#channel_set_area li.ch_none') + 1;
+            if (from > 0) {
+              var parameters = {
+                'channelSetId': $('#cc_id').val(),
+                'from':         from,
+                'to':           to
+              };
+              $.post('/CMSAPI/changeChannelSetChannel', parameters, function() { channelSetArea.reload(); });
+            } else {
+              var channelId = $(ui.draggable).find('input[name="channelId"]').val();
+              var parameters = {
+                'channelSetId': $('#cc_id').val(),
+                'channelId':    channelId,
+                'seq':          to
+              }
+              $.post('/CMSAPI/addChannelSetChannel', parameters, function() { channelSetArea.reload(); });
+            }
+          }
+        });
     });
-}
+  }
+};
 
 var initChannelSetInfo = function()
 {
@@ -251,9 +340,9 @@ var publishChannelSet = function()
 $(document).ready(function()
 {
   
-  initChannelPool();
-  initChannelSetArea();
   initChannelSetInfo();
+  channelPool.init();
+  channelSetArea.init();
   
   $('#upload_image').click(uploadImage);
   $('#publish_channel_set').click(publishChannelSet);

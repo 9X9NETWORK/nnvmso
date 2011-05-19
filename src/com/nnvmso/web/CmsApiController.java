@@ -18,9 +18,11 @@ import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.service.CategoryChannelSetManager;
 import com.nnvmso.service.CategoryManager;
+import com.nnvmso.service.ChannelSetChannelManager;
 import com.nnvmso.service.ChannelSetManager;
 import com.nnvmso.service.CmsApiService;
 import com.nnvmso.service.ContentOwnershipManager;
+import com.nnvmso.service.MsoChannelManager;
 import com.nnvmso.service.MsoManager;
 
 @Controller
@@ -151,5 +153,47 @@ public class CmsApiController {
 		}
 		
 		return "OK";
+	}
+	
+	@RequestMapping("changeChannelSetChannel")
+	public void changeChannelSetChannel(@RequestParam Long  channelSetId,
+	                                    @RequestParam Short from,
+	                                    @RequestParam Short to) {
+		
+		logger.info("channelSetId = " + channelSetId + ", from = " + from + ", to = " + to);
+		
+		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
+		cscMngr.moveSeq(channelSetId, from, to);
+	}
+	
+	@RequestMapping("addChannelSetChannel")
+	public void addChannelSetChannel(@RequestParam Long  channelSetId,
+	                                 @RequestParam Long  channelId,
+	                                 @RequestParam Short seq) {
+		
+		logger.info("channelSetId = " + channelSetId + ", channelId = " + channelId + ", seq = " + seq);
+		
+		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		
+		MsoChannel channel = channelMngr.findById(channelId);
+		if (channel == null) {
+			logger.warning("Invalid channelId");
+			return;
+		}
+		channel.setSeq(seq);
+		cscMngr.addChannel(channelSetId, channel);
+		
+	}
+	
+	@RequestMapping("removeChannelSetChannel")
+	public void removeChannelSetChannel(@RequestParam Long  channelSetId,
+	                                    @RequestParam Short seq) {
+		
+		logger.info("channelSetId = " + channelSetId + ", seq = " + seq);
+		
+		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
+		cscMngr.removeChannel(channelSetId, seq);
+		
 	}
 }

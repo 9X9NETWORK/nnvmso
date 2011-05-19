@@ -46,7 +46,7 @@ public class ChannelSetChannelManager {
 		this.save(csc1);
 		if (csc2 != null) {
 			csc2.setSeq(seq1);
-			this.save(csc1);
+			this.save(csc2);
 		}
 		return true;
 	}

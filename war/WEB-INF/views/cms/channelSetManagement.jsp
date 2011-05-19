@@ -13,6 +13,7 @@
 <link href="/stylesheets/cms.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4dcccc98718a5dbe"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.0/jquery.min.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/jquery-ui.min.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.bubble.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.textTruncate.js"></script>
 <script type="text/javascript" src="/javascripts/cms.js"></script>
@@ -108,36 +109,36 @@
   <div class="right_content floatL">
     <div class="right_body">
       <div class="right_title">編排頻道網</div>
-        <div class="ch_arrange" id="channel_set_area">
-          <div class="ch_bg">
-            <ul>
-              <!--
-              <li class="ch_none ch_exist"><img src="http://i2.ytimg.com/vi/qxwPtIOs9Q8/default.jpg" width="93" height="56" alt=""/></li>
-              -->
-              <li class="ch_none"></li>
-              <li class="ch_none"></li>
-              <li class="ch_none"></li>
-              <li class="ch_none"></li>
-              <li class="ch_none"></li>
-              <li class="ch_none"></li>
-              <li class="ch_none"></li>
-              <li class="ch_none"></li>
-              <li class="ch_none"></li>
-            </ul>
-            <div class="clear"></div>
-          </div>
+      <div class="ch_arrange" id="channel_set_area">
+        <div class="ch_bg">
+          <ul>
+            <!--             
+            <li class="ch_none ch_exist"><img src="http://i2.ytimg.com/vi/qxwPtIOs9Q8/default.jpg" width="93" height="56" alt=""/></li>
+            -->
+            <li class="ch_none"></li>
+            <li class="ch_none"></li>
+            <li class="ch_none"></li>
+            <li class="ch_none"></li>
+            <li class="ch_none"></li>
+            <li class="ch_none"></li>
+            <li class="ch_none"></li>
+            <li class="ch_none"></li>
+            <li class="ch_none"></li>
+          </ul>
+          <div class="clear"></div>
         </div>
-        <div class="ch_pool">
-          <p class="ch_sub_title">請選擇頻道拖曳至頻道網<span>將頻道拖曳回來即可從頻道網中移除</span></p>
-          <div id="slideshow">
-            <div id="slidesContainer">
-            </div>
+      </div>
+      <div class="ch_pool">
+        <p class="ch_sub_title">請選擇頻道拖曳至頻道網<span>將頻道拖曳回來即可從頻道網中移除</span></p>
+        <div id="slideshow">
+          <div id="slidesContainer">
           </div>
         </div>
       </div>
-      <div class="right_footer"></div>
-      <input type="button" id="publish_channel_set" value="醜醜的發佈按鈕"/>
     </div>
+    <div class="right_footer"></div>
+    <input type="button" id="publish_channel_set" value="醜醜的發佈按鈕"/>
+  </div>
   <div class="clear"></div>
 </div>
 </body>
