@@ -9,7 +9,6 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <link href="/stylesheets/jquery.bubble.css" rel="stylesheet" type="text/css"/>
-<link href="/stylesheets/cms-doc.css" rel="stylesheet" type="text/css"/>
 <link href="/stylesheets/cms.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4dcccc98718a5dbe"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.0/jquery.min.js"></script>
@@ -22,11 +21,11 @@
 <body>
 <div class="header">
   <input type="hidden" id="msoId" value="${msoId}"/>
-  <div class="floatL"><img alt="" src="${mso.logoUrl}"/></div>
+  <div class="floatL"><img alt="" src="${msoLogo}"/></div>
   <div class="floatR">
     <p><spring:message code="cms.header.welcome"/> <span><c:out value="${mso.contactEmail}"/></span></p>
     <a href="#" class="setup"></a>
-    <a href="#" class="logout"></a>
+    <a href="${logoutUrl}" class="logout"></a>
   </div>
 </div>
 <div class="content">

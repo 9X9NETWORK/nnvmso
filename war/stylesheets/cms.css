@@ -138,3 +138,32 @@ p{ margin-left:5px;}
   margin:0 auto;
   width:960px;
 }
+
+/*slide end*/
+
+.loginPanel{ background:url(/images/cms/bg_login_panel.png) no-repeat; width:619px; height:388px; margin:auto; padding:20px 0 0 20px}
+.loginContent{ padding-top:50px;}
+.loginPanel img { width: 165px; height: 85px; }
+.loginPanel label{ width:100px; text-align:right; padding-right:20px; white-space:nowrap;}
+.loginPanel form{width:500px; padding: 30px 0 0 90px;}
+a.btnLogin{ background:url(/images/cms/btn_login.png) no-repeat; width:95px; height:32px; display:block;  float:left;}
+a.btnLogin:hover { background:url(/images/cms/btn_login_hover.png) no-repeat;}
+
+
+/* Doc Styles */
+
+table{
+    margin:auto;
+    display:table;
+    border-collapse:collapse;
+    border-spacing:0px;
+    empty-cells:show;
+}
+div.page{
+    margin:0px auto;
+}
+.button{
+    display:table-cell;
+}
+
+.error { color: red; }

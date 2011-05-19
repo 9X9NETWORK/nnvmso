@@ -34,8 +34,8 @@ public class NnUserDao extends GenericDao<NnUser> {
 		return user;
 	}
 	
-	// return TYPE_TBC only
-	public NnUser findAuthenticatedMsoUser(String email, String password, long msoId) {
+	// return TYPE_3X3 only
+	public NnUser findAuthenticated3x3User(String email, String password, long msoId) {
 		NnUser user = null;
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
@@ -43,7 +43,7 @@ public class NnUserDao extends GenericDao<NnUser> {
 			query.setFilter("email == emailParam && msoId == msoIdParam && type == typeParam");
 			query.declareParameters("String emailParam, long msoIdParam, short typeParam");				
 			@SuppressWarnings("unchecked")
-			List<NnUser> results = (List<NnUser>) query.execute(email, msoId, NnUser.TYPE_TBC);
+			List<NnUser> results = (List<NnUser>) query.execute(email, msoId, NnUser.TYPE_3X3);
 			if (results.size() > 0) {
 				user = results.get(0);		
 				byte[] proposedDigest = AuthLib.passwordDigest(password, user.getSalt());
