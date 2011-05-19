@@ -39,7 +39,7 @@ public class CategoryDao extends GenericDao<Category> {
 		Category detached = null;
 		try {
 			Query query = pm.newQuery(Category.class);
-			query.setFilter("name == '" + NnStringUtil.capitalize(name) + "'");
+			query.setFilter("name == " + NnStringUtil.escapedQuote(name));
 			@SuppressWarnings("unchecked")
 			List<Category> results = (List<Category>) query.execute();			
 			if (results.size() > 0) {

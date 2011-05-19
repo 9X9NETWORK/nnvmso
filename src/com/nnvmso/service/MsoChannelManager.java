@@ -42,8 +42,10 @@ public class MsoChannelManager {
 	 */
 	public void create(MsoChannel channel, List<Category> categories) {
 		Date now = new Date();
-		if (channel.getSourceUrl() != null) 
+		if (channel.getSourceUrl() != null) {
 			channel.setSourceUrl(channel.getSourceUrl().trim());
+			channel.setSourceUrlSearch(channel.getSourceUrl().toLowerCase());
+		}
 		if (channel.getName() != null)
 			channel.setNameSearch(channel.getName().trim().toLowerCase());
 		channel.setCreateDate(now);
@@ -78,8 +80,10 @@ public class MsoChannelManager {
 	 *       
 	 */
 	public MsoChannel save(MsoChannel channel) {
-		if (channel.getSourceUrl() != null)
+		if (channel.getSourceUrl() != null) {
 			channel.setSourceUrl(channel.getSourceUrl().trim());
+			channel.setSourceUrlSearch(channel.getSourceUrl().toLowerCase());
+		}
 		if (channel.getName() != null)
 			channel.setNameSearch(channel.getName().trim().toLowerCase());
 		

@@ -43,7 +43,6 @@ public class InitService {
 	public void initMsoAndCategories(boolean debug) {
 		initializeMso1AndCategories(debug);
 		initializeMso2AndCategories(debug);	
-		initializeMso3AndCategories(debug);
 	}	
 	
 	public void deleteAll() {
@@ -203,7 +202,7 @@ public class InitService {
 		log.info("initializeMso2AndCategories is done");
 	}		
 	
-	private void initializeMso3AndCategories(boolean debug) {
+	public void initializeMso3AndCategories(boolean debug) {
 		//a default 3x3 owner (MSO)
 		MsoManager msoMngr = new MsoManager();
 		Mso mso = new Mso("daai", "daai", "daai@9x9.tv", Mso.TYPE_3X3);
@@ -1265,7 +1264,7 @@ public class InitService {
 				"http://podcast.daaitv.org/Daai_TV_Podcast/jing_si_yu/rss.xml",
 				"http://podcast.daaitv.org/Daai_TV_Podcast/fa_pi_ru_shui/rss.xml",
 				"http://podcast.daaitv.org/Daai_TV_Podcast/da_ai_dian_shi/rss.xml",
-				"http://www.youtube.com/playlist?p=236DA856894AFC8E",
+				"http://www.youtube.com/view_play_list?p=236DA856894AFC8E",
 				"http://www.youtube.com/user/DaAiVideo"
 		};
 		return urls;

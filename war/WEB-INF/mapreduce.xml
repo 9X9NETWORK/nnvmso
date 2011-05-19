@@ -37,7 +37,7 @@
       <value template="optinonal">String</value>
     </property>
     <property>
-      <name human="Property Type (int, boolean, date, string)">propertyType</name>
+      <name human="Property Type (int, boolean, date, string, long)">propertyType</name>
       <value template="optinonal">String</value>
     </property>
   </configuration>  

@@ -57,13 +57,15 @@ public class CmsController {
 			return "cms/channelSetManagement";
 		} else {
 			Cookie[] cookies = request.getCookies();
-			for (Cookie cookie : cookies) {
-				logger.info(cookie.getName());
-				if (cookie.getName().length() > 0 && cookie.getName().compareTo("cms_login_" + msoName) == 0) {
-					String[] split = cookie.getValue().split("\\|");
-					if (split.length >= 2) {
-						model.addAttribute("email", split[0]);
-						model.addAttribute("password", split[1]);
+			if (cookies != null) {
+				for (Cookie cookie : cookies) {
+					logger.info(cookie.getName());
+					if (cookie.getName().length() > 0 && cookie.getName().compareTo("cms_login_" + msoName) == 0) {
+						String[] split = cookie.getValue().split("\\|");
+						if (split.length >= 2) {
+							model.addAttribute("email", split[0]);
+							model.addAttribute("password", split[1]);
+						}
 					}
 				}
 			}
