@@ -156,7 +156,7 @@
     <li>CMS
         <ul>
             <li>
-                <a href="/admin/ownership/list">list all ownership</a></li>
+                <a href="/admin/cms/ownership/list">list all ownership</a></li>
             <li>list channel/channel set owned by mso<br/>
                 http://host/admin/cms/ownership/list?msoId=207
             </li>
