@@ -657,6 +657,7 @@ public class InitService {
 			String[] urls = this.getMso3OwnedChannels();
 			this.channelsCreate(urls, categories, user.getKey().getId(), trans);
 			for (String url : urls) {
+				url = channelMngr.verifyUrl(url);
 				MsoChannel channel = channelMngr.findBySourceUrlSearch(url);
 				ownershipMngr.create(new ContentOwnership(), mso, channel);
 			}
@@ -669,6 +670,8 @@ public class InitService {
 		MsoChannelManager channelMngr = new MsoChannelManager();
 		CategoryManager categoryMngr = new CategoryManager();
 		for (String url : urls) {
+			log.info(url);
+			url = channelMngr.verifyUrl(url);
 			MsoChannel channel = channelMngr.findBySourceUrlSearch(url);
 			if (channel != null) {
 				categoryMngr.changeCategory(channel.getKey().getId(), categories);				
@@ -717,7 +720,7 @@ public class InitService {
 		} else {
 			String[] urls = this.getMso1DefaultIpg();
 			for (int i=0; i< urls.length; i++) {
-				MsoChannel c = channelMngr.findBySourceUrlSearch(urls[i]);
+				MsoChannel c = channelMngr.findBySourceUrlSearch(channelMngr.verifyUrl(urls[i]));
 				System.out.println("i=" + i + ";" + urls[i]);
 				System.out.println("channel=" + c.getName() + ";");
 				MsoIpg msoIpg = new MsoIpg(mso.getKey().getId(), c.getKey().getId(), i+1, MsoIpg.TYPE_GENERAL);			
@@ -746,7 +749,7 @@ public class InitService {
 			String[] seqs = this.getMso2IpgSeq();
 			System.out.println(urls.length + seqs.length);
 			for (int i=0; i<urls.length; i++) {
-				MsoChannel c = cMngr.findBySourceUrlSearch(urls[i]);
+				MsoChannel c = cMngr.findBySourceUrlSearch(cMngr.verifyUrl(urls[i]));
 				System.out.println("i=" + i + ";" + urls[i]);
 				System.out.println("channel=" + c.getName() + ";");				
 				MsoIpg msoIpg = new MsoIpg(mso.getKey().getId(), c.getKey().getId(), Integer.parseInt(seqs[i]), MsoIpg.TYPE_GENERAL);					
@@ -776,7 +779,7 @@ public class InitService {
 			String[] seqs = this.getMso3ChannelSetSeqs();
 			log.info(urls.length + " " + seqs.length);
 			for (int i = 0; i < urls.length; i++) {
-				MsoChannel channel = channelMngr.findBySourceUrlSearch(urls[i]);
+				MsoChannel channel = channelMngr.findBySourceUrlSearch(channelMngr.verifyUrl(urls[i]));
 				log.info("i=" + i + ";" + urls[i]);
 				log.info("channel=" + channel.getName() + ";");
 				channel.setSeq(Integer.parseInt(seqs[i]));
@@ -1143,7 +1146,7 @@ public class InitService {
 				"http://www.youtube.com/user/chinatv",
 				"http://www.youtube.com/user/pts",                                                                                            
 				"http://www.youtube.com/user/zimeitao",
-				"http://www.youtube.com/user/trailers",
+				// "http://www.youtube.com/user/trailers", // can not pass formatCheck
 				"http://www.youtube.com/user/twfoxmovies",
 				"http://www.youtube.com/user/2010jaychou",
 				"http://www.youtube.com/user/FoxBroadcasting",
@@ -1295,7 +1298,6 @@ public class InitService {
 				"http://feeds.feedburner.com/earth-touch_featured_720p?format=xml",
 				"http://www.youtube.com/user/SHAYTARDS?feature=chclk",
 				"http://www.discovery.com/radio/xml/discovery_video.xml",
-				"http://feeds.feedburner.com/SelfPsychologyPodcast?format=xml",
 				"http://www.youtube.com/user/nba",
 				"http://feeds.feedburner.com/caliextralarge?format=xml",
 				"http://lltv.libsyn.com/rss"				
@@ -1479,7 +1481,6 @@ public class InitService {
 	}
 	public String[] getMso1ReligionChannels() {
 		String[] urls = {		
-				"http://feeds.feedburner.com/SelfPsychologyPodcast?format=xml",
 				"http://www.youtube.com/user/patcondell",
 				"http://feeds.churchmediadesign.tv/churchmediadesign?format=xml",
 				"http://ishafoundation.blip.tv/rss",
@@ -1525,7 +1526,7 @@ public class InitService {
 		return urls;
 	}
 	
-	public String[] getMso1DefaultChannels() {
+	public String[] getMso1DefaultChannels() { // it seems not used ?
 		String[] urls = {
 				"http://feeds.visionontv.net/visionontv/Olympics?format=xml",
 				"http://feeds.feedburner.com/cnet/cartechpodcastvideo?format=xml",
@@ -1542,7 +1543,6 @@ public class InitService {
 				"http://feeds.feedburner.com/cnet/buzzreport?format=xml",
 				"http://feeds.feedburner.com/earth-touch_featured_720p?format=xml",
 				"http://www.youtube.com/user/SHAYTARDS?feature=chclk",
-				"http://feeds.feedburner.com/SelfPsychologyPodcast?format=xml",
 				"http://www.youtube.com/user/nba",
 				"http://feeds.feedburner.com/caliextralarge?format=xml",
 				"http://lltv.libsyn.com/rss"
