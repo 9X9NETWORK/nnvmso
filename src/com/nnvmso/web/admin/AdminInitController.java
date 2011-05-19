@@ -72,7 +72,7 @@ public class AdminInitController {
 		return "admin/groundStart";
 	}	
 
-	private void sendEmail(String subject) {
+	public void sendEmail(String subject) {
 		Properties props = new Properties();
         Session session = Session.getDefaultInstance(props, null);
         String msgBody = "done";
@@ -123,18 +123,16 @@ public class AdminInitController {
 		return NnNetUtil.textReturn("OK");
 	}
 	
-	@SuppressWarnings("unused")
 	@RequestMapping("initMso3Channels")
-	private ResponseEntity<String> initMso3Channels(@RequestParam boolean devel, @RequestParam boolean trans, HttpServletRequest req) {
+	public ResponseEntity<String> initMso3Channels(@RequestParam boolean devel, @RequestParam boolean trans, HttpServletRequest req) {
 		initService.setRequest(req);
 		initService.createMso3OwnedChannels(devel, trans);
 		this.sendEmail("step6 done: create daai channels");
 		return NnNetUtil.textReturn("OK");
 	}
 	
-	@SuppressWarnings("unused")
 	@RequestMapping("initMso3ChannelSet")
-	private ResponseEntity<String> initMso3ChannelSet(@RequestParam boolean devel, HttpServletRequest req) {
+	public ResponseEntity<String> initMso3ChannelSet(@RequestParam boolean devel, HttpServletRequest req) {
 		initService.setRequest(req);
 		initService.createMso3ChannelSet(devel);
 		this.sendEmail("step7 done: daai channel set");
@@ -188,10 +186,10 @@ public class AdminInitController {
 		return NnNetUtil.textReturn("You will receive an email when it is done.");
 	}
 	
-	@SuppressWarnings("unused")
 	@RequestMapping("initProStep6")
-	private ResponseEntity<String> initProStep6(@RequestParam boolean devel, @RequestParam boolean trans, @RequestParam boolean debug, HttpServletRequest req) {
+	public ResponseEntity<String> initProStep6(@RequestParam boolean devel, @RequestParam boolean trans, @RequestParam boolean debug, HttpServletRequest req) {
 		initService.setRequest(req);
+		initService.initializeMso3AndCategories(debug);
 		QueueFactory.getDefaultQueue().add(
 			      TaskOptions.Builder.withUrl("/admin/init/initMso3Channels")
 			         .param("devel", String.valueOf(devel))
@@ -200,9 +198,8 @@ public class AdminInitController {
 		return NnNetUtil.textReturn("You will receive an email when it is done.\nDo no proceed to step7 until all the channels are ready.");
 	}
 	
-	@SuppressWarnings("unused")
 	@RequestMapping("initProStep7")
-	private ResponseEntity<String> initProStep7(@RequestParam boolean devel, @RequestParam boolean trans, @RequestParam boolean debug, HttpServletRequest req) {
+	public ResponseEntity<String> initProStep7(@RequestParam boolean devel, @RequestParam boolean trans, @RequestParam boolean debug, HttpServletRequest req) {
 		initService.setRequest(req);
 		QueueFactory.getDefaultQueue().add(
 			      TaskOptions.Builder.withUrl("/admin/init/initMso3ChannelSet")
