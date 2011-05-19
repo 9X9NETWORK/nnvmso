@@ -57,7 +57,6 @@ public class CmsController {
 			return "cms/channelSetManagement";
 		} else {
 			Cookie[] cookies = request.getCookies();
-			logger.info(cookies.length + " cookies");
 			for (Cookie cookie : cookies) {
 				logger.info(cookie.getName());
 				if (cookie.getName().length() > 0 && cookie.getName().compareTo("cms_login_" + msoName) == 0) {

@@ -62,11 +62,11 @@ var populateBubbleContent = function(channel)
 
 var channelPool =
 {
-  'currentPosition': 0,
-  'slideWidth':      410,
-  'slides':          null,
-  'numberOfSlides':  null,
-  'populateSlides': function(channels)
+  currentPosition: 0,
+  slideWidth:      410,
+  slides:          null,
+  numberOfSlides:  null,
+  populateSlides: function(channels)
   {
     for (var i = 0; i < channels.length; i = i + 8)
     {
@@ -89,7 +89,7 @@ var channelPool =
     this.slides = $('.slide');
     this.numberOfSlides = this.slides.length;
   },
-  'init': function()
+  init: function()
   {
     $.getJSON('/CMSAPI/listOwnedChannels?msoId=' + $('#msoId').val(), function(channels)
       {
@@ -145,7 +145,7 @@ var channelPool =
       });
   },
   // manageControls: Hides and Shows controls depending on currentPosition
-  'manageControls': function ()
+  manageControls: function ()
   {
     // Hide left arrow if position is first slide
     if(this.currentPosition == 0) {
@@ -164,23 +164,36 @@ var channelPool =
     $(slideDom).find('li').each(function(index, element)
       {
         bubblePopupProperties['innerHtml'] = $(this).find('span').html();
-        $(this).CreateBubblePopup(bubblePopupProperties);
+        var channelId = $(this).find('input[name=channelId]').val();
+        if($.inArray(channelId, channelSetArea.channelIds) >= 0) {
+          $(this).addClass('ch_disable');
+          $(this).removeClass('ch_normal');
+          $(this).draggable({ disabled: true });
+          $(this).RemoveBubblePopup();
+        } else{
+          $(this).removeClass('ch_disable');
+          $(this).addClass('ch_normal');
+          $(this).draggable({ disabled: false });
+          $(this).CreateBubblePopup(bubblePopupProperties);
+        }
       });
   }
 };
 
 var channelSetArea =
 {
-  'reload': function()
+  channelIds: [],
+  reload: function()
   {
     $('.ch_exist').each(function()
       {
         $(this).RemoveBubblePopup();
       });
     $('.ch_exist').html('').removeClass('ch_exist').draggable({ 'disabled': true });
+    this.channelIds = [];
     this.init();
   },
-  'initBubbles': function()
+  initBubbles: function()
   {
     $('.ch_exist').each(function()
       {
@@ -188,7 +201,7 @@ var channelSetArea =
         $(this).CreateBubblePopup(bubblePopupProperties);
       });
   },
-  'init': function()
+  init: function()
   {
     $.getJSON('/CMSAPI/defaultChannelSetChannels?msoId=' + $('#msoId').val(), function(channels)
     {
@@ -201,7 +214,9 @@ var channelSetArea =
         $('<span></span>').hide().html(populateBubbleContent(channels[i])).appendTo(dom);
         channelSetArea.initBubbles();
         $(dom).draggable(draggableProperties);
+        channelSetArea.channelIds.push(channels[i].key.id.toString());
       }
+      channelPool.manageControls();
       $('.ch_none').droppable(
         {
           accept: 'li',
