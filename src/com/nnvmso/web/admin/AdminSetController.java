@@ -12,9 +12,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.model.ChannelSet;
+import com.nnvmso.model.ContentOwnership;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.service.ChannelSetManager;
+import com.nnvmso.service.ContentOwnershipManager;
 import com.nnvmso.service.MsoChannelManager;
 import com.nnvmso.service.MsoManager;
 
@@ -54,6 +56,11 @@ public class AdminSetController {
 			channels.get(i).setSeq(Short.valueOf(seqArr[i]));
 		}		
 		channelSetMngr.create(channelSet, channels);						
+		
+		//channelSet ownership
+		ContentOwnershipManager ownershipMngr = new ContentOwnershipManager();
+		ownershipMngr.create(new ContentOwnership(), mso, channelSet);
+		
 		return NnNetUtil.textReturn("OK");
 	}	
 	
