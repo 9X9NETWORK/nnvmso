@@ -107,9 +107,6 @@ public class CmsController {
 			return "cms/login";
 		}
 		
-		//model.addAttribute("mso", mso);
-		//model.addAttribute("msoId", mso.getKey().getId());
-		//model.addAttribute("logoutUrl", "/" + msoName + "/logout");
 		HttpSession session = sessionService.getSession();
 		session.setAttribute("mso", mso);
 		sessionService.saveSession(session);
