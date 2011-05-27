@@ -167,11 +167,13 @@ public class TranscodingServiceController {
 			String callbackUrl = transcodingEnv[1];		
 			List<Channel> cs = new ArrayList<Channel>();
 			for (MsoChannel c : channels) {
-				cs.add(new Channel(String.valueOf(c.getKey().getId()), 
-						           c.getSourceUrl(), 
-						           c.getTranscodingUpdateDate(), 
-						           String.valueOf(c.getEnforceTranscoding()),
-						           String.valueOf(c.getSubscriptionCount())));
+				if (c.getContentType() != MsoChannel.CONTENTTYPE_FACEBOOK) {
+					cs.add(new Channel(String.valueOf(c.getKey().getId()), 
+							           c.getSourceUrl(), 
+							           c.getTranscodingUpdateDate(), 
+							           String.valueOf(c.getEnforceTranscoding()),
+							           String.valueOf(c.getSubscriptionCount())));
+				}
 			}
 			info.setErrorCode(String.valueOf(NnStatusCode.SUCCESS));
 			info.setErrorReason("Success");
