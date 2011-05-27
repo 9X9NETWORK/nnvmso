@@ -151,13 +151,14 @@ public class MsoChannelManager {
 			String[] info = lib.getFanpageInfo(sourceUrl);			
 			channel.setName(info[0]);
 			channel.setImageUrl(info[1]);
+			channel.setStatus(MsoChannel.STATUS_SUCCESS);
 			//channel.setImageUrl("/WEB-INF/../images/facebook-icon.gif");			
 		} else {
 			channel.setImageUrl("/WEB-INF/../images/processing.png");
 			channel.setName("Processing");
+			channel.setStatus(MsoChannel.STATUS_PROCESSING);
 		}
 		channel.setSourceUrlSearch(sourceUrl.toLowerCase());
-		channel.setStatus(MsoChannel.STATUS_PROCESSING);
 		channel.setUserId(user.getKey().getId());
 		channel.setPublic(false);
 		return channel;
