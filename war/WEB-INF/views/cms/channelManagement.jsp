@@ -6,7 +6,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link href="/stylesheets/cms.css" rel="stylesheet" type="text/css"/>
+<link rel="stylesheet" href="/stylesheets/cms.css" type="text/css"/>
+<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/themes/start/jquery-ui.css" type="text/css" />
 <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4dcccc98718a5dbe"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.0/jquery.min.js"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/jquery-ui.min.js"></script>
@@ -190,12 +191,12 @@
               <input type="hidden" id="ch_id" value="0"/>
               <div class="clear"></div><br/>
               <label class="floatL"><span class="red">＊</span>名稱</label>
-              <div class="bg_input floatL"><input id="ch_name" type="text" size="40" maxlength="40"/></div>
+              <div class="bg_input floatL"><input id="ch_name" type="text" size="25" maxlength="40"/></div>
               <div class="clear"></div>
               <p class="hint">限40字元</p>
               <br/>
               <label class="floatL">介紹</label>
-              <div class="bg_textarea floatL"><textarea id="ch_intro" name="" cols="37" rows="3"></textarea></div>
+              <div class="bg_textarea floatL"><textarea id="ch_intro" name="" cols="33" rows="5"></textarea></div>
               <div class="clear"></div>
               <p class="hint">限200字元</p>
               <br/><!-- 
@@ -259,10 +260,12 @@
                     <a href="javascript:" class="btnCreate floatL ep_urlbutton">從URL載點</a>
                     <span class="ep_upload_video">從硬碟</span>
                   </div>
-                  <div class="floatL ep_uploading_video" style="display:none"></div>
+                  <div style="width:100px;padding-left:5px" class="floatL ep_uploading_video" style="display:none">
+                    <div></div>
+                  </div>
                   <!--  upload by URL link -->
                   <div class="floatL uploadURL ep_url_block" style="display:none">
-                    <div class="bg_input floatL"><input type="text" size="24" maxlength="100" class="ep_url_input"/></div>&nbsp;<a href="javascript:" class="ep_url_cancel">取消</a>
+                    <div class="bg_input floatL"><input type="text" size="27" maxlength="100" class="ep_url_input"/></div>&nbsp;<a href="javascript:" class="ep_url_cancel">取消</a>
                     <div class="clear"></div>
                     <p class="hint">網址結尾必須為影片格式的附檔名<br/>範例：http://blip.tv/file/get/QtvTV732.wmv</p><br/>
                   </div>
@@ -277,12 +280,12 @@
                     <div class="clear"></div>
                   </div>
                   <label class="floatL"><span class="red">＊</span>節目名稱</label>
-                  <div class="bg_input floatL"><input class="ep_name" type="text" size="35" maxlength="40"/></div>
+                  <div class="bg_input floatL"><input class="ep_name" type="text" size="25" maxlength="40"/></div>
                   <div class="clear"></div>
                   <p class="hint">限40字元</p>
                   <br/>
                   <label class="floatL">節目介紹</label>
-                  <div class="bg_textarea floatL"><textarea class="ep_intro" name="" cols="37" rows="3"></textarea></div>
+                  <div class="bg_textarea floatL"><textarea class="ep_intro" name="" cols="33" rows="5"></textarea></div>
                   <div class="clear"></div>
                   <p class="hint">限200字元</p>
                   <br/>
@@ -314,7 +317,7 @@
         <ul id="program_list_ul">
           <li style="display:none">
             <div class="epItem program_info_block" id="program_info_block">
-              <div class="epInfoTitle program_info_title"><span>何處是我家</span> <a href="javascript:" class="btnDel program_info_removebutton"></a></div>
+              <div class="epInfoTitle program_info_title"><div>何處是我家</div> <a href="javascript:" class="btnDel program_info_removebutton"></a></div>
               <div class="epInfoImg program_info_image"></div>
               <div class="floatL epInfo">
                 <a href="#" class="floatL program_info_promoteurl">http://www.9x9.tv/channel/3958</a>
@@ -355,14 +358,14 @@
     </div>
     <!-- upload channel  = 9x9 channel episode information -->
     <div class="createChoose" style="display:none" id="program_detail">
-      <div class="right_title"><span>小灰熊的大愛劇場</span> - 節目資訊<a href="javascript:" class="floatR ep_return">回到節目管理&nbsp;&gt;&gt;</a></div>
+      <div class="right_title"><div class="floatL">小灰熊的大愛劇場</div> - 節目資訊<a href="javascript:" class="floatR ep_return">回到節目管理&nbsp;&gt;&gt;</a></div>
       <div class="createEpList">
         <div class="chStep2">
           <p class="hint_title"><span class="red">＊</span>為必填資訊</p>
           <form>
             <fieldset class="setAlbum">
               <label class="floatL">節目來源</label>
-              <p class="ep_source">9x9</p><br/>
+              <p class="ep_source"><a target="_player" href="javascript:">9x9</a></p><br/>
               <label class="floatL">節目網址</label>
               <p><a target="_player" href="#" class="ep_url">http://www.9x9.tv/share/3958</a><p><br/>
               <label class="floatL">建立時間</label>
@@ -382,13 +385,13 @@
               <div class="clear"></div><br/>
               <label class="floatL"><span class="red">＊</span>名稱</label>
               <div class="bg_input floatL">
-                <input type="text" size="30" maxlength="40" class="ep_name"/>
+                <input type="text" size="27" maxlength="40" class="ep_name"/>
               </div>
               <div class="clear"></div>
               <p class="hint">限40字元</p>
               <br/>
               <label class="floatL">介紹</label>
-              <div class="bg_textarea floatL"><textarea name="" cols="30" rows="3" class="ep_intro"></textarea></div>
+              <div class="bg_textarea floatL"><textarea name="" cols="30" rows="5" class="ep_intro"></textarea></div>
               <div class="clear"></div>
               <p class="hint">限200字元</p>
               <br/><!-- 

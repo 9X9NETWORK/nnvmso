@@ -44,12 +44,11 @@ public class CmsController {
 		Mso mso = msoMngr.findByName(msoName);
 		if (mso == null)
 			return "error/404";
-		model.addAttribute("msoLogo", mso.getLogoUrl());
 		
 		Mso sessionMso = (Mso)session.getAttribute("mso");
 		if (sessionMso != null && sessionMso.getKey().getId() == mso.getKey().getId()) {
 			
-			return "redirect:cms/channelSetManagement";
+			return "redirect:/" + msoName + "/channelManagement";
 		} else {
 			Cookie[] cookies = request.getCookies();
 			if (cookies != null) {
@@ -64,6 +63,7 @@ public class CmsController {
 					}
 				}
 			}
+			model.addAttribute("msoLogo", mso.getLogoUrl());
 			sessionService.removeSession();
 			return "cms/login";
 		}

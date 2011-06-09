@@ -147,7 +147,17 @@ var programDetail =
     if (title.length > 20) {
       title = title.substring(0, 20) + '...';
     }
-    programDetailBlock.find('.right_title span').text(title);
+    var source = "javascript:";
+    if (program.mpeg4FileUrl != null)
+      source = program.mpeg4FileUrl;
+    else if (program.webMFileUrl != null)
+      source = program.webMFileUrl;
+    else if (program.otherFileUrl != null)
+      source = program.otherFileUrl;
+    else if (program.audioFileUrl != null)
+      source = program.audioFileUrl;
+    programDetailBlock.find('.ep_source a').attr('href', source);
+    programDetailBlock.find('.right_title div').text(title);
     programDetailBlock.find('.ep_name').val(program.name);
     programDetailBlock.find('.ep_intro').val(program.intro);
     var promoteUrl = 'http://' + location.host + '/episode/' + programId;
@@ -362,16 +372,20 @@ var programDetail =
         button_cursor:      SWFUpload.CURSOR.HAND,
         debug:              false,
         http_success :      [201],
+        upload_progress_handler: function(file, completed, total)
+        {
+          programDetailBlock.find('.ep_uploading_video div').progressbar('value', (completed * 100) / total);
+        },
         upload_success_handler: function(file, serverData, recievedResponse)
         {
-          programDetailBlock.find('.ep_uploading_video').text('上傳完成').show();
+          programDetailBlock.find('.ep_uploading_video div').progressbar('destroy').text('上傳完成').show();
           programDetailBlock.find('.ep_url_input')
             .val('http://9x9tmp.s3.amazonaws.com/' + 'prog_video_' + programId + file.type)
             .focusout();
         },
         upload_error_handler: function(file, code, message)
         {
-          programDetailBlock.find('.ep_uploading_video').text('上傳失敗').show();
+          programDetailBlock.find('.ep_uploading_video div').progressbar('destroy').text('上傳失敗').show();
           alert('error: ' + message);
         },
         file_queued_handler: function(file)
@@ -388,7 +402,7 @@ var programDetail =
           };
           this.setPostParams(post_params);
           this.startUpload(file.id);
-          programDetailBlock.find('.ep_uploading_video').text('上傳中...').show();
+          programDetailBlock.find('.ep_uploading_video div').text('').show().progressbar();
           programDetailBlock.find('.ep_url_block').hide();
         }
       };
@@ -506,7 +520,7 @@ var programList =
       var programInfoBlock = $('#program_info_block').clone(true).removeAttr('id').addClass('program_info_block_cloned');
       var programId = programs[i].key.id;
       
-      programInfoBlock.find('.program_info_title span').text(programs[i].name);
+      programInfoBlock.find('.program_info_title div').text(programs[i].name);
       $('<img/>').attr('src', programs[i].imageUrl).appendTo(programInfoBlock.find('.program_info_image'));
       var type = 'Unknown';
       switch(programs[i].type) {
@@ -529,6 +543,7 @@ var programList =
         'url': promoteUrl
       }
       addthis_config['pubid'] = $('#msoId').val();
+      addthis_config['ui_click'] = true;
       addthis.button(programInfoBlock.find('.program_info_addthis').get(0), null, addthis_share);
       var switchObject = programInfoBlock.find('.program_info_publish');
       if (programs[i]['public']) {
@@ -904,7 +919,7 @@ var channelDetail =
         'imageUrl':   $('#ch_image').attr('src'),
         'name':       $('#ch_name').val(),
         'intro':      $('#ch_intro').val(),
-        'tag':        $('#ch_tag').val(),
+        'tag':        '', //$('#ch_tag').val(),
         'categoryId': $('#ch_category').val()
       };
       $.post('/CMSAPI/saveChannel', parameters, function(response)
@@ -981,6 +996,7 @@ var channelList =
           'url': promoteUrl
         }
         addthis_config['pubid'] = $('#msoId').val();
+        addthis_config['ui_click'] = true;
         addthis.button(channelInfoBlock.find('.channel_info_addthis').get(0), null, addthis_share);
         var switchObject = channelInfoBlock.find('.channel_info_publish');
         if (channels[i]['public']) {
