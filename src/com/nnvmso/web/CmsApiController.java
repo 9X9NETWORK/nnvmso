@@ -367,6 +367,43 @@ public class CmsApiController {
 		return "OK";
 	}
 	
+	@RequestMapping("saveNewProgram")
+	public @ResponseBody String saveNewProgram(@RequestParam Long programId,
+	                                           @RequestParam Long channelId,
+	                                           @RequestParam String sourceUrl,
+	                                           @RequestParam String imageUrl,
+	                                           @RequestParam String name,
+	                                           @RequestParam String intro) {
+		
+		logger.info("programId = " + programId);
+		logger.info("channelId = " + channelId);
+		logger.info("sourceUrl = " + sourceUrl);
+		logger.info("imageUrl = " + imageUrl);
+		logger.info("name = " + name);
+		logger.info("intro = " + intro);
+		
+		MsoProgramManager programMngr = new MsoProgramManager();
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		
+		MsoProgram program = programMngr.findById(programId);
+		if (program == null) {
+			return "Invalid programId";
+		}
+		MsoChannel channel = channelMngr.findById(channelId);
+		if (channel == null) {
+			return "Invalid channelId";
+		}
+		
+		program.setName(name);
+		program.setOtherFileUrl(sourceUrl);
+		program.setImageUrl(imageUrl);
+		program.setIntro(intro);
+		program.setPublic(true);
+		programMngr.create(channel, program);
+		
+		return "OK";
+	}
+	
 	@RequestMapping("saveProgram")
 	public @ResponseBody String saveProgram(@RequestParam Long programId,
 	                                        @RequestParam String imageUrl,
@@ -452,6 +489,19 @@ public class CmsApiController {
 			return categoryList.get(0);
 		else
 			return null;
+	}
+	
+	@RequestMapping("createProgramSkeleton")
+	public @ResponseBody Long createProgramSkeleton() {
+		MsoProgramManager programMngr = new MsoProgramManager();
+		
+		logger.info("create program skeleton");
+		MsoProgram program = new MsoProgram("New Program", "New Program", "/WEB-INF/../images/processing.png", MsoProgram.TYPE_VIDEO);
+		program.setPublic(false);
+		program.setType(MsoProgram.TYPE_VIDEO);
+		programMngr.create(program);
+		
+		return program.getKey().getId();
 	}
 	
 	@RequestMapping("createChannelSkeleton")

@@ -26,6 +26,17 @@ public class MsoProgramManager {
 	
 	private MsoProgramDao msoProgramDao = new MsoProgramDao();
 	
+	/**
+	 * Create program skeleton only, not relate to any channel
+	 * 
+	 * @param program
+	 */
+	public void create(MsoProgram program) {
+		
+		program.setChannelId(0);
+		msoProgramDao.save(program);
+	}
+	
 	public void create(MsoChannel channel, MsoProgram program) {		
 		Date now = new Date();
 		program.setCreateDate(now);
@@ -324,6 +335,6 @@ public class MsoProgramManager {
 			}
 			cache.remove(this.getCacheProgramListKey(channelId));
 		}
-	}	 
+	}
 	
 }

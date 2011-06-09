@@ -198,12 +198,13 @@
               <div class="bg_textarea floatL"><textarea id="ch_intro" name="" cols="37" rows="3"></textarea></div>
               <div class="clear"></div>
               <p class="hint">限200字元</p>
-              <br/>
+              <br/><!-- 
               <label class="floatL">標籤</label>
               <div class="bg_input floatL"><input id="ch_tag" type="text" size="40" maxlength="40" disabled="disabled"/></div>
               <div class="clear"></div>
               <p class="hint">請用" , "分開</p>
               <br/>
+              -->
               <label class="floatL"><span class="red">＊</span>系統分類</label>
               <div class="floatL">
                 <select name="" id="ch_category" class="sys_directory"></select>
@@ -241,59 +242,66 @@
          2. class="addNew" this a tag will show up when the last uploadSection has already choosed a file to upload , and also fill up the episode title, if one of these did not satified  , the a tag wont show
          3. the button  "save"   will keep disable status (class="btnDisable" ), until the upload progress bar has been finished then switch to class="epSave"
          -->
-    <div class="createEp" style="display:none">
-      <div class="right_title"><span>小灰熊的大愛劇場</span> - 建立節目 <a href="#" class="floatR">回到節目管理&nbsp;&gt;&gt;</a></div>
+    <div class="createEp" style="display:none" id="program_create_detail">
+      <div class="right_title"><span>小灰熊的大愛劇場</span> - 建立節目 <a href="javascript:" class="floatR ep_return">回到節目管理&nbsp;&gt;&gt;</a></div>
       <div class="createEpList">
         <p class="hint_title"><span class="red">＊</span>為必填資訊</p>
-        <ul class="addEpSection">
-          <li>
-            <div class="uploadSection">
+        <ul class="addEpSection" id="program_create_ul">
+          <li style="display:none">
+            <div class="uploadSection program_create_detail_block" id="program_create_detail_block">
               <form>
                 <fieldset class="setAlbum">
                   <label class="floatL"><span class="red">＊</span>上傳檔案</label>
-                  <div class="floatL epImport" >
-                    <a href="#" class="btnCreate floatL">從硬碟</a>
-                    <a href="#" class="btnCreate floatL">從URL載點</a>
+                  <div class="floatL epImport ep_select_block">
+                    <!-- 
+                    <span class="btnCreate floatL ep_upload_video">從硬碟</span>
+                    -->
+                    <a href="javascript:" class="btnCreate floatL ep_urlbutton">從URL載點</a>
+                    <span class="ep_upload_video">從硬碟</span>
                   </div>
+                  <div class="floatL ep_uploading_video" style="display:none"></div>
                   <!--  upload by URL link -->
-                  <div class="floatL uploadURL" style="display:none">
-                    <div class="bg_input floatL"><input type="text" size="40" maxlength="40"/></div>&nbsp;<a href="#">取消</a>
+                  <div class="floatL uploadURL ep_url_block" style="display:none">
+                    <div class="bg_input floatL"><input type="text" size="24" maxlength="100" class="ep_url_input"/></div>&nbsp;<a href="javascript:" class="ep_url_cancel">取消</a>
                     <div class="clear"></div>
                     <p class="hint">網址結尾必須為影片格式的附檔名<br/>範例：http://blip.tv/file/get/QtvTV732.wmv</p><br/>
                   </div>
                   <label class="floatL"><span class="red">＊</span>節目圖示</label>
                   <div class="uploadImg">
-                    <img alt="" src="/images/cms/upload_img.jpg" class="floatL"/>
+                    <img alt="" src="/images/cms/upload_img.jpg" class="floatL ep_image"/>
                     <div class="floatL imgBtn">
                       <p class="gray">多螢幕最佳顯示品質建議<br/>解析度至少為720x480</p>
-                      <a href="#" class="uploadBtn"></a>
+                      <a href="javascript:" class="uploadBtn ep_upload_image"></a>
+                      <span class="ep_uploading_image" style="display:none">上傳中...</span>
                     </div>
                     <div class="clear"></div>
                   </div>
                   <label class="floatL"><span class="red">＊</span>節目名稱</label>
-                  <div class="bg_input floatL"><input type="text" size="35" maxlength="40"/></div>
+                  <div class="bg_input floatL"><input class="ep_name" type="text" size="35" maxlength="40"/></div>
                   <div class="clear"></div>
                   <p class="hint">限40字元</p>
                   <br/>
                   <label class="floatL">節目介紹</label>
-                  <div class="bg_textarea floatL"><textarea name="" cols="37" rows="3"></textarea></div>
+                  <div class="bg_textarea floatL"><textarea class="ep_intro" name="" cols="37" rows="3"></textarea></div>
                   <div class="clear"></div>
                   <p class="hint">限200字元</p>
                   <br/>
+                  <!-- 
                   <label class="floatL">標籤</label>
                   <div class="bg_input floatL"><input type="text" size="35" maxlength="40"/></div>
                   <div class="clear"></div>
                   <p class="hint">請用" , "分開</p><br/>
+                  -->
                   <div class="epBtns" >
-                    <a href="#" class="btnDisable floatL">儲存</a>
-                    <a href="#"  class="btnCancel  floatL">取消</a>
+                    <a href="javascript:" class="btnDisable floatL ep_savebutton">儲存</a>
+                    <a href="javascript:" class="btnCancel floatL ep_cancelbutton">取消</a>
                   </div>
                 </fieldset>
               </form>
             </div>
-            <a href="#" class="addNew">繼續新增節目</a>
           </li>
         </ul>
+        <a href="javascript:" class="addNew" id="continue_add_new_program_button">繼續新增節目</a>
       </div>
     </div>
     <!-- upload channel = 9x9 channel s episode list
@@ -306,15 +314,15 @@
         <ul id="program_list_ul">
           <li style="display:none">
             <div class="epItem program_info_block" id="program_info_block">
-              <div class="epInfoTitle program_info_title"><span>何處是我家</span> <a href="#" class="btnDel program_info_removebutton"></a></div>
+              <div class="epInfoTitle program_info_title"><span>何處是我家</span> <a href="javascript:" class="btnDel program_info_removebutton"></a></div>
               <div class="epInfoImg program_info_image"></div>
-              <div class=" floatL epInfo" >
+              <div class="floatL epInfo">
                 <a href="#" class="floatL program_info_promoteurl">http://www.9x9.tv/channel/3958</a>
                 <a class="floatL program_info_addthis"><img src="http://cache.addthiscdn.com/icons/v1/thumbs/addthis.gif"/></a>
                 <a href="#" class="iconStatistics" title="觀看數據"></a>
                 <div class="clear"></div>
                 <p class="program_info_type">節目類型 : <span>9x9</span></p>
-                <p class="program_info_updatedate">更新時間  : <span>2011/04/15 14:45</span></p>
+                <p class="program_info_updatedate">更新時間 : <span>2011/04/15 14:45</span></p>
               </div>
               <ul class="floatL">
                 <li><a class="chUnPublic program_info_publish"></a></li>
@@ -364,7 +372,10 @@
                 <img alt="" src="/images/cms/upload_img.jpg" class="floatL ep_image"/>
                 <div class="floatL imgBtn">
                   <p class="gray">多螢幕最佳顯示品質建議<br/>解析度至少為720x480</p>
-                  <a href="#" class="uploadBtn ep_upload_image"></a>
+                  <span class="upload_button_place"><!-- 
+                  <a href="javascript:" class="uploadBtn ep_upload_image"></a>
+                  --></span>
+                  <span style="display:none" class="ep_uploading_image">上傳中...</span>
                 </div>
                 <div class="clear"></div>
               </div>

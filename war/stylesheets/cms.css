@@ -168,8 +168,8 @@ div.page{
 .error { color: red; }
 
 /* channel management - never create channel yet*/
-a.btnCreate:hover { background:url(/images/cms/btn_create_hover.jpg) no-repeat;}
-a.btnCreate, a.btnSave , a.btnCancel {		
+.btnCreate:hover { background:url(/images/cms/btn_create_hover.jpg) no-repeat;}
+.btnCreate, a.btnSave , a.btnCancel {		
   height: 30px;
   line-height:30px;
   text-align: center;
@@ -274,7 +274,8 @@ a.btnGray  span{ line-height:27px;}
 
 .uploadSection{border:1px solid #C6D1EB; width:460px; min-height:430px; padding:10px 10px 5px 10px;}
 .epImport a{ margin:0 5px 20px 0; *margin:0 3px 10px 0;}
-.uploadURL a{ line-height:30px; font-size:0.9em;}
+.uploadURL a { line-height:30px; font-size:0.9em; }
+.uploadURL .bg_input { margin-left: 80px; }
 
 a.addNew{ padding:10px 0 0 0; display:block; font-size:0.9em;}
 .addEpSection li { padding:5px 0; }
@@ -330,6 +331,7 @@ a.addNew{ padding:10px 0 0 0; display:block; font-size:0.9em;}
 .createChList2{ height:548px; overflow:auto;}
 .createEpList{ overflow:auto; height:548px;}
 .createEpList2{ overflow:auto; height:510px;}
+.createEp { width:500px; }
 textarea , input { font-size:0.9em}
 form a{ font-size:0.8em}
 

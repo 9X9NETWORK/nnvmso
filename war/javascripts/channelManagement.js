@@ -18,6 +18,57 @@ var formatDate = function(timestamp)
   return year + '/' + month + '/' + date + ' ' + hour + ':' + minute + ':' + second;
 };
 
+var getContentTypeByFileExtention = function(ext)
+{
+  switch(ext)
+  {
+    case '.mpg':
+    case '.mpeg':
+    return 'video/mpeg';
+    break;
+    
+    case '.m4v':
+    case '.mp4':
+    return 'video/mp4';
+    break;
+    
+    case '.ogg':
+    return 'video/ogg';
+    break;
+    
+    case '.webm':
+    return 'video/webm';
+    break;
+    
+    case '.mov':
+    return 'video/quicktime';
+    break;
+    
+    case '.wmv':
+    return 'video/x-ms-wmv';
+    break;
+    
+    case '.flv':
+    return 'video/x-flv';
+    break;
+    
+    case '.avi':
+    return 'video/avi';
+    break;
+    
+    case '.rmvb':
+    return 'application/vnd.rn-realmedia-vbr';
+    break;
+    
+    case 'rm':
+    return 'video/rm';
+    break;
+    
+    default:
+    return 'video/unknown';
+  }
+};
+
 var overallLayout =
 {
   destroyRightSideContent: function()
@@ -41,33 +92,39 @@ var skeletonCreation =
       channelDetail.init(channelId);
     });
   },
-  create9x9Program: function(channelId)
+  create9x9Program: function(channelId, channelName)
   {
-    $.getJSON('/CMSAPI/createProgramSkeleton?msoId=' + $('#msoId').val(), function(programId)
+    $.getJSON('/CMSAPI/createProgramSkeleton', function(programId)
     {
-      programDetail.init(programId);
+      if (programId != null)
+        programDetail.programCreation(programId, channelId, channelName);
     });
   }
 };
 
 var programDetail =
 {
-  swfObjectImage: null,
-  swfObjectVideo: null,
+  swfObjectImage: [],
+  swfObjectVideo: [],
   destroy: function()
   {
-    if (programDetail.swfObjectImage != null)
+    for (i in programDetail.swfObjectImage)
     {
-      programDetail.swfObjectImage.destroy();
-      programDetail.swfObjectImage = null;
+      programDetail.swfObjectImage[i].destroy();
     }
-    if (programDetail.swfObjectVideo != null)
+    for (i in programDetail.swfObjectVideo)
     {
-      programDetail.swfObjectVideo.destroy();
-      programDetail.swfObjectVideo = null;
+      programDetail.swfObjectVideo[i].destroy();
     }
+    programDetail.swfObjectVideo = [];
+    programDetail.swfObjectImage = [];
     $('#program_detail').hide();
     $('#program_detail_readonly').hide();
+    $('#program_create_detail').hide();
+    $('.program_create_detail_block_cloned').each(function()
+    {
+      $(this).parent().remove();
+    });
   },
   init: function(programId, readonly)
   {
@@ -86,6 +143,11 @@ var programDetail =
   {
     var programDetailBlock = $('#program_detail');
     var programId = program.key.id;
+    var title = program.name;
+    if (title.length > 20) {
+      title = title.substring(0, 20) + '...';
+    }
+    programDetailBlock.find('.right_title span').text(title);
     programDetailBlock.find('.ep_name').val(program.name);
     programDetailBlock.find('.ep_intro').val(program.intro);
     var promoteUrl = 'http://' + location.host + '/episode/' + programId;
@@ -99,11 +161,12 @@ var programDetail =
     });
     programDetailBlock.find('.ep_cancel').unbind().click(function()
     {
-      programDetail.init(programId, false);
+      programDetail.destroy();
+      $('#program_list').show();
     });
     programDetailBlock.find('.ep_savebutton').unbind().click(function()
     {
-      if (programDetailBlock.find('.ep_name').val == "") {
+      if (programDetailBlock.find('.ep_name').val() == "") {
         alert('名稱不可以為空');
         return;
       }
@@ -119,17 +182,68 @@ var programDetail =
         if (response != 'OK') {
           alert('發生錯誤');
         }else {
-          alert('儲存成功');alert($('#program_list .right_title span').text());
+          alert('儲存成功');
           programList.init(program.channelId, false, $('#program_list .right_title span').text());
         }
       }, 'text');
     });
+      $('<span/>').addClass('ep_upload_image').appendTo(programDetailBlock.find('.upload_button_place'));
+      var swfupload_settings =
+      {
+        flash_url:          '/javascripts/swfupload/swfupload.swf',
+        upload_url:         'http://9x9tmp.s3.amazonaws.com/',
+        file_size_limit:    '10240',
+        file_types:         '*.jpg;*.png',
+        file_types_description: 'Image Files',
+        file_post_name:     'file',
+        button_placeholder: programDetailBlock.find('.ep_upload_image').get(0),
+        button_action:      SWFUpload.BUTTON_ACTION.SELECT_FILE,
+        button_image_url:   '/images/cms/btn_upload.png',
+        button_width:       '95',
+        button_height:      '32',
+        button_cursor:      SWFUpload.CURSOR.HAND,
+        debug:              false,
+        http_success :      [201],
+        upload_success_handler: function(file, serverData, recievedResponse)
+        {
+          programDetailBlock.find('.ep_uploading_image').hide();
+          programDetailBlock.find('.ep_image').attr('src', 'http://9x9tmp.s3.amazonaws.com/prog_logo_' + programId + file.type);
+        },
+        upload_error_handler: function(file, code, message)
+        {
+          programDetailBlock.find('.ep_uploading_image').hide();
+          alert('error: ' + message);
+        },
+        file_queued_handler: function(file)
+        {
+          var post_params =
+          {
+            "AWSAccessKeyId": $('#s3_id').val(),
+            "key":            'prog_logo_' + programId + file.type,
+            "acl":            "public-read",
+            "policy":         $('#s3_policy').val(),
+            "signature":      $('#s3_signature').val(),
+            "content-type":   (file.type == '.jpg') ? "image/jpeg" : "image/png",
+            "success_action_status": "201"
+          };
+          this.setPostParams(post_params);
+          this.startUpload(file.id);
+          programDetailBlock.find('.ep_uploading_image').show();
+        }
+      };
+      var swfObjectImage = new SWFUpload(swfupload_settings);
+      programDetail.swfObjectImage.push(swfObjectImage);
     $('#program_detail').show();
   },
   displayProgramReadonly: function(program)
   {
     var programDetailBlock = $('#program_detail_readonly');
     var programId = program.key.id;
+    var title = program.name;
+    if (title.length > 20) {
+      title = title.substring(0, 20) + '...';
+    }
+    programDetailBlock.find('.right_title span').text(title);
     programDetailBlock.find('.ep_name').text(program.name);
     programDetailBlock.find('.ep_intro').text(program.intro);
     var promoteUrl = 'http://' + location.host + '/episode/' + programId;
@@ -142,19 +256,203 @@ var programDetail =
       $('#program_list_readonly').show();
     });
     var source = "N/A";
-    if (program.mpeg4FileUrl != "")
+    if (program.mpeg4FileUrl != null)
       source = program.mpeg4FileUrl;
-    else if (program.webMFileUrl != "")
+    else if (program.webMFileUrl != null)
       source = program.webMFileUrl;
-    else if (program.otherFileUrl !="")
+    else if (program.otherFileUrl != null)
       source = program.otherFileUrl;
-    else if (program.audioFileUrl != "")
+    else if (program.audioFileUrl != null)
       source = program.audioFileUrl;
     var source_truncated = source;
     if (source_truncated.length > 50)
       source_truncated = source_truncated.substring(0, 50) + '...';
     var dom = programDetailBlock.find('.ep_source').text(source_truncated).attr('href', source);
+    $('#program_list_readonly').hide();
     $('#program_detail_readonly').show();
+  },
+  programCreation: function(programId, channelId, channelName)
+  {
+    $('#program_create_detail .ep_return').unbind().click(function()
+    {
+      programList.init(channelId, false, channelName);
+    });
+    $('#continue_add_new_program_button').unbind().click(function()
+    {
+      skeletonCreation.create9x9Program(channelId, channelName);
+    });
+    $.get('/CMSAPI/programInfo?programId=' + programId, function(program)
+    {
+      var programDetailBlock = $('#program_create_detail_block')
+                                 .clone(true)
+                                 .removeAttr('id')
+                                 .addClass('program_create_detail_block_cloned');
+      var programId = program.key.id;
+      
+      programDetailBlock.find('.ep_name').val(program.name);
+      programDetailBlock.find('.ep_image').attr('src', program.imageUrl);
+      programDetailBlock.find('.ep_intro').val(program.intro);
+      programDetailBlock.find('.ep_urlbutton').click(function()
+      {
+        programDetailBlock.find('.ep_url_block').show();
+      });
+      programDetailBlock.find('.ep_url_cancel').click(function()
+      {
+        programDetailBlock.find('.ep_url_input').val('');
+        programDetailBlock.find('.ep_url_block').hide();
+        programDetailBlock.find('.ep_savebutton').unbind().addClass('btnDisable').removeClass('btnSave');
+      });
+      programDetailBlock.find('.ep_url_input').focusout(function()
+      {
+        if (programDetailBlock.find('.ep_url_input').val().length > 0) {
+          programDetailBlock
+            .find('.ep_savebutton')
+            .unbind()
+            .removeClass('btnDisable')
+            .addClass('btnSave')
+            .click(function()
+            {
+              if (programDetailBlock.find('.ep_name').val() == '') {
+                alert('名稱不可為空');
+                return;
+              }
+              var parameters =
+              {
+                'channelId': channelId,
+                'programId': programId,
+                'sourceUrl': programDetailBlock.find('.ep_url_input').val(),
+                'imageUrl':  programDetailBlock.find('.ep_image').attr('src'),
+                'name':      programDetailBlock.find('.ep_name').val(),
+                'intro':     programDetailBlock.find('.ep_intro').val()
+              };
+              $.post('/CMSAPI/saveNewProgram', parameters, function(response)
+              {
+                if (response == 'OK') {
+                  alert('儲存成功');
+                  programDetailBlock.parent().remove();
+                  if ($('.program_create_detail_block_cloned').size() == 0) {
+                    programList.init(channelId, false, channelName);
+                  }
+                } else {
+                  alert('發生錯誤');
+                }
+              }, 'text');
+            });
+        } else {
+          programDetailBlock.find('.ep_savebutton').unbind().addClass('btnDisable').removeClass('btnSave');
+        }
+      });
+      $('#program_create_detail').show();
+      $('<li></li>').append(programDetailBlock).appendTo('#program_create_ul');
+      // video uploading
+      var swfupload_settings =
+      {
+        flash_url:          '/javascripts/swfupload/swfupload.swf',
+        upload_url:         'http://9x9tmp.s3.amazonaws.com/',
+        file_size_limit:    '1024000',
+        file_types:         '*.m4v;*.mp4;*.mpg;*.mpeg;*.mov;*.webm;*.rm;*.rmvb;*.avi;*.wmv;*.flv;*.ogg',
+        file_types_description: 'Video Files',
+        file_post_name:     'file',
+        button_placeholder: programDetailBlock.find('.ep_upload_video').get(0),
+        button_action:      SWFUpload.BUTTON_ACTION.SELECT_FILE,
+        button_image_url:   '/images/cms/btn_upload.png',
+        button_width:       '95',
+        button_height:      '32',
+        button_text:        '從硬碟',
+        button_cursor:      SWFUpload.CURSOR.HAND,
+        debug:              false,
+        http_success :      [201],
+        upload_success_handler: function(file, serverData, recievedResponse)
+        {
+          programDetailBlock.find('.ep_uploading_video').text('上傳完成').show();
+          programDetailBlock.find('.ep_url_input')
+            .val('http://9x9tmp.s3.amazonaws.com/' + 'prog_video_' + programId + file.type)
+            .focusout();
+        },
+        upload_error_handler: function(file, code, message)
+        {
+          programDetailBlock.find('.ep_uploading_video').text('上傳失敗').show();
+          alert('error: ' + message);
+        },
+        file_queued_handler: function(file)
+        {
+          var post_params =
+          {
+            "AWSAccessKeyId": $('#s3_id').val(),
+            "key":            'prog_video_' + programId + file.type,
+            "acl":            "public-read",
+            "policy":         $('#s3_policy').val(),
+            "signature":      $('#s3_signature').val(),
+            "content-type":   getContentTypeByFileExtention(file.type),
+            "success_action_status": "201"
+          };
+          this.setPostParams(post_params);
+          this.startUpload(file.id);
+          programDetailBlock.find('.ep_uploading_video').text('上傳中...').show();
+          programDetailBlock.find('.ep_url_block').hide();
+        }
+      };
+      var swfObject = new SWFUpload(swfupload_settings);
+      programDetail.swfObjectVideo.push(swfObject);
+      // logo uploading
+      var swfupload_settings =
+      {
+        flash_url:          '/javascripts/swfupload/swfupload.swf',
+        upload_url:         'http://9x9tmp.s3.amazonaws.com/',
+        file_size_limit:    '10240',
+        file_types:         '*.jpg;*.png',
+        file_types_description: 'Image Files',
+        file_post_name:     'file',
+        button_placeholder: programDetailBlock.find('.ep_upload_image').get(0),
+        button_action:      SWFUpload.BUTTON_ACTION.SELECT_FILE,
+        button_image_url:   '/images/cms/btn_upload.png',
+        button_width:       '95',
+        button_height:      '32',
+        button_cursor:      SWFUpload.CURSOR.HAND,
+        debug:              false,
+        http_success :      [201],
+        upload_success_handler: function(file, serverData, recievedResponse)
+        {
+          programDetailBlock.find('.ep_uploading_image').hide();
+          programDetailBlock.find('.ep_image').attr('src', 'http://9x9tmp.s3.amazonaws.com/prog_logo_' + programId + file.type);
+        },
+        upload_error_handler: function(file, code, message)
+        {
+          programDetailBlock.find('.ep_uploading_image').hide();
+          alert('error: ' + message);
+        },
+        file_queued_handler: function(file)
+        {
+          var post_params =
+          {
+            "AWSAccessKeyId": $('#s3_id').val(),
+            "key":            'prog_logo_' + programId + file.type,
+            "acl":            "public-read",
+            "policy":         $('#s3_policy').val(),
+            "signature":      $('#s3_signature').val(),
+            "content-type":   (file.type == '.jpg') ? "image/jpeg" : "image/png",
+            "success_action_status": "201"
+          };
+          this.setPostParams(post_params);
+          this.startUpload(file.id);
+          programDetailBlock.find('.ep_uploading_image').show();
+        }
+      };
+      var swfObjectImage = new SWFUpload(swfupload_settings);
+      programDetail.swfObjectImage.push(swfObjectImage);
+      programDetailBlock.find('.ep_cancelbutton').click(function()
+      {
+        if (confirm('確認取消') == false)
+          return;
+        swfObjectImage.destroy();
+        swfObject.destroy();
+        programDetailBlock.parent().remove();
+        if ($('.program_create_detail_block_cloned').size() == 0) {
+          programList.init(channelId, false, channelName);
+        }
+      });
+    });
+    
   }
 }
 
@@ -163,10 +461,12 @@ var programList =
   destroy: function()
   {
     $('#program_list_empty').hide();
+    $('#program_list_empty_readonly').hide();
     $('.program_info_block_cloned').each(function() {
       $(this).parent().remove();
     });
     $('#program_list').hide();
+    $('#program_list_readonly').hide();
   },
   init: function(channelId, readonly, channelName)
   {
@@ -174,6 +474,11 @@ var programList =
     
     $.get('/CMSAPI/programList?channelId=' + channelId, function(programs)
     {
+      $('.create_program_button').unbind().click({ 'channelId': channelId, 'channelName': channelName }, function(event)
+      {
+        overallLayout.destroyRightSideContent();
+        skeletonCreation.create9x9Program(event.data.channelId, event.data.channelName);
+      });
       if (programs.length == 0) {
         if (readonly) {
           $('#program_list_empty_readonly .right_title span').text(channelName);
@@ -181,10 +486,6 @@ var programList =
         } else {
           $('#program_list_empty .right_title span').text(channelName);
           $('#program_list_empty').show();
-          $('.create_program_button').unbind().click({ 'channelId': channelId }, function(event)
-          {
-            alert('create program');
-          });
         }
         return;
       }
@@ -262,7 +563,7 @@ var programList =
       });
       programInfoBlock.find('.program_info_detailbutton').click({ 'programId': programId }, function(event)
       {
-        programDetail.init(event.data.programId, true);
+        programDetail.init(event.data.programId, false);
         return false;
       });
       programInfoBlock.find('.program_info_promoteurl').text(promoteUrl).attr('href', promoteUrl);
@@ -314,35 +615,6 @@ var programList =
       } else {
         switchObject.removeClass('chPublic').addClass('chUnPublic');
       }
-      /*
-      programInfoBlock.find('.program_info_removebutton').click({ 'programId': programId, 'programInfoBlock': programInfoBlock }, function(event)
-      {
-        if (confirm('你確定要將頻道移除嗎？') == false)
-          return false;
-        var parameters = {
-          'programId': event.data.programId,
-          'msoId': $('#msoId').val()
-        };
-        $.post('/CMSAPI/removeChannelFromList', parameters, function()
-        {
-          event.data.programInfoBlock.parent().remove();
-          overallLayout.destroyRightSideContent();
-        });
-        return false;
-      });
-      programInfoBlock.find('.program_info_publish').click({ 'programId': programId, 'switchObject': switchObject }, function(event)
-      {
-        $.getJSON('/CMSAPI/switchChannelPublicity?programId=' + event.data.programId, function(response)
-        {
-          if (response) {
-            event.data.switchObject.removeClass('chUnPublic').addClass('chPublic');
-          } else {
-            event.data.switchObject.removeClass('chPublic').addClass('chUnPublic');
-          }
-        });
-        return false;
-      });
-      */
       programInfoBlock.find('.program_info_detailbutton').click({ 'programId': programId }, function(event)
       {
         programDetail.init(event.data.programId, true);
@@ -388,7 +660,7 @@ var channelDetail =
       if (channelDetail.swfObject != null) {
         channelDetail.swfObject.destroy();
       }
-      $('<spane/>').attr('id', 'ch_upload_image').appendTo('#upload_button_place');
+      $('<span/>').attr('id', 'ch_upload_image').appendTo('#upload_button_place');
       var swfupload_settings =
       {
         flash_url:          '/javascripts/swfupload/swfupload.swf',
