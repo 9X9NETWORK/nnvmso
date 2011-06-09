@@ -175,14 +175,20 @@ var brandinfo = "${brandInfo}";
     
     <div id="sg-content">
       
-      <div id="branding-elements">
+      <div id="follow-elements">
         <p class="btn-big" id="btn-follow"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV57/images/icon_follow.png" id="icon-follow"><span>Follow These Channels</span></p>
         <p id="follow-hint"><span>Click to receive the latest episodes from these channels.</span></p>
-        <img src="http://9x9ui.s3.amazonaws.com/9x9playerV57/images/logo_tzuchi.png" id="branding-logo">
+      </div>
+
+      <div id="branding-elements">
+        <img src="http://9x9ui.s3.amazonaws.com/9x9playerV57/images/logo_tzuchi.png" id="branding-logo" style="display: none">
       </div>
       
       <div id="sg-elements">
         <p id="sg-title"><span id="sg-user">Guest's</span><span id="btn-smart-guide">Smart Guide<img src="http://9x9ui.s3.amazonaws.com/9x9playerV57/images/icon_sg.png" id="icon-sg"></span></p>
+      </div>
+
+      <div id="add-ch-elements">
         <p class="btn-big" id="btn-add-channels"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV57/images/icon_add.png" id="icon-add"><span>Add More Channels</span></p>
       </div>
 
