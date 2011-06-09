@@ -64,6 +64,29 @@ public class NnUserManager {
 		return null;
 	}
 	
+	public NnUser findMsoUser(Mso mso) {
+		
+		if (mso.getType() == Mso.TYPE_NN) {
+			return this.findNNUser();
+		} else if (mso.getType() == Mso.TYPE_MSO) {
+			List<NnUser> users = nnUserDao.findByType(NnUser.TYPE_TBC);
+			for (NnUser user : users) {
+				if (user.getMsoId() == mso.getKey().getId()) {
+					return user;
+				}
+			}
+		} else if (mso.getType() == Mso.TYPE_3X3) {
+			List<NnUser> users = nnUserDao.findByType(NnUser.TYPE_3X3);
+			for (NnUser user : users) {
+				if (user.getMsoId() == mso.getKey().getId()) {
+					return user;
+				}
+			}
+		}
+		
+		return null;
+	}
+	
 	public NnUser findAuthenticatedUser(String email, String password, long msoId) {
 		return nnUserDao.findAuthenticatedUser(email.toLowerCase(), password, msoId);
 	}

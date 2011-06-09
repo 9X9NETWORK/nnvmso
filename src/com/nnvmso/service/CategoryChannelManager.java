@@ -1,5 +1,6 @@
 package com.nnvmso.service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
@@ -52,7 +53,7 @@ public class CategoryChannelManager {
 		List<CategoryChannel> ccs = ccDao.findAllByChannelId(channelId);
 		return ccs;
 	}
-
+	
 	public CategoryChannel findByCategoryIdAndChannelId(long categoryId, long channelId) {
 		return ccDao.findByCategoryIdAndChannelId(categoryId, channelId);
 	}
@@ -75,5 +76,15 @@ public class CategoryChannelManager {
 	
 	public int total(String filter) {
 		return ccDao.total(filter);
+	}
+	
+	public List<CategoryChannel> findByChannelIdAndCategoryIds(Long channelId, List<Long> categoryIds) {
+		List<CategoryChannel> results = new ArrayList<CategoryChannel>();
+		for (Long categoryId : categoryIds) {
+			CategoryChannel cc = ccDao.findByCategoryIdAndChannelId(categoryId, channelId);
+			if (cc != null)
+				results.add(cc);
+		}
+		return results;
 	}
 }

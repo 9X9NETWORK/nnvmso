@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,10 +14,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.model.Category;
+import com.nnvmso.model.CategoryChannel;
 import com.nnvmso.model.CategoryChannelSet;
 import com.nnvmso.model.ChannelSet;
+import com.nnvmso.model.ContentOwnership;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
+import com.nnvmso.service.CategoryChannelManager;
 import com.nnvmso.service.CategoryChannelSetManager;
 import com.nnvmso.service.CategoryManager;
 import com.nnvmso.service.ChannelSetChannelManager;
@@ -24,6 +29,8 @@ import com.nnvmso.service.CmsApiService;
 import com.nnvmso.service.ContentOwnershipManager;
 import com.nnvmso.service.MsoChannelManager;
 import com.nnvmso.service.MsoManager;
+import com.nnvmso.service.NnUserManager;
+import com.nnvmso.service.TranscodingService;
 
 @Controller
 @RequestMapping("CMSAPI")
@@ -196,4 +203,170 @@ public class CmsApiController {
 		cscMngr.removeChannel(channelSetId, seq);
 		
 	}
+	
+	@RequestMapping("switchChannelPublicity")
+	public @ResponseBody Boolean switchChannelPublicity(@RequestParam Long channelId) {
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		MsoChannel channel = channelMngr.findById(channelId);
+		if (channel.isPublic())
+			channel.setPublic(false);
+		else
+			channel.setPublic(true);
+		channelMngr.save(channel);
+		return channel.isPublic();
+	}
+	
+	@RequestMapping("removeChannelFromList")
+	public void removeChannelFromList(@RequestParam Long channelId, @RequestParam Long msoId) {
+		ContentOwnershipManager ownershipMngr = new ContentOwnershipManager();
+		ContentOwnership ownership = ownershipMngr.findByMsoIdAndChannelId(msoId, channelId);
+		if (ownership != null)
+			ownershipMngr.delete(ownership);
+	}
+	
+	@RequestMapping("channelInfo")
+	public MsoChannel channelInfo(@RequestParam Long channelId) {
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		return channelMngr.findById(channelId);
+	}
+	
+	@RequestMapping("importChannelByUrl")
+	public @ResponseBody String importChannelByUrl(HttpServletRequest req, @RequestParam String sourceUrl) {
+		
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		NnUserManager userMngr = new NnUserManager();
+		
+		sourceUrl = sourceUrl.trim();
+		logger.info("import " + sourceUrl);
+		MsoChannel channel = channelMngr.findBySourceUrlSearch(sourceUrl);
+		if (channel == null) {
+			sourceUrl = channelMngr.verifyUrl(sourceUrl);
+			if (sourceUrl == null)
+				return null;
+			logger.info("new source url");
+			channel = channelMngr.initChannelSubmittedFromPlayer(sourceUrl, userMngr.findNNUser()); //!!!
+			channelMngr.create(channel, new ArrayList<Category>());
+			if (channel.getKey() != null && channel.getContentType() != MsoChannel.CONTENTTYPE_FACEBOOK) { //!!!
+				TranscodingService tranService = new TranscodingService();
+				tranService.submitToTranscodingService(channel.getKey().getId(), sourceUrl, req);
+			}
+		}
+		
+		return sourceUrl;
+	}
+	
+	@RequestMapping("addChannelByUrl")
+	public @ResponseBody String addChannelByUrl(@RequestParam String sourceUrl,
+	                                            @RequestParam String imageUrl,
+	                                            @RequestParam String name,
+	                                            @RequestParam String intro,
+	                                            @RequestParam String tag,
+	                                            @RequestParam Long categoryId,
+	                                            @RequestParam Long msoId) {
+		
+		logger.info("sourceUrl = " + sourceUrl);
+		logger.info("imageUrl = " + imageUrl);
+		logger.info("name = " + name);
+		logger.info("intro = " + intro);
+		logger.info("tag = " + tag);
+		logger.info("categoryId = " + categoryId);
+		logger.info("msoId = " + msoId);
+		
+		CmsApiService cmsApiService = new CmsApiService();
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		MsoChannel channel = channelMngr.findBySourceUrlSearch(sourceUrl);
+		CategoryChannelManager ccMngr = new CategoryChannelManager();
+		ContentOwnershipManager ownershipMngr = new ContentOwnershipManager();
+		MsoManager msoMngr = new MsoManager();
+		Mso mso = msoMngr.findById(msoId);
+		
+		if (channel == null)
+			return "Invalid Source Url";
+		if (mso == null)
+			return "Invalid msoId";
+		
+		channel.setName(name);
+		//channel.setTag(tag); MsoChannel needs a tag property
+		channel.setImageUrl(imageUrl);
+		channel.setIntro(intro);
+		channelMngr.save(channel);
+		
+		List<CategoryChannel> ccs = cmsApiService.whichCCContainingTheChannel(channel.getKey().getId());
+		
+		// NOTE: channel can only in one system category
+		for (CategoryChannel cc : ccs) {
+			if (cc.getCategoryId() != categoryId) {
+				ccMngr.delete(cc);
+				ccs.remove(cc);
+			}
+		}
+		
+		logger.info("ccs size = " + ccs.size());
+		
+		if (ccs.isEmpty()) {
+			// create a new CategoryChannelSet
+			CategoryChannel cc = new CategoryChannel(categoryId, channel.getKey().getId());
+			ccMngr.create(cc);
+			logger.info("create new CategoryChannel channelId = " + channel.getKey().getId() + ", categoryId = " + categoryId);
+		}
+		
+		// create ownership
+		ContentOwnership ownership = ownershipMngr.findByMsoIdAndChannelId(msoId, channel.getKey().getId());
+		if (ownership == null)
+			ownershipMngr.create(new ContentOwnership(), mso, channel);
+		
+		return "OK";
+	}
+	
+	@RequestMapping("saveChannel")
+	public @ResponseBody String saveChannel(@RequestParam Long channelId,
+	                                        @RequestParam String imageUrl,
+	                                        @RequestParam String name,
+	                                        @RequestParam String intro,
+	                                        @RequestParam String tag,
+	                                        @RequestParam Long categoryId) {
+		
+		logger.info("channelId = " + channelId);
+		logger.info("imageUrl = " + imageUrl);
+		logger.info("name = " + name);
+		logger.info("intro = " + intro);
+		logger.info("tag = " + tag);
+		logger.info("categoryId = " + categoryId);
+		
+		CmsApiService cmsApiService = new CmsApiService();
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		MsoChannel channel = channelMngr.findById(channelId);
+		CategoryChannelManager ccMngr = new CategoryChannelManager();
+		
+		if (channel == null)
+			return "Invalid ChannelId";
+		
+		channel.setName(name);
+		//channel.setTag(tag); MsoChannel needs a tag property
+		channel.setImageUrl(imageUrl);
+		channel.setIntro(intro);
+		channelMngr.save(channel);
+		
+		List<CategoryChannel> ccs = cmsApiService.whichCCContainingTheChannel(channelId);
+		
+		// NOTE: channel can only in one system category
+		for (CategoryChannel cc : ccs) {
+			if (cc.getCategoryId() != categoryId) {
+				ccMngr.delete(cc);
+				ccs.remove(cc);
+			}
+		}
+		
+		logger.info("ccs size = " + ccs.size());
+		
+		if (ccs.isEmpty()) {
+			// create a new CategoryChannelSet
+			CategoryChannel cc = new CategoryChannel(categoryId, channelId);
+			ccMngr.create(cc);
+			logger.info("create new CategoryChannel channelId = " + channelId + ", categoryId = " + categoryId);
+		}
+		
+		return "OK";
+	}
+
 }

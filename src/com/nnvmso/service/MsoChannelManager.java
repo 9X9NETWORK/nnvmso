@@ -163,7 +163,7 @@ public class MsoChannelManager {
 		channel.setPublic(false);
 		return channel;
 	}
-
+	
 	//the url has to be verified(verifyUrl) first
 	public short getContentTypeByUrl(String url) {
 		short type = MsoChannel.CONTENTTYPE_PODCAST;
@@ -257,8 +257,8 @@ public class MsoChannelManager {
 			}
 		}
 		return channels;
-	}	
-
+	}
+	
 	public List<MsoChannel> findAllByStatus(short status) {
 		List<MsoChannel> channels = msoChannelDao.findAllByStatus(status);		
 		return channels;
