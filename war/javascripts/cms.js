@@ -311,6 +311,7 @@ var initChannelSetInfo = function()
                 button_image_url:   '/images/cms/btn_upload.png',
                 button_width:       '95',
                 button_height:      '32',
+                button_cursor:      SWFUpload.CURSOR.HAND,
                 debug:              false,
                 http_success :      [201],
                 upload_success_handler: function(file, serverData, recievedResponse)

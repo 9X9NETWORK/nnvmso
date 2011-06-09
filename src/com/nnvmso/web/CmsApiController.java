@@ -23,6 +23,7 @@ import com.nnvmso.model.ChannelSet;
 import com.nnvmso.model.ContentOwnership;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
+import com.nnvmso.model.MsoProgram;
 import com.nnvmso.service.CategoryChannelManager;
 import com.nnvmso.service.CategoryChannelSetManager;
 import com.nnvmso.service.CategoryManager;
@@ -32,6 +33,7 @@ import com.nnvmso.service.CmsApiService;
 import com.nnvmso.service.ContentOwnershipManager;
 import com.nnvmso.service.MsoChannelManager;
 import com.nnvmso.service.MsoManager;
+import com.nnvmso.service.MsoProgramManager;
 import com.nnvmso.service.NnUserManager;
 import com.nnvmso.service.TranscodingService;
 
@@ -219,6 +221,18 @@ public class CmsApiController {
 		
 	}
 	
+	@RequestMapping("switchProgramPublicity")
+	public @ResponseBody Boolean switchProgramPublicity(@RequestParam Long programId) {
+		MsoProgramManager programMngr = new MsoProgramManager();
+		MsoProgram program = programMngr.findById(programId);
+		if (program.isPublic())
+			program.setPublic(false);
+		else
+			program.setPublic(true);
+		programMngr.save(program);
+		return program.isPublic();
+	}
+	
 	@RequestMapping("switchChannelPublicity")
 	public @ResponseBody Boolean switchChannelPublicity(@RequestParam Long channelId) {
 		MsoChannelManager channelMngr = new MsoChannelManager();
@@ -231,6 +245,16 @@ public class CmsApiController {
 		return channel.isPublic();
 	}
 	
+	@RequestMapping("removeProgram")
+	public @ResponseBody void removeProgram(@RequestParam Long programId) {
+		logger.info("programId = " + programId);
+		MsoProgramManager programMngr = new MsoProgramManager();
+		MsoProgram program = programMngr.findById(programId);
+		if (program != null) {
+			programMngr.delete(program); // NOTE: better way instead of delete ?
+		}
+	}
+	
 	@RequestMapping("removeChannelFromList")
 	public @ResponseBody void removeChannelFromList(@RequestParam Long channelId, @RequestParam Long msoId) {
 		
@@ -241,6 +265,12 @@ public class CmsApiController {
 			ownershipMngr.delete(ownership);
 			logger.info("remove ownership");
 		}
+	}
+	
+	@RequestMapping("programInfo")
+	public @ResponseBody MsoProgram programInfo(@RequestParam Long programId) {
+		MsoProgramManager programMngr = new MsoProgramManager();
+		return programMngr.findById(programId);
 	}
 	
 	@RequestMapping("channelInfo")
@@ -337,6 +367,29 @@ public class CmsApiController {
 		return "OK";
 	}
 	
+	@RequestMapping("saveProgram")
+	public @ResponseBody String saveProgram(@RequestParam Long programId,
+	                                        @RequestParam String imageUrl,
+	                                        @RequestParam String name,
+	                                        @RequestParam String intro) {
+		logger.info("programId = " + programId);
+		logger.info("imageUrl = " + imageUrl);
+		logger.info("name = " + name);
+		logger.info("intro = " + intro);
+		
+		MsoProgramManager programMngr = new MsoProgramManager();
+		MsoProgram program = programMngr.findById(programId);
+		if (program == null) {
+			return "Invalid programId";
+		}
+		program.setName(name);
+		program.setImageUrl(imageUrl);
+		program.setIntro(intro);
+		programMngr.save(program);
+		
+		return "OK";
+	}
+	
 	@RequestMapping("saveChannel")
 	public @ResponseBody String saveChannel(@RequestParam Long channelId,
 	                                        @RequestParam String imageUrl,
@@ -422,5 +475,11 @@ public class CmsApiController {
 		ownershipMngr.create(new ContentOwnership(), mso, channel);
 		
 		return channel.getKey().getId();
+	}
+	
+	@RequestMapping("programList")
+	public @ResponseBody List<MsoProgram> programList(Long channelId) {
+		MsoProgramManager programMngr = new MsoProgramManager();
+		return programMngr.findAllByChannelId(channelId);
 	}
 }

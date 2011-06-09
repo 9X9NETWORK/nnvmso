@@ -200,7 +200,7 @@
               <p class="hint">限200字元</p>
               <br/>
               <label class="floatL">標籤</label>
-              <div class="bg_input floatL"><input id="ch_tag" type="text" size="40" maxlength="40"/></div>
+              <div class="bg_input floatL"><input id="ch_tag" type="text" size="40" maxlength="40" disabled="disabled"/></div>
               <div class="clear"></div>
               <p class="hint">請用" , "分開</p>
               <br/>
@@ -219,12 +219,20 @@
       </div>
     </div>
     <!-- channel management - create ch step3 end (created a new channel , choose to create episode)-->
-    <div class="createEp" style="display:none">
+    <div class="createEp" style="display:none" id="program_list_empty">
       <div class="right_title"><span>小灰熊的大愛劇場</span> - 節目管理</div>
       <div class="createEpList">
         <div class="createEpStep1">
-          <div ><a href="#" class="btnCreate">建立節目</a></div>
+          <div ><a href="javascript:" class="btnCreate create_program_button">建立節目</a></div>
           <p>您尚無任何節目<br/>迅速建立節目，即可立即行銷您的影視內容</p>
+        </div>
+      </div>
+    </div>
+    <div class="createEp" style="display:none" id="program_list_empty_readonly">
+      <div class="right_title"><span>小灰熊的大愛劇場</span> - 節目管理</div>
+      <div class="createEpList">
+        <div class="createEpStep1">
+          <p>無任何節目</p>
         </div>
       </div>
     </div>
@@ -291,31 +299,31 @@
     <!-- upload channel = 9x9 channel s episode list
          1. first li is normal status , second is active status , when user click a  li, switch status to this "epItemFocus"  and epItemFocusTitle than switch into chInfo div
          -->
-    <div class="epList" style="display:none">
+    <div class="epList" style="display:none" id="program_list">
       <div class="right_title"><span>小灰熊的大愛劇場</span> - 節目管理 </div>
       <div class="createEpList2">
-        <a class="btnCreate" href="#">建立節目</a>
-        <ul>
-          <li>
-            <div class="epItem">
-              <div class="epInfoTitle">何處是我家 <a href="#" class="btnDel"></a></div>
-              <div class="epInfoImg"></div>
+        <a class="btnCreate create_program_button" href="javascript:">建立節目</a>
+        <ul id="program_list_ul">
+          <li style="display:none">
+            <div class="epItem program_info_block" id="program_info_block">
+              <div class="epInfoTitle program_info_title"><span>何處是我家</span> <a href="#" class="btnDel program_info_removebutton"></a></div>
+              <div class="epInfoImg program_info_image"></div>
               <div class=" floatL epInfo" >
-                <a href="#" class="floatL">http://www.9x9.tv/channel/3958</a>
-                <div class="addthis_toolbox addthis_default_style floatL">
-                  <a class="addthis_button_compact"></a>
-                </div>
+                <a href="#" class="floatL program_info_promoteurl">http://www.9x9.tv/channel/3958</a>
+                <a class="floatL program_info_addthis"><img src="http://cache.addthiscdn.com/icons/v1/thumbs/addthis.gif"/></a>
                 <a href="#" class="iconStatistics" title="觀看數據"></a>
                 <div class="clear"></div>
-                <p>頻道類型 : <span>9x9</span></p>
-                <p>節目數量 : <span>0</span></p>
-                <p>訂閱人數 : <span>0</span></p>
-                <p>更新時間  : <span>2011/04/15 14:45</span></p>
+                <p class="program_info_type">節目類型 : <span>9x9</span></p>
+                <p class="program_info_updatedate">更新時間  : <span>2011/04/15 14:45</span></p>
               </div>
+              <ul class="floatL">
+                <li><a class="chUnPublic program_info_publish"></a></li>
+                <li><a class="btnGray program_info_detailbutton"><span>節目資訊</span></a></li>
+              </ul>
               <div class="clear"></div>
             </div>
           </li>
-          <li>
+          <li style="display:none">
             <div class="epItemFocus">
               <div class="epItemFocusTitle">何處是我家 <a href="#" class="btnDel"></a></div>
               <div class="epInfoImg"></div>
@@ -338,49 +346,49 @@
       </div>
     </div>
     <!-- upload channel  = 9x9 channel episode information -->
-    <div class="createChoose" style="display:none">
-      <div class="right_title">小灰熊的大愛劇場 - 節目資訊<a href="#" class="floatR">回到節目管理&nbsp;&gt;&gt;</a></div>
+    <div class="createChoose" style="display:none" id="program_detail">
+      <div class="right_title"><span>小灰熊的大愛劇場</span> - 節目資訊<a href="javascript:" class="floatR ep_return">回到節目管理&nbsp;&gt;&gt;</a></div>
       <div class="createEpList">
         <div class="chStep2">
           <p class="hint_title"><span class="red">＊</span>為必填資訊</p>
           <form>
             <fieldset class="setAlbum">
               <label class="floatL">節目來源</label>
-              <p>9x9</p><br/>
+              <p class="ep_source">9x9</p><br/>
               <label class="floatL">節目網址</label>
-              <p><a href="#">http://www.9x9.tv/share/3958</a><p><br/>
+              <p><a target="_player" href="#" class="ep_url">http://www.9x9.tv/share/3958</a><p><br/>
               <label class="floatL">建立時間</label>
-              <p>2011/04/25 14:30</p><br/>
+              <p class="ep_createdate">2011/04/25 14:30</p><br/>
               <label class="floatL"><span class="red">＊</span>圖示</label>
               <div class="uploadImg">
-                <img alt="" src="/images/cms/upload_img.jpg" class="floatL"/>
+                <img alt="" src="/images/cms/upload_img.jpg" class="floatL ep_image"/>
                 <div class="floatL imgBtn">
                   <p class="gray">多螢幕最佳顯示品質建議<br/>解析度至少為720x480</p>
-                  <a href="#" class="uploadBtn"></a>
+                  <a href="#" class="uploadBtn ep_upload_image"></a>
                 </div>
                 <div class="clear"></div>
               </div>
               <div class="clear"></div><br/>
               <label class="floatL"><span class="red">＊</span>名稱</label>
               <div class="bg_input floatL">
-                <input type="text" size="40" maxlength="40"/>
+                <input type="text" size="30" maxlength="40" class="ep_name"/>
               </div>
               <div class="clear"></div>
               <p class="hint">限40字元</p>
               <br/>
               <label class="floatL">介紹</label>
-              <div class="bg_textarea floatL"><textarea name="" cols="37" rows="3"></textarea></div>
+              <div class="bg_textarea floatL"><textarea name="" cols="30" rows="3" class="ep_intro"></textarea></div>
               <div class="clear"></div>
               <p class="hint">限200字元</p>
-              <br/>
+              <br/><!-- 
               <label class="floatL">標籤</label>
-              <div class="bg_input floatL"><input type="text" size="40" maxlength="40"/></div>
+              <div class="bg_input floatL"><input type="text" size="40" maxlength="40" disabled="disabled"/></div>
               <div class="clear"></div>
               <p class="hint">請用" , "分開</p>
               <br/>
               <label class="floatL"><span class="red">＊</span>系統分類</label>
               <div class="floatL">
-                <select name="" class="sys_directory">
+                <select name="" class="sys_directory" disabled="disabled">
                   <option selected="selected">請選擇分類</option>
                   <option>新聞 / 政治</option>
                   <option>財經企管</option>
@@ -402,8 +410,9 @@
               </div>
               <div class="clear"></div>
               <p class="hint">選擇分類後，頻道網將被收錄至9x9.tv的系統目錄中，供觀眾瀏覽，<br/>您也可以至「目錄管理」編輯您自訂的目錄，匯錄您的所有內容。</p>
+              -->
               <div class="commitPlace">
-                <a href="#" class="btn btnStep2 floatL"><span>儲存修改</span></a><a href="#" class="floatL btn_cancel"><span>取消</span></a>
+                <a href="javascript:" class="btn btnStep2 floatL ep_savebutton"><span>儲存修改</span></a><a href="javascript:" class="floatL btn_cancel ep_cancel"><span>取消</span></a>
               </div>
             </fieldset>
           </form>
@@ -411,30 +420,30 @@
       </div>
     </div>
     <!-- the channel is create by import other content source -->
-    <div class="epList" style="display:none">
+    <div class="epList" style="display:none" id="program_list_readonly">
       <div class="right_title"><span>小灰熊的大愛劇場</span> - 節目管理 </div>
       <div class="createEpList">
-        <ul>
-          <li>
-            <div class="epItem">
-              <div class="epInfoTitle">何處是我家 </div>
-              <div class="epInfoImg"></div>
+        <ul id="program_list_ul_readonly">
+          <li style="display:none">
+            <div class="epItem program_info_block_readonly" id="program_info_block_readonly">
+              <div class="epInfoTitle program_info_title"><span>何處是我家 </span></div>
+              <div class="epInfoImg program_info_image"></div>
               <div class=" floatL epInfo" >
-                <a href="#" class="floatL">http://www.9x9.tv/channel/3958</a>
-                <div class="addthis_toolbox addthis_default_style floatL">
-                  <a class="addthis_button_compact"></a>
-                </div>
+                <a href="#" class="floatL program_info_promoteurl">http://www.9x9.tv/channel/3958</a>
+                <a class="floatL program_info_addthis"><img src="http://cache.addthiscdn.com/icons/v1/thumbs/addthis.gif"/></a>
                 <a href="#" class="iconStatistics" title="觀看數據"></a>
                 <div class="clear"></div>
-                <p>頻道類型 : <span>9x9</span></p>
-                <p>節目數量 : <span>0</span></p>
-                <p>訂閱人數 : <span>0</span></p>
-                <p>更新時間  : <span>2011/04/15 14:45</span></p>
+                <p class="program_info_type">節目類型 : <span>9x9</span></p>
+                <p class="program_info_updatedate">更新時間 : <span>2011/04/15 14:45</span></p>
               </div>
+              <ul class="floatL">
+                <li><a class="chUnPublic program_info_publish"></a></li>
+                <li><a class="btnGray program_info_detailbutton"><span>節目資訊</span></a></li>
+              </ul>
               <div class="clear"></div>
             </div>
           </li>
-          <li>
+          <li style="display:none">
             <div class="epItemFocus">
               <div class="epItemFocusTitle">何處是我家 </div>
               <div class="epInfoImg"></div>
@@ -457,30 +466,30 @@
       </div>
     </div>
     <!-- the channel is create by import other content source  - episode info -->			
-    <div class="createChoose" style="display:none">
-      <div class="right_title">小灰熊的大愛劇場 - 節目資訊<a href="#" class="floatR">回到節目管理&nbsp;&gt;&gt;</a></div>
+    <div class="createChoose" style="display:none" id="program_detail_readonly">
+      <div class="right_title"><span>小灰熊的大愛劇場</span> - 節目資訊<a href="javascript:" class="floatR ep_return">回到節目管理&nbsp;&gt;&gt;</a></div>
       <div class="createEpList">
         <div class="chStep2">
           <p class="hint_title"></p>
           <form>
             <fieldset class="setAlbum">
               <label class="floatL">節目來源</label>
-              <p><a href="#">http://blip.tv/file/get/Qtv-JulianSchnabelOnQTV732.m4v</a></p><br/><br/>
+              <p><a target="_player" class="ep_source" href="#">http://blip.tv/file/get/Qtv-JulianSchnabelOnQTV732.m4v</a></p><br/><br/>
               <label class="floatL">節目網址</label>
-              <p><a href="#">http://www.9x9.tv/share/3958</a><p><br/><br/>
+              <p><a target="_player" class="ep_url" href="#">http://www.9x9.tv/share/3958</a><p><br/><br/>
               <label class="floatL">建立時間</label>
-              <p>2011/04/25 14:30</p><br/><br/>
+              <p class="ep_createdate">2011/04/25 14:30</p><br/><br/>
               <label class="floatL">圖示</label>
               <div class="uploadImg">
-                <img alt="" src="/images/cms/upload_img.jpg" />
+                <img class="ep_image" alt="" src="/images/cms/upload_img.jpg" />
               </div>
               <div class="clear"></div><br/><br/>
               <label class="floatL">名稱</label>
-              <p class="floatL">20110326《慈濟新聞深度報導》十噸賑災愛心物資 親手送給日本災民</p><br/><br/>
+              <p class="floatL ep_name">20110326《慈濟新聞深度報導》十噸賑災愛心物資 親手送給日本災民</p><br/><br/>
               <div class="clear"></div>
               <br/>
               <label class="floatL">介紹</label>
-              <p class="floatL">慈濟前往日本福島地區協助災民重建工作</p><br/><br/>
+              <p class="floatL ep_intro">慈濟前往日本福島地區協助災民重建工作</p><br/><br/>
               <div class="clear"></div>
             </fieldset>
           </form>
