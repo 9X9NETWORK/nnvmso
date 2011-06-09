@@ -149,7 +149,6 @@ p{ margin-left:5px;}
 a.btnLogin{ background:url(/images/cms/btn_login.png) no-repeat; width:95px; height:32px; display:block;  float:left;}
 a.btnLogin:hover { background:url(/images/cms/btn_login_hover.png) no-repeat;}
 
-
 /* Doc Styles */
 
 table{
@@ -167,3 +166,147 @@ div.page{
 }
 
 .error { color: red; }
+
+/* channel management - never create channel yet*/
+a.btnCreate:hover { background:url(/images/cms/btn_create_hover.jpg) no-repeat;}
+a.btnCreate, a.btnSave , a.btnCancel {		
+  height: 32px;
+  line-height:32px;
+  text-align: center;
+  text-decoration: none; 
+  background: url(/images/cms/btn_create.jpg) 0 0 repeat-x;
+  background-size: auto 100%;
+  -moz-background-size: auto 100%;
+  filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#6cacdc, endColorstr=#2d82c3);
+  -moz-border-radius: 0.5em;
+  -webkit-border-radius: 0.5em;
+  border-radius: 0.5em;
+  display: block;
+  color:#fff;
+  font-size:0.95em;
+  padding:0 15px;
+  margin-bottom:5px; *margin-bottom:3px;
+  width:60px;
+}
+
+a.btnCreate span{ line-height:32px; display:block;}
+
+.createCh{ text-align:center; width:430px; }
+.createCh p , .createEpStep1 p { text-align:center; padding-top:20px; color:#333; line-height:25px;}
+.createCh div{padding:100px 0 0 110px;}
+.createEpStep1{text-align:center; width:430px; padding-top:120px;}
+.createEpStep1 div{ position:relative; top:0px; left:160px;}
+/* end */
+
+/* channel management - start create channel*/
+
+.createCh1 .left_title , .epList .right_title{ padding-bottom:5px; }
+
+.createChoose .right_title{ background:url(/images/cms/right_title.jpg) no-repeat; width:480px; height:35px; padding:10px 0 0 10px; border:none;}
+.chShadow{ border:1px solid #d3d3d3; width:425px; height:125px;}
+.chShadowTitle{ width:415px; background:#d3d3d3; height:30px;}
+.chImg{ width:85px; height:70px; background:#d3d3d3; margin:5px 0 0 5px; *margin:3px 0 0 3px;}
+.chImg img , .chFocusImg img{ width:85px; height:70px; padding:1px ;}
+
+.chUnFocus{border:1px solid #d0d0d0; width:425px; height:135px; cursor:pointer;}
+.chUnFocusTitle{width:415px; border-bottom:1px dotted #d0d0d0; height:30px; line-height:30px; padding-left:10px; font-size:1.1em;}
+
+.chUnFocus:hover { background:#fefce3; border:1px solid #ffd885;}
+
+.chFocus{ border:1px solid #ffce3a; width:425px; height:135px; cursor:pointer;}
+.chInfo , .epInfo{ padding:5px 0 5px 10px;}
+.chFocusTitle{ width:415px; background:#fff89a; height:30px; color:#5f4800; line-height:30px; padding-left:10px; font-size:1.1em;}
+.chFocusImg , .epInfoImg , .chUnFocusImg{ width:85px; height:70px; border:1px solid #CCC; margin:5px 0 0 5px; *margin:3px 0 0 3px; float:left;}
+a.btnDel{ background:url(/images/cms/btnClose.png) no-repeat; width:24px; height:23px; display:block; position:relative; top:-28px; left:385px;}
+a.btnDel:hover { background:url(/images/cms/btnCloseHover.png) no-repeat;}
+.chInfo p , .epInfo{ font-size:0.85em; color:#343434; padding-top:2px; width:235px;}
+.chInfo a , .epInfo{ font-size:0.85em;}
+
+.btnStep1{ width: 170px;}
+.btnStep2{ width:100px;}
+.btn_cancel{ padding-left:20px; line-height:37px;}
+.commitPlace{ padding:10px 0 0 80px;}
+.btn {
+  height: 37px;
+  text-align: center;
+  text-decoration: none; 
+  background: url(/images/cms/btn_red.jpg) 0 0 repeat-x;
+  background-size: auto 100%;
+  -moz-background-size: auto 100%;
+  filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#e35f56, endColorstr=#a01b0a);
+  -moz-border-radius: 0.5em;
+  -webkit-border-radius: 0.5em;
+  border-radius: 0.5em;
+  display: block;
+  color:#fff;
+  font-size:0.95em;
+  padding:0 5px;
+}
+.btn:hover { background:url(/images/cms/btn_red_hover.jpg) 0 0 repeat-x;}
+.btn span{ line-height:37px; display:block;}
+.createAbout li { background:url(/images/cms/icon_check.jpg) no-repeat 0 0; padding-left:25px; height:18px; color:#5e5e5e; font-size:0.9em}
+.createBtn{ padding:5px 20px 0 0;}
+.chStep1{ padding:20px 0 0 20px;}
+.createChItem{ padding:20px 0}
+.createChItem .hint{ padding:10px 0 0 0; }
+
+.iconStatistics{ background:url(/images/cms/icon_statistics.png) no-repeat; display:block; width:16px; height:17px; float:left;}
+
+.chPublic{ background:url(/images/cms/ch_public.jpg) no-repeat; width:80px; height:27px; display:block;}
+.chUnPublic{ background:url(/images/cms/ch_unpublic.jpg) no-repeat; width:80px; height:27px; display:block;}
+.chInfo li{ padding:5px 0;}
+.chInfo ul { width: 80px; }
+
+a.btnGray {
+  height: 27px;
+  text-align: center;
+  text-decoration: none; 
+  background: url(/images/cms/btn_gray.jpg) 0 0 repeat-x;
+  display: block;
+  color:#404040;
+  font-size:0.8em;
+  width:80px;
+}
+a.btnGray:hover { background:url(/images/cms/btn_gray_hover.jpg) 0 0 repeat-x;}
+a.btnGray  span{ line-height:27px;}
+
+.uploadSection{border:1px solid #C6D1EB; width:470px; min-height:430px; padding:10px 10px 5px 10px;}
+.epImport a{ margin:0 5px 20px 0; *margin:0 3px 10px 0;}
+.uploadURL a{ line-height:30px; font-size:0.9em;}
+
+a.addNew{ padding:10px 0 0 0; display:block; font-size:0.9em;}
+.addEpSection li{ padding:5px 0;}
+.epBtns{ padding-left:90px;}
+.epBtns a{ margin-right:5px;}
+.btnDisable{
+	height: 32px;
+  line-height:32px;
+  text-align: center;
+  text-decoration: none; 
+  background: url(/images/cms/btn_disable.jpg) 0 0 repeat-x;
+  background-size: auto 100%;
+  -moz-background-size: auto 100%;
+  filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#6cacdc, endColorstr=#2d82c3);
+  -moz-border-radius: 0.5em;
+  -webkit-border-radius: 0.5em;
+  border-radius: 0.5em;
+  display: block;
+  color:#999;
+  font-size:1em;
+  padding:0 20px;
+  margin-bottom:5px; *margin-bottom:3px;
+}
+
+.right_title a.floatR , .right_title a.floatR:active , .right_title a.floatR:visited{ color:#FFF; font-size:0.8em; padding-right:10px; }
+.right_title a.floatR:hover{text-decoration:none; color:#fff;}
+
+.epItem{ border:1px solid #d0d0d0; width:470px; cursor:pointer;}
+.epItemFocus{border:1px solid #ffce3a; width:470px; cursor:pointer; }
+.epItemFocusTitle{background:#FFF89A; color:#5F4800; height:30px; line-height:30px; padding-left:10px; font-size:1.1em; border-bottom:1px dotted #d0d0d0;}
+.epInfo{ padding-left:10px;}
+.epInfoTitle{ height:30px; color:#242424; line-height:30px; padding-left:10px; font-size:1.1em; border-bottom:1px dotted #d0d0d0; }
+.epItem:hover { background:#fefce3; border:1px solid #ffd885; }
+
+.epItem a.btnDel , .epItemFocus a.btnDel{background:url(/images/cms/btnClose.png) no-repeat; width:24px; height:23px; display:block; position:relative; top:-28px; left:430px;}
+.chList li , .epList li{ padding-bottom:5px;}
+

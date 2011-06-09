@@ -31,7 +31,7 @@
 <div class="content">
   <div class="left_content floatL">
     <ul>
-      <li><a href="#" class="menuA"></a></li>
+      <li><a href="channelManagement" class="menuA"></a></li>
       <li><a href="#" class="menuB_active"></a></li>
       <li><a href="#" class="menuC"></a></li>
       <li><a href="#" class="menuD"></a></li>

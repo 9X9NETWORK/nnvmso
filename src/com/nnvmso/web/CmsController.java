@@ -33,11 +33,7 @@ public class CmsController {
 	}
 	
 	@RequestMapping(value = "{msoName}/admin", method = RequestMethod.GET)
-	public String admin(HttpServletRequest request,
-			@PathVariable("msoName") String msoName,
-			Model model) {
-		
-		logger.info(msoName);
+	public String admin(HttpServletRequest request, @PathVariable("msoName") String msoName, Model model) {
 		
 		SessionService sessionService = new SessionService(request);
 		HttpSession session = sessionService.getSession();
@@ -50,11 +46,11 @@ public class CmsController {
 		
 		Mso sessionMso = (Mso)session.getAttribute("mso");
 		if (sessionMso != null && sessionMso.getKey().getId() == mso.getKey().getId()) {
-			model.addAttribute("mso", mso);
-			model.addAttribute("msoId", mso.getKey().getId());
-			model.addAttribute("logoutUrl", "/" + msoName + "/logout");
+			//model.addAttribute("mso", mso);
+			//model.addAttribute("msoId", mso.getKey().getId());
+			//model.addAttribute("logoutUrl", "/" + msoName + "/logout");
 			
-			return "cms/channelSetManagement";
+			return "redirect:cms/channelSetManagement";
 		} else {
 			Cookie[] cookies = request.getCookies();
 			if (cookies != null) {
@@ -119,7 +115,7 @@ public class CmsController {
 			response.addCookie(new Cookie("cms_login_" + msoName, ""));
 		}
 		
-		return "redirect:/" + msoName + "/admin";
+		return "redirect:/" + msoName + "/channelManagement";
 	}
 	
 	@RequestMapping(value = "{msoName}/logout")
@@ -127,5 +123,33 @@ public class CmsController {
 		SessionService sessionService = new SessionService(request);
 		sessionService.removeSession();
 		return "redirect:/" + msoName + "/admin";
+	}
+	
+	@RequestMapping(value = "{msoName}/{cmsTab}")
+	public String channelManagement(HttpServletRequest request, @PathVariable String msoName, @PathVariable String cmsTab, Model model) {
+		
+		SessionService sessionService = new SessionService(request);
+		HttpSession session = sessionService.getSession();
+		
+		MsoManager msoMngr = new MsoManager();
+		Mso mso = msoMngr.findByName(msoName);
+		if (mso == null)
+			return "redirect:error/404";
+		
+		Mso sessionMso = (Mso)session.getAttribute("mso");
+		if (sessionMso != null && sessionMso.getKey().getId() == mso.getKey().getId()) {
+			model.addAttribute("msoLogo", mso.getLogoUrl());
+			model.addAttribute("mso", mso);
+			model.addAttribute("msoId", mso.getKey().getId());
+			model.addAttribute("logoutUrl", "/" + msoName + "/logout");
+			if (cmsTab.equals("channelManagement"))
+				return "cms/channelManagement";
+			else if (cmsTab.equals("channelSetManagement"))
+				return "cms/channelSetManagement";
+			else
+				return "error/404";
+		} else {
+			return "redirect:cms/login";
+		}
 	}
 }
