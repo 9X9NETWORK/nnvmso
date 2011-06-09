@@ -280,7 +280,7 @@ public class CmsApiController {
 	}
 	
 	@RequestMapping("importChannelByUrl")
-	public @ResponseBody String importChannelByUrl(HttpServletRequest req, @RequestParam String sourceUrl) {
+	public @ResponseBody MsoChannel importChannelByUrl(HttpServletRequest req, @RequestParam String sourceUrl) {
 		
 		MsoChannelManager channelMngr = new MsoChannelManager();
 		NnUserManager userMngr = new NnUserManager();
@@ -290,8 +290,10 @@ public class CmsApiController {
 		MsoChannel channel = channelMngr.findBySourceUrlSearch(sourceUrl);
 		if (channel == null) {
 			sourceUrl = channelMngr.verifyUrl(sourceUrl);
-			if (sourceUrl == null)
+			if (sourceUrl == null) {
+				logger.warning("invalid source url");
 				return null;
+			}
 			logger.info("new source url");
 			channel = channelMngr.initChannelSubmittedFromPlayer(sourceUrl, userMngr.findNNUser()); //!!!
 			channelMngr.create(channel, new ArrayList<Category>());
@@ -301,7 +303,7 @@ public class CmsApiController {
 			}
 		}
 		
-		return sourceUrl;
+		return channel;
 	}
 	
 	@RequestMapping("addChannelByUrl")
@@ -480,7 +482,7 @@ public class CmsApiController {
 	}
 	
 	@RequestMapping("channelCategory")
-	public @ResponseBody Category hannelCategory(@RequestParam Long channelId) {
+	public @ResponseBody Category channelCategory(@RequestParam Long channelId) {
 		CmsApiService cmsService = new CmsApiService();
 		if (channelId == null)
 			return null;

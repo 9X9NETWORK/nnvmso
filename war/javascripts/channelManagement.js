@@ -645,6 +645,166 @@ var channelDetail =
       channelDetail.swfObject = null;
     }
     $('#channel_detail').hide();
+    $('#channel_import_detail').hide();
+    $('#channel_import_detail [name="ch_import_url"]').val('');
+    $('#channel_import_detail [name="ch_name"]').val('');
+    $('#channel_import_detail [name="ch_intro"]').val('');
+    $('#channel_import_detail [name="ch_image"]').attr('src', '/images/cms/upload_img.jpg');
+  },
+  displayImportDetail: function()
+  {
+    overallLayout.destroyRightSideContent();
+    $.getJSON('/CMSAPI/systemCategories', function(categories)
+    {
+      $('#channel_import_detail .sys_directory').html('<option value="0">請選擇分類</option>');
+      for (i in categories)
+      {
+        $('<option></option>')
+            .attr('value', categories[i].key.id)
+            .text(categories[i].name)
+            .appendTo('#channel_import_detail .sys_directory');
+      }
+    });
+    $('#channel_import_detail [name="ch_import_button"]').click(function()
+    {
+      if ($('#channel_import_detail [name="ch_import_url"]').val() == "") {
+        alert('頻道來源是空的');
+        return;
+      }
+      var sourceUrl = $('#channel_import_detail [name="ch_import_url"]').val();
+      var parameters = {
+        'sourceUrl': sourceUrl
+      }
+      $.post('/CMSAPI/importChannelByUrl', parameters, function(channel)
+      {
+        if (channel == null) {
+          alert('頻道來源有誤，請重新輸入');
+          return;
+        }
+        var channelId = channel.key.id;
+        $('#channel_import_detail [name="ch_import_url"]').val(channel.sourceUrl);
+        $('#channel_import_detail [name="upload_button_place"]').html('').append($('<span/>').attr('name', 'ch_upload_image'));
+        var swfupload_settings =
+        {
+          flash_url:          '/javascripts/swfupload/swfupload.swf',
+          upload_url:         'http://9x9tmp.s3.amazonaws.com/',
+          file_size_limit:    '10240',
+          file_types:         '*.jpg;*.png',
+          file_types_description: 'Image Files',
+          file_post_name:     'file',
+          button_placeholder: $('#channel_import_detail [name="ch_upload_image"]').get(0),
+          button_action:       SWFUpload.BUTTON_ACTION.SELECT_FILE,
+          button_image_url:   '/images/cms/btn_upload.png',
+          button_width:       '95',
+          button_height:      '32',
+          button_cursor:      SWFUpload.CURSOR.HAND,
+          debug:              false,
+          http_success :      [201],
+          upload_success_handler: function(file, serverData, recievedResponse)
+          {
+            $('#channel_import_detail [name="ch_uploading_image"]').hide();
+            $('#channel_import_detail [name="ch_image"]').attr('src', 'http://9x9tmp.s3.amazonaws.com/' + 'ch_logo_' + channel.key.id + file.type);
+          },
+          upload_error_handler: function(file, code, message)
+          {
+            $('#channel_import_detail [name="ch_uploading_image"]').hide();
+            alert('error: ' + message);
+          },
+          file_queued_handler: function(file)
+          {
+            var post_params =
+            {
+              "AWSAccessKeyId": $('#s3_id').val(),
+              "key":            'ch_logo_' + channel.key.id + file.type,
+              "acl":            "public-read",
+              "policy":         $('#s3_policy').val(),
+              "signature":      $('#s3_signature').val(),
+              "content-type":   (file.type == '.jpg') ? "image/jpeg" : "image/png",
+              "success_action_status": "201"
+            };
+            this.setPostParams(post_params);
+            this.startUpload(file.id);
+            $('#channel_import_detail [name="ch_uploading_image"]').show();
+          }
+        };
+        channelDetail.swfObject = new SWFUpload(swfupload_settings);
+        $('#channel_import_detail [name="ch_name"]').val(channel.name);
+        $('#channel_import_detail [name="ch_intro"]').val(channel.intro);
+        $('#channel_import_detail [name="ch_image"]').attr('src', channel.imageUrl);
+          /*
+          var parameters = {
+            'alt': 'json',
+            'v':   '2',
+            'format': '5'
+          }
+          
+          var username = channel.sourceUrl.match (/\/user\/([^\/]*)/)[1];
+          var requestUrl = 'http://gdata.youtube.com/feeds/api/users/' + username + '/uploads';
+          
+          $.get(requestUrl, function(data)
+          {
+            if (data == null) {
+              alert('匯入頻道資訊失敗');
+              return;
+            }
+            var feed = data.feed;
+            $('#channel_import_detail [name="ch_name"]').val(feed.title.$t);
+            $('#channel_import_detail [name="ch_image"]').attr('src', feed.entry[0].media$group.media$thumbnail[1]['url']);
+          }, 'json');
+          */
+        $.getJSON('/CMSAPI/channelCategory?channelId=' + channelId, function(category)
+        {
+          if (category != null) {
+            $('#channel_import_detail [name="ch_category"]').val(category.key.id);
+          }
+        });
+        $('#channel_import_detail [name="ch_savebutton"]').unbind().click(function()
+        {
+          var name = $('#channel_import_detail [name="ch_name"]').val();
+          if (name == '') {
+            alert('名稱不可為空');
+            return;
+          }
+          var category = $('#channel_import_detail [name="ch_category"]').val();
+          if (category == 0) {
+            alert('請選擇一個系統分類');
+            return;
+          }
+          var intro = $('#channel_import_detail [name="ch_intro"]').val();
+          var imageUrl = $('#channel_import_detail [name="ch_image"]').attr('src');
+          var sourceUrl = $('#channel_import_detail [name="ch_import_url"]').val();
+          var parameters =
+          {
+            'name':       name,
+            'intro':      intro,
+            'imageUrl':   imageUrl,
+            'categoryId': category,
+            'tag':        '',
+            'msoId':      $('#msoId').val(),
+            'sourceUrl':  sourceUrl
+          };
+          $.post('/CMSAPI/addChannelByUrl', parameters, function(response)
+          {
+            if (response != 'OK') {
+              alert('發生錯誤');
+              return;
+            }
+            alert('匯入成功');
+            overallLayout.destroyRightSideContent();
+            channelList.init();
+          }, 'text');
+        });
+      }, 'json');
+    });
+    $('#channel_import_detail [name="ch_savebutton"]').unbind().click(function()
+    {
+      alert('請先匯入頻道來源');
+    });
+    $('#channel_import_detail [name="ch_cancelbutton"]').unbind().click(function()
+    {
+      channelDetail.displayImportDetail();
+    });
+    $('#channel_import_detail').show();
   },
   init: function(channelId)
   {
@@ -884,6 +1044,7 @@ var channelList =
     {
       overallLayout.destroyRightSideContent();
       $('#create_9x9_channel_button').unbind().click(skeletonCreation.create9x9Channel);
+      $('.import_button').unbind().click(channelDetail.displayImportDetail);
       $('#choose_channel_type').show();
     });
   }

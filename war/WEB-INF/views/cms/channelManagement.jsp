@@ -9,11 +9,11 @@
 <link href="/stylesheets/cms.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4dcccc98718a5dbe"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.0/jquery.min.js"></script>
-<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/jquery-ui.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/jquery-ui.min.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.textTruncate.js"></script>
-<script type="text/javascript" src="/javascripts/channelManagement.js"></script>
 <script type="text/javascript" src="http://www.netgrow.com.au/assets/files/jquery_plugins/jquery.dump.js"></script>
 <script type="text/javascript" src="/javascripts/swfupload/swfupload.js"></script>
+<script type="text/javascript" src="/javascripts/channelManagement.js"></script>
 <title>頻道管理</title>
 </head>
 <body>
@@ -133,7 +133,7 @@
               <div class="clear"></div>
             </li>
             <li class="createChItem">
-              <div class="floatL createBtn"><a href="#" class="btn btnStep1"><span>匯入Podcast</span></a></div>
+              <div class="floatL createBtn"><a href="javascript:" class="btn btnStep1 import_button"><span>匯入Podcast</span></a></div>
               <ul class="floatL createAbout">
                 <li>直接同步既有Podcast</li>
                 <li>絕佳的播放速度</li>
@@ -142,7 +142,7 @@
               <div class="clear"></div>
             </li>
             <li class="createChItem">
-              <div class="floatL createBtn"><a href="#" class="btn btnStep1"><span>匯入YouTube 頻道</span></a></div>
+              <div class="floatL createBtn"><a href="javascript:" class="btn btnStep1 import_button"><span>匯入YouTube 頻道</span></a></div>
               <ul class="floatL createAbout">
                 <li>直接同步既有YouTube頻道</li>
                 <li>基本的管理功能</li>
@@ -151,7 +151,7 @@
               <p class="hint">範例 www.youtube.com/user/MIT</p>
             </li>
             <li class="createChItem">
-              <div class="floatL createBtn"><a href="#" class="btn btnStep1"><span>匯入YouTube 播放清單</span></a></div>
+              <div class="floatL createBtn"><a href="javascript:" class="btn btnStep1 import_button"><span>匯入YouTube 播放清單</span></a></div>
               <ul class="floatL createAbout">
                 <li>直接同步既有YouTube播放清單</li>
                 <li>基本的管理功能</li>
@@ -345,7 +345,7 @@
                 <p>頻道類型 : <span>9x9</span></p>
                 <p>節目數量 : <span>0</span></p>
                 <p>訂閱人數 : <span>0</span></p>
-                <p>更新時間  : <span>2011/04/15 14:45</span></p>
+                <p>更新時間 : <span>2011/04/15 14:45</span></p>
               </div>
               <div class="clear"></div>
             </div>
@@ -508,7 +508,7 @@
       </div>
     </div>
     <!-- create channel by import podcast / youtube channel / youtube playlist-->
-    <div class="createChoose" style="display:none">
+    <div class="createChoose" style="display:none" id="channel_import_detail">
       <div class="right_title">頻道管理 - 建立頻道資訊</div>
       <div class="createEpList">
         <div class="chStep2">
@@ -516,37 +516,41 @@
           <form>
             <fieldset class="setAlbum">
               <label class="floatL"><span class="red">＊</span>頻道來源</label>
-              <div class="bg_input floatL"><input type="text" size="40" maxlength="40"/></div>
-              <a href="#" class="btnCreate floatL">匯入</a>
+              <div class="bg_input floatL"><input type="text" size="25" maxlength="100" name="ch_import_url"/></div>
+              <a href="javascript:" class="btnCreate floatL" name="ch_import_button">匯入</a>
               <div class="clear"></div><br/>
               <label class="floatL"><span class="red">＊</span>圖示</label>
               <div class="uploadImg">
-                <img alt="" src="/images/cms/upload_img.jpg" class="floatL"/>
+                <img name="ch_image" alt="" src="/images/cms/upload_img.jpg" class="floatL"/>
                 <div class="floatL imgBtn">
                   <p class="gray">多螢幕最佳顯示品質建議<br/>解析度至少為720x480</p>
-                  <a href="#" class="uploadBtn"></a>
+                  <span name="upload_button_place">
+                    <a href="javascript:" class="uploadBtn"></a>
+                  </span>
+                  <span name="ch_uploading_image" style="display:none">上傳中...</span>
                 </div>
                 <div class="clear"></div>
               </div>
               <div class="clear"></div><br/>
               <label class="floatL"><span class="red">＊</span>名稱</label>
-              <div class="bg_input floatL"><input type="text" size="40" maxlength="40"/></div>
+              <div class="bg_input floatL"><input name="ch_name" type="text" size="25" maxlength="40"/></div>
               <div class="clear"></div>
               <p class="hint">限40字元</p>
               <br/>
               <label class="floatL">介紹</label>
-              <div class="bg_textarea floatL"><textarea name="" cols="37" rows="3"></textarea></div>
+              <div class="bg_textarea floatL"><textarea name="ch_intro" cols="30" rows="5"></textarea></div>
               <div class="clear"></div>
               <p class="hint">限200字元</p>
-              <br/>
+              <br/><!--
               <label class="floatL">標籤</label>
               <div class="bg_input floatL"><input type="text" size="40" maxlength="40"/></div>
               <div class="clear"></div>
               <p class="hint">請用" , "分開</p>
               <br/>
+              -->
               <label class="floatL"><span class="red">＊</span>系統分類</label>
               <div class="floatL">
-                <select name="" class="sys_directory">
+                <select name="ch_category" class="sys_directory">
                   <option selected="selected">請選擇分類</option>
                   <option>新聞 / 政治</option>
                   <option>財經企管</option>
@@ -569,7 +573,7 @@
               <div class="clear"></div>
               <p class="hint">選擇分類後，頻道網將被收錄至9x9.tv的系統目錄中，供觀眾瀏覽，<br/>您也可以至「目錄管理」編輯您自訂的目錄，匯錄您的所有內容。</p>
               <div class="commitPlace">
-                <a href="#" class="btn btnStep2 floatL"><span>儲存</span></a><a href="#" class="floatL btn_cancel"><span>取消</span></a>
+                <a href="javascript:" name="ch_savebutton" class="btn btnStep2 floatL"><span>儲存</span></a><a href="javascript:" name="ch_cancelbutton" class="floatL btn_cancel"><span>取消</span></a>
               </div>
             </fieldset>
           </form>
