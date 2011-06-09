@@ -1,5 +1,6 @@
 package com.nnvmso.web;
 
+import java.security.SignatureException;
 import java.util.logging.Logger;
 
 import javax.servlet.http.Cookie;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.nnvmso.lib.AmazonLib;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.model.Mso;
 import com.nnvmso.service.AuthService;
@@ -46,9 +48,6 @@ public class CmsController {
 		
 		Mso sessionMso = (Mso)session.getAttribute("mso");
 		if (sessionMso != null && sessionMso.getKey().getId() == mso.getKey().getId()) {
-			//model.addAttribute("mso", mso);
-			//model.addAttribute("msoId", mso.getKey().getId());
-			//model.addAttribute("logoutUrl", "/" + msoName + "/logout");
 			
 			return "redirect:cms/channelSetManagement";
 		} else {
@@ -126,7 +125,7 @@ public class CmsController {
 	}
 	
 	@RequestMapping(value = "{msoName}/{cmsTab}")
-	public String channelManagement(HttpServletRequest request, @PathVariable String msoName, @PathVariable String cmsTab, Model model) {
+	public String channelManagement(HttpServletRequest request, @PathVariable String msoName, @PathVariable String cmsTab, Model model) throws SignatureException {
 		
 		SessionService sessionService = new SessionService(request);
 		HttpSession session = sessionService.getSession();
@@ -142,14 +141,20 @@ public class CmsController {
 			model.addAttribute("mso", mso);
 			model.addAttribute("msoId", mso.getKey().getId());
 			model.addAttribute("logoutUrl", "/" + msoName + "/logout");
-			if (cmsTab.equals("channelManagement"))
+			if (cmsTab.equals("channelManagement")) {
 				return "cms/channelManagement";
-			else if (cmsTab.equals("channelSetManagement"))
+			} else if (cmsTab.equals("channelSetManagement")) {
+				String policy = AmazonLib.buildS3Policy("9x9tmp", "public-read", "image/");
+				model.addAttribute("s3Policy", policy);
+				model.addAttribute("s3Signature", AmazonLib.calculateRFC2104HMAC(policy));
+				model.addAttribute("s3Id", AmazonLib.AWS_ID);
 				return "cms/channelSetManagement";
-			else
+			} else {
 				return "error/404";
+			}
 		} else {
-			return "redirect:cms/login";
+			sessionService.removeSession();
+			return "redirect:/" + msoName + "/admin";
 		}
 	}
 }

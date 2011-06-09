@@ -15,6 +15,7 @@
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/jquery-ui.min.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.bubble.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.textTruncate.js"></script>
+<script type="text/javascript" src="/javascripts/swfupload/swfupload.js"></script>
 <script type="text/javascript" src="/javascripts/cms.js"></script>
 <title><spring:message code="cms.channel_set_management.title"/></title>
 </head>
@@ -50,6 +51,10 @@
             <div class="floatL imgBtn">
               <p class="gray">多螢幕最佳顯示品質建議<br/>解析度至少為720x480</p>
               <a href="#" id="upload_image" class="uploadBtn"></a>
+              <span id="uploading" style="display:none">上傳中....</span>
+              <input type="hidden" id="s3_policy" value="${s3Policy}"/>
+              <input type="hidden" id="s3_signature" value="${s3Signature}"/>
+              <input type="hidden" id="s3_id" value="${s3Id}"/>
             </div>
             <div class="clear"></div>
           </div>

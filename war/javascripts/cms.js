@@ -291,17 +291,59 @@ var initChannelSetInfo = function()
             }
             
             $('#cc_id').val(channelSet.key.id);
+            $('#upload_image').click(function()
+              {
+                $('#upload_image_form').submit(function(event)
+                  {
+                    alert(event);
+                  });
+              });
+            var swfupload_settings =
+              {
+                flash_url:          '/javascripts/swfupload/swfupload.swf',
+                upload_url:         'http://9x9tmp.s3.amazonaws.com/',
+                file_size_limit:    '10240',
+                file_types:         '*.jpg;*.png',
+                file_types_description: 'Image Files',
+                file_post_name:     'file',
+                button_placeholder: document.getElementById('upload_image'),
+                utton_action:       SWFUpload.BUTTON_ACTION.SELECT_FILE,
+                button_image_url:   '/images/cms/btn_upload.png',
+                button_width:       '95',
+                button_height:      '32',
+                debug:              false,
+                http_success :      [201],
+                upload_success_handler: function(file, serverData, recievedResponse)
+                {
+                  $('#uploading').hide();
+                  $('#cc_image').attr('src', 'http://9x9tmp.s3.amazonaws.com/' + 'ch_set_logo_' + channelSet.key.id + file.type);
+                },
+                upload_error_handler: function(file, code, message)
+                {
+                  $('#uploading').hide();
+                  alert('error: ' + message);
+                },
+                file_queued_handler: function(file)
+                {
+                  var post_params =
+                    {
+                      "AWSAccessKeyId": $('#s3_id').val(),
+                      "key":            'ch_set_logo_' + channelSet.key.id + file.type,
+                      "acl":            "public-read",
+                      "policy":         $('#s3_policy').val(),
+                      "signature":      $('#s3_signature').val(),
+                      "content-type":   (file.type == '.jpg') ? "image/jpeg" : "image/png",
+                      "success_action_status": "201"
+                    };
+                  this.setPostParams(post_params);
+                  this.startUpload(file.id);
+                  $('#uploading').show();
+                }
+              };
+            var swfu = new SWFUpload(swfupload_settings);
           }
-          
         });
     });
-}
-
-var uploadImage = function()
-{
-  var imageUrl = prompt('上傳功能將在稍後開通，請暫以輸入圖片網址取代', $('#cc_image').attr('src'));
-  if (imageUrl != null)
-    $('#cc_image').attr('src', imageUrl);
 }
 
 var publishChannelSet = function()
@@ -359,7 +401,6 @@ $(document).ready(function()
   channelPool.init();
   channelSetArea.init();
   
-  $('#upload_image').click(uploadImage);
   $('#publish_channel_set').click(publishChannelSet);
   
 });
