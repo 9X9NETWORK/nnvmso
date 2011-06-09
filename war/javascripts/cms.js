@@ -307,7 +307,7 @@ var initChannelSetInfo = function()
                 file_types_description: 'Image Files',
                 file_post_name:     'file',
                 button_placeholder: document.getElementById('upload_image'),
-                utton_action:       SWFUpload.BUTTON_ACTION.SELECT_FILE,
+                button_action:       SWFUpload.BUTTON_ACTION.SELECT_FILE,
                 button_image_url:   '/images/cms/btn_upload.png',
                 button_width:       '95',
                 button_height:      '32',

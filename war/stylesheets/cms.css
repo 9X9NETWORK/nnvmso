@@ -51,7 +51,7 @@ p.hint_title{ text-align:right; color:#2e2e2e; font-size:0.8em; padding-right:20
 .gray { color:#666; font-size:0.9em; padding:10px 0;}
 
 .setAlbum{ border:none;}
-.uploadImg{float:left; padding:0 0 15px 0;}
+.uploadImg{float:left; padding:0 0 10px 0;}
 .uploadImg img{ padding:3px; border:2px solid #dadada; max-width: 120px; max-height: 80px; }
 .imgBtn{ padding-left:10px;}
 .uploadBtn{ background:url(/images/cms/btn_upload.png) no-repeat; width:95px; height:32px; display:block;}
@@ -60,7 +60,7 @@ form label{ color:#161616; font-size:0.9em; text-align:right; padding-right:15px
 #addthis_button{ padding-left:5px;}
 .bg_input{ background:url(/images/cms/bg_input.jpg) no-repeat; width:250px; height:28px; padding:5px 0 0 10px;}
 .bg_input input{ border:none; background:none;}
-.bg_textarea{ background:url(/images/cms/bg_textarea.jpg) no-repeat; width:250px; height:93px; padding:5px 0 0 10px;}
+.bg_textarea{ background:url(/images/cms/bg_textarea.jpg) no-repeat; width:250px; height:83px; padding:5px 0 0 10px;}
 .bg_textarea textarea{ border:none; background:none;}
 .hint{font-size:0.9em; color:#666; padding-left:80px; width:300px;}
 
@@ -206,14 +206,14 @@ a.btnCreate span{ line-height:30px; display:block;}
 .chShadow{ border:1px solid #d3d3d3; width:415px; height:125px;}
 .chShadowTitle{ width:415px; background:#d3d3d3; height:30px;}
 .chImg{ width:85px; height:70px; background:#d3d3d3; margin:5px 0 0 5px; *margin:3px 0 0 3px;}
-.chImg img , .chFocusImg img{ width:85px; height:70px; padding:1px ;}
+.chImg img, .chFocusImg img, .chUnFocusImg img { width:85px; height:70px; padding:0; }
 
-.chUnFocus{border:1px solid #d0d0d0; width:415px; height:130px; cursor:pointer;}
+.chUnFocus{border:1px solid #d0d0d0; width:415px; height:135px; cursor:pointer;}
 .chUnFocusTitle{width:405px; border-bottom:1px dotted #d0d0d0; height:30px; line-height:30px; padding-left:10px; font-size:1.1em;}
 
 .chUnFocus:hover { background:#fefce3; border:1px solid #ffd885;}
 
-.chFocus{ border:1px solid #ffce3a; width:415px; height:130px; cursor:pointer;}
+.chFocus{ border:1px solid #ffce3a; width:415px; height:135px; cursor:pointer;}
 .chInfo , .epInfo{ padding:5px 0 5px 10px;}
 .chFocusTitle{ width:405px; background:#fff89a; height:30px; color:#5f4800; line-height:30px; padding-left:10px; font-size:1.1em;}
 .chFocusImg , .epInfoImg , .chUnFocusImg{ width:85px; height:70px; border:1px solid #CCC; margin:5px 0 0 5px; *margin:3px 0 0 3px; float:left;}
@@ -222,6 +222,7 @@ a.btnDel:hover { background:url(/images/cms/btnCloseHover.png) no-repeat;}
 .chInfo p { color:#343434; padding-top:2px; width:220px;}
 .epInfo { color:#343434; padding-top:2px; width:260px; }
 .chInfo a , .epInfo , .chInfo p { font-size:0.85em; }
+.chInfo a { margin-right:3px; }
 
 .btnStep1{ width: 170px;}
 .btnStep2{ width:100px;}

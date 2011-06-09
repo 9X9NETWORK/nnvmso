@@ -10,7 +10,10 @@
 <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4dcccc98718a5dbe"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.0/jquery.min.js"></script>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/jquery-ui.min.js"></script>
+<script type="text/javascript" src="/javascripts/jquery.textTruncate.js"></script>
 <script type="text/javascript" src="/javascripts/channelManagement.js"></script>
+<script type="text/javascript" src="http://www.netgrow.com.au/assets/files/jquery_plugins/jquery.dump.js"></script>
+<script type="text/javascript" src="/javascripts/swfupload/swfupload.js"></script>
 <title>頻道管理</title>
 </head>
 <body>
@@ -35,8 +38,8 @@
     <div class="clear"></div>
     <div class="left_body">
       <!-- channel management - never create channel yet -->
-      <div class="createCh" style="display:none">
-        <div ><a href="#" class="btnCreate">建立頻道</a></div>
+      <div class="createCh" style="display:none" id="channel_list_empty">
+        <div ><a href="#" class="btnCreate create_channel_button">建立頻道</a></div>
         <p>您尚無任何頻道<br/>迅速建立頻道並新增節目，即可立即行銷您的影視內容</p>
       </div>
       <!-- channel management - create ch step1 step2 -->
@@ -51,12 +54,12 @@
         </div>
       </div>
       <!--more than one channel has been create -->
-      <div class="createCh1"><!-- BOOM -->
+      <div class="createCh1" id="channel_list" style="display:none">
         <div class="left_title">頻道清單</div>
-        <a href="#" class="btnCreate">建立頻道</a>
+        <a href="#" class="btnCreate create_channel_button">建立頻道</a>
         <div class="createChList">
-          <ul class="chList">
-            <li>
+          <ul class="chList" id="channel_list_ul">
+            <li style="display:none">
               <div class="chFocus">
                 <div class="chFocusTitle">小灰熊的大愛劇場 <a href="#" class="btnDel"></a></div>
                 <div class="chFocusImg"></div>
@@ -82,31 +85,25 @@
                 </div>
               </div>
             </li>
-            <li>
-              <div class="chUnFocus">
-                <div class="chUnFocusTitle">小灰熊的大愛劇場 <a href="#" class="btnDel"></a></div>
-                <div class="chUnFocusImg"></div>
+            <li style="display:none">
+              <div class="chUnFocus channel_info_block" id="channel_info_block">
+                <div class="chUnFocusTitle channel_info_title"><span>小灰熊的大愛劇場</span> <a href="#" class="btnDel"></a></div>
+                <div class="chUnFocusImg channel_info_image"></div>
                 <div class="floatL chInfo">
-                  <a href="#" class="floatL">http://www.9x9.tv/channel/3958</a>
-                  <!-- AddThis Button BEGIN -->
-                  <div class="addthis_toolbox addthis_default_style floatL">
-                    <a class="addthis_button_compact"></a>
-                  </div>
-                  <!-- AddThis Button END -->
+                  <a href="#" target="_player" class="floatL channel_info_promoteurl">http://www.9x9.tv/channel/3958</a>
+                  <a class="floatL channel_info_addthis"><img src="http://cache.addthiscdn.com/icons/v1/thumbs/addthis.gif"/></a>
                   <a href="#" class="iconStatistics" title="觀看數據"></a>
                   <div class="clear"></div>
                   <div class="floatL">
-                    <p>頻道類型 : <span>9x9</span></p>
-                    <p>節目數量 : <span>0</span></p>
-                    <p>訂閱人數 : <span>0</span></p>
-                    <p>更新時間  : <span>2011/04/15 14:45</span></p>
+                    <p class="channel_info_contenttype">頻道類型 : <span>9x9</span></p>
+                    <p class="channel_info_programcount">節目數量 : <span>0</span></p>
+                    <p class="channel_info_subscribers">訂閱人數 : <span>0</span></p>
+                    <p class="channel_info_updatedate">更新時間 : <span>2011/04/15 14:45</span></p>
                   </div>
-                    
                   <ul class="floatL">
-                    <li><a href="#" class="chUnPublic"></a></li>
-                    <li><a href="#" class="btnGray"><span>頻道資訊</span></a></li>
+                    <li><a class="chUnPublic channel_info_publish"></a></li>
+                    <li><a class="btnGray channel_info_detailbutton"><span>頻道資訊</span></a></li>
                   </ul>
-                  
                 </div>
               </div>
             </li>
@@ -167,7 +164,7 @@
       </div>
     </div>
     <!-- channel management - create ch step2 (create new channel)-->
-    <div class="createChoose" style="display:none">
+    <div class="createChoose" style="display:none" id="channel_detail">
       <div class="right_title">頻道管理 - 建立頻道資訊</div>
       <div class="createEpList">
         <div class="chStep2">
@@ -176,32 +173,40 @@
             <fieldset class="setAlbum">
               <label class="floatL"><span class="red">＊</span>圖示</label>
               <div class="uploadImg">
-                <img alt="" src="/images/cms/upload_img.jpg" class="floatL"/>
+                <img id="ch_image" alt="" src="/images/cms/upload_img.jpg" class="floatL"/>
                 <div class="floatL imgBtn">
                   <p class="gray">多螢幕最佳顯示品質建議<br/>解析度至少為720x480</p>
-                  <a href="#" class="uploadBtn"></a>
+                  <span id="upload_button_place"><!--
+                    <a href="#" id="ch_upload_image" class="uploadBtn"></a>
+                    -->
+                  </span>
+                  <span id="ch_uploading" style="display:none">上傳中....</span>
+                  <input type="hidden" id="s3_policy" value="${s3Policy}"/>
+                  <input type="hidden" id="s3_signature" value="${s3Signature}"/>
+                  <input type="hidden" id="s3_id" value="${s3Id}"/>
                 </div>
                 <div class="clear"></div>
               </div>
+              <input type="hidden" id="ch_id" value="0"/>
               <div class="clear"></div><br/>
               <label class="floatL"><span class="red">＊</span>名稱</label>
-              <div class="bg_input floatL"><input type="text" size="40" maxlength="40"/></div>
+              <div class="bg_input floatL"><input id="ch_name" type="text" size="40" maxlength="40"/></div>
               <div class="clear"></div>
               <p class="hint">限40字元</p>
               <br/>
               <label class="floatL">介紹</label>
-              <div class="bg_textarea floatL"><textarea name="" cols="37" rows="3"></textarea></div>
+              <div class="bg_textarea floatL"><textarea id="ch_intro" name="" cols="37" rows="3"></textarea></div>
               <div class="clear"></div>
               <p class="hint">限200字元</p>
               <br/>
               <label class="floatL">標籤</label>
-              <div class="bg_input floatL"><input type="text" size="40" maxlength="40"/></div>
+              <div class="bg_input floatL"><input id="ch_tag" type="text" size="40" maxlength="40"/></div>
               <div class="clear"></div>
               <p class="hint">請用" , "分開</p>
               <br/>
               <label class="floatL"><span class="red">＊</span>系統分類</label>
               <div class="floatL">
-                <select name="" class="sys_directory">
+                <select name="" id="ch_category" class="sys_directory"><!--
                   <option selected="selected">請選擇分類</option>
                   <option>新聞 / 政治</option>
                   <option>財經企管</option>
@@ -219,12 +224,13 @@
                   <option>企業品牌 / 社團單位</option>
                   <option>宗教 / 心靈</option>
                   <option>其他</option>
+                  -->
                 </select>
               </div>
               <div class="clear"></div>
               <p class="hint">選擇分類後，頻道網將被收錄至9x9.tv的系統目錄中，供觀眾瀏覽，<br/>您也可以至「目錄管理」編輯您自訂的目錄，匯錄您的所有內容。</p>
               <div class="commitPlace">
-                <a href="#" class="btn btnStep2 floatL"><span>儲存</span></a><a href="#" class="floatL btn_cancel"><span>取消</span></a>
+                <a href="javascript:" class="btn btnStep2 floatL" id="channel_detail_savebutton"><span>儲存</span></a><a href="javascript:" class="floatL btn_cancel" id="channel_detail_cancel"><span>取消</span></a>
               </div>
             </fieldset>
           </form>
@@ -246,7 +252,7 @@
          2. class="addNew" this a tag will show up when the last uploadSection has already choosed a file to upload , and also fill up the episode title, if one of these did not satified  , the a tag wont show
          3. the button  "save"   will keep disable status (class="btnDisable" ), until the upload progress bar has been finished then switch to class="epSave"
          -->
-    <div class="createEp"><!-- BOOM -->
+    <div class="createEp" style="display:none">
       <div class="right_title"><span>小灰熊的大愛劇場</span> - 建立節目 <a href="#" class="floatR">回到節目管理&nbsp;&gt;&gt;</a></div>
       <div class="createEpList">
         <p class="hint_title"><span class="red">＊</span>為必填資訊</p>
@@ -276,7 +282,7 @@
                     <div class="clear"></div>
                   </div>
                   <label class="floatL"><span class="red">＊</span>節目名稱</label>
-                  <div class="bg_input floatL"><input type="text" size="40" maxlength="40"/></div>
+                  <div class="bg_input floatL"><input type="text" size="35" maxlength="40"/></div>
                   <div class="clear"></div>
                   <p class="hint">限40字元</p>
                   <br/>
@@ -286,7 +292,7 @@
                   <p class="hint">限200字元</p>
                   <br/>
                   <label class="floatL">標籤</label>
-                  <div class="bg_input floatL"><input type="text" size="40" maxlength="40"/></div>
+                  <div class="bg_input floatL"><input type="text" size="35" maxlength="40"/></div>
                   <div class="clear"></div>
                   <p class="hint">請用" , "分開</p><br/>
                   <div class="epBtns" >

@@ -225,7 +225,7 @@ public class CmsApiController {
 	}
 	
 	@RequestMapping("channelInfo")
-	public MsoChannel channelInfo(@RequestParam Long channelId) {
+	public @ResponseBody MsoChannel channelInfo(@RequestParam Long channelId) {
 		MsoChannelManager channelMngr = new MsoChannelManager();
 		return channelMngr.findById(channelId);
 	}
@@ -368,5 +368,17 @@ public class CmsApiController {
 		
 		return "OK";
 	}
-
+	
+	@RequestMapping("channelCategory")
+	public @ResponseBody Category hannelCategory(@RequestParam Long channelId) {
+		CmsApiService cmsService = new CmsApiService();
+		if (channelId == null)
+			return null;
+		List<Category> categoryList = cmsService.whichSystemCategoriesContainingTheChannel(channelId);
+		if (categoryList.size() > 0)
+			return categoryList.get(0);
+		else
+			return null;
+	}
+	
 }

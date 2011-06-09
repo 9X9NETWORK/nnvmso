@@ -9,7 +9,9 @@ $(function()
     1: 'System',
     2: 'Podcast',
     3: 'YouTube Channel',
-    4: 'YouTube Playlist'
+    4: 'YouTube Playlist',
+    5: 'Facebook',
+    6: '9x9'
   };
 
   var channelStatus = {

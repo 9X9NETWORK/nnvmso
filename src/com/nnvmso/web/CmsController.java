@@ -141,14 +141,12 @@ public class CmsController {
 			model.addAttribute("mso", mso);
 			model.addAttribute("msoId", mso.getKey().getId());
 			model.addAttribute("logoutUrl", "/" + msoName + "/logout");
-			if (cmsTab.equals("channelManagement")) {
-				return "cms/channelManagement";
-			} else if (cmsTab.equals("channelSetManagement")) {
+			if (cmsTab.equals("channelManagement") || cmsTab.equals("channelSetManagement")) {
 				String policy = AmazonLib.buildS3Policy("9x9tmp", "public-read", "image/");
 				model.addAttribute("s3Policy", policy);
 				model.addAttribute("s3Signature", AmazonLib.calculateRFC2104HMAC(policy));
 				model.addAttribute("s3Id", AmazonLib.AWS_ID);
-				return "cms/channelSetManagement";
+				return "cms/" + cmsTab;
 			} else {
 				return "error/404";
 			}
