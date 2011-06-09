@@ -18,11 +18,34 @@ var formatDate = function(timestamp)
   return year + '/' + month + '/' + date + ' ' + hour + ':' + minute + ':' + second;
 };
 
+var channelCreation =
+{
+  create9x9Channel: function()
+  {
+    $.getJSON('/CMSAPI/createChannelSkeleton?msoId=' + $('#msoId').val(), function(channelId)
+    {
+      $('<li/>').append('<div class="chShadow channel_info_block_cloned"><div class="chShadowTitle"></div><div class="chImg"></div></div>')
+        .prependTo('#channel_list_ul');
+      channelDetail.init(channelId);
+    });
+  }
+};
+
 var channelDetail =
 {
   swfuploadObject: null,
+  destroy: function()
+  {
+    if (channelDetail.swfuploadObject != null)
+    {
+      channelDetail.swfuploadObject.destroy();
+      channelDetail.swfuploadObject = null;
+      }
+    $('#channel_detail').hide();
+  },
   init: function(channelId)
   {
+    $('#choose_channel_type').hide();
     $.getJSON('/CMSAPI/channelInfo?channelId=' + channelId, function(channel)
     {
       $('#ch_id').val(channel.key.id);
@@ -30,8 +53,9 @@ var channelDetail =
       $('#ch_image').attr('src', channel.imageUrl);
       $('#ch_intro').val('').val(channel.intro);
       $('#ch_tag').val('');
-      if (channelDetail.swfuploadObject != null)
+      if (channelDetail.swfuploadObject != null) {
         channelDetail.swfuploadObject.destroy();
+      }
       $('<spane/>').attr('id', 'ch_upload_image').appendTo('#upload_button_place');
       var swfupload_settings =
       {
@@ -120,10 +144,12 @@ var channelDetail =
       };
       $.post('/CMSAPI/saveChannel', parameters, function(response)
       {
-        if (response != 'OK')
+        if (response != 'OK') {
           alert('發生錯誤');
-        else
+        }else {
           alert('儲存成功');
+          channelList.init();
+        }
       }, 'text');
     });
   }
@@ -133,6 +159,10 @@ var channelList =
 {
   init: function()
   {
+    $('.channel_info_block_cloned').each(function()
+    {
+      $(this).parent().remove();
+    });
     // load channels
     $.getJSON('/CMSAPI/listOwnedChannels?msoId=' + $('#msoId').val(), function(channels)
     {
@@ -142,7 +172,7 @@ var channelList =
       }
       for (i in channels)
       {
-        var channelInfoBlock = $('#channel_info_block').clone(true).removeAttr('id');
+        var channelInfoBlock = $('#channel_info_block').clone(true).removeAttr('id').addClass('channel_info_block_cloned');
         var channelId = channels[i].key.id;
         
         channelInfoBlock.find('.channel_info_title span').text(channels[i].name);
@@ -188,6 +218,21 @@ var channelList =
         } else {
           switchObject.removeClass('chPublic').addClass('chUnPublic');
         }
+        channelInfoBlock.find('.channel_info_removebutton').click({ 'channelId': channelId, 'channelInfoBlock': channelInfoBlock }, function(event)
+        {
+          if (confirm('你確定要將頻道移除嗎？') == false)
+            return false;
+          var parameters = {
+            'channelId': event.data.channelId,
+            'msoId': $('#msoId').val()
+          };
+          $.post('/CMSAPI/removeChannelFromList', parameters, function()
+          {
+            event.data.channelInfoBlock.parent().remove();
+            channelDetail.destroy();
+          });
+          return false;
+        });
         channelInfoBlock.find('.channel_info_publish').click({ 'channelId': channelId, 'switchObject': switchObject }, function(event)
         {
           $.getJSON('/CMSAPI/switchChannelPublicity?channelId=' + event.data.channelId, function(response)
@@ -198,11 +243,13 @@ var channelList =
               event.data.switchObject.removeClass('chPublic').addClass('chUnPublic');
             }
           });
+          return false;
         });
         channelInfoBlock.find('.channel_info_detailbutton').click({ 'channelId': channelId }, function(event)
         {
           alert('program list');
           //channelInfo.init(event.data.channelId);
+          return false;
         });
         channelInfoBlock.find('.channel_info_promoteurl').text(promoteUrl).attr('href', promoteUrl);
         $('<li></li>').append(channelInfoBlock).appendTo('#channel_list_ul');
@@ -220,7 +267,12 @@ var channelList =
       }
       $('#channel_list').show();
     });
-    
+    $('.create_channel_button').unbind().click(function()
+    {
+      channelDetail.destroy();
+      $('#create_9x9_channel_button').unbind().click(channelCreation.create9x9Channel);
+      $('#choose_channel_type').show();
+    });
   }
 }
 

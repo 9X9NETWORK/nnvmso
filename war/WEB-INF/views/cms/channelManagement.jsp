@@ -39,7 +39,7 @@
     <div class="left_body">
       <!-- channel management - never create channel yet -->
       <div class="createCh" style="display:none" id="channel_list_empty">
-        <div ><a href="#" class="btnCreate create_channel_button">建立頻道</a></div>
+        <div ><a href="javascript:" class="btnCreate create_channel_button">建立頻道</a></div>
         <p>您尚無任何頻道<br/>迅速建立頻道並新增節目，即可立即行銷您的影視內容</p>
       </div>
       <!-- channel management - create ch step1 step2 -->
@@ -56,12 +56,12 @@
       <!--more than one channel has been create -->
       <div class="createCh1" id="channel_list" style="display:none">
         <div class="left_title">頻道清單</div>
-        <a href="#" class="btnCreate create_channel_button">建立頻道</a>
+        <a href="javascript:" class="btnCreate create_channel_button">建立頻道</a>
         <div class="createChList">
           <ul class="chList" id="channel_list_ul">
             <li style="display:none">
               <div class="chFocus">
-                <div class="chFocusTitle">小灰熊的大愛劇場 <a href="#" class="btnDel"></a></div>
+                <div class="chFocusTitle">小灰熊的大愛劇場 <a href="javascript:" class="btnDel"></a></div>
                 <div class="chFocusImg"></div>
                 <div class="floatL chInfo">
                   <a href="#" class="floatL">http://www.9x9.tv/channel/3958</a>
@@ -87,7 +87,7 @@
             </li>
             <li style="display:none">
               <div class="chUnFocus channel_info_block" id="channel_info_block">
-                <div class="chUnFocusTitle channel_info_title"><span>小灰熊的大愛劇場</span> <a href="#" class="btnDel"></a></div>
+                <div class="chUnFocusTitle channel_info_title"><span>小灰熊的大愛劇場</span> <a href="javascript:" class="btnDel channel_info_removebutton"></a></div>
                 <div class="chUnFocusImg channel_info_image"></div>
                 <div class="floatL chInfo">
                   <a href="#" target="_player" class="floatL channel_info_promoteurl">http://www.9x9.tv/channel/3958</a>
@@ -116,13 +116,13 @@
   <div class="right_content floatL">
     <div class="right_body">
     <!-- channel management - create ch step1-->
-    <div class="createChoose" style="display:none">
+    <div class="createChoose" style="display:none" id="choose_channel_type">
       <div class="right_title">頻道管理 - 建立頻道</div>
       <div class="createEpList">
         <div class="chStep1">
           <ul>
             <li class="createChItem">
-              <div class="floatL createBtn"><a href="#" class="btn btnStep1"><span>建立全新9x9頻道</span></a></div>
+              <div class="floatL createBtn"><a href="javascript:" id="create_9x9_channel_button" class="btn btnStep1"><span>建立全新9x9頻道</span></a></div>
               <ul class="floatL createAbout">
                 <li>轉檔、儲存、管理、行銷</li>
                 <li>絕佳的播放速度</li>
@@ -206,26 +206,7 @@
               <br/>
               <label class="floatL"><span class="red">＊</span>系統分類</label>
               <div class="floatL">
-                <select name="" id="ch_category" class="sys_directory"><!--
-                  <option selected="selected">請選擇分類</option>
-                  <option>新聞 / 政治</option>
-                  <option>財經企管</option>
-                  <option>影視娛樂</option>
-                  <option>運動休閒</option>
-                  <option>科技 / 軟體應用</option>
-                  <option>電玩遊戲</option>
-                  <option>嗜好興趣</option>
-                  <option>旅遊生活</option>
-                  <option>藝術 / 文創</option>
-                  <option>非營利組織與社會行動</option>
-                  <option>教育 / 教學</option>
-                  <option>自然 / 動物</option>
-                  <option>個人 / 名人</option>
-                  <option>企業品牌 / 社團單位</option>
-                  <option>宗教 / 心靈</option>
-                  <option>其他</option>
-                  -->
-                </select>
+                <select name="" id="ch_category" class="sys_directory"></select>
               </div>
               <div class="clear"></div>
               <p class="hint">選擇分類後，頻道網將被收錄至9x9.tv的系統目錄中，供觀眾瀏覽，<br/>您也可以至「目錄管理」編輯您自訂的目錄，匯錄您的所有內容。</p>

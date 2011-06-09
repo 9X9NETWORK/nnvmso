@@ -203,7 +203,7 @@ a.btnCreate span{ line-height:30px; display:block;}
 .createCh1 .left_title , .epList .right_title{ padding-bottom:5px; }
 
 .createChoose .right_title{ background:url(/images/cms/right_title.jpg) no-repeat; width:480px; height:35px; padding:10px 0 0 10px; border:none;}
-.chShadow{ border:1px solid #d3d3d3; width:415px; height:125px;}
+.chShadow { border:1px solid #d3d3d3; width:415px; height:125px; }
 .chShadowTitle{ width:415px; background:#d3d3d3; height:30px;}
 .chImg{ width:85px; height:70px; background:#d3d3d3; margin:5px 0 0 5px; *margin:3px 0 0 3px;}
 .chImg img, .chFocusImg img, .chUnFocusImg img { width:85px; height:70px; padding:0; }

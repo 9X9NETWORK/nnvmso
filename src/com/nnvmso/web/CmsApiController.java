@@ -1,6 +1,9 @@
 package com.nnvmso.web;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -57,10 +60,22 @@ public class CmsApiController {
 	public @ResponseBody List<MsoChannel> listOwnedChannels(@RequestParam Long msoId) {
 		
 		ContentOwnershipManager ownershipMngr = new ContentOwnershipManager();
+		List<MsoChannel> results = new ArrayList<MsoChannel>();
 		
 		logger.info("msoId = " + msoId);
 		
-		return ownershipMngr.findOwnedChannelsByMsoId(msoId);
+		class MsoChannelComparator implements Comparator<MsoChannel> {  // yes, I know, its a little dirty
+			@Override
+			public int compare(MsoChannel channel1, MsoChannel channel2) {
+				Date date1 = channel1.getUpdateDate();
+				Date date2 = channel2.getUpdateDate();
+				return date2.compareTo(date1);
+			}
+		}
+		
+		results = ownershipMngr.findOwnedChannelsByMsoId(msoId);
+		Collections.sort(results, new MsoChannelComparator());
+		return results;
 	}
 	
 	/**
@@ -217,11 +232,15 @@ public class CmsApiController {
 	}
 	
 	@RequestMapping("removeChannelFromList")
-	public void removeChannelFromList(@RequestParam Long channelId, @RequestParam Long msoId) {
+	public @ResponseBody void removeChannelFromList(@RequestParam Long channelId, @RequestParam Long msoId) {
+		
+		logger.info("msoId = " + msoId + ", channelId = " + channelId);
 		ContentOwnershipManager ownershipMngr = new ContentOwnershipManager();
 		ContentOwnership ownership = ownershipMngr.findByMsoIdAndChannelId(msoId, channelId);
-		if (ownership != null)
+		if (ownership != null) {
 			ownershipMngr.delete(ownership);
+			logger.info("remove ownership");
+		}
 	}
 	
 	@RequestMapping("channelInfo")
@@ -345,6 +364,7 @@ public class CmsApiController {
 		//channel.setTag(tag); MsoChannel needs a tag property
 		channel.setImageUrl(imageUrl);
 		channel.setIntro(intro);
+		channel.setUpdateDate(new Date());
 		channelMngr.save(channel);
 		
 		List<CategoryChannel> ccs = cmsApiService.whichCCContainingTheChannel(channelId);
@@ -381,4 +401,26 @@ public class CmsApiController {
 			return null;
 	}
 	
+	@RequestMapping("createChannelSkeleton")
+	public @ResponseBody Long createChannelSkeleton(Long msoId) {
+		
+		NnUserManager userMngr = new NnUserManager();
+		MsoManager msoMngr = new MsoManager();
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		
+		Mso mso = msoMngr.findById(msoId);
+		if (mso == null)
+			return null;
+		
+		MsoChannel channel = new MsoChannel("New Channel", "New Channel", "/WEB-INF/../images/processing.png", userMngr.findNNUser().getKey().getId());
+		channel.setPublic(false);
+		channel.setContentType(MsoChannel.CONTENTTYPE_9X9);
+		channelMngr.create(channel, new ArrayList<Category>());
+		
+		//channel1 ownership
+		ContentOwnershipManager ownershipMngr = new ContentOwnershipManager();
+		ownershipMngr.create(new ContentOwnership(), mso, channel);
+		
+		return channel.getKey().getId();
+	}
 }
