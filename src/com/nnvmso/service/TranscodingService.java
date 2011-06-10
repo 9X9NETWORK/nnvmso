@@ -244,6 +244,16 @@ public class TranscodingService {
 		return pro;
 	}
 	
+	public void updateFbToken(String fbToken) {
+		MsoConfigManager configMngr = new MsoConfigManager();		
+		MsoConfig config = configMngr.findByItem(MsoConfig.FBTOKEN);
+		if (config == null) { config = new MsoConfig();	}
+		config.setItem(MsoConfig.FBTOKEN);
+		config.setValue(fbToken);
+		configMngr.save(config);
+		
+	}
+	
 	public String[] getTranscodingEnv(HttpServletRequest req) {
 		//get environment
 		Properties pro = getTranscodingServerPro();

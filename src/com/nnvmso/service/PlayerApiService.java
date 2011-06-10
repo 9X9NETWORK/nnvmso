@@ -149,6 +149,7 @@ public class PlayerApiService {
 		int counter = this.addMsoInfoVisitCounter(theMso.getName());
 		MsoConfigManager configMngr = new MsoConfigManager();
 		MsoConfig config = configMngr.findByMsoIdAndItem(theMso.getKey().getId(), MsoConfig.DEBUG);
+		MsoConfig fbConfig = configMngr.findByItem(MsoConfig.FBTOKEN);
 		String debug = "1";
 		if (config != null) { debug = config.getValue(); }
 		
@@ -163,6 +164,7 @@ public class PlayerApiService {
 		results = results + this.assembleKeyValue("jingleUrl", mso.getJingleUrl());
 		results = results + this.assembleKeyValue("brandInfoCounter", String.valueOf(counter));
 		results = results + this.assembleKeyValue("debug", debug);
+		results = results + this.assembleKeyValue(MsoConfig.FBTOKEN, fbConfig.getValue());
 		
 		return results;
 	}
