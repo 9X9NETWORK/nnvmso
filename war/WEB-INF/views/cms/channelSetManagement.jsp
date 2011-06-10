@@ -16,7 +16,7 @@
 <script type="text/javascript" src="/javascripts/jquery.bubble.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.textTruncate.js"></script>
 <script type="text/javascript" src="/javascripts/swfupload/swfupload.js"></script>
-<script type="text/javascript" src="/javascripts/cms.js"></script>
+<script type="text/javascript" src="/javascripts/channelSetManagement.js"></script>
 <title><spring:message code="cms.channel_set_management.title"/></title>
 </head>
 <body>
@@ -33,8 +33,8 @@
   <div class="left_content floatL">
     <ul>
       <li><a href="channelManagement" class="menuA"></a></li>
-      <li><a href="#" class="menuB_active"></a></li>
-      <li><a href="#" class="menuC"></a></li>
+      <li><a href="javascript:" class="menuB_active"></a></li>
+      <li><a href="directoryManagement" class="menuC"></a></li>
       <li><a href="#" class="menuD"></a></li>
       <li><a href="#" class="menuE"></a></li>
     </ul>

@@ -334,8 +334,8 @@ a.addNew{ padding:10px 0 0 0; display:block; font-size:0.9em;}
 .createEpList{ overflow:auto; height:548px;}
 .createEpList2{ overflow:auto; height:510px;}
 .createEp { width:500px; }
-textarea , input { font-size:0.9em}
-form a{ font-size:0.8em}
+textarea, input { font-size:0.9em; }
+form a { font-size:0.8em; }
 
 .promote_title{ border-bottom:1px dashed #ddd; padding:20px 0px 10px 0px; font-size:1.2em; position: relative;}
 .promote_title a{ font-size:0.8em;}
@@ -344,4 +344,14 @@ form a{ font-size:0.8em}
 
 .promote_hint{ font-size:12px; color:#444; width:300px; background:#FFC; position:absolute; top:20px; right:70px; z-index:99999; display:none; padding:5px;}
 .promote_hint li{ padding:3px 0px 3px 10px; list-style-type:circle; list-style:inside}
+
+.directory_ch { width:450px; }
+.directory_ch li { float:left; margin:5px 3px 3px 5px; padding:5px 0 0 5px; }
+.directory_ch .ch_normal { background:url(/images/cms/ch_normal.jpg) no-repeat 0px 0px; width:96px; height:83px; cursor:move; }
+.directory_ch .ch_normal:hover { background:url(/images/cms/ch_hover.jpg) no-repeat 0px 0px; width:96px; height:83px; }
+.directory_ch img { width:85px; height:50px; border:1px solid #b7b7b7; }
+.directory_ch .ch_disable { background:url(/images/cms/ch_disable.jpg) no-repeat 5px 0px; width:76px; height:73px; }
+.directoryChList { height:480px; overflow:auto; }
+.directoryList { height:440px; overflow:auto; }
+.directoryList li { float:none; }
 

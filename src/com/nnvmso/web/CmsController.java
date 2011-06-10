@@ -147,6 +147,8 @@ public class CmsController {
 				model.addAttribute("s3Signature", AmazonLib.calculateRFC2104HMAC(policy));
 				model.addAttribute("s3Id", AmazonLib.AWS_ID);
 				return "cms/" + cmsTab;
+			} else if (cmsTab.equals("directoryManagement")) {
+				return "cms/" + cmsTab;
 			} else {
 				return "error/404";
 			}
