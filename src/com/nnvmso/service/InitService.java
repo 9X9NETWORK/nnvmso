@@ -770,9 +770,13 @@ public class InitService {
 			CategoryManager categoryMngr = new CategoryManager();
 			Category category = categoryMngr.findByName("慈濟大愛電視");
 			channels = new MsoChannelManager().findPublicChannelsByCategoryId(category.getKey().getId());
+			channels.get(0).setSeq(1);
+			channels.get(1).setSeq(2);
+			/*
 			for (int i = 0; i < channels.size(); i++) {
 				channels.get(i).setSeq(i+1);
 			}
+			*/
 		} else {
 			MsoChannelManager channelMngr = new MsoChannelManager();
 			String[] urls = this.getMso3ChannelSetUrls();

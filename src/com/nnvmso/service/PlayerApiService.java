@@ -164,7 +164,8 @@ public class PlayerApiService {
 		results = results + this.assembleKeyValue("jingleUrl", mso.getJingleUrl());
 		results = results + this.assembleKeyValue("brandInfoCounter", String.valueOf(counter));
 		results = results + this.assembleKeyValue("debug", debug);
-		results = results + this.assembleKeyValue(MsoConfig.FBTOKEN, fbConfig.getValue());
+		if (fbConfig!=null)
+			results = results + this.assembleKeyValue(MsoConfig.FBTOKEN, fbConfig.getValue());
 		
 		return results;
 	}
