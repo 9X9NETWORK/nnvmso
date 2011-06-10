@@ -71,13 +71,21 @@ var getContentTypeByFileExtention = function(ext)
 
 var overallLayout =
 {
-  destroyRightSideContent: function()
+  destroyRightSideContent: function(cleanup)
   {
+    if (cleanup == false) {
+      if ($('.program_create_detail_block_cloned').size() > 0) {
+        if (confirm('節目尚未建立完成，確定離開？') == false) {
+          return false;
+        }
+      }
+    }
     // hide right side content
     channelDetail.destroy();
     programDetail.destroy();
     programList.destroy();
     $('#choose_channel_type').hide();
+    return true;
   }
 }
 
@@ -192,57 +200,57 @@ var programDetail =
         if (response != 'OK') {
           alert('發生錯誤');
         }else {
-          alert('儲存成功');
+          alert('完成更新');
           programList.init(program.channelId, false, $('#program_list .right_title span').text());
         }
       }, 'text');
     });
-      $('<span/>').addClass('ep_upload_image').appendTo(programDetailBlock.find('.upload_button_place'));
-      var swfupload_settings =
+    $('<span/>').addClass('ep_upload_image').appendTo(programDetailBlock.find('.upload_button_place'));
+    var swfupload_settings =
+    {
+      flash_url:          '/javascripts/swfupload/swfupload.swf',
+      upload_url:         'http://9x9tmp.s3.amazonaws.com/',
+      file_size_limit:    '10240',
+      file_types:         '*.jpg;*.png',
+      file_types_description: 'Image Files',
+      file_post_name:     'file',
+      button_placeholder: programDetailBlock.find('.ep_upload_image').get(0),
+      button_action:      SWFUpload.BUTTON_ACTION.SELECT_FILE,
+      button_image_url:   '/images/cms/btn_upload.png',
+      button_width:       '95',
+      button_height:      '32',
+      button_cursor:      SWFUpload.CURSOR.HAND,
+      debug:              false,
+      http_success :      [201],
+      upload_success_handler: function(file, serverData, recievedResponse)
       {
-        flash_url:          '/javascripts/swfupload/swfupload.swf',
-        upload_url:         'http://9x9tmp.s3.amazonaws.com/',
-        file_size_limit:    '10240',
-        file_types:         '*.jpg;*.png',
-        file_types_description: 'Image Files',
-        file_post_name:     'file',
-        button_placeholder: programDetailBlock.find('.ep_upload_image').get(0),
-        button_action:      SWFUpload.BUTTON_ACTION.SELECT_FILE,
-        button_image_url:   '/images/cms/btn_upload.png',
-        button_width:       '95',
-        button_height:      '32',
-        button_cursor:      SWFUpload.CURSOR.HAND,
-        debug:              false,
-        http_success :      [201],
-        upload_success_handler: function(file, serverData, recievedResponse)
+        programDetailBlock.find('.ep_uploading_image').hide();
+        programDetailBlock.find('.ep_image').attr('src', 'http://9x9tmp.s3.amazonaws.com/prog_logo_' + programId + file.type);
+      },
+      upload_error_handler: function(file, code, message)
+      {
+        programDetailBlock.find('.ep_uploading_image').hide();
+        alert('error: ' + message);
+      },
+      file_queued_handler: function(file)
+      {
+        var post_params =
         {
-          programDetailBlock.find('.ep_uploading_image').hide();
-          programDetailBlock.find('.ep_image').attr('src', 'http://9x9tmp.s3.amazonaws.com/prog_logo_' + programId + file.type);
-        },
-        upload_error_handler: function(file, code, message)
-        {
-          programDetailBlock.find('.ep_uploading_image').hide();
-          alert('error: ' + message);
-        },
-        file_queued_handler: function(file)
-        {
-          var post_params =
-          {
-            "AWSAccessKeyId": $('#s3_id').val(),
-            "key":            'prog_logo_' + programId + file.type,
-            "acl":            "public-read",
-            "policy":         $('#s3_policy').val(),
-            "signature":      $('#s3_signature').val(),
-            "content-type":   (file.type == '.jpg') ? "image/jpeg" : "image/png",
-            "success_action_status": "201"
-          };
-          this.setPostParams(post_params);
-          this.startUpload(file.id);
-          programDetailBlock.find('.ep_uploading_image').show();
-        }
-      };
-      var swfObjectImage = new SWFUpload(swfupload_settings);
-      programDetail.swfObjectImage.push(swfObjectImage);
+          "AWSAccessKeyId": $('#s3_id').val(),
+          "key":            'prog_logo_' + programId + file.type,
+          "acl":            "public-read",
+          "policy":         $('#s3_policy').val(),
+          "signature":      $('#s3_signature').val(),
+          "content-type":   (file.type == '.jpg') ? "image/jpeg" : "image/png",
+          "success_action_status": "201"
+        };
+        this.setPostParams(post_params);
+        this.startUpload(file.id);
+        programDetailBlock.find('.ep_uploading_image').show();
+      }
+    };
+    var swfObjectImage = new SWFUpload(swfupload_settings);
+    programDetail.swfObjectImage.push(swfObjectImage);
     $('#program_detail').show();
   },
   displayProgramReadonly: function(program)
@@ -312,9 +320,10 @@ var programDetail =
         programDetailBlock.find('.ep_url_block').hide();
         programDetailBlock.find('.ep_savebutton').unbind().addClass('btnDisable').removeClass('btnSave');
       });
-      programDetailBlock.find('.ep_url_input').focusout(function()
+      programDetailBlock.find('.ep_url_input, .ep_name').focusout(function()
       {
-        if (programDetailBlock.find('.ep_url_input').val().length > 0) {
+        if (programDetailBlock.find('.ep_url_input').val().length > 0
+            && programDetailBlock.find('.ep_name').val().length > 0) {
           programDetailBlock
             .find('.ep_savebutton')
             .unbind()
@@ -338,7 +347,7 @@ var programDetail =
               $.post('/CMSAPI/saveNewProgram', parameters, function(response)
               {
                 if (response == 'OK') {
-                  alert('儲存成功');
+                  alert('完成更新');
                   programDetailBlock.parent().remove();
                   if ($('.program_create_detail_block_cloned').size() == 0) {
                     programList.init(channelId, false, channelName);
@@ -484,13 +493,13 @@ var programList =
   },
   init: function(channelId, readonly, channelName)
   {
-    overallLayout.destroyRightSideContent();
+    if (overallLayout.destroyRightSideContent(false) == false) return false;
     
     $.get('/CMSAPI/programList?channelId=' + channelId, function(programs)
     {
       $('.create_program_button').unbind().click({ 'channelId': channelId, 'channelName': channelName }, function(event)
       {
-        overallLayout.destroyRightSideContent();
+        if (overallLayout.destroyRightSideContent(false) == false) return false;
         skeletonCreation.create9x9Program(event.data.channelId, event.data.channelName);
       });
       if (programs.length == 0) {
@@ -551,9 +560,9 @@ var programList =
       } else {
         switchObject.removeClass('chPublic').addClass('chUnPublic');
       }
-      programInfoBlock.find('.program_info_removebutton').click({ 'programId': programId, 'programInfoBlock': programInfoBlock }, function(event)
+      programInfoBlock.find('.program_info_removebutton').click({ 'programId': programId, 'programName': programs[i].name, 'programInfoBlock': programInfoBlock }, function(event)
       {
-        if (confirm('你確定要將節目移除嗎？') == false)
+        if (confirm('若您確定要移除 "' + event.data.programName + '" 節目，則節目資訊以及檔案將全部被移除') == false)
           return false;
         var parameters = {
           'programId': event.data.programId
@@ -668,7 +677,8 @@ var channelDetail =
   },
   displayImportDetail: function()
   {
-    overallLayout.destroyRightSideContent();
+    if (overallLayout.destroyRightSideContent(false) == false) return false;
+    
     $.getJSON('/CMSAPI/systemCategories', function(categories)
     {
       $('#channel_import_detail .sys_directory').html('<option value="0">請選擇分類</option>');
@@ -693,7 +703,8 @@ var channelDetail =
       $.post('/CMSAPI/importChannelByUrl', parameters, function(channel)
       {
         if (channel == null) {
-          alert('頻道來源有誤，請重新輸入');
+          alert('來源網址有誤，請重新確認');
+          $('#channel_import_detail [name="ch_import_url"]').focus();
           return;
         }
         var channelId = channel.key.id;
@@ -802,11 +813,11 @@ var channelDetail =
           {
             if (response != 'OK') {
               alert('發生錯誤');
-              return;
+            } else {
+              alert('完成更新');
+              overallLayout.destroyRightSideContent(true);
+              channelList.init();
             }
-            alert('匯入成功');
-            overallLayout.destroyRightSideContent();
-            channelList.init();
           }, 'text');
         });
       }, 'json');
@@ -823,7 +834,7 @@ var channelDetail =
   },
   init: function(channelId)
   {
-    overallLayout.destroyRightSideContent();
+    if (overallLayout.destroyRightSideContent(false) == false) return false;
     
     $.getJSON('/CMSAPI/channelInfo?channelId=' + channelId, function(channel)
     {
@@ -927,7 +938,7 @@ var channelDetail =
         if (response != 'OK') {
           alert('發生錯誤');
         }else {
-          alert('儲存成功');
+          alert('完成更新');
           channelList.init();
         }
       }, 'text');
@@ -1004,9 +1015,9 @@ var channelList =
         } else {
           switchObject.removeClass('chPublic').addClass('chUnPublic');
         }
-        channelInfoBlock.find('.channel_info_removebutton').click({ 'channelId': channelId, 'channelInfoBlock': channelInfoBlock }, function(event)
+        channelInfoBlock.find('.channel_info_removebutton').click({ 'channelId': channelId, 'channelName': channels[i].name, 'channelInfoBlock': channelInfoBlock }, function(event)
         {
-          if (confirm('你確定要將頻道移除嗎？') == false)
+          if (confirm('若您確定要移除 "' + event.data.channelName + '" 頻道，則頻道資訊將全部被移除') == false)
             return false;
           var parameters = {
             'channelId': event.data.channelId,
@@ -1015,7 +1026,7 @@ var channelList =
           $.post('/CMSAPI/removeChannelFromList', parameters, function()
           {
             event.data.channelInfoBlock.parent().remove();
-            overallLayout.destroyRightSideContent();
+            if (overallLayout.destroyRightSideContent(false) == false) return false;
           });
           return false;
         });
@@ -1058,7 +1069,7 @@ var channelList =
     });
     $('.create_channel_button').unbind().click(function()
     {
-      overallLayout.destroyRightSideContent();
+      if (overallLayout.destroyRightSideContent(false) == false) return false;
       $('#create_9x9_channel_button').unbind().click(skeletonCreation.create9x9Channel);
       $('.import_button').unbind().click(channelDetail.displayImportDetail);
       $('#choose_channel_type').show();
@@ -1069,4 +1080,11 @@ var channelList =
 $(function()
 {
   channelList.init();
+  $(window).bind('beforeunload', function()
+  {
+    if ($('.program_create_detail_block_cloned').size() > 0) {
+      return '節目尚未建立完成，確定離開？';
+    }
+    return;
+  });
 });
