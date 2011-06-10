@@ -260,5 +260,15 @@ public class TranscodingServiceController {
 	    }
 		return NnNetUtil.textReturn("OK");
 	}
-		
+
+	@RequestMapping("updateFbToken")
+	public ResponseEntity<String> updateFbToken(@RequestParam String access_token) throws IOException {
+		try {
+			transcodingService.updateFbToken(access_token);
+		} catch (Exception e) {
+			transcodingService.handleException(e);
+		}
+		return NnNetUtil.textReturn("OK");
+	}
+	
 }
