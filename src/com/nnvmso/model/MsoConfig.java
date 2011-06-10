@@ -22,6 +22,7 @@ public class MsoConfig {
 	private String item;
 	public static String CDN = "cdn";
 	public static String DEBUG = "debug";
+	public static String FBTOKEN = "fbtoken";
 	
 	@Persistent
 	private String value;
