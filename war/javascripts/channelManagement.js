@@ -75,7 +75,7 @@ var overallLayout =
   {
     if (cleanup == false) {
       if ($('.program_create_detail_block_cloned').size() > 0) {
-        if (confirm('節目尚未建立完成，確定離開？') == false) {
+        if (confirm($('#lang_confirm_leaving_program_creation').text()) == false) {
           return false;
         }
       }
@@ -185,7 +185,7 @@ var programDetail =
     programDetailBlock.find('.ep_savebutton').unbind().click(function()
     {
       if (programDetailBlock.find('.ep_name').val() == "") {
-        alert('名稱不可以為空');
+        alert($('#lang_warning_empty_name').text());
         return;
       }
       var parameters =
@@ -198,10 +198,10 @@ var programDetail =
       $.post('/CMSAPI/saveProgram', parameters, function(response)
       {
         if (response != 'OK') {
-          alert('發生錯誤');
+          alert($('#lang_warning_error_occurs').text());
         }else {
-          alert('完成更新');
-          programList.init(program.channelId, false, $('#program_list .right_title span').text());
+          alert($('#lang_update_successfully').text());
+          programList.init(program.channelId, false, $('#program_list .right_title div').text());
         }
       }, 'text');
     });
@@ -261,7 +261,7 @@ var programDetail =
     if (title.length > 20) {
       title = title.substring(0, 20) + '...';
     }
-    programDetailBlock.find('.right_title span').text(title);
+    programDetailBlock.find('.right_title div').text(title);
     programDetailBlock.find('.ep_name').text(program.name);
     programDetailBlock.find('.ep_intro').text(program.intro);
     var promoteUrl = 'http://' + location.host + '/episode/' + programId;
@@ -291,6 +291,7 @@ var programDetail =
   },
   programCreation: function(programId, channelId, channelName)
   {
+    $('#program_create_detail .right_title div').text(channelName);
     $('#program_create_detail .ep_return').unbind().click(function()
     {
       programList.init(channelId, false, channelName);
@@ -332,7 +333,7 @@ var programDetail =
             .click(function()
             {
               if (programDetailBlock.find('.ep_name').val() == '') {
-                alert('名稱不可為空');
+                alert($('#lang_warning_empty_name').text());
                 return;
               }
               var parameters =
@@ -347,13 +348,13 @@ var programDetail =
               $.post('/CMSAPI/saveNewProgram', parameters, function(response)
               {
                 if (response == 'OK') {
-                  alert('完成更新');
+                  alert($('#lang_update_successfully').text());
                   programDetailBlock.parent().remove();
                   if ($('.program_create_detail_block_cloned').size() == 0) {
                     programList.init(channelId, false, channelName);
                   }
                 } else {
-                  alert('發生錯誤');
+                  alert($('#lang_warning_error_occurs').text());
                 }
               }, 'text');
             });
@@ -387,14 +388,14 @@ var programDetail =
         },
         upload_success_handler: function(file, serverData, recievedResponse)
         {
-          programDetailBlock.find('.ep_uploading_video div').progressbar('destroy').text('上傳完成').show();
+          programDetailBlock.find('.ep_uploading_video div').progressbar('destroy').text($('#lang_upload_finished').text()).show();
           programDetailBlock.find('.ep_url_input')
             .val('http://9x9tmp.s3.amazonaws.com/' + 'prog_video_' + programId + file.type)
             .focusout();
         },
         upload_error_handler: function(file, code, message)
         {
-          programDetailBlock.find('.ep_uploading_video div').progressbar('destroy').text('上傳失敗').show();
+          programDetailBlock.find('.ep_uploading_video div').progressbar('destroy').text($('#lang_upload_failed').text()).show();
           alert('error: ' + message);
         },
         file_queued_handler: function(file)
@@ -465,7 +466,7 @@ var programDetail =
       programDetail.swfObjectImage.push(swfObjectImage);
       programDetailBlock.find('.ep_cancelbutton').click(function()
       {
-        if (confirm('確認取消') == false)
+        if (confirm($('#lang_confirm_cancel').text()) == false)
           return;
         swfObjectImage.destroy();
         swfObject.destroy();
@@ -504,19 +505,19 @@ var programList =
       });
       if (programs.length == 0) {
         if (readonly) {
-          $('#program_list_empty_readonly .right_title span').text(channelName);
+          $('#program_list_empty_readonly .right_title div').text(channelName);
           $('#program_list_empty_readonly').show();
         } else {
-          $('#program_list_empty .right_title span').text(channelName);
+          $('#program_list_empty .right_title div').text(channelName);
           $('#program_list_empty').show();
         }
         return;
       }
       if (readonly) {
-        $('#program_list_readonly .right_title span').text(channelName);
+        $('#program_list_readonly .right_title div').text(channelName);
         programList.displayProgramListReadonly(programs);
       } else {
-        $('#program_list .right_title span').text(channelName);
+        $('#program_list .right_title div').text(channelName);
         programList.displayProgramList(programs);
       }
     });
@@ -529,6 +530,7 @@ var programList =
       var programInfoBlock = $('#program_info_block').clone(true).removeAttr('id').addClass('program_info_block_cloned');
       var programId = programs[i].key.id;
       
+      programInfoBlock.find('.iconStatistics').attr('title', $('#lang_view_statistics'));
       programInfoBlock.find('.program_info_title div').text(programs[i].name);
       $('<img/>').attr('src', programs[i].imageUrl).appendTo(programInfoBlock.find('.program_info_image'));
       var type = 'Unknown';
@@ -562,7 +564,8 @@ var programList =
       }
       programInfoBlock.find('.program_info_removebutton').click({ 'programId': programId, 'programName': programs[i].name, 'programInfoBlock': programInfoBlock }, function(event)
       {
-        if (confirm('若您確定要移除 "' + event.data.programName + '" 節目，則節目資訊以及檔案將全部被移除') == false)
+        var confirmation = $('#lang_confirm_removing_program').text().replace('{programName}', event.data.programName);
+        if (confirm(confirmation) == false)
           return false;
         var parameters = {
           'programId': event.data.programId
@@ -609,6 +612,7 @@ var programList =
       var programInfoBlock = $('#program_info_block_readonly').clone(true).removeAttr('id').addClass('program_info_block_cloned');
       var programId = programs[i].key.id;
       
+      programInfoBlock.find('.iconStatistics').attr('title', $('#lang_view_statistics'));
       programInfoBlock.find('.program_info_title span').text(programs[i].name);
       $('<img/>').attr('src', programs[i].imageUrl).appendTo(programInfoBlock.find('.program_info_image'));
       var type = 'Unknown';
@@ -693,7 +697,7 @@ var channelDetail =
     $('#channel_import_detail [name="ch_import_button"]').click(function()
     {
       if ($('#channel_import_detail [name="ch_import_url"]').val() == "") {
-        alert('頻道來源是空的');
+        alert($('#lang_channel_source_is_empty').text());
         return;
       }
       var sourceUrl = $('#channel_import_detail [name="ch_import_url"]').val();
@@ -703,7 +707,7 @@ var channelDetail =
       $.post('/CMSAPI/importChannelByUrl', parameters, function(channel)
       {
         if (channel == null) {
-          alert('來源網址有誤，請重新確認');
+          alert($('#lang_channel_source_is_wrong').text());
           $('#channel_import_detail [name="ch_import_url"]').focus();
           return;
         }
@@ -788,12 +792,12 @@ var channelDetail =
         {
           var name = $('#channel_import_detail [name="ch_name"]').val();
           if (name == '') {
-            alert('名稱不可為空');
+            alert($('#lang_warning_empty_name').text());
             return;
           }
           var category = $('#channel_import_detail [name="ch_category"]').val();
           if (category == 0) {
-            alert('請選擇一個系統分類');
+            alert($('#lang_warning_select_category').text());
             return;
           }
           var intro = $('#channel_import_detail [name="ch_intro"]').val();
@@ -812,9 +816,9 @@ var channelDetail =
           $.post('/CMSAPI/addChannelByUrl', parameters, function(response)
           {
             if (response != 'OK') {
-              alert('發生錯誤');
+              alert($('#lang_warning_error_occurs').text());
             } else {
-              alert('完成更新');
+              alert($('#lang_update_successfully').text());
               overallLayout.destroyRightSideContent(true);
               channelList.init();
             }
@@ -824,7 +828,7 @@ var channelDetail =
     });
     $('#channel_import_detail [name="ch_savebutton"]').unbind().click(function()
     {
-      alert('請先匯入頻道來源');
+      alert($('#lang_warning_import_channel_source').text());
     });
     $('#channel_import_detail [name="ch_cancelbutton"]').unbind().click(function()
     {
@@ -895,7 +899,8 @@ var channelDetail =
     });
     $.getJSON('/CMSAPI/systemCategories', function(categories)
     {
-      $('#channel_detail .sys_directory').html('<option value="0">請選擇分類</option>');
+      var select_category = $('#lang_select_category').text();
+      $('#channel_detail .sys_directory').html('<option value="0">' + select_category + '</option>');
       for (i in categories)
       {
         $('<option></option>')
@@ -917,11 +922,11 @@ var channelDetail =
     $('#channel_detail_savebutton').unbind().click(function()
     {
       if ($('#ch_name').val() == "") {
-        alert('名稱不可以為空');
+        alert($('#lang_warning_empty_name').text());
         return;
       }
       if ($('#ch_category').val() == 0) {
-        alert('請選擇一個系統分類');
+        alert($('#lang_warning_select_category').text());
         return;
       }
       var parameters =
@@ -936,9 +941,9 @@ var channelDetail =
       $.post('/CMSAPI/saveChannel', parameters, function(response)
       {
         if (response != 'OK') {
-          alert('發生錯誤');
+          alert($('#lang_warning_error_occurs').text());
         }else {
-          alert('完成更新');
+          alert($('#lang_update_successfully').text());
           channelList.init();
         }
       }, 'text');
@@ -971,7 +976,8 @@ var channelList =
         var channelInfoBlock = $('#channel_info_block').clone(true).removeAttr('id').addClass('channel_info_block_cloned');
         var channelId = channels[i].key.id;
         
-        channelInfoBlock.find('.channel_info_title span').text(channels[i].name);
+        channelInfoBlock.find('.iconStatistics').attr('title', $('#lang_view_statistics'));
+        channelInfoBlock.find('.channel_info_title div').text(channels[i].name);
         $('<img/>').attr('src', channels[i].imageUrl).appendTo(channelInfoBlock.find('.channel_info_image'));
         var contentType = 'Unknown';
         switch(channels[i].contentType) {
@@ -1017,7 +1023,8 @@ var channelList =
         }
         channelInfoBlock.find('.channel_info_removebutton').click({ 'channelId': channelId, 'channelName': channels[i].name, 'channelInfoBlock': channelInfoBlock }, function(event)
         {
-          if (confirm('若您確定要移除 "' + event.data.channelName + '" 頻道，則頻道資訊將全部被移除') == false)
+          var confirmation = $('#lang_confirm_removing_channel').text().replace('{channelName}', event.data.channelName);
+          if (confirm(confirmation) == false)
             return false;
           var parameters = {
             'channelId': event.data.channelId,
@@ -1083,7 +1090,7 @@ $(function()
   $(window).bind('beforeunload', function()
   {
     if ($('.program_create_detail_block_cloned').size() > 0) {
-      return '節目尚未建立完成，確定離開？';
+      return $('#lang_confirm_leaving_program_creation').text();
     }
     return;
   });

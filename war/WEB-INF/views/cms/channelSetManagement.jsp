@@ -40,49 +40,49 @@
     </ul>
     <div class="clear"></div>
     <div class="left_body">
-      <div class="left_title">頻道網資訊</div>
-      <p class="hint_title"><span class="red">＊</span>為必填資訊</p>
+      <div class="left_title"><spring:message code="cms.channel_set_management.title.channel_set_info"/></div>
+      <p class="hint_title"><span class="red">＊</span><spring:message code="cms.channel_set_management.msg.necessary_info"/></p>
       <form>
         <fieldset class="setAlbum">
           <input type="hidden" id="cc_id" value="0"/>
-          <label class="floatL"><span class="red">＊</span>圖示</label>
+          <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_set_management.label.logo"/></label>
           <div class="uploadImg">
             <img alt="" id="cc_image" src="/images/cms/upload_img.jpg" class="floatL"/>
             <div class="floatL imgBtn">
-              <p class="gray">多螢幕最佳顯示品質建議<br/>解析度至少為720x480</p>
+              <p class="gray"><spring:message code="cms.channel_set_management.msg.best_resolution"/></p>
               <a href="#" id="upload_image" class="uploadBtn"></a>
-              <span id="uploading" style="display:none">上傳中....</span>
+              <span id="uploading" style="display:none"><spring:message code="cms.channel_set_management.msg.uploading"/></span>
               <input type="hidden" id="s3_policy" value="${s3Policy}"/>
               <input type="hidden" id="s3_signature" value="${s3Signature}"/>
               <input type="hidden" id="s3_id" value="${s3Id}"/>
             </div>
             <div class="clear"></div>
           </div>
-          <label class="floatL">網址</label>
+          <label class="floatL"><spring:message code="cms.channel_set_management.label.url"/></label>
           <div class="floatL">
             <a href="#" id="channel_set_promote_url" target="_player"></a>
             <a id="addthis_button"><img src="http://cache.addthiscdn.com/icons/v1/thumbs/addthis.gif"/></a>
           </div>
           <div class="clear"></div><br/>
-          <label class="floatL"><span class="red">＊</span>名稱</label>
-          <div class="bg_input floatL"><input type="text" id="cc_name" name="cc_name" size="50" maxlength="40"/></div>
+          <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_set_management.label.name"/></label>
+          <div class="bg_input floatL"><input type="text" id="cc_name" name="cc_name" size="25" maxlength="40"/></div>
           <div class="clear"></div>
-          <p class="hint">限40字元</p>
+          <p class="hint"><spring:message code="cms.channel_set_management.msg.fourty_characters"/></p>
           <br/>
-          <label class="floatL">介紹</label>
-          <div class="bg_textarea floatL"><textarea name="cc_intro" id="cc_intro" cols="37" rows="4"></textarea></div>
+          <label class="floatL"><spring:message code="cms.channel_set_management.label.introduction"/></label>
+          <div class="bg_textarea floatL"><textarea name="cc_intro" id="cc_intro" cols="33" rows="5"></textarea></div>
           <div class="clear"></div>
-          <p class="hint">限200字元</p>
+          <p class="hint"><spring:message code="cms.channel_set_management.msg.two_hundred_characters"/></p>
           <br/>
-          <label class="floatL">標籤</label>
-          <div class="bg_input floatL"><input name="cc_tag" id="cc_tag" type="text" size="50" maxlength="40"/></div>
+          <label class="floatL"><spring:message code="cms.channel_set_management.label.tag"/></label>
+          <div class="bg_input floatL"><input name="cc_tag" id="cc_tag" type="text" size="25" maxlength="40"/></div>
           <div class="clear"></div>
-          <p class="hint">請用“ , ”分開</p>
+          <p class="hint"><spring:message code="cms.channel_set_management.msg.camma_seperated"/></p>
           <br/>
-          <label class="floatL"><span class="red">＊</span>系統分類</label>
+          <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_set_management.label.system_category"/></label>
           <div class="floatL">
             <select id="sys_directory" name="sys_directory" class="sys_directory">
-              <option value="0" selected="selected">請選擇分類</option>
+              <option value="0" selected="selected"><spring:message code="cms.channel_set_management.msg.select_category"/></option>
               <!--
               <option>新聞 / 政治</option>
               <option>財經企管</option>
@@ -104,7 +104,7 @@
             </select>
           </div>
           <div class="clear"></div>
-          <p class="hint">選擇分類後，頻道網將被收錄至9x9.tv的系統目錄中，供觀眾瀏覽，您也可以至「目錄管理」編輯您自訂的目錄，匯錄您的所有內容。</p>
+          <p class="hint"><spring:message code="cms.channel_set_management.msg.system_category_explanation"/></p>
         </fieldset>
       </form>
     </div>
@@ -112,7 +112,7 @@
   </div>
   <div class="right_content floatL">
     <div class="right_body">
-      <div class="right_title">編排頻道網</div>
+      <div class="right_title"><spring:message code="cms.channel_set_management.title.edit_channel_set"/></div>
       <div class="ch_arrange" id="channel_set_area">
         <div class="ch_bg">
           <ul>
@@ -133,7 +133,7 @@
         </div>
       </div>
       <div class="ch_pool">
-        <p class="ch_sub_title">請選擇頻道拖曳至頻道網<span>將頻道拖曳回來即可從頻道網中移除</span></p>
+        <p class="ch_sub_title"><spring:message code="cms.channel_set_management.msg.drag_drop_explanation"/></p>
         <div id="slideshow">
           <div id="slidesContainer">
           </div>
@@ -141,9 +141,40 @@
       </div>
     </div>
     <div class="right_footer"></div>
-    <input type="button" id="publish_channel_set" value="醜醜的發佈按鈕"/>
+    <button id="publish_channel_set"><spring:message code="cms.channel_set_management.btn.pubish"/></button>
   </div>
   <div class="clear"></div>
 </div>
+<!-- language tags for javascript -->
+<label class="lang" id="lang_label_program_count"><spring:message code="cms.channel_set_management.label.program_count"/></label>
+<label class="lang" id="lang_label_update_time"><spring:message code="cms.channel_set_management.label.update_time"/></label>
+<label class="lang" id="lang_warning_select_category"><spring:message code="cms.warning.select_system_category"/></label>
+<label class="lang" id="lang_warning_empty_name"><spring:message code="cms.warning.empty_name"/></label>
+<label class="lang" id="lang_warning_empty_logo"><spring:message code="cms.warning.empty_logo"/></label>
+<label class="lang" id="lang_warning_tag_over_limitation"><spring:message code="cms.warning.tag_over_limitation"/></label>
+<label class="lang" id="lang_warning_name_over_limitation"><spring:message code="cms.warning.name_over_limitation"/></label>
+<label class="lang" id="lang_warning_intro_over_limitation"><spring:message code="cms.warning.intro_over_limitation"/></label>
+<label class="lang" id="lang_warning_error_occurs"><spring:message code="cms.warning.error_occurs"/></label>
+<label class="lang" id="lang_update_successfully"><spring:message code="cms.warning.update_successfully"/></label>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </body>
 </html>

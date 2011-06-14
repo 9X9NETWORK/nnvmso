@@ -224,6 +224,7 @@ a.btnDel:hover { background:url(/images/cms/btnCloseHover.png) no-repeat;}
 .epInfo { color:#343434; padding-top:2px; width:260px; }
 .chInfo a , .epInfo , .chInfo p { font-size:0.85em; }
 .chInfo a { margin-right:3px; }
+.chFocusTitle div, .chUnFocusTitle div { max-height:30px; overflow:hidden; }
 
 .btnStep1{ width: 170px;}
 .btnStep2{ width:100px;}
@@ -331,7 +332,7 @@ a.addNew{ padding:10px 0 0 0; display:block; font-size:0.9em;}
 
 .createChList{ height:470px; overflow:auto;}
 .createChList2{ height:548px; overflow:auto;}
-.createEpList{ overflow:auto; height:548px;}
+.createEpList{ overflow:auto; height:548px; width:500px; }
 .createEpList2{ overflow:auto; height:510px;}
 .createEp { width:500px; }
 textarea, input { font-size:0.9em; }
@@ -355,3 +356,4 @@ form a { font-size:0.8em; }
 .directoryList { height:440px; overflow:auto; }
 .directoryList li { float:none; }
 
+.lang { display:none; }

@@ -54,8 +54,10 @@ var populateBubbleContent = function(channel)
     second = "0" + second;
   
   var innerHtml = span.html();
-  innerHtml += '<br/>節目數量 ：' + channel.programCount;
-  innerHtml += '<br/>更新時間 ：' + year + '/' + month + '/' + date + '&nbsp;' + hour + ':' + minute + ':' + second;
+  var label_program_count = $('#lang_label_program_count').text();
+  var label_update_time = $('#lang_label_update_time').text();
+  innerHtml += '<br/>' + label_program_count + ' ：' + channel.programCount;
+  innerHtml += '<br/>' + label_update_time + ' ：' + year + '/' + month + '/' + date + '&nbsp;' + hour + ':' + minute + ':' + second;
   
   return innerHtml;
 }
@@ -351,31 +353,32 @@ var publishChannelSet = function()
 {
   var categoryId = $('#sys_directory').val();
   if (categoryId == 0) {
-    alert('你必需選一個系統分類');
+    alert($('#lang_warning_select_category').text());
     return;
   }
   var intro = $('#cc_intro').text();
   if (intro.length > 200) {
-    alert('"介紹"超過字數限制');
+    alert($('#lang_warning_intro_over_limitation').text());
     return;
   }
   var name = $('#cc_name').val();
   if (name.length > 40) {
-    alert('"名稱"超過字數限制');
+    alert($('#lang_warning_name_over_limitation').text());
     return;
   } else if (name.length == 0) {
-    alert('"名稱"不可以為空');
+    alert($('#lang_warning_empty_name').text());
     return;
   }
   var tag = $('#cc_tag').val();
   if (tag.length > 200) {
-    alert('"標籤“超過長度');
+    alert($('#lang_warning_tag_over_limitation').text());
     return;
   }
   var imageUrl = $('#cc_image').attr('src');
-  if (imageUrl.length == 0 || imageUrl == '/images/cms/upload_img.jpg')
-    return alert('"圖示“不可以為空');
-  
+  if (imageUrl.length == 0 || imageUrl == '/images/cms/upload_img.jpg') {
+    alert($('#lang_warning_empty_logo').text());
+    return;
+  }
   var parameters = {
     'channelSetId': $('#cc_id').val(),
     'imageUrl':     imageUrl,
@@ -388,9 +391,9 @@ var publishChannelSet = function()
   $.post('/CMSAPI/saveChannelSet', parameters, function(response)
     {
       if (response != 'OK')
-        alert('儲存資料時發生錯誤');
+        alert($('#lang_warning_error_occurs').text());
       else
-        alert('發佈成功');
+        alert($('#lang_update_successfully').text());
     }, 'text');
   
 }
