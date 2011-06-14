@@ -104,7 +104,7 @@ h2.popTitle{ border-bottom:1px dashed #b3b3b3; padding-bottom:10px;}
 #slideshow #slidesContainer {
   margin:0 auto;
   width:410px;
-  height:263px;
+  height:208px;
   overflow:auto; /* allow scrollbar */
   position:relative;
 }

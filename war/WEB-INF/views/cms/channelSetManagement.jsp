@@ -137,11 +137,11 @@
         <div id="slideshow">
           <div id="slidesContainer">
           </div>
+          <a href="javascript:" class="btn btnStep2 floatR" id="publish_channel_set"><span><spring:message code="cms.channel_set_management.btn.pubish"/></span></a>
         </div>
       </div>
     </div>
     <div class="right_footer"></div>
-    <button id="publish_channel_set"><spring:message code="cms.channel_set_management.btn.pubish"/></button>
   </div>
   <div class="clear"></div>
 </div>
