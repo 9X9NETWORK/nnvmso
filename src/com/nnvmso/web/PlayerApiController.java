@@ -431,7 +431,7 @@ public class PlayerApiController {
 	}
 
 	/**
-	 * Change set name
+	 * Change set name. Please note a pre-defined set is not editable.
 	 * 
 	 * @param user user token
 	 * @param name set name
@@ -456,13 +456,20 @@ public class PlayerApiController {
 	}	
 
 	/**
-	 * User unsubscribes a channel
+	 * User unsubscribes a channel or a set. 
+	 * 
+	 * To unsubscribe a channel, use params channel and seq; to unsubscribe a set, use param set.
 	 * 
 	 * <p>Example: http://host:port/playerAPI/unsubscribe?user=QQl0l208W2C4F008980F&channel=51</p>
 	 * 
 	 * @param user user's unique identifier
 	 * @param channel channelId
-	 * @return status code and status message 
+	 * @param seq grid location. use with channel.   
+	 * giving channel only is valid (for backward compatibility), 
+	 * but since one channel can exist on multitple locations in a smart guide,
+	 * it could result in unsubscribing on an unexpected grid location. 
+	 * @param set set id. 
+	 * @return status code and status message
 	 */			
 	@RequestMapping(value="unsubscribe")
 	public ResponseEntity<String> unsubscribe(@RequestParam(value="user", required=false) String userToken, 
@@ -493,6 +500,7 @@ public class PlayerApiController {
 	 * @param grid grid location, 0 - 81
 	 * @param category category id
 	 * @param langCode language code, en or zh.
+	 * @param tag tag string, separated by comma
 	 * 
 	 * @return channel id, channel name, image url. <br/>
 	 */	
@@ -578,7 +586,7 @@ public class PlayerApiController {
 	 *         Third block: channel information. It would be the second block if setInfo is false
 	 *         <p>
 	 *         Set info has following fields: <br/>
-	 *         position, set id, set name, set image url
+	 *         position, set id, set name, set image url, set type
 	 *         <p>  
 	 *         Channel info has following fields: <br/>
 	 *         channel name, channel description, channel image url, <br/>
@@ -586,7 +594,9 @@ public class PlayerApiController {
 	 *         contentType(integer, see following), sourceUrl
 	 *         </blockquote>
 	 *         <p>
-	 *         type: TYPE_GENERAL = 1; TYPE_READONLY = 2;
+	 *         set type: TYPE_USER = 1; TYPE_READONLY = 2;
+	 *         <br/>
+	 *         channel type: TYPE_GENERAL = 1; TYPE_READONLY = 2;
 	 *         <br/>
 	 *         status: STATUS_SUCCESS = 0; STATUS_ERROR = 1;
 	 *         <br/> 
@@ -809,10 +819,10 @@ public class PlayerApiController {
 	}
 
 	/**
-	 * Mark a program bad when player sees it 
+	 * Listing featured sets 
 	 * 
-	 * @param user user token
-	 * @param program programId
+	 * @param mso name
+	 * @return set id, set name, set image (developing)
 	 */	
 	@RequestMapping(value="listFeaturedSets")
 	public ResponseEntity<String> listFeaturedSets(HttpServletRequest req) {				                                
@@ -827,10 +837,10 @@ public class PlayerApiController {
 	}
 
 	/**
-	 * Mark a program bad when player sees it 
+	 * List featured channels 
 	 * 
-	 * @param user user token
-	 * @param program programId
+	 * @param mso name
+	 * @return please reference channelLineup
 	 */	
 	@RequestMapping(value="listFeaturedChannels")
 	public ResponseEntity<String> listFeaturedChannels(HttpServletRequest req) {				                                
