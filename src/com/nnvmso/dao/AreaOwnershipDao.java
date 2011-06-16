@@ -55,5 +55,24 @@ public class AreaOwnershipDao extends GenericDao<AreaOwnership> {
 		}
 		return detached;
 	}
+
+	public AreaOwnership findByUserIdAndSetId(long userId, long setId) {		
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		AreaOwnership detached = null;		
+		try {
+			Query query = pm.newQuery(AreaOwnership.class);
+			query.setFilter("userId == userIdParam && setId == setIdParam");
+			query.declareParameters("long userIdParam, short setIdParam");
+			@SuppressWarnings("unchecked")
+			List<AreaOwnership> result = (List<AreaOwnership>)query.execute(userId, setId);
+			if (result.size() > 0) {
+				detached = pm.detachCopy(result.get(0));
+			} 
+		} catch (JDOObjectNotFoundException e) {
+		} finally {
+			pm.close();
+		}
+		return detached;
+	}
 	
 }

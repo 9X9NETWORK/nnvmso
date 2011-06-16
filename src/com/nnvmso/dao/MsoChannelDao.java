@@ -11,7 +11,9 @@ import javax.jdo.Query;
 
 import com.google.appengine.api.datastore.Key;
 import com.nnvmso.lib.PMF;
+import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
+import com.nnvmso.model.NnUser;
 
 public class MsoChannelDao extends GenericDao<MsoChannel> {
 	
@@ -146,6 +148,23 @@ public class MsoChannelDao extends GenericDao<MsoChannel> {
 		return detached;		
 	}	
 
+	public List<MsoChannel> findFeaturedChannelsByMso(NnUser user) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		List<MsoChannel> detached = new ArrayList<MsoChannel>(); 
+		try {
+			Query q = pm.newQuery(MsoChannel.class);
+			q.setFilter("featured == featuredParam && userId == userIdParam");
+			q.declareParameters("boolean featuredParam, boolean msoIdParam");
+			q.setOrdering("createDate asc");
+			@SuppressWarnings("unchecked")
+			List<MsoChannel> channels = (List<MsoChannel>) q.execute(true, user.getKey().getId());
+			detached = (List<MsoChannel>)pm.detachCopyAll(channels);
+		} finally {
+			pm.close();
+		}
+		return detached;
+	}	
+	
 	public List<MsoChannel> findAllByStatus(short status) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		List<MsoChannel> detached = new ArrayList<MsoChannel>(); 

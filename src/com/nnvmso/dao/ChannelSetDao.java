@@ -1,5 +1,6 @@
 package com.nnvmso.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -9,6 +10,9 @@ import javax.jdo.Query;
 
 import com.nnvmso.lib.PMF;
 import com.nnvmso.model.ChannelSet;
+import com.nnvmso.model.ContentOwnership;
+import com.nnvmso.model.Mso;
+import com.nnvmso.model.MsoChannel;
 
 public class ChannelSetDao extends GenericDao<ChannelSet> {
 	
@@ -30,6 +34,23 @@ public class ChannelSetDao extends GenericDao<ChannelSet> {
 		}
 		return cs;
 	}
+
+	public List<ChannelSet> findFeaturedSetsByMso(Mso mso) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		List<ChannelSet> detached = new ArrayList<ChannelSet>(); 
+		try {
+			Query q = pm.newQuery(ChannelSet.class);
+			q.setFilter("featured == featuredParam && msoId == msoIdParam");
+			q.declareParameters("boolean featuredParam, long msoIdParam");
+			q.setOrdering("createDate asc");
+			@SuppressWarnings("unchecked")
+			List<ChannelSet> sets = (List<ChannelSet>) q.execute(true, mso.getKey().getId());
+			detached = (List<ChannelSet>)pm.detachCopyAll(sets);
+		} finally {
+			pm.close();
+		}
+		return detached;
+	}	
 	
 	public ChannelSet findByBeautifulUrl(String url) {		
 		PersistenceManager pm = PMF.get().getPersistenceManager();

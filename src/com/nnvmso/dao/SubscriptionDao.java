@@ -112,5 +112,24 @@ public class SubscriptionDao extends GenericDao<Subscription>{
 		return detached;
 	}	 
 		
+	public Subscription findChannelSubscription(long userId, long channelId, int seq) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		Subscription detached = null;
+		try {
+			Query q = pm.newQuery(Subscription.class);
+			q.setFilter("userId == userIdParam && channelId == channelIdParam && seq == seqParam");
+			q.declareParameters("long userIdParam, long chanenlIdParam, int seqParam");
+			q.setOrdering("seq asc");
+			@SuppressWarnings("unchecked")
+			List<Subscription> subs = (List<Subscription>)q.execute(userId, channelId, seq);
+			if (subs.size() > 0) {
+				detached = subs.get(0);
+				detached = pm.detachCopy(detached);
+			}						
+		} finally {
+			pm.close();
+		}
+		return detached;
+	}
 	
 }
