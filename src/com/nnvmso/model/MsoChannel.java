@@ -45,7 +45,13 @@ public class MsoChannel implements Serializable {
 	private short license;
 	
 	@Persistent
+	private String tags;
+	
+	@Persistent
 	private short advertsing;
+	
+	@Persistent
+	private boolean featured;
 
 	@Persistent
 	private int programCount;
@@ -311,5 +317,20 @@ public class MsoChannel implements Serializable {
 	public String getTranscodingUpdateDate() {
 		return transcodingUpdateDate;
 	}
-	
+
+	public String getTags() {
+		return tags;
+	}
+
+	public void setTags(String tags) {
+		this.tags = tags;
+	}
+
+	public boolean isFeatured() {
+		return featured;
+	}
+
+	public void setFeatured(boolean featured) {
+		this.featured = featured;
+	}	
 }
