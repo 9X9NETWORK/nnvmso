@@ -101,7 +101,7 @@ public class PlayerApiService {
 		output = output + separatorStr;			
 		//3rd block: set info
 		output += assembleKeyValue("id", String.valueOf(cs.getKey().getId()));
-		output += assembleKeyValue("name", cs.getName());
+		output += assembleKeyValue("name", cs.getName());		
 		output += assembleKeyValue("imageUrl", cs.getImageUrl());
 		
 		//4rd block, channel info
@@ -792,10 +792,27 @@ public class PlayerApiService {
 				channels.add(channel);
 			}
 		}
-		//find channels from set
 		AreaOwnershipManager areaMngr = new AreaOwnershipManager();
 		List<AreaOwnership> sets = areaMngr.findByUserId(user.getKey().getId());
-		ChannelSetManager setMngr = new ChannelSetManager();		
+		
+	    //set info
+		if (setInfo) {
+			for (AreaOwnership s : sets) {
+				String[] obj = {
+						String.valueOf(s.getAreaNo()),
+						String.valueOf(s.getKey().getId()),
+						s.getSetName(),						
+						s.getSetImageUrl(),
+						String.valueOf(s.getType()),
+				};
+				result = result + NnStringUtil.getDelimitedStr(obj);;
+				result = result + "\n";
+			}
+			result = result + separatorStr;					
+		}		
+		
+		//find channels from set
+		ChannelSetManager setMngr = new ChannelSetManager();
 		List<MsoChannel> setChannels = new ArrayList<MsoChannel>();
 		for (AreaOwnership area : sets) {
 			if (area.getType() == AreaOwnership.TYPE_RO) {
@@ -823,21 +840,6 @@ public class PlayerApiService {
 			result = result + this.composeChannelLineupStr((MsoChannel)pairs.getValue(), mso);
 			result = result + "\n";	       
 	    }
-	    //set info
-		if (setInfo) {
-			for (AreaOwnership s : sets) {
-				String[] obj = {
-						String.valueOf(s.getAreaNo()),
-						String.valueOf(s.getKey().getId()),
-						s.getSetName(),						
-						s.getSetImageUrl(),
-				};
-				result = result + NnStringUtil.getDelimitedStr(obj);;
-				result = result + "\n";
-			}
-			result = result + separatorStr;					
-		}
-
 		
 		return result;
 	}
