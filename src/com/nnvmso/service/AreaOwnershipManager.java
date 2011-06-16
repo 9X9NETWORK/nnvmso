@@ -23,6 +23,10 @@ public class AreaOwnershipManager {
 		areaDao.save(area);
 	}
 	
+	public void delete(AreaOwnership area) {
+		areaDao.delete(area);
+	}
+	
 	public AreaOwnership save(AreaOwnership area) {
 		area.setUpdateDate(new Date());
 		area = areaDao.save(area);
@@ -35,5 +39,10 @@ public class AreaOwnershipManager {
 	
 	public AreaOwnership findByUserIdAndAreaNo(long userId, short areaNo) {
 		return areaDao.findByUserIdAndAreaNo(userId, areaNo);
+	}
+	
+	public AreaOwnership findByUserIdAndSetId(long userId, long setId) {
+		return areaDao.findByUserIdAndSetId(userId, setId);
 	}	
+	
 }
