@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.nnvmso.dao.ChannelSetDao;
 import com.nnvmso.model.ChannelSet;
 import com.nnvmso.model.ChannelSetChannel;
+import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
 
 @Service
@@ -39,10 +40,18 @@ public class ChannelSetManager {
 		}
 	}
 	
-	public ChannelSet findBybeautifulUrl(String url) {
+	public ChannelSet findByBeautifulUrl(String url) {
 		return channelSetDao.findByBeautifulUrl(url);
 	}
 
+	public ChannelSet findBybeautifulUrl(String url) {
+		return channelSetDao.findByBeautifulUrl(url);
+	}
+	
+	public List<ChannelSet> findFeaturedSetsByMso(Mso mso) {
+		return channelSetDao.findFeaturedSetsByMso(mso);
+	}
+	
 	public ChannelSet save(ChannelSet channelSet) {	
 		//NOTE check name existence if needed
 		channelSet.setUpdateDate(new Date());
