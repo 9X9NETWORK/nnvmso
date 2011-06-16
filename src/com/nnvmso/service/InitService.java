@@ -36,7 +36,8 @@ public class InitService {
 		createMso2DefaultChannels(devel, trans);	
 		createMso3OwnedChannels(devel, trans);
 		createMso1DefaultIpg(devel);
-		createMso2DefaultIpg(devel);		
+		createMso2DefaultIpg(devel);
+		createMso1ChannelSet(devel);
 		createMso3ChannelSet(devel);
 	}
 	
@@ -256,6 +257,7 @@ public class InitService {
 			MsoChannel channel1 = new MsoChannel("Etsy", "Etsy.com", "http://s3.amazonaws.com/9x9chthumb/54e2967caf4e60fe9bc19ef1920997977eae1578.gif", user.getKey().getId());
 			channel1.setSourceUrl("http://feeds.feedburner.com/etsyetsyetsy");
 			channel1.setPublic(true);
+			channel1.setFeatured(true);
 			channelMngr.create(channel1, categories);
 			
 			MsoProgram program1 = new MsoProgram("Handmade Confessional: Eli Dlugach", "Eli Dlugach gives a testimonial on why he loves handmade", "http://s3.amazonaws.com/9x9cache/005a69b4431d521e39534431254d81a211ebefc7_1227739497_thumbnail.jpg", MsoProgram.TYPE_VIDEO);
@@ -305,6 +307,7 @@ public class InitService {
 			//create channel				
 			MsoChannel channel5 = new MsoChannel("System Channel", "System Channel", "/WEB-INF/../images/logo_9x9.png", user.getKey().getId());
 			channel5.setPublic(true);
+			channel5.setFeatured(true);
 			Category system = categoryMngr.findByName("Tech & Science");
 			List<Category> systemCategories = new ArrayList<Category>();
 			systemCategories.add(system);
@@ -758,6 +761,34 @@ public class InitService {
 			System.out.println("mso2 ipg:" + urls.length);
 		}
 		log.info("prepareMso2DefaultIpg is done");
+	}
+	
+	public void createMso1ChannelSet(boolean devel) {
+		
+		Mso mso = new MsoManager().findByName("9x9");
+		ChannelSetManager channelSetMngr = new ChannelSetManager();
+		List<MsoChannel> channels = new ArrayList<MsoChannel>();
+		
+		if (devel) {
+			CategoryManager categoryMngr = new CategoryManager();
+			Category category = categoryMngr.findByName("Activism");
+			channels = new MsoChannelManager().findPublicChannelsByCategoryId(category.getKey().getId());
+			channels.get(0).setSeq(1);
+			channels.get(1).setSeq(2);
+			channels.remove(2);
+		}
+		
+		ChannelSet channelSet = new ChannelSet(mso.getKey().getId(), "SetOne", "SetOne", true);
+		channelSet.setDefaultUrl("setone"); 
+		channelSet.setBeautifulUrl("setone");
+		channelSet.setFeatured(true);
+		channelSetMngr.create(channelSet, channels);
+		
+		//channelSet ownership
+		ContentOwnershipManager ownershipMngr = new ContentOwnershipManager();
+		ownershipMngr.create(new ContentOwnership(), mso, channelSet);
+		
+		log.info("prepareMso1ChannelSet is done");
 	}
 	
 	public void createMso3ChannelSet(boolean devel) {
