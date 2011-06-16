@@ -47,6 +47,9 @@ public class MsoProgram implements Serializable {
 	private String storageId; // id of where the file physically stores, from transcoding service
 	
 	@Persistent
+	private short contentType;
+	
+	@Persistent
 	private String errorCode;
 
 	@Persistent
@@ -236,4 +239,12 @@ public class MsoProgram implements Serializable {
 		this.pubDate = pubDate;
 	}
 
+	public short getContentType() {
+		return contentType;
+	}
+
+	public void setContentType(short contentType) {
+		this.contentType = contentType;
+	}
+	
 }
