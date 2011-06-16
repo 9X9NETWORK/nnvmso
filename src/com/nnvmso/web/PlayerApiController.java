@@ -374,16 +374,16 @@ public class PlayerApiController {
 	 */		
 	@RequestMapping(value="subscribe")
 	public ResponseEntity<String> subscribe(@RequestParam(value="user", required=false) String userToken, 
-			                                @RequestParam(value="channel", required=false) String channelIds,
+			                                @RequestParam(value="channel", required=false) String channelId,
 			                                @RequestParam(value="set", required=false) String setId,
-			                                @RequestParam(value="grid", required=false) String gridIds, 
+			                                @RequestParam(value="grid", required=false) String gridId, 
 			                                @RequestParam(value="pos", required=false) String pos,
 			                                HttpServletRequest req ) {		
-		log.info("subscribe: userToken=" + userToken+ "; channel=" + channelIds + "; grid=" + gridIds + "; set=" + setId + ";pos=" + pos);
+		log.info("subscribe: userToken=" + userToken+ "; channel=" + channelId + "; grid=" + gridId + "; set=" + setId + ";pos=" + pos);
 		this.prepService(req);
 		String output = NnStatusMsg.errorStr(locale);
 		try {
-			output = playerApiService.subscribeChannel(userToken, channelIds, setId, gridIds, pos);
+			output = playerApiService.subscribe(userToken, channelId, setId, gridId, pos);
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}
@@ -465,14 +465,16 @@ public class PlayerApiController {
 	 * @return status code and status message 
 	 */			
 	@RequestMapping(value="unsubscribe")
-	public ResponseEntity<String> unsubscribe(@RequestParam(value="user") String userToken, 
-								              @RequestParam(value="channel") String channelId,
+	public ResponseEntity<String> unsubscribe(@RequestParam(value="user", required=false) String userToken, 
+								              @RequestParam(value="channel", required=false) String channelId,
+								              @RequestParam(value="seq", required=false) String seq,
+								              @RequestParam(value="set", required=false) String setId,
 								              HttpServletRequest req) {			
 		this.prepService(req);
-		log.info("userToken=" + userToken + "; channel=" + channelId);
+		log.info("userToken=" + userToken + "; channel=" + channelId + "; set=" + setId + "; seq=" + seq);
 		String output = NnStatusMsg.errorStr(locale);
 		try {
-			output = playerApiService.unsubscribeChannel(userToken, channelId);
+			output = playerApiService.unsubscribe(userToken, channelId, setId, seq);
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}
@@ -500,13 +502,14 @@ public class PlayerApiController {
 		String userToken= req.getParameter("user");
 		String grid = req.getParameter("grid");
 		String categoryIds = req.getParameter("category");
+		String tags = req.getParameter("tag");
 
 		this.prepService(req);		
 		log.info("player input - userToken=" + userToken+ "; url=" + url + ";grid=" + grid + ";categoryId=" + categoryIds);				
 		String output = NnStatusMsg.errorStr(locale);		
 		
 		try {
-			output = playerApiService.createChannel(categoryIds, userToken, url, grid, req);
+			output = playerApiService.createChannel(categoryIds, userToken, url, grid, tags, req);
 		} catch (Exception e){
 			output = playerApiService.handleException(e);
 		}
@@ -575,7 +578,7 @@ public class PlayerApiController {
 	 *         Third block: channel information. It would be the second block if setInfo is false
 	 *         <p>
 	 *         Set info has following fields: <br/>
-	 *         position, set id, set name, set image url                  
+	 *         position, set id, set name, set image url
 	 *         <p>  
 	 *         Channel info has following fields: <br/>
 	 *         channel name, channel description, channel image url, <br/>
@@ -799,6 +802,42 @@ public class PlayerApiController {
 		log.info("bad program:" + programId + ";reported by user:" + userToken);
 		try {
 			output = playerApiService.markBadProgram(programId, userToken);
+		} catch (Exception e) {
+			output = playerApiService.handleException(e);
+		}
+		return NnNetUtil.textReturn(output);
+	}
+
+	/**
+	 * Mark a program bad when player sees it 
+	 * 
+	 * @param user user token
+	 * @param program programId
+	 */	
+	@RequestMapping(value="listFeaturedSets")
+	public ResponseEntity<String> listFeaturedSets(HttpServletRequest req) {				                                
+		this.prepService(req);
+		String output = NnStatusMsg.errorStr(locale);
+		try {
+			output = playerApiService.findFeaturedSetsByMso();
+		} catch (Exception e) {
+			output = playerApiService.handleException(e);
+		}
+		return NnNetUtil.textReturn(output);
+	}
+
+	/**
+	 * Mark a program bad when player sees it 
+	 * 
+	 * @param user user token
+	 * @param program programId
+	 */	
+	@RequestMapping(value="listFeaturedChannels")
+	public ResponseEntity<String> listFeaturedChannels(HttpServletRequest req) {				                                
+		this.prepService(req);
+		String output = NnStatusMsg.errorStr(locale);
+		try {
+			output = playerApiService.findFeaturedChannelsByMso();
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}
