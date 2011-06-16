@@ -37,10 +37,15 @@ public class NnStatusCode {
 	public static final int CHANNEL_STATUS_ERROR = 304;
 	public static final int CHANNEL_MAXSIZE_EXCEEDED = 305;
 	
+	public static final int PROGRAM_ERROR = 320;
+	public static final int PROGRAM_INVALID = 321;
+	
 	//350 subscription related
 	public static final int SUBSCRIPTION_ERROR = 350;
 	public static final int SUBSCRIPTION_DUPLICATE_CHANNEL = 351;
 	public static final int SUBSCRIPTION_SET_OCCUPIED = 352;
+	public static final int SUBSCRIPTION_DUPLICATE_SET = 353;
+	public static final int SUBSCRIPTION_RO_SET = 354;
 	
 	//400 category related
 	public static final int CATEGORY_ERROR = 400;
@@ -51,8 +56,8 @@ public class NnStatusCode {
 	public static final int IPG_INVALID =451;
 	
 	//500 set related
-	public static final int SET_ERROR = 450;
-	public static final int SET_INVALID =451;
+	public static final int SET_ERROR = 500;
+	public static final int SET_INVALID =501;
 
 	//700 GAE error
 	public static final int GAE_ERROR = 700;
