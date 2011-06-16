@@ -27,6 +27,11 @@ public class AreaOwnership implements Serializable {
 	
 	@Persistent
 	private long setId;
+
+	@Persistent
+	private short type;
+	public static final short TYPE_USER = 1;
+	public static final short TYPE_RO = 2;
 	
 	@Persistent
 	private String setName;
@@ -119,5 +124,12 @@ public class AreaOwnership implements Serializable {
 	public void setSetImageUrl(String setImageUrl) {
 		this.setImageUrl = setImageUrl;
 	}
-		
+
+	public short getType() {
+		return type;
+	}
+
+	public void setType(short type) {
+		this.type = type;
+	}	
 }
