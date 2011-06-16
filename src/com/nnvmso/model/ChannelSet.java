@@ -29,7 +29,7 @@ public class ChannelSet implements Serializable {
 	
 	@Persistent
 	private String intro;
-	
+			
 	@Persistent
 	private String imageUrl;
 	
@@ -44,6 +44,9 @@ public class ChannelSet implements Serializable {
 	
 	@Persistent
 	private String tag;
+	
+	@Persistent
+	private boolean featured;
 	
 	@Persistent
 	private Date createDate;
@@ -152,6 +155,15 @@ public class ChannelSet implements Serializable {
 	
 	public void setNameSearch(String nameSearch) {
 		this.nameSearch = nameSearch;
+	}
+
+	//<<<
+	public boolean isFeatured() {
+		return featured;
+	}
+
+	public void setFeatured(boolean featured) {
+		this.featured = featured;
 	}
 	
 }
