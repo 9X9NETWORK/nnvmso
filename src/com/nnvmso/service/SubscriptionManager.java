@@ -47,6 +47,11 @@ public class SubscriptionManager {
 		Subscription s = subDao.findByUserIdAndChannelId(userId, channelId);
 		return s;
 	}
+
+	public Subscription findChannelSubscription(long userId, long channelId, int seq) {
+		Subscription s = subDao.findChannelSubscription(userId, channelId, seq);
+		return s;
+	}
 	
 	public void unsubscribeChannel(Subscription s) {
 		if (s != null) { subDao.delete(s); }
