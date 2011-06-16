@@ -779,6 +779,7 @@ public class InitService {
 		}
 		
 		ChannelSet channelSet = new ChannelSet(mso.getKey().getId(), "SetOne", "SetOne", true);
+		channelSet.setImageUrl("");
 		channelSet.setDefaultUrl("setone"); 
 		channelSet.setBeautifulUrl("setone");
 		channelSet.setFeatured(true);
