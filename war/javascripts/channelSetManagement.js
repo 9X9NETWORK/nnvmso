@@ -28,7 +28,7 @@ var populateBubbleContent = function(channel)
   var h2 = $('<h2 class="popTitle"></h2>').text(channel.name).textTruncate(20, '...').appendTo(span);
   var updateDate = new Date(channel.updateDate);
   var year = updateDate.getFullYear();
-  var month = updateDate.getMonth();
+  var month = updateDate.getMonth() + 1;
   var date = updateDate.getDate();
   var hour = updateDate.getHours();
   var minute = updateDate.getMinutes().toString();
@@ -276,7 +276,7 @@ var initChannelSetInfo = function()
             if (channelSet.imageUrl != null) {
               $('#cc_image').attr('src', channelSet.imageUrl);
             }
-            
+            $('#cc_image_updated').val('false');
             $('#cc_id').val(channelSet.key.id);
             $('#upload_image').click(function()
               {
@@ -304,7 +304,8 @@ var initChannelSetInfo = function()
                 upload_success_handler: function(file, serverData, recievedResponse)
                 {
                   $('#uploading').hide();
-                  $('#cc_image').attr('src', 'http://9x9tmp.s3.amazonaws.com/' + 'ch_set_logo_' + channelSet.key.id + file.type);
+                  $('#cc_image').attr('src', 'http://9x9tmp.s3.amazonaws.com/' + 'ch_set_logo_' + channelSet.key.id + '_'+ file.size + file.type);
+                  $('#cc_image_updated').val('true');
                 },
                 upload_error_handler: function(file, code, message)
                 {
@@ -316,7 +317,7 @@ var initChannelSetInfo = function()
                   var post_params =
                     {
                       "AWSAccessKeyId": $('#s3_id').val(),
-                      "key":            'ch_set_logo_' + channelSet.key.id + file.type,
+                      "key":            'ch_set_logo_' + channelSet.key.id + '_'+ file.size + file.type,
                       "acl":            "public-read",
                       "policy":         $('#s3_policy').val(),
                       "signature":      $('#s3_signature').val(),
@@ -360,19 +361,22 @@ var publishChannelSet = function()
     return;
   }
   var imageUrl = $('#cc_image').attr('src');
+  var imageUpdated = $('#cc_image_updated').val();
   if (imageUrl.length == 0 || imageUrl == '/images/cms/upload_img.jpg') {
     alert($('#lang_warning_empty_logo').text());
     return;
   }
   var parameters = {
     'channelSetId': $('#cc_id').val(),
-    'imageUrl':     imageUrl,
+    //'imageUrl':     imageUrl,
     'name':         name,
     'intro':        intro,
     'tag':          tag,
     'categoryId':   categoryId
   };
-  
+  if (imageUpdated == 'true') {
+    parameters['imageUrl'] = imageUrl;
+  }
   $.post('/CMSAPI/saveChannelSet', parameters, function(response)
     {
       if (response != 'OK')

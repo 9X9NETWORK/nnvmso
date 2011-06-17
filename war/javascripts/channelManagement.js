@@ -104,6 +104,7 @@ var programDetail =
     var promoteUrl = 'http://' + location.host + '/episode/' + programId;
     programDetailBlock.find('.ep_url').attr('href', promoteUrl).text(promoteUrl);
     programDetailBlock.find('.ep_image').attr('src', program.imageUrl);
+    programDetailBlock.find('.ep_image_updated').val('false');
     programDetailBlock.find('.ep_createdate').text(formatDate(program.createDate));
     programDetailBlock.find('.ep_return').unbind().click(function()
     {
@@ -124,10 +125,13 @@ var programDetail =
       var parameters =
       {
         'programId': programId,
-        'imageUrl':  programDetailBlock.find('.ep_image').attr('src'),
+        //'imageUrl':  programDetailBlock.find('.ep_image').attr('src'),
         'name':      programDetailBlock.find('.ep_name').val(),
         'intro':     programDetailBlock.find('.ep_intro').val()
       };
+      if (programDetailBlock.find('.ep_image_updated').val() == 'true') {
+        parameters['imageUrl'] = programDetailBlock.find('.ep_image').attr('src');
+      }
       $.post('/CMSAPI/saveProgram', parameters, function(response)
       {
         if (response != 'OK') {
@@ -158,7 +162,8 @@ var programDetail =
       upload_success_handler: function(file, serverData, recievedResponse)
       {
         programDetailBlock.find('.ep_uploading_image').hide();
-        programDetailBlock.find('.ep_image').attr('src', 'http://9x9tmp.s3.amazonaws.com/prog_logo_' + programId + file.type);
+        programDetailBlock.find('.ep_image').attr('src', 'http://9x9tmp.s3.amazonaws.com/prog_logo_' + programId + '_' + file.size + file.type);
+        programDetailBlock.find('.ep_image_updated').val('true');
       },
       upload_error_handler: function(file, code, message)
       {
@@ -170,7 +175,7 @@ var programDetail =
         var post_params =
         {
           "AWSAccessKeyId": $('#s3_id').val(),
-          "key":            'prog_logo_' + programId + file.type,
+          "key":            'prog_logo_' + programId + '_' + file.size + file.type,
           "acl":            "public-read",
           "policy":         $('#s3_policy').val(),
           "signature":      $('#s3_signature').val(),
@@ -243,6 +248,7 @@ var programDetail =
       
       programDetailBlock.find('.ep_name').val(program.name);
       programDetailBlock.find('.ep_image').attr('src', program.imageUrl);
+      programDetailBlock.find('.ep_image_updated').val('false');
       programDetailBlock.find('.ep_intro').val(program.intro);
       programDetailBlock.find('.ep_urlbutton').click(function()
       {
@@ -274,10 +280,13 @@ var programDetail =
                 'channelId': channelId,
                 'programId': programId,
                 'sourceUrl': programDetailBlock.find('.ep_url_input').val(),
-                'imageUrl':  programDetailBlock.find('.ep_image').attr('src'),
+                //'imageUrl':  programDetailBlock.find('.ep_image').attr('src'),
                 'name':      programDetailBlock.find('.ep_name').val(),
                 'intro':     programDetailBlock.find('.ep_intro').val()
               };
+              if (programDetailBlock.find('.ep_image_updated').val() == 'true') {
+                parameters['imageUrl'] = programDetailBlock.find('.ep_image').attr('src');
+              }
               $.post('/CMSAPI/saveNewProgram', parameters, function(response)
               {
                 if (response == 'OK') {
@@ -371,7 +380,8 @@ var programDetail =
         upload_success_handler: function(file, serverData, recievedResponse)
         {
           programDetailBlock.find('.ep_uploading_image').hide();
-          programDetailBlock.find('.ep_image').attr('src', 'http://9x9tmp.s3.amazonaws.com/prog_logo_' + programId + file.type);
+          programDetailBlock.find('.ep_image').attr('src', 'http://9x9tmp.s3.amazonaws.com/prog_logo_' + programId + '_' + file.size + file.type);
+          programDetailBlock.find('.ep_image_updated').val('true');
         },
         upload_error_handler: function(file, code, message)
         {
@@ -383,7 +393,7 @@ var programDetail =
           var post_params =
           {
             "AWSAccessKeyId": $('#s3_id').val(),
-            "key":            'prog_logo_' + programId + file.type,
+            "key":            'prog_logo_' + programId + '_' + file.size + file.type,
             "acl":            "public-read",
             "policy":         $('#s3_policy').val(),
             "signature":      $('#s3_signature').val(),
@@ -611,6 +621,7 @@ var channelDetail =
     $('#channel_import_detail [name="ch_name"]').val('');
     $('#channel_import_detail [name="ch_intro"]').val('');
     $('#channel_import_detail [name="ch_image"]').attr('src', '/images/cms/upload_img.jpg');
+    $('#channel_import_detail [name="ch_image_updated"]').val('false');
   },
   displayImportDetail: function()
   {
@@ -647,6 +658,9 @@ var channelDetail =
         var channelId = channel.key.id;
         $('#channel_import_detail [name="ch_import_url"]').val(channel.sourceUrl);
         $('#channel_import_detail [name="upload_button_place"]').html('').append($('<span/>').attr('name', 'ch_upload_image'));
+        if (channelDetail.swfObject != null) {
+          channelDetail.swfObject.destroy();
+        }
         var swfupload_settings =
         {
           flash_url:          '/javascripts/swfupload/swfupload.swf',
@@ -666,8 +680,9 @@ var channelDetail =
           upload_success_handler: function(file, serverData, recievedResponse)
           {
             $('#channel_import_detail [name="ch_uploading_image"]').hide();
-            $('#channel_import_detail [name="ch_image"]').attr('src', 'http://9x9tmp.s3.amazonaws.com/' + 'ch_logo_' + channel.key.id + file.type);
-          },
+            $('#channel_import_detail [name="ch_image"]').attr('src', 'http://9x9tmp.s3.amazonaws.com/' + 'ch_logo_' + channel.key.id + '_' + file.size + file.type);
+            $('#channel_import_detail [name="ch_image_updated"]').val('true');
+            },
           upload_error_handler: function(file, code, message)
           {
             $('#channel_import_detail [name="ch_uploading_image"]').hide();
@@ -678,7 +693,7 @@ var channelDetail =
             var post_params =
             {
               "AWSAccessKeyId": $('#s3_id').val(),
-              "key":            'ch_logo_' + channel.key.id + file.type,
+              "key":            'ch_logo_' + channel.key.id + '_' + file.size + file.type,
               "acl":            "public-read",
               "policy":         $('#s3_policy').val(),
               "signature":      $('#s3_signature').val(),
@@ -694,27 +709,7 @@ var channelDetail =
         $('#channel_import_detail [name="ch_name"]').val(channel.name);
         $('#channel_import_detail [name="ch_intro"]').val(channel.intro);
         $('#channel_import_detail [name="ch_image"]').attr('src', channel.imageUrl);
-          /*
-          var parameters = {
-            'alt': 'json',
-            'v':   '2',
-            'format': '5'
-          }
-          
-          var username = channel.sourceUrl.match (/\/user\/([^\/]*)/)[1];
-          var requestUrl = 'http://gdata.youtube.com/feeds/api/users/' + username + '/uploads';
-          
-          $.get(requestUrl, function(data)
-          {
-            if (data == null) {
-              alert('匯入頻道資訊失敗');
-              return;
-            }
-            var feed = data.feed;
-            $('#channel_import_detail [name="ch_name"]').val(feed.title.$t);
-            $('#channel_import_detail [name="ch_image"]').attr('src', feed.entry[0].media$group.media$thumbnail[1]['url']);
-          }, 'json');
-          */
+        $('#channel_import_detail [name="ch_image_updated"]').val('false');
         $.getJSON('/CMSAPI/channelCategory?channelId=' + channelId, function(category)
         {
           if (category != null) {
@@ -735,17 +730,21 @@ var channelDetail =
           }
           var intro = $('#channel_import_detail [name="ch_intro"]').val();
           var imageUrl = $('#channel_import_detail [name="ch_image"]').attr('src');
+          var imageUpdated = $('#channel_import_detail [name="ch_image_updated"]').val();
           var sourceUrl = $('#channel_import_detail [name="ch_import_url"]').val();
           var parameters =
           {
             'name':       name,
             'intro':      intro,
-            'imageUrl':   imageUrl,
+            //'imageUrl':   imageUrl,
             'categoryId': category,
             'tag':        '',
             'msoId':      $('#msoId').val(),
             'sourceUrl':  sourceUrl
           };
+          if (imageUpdated == 'true') {
+            parameters['imageUrl'] = imageUrl;
+          }
           $.post('/CMSAPI/addChannelByUrl', parameters, function(response)
           {
             if (response != 'OK') {
@@ -778,8 +777,9 @@ var channelDetail =
       $('#ch_id').val(channel.key.id);
       $('#ch_name').val('').val(channel.name);
       $('#ch_image').attr('src', channel.imageUrl);
+      $('#ch_image_updated').val('false');
       $('#ch_intro').val('').val(channel.intro);
-      $('#ch_tag').val('');
+      $('#ch_tag').val(channel.tags);
       if (channelDetail.swfObject != null) {
         channelDetail.swfObject.destroy();
       }
@@ -803,11 +803,13 @@ var channelDetail =
         upload_success_handler: function(file, serverData, recievedResponse)
         {
           $('#ch_uploading').hide();
-          $('#ch_image').attr('src', 'http://9x9tmp.s3.amazonaws.com/' + 'ch_logo_' + channel.key.id + file.type);
+          var imageUrl = 'http://9x9tmp.s3.amazonaws.com/' + 'ch_logo_' + channel.key.id + '_' + file.size + file.type;
+          $('#ch_image').attr('src', imageUrl);
+          $('#ch_image_updated').val('true');
         },
         upload_error_handler: function(file, code, message)
         {
-          $('#uploading').hide();
+          $('#ch_uploading').hide();
           alert('error: ' + message);
         },
         file_queued_handler: function(file)
@@ -815,7 +817,7 @@ var channelDetail =
           var post_params =
           {
             "AWSAccessKeyId": $('#s3_id').val(),
-            "key":            'ch_logo_' + channel.key.id + file.type,
+            "key":            'ch_logo_' + channel.key.id + '_' + file.size + file.type,
             "acl":            "public-read",
             "policy":         $('#s3_policy').val(),
             "signature":      $('#s3_signature').val(),
@@ -865,12 +867,15 @@ var channelDetail =
       var parameters =
       {
         'channelId':  $('#ch_id').val(),
-        'imageUrl':   $('#ch_image').attr('src'),
+        //'imageUrl':   $('#ch_image').attr('src'),
         'name':       $('#ch_name').val(),
         'intro':      $('#ch_intro').val(),
-        'tag':        '', //$('#ch_tag').val(),
+        'tag':        $('#ch_tag').val(),
         'categoryId': $('#ch_category').val()
       };
+      if ($('#ch_image_updated').val() == 'true') {
+        parameters['imageUrl'] = $('#ch_image').attr('src');
+      }
       $.post('/CMSAPI/saveChannel', parameters, function(response)
       {
         if (response != 'OK') {

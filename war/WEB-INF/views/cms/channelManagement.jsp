@@ -167,7 +167,7 @@
             <fieldset class="setAlbum">
               <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.logo"/></label>
               <div class="uploadImg">
-                <img id="ch_image" alt="" src="/images/cms/upload_img.jpg" class="floatL"/>
+                <img id="ch_image" alt="" src="/images/cms/upload_img.jpg" class="floatL"/><input type="hidden" id="ch_image_updated" value="false"/>
                 <div class="floatL imgBtn">
                   <p class="gray"><spring:message code="cms.channel_management.msg.best_resolution"/></p>
                   <span id="upload_button_place"><!--
@@ -192,13 +192,12 @@
               <div class="bg_textarea floatL"><textarea id="ch_intro" name="" cols="33" rows="5"></textarea></div>
               <div class="clear"></div>
               <p class="hint"><spring:message code="cms.channel_management.msg.two_hundred_characters"/></p>
-              <br/><!-- 
+              <br/>
               <label class="floatL"><spring:message code="cms.channel_management.label.tag"/></label>
-              <div class="bg_input floatL"><input id="ch_tag" type="text" size="40" maxlength="40" disabled="disabled"/></div>
+              <div class="bg_input floatL"><input id="ch_tag" type="text" size="25" maxlength="100" /></div>
               <div class="clear"></div>
               <p class="hint"><spring:message code="cms.channel_management.msg.camma_seperated"/></p>
               <br/>
-              -->
               <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.system_category"/></label>
               <div class="floatL">
                 <select name="" id="ch_category" class="sys_directory"></select>
@@ -264,7 +263,7 @@
                   </div>
                   <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.program_logo"/></label>
                   <div class="uploadImg">
-                    <img alt="" src="/images/cms/upload_img.jpg" class="floatL ep_image"/>
+                    <img alt="" src="/images/cms/upload_img.jpg" class="floatL ep_image"/><input type="hidden" class="ep_image_updated" value="fase"/>
                     <div class="floatL imgBtn">
                       <p class="gray"><spring:message code="cms.channel_management.msg.best_resolution"/></p>
                       <a href="javascript:" class="uploadBtn ep_upload_image"></a>
@@ -365,7 +364,7 @@
               <p class="ep_createdate">2011/04/25 14:30</p><br/>
               <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.logo"/></label>
               <div class="uploadImg">
-                <img alt="" src="/images/cms/upload_img.jpg" class="floatL ep_image"/>
+                <img alt="" src="/images/cms/upload_img.jpg" class="floatL ep_image"/><input type="hidden" class="ep_image_updated" value="fase"/>
                 <div class="floatL imgBtn">
                   <p class="gray"><spring:message code="cms.channel_management.msg.best_resolution"/></p>
                   <span class="upload_button_place"><!-- 
@@ -517,7 +516,7 @@
               <div class="clear"></div><br/>
               <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.logo"/></label>
               <div class="uploadImg">
-                <img name="ch_image" alt="" src="/images/cms/upload_img.jpg" class="floatL"/>
+                <img name="ch_image" alt="" src="/images/cms/upload_img.jpg" class="floatL"/><input type="hidden" name="ch_image_updated" value="false"/>
                 <div class="floatL imgBtn">
                   <p class="gray"><spring:message code="cms.channel_management.msg.best_resolution"/></p>
                   <span name="upload_button_place">

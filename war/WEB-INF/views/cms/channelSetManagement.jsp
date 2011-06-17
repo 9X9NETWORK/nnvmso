@@ -48,7 +48,7 @@
           <input type="hidden" id="cc_id" value="0"/>
           <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_set_management.label.logo"/></label>
           <div class="uploadImg">
-            <img alt="" id="cc_image" src="/images/cms/upload_img.jpg" class="floatL"/>
+            <img alt="" id="cc_image" src="/images/cms/upload_img.jpg" class="floatL"/><input type="hidden" id="cc_image_updated" value="false"/>
             <div class="floatL imgBtn">
               <p class="gray"><spring:message code="cms.channel_set_management.msg.best_resolution"/></p>
               <a href="#" id="upload_image" class="uploadBtn"></a>

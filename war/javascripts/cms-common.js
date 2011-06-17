@@ -6,7 +6,7 @@ var formatDate = function(timestamp)
 {
   var updateDate = new Date(timestamp);
   var year = updateDate.getFullYear();
-  var month = updateDate.getMonth();
+  var month = updateDate.getMonth() + 1;
   var date = updateDate.getDate();
   var hour = updateDate.getHours();
   var minute = updateDate.getMinutes().toString();

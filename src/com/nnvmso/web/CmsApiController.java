@@ -1,5 +1,7 @@
 package com.nnvmso.web;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.nnvmso.lib.NnLogUtil;
+import com.nnvmso.lib.NnStringUtil;
 import com.nnvmso.model.Category;
 import com.nnvmso.model.CategoryChannel;
 import com.nnvmso.model.CategoryChannelSet;
@@ -31,6 +34,7 @@ import com.nnvmso.service.ChannelSetChannelManager;
 import com.nnvmso.service.ChannelSetManager;
 import com.nnvmso.service.CmsApiService;
 import com.nnvmso.service.ContentOwnershipManager;
+import com.nnvmso.service.ContentWorkerService;
 import com.nnvmso.service.MsoChannelManager;
 import com.nnvmso.service.MsoManager;
 import com.nnvmso.service.MsoProgramManager;
@@ -89,7 +93,7 @@ public class CmsApiController {
 	
 	@RequestMapping("saveChannelSet")
 	public @ResponseBody String saveChannelSet(@RequestParam Long channelSetId,
-	                                           @RequestParam String imageUrl,
+	                                           @RequestParam(required = false) String imageUrl,
 	                                           @RequestParam String name,
 	                                           @RequestParam String intro,
 	                                           @RequestParam String tag,
@@ -112,7 +116,10 @@ public class CmsApiController {
 		
 		channelSet.setName(name);
 		channelSet.setTag(tag);
-		channelSet.setImageUrl(imageUrl);
+		if (imageUrl != null) {
+			channelSet.setImageUrl(imageUrl);
+			// TODO: channel set also needs to be processed
+		}
 		channelSet.setIntro(intro);
 		channelSetMngr.save(channelSet);
 		
@@ -252,7 +259,8 @@ public class CmsApiController {
 		MsoProgramManager programMngr = new MsoProgramManager();
 		MsoProgram program = programMngr.findById(programId);
 		if (program != null) {
-			programMngr.delete(program); // NOTE: better way instead of delete ?
+			programMngr.delete(program); // NOTE: better way instead of deleting it ?
+			// TODO: remove S3 temp files also ?
 		}
 	}
 	
@@ -308,13 +316,14 @@ public class CmsApiController {
 	}
 	
 	@RequestMapping("addChannelByUrl")
-	public @ResponseBody String addChannelByUrl(@RequestParam String sourceUrl,
-	                                            @RequestParam String imageUrl,
+	public @ResponseBody String addChannelByUrl(HttpServletRequest req,
+	                                            @RequestParam String sourceUrl,
+	                                            @RequestParam(required = false) String imageUrl,
 	                                            @RequestParam String name,
 	                                            @RequestParam String intro,
 	                                            @RequestParam String tag,
 	                                            @RequestParam Long categoryId,
-	                                            @RequestParam Long msoId) {
+	                                            @RequestParam Long msoId) throws NoSuchAlgorithmException {
 		
 		logger.info("sourceUrl = " + sourceUrl);
 		logger.info("imageUrl = " + imageUrl);
@@ -339,7 +348,20 @@ public class CmsApiController {
 		
 		channel.setName(name);
 		//channel.setTag(tag); MsoChannel needs a tag property
-		channel.setImageUrl(imageUrl);
+		if (imageUrl != null) {
+			ContentWorkerService workerService = new ContentWorkerService();
+			Long timestamp = System.currentTimeMillis() / 1000L;
+			
+			MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
+			String sudoChannelSource = "http://9x9.tv/channel/" + channel.getKey().getId();
+			sha1.update(sudoChannelSource.getBytes());
+			String prefix = NnStringUtil.bytesToHex(sha1.digest()) + "_" + timestamp + "_";
+			
+			logger.info("prefix = " + prefix);
+			
+			channel.setImageUrl(imageUrl);
+			workerService.channelLogoProcess(channel.getKey().getId(), imageUrl, prefix, req);
+		}
 		channel.setIntro(intro);
 		channelMngr.save(channel);
 		
@@ -371,12 +393,13 @@ public class CmsApiController {
 	}
 	
 	@RequestMapping("saveNewProgram")
-	public @ResponseBody String saveNewProgram(@RequestParam Long programId,
+	public @ResponseBody String saveNewProgram(HttpServletRequest req,
+	                                           @RequestParam Long programId,
 	                                           @RequestParam Long channelId,
 	                                           @RequestParam String sourceUrl,
-	                                           @RequestParam String imageUrl,
+	                                           @RequestParam(required = false) String imageUrl,
 	                                           @RequestParam String name,
-	                                           @RequestParam String intro) {
+	                                           @RequestParam String intro) throws NoSuchAlgorithmException {
 		
 		logger.info("programId = " + programId);
 		logger.info("channelId = " + channelId);
@@ -387,6 +410,7 @@ public class CmsApiController {
 		
 		MsoProgramManager programMngr = new MsoProgramManager();
 		MsoChannelManager channelMngr = new MsoChannelManager();
+		ContentWorkerService workerService = new ContentWorkerService();
 		
 		MsoProgram program = programMngr.findById(programId);
 		if (program == null) {
@@ -397,9 +421,20 @@ public class CmsApiController {
 			return "Invalid channelId";
 		}
 		
-		program.setName(name);
+		Long timestamp = System.currentTimeMillis() / 1000L;
+		MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
+		sha1.update(sourceUrl.getBytes());
+		String prefix = NnStringUtil.bytesToHex(sha1.digest()) + "_" + timestamp + "_";
+		logger.info("prefix = " + prefix);
+		
+		boolean autoGeneratedLogo = (imageUrl == null) ? true : false;
 		program.setOtherFileUrl(sourceUrl);
-		program.setImageUrl(imageUrl);
+		workerService.programVideoProcess(programId, sourceUrl, prefix, autoGeneratedLogo, req);
+		if (imageUrl != null) {
+			program.setImageUrl(imageUrl);
+			workerService.programLogoProcess(program.getKey().getId(), imageUrl, prefix, req);
+		}
+		program.setName(name);
 		program.setIntro(intro);
 		program.setPublic(true);
 		programMngr.create(channel, program);
@@ -408,10 +443,11 @@ public class CmsApiController {
 	}
 	
 	@RequestMapping("saveProgram")
-	public @ResponseBody String saveProgram(@RequestParam Long programId,
-	                                        @RequestParam String imageUrl,
+	public @ResponseBody String saveProgram(HttpServletRequest req,
+	                                        @RequestParam Long programId,
+	                                        @RequestParam(required = false) String imageUrl,
 	                                        @RequestParam String name,
-	                                        @RequestParam String intro) {
+	                                        @RequestParam String intro) throws NoSuchAlgorithmException {
 		logger.info("programId = " + programId);
 		logger.info("imageUrl = " + imageUrl);
 		logger.info("name = " + name);
@@ -423,7 +459,31 @@ public class CmsApiController {
 			return "Invalid programId";
 		}
 		program.setName(name);
-		program.setImageUrl(imageUrl);
+		if (imageUrl != null) {
+			ContentWorkerService workerService = new ContentWorkerService();
+			Long timestamp = System.currentTimeMillis() / 1000L;
+			
+			String sourceUrl;
+			if (program.getMpeg4FileUrl() != null)
+				sourceUrl = program.getMpeg4FileUrl();
+			else if (program.getWebMFileUrl() != null)
+				sourceUrl = program.getWebMFileUrl();
+			else if (program.getOtherFileUrl() != null)
+				sourceUrl = program.getOtherFileUrl();
+			else if (program.getAudioFileUrl() != null)
+				sourceUrl = program.getAudioFileUrl();
+			else
+				sourceUrl = "http://9x9.tv/episode/" + program.getKey().getId();
+			
+			MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
+			sha1.update(sourceUrl.getBytes());
+			String prefix = NnStringUtil.bytesToHex(sha1.digest()) + "_" + timestamp + "_";
+			
+			logger.info("prefix = " + prefix);
+			
+			program.setImageUrl(imageUrl);
+			workerService.programLogoProcess(program.getKey().getId(), imageUrl, prefix, req);
+		}
 		program.setIntro(intro);
 		programMngr.save(program);
 		
@@ -431,12 +491,13 @@ public class CmsApiController {
 	}
 	
 	@RequestMapping("saveChannel")
-	public @ResponseBody String saveChannel(@RequestParam Long channelId,
-	                                        @RequestParam String imageUrl,
+	public @ResponseBody String saveChannel(HttpServletRequest req,
+	                                        @RequestParam Long channelId,
+	                                        @RequestParam(required = false) String imageUrl,
 	                                        @RequestParam String name,
 	                                        @RequestParam String intro,
 	                                        @RequestParam String tag,
-	                                        @RequestParam Long categoryId) {
+	                                        @RequestParam Long categoryId) throws NoSuchAlgorithmException {
 		
 		logger.info("channelId = " + channelId);
 		logger.info("imageUrl = " + imageUrl);
@@ -453,9 +514,23 @@ public class CmsApiController {
 		if (channel == null)
 			return "Invalid ChannelId";
 		
+		channel.setTags(tag);
+		if (imageUrl != null) {
+			ContentWorkerService workerService = new ContentWorkerService();
+			Long timestamp = System.currentTimeMillis() / 1000L;
+			
+			MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
+			String sudoChannelSource = "http://9x9.tv/channel/" + channel.getKey().getId();
+			sha1.update(sudoChannelSource.getBytes());
+			String prefix = NnStringUtil.bytesToHex(sha1.digest()) + "_" + timestamp + "_";
+			
+			logger.info("prefix = " + prefix);
+			
+			channel.setImageUrl(imageUrl);
+			workerService.channelLogoProcess(channelId, imageUrl, prefix, req);
+		}
+		
 		channel.setName(name);
-		//channel.setTag(tag); MsoChannel needs a tag property
-		channel.setImageUrl(imageUrl);
 		channel.setIntro(intro);
 		channel.setUpdateDate(new Date());
 		channelMngr.save(channel);
