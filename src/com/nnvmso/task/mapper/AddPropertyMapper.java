@@ -25,6 +25,8 @@ public class AddPropertyMapper extends AppEngineMapper<Key, Entity, NullWritable
 			value.setProperty(propertyName, Integer.parseInt(propertyValue));
 		} else if (type.equals("long")) {
 			value.setProperty(propertyName, Long.parseLong(propertyValue));
+		} else if (type.equals("short")) {
+			value.setProperty(propertyName, Short.parseShort(propertyValue));
 		} else if (type.equals("boolean")) {
 			value.setProperty(propertyName, Boolean.parseBoolean(propertyValue));
 		} else if (type.equals("date")) {
