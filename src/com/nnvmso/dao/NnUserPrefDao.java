@@ -9,7 +9,6 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import com.nnvmso.lib.PMF;
-import com.nnvmso.model.NnUser;
 import com.nnvmso.model.NnUserPref;
 
 public class NnUserPrefDao extends GenericDao<NnUserPref> {

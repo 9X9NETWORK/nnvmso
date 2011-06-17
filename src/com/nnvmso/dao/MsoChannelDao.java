@@ -11,7 +11,6 @@ import javax.jdo.Query;
 
 import com.google.appengine.api.datastore.Key;
 import com.nnvmso.lib.PMF;
-import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.NnUser;
 

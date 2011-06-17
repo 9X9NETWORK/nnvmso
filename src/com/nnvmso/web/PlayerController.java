@@ -38,7 +38,7 @@ public class PlayerController {
 	 * to become a 9x9 player, 1)delete cookie, 2)set fb info 
 	 */	
 	@RequestMapping("{name}")
-	public String zooatomics(@RequestParam(value="mso",required=false) String mso, HttpServletRequest req, HttpServletResponse resp, Model model) {
+	public String zooatomics(@RequestParam(value="mso",required=false) String mso, HttpServletRequest req, HttpServletResponse resp, Model model, @PathVariable("name") String name) {
 		PlayerService service = new PlayerService();
 		model = service.prepareBrand(model, mso, resp);
 		return "player/zooatomics";

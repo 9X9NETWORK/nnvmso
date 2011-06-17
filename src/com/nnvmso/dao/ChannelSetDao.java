@@ -10,9 +10,7 @@ import javax.jdo.Query;
 
 import com.nnvmso.lib.PMF;
 import com.nnvmso.model.ChannelSet;
-import com.nnvmso.model.ContentOwnership;
 import com.nnvmso.model.Mso;
-import com.nnvmso.model.MsoChannel;
 
 public class ChannelSetDao extends GenericDao<ChannelSet> {
 	
