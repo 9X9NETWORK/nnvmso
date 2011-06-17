@@ -45,29 +45,30 @@
       <p>
         <button id="btn_delete_directory">刪除目錄</button>
         <button id="btn_create_directory">創建目錄</button>
+        <button id="btn_rename_directory">重新命名</button>
       </p>
-      <div class="directoryList" id="treeview">
+      <div class="directoryList" id="treeview"><!--
         <ul>
-          <li id="root">
-            <a href="#">大愛電視目錄</a>
+          <li id="root" rel="folder">
+            <a href="javascript:">大愛電視目錄</a>
             <ul>
-              <li id="ch1">
-                <a href="#">大愛醫生館</a>
+              <li id="ch1" rel="file">
+                <a href="javascript:">大愛醫生館</a>
               </li>
               <li id="ch2">
-                <a href="#">大愛劇場</a>
+                <a href="javascript:">大愛劇場</a>
                 <ul>
-                  <li>
-                    <a href="#">芳草碧連天</a>
+                  <li rel="set">
+                    <a href="javascript:">芳草碧連天</a>
                   </li>
                   <li>
-                    <a href="#">有情飲水飽</a>
+                    <a href="javascript:">有情飲水飽</a>
                   </li>
                 </ul>
               </li>
             </ul>
           </li>
-        </ul>
+        </ul>-->
       </div>
     </div>
     <div class="left_footer"></div>
@@ -77,7 +78,7 @@
       <div class="right_title">頻道網與頻道庫</div>
       <div class="ch_pool">
         <p class="ch_sub_title"><span>系統會自動將您所建立的頻道與頻道套餐收錄至您的根目錄中，您可以在左側新增子目錄後，自行拖曳頻道或頻道套餐，重新進行編排</span></p>
-        <div class="directoryChList">
+        <div class="directoryChList jstree-drop">
           <ul class="directory_ch" id="directory_list_ul">
             <!--
             <li class="ch_normal">

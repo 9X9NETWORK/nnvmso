@@ -132,6 +132,45 @@ public class CmsApiController {
 			return null;
 	}
 	
+	@RequestMapping("listCategoryChannels")
+	public @ResponseBody List<MsoChannel> listCategoryChannels(@RequestParam Long categoryId) {
+		CategoryChannelManager ccMngr = new CategoryChannelManager();
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		
+		List<CategoryChannel> ccs = ccMngr.findAllByCategoryId(categoryId);
+		List<Long> channelIdList = new ArrayList<Long>();
+		for (CategoryChannel cc : ccs) {
+			channelIdList.add(cc.getChannelId());
+		}
+		return channelMngr.findAllByChannelIds(channelIdList);
+	}
+	
+	@RequestMapping("listCategoryChannelSets")
+	public @ResponseBody List<ChannelSet> listCategoryChannelSets(@RequestParam Long categoryId) {
+		CategoryChannelSetManager cscMngr = new CategoryChannelSetManager();
+		ChannelSetManager channelSetMngr = new ChannelSetManager();
+		
+		List<CategoryChannelSet> ccss = cscMngr.findAllByCategoryId(categoryId);
+		List<Long> channelSetIdList = new ArrayList<Long>();
+		for (CategoryChannelSet ccs : ccss) {
+			channelSetIdList.add(ccs.getChannelSetId());
+		}
+		return channelSetMngr.findAllByChannelSetIds(channelSetIdList);
+	}
+	
+	/**
+	 * List all mso categories
+	 */
+	@RequestMapping("listCategories")
+	public @ResponseBody List<Category> listCategories(@RequestParam Long msoId) {
+		CategoryManager catMngr = new CategoryManager();
+		MsoManager msoMngr = new MsoManager();
+		Mso mso = msoMngr.findById(msoId);
+		if (mso == null)
+			return new ArrayList<Category>();
+		return catMngr.findAllByMsoId(mso.getKey().getId());
+	}
+	
 	/**
 	 * List all system categories (mso in TYPE_NN)
 	 */
@@ -141,6 +180,117 @@ public class CmsApiController {
 		MsoManager msoMngr = new MsoManager();
 		Mso nnmso = msoMngr.findNNMso();
 		return catMngr.findAllByMsoId(nnmso.getKey().getId());
+	}
+	
+	@RequestMapping("renameCategory")
+	public @ResponseBody String renameCategory(@RequestParam Long categoryId,
+	                                           @RequestParam String name) {
+		logger.info("categoryId = " + categoryId);
+		logger.info("name = " + name);
+		
+		CategoryManager catMngr = new CategoryManager();
+		Category category = catMngr.findById(categoryId);
+		if (category == null)
+			return "Invalid categoryId";
+		category.setName(name);
+		catMngr.save(category);
+		return "OK";
+	}
+	
+	@RequestMapping("createCategory")
+	public @ResponseBody Long createCategory(@RequestParam Long msoId,
+	                                         @RequestParam Long parentId,
+	                                         @RequestParam String name) {
+		logger.info("msoId = " + msoId);
+		logger.info("parentId = " + parentId);
+		logger.info("name = " + name);
+		
+		CategoryManager catMngr = new CategoryManager();
+		MsoManager msoMngr = new MsoManager();
+		Mso mso = msoMngr.findById(msoId);
+		if (mso == null)
+			return null;
+		Category category = new Category(name, true, msoId);
+		category.setParentId(parentId);
+		catMngr.create(category);
+		logger.info("newCategoryId = " + category.getKey().getId());
+		return category.getKey().getId();
+	}
+	
+	@RequestMapping("createCategoryChannelSet")
+	public @ResponseBody String createCategoryChannelSet(@RequestParam Long categoryId,
+	                                                     @RequestParam Long channelSetId) {
+		logger.info("categoryId = " + categoryId);
+		logger.info("channelSetId = " + channelSetId);
+		
+		CategoryChannelSetManager ccsMngr = new CategoryChannelSetManager();
+		CategoryManager catMngr = new CategoryManager();
+		ChannelSetManager setMngr = new ChannelSetManager();
+		
+		Category category = catMngr.findById(categoryId);
+		if (category == null)
+			return "Invalid categoryId";
+		ChannelSet channelSet = setMngr.findById(channelSetId);
+		if (channelSet == null)
+			return "Invalid channelSetId";
+		
+		CategoryChannelSet found = ccsMngr.findByCategoryIdAndChannelSetId(categoryId, channelSetId);
+		if (found == null) {
+			ccsMngr.create(new CategoryChannelSet(categoryId, channelSetId));
+		}
+		return "CategoryChannelSet Exists";
+	}
+	
+	@RequestMapping("createCategoryChannel")
+	public @ResponseBody String createCategoryChannel(@RequestParam Long categoryId,
+	                                                  @RequestParam Long channelId) {
+		logger.info("categoryId = " + categoryId);
+		logger.info("channelId = " + channelId);
+		
+		CategoryChannelManager ccMngr = new CategoryChannelManager();
+		CategoryManager catMngr = new CategoryManager();
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		
+		Category category = catMngr.findById(categoryId);
+		if (category == null)
+			return "Invalid categoryId";
+		MsoChannel channel = channelMngr.findById(channelId);
+		if(channel == null)
+			return "Invalid channelId";
+		
+		CategoryChannel found = ccMngr.findByCategoryIdAndChannelId(categoryId, channelId);
+		if (found == null) {
+			ccMngr.create(new CategoryChannel(categoryId, channelId));
+		}
+		return "CategoryChannel Exists";
+	}
+	
+	@RequestMapping("removeCategoryChannel")
+	public @ResponseBody String removeCategoryChannel(@RequestParam Long categoryId,
+	                                                  @RequestParam Long channelId) {
+		logger.info("categoryId = " + categoryId);
+		logger.info("channelId = " + channelId);
+		
+		CategoryChannelManager ccMngr = new CategoryChannelManager();
+		CategoryChannel found = ccMngr.findByCategoryIdAndChannelId(categoryId, channelId);
+		if (found == null)
+			return "Not Found";
+		ccMngr.delete(found);
+		return "OK";
+	}
+	
+	@RequestMapping("removeCategoryChannelSet")
+	public @ResponseBody String removeCategoryChannelSet(@RequestParam Long categoryId,
+	                                                     @RequestParam Long channelSetId) {
+		logger.info("categoryId = " + categoryId);
+		logger.info("channelSetId = " + channelSetId);
+		
+		CategoryChannelSetManager ccsMngr = new CategoryChannelSetManager();
+		CategoryChannelSet found = ccsMngr.findByCategoryIdAndChannelSetId(categoryId, channelSetId);
+		if (found == null)
+			return "Not Found";
+		ccsMngr.delete(found);
+		return "OK";
 	}
 	
 	@RequestMapping("saveChannelSet")
@@ -186,7 +336,7 @@ public class CmsApiController {
 		
 		if (ccss.isEmpty()) {
 			// create a new CategoryChannelSet
-			CategoryChannelSet ccs = new CategoryChannelSet(channelSetId, categoryId);
+			CategoryChannelSet ccs = new CategoryChannelSet(categoryId, channelSetId);
 			ccsMngr.create(ccs);
 			logger.info("create new CategoryChannelSet channelSetId = " + channelSetId + ", categoryId = " + categoryId);
 		}

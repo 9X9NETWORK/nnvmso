@@ -351,7 +351,7 @@ form a { font-size:0.8em; }
 .directory_ch .ch_normal { background:url(/images/cms/ch_normal.jpg) no-repeat 0px 0px; width:96px; height:83px; cursor:move; }
 .directory_ch .ch_normal:hover { background:url(/images/cms/ch_hover.jpg) no-repeat 0px 0px; width:96px; height:83px; }
 .directory_ch img { width:85px; height:50px; border:1px solid #b7b7b7; }
-.directory_ch .ch_disable { background:url(/images/cms/ch_disable.jpg) no-repeat 5px 0px; width:76px; height:73px; }
+.directory_ch .ch_disable { background:url(/images/cms/ch_disable.jpg) no-repeat 0px 0px; width:96px; height:83px; }
 .directoryChList { height:480px; overflow:auto; }
 .directoryList { width:410px; margin-left:10px; margin-top:10px; height:410px; overflow:auto; }
 .directoryList li { float:none; }

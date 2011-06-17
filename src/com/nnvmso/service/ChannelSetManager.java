@@ -79,9 +79,18 @@ public class ChannelSetManager {
 		}
 		return results;
 	}
-
+	
 	public ChannelSet findById(long channelSetId) {
 		return channelSetDao.findById(channelSetId);
+	}
+
+	public List<ChannelSet> findAllByChannelSetIds(List<Long> channelSetIdList) {
+		List<ChannelSet> results = new ArrayList<ChannelSet>();
+		for (Long channelSetId : channelSetIdList) {
+			ChannelSet channelSet = this.findById(channelSetId);
+			if (channelSet != null) results.add(channelSet);
+		}
+		return results;
 	}
 	
 }

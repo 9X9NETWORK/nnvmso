@@ -37,4 +37,12 @@ public class CategoryChannelSetManager {
 		}
 		return results;
 	}
+
+	public List<CategoryChannelSet> findAllByCategoryId(Long categoryId) {
+		return ccsDao.findAllByCategoryId(categoryId);
+	}
+
+	public CategoryChannelSet findByCategoryIdAndChannelSetId(Long categoryId, Long channelSetId) {
+		return ccsDao.findByChannelSetIdAndCategoryId(channelSetId, categoryId);
+	}
 }
