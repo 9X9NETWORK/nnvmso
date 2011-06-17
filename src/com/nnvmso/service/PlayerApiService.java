@@ -1024,7 +1024,7 @@ public class PlayerApiService {
 				set.getName(),
 				set.getImageUrl()
 			};							
-			output += NnStringUtil.getDelimitedStr(obj);			
+			output += NnStringUtil.getDelimitedStr(obj) + "\n";			
 		}				
 		return output;		
 	}
