@@ -81,6 +81,21 @@ public class CmsApiController {
 	}
 	
 	/**
+	 * List all channel sets owned by mso
+	 */
+	@RequestMapping("listOwnedChannelSets")
+	public @ResponseBody List<ChannelSet> listOwnedChannelSets(@RequestParam Long msoId) {
+		
+		ContentOwnershipManager ownershipMngr = new ContentOwnershipManager();
+		List<ChannelSet> results = new ArrayList<ChannelSet>();
+		
+		logger.info("msoId = " + msoId);
+		
+		results = ownershipMngr.findOwnedChannelSetsByMsoId(msoId);
+		return results;
+	}
+	
+	/**
 	 * List all channel in mso default channel set
 	 */
 	@RequestMapping("defaultChannelSetChannels")

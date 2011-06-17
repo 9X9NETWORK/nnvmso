@@ -81,7 +81,7 @@ padding:10px 0 0 80px;
 .ch_exist img { width:93px; height: 56px; }
 .ch_bg li{ float:left; margin:5px; *margin:3px;}
 .ch_bg ul{ padding:30px 0 0 10px;}
-h2.popTitle{ border-bottom:1px dashed #b3b3b3; padding-bottom:10px;}
+h2.popTitle { border-bottom:1px dashed #b3b3b3; padding-bottom:10px; max-width:300px; overflow:hidden; }
 .ch_sub_title{ font-size:1.1em; padding:10px 0;}
 .ch_sub_title span{ color:#5f5f5f; font-size:0.9em; padding-left:10px;}
 
@@ -353,7 +353,7 @@ form a { font-size:0.8em; }
 .directory_ch img { width:85px; height:50px; border:1px solid #b7b7b7; }
 .directory_ch .ch_disable { background:url(/images/cms/ch_disable.jpg) no-repeat 5px 0px; width:76px; height:73px; }
 .directoryChList { height:480px; overflow:auto; }
-.directoryList { height:440px; overflow:auto; }
+.directoryList { width:410px; margin-left:10px; margin-top:10px; height:410px; overflow:auto; }
 .directoryList li { float:none; }
 
 .lang { display:none; }

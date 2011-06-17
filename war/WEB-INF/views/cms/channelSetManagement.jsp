@@ -16,6 +16,7 @@
 <script type="text/javascript" src="/javascripts/jquery.bubble.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.textTruncate.js"></script>
 <script type="text/javascript" src="/javascripts/swfupload/swfupload.js"></script>
+<script type="text/javascript" src="/javascripts/cms-common.js"></script>
 <script type="text/javascript" src="/javascripts/channelSetManagement.js"></script>
 <title><spring:message code="cms.channel_set_management.title"/></title>
 </head>
@@ -156,25 +157,5 @@
 <label class="lang" id="lang_warning_intro_over_limitation"><spring:message code="cms.warning.intro_over_limitation"/></label>
 <label class="lang" id="lang_warning_error_occurs"><spring:message code="cms.warning.error_occurs"/></label>
 <label class="lang" id="lang_update_successfully"><spring:message code="cms.warning.update_successfully"/></label>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 </body>
 </html>

@@ -16,6 +16,7 @@
 <script type="text/javascript" src="/javascripts/jquery.textTruncate.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.jstree.js"></script>
 <script type="text/javascript" src="http://www.netgrow.com.au/assets/files/jquery_plugins/jquery.dump.js"></script>
+<script type="text/javascript" src="/javascripts/cms-common.js"></script>
 <script type="text/javascript" src="/javascripts/directoryManagement.js"></script>
 <title>目錄管理</title>
 </head>
@@ -41,6 +42,10 @@
     <div class="clear"></div>
     <div class="left_body">
       <p class="ch_sub_title"><span>9x9提供您一個可以自訂的品牌目錄，讓您能夠將所擁有的頻道與頻道網收錄在您自有的目錄中，並被觀眾在9x9.tv瀏覽目錄時看到</span></p>
+      <p>
+        <button id="btn_delete_directory">刪除目錄</button>
+        <button id="btn_create_directory">創建目錄</button>
+      </p>
       <div class="directoryList" id="treeview">
         <ul>
           <li id="root">
@@ -73,7 +78,8 @@
       <div class="ch_pool">
         <p class="ch_sub_title"><span>系統會自動將您所建立的頻道與頻道套餐收錄至您的根目錄中，您可以在左側新增子目錄後，自行拖曳頻道或頻道套餐，重新進行編排</span></p>
         <div class="directoryChList">
-          <ul class="directory_ch">
+          <ul class="directory_ch" id="directory_list_ul">
+            <!--
             <li class="ch_normal">
               <img alt="" src="/images/cms/ch_img.jpg"/>
               <p class="ch_name">頻道名稱名...</p>
@@ -159,6 +165,7 @@
               <p class="ch_name">頻道名稱名...</p>
             </li>
             <div style="clear:both"/>
+            -->
           </ul>
         </div>
       </div>
@@ -168,5 +175,9 @@
   </div>
 </div>
 <div style="clear:both"/>
+<!-- language tags for javascript -->
+<label class="lang" id="lang_label_program_count"><spring:message code="cms.directory_management.label.program_count"/></label>
+<label class="lang" id="lang_label_update_time"><spring:message code="cms.directory_management.label.update_time"/></label>
+<label class="lang" id="lang_label_channel_set"><spring:message code="cms.directory_management.label.channel_set"/></label>
 </body>
 </html>

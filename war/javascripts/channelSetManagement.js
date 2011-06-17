@@ -2,21 +2,6 @@
  * 
  */
  
-var bubblePopupProperties = 
-{
-  'position':  'top',
-  'align':     'center',
-  //'innerHtml': innerHtml,
-  'innerHtmlStyle':
-  {
-    'color':      '#292929',
-    'text-align': 'left',
-    'font-size':  '0.8em'
-  },
-  'themeName': 'all-black',
-  'themePath': '/images/cms'
-};
-
 var draggableProperties =
   {
     'start': function()
