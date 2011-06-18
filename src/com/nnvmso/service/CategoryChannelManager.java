@@ -21,8 +21,14 @@ public class CategoryChannelManager {
 		cc.setCreateDate(now);
 		cc.setUpdateDate(now);
 		ccDao.save(cc);
-	}	
-
+	}
+	
+	public void save(CategoryChannel cc) {
+		Date now = new Date();
+		cc.setUpdateDate(now);
+		ccDao.save(cc);
+	}
+	
 	public void delete(CategoryChannel cc) {
 		CategoryManager categoryMngr = new CategoryManager();
 		Category category = categoryMngr.findById(cc.getCategoryId()); 
@@ -87,4 +93,5 @@ public class CategoryChannelManager {
 		}
 		return results;
 	}
+	
 }

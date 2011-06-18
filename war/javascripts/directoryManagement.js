@@ -49,41 +49,15 @@ var populateBubbleChannelContent = function(channel)
   return innerHtml;
 }
 
-var loadCategoryChannelSets = function(categoryId) {
-  $.get('/CMSAPI/listCategoryChannelSets?categoryId=' + categoryId, function(channelSets)
-  {
-    for (i in channelSets)
-    {
-      var channelSetId = channelSets[i].key.id;
-      var steal = $('#treeview').bind('create.jstree');
-      $('#treeview').unbind('create.jstree');
-      $('#treeview').jstree('create', $('#' + categoryId), 'last', {
-        attr: {
-          rel: 'set',
-          id: channelSetId
-        },
-        data: channelSets[i].name
-      }, null, true);
-      $('#treeview').bind('create.jstree', steal);
-      $('.ch_normal input[name="id"][value="'+channelSetId+'"]')
-        .parent()
-        .removeClass('ch_normal')
-        .removeClass('jstree-draggable')
-        .addClass('ch_disable')
-        //.draggable('disable')
-        .RemoveBubblePopup();
-    }
-  }, 'json');
-}
-
-var loadCategoryChannels = function(categoryId) {
+var loadCategoryChannelsAndChannelSets = function(categoryId) {
+  // load channels
   $.get('/CMSAPI/listCategoryChannels?categoryId=' + categoryId, function(channels)
   {
+    //var steal = $('#treeview').bind('create.jstree');
+    //$('#treeview').unbind('create.jstree');
     for (i in channels)
     {
       var channelId = channels[i].key.id;
-      var steal = $('#treeview').bind('create.jstree');
-      $('#treeview').unbind('create.jstree');
       $('#treeview').jstree('create', $('#' + categoryId), 'last', {
         attr: {
           rel: 'file',
@@ -91,7 +65,6 @@ var loadCategoryChannels = function(categoryId) {
         },
         data: channels[i].name
       }, null, true);
-      $('#treeview').bind('create.jstree', steal);
       $('.ch_normal input[name="id"][value="'+channelId+'"]')
         .parent()
         .removeClass('ch_normal')
@@ -100,8 +73,34 @@ var loadCategoryChannels = function(categoryId) {
         //.draggable('disable')
         .RemoveBubblePopup();
     }
+    //$('#treeview').bind('create.jstree', steal);
   }, 'json');
-}
+  // load channel sets
+  $.get('/CMSAPI/listCategoryChannelSets?categoryId=' + categoryId, function(channelSets)
+  {
+    //var steal = $('#treeview').bind('create.jstree');
+    //$('#treeview').unbind('create.jstree');
+    for (i in channelSets)
+    {
+      var channelSetId = channelSets[i].key.id;
+      $('#treeview').jstree('create', $('#' + categoryId), 'last', {
+        attr: {
+          rel: 'set',
+          id: channelSetId
+        },
+        data: channelSets[i].name
+      }, null, true);
+      $('.ch_normal input[name="id"][value="'+channelSetId+'"]')
+        .parent()
+        .removeClass('ch_normal')
+        .removeClass('jstree-draggable')
+        .addClass('ch_disable')
+        //.draggable('disable')
+        .RemoveBubblePopup();
+    }
+    //$('#treeview').bind('create.jstree', steal);
+  }, 'json');
+};
 
 var composeCategoryTreeData = function(categories, all)
 {
@@ -125,8 +124,9 @@ var composeCategoryTreeData = function(categories, all)
     {
       item.append(composeCategoryTreeData(sub, all));
     }
-    loadCategoryChannelSets(categoryId);
-    loadCategoryChannels(categoryId);
+    //loadCategoryChannelSets(categoryId);
+    //loadCategoryChannels(categoryId);
+    loadCategoryChannelsAndChannelSets(categoryId);
     ul.append(item);
   }
   result.append(ul);
@@ -139,9 +139,27 @@ var directoryArea =
   {
     $('#btn_delete_directory').button().unbind('click').click(function()
     {
-      alert(new Date().getTime());
-      //alert('delete directory');
-      //alert($('#treeview').html());
+      var selected = $('#treeview').jstree('get_selected');
+      if ($(selected).attr('rel') != 'folder') {
+        alert('你必須選擇一個目錄');
+        return;
+      } else if ($(selected).parent().parent().attr('id') == 'treeview') {
+        alert('根目錄將無法被移除');
+        return;
+      }
+      var categoryId = $(selected).attr('id');
+      var categoryName = $(selected).find('> a').text();
+      if (confirm('你確定要移除目錄 "'+categoryName+'" 所有的子目錄也會一併被移除') == false) {
+        return;
+      }
+      $.get('/CMSAPI/removeCategory?categoryId=' + categoryId, function(response)
+      {
+        if (response != 'OK') {
+          alert('發生錯誤');
+          return;
+        }
+        $('#treeview').jstree('remove', selected);
+      }, 'text');
     });
     $('#btn_create_directory').button().unbind('click').click(function()
     {
@@ -151,12 +169,12 @@ var directoryArea =
         return;
       }
       var name = new Date().getTime().toString();
-      var parameter = {
+      var parameters = {
         msoId: $('#msoId').val(),
         parentId: $(selected).attr('id'),
         name: name
       };
-      $.post('/CMSAPI/createCategory', parameter, function(categoryId)
+      $.post('/CMSAPI/createCategory', parameters, function(categoryId)
       {
         //alert(categoryId);
         if (!categoryId.toString().match(/^[0-9]+$/) || categoryId == 0) {
@@ -169,7 +187,7 @@ var directoryArea =
             id: categoryId
           },
           data: name
-        }, function(dom)
+        }, function(data)
         {
         }, false);
       });
@@ -206,32 +224,33 @@ var directoryArea =
             var type = data.o.attr('rel');
             
             var url;
-            var parameter = {
+            var parameters = {
               'categoryId': categoryId
             };
             if (type == 'file') {
               url = '/CMSAPI/removeCategoryChannel';
-              parameter['channelId'] = objectId;
+              parameters['channelId'] = objectId;
             } else if (type == 'set') {
               url = '/CMSAPI/removeCategoryChannelSet';
-              parameter['channelSetId'] = objectId;
+              parameters['channelSetId'] = objectId;
             } else {
               alert('拖拽目錄無效');
               return;
             }
-            $.post(url, parameter, function(response)
+            $.post(url, parameters, function(response)
             {
               if (response != 'OK') {
                 alert('發生錯誤');
                 return;
               }
-              $('treeview').jstree('remove', data.o);
-               var ch = $('.ch_normal input[name="id"][value="'+objectId+'"]')
-                          .parent()
-                          .removeClass('ch_disable')
-                          .addClass('ch_normal')
-                          //.draggable('enable')
-                          .addClass('jstree-draggable');
+              //alert('Qoo');
+              $('#treeview').jstree('remove', data.o);
+              var ch = $('.ch_disable input[name="id"][value="'+objectId+'"]')
+                         .parent()
+                         .removeClass('ch_disable')
+                         .addClass('ch_normal')
+                         //.draggable('enable')
+                         .addClass('jstree-draggable');
               bubblePopupProperties['innerHtml'] = ch.find('span').html();
               ch.CreateBubblePopup(bubblePopupProperties);
             }, 'text')
@@ -246,8 +265,26 @@ var directoryArea =
               obj = $(data.o);
             var type = obj.find('input[name="type"]').val();
             var objectId = obj.find('input[name="id"]').val();
-            
-            alert(objectId + type); // Qoo
+            var url;
+            var parameters = {
+              'categoryId': categoryId
+            };
+            if (type == 'channelSet') {
+              url = '/CMSAPI/createCategoryChannelSet';
+              parameters['channelSetId'] = objectId;
+            } else {
+              url = '/CMSAPI/createCategoryChannel';
+              parameters['channelId'] = objectId;
+            }
+            $.post(url, parameters, function(response)
+            {
+              if (response != 'OK') {
+                alert('發生錯誤');
+                return;
+              }
+              $(data.r).find('ul > li[rel!="folder"]').remove();
+              loadCategoryChannelsAndChannelSets(categoryId);
+            }, 'text');
           },
           'drag_check': function(data)
           {
@@ -292,6 +329,25 @@ var directoryArea =
             }
           }
         },
+        'crrm': {
+          'move': {
+            'check_move': function(data)
+            {
+              var parent = $(data.o).parent().parent();
+              var dest = $(data.r);
+              if (parent.attr('id') == 'treeview') { // root can not be moved
+                return false;
+              }
+              if (dest.attr('rel') != 'folder') { // destination must be a folder
+                return false;
+              }
+              if (data.cr == -1) {
+                return false
+              }
+              return true;
+            }
+          }
+        },
         'plugins': ['themes', 'html_data', 'types', 'ui', 'crrm', 'dnd'] 
       });
       $('#treeview').bind('rename.jstree', function(event, data)
@@ -316,6 +372,10 @@ var directoryArea =
       });
       $('#treeview').bind('create.jstree', function(event, data)
       {
+        //alert(data.rslt.obj.attr('rel'));
+        if (data.rslt.obj.attr('rel') != 'folder') {
+          return;
+        }
         var categoryId = data.rslt.obj.attr('id');
         var name = data.rslt.name;
         var parameter = {
@@ -327,6 +387,38 @@ var directoryArea =
           if (response != 'OK')
             alert('發生錯誤');
         }, 'text');
+      });
+      $('#treeview').bind('move_node.jstree', function(event, data)
+      {
+        var toCategoryId = $(data.rslt.np).attr('id');
+        var type = $(data.rslt.o).attr('rel');
+        var objectId = $(data.rslt.o).attr('id');
+        var fromCategoryId = $(data.rslt.op).attr('id');
+        
+        var url;
+        var parameters = {
+          'toCategoryId': toCategoryId,
+          'fromCategoryId': fromCategoryId
+        }
+        if (type == 'file') {
+          url = '/CMSAPI/moveCategoryChannel';
+          parameters['channelId'] = objectId;
+        } else if (type == 'set') {
+          url = '/CMSAPI/moveCategoryChannelSet';
+          parameters['channelSetId'] = objectId;
+        } else if (type == 'folder') {
+          url = '/CMSAPI/moveCategory';
+          parameters['categoryId'] = objectId;
+        } else {
+          return;
+        }
+        $.post(url, parameters, function(response)
+        {
+          if (response != 'OK') {
+            alert('發生錯誤');
+          }
+        }, 'text');
+        
       });
     });
   }

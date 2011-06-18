@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.google.appengine.api.taskqueue.QueueFactory;
+import com.google.appengine.api.taskqueue.TaskOptions;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnStringUtil;
 import com.nnvmso.model.Category;
@@ -649,7 +651,7 @@ public class CmsApiController {
 		Mso mso = msoMngr.findById(msoId);
 		if (mso == null)
 			return new ArrayList<Category>();
-		return catMngr.findAllByMsoId(mso.getKey().getId());
+		return catMngr.findAllByMsoIdWithoutCache(mso.getKey().getId());
 	}
 	
 	/**
@@ -695,6 +697,8 @@ public class CmsApiController {
 		category.setParentId(parentId);
 		catMngr.create(category);
 		logger.info("newCategoryId = " + category.getKey().getId());
+		if (category.getKey() == null)
+			return null;
 		return category.getKey().getId();
 	}
 	
@@ -718,6 +722,7 @@ public class CmsApiController {
 		CategoryChannelSet found = ccsMngr.findByCategoryIdAndChannelSetId(categoryId, channelSetId);
 		if (found == null) {
 			ccsMngr.create(new CategoryChannelSet(categoryId, channelSetId));
+			return "OK";
 		}
 		return "CategoryChannelSet Exists";
 	}
@@ -742,6 +747,7 @@ public class CmsApiController {
 		CategoryChannel found = ccMngr.findByCategoryIdAndChannelId(categoryId, channelId);
 		if (found == null) {
 			ccMngr.create(new CategoryChannel(categoryId, channelId));
+			return "OK";
 		}
 		return "CategoryChannel Exists";
 	}
@@ -774,5 +780,105 @@ public class CmsApiController {
 		return "OK";
 	}
 	
+	@RequestMapping("removeCategory")
+	public @ResponseBody String removeCategory(@RequestParam Long categoryId) {
+		
+		CategoryManager catMngr = new CategoryManager();
+		CategoryChannelSetManager ccsMngr = new CategoryChannelSetManager();
+		CategoryChannelManager ccMngr = new CategoryChannelManager();
+		
+		logger.info("categoryId = " + categoryId);
+		
+		Category category = catMngr.findById(categoryId);
+		if (category == null)
+			return "Invalid categoryId";
+		if (category.getParentId() == 0)
+			return "Can Not Remove Root";
+		
+		// remove channel sets
+		List<CategoryChannelSet> ccss = ccsMngr.findAllByCategoryId(categoryId);
+		for (CategoryChannelSet ccs : ccss) {
+			QueueFactory.getDefaultQueue().add(
+					TaskOptions.Builder.withUrl("/CMSAPI/removeCategoryChannelSet")
+					.param("categoryId", String.valueOf(ccs.getCategoryId()))
+					.param("channelSetId", String.valueOf(ccs.getChannelSetId())));
+		}
+		// remove channels
+		List<CategoryChannel> ccs = ccMngr.findAllByCategoryId(categoryId);
+		for (CategoryChannel cc : ccs) {
+			QueueFactory.getDefaultQueue().add(
+					TaskOptions.Builder.withUrl("/CMSAPI/removeCategoryChannel")
+					.param("categoryId", String.valueOf(cc.getCategoryId()))
+					.param("channelId", String.valueOf(cc.getChannelId())));
+		}
+		// remove sub-categories
+		List<Category> subCategories = catMngr.findAllByParentId(categoryId);
+		for (Category sub : subCategories) {
+			QueueFactory.getDefaultQueue().add(
+					TaskOptions.Builder.withUrl("/CMSAPI/removeCategory")
+					.param("categoryId", String.valueOf(sub.getKey().getId())));
+		}
+		
+		category.setMsoId(0);
+		category.setParentId(0);
+		catMngr.save(category); // NOTE: delete or not ?
+		return "OK";
+	}
+	
+	@RequestMapping("moveCategory")
+	public @ResponseBody String moveCategory(@RequestParam Long toCategoryId,
+	                                         @RequestParam Long fromCategoryId,
+	                                         @RequestParam Long categoryId) {
+		logger.info("toCategoryId = " + toCategoryId);
+		logger.info("fromCategoryId = " + fromCategoryId);
+		logger.info("categoryId = " + categoryId);
+		
+		CategoryManager catMngr = new CategoryManager();
+		Category category = catMngr.findById(categoryId);
+		if (category == null)
+			return "Category Not Found";
+		Category parent = catMngr.findById(toCategoryId);
+		if (parent == null)
+			return "Parent Not Found";
+		if (category.getParentId() != fromCategoryId)
+			return "Parent Not Matched";
+		category.setParentId(toCategoryId);
+		catMngr.save(category);
+		return "OK";
+	}
+	
+	@RequestMapping("moveCategoryChannelSet")
+	public @ResponseBody String moveCategoryChannelSet(@RequestParam Long toCategoryId,
+	                                                   @RequestParam Long fromCategoryId,
+	                                                   @RequestParam Long channelSetId) {
+		logger.info("toCategoryId = " + toCategoryId);
+		logger.info("fromCategoryId = " + fromCategoryId);
+		logger.info("channelSetId = " + channelSetId);
+		
+		CategoryChannelSetManager ccsMngr = new CategoryChannelSetManager();
+		CategoryChannelSet ccs = ccsMngr.findByCategoryIdAndChannelSetId(fromCategoryId, channelSetId);
+		if (ccs == null)
+			return "Not Found";
+		ccs.setCategoryId(toCategoryId);
+		ccsMngr.save(ccs);
+		return "OK";
+	}
+	
+	@RequestMapping("moveCategoryChannel")
+	public @ResponseBody String moveCategoryChannel(@RequestParam Long toCategoryId,
+	                                                @RequestParam Long fromCategoryId,
+	                                                @RequestParam Long channelId) {
+		logger.info("toCategoryId = " + toCategoryId);
+		logger.info("fromCategoryId = " + fromCategoryId);
+		logger.info("channelId = " + channelId);
+		
+		CategoryChannelManager ccMngr = new CategoryChannelManager();
+		CategoryChannel cc = ccMngr.findByCategoryIdAndChannelId(fromCategoryId, channelId);
+		if (cc == null)
+			return "Not Found";
+		cc.setCategoryId(toCategoryId);
+		ccMngr.save(cc);
+		return "OK";
+	}
 }
 

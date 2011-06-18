@@ -149,6 +149,10 @@ public class CategoryManager {
 		return categoryDao.total(filter);
 	}
 	
+	public List<Category> findAllByMsoIdWithoutCache(long msoId) {
+		return categoryDao.findAllByMsoId(msoId);
+	}
+	
 	//result will be cached
 	public List<Category> findAllByMsoId(long msoId) {
 		List<Category> categories = new ArrayList<Category>();
@@ -252,6 +256,10 @@ public class CategoryManager {
 			}
 		}
 		return output + listOutput;
+	}
+
+	public List<Category> findAllByParentId(long parentId) {
+		return categoryDao.findAllByParanetId(parentId);
 	}
 	
 }

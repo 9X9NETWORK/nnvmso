@@ -24,10 +24,16 @@ public class CategoryChannelSetManager {
 		ccsDao.save(ccs);
 	}
 	
+	public void save(CategoryChannelSet ccs) {
+		Date now = new Date();
+		ccs.setUpdateDate(now);
+		ccsDao.save(ccs);
+	}
+	
 	public void delete(CategoryChannelSet ccs) {
 		ccsDao.delete(ccs);
 	}
-
+	
 	public List<CategoryChannelSet> findByChannelSetIdAndCategoryIds(long channelSetId, List<Long> categoryIds) {
 		List<CategoryChannelSet> results = new ArrayList<CategoryChannelSet>();
 		for (Long categoryId : categoryIds) {
@@ -45,4 +51,5 @@ public class CategoryChannelSetManager {
 	public CategoryChannelSet findByCategoryIdAndChannelSetId(Long categoryId, Long channelSetId) {
 		return ccsDao.findByChannelSetIdAndCategoryId(channelSetId, categoryId);
 	}
+	
 }

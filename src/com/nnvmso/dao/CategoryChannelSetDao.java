@@ -42,11 +42,10 @@ public class CategoryChannelSetDao extends GenericDao<CategoryChannelSet> {
 		CategoryChannelSet result = null;
 		try {
 			Query query = pm.newQuery(CategoryChannelSet.class);
-			query.setFilter("categoryId == categoryIdParam");
-			query.setFilter("channelSetId == channelSetIdParam");
-			query.declareParameters("long categoryIdParam");
+			query.setFilter("categoryId == categoryIdParam && channelSetId == channelSetIdParam");
+			query.declareParameters("long categoryIdParam, long channelSetIdParam");
 			@SuppressWarnings("unchecked")
-			List<CategoryChannelSet> ccss = (List<CategoryChannelSet>)query.execute(categoryId);
+			List<CategoryChannelSet> ccss = (List<CategoryChannelSet>)query.execute(categoryId, channelSetId);
 			if (ccss.size() > 0)
 				result = pm.detachCopy(ccss.get(0));
 		} catch (JDOObjectNotFoundException e) {
