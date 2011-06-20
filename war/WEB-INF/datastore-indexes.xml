@@ -31,6 +31,10 @@
     <property name="__key__" direction="desc"/>
   </datastore-index>
   <datastore-index kind="MsoChannel" ancestor="false" source="manual">
+    <property name="featured" direction="asc"/>
+    <property name="createDate" direction="asc"/>
+  </datastore-index>  
+  <datastore-index kind="MsoChannel" ancestor="false" source="manual">
     <property name="isPublic" direction="asc"/>
     <property name="name" direction="asc"/>    
   </datastore-index>  
