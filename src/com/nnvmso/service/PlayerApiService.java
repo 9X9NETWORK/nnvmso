@@ -346,7 +346,9 @@ public class PlayerApiService {
 						        channels.get(i).getName(), 
 						        channels.get(i).getImageUrl(), 
 						        Integer.toString(channels.get(i).getProgramCount()),
-						        String.valueOf(channels.get(i).getSubscriptionCount())};
+						        String.valueOf(channels.get(i).getSubscriptionCount()),
+						        String.valueOf(channels.get(i).getContentType())
+						        };
 				result = result + NnStringUtil.getDelimitedStr(ori);
 				result = result + "\n";
 			}
