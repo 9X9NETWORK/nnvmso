@@ -589,9 +589,11 @@ public class PlayerApiController {
 	 *         position, set id, set name, set image url, set type
 	 *         <p>  
 	 *         Channel info has following fields: <br/>
-	 *         channel name, channel description, channel image url, <br/>
-	 *         program count, type(integer, see following), status(integer, see following),
-	 *         contentType(integer, see following), sourceUrl
+	 *         grid position, channel id, channel name, channel description, channel image url, <br/>
+	 *         program count, channel type(integer, see following), channel status(integer, see following), <br/>
+	 *         contentType(integer, see following), source url, <br/>
+	 *         channel/episodes last update time (see note)
+	 *         
 	 *         </blockquote>
 	 *         <p>
 	 *         set type: TYPE_USER = 1; TYPE_READONLY = 2;
@@ -601,6 +603,8 @@ public class PlayerApiController {
 	 *         status: STATUS_SUCCESS = 0; STATUS_ERROR = 1;
 	 *         <br/> 
 	 *         contentType: SYSTEM_CHANNEL=1; PODCAST=2; YOUTUBE_CHANNEL=3; YOUTUBE_PLAYERLIST=4 FACEBOOK_CHANNEL=5
+	 *         <br/>
+	 *         channel episodes last update time: it does not always accurate on Youtube channels. It will pass channel create date on FB channels.
 	 *         <p> 
 	 *         Example: <br/>
 	 *         0	success<br/>
