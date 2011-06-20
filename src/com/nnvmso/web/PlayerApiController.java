@@ -533,14 +533,14 @@ public class PlayerApiController {
 	 * @return Category info and channels info. <br/>
 	 *  	   First section is category info, follows channels info. Each channel is \n separated.<br/>    
 	 *         Category info has category id. <br/>
-	 *         Channel info includes channel id, channel name, channel image url, program count, subscription count <br/>
+	 *         Channel info includes channel id, channel name, channel image url, program count, subscription count, channel type <br/>
 	 *         Example: 	<br/>
 	 *         0	success<br/>
 	 *         --<br/>
 	 *         1174<br/>
 	 *         --<br/>
-	 *         0	1207	Etsy	http://s3.amazonaws.com/9x9chthumb/a.gif	2	2 <br/>
-	 *         0	1217	System	http://s3.amazonaws.com/9x9chthumb/b.gif	1	2 <br/>        
+	 *         0	1207	Etsy	http://s3.amazonaws.com/9x9chthumb/a.gif	2	2	2<br/>
+	 *         0	1217	System	http://s3.amazonaws.com/9x9chthumb/b.gif	1	2	2<br/>        
 	 */		
 	@RequestMapping(value="channelBrowse")
 	public ResponseEntity<String> channelBrowse(@RequestParam(value="category", required=false) String categoryIds, HttpServletRequest req) {
