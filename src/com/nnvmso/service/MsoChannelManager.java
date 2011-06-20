@@ -87,6 +87,7 @@ public class MsoChannelManager {
 		if (channel.getName() != null)
 			channel.setNameSearch(channel.getName().trim().toLowerCase());
 		
+		channel.setUpdateDate(new Date());
 		channel = msoChannelDao.save(channel);
 		//save to cache
 		Cache cache = CacheFactory.get();		

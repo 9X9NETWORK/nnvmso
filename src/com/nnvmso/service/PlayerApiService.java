@@ -65,7 +65,7 @@ public class PlayerApiService {
 	public void setMso(Mso mso) {
 		this.mso = mso;
 	}		
-	
+
 	//create a set
 	//do findsetinfo
 	public String findSetInfo(String id, String beautifulUrl) {
@@ -758,6 +758,19 @@ public class PlayerApiService {
 		}
 	}
 	
+	private String convertEpochToTime(String transcodingUpdateDate, Date updateDate) {
+		String output = "";
+		if (transcodingUpdateDate != null) {
+			long epoch = Long.parseLong(transcodingUpdateDate);
+			Date myDate = new Date (epoch*1000);
+			output = String.valueOf(myDate.getTime());
+		} else if (updateDate != null){
+			output = String.valueOf(updateDate.getTime());
+		}
+		System.out.println("output:" + output);
+		return output;
+	}
+	
 	public String findChannelInfo(String userToken, boolean userInfo, String channelIds, boolean setInfo) {
 		//verify input
 		if ((userToken == null && userInfo == true) || (userToken == null && channelIds == null) || (userToken == null && setInfo == true)) {
@@ -932,8 +945,9 @@ public class PlayerApiService {
 					    String.valueOf(c.getType()),
 					    String.valueOf(c.getStatus()),
 					    String.valueOf(c.getContentType()),
-					    channelName
-					    }; 					   
+					    channelName,
+					    this.convertEpochToTime(c.getTranscodingUpdateDate(), c.getUpdateDate())
+					    };
 		String output = NnStringUtil.getDelimitedStr(ori);
 		return output;
 	}
