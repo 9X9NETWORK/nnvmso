@@ -341,13 +341,15 @@ public class PlayerApiService {
 		result = result + categoryId + "\n" + separatorStr;
 		for (int i=0; i< channels.size(); i++) {	
 			if (channels.get(i).getProgramCount() > 0 ) {
-				String[] ori = {String.valueOf(channels.get(i).getSeq()),
-						        String.valueOf(channels.get(i).getKey().getId()), 
-						        channels.get(i).getName(), 
-						        channels.get(i).getImageUrl(), 
-						        Integer.toString(channels.get(i).getProgramCount()),
-						        String.valueOf(channels.get(i).getSubscriptionCount()),
-						        String.valueOf(channels.get(i).getContentType())
+				MsoChannel c = channels.get(i);
+				String[] ori = {String.valueOf(c.getSeq()),
+						        String.valueOf(c.getKey().getId()), 
+						        c.getName(), 
+						        c.getImageUrl(), 
+						        Integer.toString(c.getProgramCount()),
+						        String.valueOf(c.getSubscriptionCount()),
+						        String.valueOf(c.getContentType()),
+						        this.convertEpochToTime(c.getTranscodingUpdateDate(), c.getUpdateDate())
 						        };
 				result = result + NnStringUtil.getDelimitedStr(ori);
 				result = result + "\n";
@@ -760,14 +762,16 @@ public class PlayerApiService {
 	
 	private String convertEpochToTime(String transcodingUpdateDate, Date updateDate) {
 		String output = "";
-		if (transcodingUpdateDate != null) {
-			long epoch = Long.parseLong(transcodingUpdateDate);
-			Date myDate = new Date (epoch*1000);
-			output = String.valueOf(myDate.getTime());
-		} else if (updateDate != null){
-			output = String.valueOf(updateDate.getTime());
+		try {
+			if (transcodingUpdateDate != null) {
+				long epoch = Long.parseLong(transcodingUpdateDate);
+				Date myDate = new Date (epoch*1000);
+				output = String.valueOf(myDate.getTime());
+			} else if (updateDate != null){
+				output = String.valueOf(updateDate.getTime());
+			}
+		} catch (NumberFormatException e) {			
 		}
-		System.out.println("output:" + output);
 		return output;
 	}
 	
