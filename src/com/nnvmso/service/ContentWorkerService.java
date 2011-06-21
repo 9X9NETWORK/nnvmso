@@ -17,8 +17,7 @@ public class ContentWorkerService {
 	protected static final Logger log = Logger.getLogger(ContentWorkerService.class.getName());
 	private static int TASK_CHANNEL_LOGO_PROCESS = 0;
 	private static int TASK_PROGRAM_LOGO_PROCESS = 1;
-	private static int TASK_PROGRAM_VIDEO_PROCESS = 2;
-	
+	private static int TASK_PROGRAM_VIDEO_PROCESS = 2; 	
 	
 	public void submit(int task, ContentWorker content, HttpServletRequest req) {
 		TranscodingService service = new TranscodingService();
@@ -30,9 +29,9 @@ public class ContentWorkerService {
 		String callbackUrl = transcodingEnv[1];
 		String devel = transcodingEnv[2];		
 		content.setCallback(callbackUrl);
-		if (!devel.equals("1")) {
-			NnNetUtil.urlPostWithJson(transcodingServer, content);			
-		}
+		content.setErrorCode(String.valueOf(NnStatusCode.SUCCESS));
+		if (!devel.equals("1"))
+			NnNetUtil.urlPostWithJson(transcodingServer, content);
 	}
 	
 	public void channelLogoProcess(long channelId, String imageUrl, String prefix, HttpServletRequest req) {						
@@ -52,42 +51,49 @@ public class ContentWorkerService {
 	 }
 	 
 	 public PostResponse channelLogoUpdate(ContentWorker content) {
+		 if (content.getErrorCode().equals(String.valueOf(NnStatusCode.SUCCESS))) {
+			 log.info("error code:" + content.getErrorCode() + "; error reason:" + content.getErrorReason());
+			 return new PostResponse(String.valueOf(NnStatusCode.SUCCESS), "SUCCESS");
+		 }
+		 
 		 MsoChannelManager channelMngr = new MsoChannelManager();
 		 System.out.println("content id:" + content.getId());
-		 MsoChannel channel = channelMngr.findById(content.getId());
-		 if (channel != null) {
-			 System.out.println("channel != null");
-			 channel.setImageUrl(content.getImageUrl());
-			 channelMngr.save(channel);
-			 return new PostResponse(String.valueOf(NnStatusCode.SUCCESS), "SUCCESS");
-		 } else {
+		 MsoChannel channel = channelMngr.findById(content.getId());		 
+		 if (channel == null) 
 			 return new PostResponse(String.valueOf(NnStatusCode.CHANNEL_INVALID), "CHANNEL INVALID");
-		 }
+		 
+		 channel.setImageUrl(content.getImageUrl());
+		 channelMngr.save(channel);
+		 return new PostResponse(String.valueOf(NnStatusCode.SUCCESS), "SUCCESS");		
 	 }
 	 	 
 	 public PostResponse programLogoUpdate(ContentWorker content) {
-		 MsoProgramManager programMngr = new MsoProgramManager();
-		 MsoProgram program = programMngr.findById(content.getId());
-		 if (program != null) {
-			 program.setImageUrl(content.getImageUrl());
-			 programMngr.save(program);
+		 if (content.getErrorCode().equals(String.valueOf(NnStatusCode.SUCCESS))) {
+			 log.info("error code:" + content.getErrorCode() + "; error reason:" + content.getErrorReason());
 			 return new PostResponse(String.valueOf(NnStatusCode.SUCCESS), "SUCCESS");
-		 } else {
-			 return new PostResponse(String.valueOf(NnStatusCode.PROGRAM_INVALID), "PROGRAM INVALID");			 
 		 }
+		 
+		 MsoProgramManager programMngr = new MsoProgramManager();
+		 MsoProgram program = programMngr.findById(content.getId());		 
+		 if (program == null) 
+			 return new PostResponse(String.valueOf(NnStatusCode.PROGRAM_INVALID), "PROGRAM INVALID");
+		 
+		 program.setImageUrl(content.getImageUrl());
+		 programMngr.save(program);
+		 return new PostResponse(String.valueOf(NnStatusCode.SUCCESS), "SUCCESS");
 	 }
 	 
 	 public PostResponse programVideoUpdate(ContentWorker content) {
 		 MsoProgramManager programMngr = new MsoProgramManager();
 		 MsoProgram program = programMngr.findById(content.getId());
-		 if (program != null) {
-			 program.setMpeg4FileUrl(content.getVideoUrl());
-			 program.setImageLargeUrl(content.getImageUrl());
-			 programMngr.save(program);
-			 return new PostResponse(String.valueOf(NnStatusCode.SUCCESS), "SUCCESS");
-		 } else {
+		 if (program == null) 
 			 return new PostResponse(String.valueOf(NnStatusCode.PROGRAM_INVALID), "PROGRAM INVALID");
-		 }
+		 
+		 program.setMpeg4FileUrl(content.getVideoUrl());
+		 if (content.getImageUrl() != null) 
+			 program.setImageLargeUrl(content.getImageUrl());
+		 programMngr.save(program);
+		 return new PostResponse(String.valueOf(NnStatusCode.SUCCESS), "SUCCESS");
 	 }
 	 
 }
