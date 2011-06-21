@@ -14,6 +14,8 @@ public class ContentWorker {
 	private String prefix; 
 	private boolean flag; //auto_generated_logo
 	private String callback;
+	private String errorCode;
+	private String errorReason;	
 	
 	public ContentWorker() {}
 	public ContentWorker(long id, String imageUrl, String videoUrl, String prefix, boolean flag) {
@@ -84,4 +86,17 @@ public class ContentWorker {
 		}
         return json;
 	}
+	public String getErrorCode() {
+		return errorCode;
+	}
+	public void setErrorCode(String errorCode) {
+		this.errorCode = errorCode;
+	}
+	public String getErrorReason() {
+		return errorReason;
+	}
+	public void setErrorReason(String errorReason) {
+		this.errorReason = errorReason;
+	}	
+	
 }
