@@ -16,31 +16,6 @@
 <script type="text/javascript" src="/javascripts/jquery.jqModal.js"></script>
 <script type="text/javascript" src="/javascripts/cms-common.js"></script>
 <script type="text/javascript" src="/javascripts/promotionTools.js"></script>
-<script type=text/javascript>
-	function setTab ( i )
-	{
-		selectTab(i);
-	}
-	
-	function selectTab ( i )
-	{
-		if( i == 1){
-			//case 1:
-			get("pro_hint").style.display = "block";
-			
-			//break;
-		} else if ( i == 2) {
-			//case 2:
-			get("pro_hint").style.display="none";
-			//break;
-			
-		}
-	}
-	function get(id) {
-		return document.getElementById(id);
-	}
-
-</script>
 <title>推廣工具</title>
 </head>
 <body>
@@ -67,108 +42,31 @@
     <div class="left_body">
       <div class="createChList2">
         <div class="left_title">頻道網清單</div>
-        <ul class="chList">
+        <ul class="chList" id="channel_set_list_ul">
           <li>
-            <div class="chFocus">
-              <div class="chFocusTitle">小灰熊的大愛劇場 <a href="#" class="btnDel"></a></div>
-              <div class="chFocusImg"></div>
-              <div class="floatL chInfo">
-                <a href="#" class="floatL">http://www.9x9.tv/channel/3958</a>
-                <div class="addthis_toolbox addthis_default_style floatL">
-                  <a class="addthis_button_compact"></a>
-                </div>
-                <a href="#" class="iconStatistics" title="觀看數據"></a>
-                <div class="clear"></div>
-                <div class="floatL">
-                  <p>頻道類型 : <span>9x9</span></p>
-                  <p>節目數量 : <span>0</span></p>
-                  <p>訂閱人數 : <span>0</span></p>
-                  <p>更新時間 : <span>2011/04/15 14:45</span></p>
-                </div>
-                <ul class="floatL">
-                  <li><a href="#" class="chUnPublic"></a></li>
-                  <li><a href="#" class="btnGray"><span>頻道資訊</span></a></li>
-                </ul>
-                <div class="clear"></div>
-              </div>
-            </div>
           </li>
           <div class="clear"/>
         </ul>
         <div class="left_title">頻道清單</div>
-        <ul class="chList">
-          <li>
-            <div class="chUnFocus">
-              <div class="chUnFocusTitle">小灰熊的大愛劇場 <a href="#" class="btnDel"></a></div>
-              <div class="chUnFocusImg"></div>
+        <ul class="chList" id="channel_list_ul">
+          <li style="display:none">
+            <div class="chUnFocus channel_info_block" id="channel_info_block">
+              <div class="chUnFocusTitle channel_info_title"><div>小灰熊的大愛劇場</div></div>
+              <div class="chUnFocusImg channel_info_image"></div>
               <div class="floatL chInfo">
-                <a href="#" class="floatL">http://www.9x9.tv/channel/3958</a>
-                <div class="addthis_toolbox addthis_default_style floatL">
-                  <a class="addthis_button_compact"></a>
-                </div>
+                <a href="#" target="_player" class="floatL channel_info_promoteurl">http://www.9x9.tv/channel/3958</a>
+                <a class="floatL channel_info_addthis"><img src="http://cache.addthiscdn.com/icons/v1/thumbs/addthis.gif"/></a>
                 <a href="#" class="iconStatistics" title="觀看數據"></a>
                 <div class="clear"></div>
                 <div class="floatL">
-                  <p>頻道類型 : <span>9x9</span></p>
-                  <p>節目數量 : <span>0</span></p>
-                  <p>訂閱人數 : <span>0</span></p>
-                  <p>更新時間 : <span>2011/04/15 14:45</span></p>
+                  <p class="channel_info_contenttype"><spring:message code="cms.channel_management.label.channel_type"/> : <span>9x9</span></p>
+                  <p class="channel_info_programcount"><spring:message code="cms.channel_management.label.program_count"/> : <span>0</span></p>
+                  <p class="channel_info_subscribers"><spring:message code="cms.channel_management.label.subscribers"/> : <span>0</span></p>
+                  <p class="channel_info_updatedate"><spring:message code="cms.channel_management.label.update_time"/> : <span>2011/04/15 14:45</span></p>
                 </div>
                 <ul class="floatL">
-                  <li><a href="#" class="chUnPublic"></a></li>
-                  <li><a href="#" class="btnGray"><span>頻道資訊</span></a></li>
+                  <li><a class="chUnPublic channel_info_publish"></a></li>
                 </ul>
-                <div class="clear"></div>
-              </div>
-            </div>
-          </li>
-          <li>
-            <div class="chUnFocus">
-              <div class="chUnFocusTitle">小灰熊的大愛劇場 <a href="#" class="btnDel"></a></div>
-              <div class="chUnFocusImg"></div>
-              <div class="floatL chInfo" >
-                <a href="#" class="floatL">http://www.9x9.tv/channel/3958</a>
-                <div class="addthis_toolbox addthis_default_style floatL">
-                  <a class="addthis_button_compact"></a>
-                </div>
-                <a href="#" class="iconStatistics" title="觀看數據"></a>
-                <div class="clear"></div>
-                <div class="floatL">
-                  <p>頻道類型 : <span>9x9</span></p>
-                  <p>節目數量 : <span>0</span></p>
-                  <p>訂閱人數 : <span>0</span></p>
-                  <p>更新時間 : <span>2011/04/15 14:45</span></p>
-                </div>
-                <ul class="floatL">
-                  <li><a href="#" class="chUnPublic"></a></li>
-                  <li><a href="#" class="btnGray"><span>頻道資訊</span></a></li>
-                </ul>
-                <div class="clear"></div>
-              </div>
-            </div>
-          </li>
-          <li>
-            <div class="chUnFocus">
-              <div class="chUnFocusTitle">小灰熊的大愛劇場 <a href="#" class="btnDel"></a></div>
-              <div class="chUnFocusImg"></div>
-              <div class="floatL chInfo">
-                <a href="#" class="floatL">http://www.9x9.tv/channel/3958</a>
-                <div class="addthis_toolbox addthis_default_style floatL">
-                  <a class="addthis_button_compact"></a>
-                </div>
-                <a href="#" class="iconStatistics" title="觀看數據"></a>
-                <div class="clear"></div>
-                <div class="floatL">
-                  <p>頻道類型 : <span>9x9</span></p>
-                  <p>節目數量 : <span>0</span></p>
-                  <p>訂閱人數 : <span>0</span></p>
-                  <p>更新時間 : <span>2011/04/15 14:45</span></p>
-                </div>
-                <ul class="floatL">
-                  <li><a href="#" class="chUnPublic"></a></li>
-                  <li><a href="#" class="btnGray"><span>頻道資訊</span></a></li>
-                </ul>
-                <div class="clear"></div>
               </div>
             </div>
           </li>
@@ -179,10 +77,10 @@
   </div>
   <div class="right_content floatL">
     <div class="right_body">
-      <div class="right_title"><span>大愛電視頻道網</span></div>
+      <div class="right_title"><div>大愛電視頻道網</div></div>
       <div class="promote_title">
         <div class="floatL">自動分享&nbsp;&nbsp;</div>
-        <a href="#" class="promoteInfo" onmouseover="setTab(1);" onmouseout="setTab(2);"></a>
+        <a href="javascript:" class="promoteInfo"></a>
         <div class="clear"></div>
         <div class="promote_hint" id="pro_hint">
           <ul>
@@ -197,7 +95,7 @@
       <label class="pro_check"><input type="checkbox" name="CheckboxGroup1_" value="checkbox" id="CheckboxGroup1_2" />&nbsp; twitter</label>
       <label class="pro_check"><input type="checkbox" name="CheckboxGroup1_" value="checkbox" id="CheckboxGroup1_3" />&nbsp; sina</label>
       <br/><br/><br/>
-      <div class="promote_title">9x9 Video RSS&nbsp;&nbsp; <a href="#">使用教學</a></div>
+      <div class="promote_title">9x9 Video RSS&nbsp;&nbsp; <a href="javascript:">使用教學</a></div>
       <br/><br/>
       <input type="text" size="40" />&nbsp;&nbsp;<a href="#">點擊複製</a>
     </div>
@@ -205,5 +103,7 @@
   </div>
   <div class="clear"></div>
 </div>
+<label class="lang" id="lang_view_statistics"><spring:message code="cms.channel_management.msg.view_statistics"/></label>
+<label class="lang" id="lang_label_channel_set">頻道網</label>
 </body>
 </html>

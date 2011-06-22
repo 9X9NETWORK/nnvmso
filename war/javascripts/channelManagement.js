@@ -476,7 +476,7 @@ var programList =
       var programInfoBlock = $('#program_info_block').clone(true).removeAttr('id').addClass('program_info_block_cloned');
       var programId = programs[i].key.id;
       
-      programInfoBlock.find('.iconStatistics').attr('title', $('#lang_view_statistics'));
+      programInfoBlock.find('.iconStatistics').attr('title', $('#lang_view_statistics').text());
       programInfoBlock.find('.program_info_title div').text(programs[i].name);
       $('<img/>').attr('src', programs[i].imageUrl).appendTo(programInfoBlock.find('.program_info_image'));
       var type = 'Unknown';
