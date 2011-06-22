@@ -51,13 +51,12 @@ public class ContentWorkerService {
 	 }
 	 
 	 public PostResponse channelLogoUpdate(ContentWorker content) {
-		 if (content.getErrorCode().equals(String.valueOf(NnStatusCode.SUCCESS))) {
-			 log.info("error code:" + content.getErrorCode() + "; error reason:" + content.getErrorReason());
+		 if (!content.getErrorCode().equals(String.valueOf(NnStatusCode.SUCCESS))) {
+			 log.info("stop processing because of error");
 			 return new PostResponse(String.valueOf(NnStatusCode.SUCCESS), "SUCCESS");
 		 }
 		 
 		 MsoChannelManager channelMngr = new MsoChannelManager();
-		 System.out.println("content id:" + content.getId());
 		 MsoChannel channel = channelMngr.findById(content.getId());		 
 		 if (channel == null) 
 			 return new PostResponse(String.valueOf(NnStatusCode.CHANNEL_INVALID), "CHANNEL INVALID");
@@ -68,8 +67,8 @@ public class ContentWorkerService {
 	 }
 	 	 
 	 public PostResponse programLogoUpdate(ContentWorker content) {
-		 if (content.getErrorCode().equals(String.valueOf(NnStatusCode.SUCCESS))) {
-			 log.info("error code:" + content.getErrorCode() + "; error reason:" + content.getErrorReason());
+		 if (!content.getErrorCode().equals(String.valueOf(NnStatusCode.SUCCESS))) {
+			 log.info("stop processing because of error");
 			 return new PostResponse(String.valueOf(NnStatusCode.SUCCESS), "SUCCESS");
 		 }
 		 
@@ -84,6 +83,11 @@ public class ContentWorkerService {
 	 }
 	 
 	 public PostResponse programVideoUpdate(ContentWorker content) {
+		 if (!content.getErrorCode().equals(String.valueOf(NnStatusCode.SUCCESS))) {
+			 log.info("stop processing because of error");
+			 return new PostResponse(String.valueOf(NnStatusCode.SUCCESS), "SUCCESS");
+		 }
+		 
 		 MsoProgramManager programMngr = new MsoProgramManager();
 		 MsoProgram program = programMngr.findById(content.getId());
 		 if (program == null) 
