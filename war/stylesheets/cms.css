@@ -411,3 +411,16 @@ a.btnClose:hover { background:url(/images/cms/btnCloseHover.png) no-repeat; }
   padding: 0 0 0 0;
   border: none;
 }
+
+.stastics_title { border-bottom:1px dashed #ddd; padding:20px 0px 10px 0px; font-size:1em; color:#313131; }
+.datePick { padding:10px 0 5px 0; float:right; }
+.datePick a { padding:0 0 0 5px; }
+.stastics_chart { padding-top:20px; }
+.stastics_list td, .stastics_list tr, .ep_stastics td, .ep_stastics tr { text-align:left; padding:25px 10px 10px 10px; font-size:1em; }
+.stasticTab li { float:left; margin-right:5px; }
+.stasticTab { padding-top:10px; border-bottom:1px solid #ccc; }
+.tab_focus, .tab_unfocus { text-align:center; }
+.tab_focus a, .tab_focus a:active, .tab_focus a:visited, .tab_unfocus a, .tab_unfocus a:active, .tab_unfocus a:visited { color:#363636; text-decoration:none; }
+.tab_focus { background:url(/images/cms/stasticTab_focus.png) no-repeat bottom; line-height:40px; width:189px; height:42px; font-size:1.2em }
+.tab_unfocus { background:url(/images/cms/stasticTab_unfocus.png) no-repeat bottom; height:42px; line-height:52px; width:150px; font-size:1em; }
+

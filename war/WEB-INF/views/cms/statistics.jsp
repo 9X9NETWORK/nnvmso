@@ -12,26 +12,34 @@
 <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4dcccc98718a5dbe"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.js"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/jquery-ui.min.js"></script>
-<script type="text/javascript" src="http://www.netgrow.com.au/assets/files/jquery_plugins/jquery.dump.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.jqModal.js"></script>
+<script type="text/javascript" src="/javascripts/jquery.jstree.js"></script>
+<script type="text/javascript" src="http://www.netgrow.com.au/assets/files/jquery_plugins/jquery.dump.js"></script>
 <script type="text/javascript" src="/javascripts/cms-common.js"></script>
-<script type="text/javascript" src="/javascripts/promotionTools.js"></script>
+<script type="text/javascript" src="/javascripts/statistics.js"></script>
+<title>統計數據</title>
 <script type=text/javascript>
 	function setTab ( i )
 	{
-		selectTab(i);
+		stasticTab(i);
 	}
 	
-	function selectTab ( i )
+	function stasticTab ( i )
 	{
 		if( i == 1){
 			//case 1:
-			get("pro_hint").style.display = "block";
+			get("ch_stastics").style.display = "block";
+			get("ep_stastics").style.display = "none";
+			get("stasticTabA").className = "tab_focus";
+			get("stasticTabB").className = "tab_unfocus";
 			
 			//break;
 		} else if ( i == 2) {
 			//case 2:
-			get("pro_hint").style.display="none";
+			get("ch_stastics").style.display="none";
+			get("ep_stastics").style.display = "block";
+			get("stasticTabA").className = "tab_unfocus";
+			get("stasticTabB").className = "tab_focus";
 			//break;
 			
 		}
@@ -41,7 +49,6 @@
 	}
 
 </script>
-<title>推廣工具</title>
 </head>
 <body>
 <div class="header">
@@ -59,9 +66,9 @@
     <ul class="menu">
       <li><a href="channelManagement" class="menuA"></a></li>
       <li><a href="channelSetManagement" class="menuB"></a></li>
-      <li><a href="directoryManagement" class="menuC"></a></li>
-      <li><a href="javascript:" class="menuD_active"></a></li>
-      <li><a href="statistics" class="menuE"></a></li>
+      <li><a href="javascript:" class="menuC"></a></li>
+      <li><a href="promotionTools" class="menuD"></a></li>
+      <li><a href="statistics" class="menuE_active"></a></li>
     </ul>
     <div class="clear"></div>
     <div class="left_body">
@@ -179,27 +186,125 @@
   </div>
   <div class="right_content floatL">
     <div class="right_body">
-      <div class="right_title"><span>大愛電視頻道網</span></div>
-      <div class="promote_title">
-        <div class="floatL">自動分享&nbsp;&nbsp;</div>
-        <a href="#" class="promoteInfo" onmouseover="setTab(1);" onmouseout="setTab(2);"></a>
-        <div class="clear"></div>
-        <div class="promote_hint" id="pro_hint">
+      <div class="set_stastics" style="display:none"><!--set stastics-->
+        <div class="right_title"><span>大愛電視頻道網 - 套餐數據</span></div>
+        <div class="stastics_title">
+          <div>連續觀看15秒即算一次有效收看次數</div>
+          <div class="datePick">請選擇時間區間&nbsp;<input type="text"/><a href="#"><img alt="" src="/images/cms/icon_calendar.png"/></a></div>
+          <div class="clear"></div>
+        </div>
+        <div class="stastics_chart">
+          <select name="">
+            <option>累計收看次數</option>
+            <option>每次平均觀看次數</option>
+            <option>訂閱戶數</option>
+            <option>每次平均停留時間</option>
+            <option>回訪率</option>
+          </select>
+          <img alt="數據圖表" src="/images/cms/img_stastics.png"/>
+        </div>
+        <table border="0" cellpadding="0" cellspacing="0" class="stastics_list">
+          <tr>
+            <td>1,057,201</td>
+            <td><a href="#">累計收看次數</a></td>
+            <td>00:03:21</td>
+            <td><a href="#">每次平均停留時間</a></td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td><a href="#">每次平均觀看次數</a></td>
+            <td>20%</td>
+            <td><a href="#">回訪率</a></td>
+          </tr>
+          <tr>
+            <td>13,596</td>
+            <td><a href="#">訂閱戶數</a></td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+          </tr>
+        </table>
+      </div>
+      <div class="ch_stastics"><!--channel stastics-->
+        <div class="right_title"><span>小灰熊的大愛劇場</span></div>
+        <div class="stasticTab">
           <ul>
-            <li>若內容更新非常頻繁，使用同步發佈功能有可能造成您社群粉絲接收資訊上的困擾，請審慎設定。</li>
-            <li>若頻道屬於頻道網，同時開啓頻道網同步與頻道同步，將造成單一頻道重複宣傳，請審慎設定。</li>
+            <li id="stasticTabA" class="tab_focus"><a href="#"  onclick="stasticTab(1);">頻道數據</a></li>
+            <li id="stasticTabB" class="tab_unfocus"><a href="#"  onclick="stasticTab(2);">節目數據</a></li>
+            <div class="clear"></div>
           </ul>
         </div>
+        <div class="ch_stastics" id="ch_stastics">
+          <div class="stastics_title">
+            <div>連續觀看15秒即算一次有效收看次數</div>
+            <div class="datePick">請選擇時間區間&nbsp;<input type="text"/><a href="#"><img alt="" src="/images/cms/icon_calendar.png"/></a></div>
+            <div class="clear"></div>
+          </div>
+          <div class="stastics_chart">
+            <select name="">
+              <option>累計收看次數</option>
+              <option>每次平均觀看次數</option>
+              <option>訂閱戶數</option>
+              <option>每次平均停留時間</option>
+              <option>回訪率</option>
+            </select>
+            <img alt="數據圖表" src="/images/cms/img_stastics.png"/>
+          </div>
+          <table border="0" cellpadding="0" cellspacing="0" class="stastics_list">
+            <tr>
+              <td>1,057,201</td>
+              <td><a href="#">累計收看次數</a></td>
+              <td>00:03:21</td>
+              <td><a href="#">每次平均停留時間</a></td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td><a href="#">每次平均觀看次數</a></td>
+              <td>20%</td>
+              <td><a href="#">回訪率</a></td>
+            </tr>
+            <tr>
+              <td>13,596</td>
+              <td><a href="#">訂閱戶數</a></td>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+            </tr>
+          </table>
+        </div>
+        <div class="ep_stastics" id="ep_stastics" style="display:none">
+          <div class="stastics_title">
+            <div>連續觀看15秒即算一次有效收看次數</div>
+            <div class="datePick">請選擇時間區間&nbsp;<input type="text"/><a href="#"><img alt="" src="/images/cms/icon_calendar.png"/></a></div>
+            <div class="clear"></div>
+          </div>
+          <div class="stastics_chart">
+            <select name="">
+              <option>請選擇節目</option>
+              <option>小灰熊的大愛劇場1</option>
+              <option>小灰熊的大愛劇場2</option>
+            </select>&nbsp;&nbsp;&nbsp;
+            <select name="">
+              <option>累計收看次數</option>
+              <option>分享次數</option>
+              <option>每次平均收看時間</option>
+            </select>
+            <img alt="數據圖表" src="/images/cms/img_stastics.png"/>
+          </div>
+          <table border="0" cellpadding="0" cellspacing="0" class="stastics_list">
+            <tr>
+              <td>1,057,201</td>
+              <td><a href="#">累計收看次數</a></td>
+              <td>3</td>
+              <td><a href="#">分享次數</a></td>
+            </tr>
+            <tr>
+              <td>00:03:21</td>
+              <td><a href="#">每次平均收看時間</a></td>
+              <td></td>
+              <td></td>
+            </tr>
+          </table>
+        </div>
       </div>
-      <br/>
-      <label class="pro_check"><input type="checkbox" name="CheckboxGroup1" value="checkbox" id="CheckboxGroup1_0" />&nbsp; facebook</label>
-      <label class="pro_check"><input type="checkbox" name="CheckboxGroup1_" value="checkbox" id="CheckboxGroup1_1" />&nbsp; plurk</label>
-      <label class="pro_check"><input type="checkbox" name="CheckboxGroup1_" value="checkbox" id="CheckboxGroup1_2" />&nbsp; twitter</label>
-      <label class="pro_check"><input type="checkbox" name="CheckboxGroup1_" value="checkbox" id="CheckboxGroup1_3" />&nbsp; sina</label>
-      <br/><br/><br/>
-      <div class="promote_title">9x9 Video RSS&nbsp;&nbsp; <a href="#">使用教學</a></div>
-      <br/><br/>
-      <input type="text" size="40" />&nbsp;&nbsp;<a href="#">點擊複製</a>
     </div>
     <div class="right_footer"></div>
   </div>
