@@ -280,8 +280,7 @@ public class CmsApiController {
 		MsoProgramManager programMngr = new MsoProgramManager();
 		MsoProgram program = programMngr.findById(programId);
 		if (program != null) {
-			programMngr.delete(program); // NOTE: better way instead of deleting it ?
-			// TODO: remove S3 temp files also ?
+			programMngr.delete(program);
 		}
 	}
 	

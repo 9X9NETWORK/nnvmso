@@ -260,7 +260,7 @@
                   </div>
                   <!--  upload by URL link -->
                   <div class="floatL uploadURL ep_url_block" style="display:none">
-                    <div class="bg_input floatL"><input type="text" size="27" maxlength="100" class="ep_url_input"/></div>&nbsp;<a href="javascript:" class="ep_url_cancel"><spring:message code="cms.channel_management.btn.cancel"/></a>
+                    <div class="bg_input floatL"><input type="text" size="25" maxlength="100" class="ep_url_input"/></div>&nbsp;<a href="javascript:" class="ep_url_cancel"><spring:message code="cms.channel_management.btn.cancel"/></a>
                     <div class="clear"></div>
                     <p class="hint"><spring:message code="cms.channel_management.msg.video_url_hint"/></p><br/>
                   </div>

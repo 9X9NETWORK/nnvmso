@@ -95,11 +95,7 @@ var initSetupPage = function()
     trigger: '#setup',
     onLoad: function()
     {
-      $('.syncInfo').hover(function() {
-        $('#fb_hint').show();
-      },function() {
-        $('#fb_hint').hide();
-      });
+      $.getScript('/javascripts/setup.js');
     }
   });
 };

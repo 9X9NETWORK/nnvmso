@@ -4,13 +4,13 @@
   <div class="setCon">
     <div class="setTitle">
       <ul class="setupTab">
-        <li id="tabA" class="link_Act"><a href="javascript:">帳號連結</a></li>
-        <li id="tabB" class="link_Normal"><a href="javascript:">管理員設定</a></li>
-        <li id="tabC" class="link_Normal"><a href="javascript:">修改密碼</a></li>
+        <li id="tabA" class="setupTabItem link_Act"><a href="javascript:">帳號連結</a></li>
+        <li id="tabB" class="setupTabItem link_Normal"><a href="javascript:">管理員設定</a></li>
+        <li id="tabC" class="setupTabItem link_Normal"><a href="javascript:">修改密碼</a></li>
         <div class="clear"></div>
       </ul>
     </div>
-    <div id="syncAcc" class="syncAcc">
+    <div id="syncAcc" class="syncAcc setupContent">
       <p>9x9 將會自動同步發佈您更新的節目至您設定連結帳號的平台</p>
       <p>設定步驟 : </p>
       <p>1. 選擇您欲同步發佈的平台，選擇「連結帳號」進行設定。</p>
@@ -52,7 +52,7 @@
         </li>
       </ul>
     </div>
-    <div id="addAcc" class="addAcc" style="display:none;">
+    <div id="addAcc" class="addAcc setupContent" style="display:none;">
       <table border="0" cellpadding="0" cellspacing="0" class="addForm">
         <tr>
           <th align="left">新增子管理員帳號</th>
@@ -111,7 +111,7 @@
         </table>
       </div>
     </div>
-    <div id="setPs" class="setPs" style="display:none;">
+    <div id="setPs" class="setPs setupContent" style="display:none;">
       <table border="0" cellpadding="0" cellspacing="0">
         <tr>
           <td>重新設定密碼</td>
@@ -123,7 +123,7 @@
         </tr>
         <tr>
           <td></td>
-          <td><input type="button" value="儲存修改"/>&nbsp;&nbsp;<a href="#">取消</a></td>
+          <td><button><big>儲存修改</big></button>&nbsp;&nbsp;<a href="javascript:">取消</a></td>
         </tr>
       </table>
     </div>
