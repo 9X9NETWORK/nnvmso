@@ -68,7 +68,10 @@ public class ContentWorker {
         buffer.append("id: " + id + ";");
         buffer.append("videoUrl: " + videoUrl + ";");
         buffer.append("prefix: " + prefix + ";");
+        buffer.append("imageUrl: " + imageUrl + ";");
         buffer.append("flag: " + flag + ";");
+        buffer.append("errorCode:" + errorCode + ";");
+        buffer.append("errorReason:" + errorReason + ";");
         return buffer.toString();		
 	}
 	
