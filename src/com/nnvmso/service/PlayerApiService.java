@@ -627,7 +627,7 @@ public class PlayerApiService {
 	}
 	
 	public String findAuthenticatedUser(String email, String password, HttpServletRequest req, HttpServletResponse resp) {		
-		log.info("login: email=" + email + "; mso=" + mso.getKey().getId() + ";password=" + password);
+		log.info("login: email=" + email + "; mso=" + mso.getKey().getId());
 		if (email == null || email.length() == 0 ||  password == null || password.length() == 0) {
 			return NnStatusMsg.inputMissing(locale);
 		}		
