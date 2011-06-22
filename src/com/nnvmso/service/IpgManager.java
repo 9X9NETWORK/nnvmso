@@ -77,4 +77,8 @@ public class IpgManager {
 		return channels;
 	}
 	
+	public List<Ipg> findByProgramId(long programId) {
+		return ipgDao.findByProgramId(programId);
+	}
+	
 }

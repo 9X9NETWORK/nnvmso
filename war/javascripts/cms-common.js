@@ -84,7 +84,7 @@ var bubblePopupProperties =
   'themePath': '/images/cms'
 };
 
-$(function()
+var initSetupPage = function()
 {
   $('#setup_page').jqm(
   {
@@ -92,6 +92,19 @@ $(function()
     toTop: true,
     modal: true,
     ajax: 'setup',
-    trigger: '#setup'
+    trigger: '#setup',
+    onLoad: function()
+    {
+      $('.syncInfo').hover(function() {
+        $('#fb_hint').show();
+      },function() {
+        $('#fb_hint').hide();
+      });
+    }
   });
+};
+
+$(function()
+{
+  initSetupPage();
 });

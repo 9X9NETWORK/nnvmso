@@ -387,12 +387,12 @@ a.btnClose:hover { background:url(/images/cms/btnCloseHover.png) no-repeat; }
 .syncAcc ul { padding:10px 0 0 10px; }
 .syncAcc li { padding-bottom:10px; font-size:0.9em }
 .syncAcc li span { width:80px; display:block; float:left }
-.syncFb { background:url(images/icon_fb.png) no-repeat; height:33px; padding-left:45px; line-height:33px; }
-.syncPlurk { background:url(images/icon_plurk.png) no-repeat; height:33px; padding-left:45px; line-height:33px; }
-.syncTwitter { background:url(images/icon_twitter.png) no-repeat; height:33px; padding-left:45px; line-height:33px; }
-.syncSina { background:url(images/icon_sina.png) no-repeat; height:33px; padding-left:45px; line-height:33px; }
-.syncInfo { background:url(images/icon_info.png) no-repeat 10px 8px;  padding: 10px 25px 5px 10px; }
-.sync_hint { font-size:12px; color:#444; width:300px; background:#FFC; position:absolute; top:310px; right:70px; z-index:5;  padding:7px; line-height:15px; display:none; }
+.syncFb { background:url(/images/cms/icon_fb.png) no-repeat; height:33px; padding-left:45px; line-height:33px; }
+.syncPlurk { background:url(/images/cms/icon_plurk.png) no-repeat; height:33px; padding-left:45px; line-height:33px; }
+.syncTwitter { background:url(/images/cms/icon_twitter.png) no-repeat; height:33px; padding-left:45px; line-height:33px; }
+.syncSina { background:url(/images/cms/icon_sina.png) no-repeat; height:33px; padding-left:45px; line-height:33px; }
+.syncInfo { background:url(/images/cms/icon_info.png) no-repeat 10px 8px;  padding: 10px 25px 5px 10px; }
+.sync_hint { font-size:12px; color:#444; width:300px; background:#FFC; position:absolute; top:310px; right:40px; z-index:5;  padding:7px; line-height:15px; display:none; }
 .addAcc { padding-top:10px; }
 .addAcc .addForm { background:#444; width:568px; }
 .addAcc .addForm th, .addAcc .addForm td { padding:10px 5px 5px 10px;  color:#CCC; }
@@ -414,8 +414,10 @@ a.btnClose:hover { background:url(/images/cms/btnCloseHover.png) no-repeat; }
 
 .stastics_title { border-bottom:1px dashed #ddd; padding:20px 0px 10px 0px; font-size:1em; color:#313131; }
 .datePick { padding:10px 0 5px 0; float:right; }
+.datePick input { margin-right: 5px; }
 .datePick a { padding:0 0 0 5px; }
 .stastics_chart { padding-top:20px; }
+.stastics_chart img { padding-top: 10px; }
 .stastics_list td, .stastics_list tr, .ep_stastics td, .ep_stastics tr { text-align:left; padding:25px 10px 10px 10px; font-size:1em; }
 .stasticTab li { float:left; margin-right:5px; }
 .stasticTab { padding-top:10px; border-bottom:1px solid #ccc; }

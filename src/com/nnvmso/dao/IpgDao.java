@@ -43,6 +43,24 @@ public class IpgDao {
 		return detached;
 	}	
 	
+	// count the number that program be shared
+	public List<Ipg> findByProgramId(long programId) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		List<Ipg> detached = new ArrayList<Ipg>();
+		try {
+			Query query = pm.newQuery(Ipg.class);
+			query.setFilter("programId == programIdParam");
+			query.declareParameters("long programIdParam");
+			@SuppressWarnings("unchecked")
+			List<Ipg> results = (List<Ipg>)query.execute(programId);
+			log.info("ipg count = " + results.size());
+			detached = (List<Ipg>)pm.detachCopyAll(results);
+		} finally {
+			pm.close();
+		}
+		return detached;
+	}
+	
 	public List<Ipg> findByUserId(long userId) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		List<Ipg> detached = new ArrayList<Ipg>();

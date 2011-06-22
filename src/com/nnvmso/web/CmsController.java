@@ -133,7 +133,7 @@ public class CmsController {
 		MsoManager msoMngr = new MsoManager();
 		Mso mso = msoMngr.findByName(msoName);
 		if (mso == null)
-			return "redirect:error/404";
+			return "error/404";
 		
 		Mso sessionMso = (Mso)session.getAttribute("mso");
 		if (sessionMso != null && sessionMso.getKey().getId() == mso.getKey().getId()) {

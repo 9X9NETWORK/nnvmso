@@ -4,9 +4,9 @@
   <div class="setCon">
     <div class="setTitle">
       <ul class="setupTab">
-        <li id="tabA" class="link_Act"><a href="#"  onclick="setupTab(1);">帳號連結</a></li>
-        <li id="tabB" class="link_Normal"><a href="#"  onclick="setupTab(2);">管理員設定</a></li>
-        <li id="tabC" class="link_Normal"><a href="#"  onclick="setupTab(3);">修改密碼</a></li>
+        <li id="tabA" class="link_Act"><a href="javascript:">帳號連結</a></li>
+        <li id="tabB" class="link_Normal"><a href="javascript:">管理員設定</a></li>
+        <li id="tabC" class="link_Normal"><a href="javascript:">修改密碼</a></li>
         <div class="clear"></div>
       </ul>
     </div>
@@ -20,11 +20,11 @@
       <ul>
         <li class="syncFb">
           <span>facebook</span>&nbsp;&nbsp;
-          <a href="#">連結帳號</a>
+          <a href="javascript:">連結帳號</a>
           <!--
           <a href="#">中斷帳戶連結</a>&nbsp; | &nbsp;<a href="#">停用自動分享 </a>
           -->
-          <a href="javascrtip:" class="syncInfo" onmouseover="setTab(1);" onmouseout="setTab(2);"></a>
+          <a href="javascript:" class="syncInfo"></a>
           <div class="sync_hint" id="fb_hint">
             若內容更新非常頻繁，使用同步發佈功能有可能造成您社群粉絲接收資訊上的困擾，請審慎設定。
           </div>

@@ -13,7 +13,6 @@
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.js"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/jquery-ui.min.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.jqModal.js"></script>
-<script type="text/javascript" src="/javascripts/jquery.jstree.js"></script>
 <script type="text/javascript" src="http://www.netgrow.com.au/assets/files/jquery_plugins/jquery.dump.js"></script>
 <script type="text/javascript" src="/javascripts/cms-common.js"></script>
 <script type="text/javascript" src="/javascripts/statistics.js"></script>
@@ -79,7 +78,7 @@
         <div class="right_title"><div>大愛電視頻道網 - 套餐數據</div></div>
         <div class="stastics_title">
           <div>連續觀看15秒即算一次有效收看次數</div>
-          <div class="datePick">請選擇時間區間&nbsp;<input type="text"/><a href="#"><img alt="" src="/images/cms/icon_calendar.png"/></a></div>
+          <div class="datePick">請選擇時間區間&nbsp;<input id="set_pickdate" type="text"/><!-- <a href="#"><img alt="" src="/images/cms/icon_calendar.png"/></a> --></div>
           <div class="clear"></div>
         </div>
         <div class="stastics_chart">
@@ -125,7 +124,7 @@
         <div class="ch_stastics" id="ch_stastics">
           <div class="stastics_title">
             <div>連續觀看15秒即算一次有效收看次數</div>
-            <div class="datePick">請選擇時間區間&nbsp;<input type="text"/><a href="#"><img alt="" src="/images/cms/icon_calendar.png"/></a></div>
+            <div class="datePick">請選擇時間區間&nbsp;<input type="text"/><!-- <a href="#"><img alt="" src="/images/cms/icon_calendar.png"/></a> --></div>
             <div class="clear"></div>
           </div>
           <div class="stastics_chart">
@@ -162,11 +161,11 @@
         <div class="ep_stastics" id="ep_stastics" style="display:none">
           <div class="stastics_title">
             <div>連續觀看15秒即算一次有效收看次數</div>
-            <div class="datePick">請選擇時間區間&nbsp;<input type="text"/><a href="#"><img alt="" src="/images/cms/icon_calendar.png"/></a></div>
+            <div class="datePick">請選擇時間區間&nbsp;<input type="text"/><!-- <a href="#"><img alt="" src="/images/cms/icon_calendar.png"/></a> --></div>
             <div class="clear"></div>
           </div>
           <div class="stastics_chart">
-            <select name="">
+            <select id="ep_selector">
               <option>請選擇節目</option>
               <option>小灰熊的大愛劇場1</option>
               <option>小灰熊的大愛劇場2</option>
@@ -182,7 +181,7 @@
             <tr>
               <td>1,057,201</td>
               <td><a href="javascript:">累計收看次數</a></td>
-              <td>3</td>
+              <td id="ep_share_count">3</td>
               <td><a href="javascript:">分享次數</a></td>
             </tr>
             <tr>
@@ -201,5 +200,7 @@
 </div>
 <label class="lang" id="lang_view_statistics"><spring:message code="cms.channel_management.msg.view_statistics"/></label>
 <label class="lang" id="lang_label_channel_set">頻道網</label>
+<label class="lang" id="lang_title_set_statistics">套餐數據</label>
+<label class="lang" id="lang_label_please_select_program">請選擇節目</label>
 </body>
 </html>

@@ -30,6 +30,7 @@ import com.nnvmso.model.ChannelAutosharing;
 import com.nnvmso.model.ChannelSet;
 import com.nnvmso.model.ChannelSetAutosharing;
 import com.nnvmso.model.ContentOwnership;
+import com.nnvmso.model.Ipg;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoProgram;
@@ -44,6 +45,7 @@ import com.nnvmso.service.ChannelSetManager;
 import com.nnvmso.service.CmsApiService;
 import com.nnvmso.service.ContentOwnershipManager;
 import com.nnvmso.service.ContentWorkerService;
+import com.nnvmso.service.IpgManager;
 import com.nnvmso.service.MsoChannelManager;
 import com.nnvmso.service.MsoManager;
 import com.nnvmso.service.MsoProgramManager;
@@ -996,6 +998,16 @@ public class CmsApiController {
 		AreaOwnershipManager areaMngr = new AreaOwnershipManager();
 		Map<String, Integer> result = new HashMap<String, Integer>();
 		result.put("subscriptionCount", areaMngr.findTotalCountBySetId(channelSetId));
+		return result;
+	}
+	
+	@RequestMapping("programStatisticsInfo")
+	public @ResponseBody Map<String, Integer> programStatisticsInfo(@RequestParam Long programId) {
+		logger.info("programId = " + programId);
+		IpgManager ipgMngr = new IpgManager();
+		Map<String, Integer> result = new HashMap<String, Integer>();
+		List<Ipg> ipgs = ipgMngr.findByProgramId(programId);
+		result.put("shareCount", ipgs.size());
 		return result;
 	}
 }
