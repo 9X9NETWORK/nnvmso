@@ -16,8 +16,8 @@
 <script type="text/javascript" src="/javascripts/jquery.jqModal.js"></script>
 <script type="text/javascript" src="http://www.netgrow.com.au/assets/files/jquery_plugins/jquery.dump.js"></script>
 <script type="text/javascript" src="/javascripts/swfupload/swfupload.js"></script>
-<script type="text/javascript" src="/javascripts/cms-common.js"></script>
-<script type="text/javascript" src="/javascripts/channelManagement.js"></script>
+<script type="text/javascript" src="/javascripts/cms/common.js"></script>
+<script type="text/javascript" src="/javascripts/cms/channelManagement.js"></script>
 <title><spring:message code="cms.channel_management.title"/></title>
 </head>
 <body>

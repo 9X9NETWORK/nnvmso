@@ -18,8 +18,8 @@
 <script type="text/javascript" src="/javascripts/jquery.jqModal.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.jstree.js"></script>
 <script type="text/javascript" src="http://www.netgrow.com.au/assets/files/jquery_plugins/jquery.dump.js"></script>
-<script type="text/javascript" src="/javascripts/cms-common.js"></script>
-<script type="text/javascript" src="/javascripts/directoryManagement.js"></script>
+<script type="text/javascript" src="/javascripts/cms/common.js"></script>
+<script type="text/javascript" src="/javascripts/cms/directoryManagement.js"></script>
 <title>目錄管理</title>
 </head>
 <body>

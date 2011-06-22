@@ -95,7 +95,7 @@ var initSetupPage = function()
     trigger: '#setup',
     onLoad: function()
     {
-      $.getScript('/javascripts/setup.js');
+      $.getScript('/javascripts/cms/setup.js');
     }
   });
 };

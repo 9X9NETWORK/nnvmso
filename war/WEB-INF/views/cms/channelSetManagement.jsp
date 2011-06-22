@@ -16,8 +16,8 @@
 <script type="text/javascript" src="/javascripts/jquery.textTruncate.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.jqModal.js"></script>
 <script type="text/javascript" src="/javascripts/swfupload/swfupload.js"></script>
-<script type="text/javascript" src="/javascripts/cms-common.js"></script>
-<script type="text/javascript" src="/javascripts/channelSetManagement.js"></script>
+<script type="text/javascript" src="/javascripts/cms/common.js"></script>
+<script type="text/javascript" src="/javascripts/cms/channelSetManagement.js"></script>
 <title><spring:message code="cms.channel_set_management.title"/></title>
 </head>
 <body>

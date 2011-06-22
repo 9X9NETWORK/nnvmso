@@ -14,8 +14,8 @@
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/jquery-ui.min.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.jqModal.js"></script>
 <script type="text/javascript" src="http://www.netgrow.com.au/assets/files/jquery_plugins/jquery.dump.js"></script>
-<script type="text/javascript" src="/javascripts/cms-common.js"></script>
-<script type="text/javascript" src="/javascripts/statistics.js"></script>
+<script type="text/javascript" src="/javascripts/cms/common.js"></script>
+<script type="text/javascript" src="/javascripts/cms/statistics.js"></script>
 <title>統計數據</title>
 </head>
 <body>
