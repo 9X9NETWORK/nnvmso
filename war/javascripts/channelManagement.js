@@ -157,6 +157,7 @@ var programDetail =
       button_width:       '95',
       button_height:      '32',
       button_cursor:      SWFUpload.CURSOR.HAND,
+      button_window_mode : SWFUpload.WINDOW_MODE.TRANSPARENT,
       debug:              false,
       http_success :      [201],
       upload_success_handler: function(file, serverData, recievedResponse)
@@ -322,6 +323,7 @@ var programDetail =
         button_height:      '32',
         button_text:        '從硬碟',
         button_cursor:      SWFUpload.CURSOR.HAND,
+        button_window_mode : SWFUpload.WINDOW_MODE.TRANSPARENT,
         debug:              false,
         http_success :      [201],
         upload_progress_handler: function(file, completed, total)
@@ -375,6 +377,7 @@ var programDetail =
         button_width:       '95',
         button_height:      '32',
         button_cursor:      SWFUpload.CURSOR.HAND,
+        button_window_mode : SWFUpload.WINDOW_MODE.TRANSPARENT,
         debug:              false,
         http_success :      [201],
         upload_success_handler: function(file, serverData, recievedResponse)
@@ -675,6 +678,7 @@ var channelDetail =
           button_width:       '95',
           button_height:      '32',
           button_cursor:      SWFUpload.CURSOR.HAND,
+          button_window_mode : SWFUpload.WINDOW_MODE.TRANSPARENT,
           debug:              false,
           http_success :      [201],
           upload_success_handler: function(file, serverData, recievedResponse)
@@ -798,6 +802,7 @@ var channelDetail =
         button_width:       '95',
         button_height:      '32',
         button_cursor:      SWFUpload.CURSOR.HAND,
+        button_window_mode : SWFUpload.WINDOW_MODE.TRANSPARENT,
         debug:              false,
         http_success :      [201],
         upload_success_handler: function(file, serverData, recievedResponse)

@@ -9,11 +9,13 @@
 <link rel="stylesheet" type="text/css" href="/stylesheets/cms.css" />
 <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/themes/start/jquery-ui.css" />
 <link rel="stylesheet" type="text/css" href="/stylesheets/jquery.bubble.css" />
+<link rel="stylesheet" href="/stylesheets/jquery.jqModal.css" type="text/css"/>
 <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4dcccc98718a5dbe"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.js"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/jquery-ui.min.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.bubble.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.textTruncate.js"></script>
+<script type="text/javascript" src="/javascripts/jquery.jqModal.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.jstree.js"></script>
 <script type="text/javascript" src="http://www.netgrow.com.au/assets/files/jquery_plugins/jquery.dump.js"></script>
 <script type="text/javascript" src="/javascripts/cms-common.js"></script>
@@ -24,9 +26,10 @@
 <div class="header">
   <input type="hidden" id="msoId" value="${msoId}"/>
   <div class="floatL"><img alt="" src="${msoLogo}"/></div>
+  <div id="setup_page" class="jqmWindow"></div>
   <div class="floatR">
     <p><spring:message code="cms.header.welcome"/> <span><c:out value="${mso.contactEmail}"/></span></p>
-    <a href="#" class="setup"></a>
+    <a href="javascript:" class="setup" id="setup"></a>
     <a href="${logoutUrl}" class="logout"></a>
   </div>
 </div>

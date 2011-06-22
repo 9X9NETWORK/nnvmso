@@ -299,6 +299,7 @@ var initChannelSetInfo = function()
                 button_width:       '95',
                 button_height:      '32',
                 button_cursor:      SWFUpload.CURSOR.HAND,
+                button_window_mode : SWFUpload.WINDOW_MODE.TRANSPARENT,
                 debug:              false,
                 http_success :      [201],
                 upload_success_handler: function(file, serverData, recievedResponse)

@@ -8,15 +8,6 @@
 <title>登入</title>
 <link href="/stylesheets/cms.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.0/jquery.min.js"></script>
-<script type="text/javascript">
-// $(function()
-//   {
-//     $('#submit_button').click(function()
-//       {
-//         $('#login_form').submit();
-//       });
-//   });
-</script>
 </head>
 <body>
   <div class="header"></div>

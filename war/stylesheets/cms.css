@@ -366,3 +366,48 @@ form a { font-size:0.8em; }
 .promote_hint { font-size:12px; color:#444; width:300px; background:#FFC; position:absolute; top:20px; right:70px; z-index:99999; display:none; padding:5px; }
 .promote_hint li { padding:3px 0px 3px 10px; list-style-type:circle; list-style:inside; }
 
+.setup_context { background:url(/images/cms/bg_setup.png) no-repeat; width:614px; height:515px; position:absolute; }
+
+a.btnClose { background:url(/images/cms/btnClose.png) no-repeat; width:24px; height:23px; display:block; position:relative; top:35px; left:555px; }
+a.btnClose:hover { background:url(/images/cms/btnCloseHover.png) no-repeat; }
+
+.setupTab li { float:left; width:100px; height:30px; text-align:center; line-height:30px; }
+.setupTab a:link, .setupTab a:active, .setupTab a:visited { font-size:0.9em; color:#03C; text-decoration:none; display:block; }
+.setupTab a:hover { text-decoration:underline; }
+
+.setupTab li.link_Act a { color:#900; }
+.setupTab li.link_Act { background:#fefbe9; border:1px solid #c8c8c8; border-bottom:none; }
+.setupTab li.link_Normal a { color:#00C;}
+.setupTab li.link_Normal { background:none; border:none; }
+
+.setTitle { padding:10px 0 0 20px; border-bottom:1px solid #c8c8c8; background:#eaeaea; height:30px; }
+.setCon { padding:52px 21px 0 25px; }
+.syncAcc { padding-top:10px; }
+.syncAcc p { padding:3px 0; width:540px; padding:5px 10px; color:#404040; font-size:0.9em }
+.syncAcc ul { padding:10px 0 0 10px; }
+.syncAcc li { padding-bottom:10px; font-size:0.9em }
+.syncAcc li span { width:80px; display:block; float:left }
+.syncFb { background:url(images/icon_fb.png) no-repeat; height:33px; padding-left:45px; line-height:33px; }
+.syncPlurk { background:url(images/icon_plurk.png) no-repeat; height:33px; padding-left:45px; line-height:33px; }
+.syncTwitter { background:url(images/icon_twitter.png) no-repeat; height:33px; padding-left:45px; line-height:33px; }
+.syncSina { background:url(images/icon_sina.png) no-repeat; height:33px; padding-left:45px; line-height:33px; }
+.syncInfo { background:url(images/icon_info.png) no-repeat 10px 8px;  padding: 10px 25px 5px 10px; }
+.sync_hint { font-size:12px; color:#444; width:300px; background:#FFC; position:absolute; top:310px; right:70px; z-index:5;  padding:7px; line-height:15px; display:none; }
+.addAcc { padding-top:10px; }
+.addAcc .addForm { background:#444; width:568px; }
+.addAcc .addForm th, .addAcc .addForm td { padding:10px 5px 5px 10px;  color:#CCC; }
+.addAcc .addForm td { font-size:0.9em; }
+.mainAcc { width:568px; }
+.mainAcc th, .subAcc th { color:#c63; padding:10px 5px 5px 10px; }
+.mainAcc td, .subAcc td { padding:10px 5px 5px 10px; border-bottom:1px dashed #999; }
+.subAcc { height:190px; overflow:auto; }
+.subAcc table { width:550px; }
+.setPs { padding:100px 0 0 100px; }
+.setPs td { padding:5px 10px; }
+
+.jqmWindow {
+  width: 0;
+  height: 0;
+  padding: 0 0 0 0;
+  border: none;
+}
