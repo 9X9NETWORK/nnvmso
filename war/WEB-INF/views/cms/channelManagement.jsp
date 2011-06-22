@@ -34,7 +34,7 @@
       <li><a href="javascript:" class="menuA_active"></a></li>
       <li><a href="channelSetManagement" class="menuB"></a></li>
       <li><a href="directoryManagement" class="menuC"></a></li>
-      <li><a href="#" class="menuD"></a></li>
+      <li><a href="promotionTools" class="menuD"></a></li>
       <li><a href="#" class="menuE"></a></li>
     </ul>
     <div class="clear"></div>
