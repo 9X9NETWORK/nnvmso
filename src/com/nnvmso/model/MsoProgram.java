@@ -48,6 +48,8 @@ public class MsoProgram implements Serializable {
 	
 	@Persistent
 	private short contentType;
+	public static final short CONTENTTYPE_DIRECTLINK = 0;
+	public static final short CONTENTTYPE_YOUTUBE = 1;
 	
 	@Persistent
 	private String errorCode;
