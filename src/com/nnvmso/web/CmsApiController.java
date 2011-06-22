@@ -24,11 +24,15 @@ import com.nnvmso.lib.NnStringUtil;
 import com.nnvmso.model.Category;
 import com.nnvmso.model.CategoryChannel;
 import com.nnvmso.model.CategoryChannelSet;
+import com.nnvmso.model.ChannelAutosharing;
 import com.nnvmso.model.ChannelSet;
+import com.nnvmso.model.ChannelSetAutosharing;
 import com.nnvmso.model.ContentOwnership;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoProgram;
+import com.nnvmso.model.SnsAuth;
+import com.nnvmso.service.AutosharingService;
 import com.nnvmso.service.CategoryChannelManager;
 import com.nnvmso.service.CategoryChannelSetManager;
 import com.nnvmso.service.CategoryManager;
@@ -41,6 +45,7 @@ import com.nnvmso.service.MsoChannelManager;
 import com.nnvmso.service.MsoManager;
 import com.nnvmso.service.MsoProgramManager;
 import com.nnvmso.service.NnUserManager;
+import com.nnvmso.service.SnsAuthManager;
 import com.nnvmso.service.TranscodingService;
 
 @Controller
@@ -879,6 +884,89 @@ public class CmsApiController {
 		cc.setCategoryId(toCategoryId);
 		ccMngr.save(cc);
 		return "OK";
+	}
+	
+	//////////////////// Promotion Tools ////////////////////
+	
+	@RequestMapping("listSnsAuth")
+	public @ResponseBody List<SnsAuth> listSnsAuth(@RequestParam Long msoId) {
+		logger.info("msoId = " + msoId);
+		SnsAuthManager snsMngr = new SnsAuthManager();
+		return snsMngr.findAllByMsoId(msoId);
+	}
+	
+	@RequestMapping("listChannelAutosharing")
+	public @ResponseBody List<ChannelAutosharing> listChannelAutosharing(@RequestParam Long msoId, @RequestParam Long channelId) {
+		logger.info("msoId = " + msoId);
+		logger.info("channelId = " + channelId);
+		AutosharingService shareService = new AutosharingService();
+		return shareService.findAllByChannelIdAndMsoId(channelId, msoId);
+	}
+	
+	@RequestMapping("listChannelSetAutosharing")
+	public @ResponseBody List<ChannelSetAutosharing> listChannelSetAutosharing(@RequestParam Long msoId, @RequestParam Long channelSetId) {
+		logger.info("msoId = " + msoId);
+		logger.info("channelSetId = " + channelSetId);
+		AutosharingService shareService = new AutosharingService();
+		return shareService.findAllByChannelSetIdAndMsoId(channelSetId, msoId);
+	}
+	
+	@RequestMapping("createChannelAutosharing")
+	public @ResponseBody void createChannelAutosharing(@RequestParam Long msoId,
+	                                                   @RequestParam Long channelId,
+	                                                   @RequestParam Short type) {
+		logger.info("msoId = " + msoId);
+		logger.info("channelId = " + channelId);
+		logger.info("type = " + type);
+		
+		AutosharingService shareService = new AutosharingService();
+		if (shareService.findChannelAutosharing(msoId, channelId, type) == null) {
+			shareService.create(new ChannelAutosharing(msoId, channelId, type));
+		}
+	}
+	
+	@RequestMapping("createChannelSetAutosharing")
+	public @ResponseBody void createChannelSetAutosharing(@RequestParam Long msoId,
+	                                                      @RequestParam Long channelSetId,
+	                                                      @RequestParam Short type) {
+		logger.info("msoId == " + msoId);
+		logger.info("channelSetId = " + channelSetId);
+		logger.info("type = " + type);
+		
+		AutosharingService shareService = new AutosharingService();
+		if (shareService.findChannelSetAutosharing(msoId, channelSetId, type) == null) {
+			shareService.create(new ChannelSetAutosharing(msoId, channelSetId, type));
+		}
+	}
+	
+	@RequestMapping("removeChannelAutosharing")
+	public @ResponseBody void removeChannelAutosharing(@RequestParam Long msoId,
+	                                                   @RequestParam Long channelId,
+	                                                   @RequestParam Short type) {
+		logger.info("msoId = " + msoId);
+		logger.info("channelId = " + channelId);
+		logger.info("type = " + type);
+		
+		AutosharingService shareService = new AutosharingService();
+		ChannelAutosharing autosharing = shareService.findChannelAutosharing(msoId, channelId, type);
+		if (autosharing != null) {
+			shareService.delete(autosharing);
+		}
+	}
+	
+	@RequestMapping("removeChannelSetAutosharing")
+	public @ResponseBody void removeChannelSetAutosharing(@RequestParam Long msoId,
+	                                                      @RequestParam Long channelSetId,
+	                                                      @RequestParam Short type) {
+		logger.info("msoId = " + msoId);
+		logger.info("channelSetId = " + channelSetId);
+		logger.info("type = " + type);
+		
+		AutosharingService shareService = new AutosharingService();
+		ChannelSetAutosharing autosharing = shareService.findChannelSetAutosharing(msoId, channelSetId, type);
+		if (autosharing != null) {
+			shareService.delete(autosharing);
+		}
 	}
 }
 

@@ -1,6 +1,7 @@
 package com.nnvmso.service;
 
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.springframework.stereotype.Service;
@@ -22,6 +23,10 @@ public class SnsAuthManager {
 	
 	public void delete(SnsAuth auth) {
 		authDao.delete(auth);
+	}
+	
+	public List<SnsAuth> findAllByMsoId(long msoId) {
+		return authDao.findAllByMsoId(msoId);
 	}
 	
 	public SnsAuth findFacebookAuthByMsoId(long msoId) {

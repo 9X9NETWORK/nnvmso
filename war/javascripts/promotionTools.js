@@ -2,7 +2,193 @@
  * 
  */
 
-var channelList =
+var autosharingSettings =
+{
+  initChannelSet: function(channelSetId, channelSetName)
+  {
+    $('.sns_checkbox').attr('checked', false)
+    // load autosharing info
+    var parameters = {
+      'channelSetId': channelSetId,
+      'msoId': $('#msoId').val()
+    }
+    $.get('/CMSAPI/listChannelSetAutosharing', parameters, function(autosharings)
+    {
+      for (i in autosharings) {
+        switch(autosharings[i].type) {
+          case 1:
+          $('input[name="sns_facebook"]').attr('checked', true);
+          break;
+          case 2:
+          $('input[name="sns_twitter"]').attr('checked', true);
+          break;
+          case 3:
+          $('input[name="sns_plurk"]').attr('checked', true);
+          break;
+          case 4:
+          $('input[name="sns_sina"]').attr('checked', true);
+          break;
+          default:
+        }
+      }
+      if (!$('input[name="sns_facebook"]').attr('disabled')) {
+        $('input[name="sns_facebook"]').unbind('change').change(function()
+        {
+          var parameters = {
+            'msoId': $('#msoId').val(),
+            'channelSetId': channelSetId,
+            'type': 1
+          };
+          if ($(this).attr('checked') == 'checked') {
+            $.get('/CMSAPI/createChannelSetAutosharing', parameters);
+          } else {
+            $.get('/CMSAPI/removeChannelSetAutosharing', parameters);
+          }
+        });
+      }
+      if (!$('input[name="sns_twitter"]').attr('disabled')) {
+        $('input[name="sns_twitter"]').unbind('change').change(function()
+        {
+          var parameters = {
+            'msoId': $('#msoId').val(),
+            'channelSetId': channelSetId,
+            'type': 2
+          };
+          if ($(this).attr('checked') == 'checked') {
+            $.get('/CMSAPI/createChannelSetAutosharing', parameters);
+          } else {
+            $.get('/CMSAPI/removeChannelSetAutosharing', parameters);
+          }
+        });
+      }
+      if (!$('input[name="sns_plurk"]').unbind('change').attr('disabled')) {
+        $('input[name="sns_plurk"]').change(function()
+        {
+          var parameters = {
+            'msoId': $('#msoId').val(),
+            'channelSetId': channelSetId,
+            'type': 3
+          };
+          if ($(this).attr('checked') == 'checked') {
+            $.get('/CMSAPI/createChannelSetAutosharing', parameters);
+          } else {
+            $.get('/CMSAPI/removeChannelSetAutosharing', parameters);
+          }
+        });
+      }
+      if (!$('input[name="sns_sina"]').unbind('change').attr('disabled')) {
+        $('input[name="sns_sina"]').change(function()
+        {
+          var parameters = {
+            'msoId': $('#msoId').val(),
+            'channelSetId': channelSetId,
+            'type': 3
+          };
+          if ($(this).attr('checked') == 'checked') {
+            $.get('/CMSAPI/createChannelSetAutosharing', parameters);
+          } else {
+            $.get('/CMSAPI/removeChannelSetAutosharing', parameters);
+          }
+        });
+      }
+      $('.right_title > div').text(channelSetName);
+      $('.right_content').show();
+    }, 'json');
+  },
+  initChannel: function(channelId, channelName)
+  {
+    $('.sns_checkbox').attr('checked', false)
+    // load autosharing info
+    var parameters = {
+      'channelId': channelId,
+      'msoId': $('#msoId').val()
+    }
+    $.get('/CMSAPI/listChannelAutosharing', parameters, function(autosharings)
+    {
+      for (i in autosharings) {
+        switch(autosharings[i].type) {
+          case 1:
+          $('input[name="sns_facebook"]').attr('checked', true);
+          break;
+          case 2:
+          $('input[name="sns_twitter"]').attr('checked', true);
+          break;
+          case 3:
+          $('input[name="sns_plurk"]').attr('checked', true);
+          break;
+          case 4:
+          $('input[name="sns_sina"]').attr('checked', true);
+          break;
+          default:
+        }
+      }
+      if (!$('input[name="sns_facebook"]').attr('disabled')) {
+        $('input[name="sns_facebook"]').unbind('change').change(function()
+        {
+          var parameters = {
+            'msoId': $('#msoId').val(),
+            'channelId': channelId,
+            'type': 1
+          };
+          if ($(this).attr('checked') == 'checked') {
+            $.get('/CMSAPI/createChannelAutosharing', parameters);
+          } else {
+            $.get('/CMSAPI/removeChannelAutosharing', parameters);
+          }
+        });
+      }
+      if (!$('input[name="sns_twitter"]').attr('disabled')) {
+        $('input[name="sns_twitter"]').unbind('change').change(function()
+        {
+          var parameters = {
+            'msoId': $('#msoId').val(),
+            'channelId': channelId,
+            'type': 2
+          };
+          if ($(this).attr('checked') == 'checked') {
+            $.get('/CMSAPI/createChannelAutosharing', parameters);
+          } else {
+            $.get('/CMSAPI/removeChannelAutosharing', parameters);
+          }
+        });
+      }
+      if (!$('input[name="sns_plurk"]').attr('disabled')) {
+        $('input[name="sns_plurk"]').unbind('change').change(function()
+        {
+          var parameters = {
+            'msoId': $('#msoId').val(),
+            'channelId': channelId,
+            'type': 3
+          };
+          if ($(this).attr('checked') == 'checked') {
+            $.get('/CMSAPI/createChannelAutosharing', parameters);
+          } else {
+            $.get('/CMSAPI/removeChannelAutosharing', parameters);
+          }
+        });
+      }
+      if (!$('input[name="sns_sina"]').attr('disabled')) {
+        $('input[name="sns_sina"]').unbind('change').change(function()
+        {
+          var parameters = {
+            'msoId': $('#msoId').val(),
+            'channelId': channelId,
+            'type': 3
+          };
+          if ($(this).attr('checked') == 'checked') {
+            $.get('/CMSAPI/createChannelAutosharing', parameters);
+          } else {
+            $.get('/CMSAPI/removeChannelAutosharing', parameters);
+          }
+        });
+      }
+      $('.right_title > div').text(channelName);
+      $('.right_content').show();
+    }, 'json');
+  }
+};
+
+var channelAndChannelSetList =
 {
   init: function()
   {
@@ -70,7 +256,9 @@ var channelList =
           $(this).removeClass('chUnFocus').addClass('chFocus');
           $('.channel_info_title', this).removeClass('chUnFocusTitle').addClass('chFocusTitle');
           $('.channel_info_image', this).removeClass('chUnFocusImg').addClass('chFocusImg');
-          //programList.init(event.data.channelId, event.data.readonly, event.data.channelName);
+          
+          // load autosharing info
+          autosharingSettings.initChannel(event.data.channelId, event.data.channelName);
         });
       }
       //$('#channel_list').show();
@@ -118,7 +306,9 @@ var channelList =
           $(this).removeClass('chUnFocus').addClass('chFocus');
           $('.channel_info_title', this).removeClass('chUnFocusTitle').addClass('chFocusTitle');
           $('.channel_info_image', this).removeClass('chUnFocusImg').addClass('chFocusImg');
-          //programList.init(event.data.channelSetId, event.data.readonly, event.data.channelName);
+          
+          autosharingSettings.initChannelSet(event.data.channelSetId, event.data.channelSetName);
+          
         });
       }
       $('#channel_set_list_ul').append('<div class="clear"/>');
@@ -128,6 +318,16 @@ var channelList =
 
 $(function()
 {
+  $('.pro_check').click(function()
+  {
+    if (confirm($(this).text() + ' 帳號尚未開通，要前往設定頁面開通？') == true) {
+      $('#setup').click();
+    }
+  });
+  $('#9x9_rss_tutorial').click(function()
+  {
+    alert('9x9 Video RSS 使用教學還沒被提拱');
+  });
   $('.promoteInfo').hover(function()
   {
     $('#pro_hint').show();
@@ -135,5 +335,26 @@ $(function()
   {
     $('#pro_hint').hide();
   });
-  channelList.init();
+  $.get('/CMSAPI/listSnsAuth?msoId=' + $('#msoId').val(), function(snsAuths)
+  {
+    for (i in snsAuths) {
+      switch (snsAuths[i].type) {
+        case 1:
+        $('input[name="sns_facebook"]').attr('disabled', false).parent().unbind('click').css('color', 'black');
+        break;
+        case 2:
+        $('input[name="sns_twitter"]').attr('disabled', false).parent().unbind('click').css('color', 'black');
+        break;
+        case 3:
+        $('input[name="sns_plurk"]').attr('disabled', false).parent().unbind('click').css('color', 'black');
+        break;
+        case 4:
+        $('input[name="sns_sina"]').attr('disabled', false).parent().unbind('click').css('color', 'black');
+        break;
+        default:
+      }
+    }
+    //$('input[name="sns_facebook"]').attr('disabled', false).parent().unbind('click').css('color', 'black'); // Qoo
+  })
+  channelAndChannelSetList.init();
 });

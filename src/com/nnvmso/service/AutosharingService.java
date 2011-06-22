@@ -1,12 +1,15 @@
 package com.nnvmso.service;
 
+import java.util.Date;
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.springframework.stereotype.Service;
 
 import com.nnvmso.dao.ChannelAutosharingDao;
 import com.nnvmso.dao.ChannelSetAutosharingDao;
-import com.nnvmso.model.SnsAuth;
+import com.nnvmso.model.ChannelAutosharing;
+import com.nnvmso.model.ChannelSetAutosharing;
 
 @Service
 public class AutosharingService {
@@ -16,36 +19,53 @@ public class AutosharingService {
 	private ChannelAutosharingDao channelAutosharingDao = new ChannelAutosharingDao();
 	private ChannelSetAutosharingDao channelSetAutosharingDao = new ChannelSetAutosharingDao();
 	
-	public boolean isChannelAutosharedToFacebook(long channelId) {
-		return channelAutosharingDao.isChannelAutosharedTo(channelId, SnsAuth.TYPE_FACEBOOK);
+	///////// channel autosharing /////////
+	
+	public List<ChannelAutosharing> findAllByChannelId(long channelId) {
+		return channelAutosharingDao.findAllByChannelId(channelId);
 	}
 	
-	public boolean isChannelAutosharedToTwitter(long channelId) {
-		return channelAutosharingDao.isChannelAutosharedTo(channelId, SnsAuth.TYPE_TWITTER);
+	public List<ChannelAutosharing> findAllByChannelIdAndMsoId(long channelId, long msoId) {
+		return channelAutosharingDao.findAllByChannelIdAndMsoId(channelId, msoId);
 	}
 	
-	public boolean isChannelAutosharedToPlurk(long channelId) {
-		return channelAutosharingDao.isChannelAutosharedTo(channelId, SnsAuth.TYPE_PLURK);
+	public boolean isChannelAutosharedByMso(long msoId, long channelId, short type) {
+		return channelAutosharingDao.isChannelAutosharedByMso(msoId, channelId, type);
 	}
 	
-	public boolean isChannelAutosharedToSina(long channelId) {
-		return channelAutosharingDao.isChannelAutosharedTo(channelId, SnsAuth.TYPE_SINA);
+	public ChannelAutosharing findChannelAutosharing(long msoId, long channelId, short type) {
+		return channelAutosharingDao.findChannelAutosharing(msoId, channelId, type);
 	}
 	
-	public boolean isChannelSetAutosharedToFacebook(long channelSetId) {
-		return channelSetAutosharingDao.isChannelSetAutosharedTo(channelSetId, SnsAuth.TYPE_FACEBOOK);
+	public void create(ChannelAutosharing autosharing) {
+		autosharing.setCreateDate(new Date());
+		channelAutosharingDao.save(autosharing);
 	}
 	
-	public boolean isChannelSetAutosharedToTwitter(long channelSetId) {
-		return channelSetAutosharingDao.isChannelSetAutosharedTo(channelSetId, SnsAuth.TYPE_TWITTER);
+	public void delete(ChannelAutosharing autosharing) {
+		channelAutosharingDao.delete(autosharing);
 	}
 	
-	public boolean isChannelSetAutosharedToPlurk(long channelSetId) {
-		return channelSetAutosharingDao.isChannelSetAutosharedTo(channelSetId, SnsAuth.TYPE_PLURK);
+	///////// channel set autosharing /////////
+	
+	public List<ChannelSetAutosharing> findAllByChannelSetId(long channelSetId) {
+		return channelSetAutosharingDao.findAllByChannelSetId(channelSetId);
 	}
 	
-	public boolean isChannelSetAutosharedToSina(long channelSetId) {
-		return channelSetAutosharingDao.isChannelSetAutosharedTo(channelSetId, SnsAuth.TYPE_SINA);
+	public List<ChannelSetAutosharing> findAllByChannelSetIdAndMsoId(long channelSetId, long msoId) {
+		return channelSetAutosharingDao.findAllByChannelSetIdAndMsoId(channelSetId, msoId);
 	}
 	
+	public ChannelSetAutosharing findChannelSetAutosharing(long msoId, long channelSetId, short type) {
+		return channelSetAutosharingDao.findChannelSetAutosharing(msoId, channelSetId, type);
+	}
+	
+	public void create(ChannelSetAutosharing autosharing) {
+		autosharing.setCreateDate(new Date());
+		channelSetAutosharingDao.save(autosharing);
+	}
+	
+	public void delete(ChannelSetAutosharing autosharing) {
+		channelSetAutosharingDao.delete(autosharing);
+	}
 }

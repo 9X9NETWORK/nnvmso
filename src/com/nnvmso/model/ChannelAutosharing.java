@@ -33,7 +33,13 @@ public class ChannelAutosharing implements Serializable {
 	
 	@Persistent
 	private Date createDate;
-
+	
+	public ChannelAutosharing(long msoId, long channelId, short type) {
+		this.msoId = msoId;
+		this.channelId = channelId;
+		this.type = type;
+	}
+	
 	public void setKey(Key key) {
 		this.key = key;
 	}

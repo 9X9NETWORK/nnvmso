@@ -75,7 +75,7 @@
     </div>
     <div class="left_footer"></div>
   </div>
-  <div class="right_content floatL">
+  <div class="right_content floatL" style="display:none">
     <div class="right_body">
       <div class="right_title"><div>大愛電視頻道網</div></div>
       <div class="promote_title">
@@ -90,14 +90,14 @@
         </div>
       </div>
       <br/>
-      <label class="pro_check"><input type="checkbox" name="CheckboxGroup1" value="checkbox" id="CheckboxGroup1_0" />&nbsp; facebook</label>
-      <label class="pro_check"><input type="checkbox" name="CheckboxGroup1_" value="checkbox" id="CheckboxGroup1_1" />&nbsp; plurk</label>
-      <label class="pro_check"><input type="checkbox" name="CheckboxGroup1_" value="checkbox" id="CheckboxGroup1_2" />&nbsp; twitter</label>
-      <label class="pro_check"><input type="checkbox" name="CheckboxGroup1_" value="checkbox" id="CheckboxGroup1_3" />&nbsp; sina</label>
+      <label class="pro_check"><input type="checkbox" class="sns_checkbox" name="sns_facebook" disabled="disabled"/>&nbsp; facebook</label>
+      <label class="pro_check"><input type="checkbox" class="sns_checkbox" name="sns_twitter" disabled="disabled"/>&nbsp; twitter</label>
+      <label class="pro_check"><input type="checkbox" class="sns_checkbox" name="sns_plurk" disabled="disabled"/>&nbsp; plurk</label>
+      <label class="pro_check"><input type="checkbox" class="sns_checkbox" name="sns_sina" disabled="disabled"/>&nbsp; sina</label>
       <br/><br/><br/>
-      <div class="promote_title">9x9 Video RSS&nbsp;&nbsp; <a href="javascript:">使用教學</a></div>
+      <div class="promote_title">9x9 Video RSS&nbsp;&nbsp; <a id="9x9_rss_tutorial" href="javascript:">使用教學</a></div>
       <br/><br/>
-      <input type="text" size="40" />&nbsp;&nbsp;<a href="#">點擊複製</a>
+      <input type="text" size="40" disabled="disabled" value="9x9 RSS 的圖示需要被提供"/>&nbsp;&nbsp;<a href="javascript:">點擊複製</a>
     </div>
     <div class="right_footer"></div>
   </div>

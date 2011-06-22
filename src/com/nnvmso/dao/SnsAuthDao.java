@@ -19,7 +19,7 @@ public class SnsAuthDao extends GenericDao<SnsAuth> {
 		super(SnsAuth.class);
 	}
 	
-	public List<SnsAuth> findByMsoId(long msoId) {
+	public List<SnsAuth> findAllByMsoId(long msoId) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		ArrayList<SnsAuth> results = new ArrayList<SnsAuth>();
 		
@@ -59,5 +59,5 @@ public class SnsAuthDao extends GenericDao<SnsAuth> {
 		else
 			return null;
 	}
-
+	
 }
