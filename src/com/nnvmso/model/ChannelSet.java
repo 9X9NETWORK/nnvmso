@@ -54,6 +54,9 @@ public class ChannelSet implements Serializable {
 	@Persistent
 	private Date updateDate;
 	
+	@NotPersistent
+	private int subscriptionCount;
+	
 	public ChannelSet(long msoId, String name, String intro, boolean isPublic) {
 		this.msoId = msoId;
 		this.name = name;
@@ -164,6 +167,14 @@ public class ChannelSet implements Serializable {
 
 	public void setFeatured(boolean featured) {
 		this.featured = featured;
+	}
+
+	public void setSubscriptionCount(int subscriptionCount) {
+		this.subscriptionCount = subscriptionCount;
+	}
+
+	public int getSubscriptionCount() {
+		return subscriptionCount;
 	}
 	
 }

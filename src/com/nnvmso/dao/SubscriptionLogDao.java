@@ -1,6 +1,7 @@
 package com.nnvmso.dao;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -9,6 +10,9 @@ import com.nnvmso.lib.PMF;
 import com.nnvmso.model.SubscriptionLog;
 
 public class SubscriptionLogDao {
+	
+	protected static final Logger logger = Logger.getLogger(SubscriptionLogDao.class.getName());
+	
 	public SubscriptionLog save(SubscriptionLog log) {		
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
@@ -54,6 +58,7 @@ public class SubscriptionLogDao {
 		} finally {
 			pm.close();
 		}
+		logger.info("subscriptionCount(" + channelId + ") = " + totalCount);
 		return totalCount;
 	}
 	

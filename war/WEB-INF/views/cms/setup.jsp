@@ -21,26 +21,34 @@
         <li class="syncFb">
           <span>facebook</span>&nbsp;&nbsp;
           <a href="#">連結帳號</a>
+          <!--
           <a href="#">中斷帳戶連結</a>&nbsp; | &nbsp;<a href="#">停用自動分享 </a>
-          <a href="#" class="syncInfo" onmouseover="setTab(1);" onmouseout="setTab(2);"></a>
+          -->
+          <a href="javascrtip:" class="syncInfo" onmouseover="setTab(1);" onmouseout="setTab(2);"></a>
           <div class="sync_hint" id="fb_hint">
             若內容更新非常頻繁，使用同步發佈功能有可能造成您社群粉絲接收資訊上的困擾，請審慎設定。
           </div>
         </li>
         <li class="syncPlurk">
           <span>plurk</span>&nbsp;&nbsp;
-          <a href="#">連結帳號</a>
+          <a href="javascript:">連結帳號</a>
+          <!--
           <a href="#">中斷帳戶連結</a>&nbsp; | &nbsp;<a href="#">停用自動分享 </a>
+          -->
         </li>
         <li class="syncTwitter">
           <span>twitter</span>&nbsp;&nbsp;
-          <a href="#">連結帳號</a>
+          <a href="javascript:">連結帳號</a>
+          <!--
           <a href="#">中斷帳戶連結</a>&nbsp; | &nbsp;<a href="#">停用自動分享 </a>
+          -->
         </li>
         <li class="syncSina">
           <span>新浪微博</span>&nbsp;&nbsp;
-          <a href="#">連結帳號</a>
+          <a href="javascript:">連結帳號</a>
+          <!--
           <a href="#">中斷帳戶連結</a>&nbsp; | &nbsp;<a href="#">停用自動分享 </a>
+          -->
         </li>
       </ul>
     </div>

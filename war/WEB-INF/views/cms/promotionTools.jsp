@@ -43,9 +43,6 @@
       <div class="createChList2">
         <div class="left_title">頻道網清單</div>
         <ul class="chList" id="channel_set_list_ul">
-          <li>
-          </li>
-          <div class="clear"/>
         </ul>
         <div class="left_title">頻道清單</div>
         <ul class="chList" id="channel_list_ul">
@@ -75,29 +72,31 @@
     </div>
     <div class="left_footer"></div>
   </div>
-  <div class="right_content floatL" style="display:none">
+  <div class="right_content floatL">
     <div class="right_body">
-      <div class="right_title"><div>大愛電視頻道網</div></div>
-      <div class="promote_title">
-        <div class="floatL">自動分享&nbsp;&nbsp;</div>
-        <a href="javascript:" class="promoteInfo"></a>
-        <div class="clear"></div>
-        <div class="promote_hint" id="pro_hint">
-          <ul>
-            <li>若內容更新非常頻繁，使用同步發佈功能有可能造成您社群粉絲接收資訊上的困擾，請審慎設定。</li>
-            <li>若頻道屬於頻道網，同時開啓頻道網同步與頻道同步，將造成單一頻道重複宣傳，請審慎設定。</li>
-          </ul>
+      <div id="promotion_content" style="display:none">
+        <div class="right_title"><div>大愛電視頻道網</div></div>
+        <div class="promote_title">
+          <div class="floatL">自動分享&nbsp;&nbsp;</div>
+          <a href="javascript:" class="promoteInfo"></a>
+          <div class="clear"></div>
+          <div class="promote_hint" id="pro_hint">
+            <ul>
+              <li>若內容更新非常頻繁，使用同步發佈功能有可能造成您社群粉絲接收資訊上的困擾，請審慎設定。</li>
+              <li>若頻道屬於頻道網，同時開啓頻道網同步與頻道同步，將造成單一頻道重複宣傳，請審慎設定。</li>
+            </ul>
+          </div>
         </div>
+        <br/>
+        <label class="pro_check"><input type="checkbox" class="sns_checkbox" name="sns_facebook" disabled="disabled"/>&nbsp; facebook</label>
+        <label class="pro_check"><input type="checkbox" class="sns_checkbox" name="sns_twitter" disabled="disabled"/>&nbsp; twitter</label>
+        <label class="pro_check"><input type="checkbox" class="sns_checkbox" name="sns_plurk" disabled="disabled"/>&nbsp; plurk</label>
+        <label class="pro_check"><input type="checkbox" class="sns_checkbox" name="sns_sina" disabled="disabled"/>&nbsp; sina</label>
+        <br/><br/><br/>
+        <div class="promote_title">9x9 Video RSS&nbsp;&nbsp; <a id="9x9_rss_tutorial" href="javascript:">使用教學</a></div>
+        <br/><br/>
+        <input type="text" size="40" disabled="disabled" value="9x9 RSS 的圖示需要被提供"/>&nbsp;&nbsp;<a href="javascript:">點擊複製</a>
       </div>
-      <br/>
-      <label class="pro_check"><input type="checkbox" class="sns_checkbox" name="sns_facebook" disabled="disabled"/>&nbsp; facebook</label>
-      <label class="pro_check"><input type="checkbox" class="sns_checkbox" name="sns_twitter" disabled="disabled"/>&nbsp; twitter</label>
-      <label class="pro_check"><input type="checkbox" class="sns_checkbox" name="sns_plurk" disabled="disabled"/>&nbsp; plurk</label>
-      <label class="pro_check"><input type="checkbox" class="sns_checkbox" name="sns_sina" disabled="disabled"/>&nbsp; sina</label>
-      <br/><br/><br/>
-      <div class="promote_title">9x9 Video RSS&nbsp;&nbsp; <a id="9x9_rss_tutorial" href="javascript:">使用教學</a></div>
-      <br/><br/>
-      <input type="text" size="40" disabled="disabled" value="9x9 RSS 的圖示需要被提供"/>&nbsp;&nbsp;<a href="javascript:">點擊複製</a>
     </div>
     <div class="right_footer"></div>
   </div>

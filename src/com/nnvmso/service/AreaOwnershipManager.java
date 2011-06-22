@@ -43,6 +43,10 @@ public class AreaOwnershipManager {
 	
 	public AreaOwnership findByUserIdAndSetId(long userId, long setId) {
 		return areaDao.findByUserIdAndSetId(userId, setId);
-	}	
+	}
+	
+	public int findTotalCountBySetId(long setId) {
+		return areaDao.findTotalCountBySetId(setId);
+	}
 	
 }

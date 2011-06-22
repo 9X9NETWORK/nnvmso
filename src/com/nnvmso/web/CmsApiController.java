@@ -6,7 +6,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,6 +34,7 @@ import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoProgram;
 import com.nnvmso.model.SnsAuth;
+import com.nnvmso.service.AreaOwnershipManager;
 import com.nnvmso.service.AutosharingService;
 import com.nnvmso.service.CategoryChannelManager;
 import com.nnvmso.service.CategoryChannelSetManager;
@@ -46,6 +49,7 @@ import com.nnvmso.service.MsoManager;
 import com.nnvmso.service.MsoProgramManager;
 import com.nnvmso.service.NnUserManager;
 import com.nnvmso.service.SnsAuthManager;
+import com.nnvmso.service.SubscriptionLogManager;
 import com.nnvmso.service.TranscodingService;
 
 @Controller
@@ -218,6 +222,10 @@ public class CmsApiController {
 		
 		results = ownershipMngr.findOwnedChannelsByMsoId(msoId);
 		Collections.sort(results, new MsoChannelComparator());
+		for (MsoChannel channel : results) {
+			SubscriptionLogManager subLogMngr = new SubscriptionLogManager();
+			channel.setSubscriptionCount(subLogMngr.findTotalCountByChannelId(channel.getKey().getId()));
+		}
 		return results;
 	}
 	
@@ -233,6 +241,10 @@ public class CmsApiController {
 		logger.info("msoId = " + msoId);
 		
 		results = ownershipMngr.findOwnedChannelSetsByMsoId(msoId);
+		for (ChannelSet channelSet : results) {
+			AreaOwnershipManager areaMngr = new AreaOwnershipManager();
+			channelSet.setSubscriptionCount(areaMngr.findTotalCountBySetId(channelSet.getKey().getId()));
+		}
 		return results;
 	}
 	
@@ -967,6 +979,24 @@ public class CmsApiController {
 		if (autosharing != null) {
 			shareService.delete(autosharing);
 		}
+	}
+	
+	@RequestMapping("channelStatisticsInfo")
+	public @ResponseBody Map<String, Integer> channelStatisticsInfo(@RequestParam Long channelId) {
+		logger.info("channelId = " + channelId);
+		SubscriptionLogManager subLogMngr = new SubscriptionLogManager();
+		Map<String, Integer> result = new HashMap<String, Integer>();
+		result.put("subscriptionCount", subLogMngr.findTotalCountByChannelId(channelId));
+		return result;
+	}
+	
+	@RequestMapping("channelSetStatisticsInfo")
+	public @ResponseBody Map<String, Integer> channelSetStatisticsInfo(@RequestParam Long channelSetId) {
+		logger.info("channelSetId = " + channelSetId);
+		AreaOwnershipManager areaMngr = new AreaOwnershipManager();
+		Map<String, Integer> result = new HashMap<String, Integer>();
+		result.put("subscriptionCount", areaMngr.findTotalCountBySetId(channelSetId));
+		return result;
 	}
 }
 

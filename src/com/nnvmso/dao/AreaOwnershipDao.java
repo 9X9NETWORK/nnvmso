@@ -75,4 +75,21 @@ public class AreaOwnershipDao extends GenericDao<AreaOwnership> {
 		return detached;
 	}
 	
+	public int findTotalCountBySetId(long setId) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		int count = 0;
+		try {
+			Query query = pm.newQuery(AreaOwnership.class);
+			query.setFilter("setId == setIdParam && status == statusParam");
+			query.declareParameters("long setIdParam, int statusParam");
+			@SuppressWarnings("unchecked")
+			List<AreaOwnership> result = (List<AreaOwnership>)query.execute(setId, AreaOwnership.STATUS_OCCUPIED);
+			count = result.size();
+		} catch (JDOObjectNotFoundException e) {
+		} finally {
+			pm.close();
+		}
+		return count;
+	}
+	
 }

@@ -92,7 +92,7 @@ var autosharingSettings =
         });
       }
       $('.right_title > div').text(channelSetName);
-      $('.right_content').show();
+      $('#promotion_content').show();
     }, 'json');
   },
   initChannel: function(channelId, channelName)
@@ -183,7 +183,7 @@ var autosharingSettings =
         });
       }
       $('.right_title > div').text(channelName);
-      $('.right_content').show();
+      $('#promotion_content').show();
     }, 'json');
   }
 };
@@ -200,7 +200,7 @@ var channelAndChannelSetList =
         var channelInfoBlock = $('#channel_info_block').clone(true).removeAttr('id').addClass('channel_info_block_cloned');
         var channelId = channels[i].key.id;
         
-        channelInfoBlock.find('.iconStatistics').attr('title', $('#lang_view_statistics'));
+        channelInfoBlock.find('.iconStatistics').attr('title', $('#lang_view_statistics').text());
         channelInfoBlock.find('.channel_info_title div').text(channels[i].name);
         $('<img/>').attr('src', channels[i].imageUrl).appendTo(channelInfoBlock.find('.channel_info_image'));
         var contentType = 'Unknown';
@@ -227,6 +227,7 @@ var channelAndChannelSetList =
         }
         channelInfoBlock.find('.channel_info_contenttype span').text(contentType);
         channelInfoBlock.find('.channel_info_programcount span').text(channels[i].programCount);
+        channelInfoBlock.find('.channel_info_subscribers span').text(channels[i].subscriptionCount);
         channelInfoBlock.find('.channel_info_updatedate span').text(formatDate(channels[i].updateDate));
         // add this
         var promoteUrl = 'http://' + location.host + '/channel/' + channelId;
@@ -275,7 +276,8 @@ var channelAndChannelSetList =
         channelSetInfoBlock.find('.channel_info_title div').text(channelSets[i].name);
         $('<img/>').attr('src', channelSets[i].imageUrl).appendTo(channelSetInfoBlock.find('.channel_info_image'));
         channelSetInfoBlock.find('.channel_info_contenttype span').text($('#lang_label_channel_set').text());
-        channelSetInfoBlock.find('.channel_info_programcount span').text(channelSets[i].programCount);
+        channelSetInfoBlock.find('.channel_info_programcount span').text('N/A');
+        channelSetInfoBlock.find('.channel_info_subscribers span').text(channelSets[i].subscriptionCount);
         channelSetInfoBlock.find('.channel_info_updatedate span').text(formatDate(channelSets[i].updateDate));
         // add this
         var promoteUrl = 'http://' + location.host + '/';

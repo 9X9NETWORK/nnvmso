@@ -18,37 +18,6 @@
 <script type="text/javascript" src="/javascripts/cms-common.js"></script>
 <script type="text/javascript" src="/javascripts/statistics.js"></script>
 <title>統計數據</title>
-<script type=text/javascript>
-	function setTab ( i )
-	{
-		stasticTab(i);
-	}
-	
-	function stasticTab ( i )
-	{
-		if( i == 1){
-			//case 1:
-			get("ch_stastics").style.display = "block";
-			get("ep_stastics").style.display = "none";
-			get("stasticTabA").className = "tab_focus";
-			get("stasticTabB").className = "tab_unfocus";
-			
-			//break;
-		} else if ( i == 2) {
-			//case 2:
-			get("ch_stastics").style.display="none";
-			get("ep_stastics").style.display = "block";
-			get("stasticTabA").className = "tab_unfocus";
-			get("stasticTabB").className = "tab_focus";
-			//break;
-			
-		}
-	}
-	function get(id) {
-		return document.getElementById(id);
-	}
-
-</script>
 </head>
 <body>
 <div class="header">
@@ -74,108 +43,28 @@
     <div class="left_body">
       <div class="createChList2">
         <div class="left_title">頻道網清單</div>
-        <ul class="chList">
-          <li>
-            <div class="chFocus">
-              <div class="chFocusTitle">小灰熊的大愛劇場 <a href="#" class="btnDel"></a></div>
-              <div class="chFocusImg"></div>
-              <div class="floatL chInfo">
-                <a href="#" class="floatL">http://www.9x9.tv/channel/3958</a>
-                <div class="addthis_toolbox addthis_default_style floatL">
-                  <a class="addthis_button_compact"></a>
-                </div>
-                <a href="#" class="iconStatistics" title="觀看數據"></a>
-                <div class="clear"></div>
-                <div class="floatL">
-                  <p>頻道類型 : <span>9x9</span></p>
-                  <p>節目數量 : <span>0</span></p>
-                  <p>訂閱人數 : <span>0</span></p>
-                  <p>更新時間 : <span>2011/04/15 14:45</span></p>
-                </div>
-                <ul class="floatL">
-                  <li><a href="#" class="chUnPublic"></a></li>
-                  <li><a href="#" class="btnGray"><span>頻道資訊</span></a></li>
-                </ul>
-                <div class="clear"></div>
-              </div>
-            </div>
-          </li>
-          <div class="clear"/>
+        <ul class="chList" id="channel_set_list_ul">
         </ul>
         <div class="left_title">頻道清單</div>
-        <ul class="chList">
-          <li>
-            <div class="chUnFocus">
-              <div class="chUnFocusTitle">小灰熊的大愛劇場 <a href="#" class="btnDel"></a></div>
-              <div class="chUnFocusImg"></div>
+        <ul class="chList" id="channel_list_ul">
+          <li style="display:none">
+            <div class="chUnFocus channel_info_block" id="channel_info_block">
+              <div class="chUnFocusTitle channel_info_title"><div>小灰熊的大愛劇場</div></div>
+              <div class="chUnFocusImg channel_info_image"></div>
               <div class="floatL chInfo">
-                <a href="#" class="floatL">http://www.9x9.tv/channel/3958</a>
-                <div class="addthis_toolbox addthis_default_style floatL">
-                  <a class="addthis_button_compact"></a>
-                </div>
+                <a href="#" target="_player" class="floatL channel_info_promoteurl">http://www.9x9.tv/channel/3958</a>
+                <a class="floatL channel_info_addthis"><img src="http://cache.addthiscdn.com/icons/v1/thumbs/addthis.gif"/></a>
                 <a href="#" class="iconStatistics" title="觀看數據"></a>
                 <div class="clear"></div>
                 <div class="floatL">
-                  <p>頻道類型 : <span>9x9</span></p>
-                  <p>節目數量 : <span>0</span></p>
-                  <p>訂閱人數 : <span>0</span></p>
-                  <p>更新時間 : <span>2011/04/15 14:45</span></p>
+                  <p class="channel_info_contenttype"><spring:message code="cms.channel_management.label.channel_type"/> : <span>9x9</span></p>
+                  <p class="channel_info_programcount"><spring:message code="cms.channel_management.label.program_count"/> : <span>0</span></p>
+                  <p class="channel_info_subscribers"><spring:message code="cms.channel_management.label.subscribers"/> : <span>0</span></p>
+                  <p class="channel_info_updatedate"><spring:message code="cms.channel_management.label.update_time"/> : <span>2011/04/15 14:45</span></p>
                 </div>
                 <ul class="floatL">
-                  <li><a href="#" class="chUnPublic"></a></li>
-                  <li><a href="#" class="btnGray"><span>頻道資訊</span></a></li>
+                  <li><a class="chUnPublic channel_info_publish"></a></li>
                 </ul>
-                <div class="clear"></div>
-              </div>
-            </div>
-          </li>
-          <li>
-            <div class="chUnFocus">
-              <div class="chUnFocusTitle">小灰熊的大愛劇場 <a href="#" class="btnDel"></a></div>
-              <div class="chUnFocusImg"></div>
-              <div class="floatL chInfo" >
-                <a href="#" class="floatL">http://www.9x9.tv/channel/3958</a>
-                <div class="addthis_toolbox addthis_default_style floatL">
-                  <a class="addthis_button_compact"></a>
-                </div>
-                <a href="#" class="iconStatistics" title="觀看數據"></a>
-                <div class="clear"></div>
-                <div class="floatL">
-                  <p>頻道類型 : <span>9x9</span></p>
-                  <p>節目數量 : <span>0</span></p>
-                  <p>訂閱人數 : <span>0</span></p>
-                  <p>更新時間 : <span>2011/04/15 14:45</span></p>
-                </div>
-                <ul class="floatL">
-                  <li><a href="#" class="chUnPublic"></a></li>
-                  <li><a href="#" class="btnGray"><span>頻道資訊</span></a></li>
-                </ul>
-                <div class="clear"></div>
-              </div>
-            </div>
-          </li>
-          <li>
-            <div class="chUnFocus">
-              <div class="chUnFocusTitle">小灰熊的大愛劇場 <a href="#" class="btnDel"></a></div>
-              <div class="chUnFocusImg"></div>
-              <div class="floatL chInfo">
-                <a href="#" class="floatL">http://www.9x9.tv/channel/3958</a>
-                <div class="addthis_toolbox addthis_default_style floatL">
-                  <a class="addthis_button_compact"></a>
-                </div>
-                <a href="#" class="iconStatistics" title="觀看數據"></a>
-                <div class="clear"></div>
-                <div class="floatL">
-                  <p>頻道類型 : <span>9x9</span></p>
-                  <p>節目數量 : <span>0</span></p>
-                  <p>訂閱人數 : <span>0</span></p>
-                  <p>更新時間 : <span>2011/04/15 14:45</span></p>
-                </div>
-                <ul class="floatL">
-                  <li><a href="#" class="chUnPublic"></a></li>
-                  <li><a href="#" class="btnGray"><span>頻道資訊</span></a></li>
-                </ul>
-                <div class="clear"></div>
               </div>
             </div>
           </li>
@@ -186,8 +75,8 @@
   </div>
   <div class="right_content floatL">
     <div class="right_body">
-      <div class="set_stastics" style="display:none"><!--set stastics-->
-        <div class="right_title"><span>大愛電視頻道網 - 套餐數據</span></div>
+      <div class="set_stastics" style="display:none" id="channel_set_statistics"><!--set stastics-->
+        <div class="right_title"><div>大愛電視頻道網 - 套餐數據</div></div>
         <div class="stastics_title">
           <div>連續觀看15秒即算一次有效收看次數</div>
           <div class="datePick">請選擇時間區間&nbsp;<input type="text"/><a href="#"><img alt="" src="/images/cms/icon_calendar.png"/></a></div>
@@ -206,30 +95,30 @@
         <table border="0" cellpadding="0" cellspacing="0" class="stastics_list">
           <tr>
             <td>1,057,201</td>
-            <td><a href="#">累計收看次數</a></td>
+            <td><a href="javascript:">累計收看次數</a></td>
             <td>00:03:21</td>
-            <td><a href="#">每次平均停留時間</a></td>
+            <td><a href="javascript:">每次平均停留時間</a></td>
           </tr>
           <tr>
             <td>3</td>
-            <td><a href="#">每次平均觀看次數</a></td>
+            <td><a href="javascript:">每次平均觀看次數</a></td>
             <td>20%</td>
-            <td><a href="#">回訪率</a></td>
+            <td><a href="javascript:">回訪率</a></td>
           </tr>
           <tr>
-            <td>13,596</td>
-            <td><a href="#">訂閱戶數</a></td>
+            <td id="set_subscription_count">13,596</td>
+            <td><a href="javascript:">訂閱戶數</a></td>
             <td>&nbsp;</td>
             <td>&nbsp;</td>
           </tr>
         </table>
       </div>
-      <div class="ch_stastics"><!--channel stastics-->
-        <div class="right_title"><span>小灰熊的大愛劇場</span></div>
+      <div class="ch_stastics" id="channel_statistics" style="display:none"><!--channel stastics-->
+        <div class="right_title"><div>小灰熊的大愛劇場</div></div>
         <div class="stasticTab">
           <ul>
-            <li id="stasticTabA" class="tab_focus"><a href="#"  onclick="stasticTab(1);">頻道數據</a></li>
-            <li id="stasticTabB" class="tab_unfocus"><a href="#"  onclick="stasticTab(2);">節目數據</a></li>
+            <li id="stasticTabA" class="tab_focus"><a href="javascript:"">頻道數據</a></li>
+            <li id="stasticTabB" class="tab_unfocus"><a href="javascript:">節目數據</a></li>
             <div class="clear"></div>
           </ul>
         </div>
@@ -252,19 +141,19 @@
           <table border="0" cellpadding="0" cellspacing="0" class="stastics_list">
             <tr>
               <td>1,057,201</td>
-              <td><a href="#">累計收看次數</a></td>
+              <td><a href="javascript:">累計收看次數</a></td>
               <td>00:03:21</td>
-              <td><a href="#">每次平均停留時間</a></td>
+              <td><a href="javascript:">每次平均停留時間</a></td>
             </tr>
             <tr>
               <td>3</td>
-              <td><a href="#">每次平均觀看次數</a></td>
+              <td><a href="javascript:">每次平均觀看次數</a></td>
               <td>20%</td>
-              <td><a href="#">回訪率</a></td>
+              <td><a href="javascript:">回訪率</a></td>
             </tr>
             <tr>
-              <td>13,596</td>
-              <td><a href="#">訂閱戶數</a></td>
+              <td id="ch_subscription_count">13,596</td>
+              <td><a href="javascript:">訂閱戶數</a></td>
               <td>&nbsp;</td>
               <td>&nbsp;</td>
             </tr>
@@ -292,13 +181,13 @@
           <table border="0" cellpadding="0" cellspacing="0" class="stastics_list">
             <tr>
               <td>1,057,201</td>
-              <td><a href="#">累計收看次數</a></td>
+              <td><a href="javascript:">累計收看次數</a></td>
               <td>3</td>
-              <td><a href="#">分享次數</a></td>
+              <td><a href="javascript:">分享次數</a></td>
             </tr>
             <tr>
               <td>00:03:21</td>
-              <td><a href="#">每次平均收看時間</a></td>
+              <td><a href="javascript:">每次平均收看時間</a></td>
               <td></td>
               <td></td>
             </tr>
@@ -310,5 +199,7 @@
   </div>
   <div class="clear"></div>
 </div>
+<label class="lang" id="lang_view_statistics"><spring:message code="cms.channel_management.msg.view_statistics"/></label>
+<label class="lang" id="lang_label_channel_set">頻道網</label>
 </body>
 </html>
