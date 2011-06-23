@@ -751,6 +751,54 @@ public class PlayerApiController {
 		}
 		return NnNetUtil.textReturn(output);
 	}	
+
+	/**
+	 * Save User Shareing
+	 *
+	 * @param user user's unique identifier
+	 * @param channel channel id
+	 * @param program program id
+	 * @param set set id (place holder for now)
+	 * @return A unique sharing identifier
+	 */
+	@RequestMapping(value="saveShare")
+	public ResponseEntity<String> saveShare(@RequestParam(value="user", required=false) String userToken, 
+			                              @RequestParam(value="channel", required=false) String channelId,
+			                              @RequestParam(value="set", required=false) String setId,
+			                              @RequestParam(value="program", required=false) String programId, 
+			                              HttpServletRequest req) {		
+		this.prepService(req);
+		log.info("saveShare(" + userToken + ")");
+		String output = NnStatusMsg.errorStr(locale);		
+		try {
+			output = playerApiService.saveShare(userToken, channelId, programId, setId);
+		} catch (Exception e) {
+			output = playerApiService.handleException(e);
+		}
+		return NnNetUtil.textReturn(output);
+	}	
+
+	/**
+	 * Load User Sharing
+	 *
+	 * @param id unique identifier from saveShare
+	 * @return  Returns a program to play follows channel information.
+	 * 	        The program to play returns in the 2nd section, format please reference programInfo format.
+	 *          3rd section is channel information, format please reference channelLineup.
+	 */
+	@RequestMapping(value="loadShare")
+	public ResponseEntity<String> loadShare(@RequestParam(value="id") Long id, 
+										  HttpServletRequest req) {		
+		log.info("ipgShare:" + id);		
+		this.prepService(req);
+		String output = NnStatusMsg.errorStr(locale);		
+		try {
+			output = playerApiService.loadShare(id);
+		} catch (Exception e) {
+			output = playerApiService.handleException(e);
+		}
+		return NnNetUtil.textReturn(output);						
+	}
 	
 	/**
 	 * Load User IPG (snapshot)
