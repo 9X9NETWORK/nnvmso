@@ -43,6 +43,7 @@ import com.nnvmso.model.MsoIpg;
 import com.nnvmso.model.MsoProgram;
 import com.nnvmso.model.NnUser;
 import com.nnvmso.model.NnUserPref;
+import com.nnvmso.model.NnUserShare;
 import com.nnvmso.model.Subscription;
 
 @Service
@@ -251,6 +252,60 @@ public class PlayerApiService {
 		ipgMngr.create(ipg, foundUser.getKey().getId());				
 		return NnStatusMsg.successStr(locale) + separatorStr + Long.toString(ipg.getId());				
 	}
+
+	public String saveShare(String userToken, String channelId, String programId, String setId) {
+		if (userToken == null || userToken.length() == 0 || userToken.equals("undefined") ||
+			channelId == null || programId == null || channelId.length() == 0 || programId.length() == 0) {
+			return NnStatusMsg.inputMissing(locale);
+		}
+		if (!Pattern.matches("^\\d*$", channelId)) {
+			return NnStatusMsg.inputError(locale);
+		}
+				
+		NnUser foundUser = userMngr.findByToken(userToken);				
+		if (foundUser == null) { return NnStatusMsg.userInvalid(locale);}
+
+		NnUserShare share = new NnUserShare();
+		share.setChannelId(Long.parseLong(channelId));
+		if (Pattern.matches("^\\d*$", programId)) {
+			share.setProgramId(Long.parseLong(programId));
+		} else {
+			share.setProgramIdStr(programId);
+		}
+		share.setUserId(foundUser.getKey().getId());
+		NnUserShareManager shareMngr = new NnUserShareManager();
+		shareMngr.create(share, foundUser.getKey().getId());				
+		return NnStatusMsg.successStr(locale) + separatorStr + Long.toString(share.getId());				
+	}
+	
+	public String loadShare(long id) {
+		NnUserShareManager shareMngr = new NnUserShareManager();
+		NnUserShare share= shareMngr.findById(id);
+		if (share== null) { return messageSource.getMessage("nnstatus.ipg_invalid", new Object[] {NnStatusCode.IPG_INVALID} , locale);} 
+		//first block: status
+		String status = NnStatusMsg.successStr(locale);
+		//second block: episode information
+		String toPlay = separatorStr;
+		MsoProgramManager programMngr = new MsoProgramManager();
+		MsoProgram program = programMngr.findById(share.getProgramId());
+		if (program != null) {
+			List<MsoProgram> programs = new ArrayList<MsoProgram>();
+			programs.add(program);
+			MsoConfig config = new MsoConfigManager().findByMsoIdAndItem(mso.getKey().getId(), MsoConfig.CDN);
+			toPlay = toPlay + this.composeProgramInfoStr(programs, config);
+		} else {			
+			toPlay = toPlay + share.getChannelId() + "\t" + share.getProgramIdStr() + "\n";			
+		}
+		String channelLineup = separatorStr;
+		MsoChannel channel = new MsoChannelManager().findById(share.getChannelId());
+		if (channel != null) {
+			channelLineup = channelLineup + this.composeChannelLineupStr(channel, mso);
+		}
+		System.out.println("status:" + status);		
+		System.out.println("to play:" + toPlay);
+		System.out.println("channelLineupe:" + channelLineup);
+		return status + toPlay + channelLineup;
+	}
 	
 	public String loadIpg(long ipgId) {
 		IpgManager ipgMngr = new IpgManager();
@@ -277,8 +332,8 @@ public class PlayerApiService {
 			channelLineup = channelLineup + this.composeChannelLineupStr(c, mso);
 			channelLineup = channelLineup + "\n";			
 		}
-		return status + toPlay + channelLineup;		
-	}			
+		return status + toPlay + channelLineup;
+	}
 	
 	public String moveChannel(String userToken, String grid1, String grid2) {		
 		//verify input
