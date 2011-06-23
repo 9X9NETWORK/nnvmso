@@ -78,7 +78,7 @@ var channelPool =
   },
   init: function()
   {
-    $.getJSON('/CMSAPI/listOwnedChannels?msoId=' + $('#msoId').val(), function(channels)
+    $.get('/CMSAPI/listOwnedChannels?msoId=' + $('#msoId').val(), function(channels)
       {
         channelPool.populateSlides(channels);
         
@@ -129,7 +129,7 @@ var channelPool =
               $.post('/CMSAPI/removeChannelSetChannel', parameters, function() { channelSetArea.reload(); });
             }
           });
-      });
+      }, 'json');
   },
   // manageControls: Hides and Shows controls depending on currentPosition
   manageControls: function ()
@@ -177,8 +177,8 @@ var channelSetArea =
         $(this).RemoveBubblePopup();
       });
     $('.ch_exist').html('').removeClass('ch_exist').draggable({ 'disabled': true });
-    this.channelIds = [];
-    this.init();
+    channelSetArea.channelIds = [];
+    channelSetArea.init();
   },
   initBubbles: function()
   {
@@ -190,7 +190,7 @@ var channelSetArea =
   },
   init: function()
   {
-    $.getJSON('/CMSAPI/defaultChannelSetChannels?msoId=' + $('#msoId').val(), function(channels)
+    $.get('/CMSAPI/defaultChannelSetChannels?msoId=' + $('#msoId').val(), function(channels)
     {
       for (var i = 0; i < channels.length; i++)
       {
@@ -217,7 +217,7 @@ var channelSetArea =
                 'from':         from,
                 'to':           to
               };
-              $.post('/CMSAPI/changeChannelSetChannel', parameters, function() { channelSetArea.reload(); });
+              $.post('/CMSAPI/changeChannelSetChannel', parameters, channelSetArea.reload);
             } else {
               var channelId = $(ui.draggable).find('input[name="channelId"]').val();
               var parameters = {
@@ -225,18 +225,18 @@ var channelSetArea =
                 'channelId':    channelId,
                 'seq':          to
               }
-              $.post('/CMSAPI/addChannelSetChannel', parameters, function() { channelSetArea.reload(); });
+              $.post('/CMSAPI/addChannelSetChannel', parameters, channelSetArea.reload);
             }
           }
         });
-    });
+    }, 'json');
   }
 };
 
 var initChannelSetInfo = function()
 {
   
-  $.getJSON('/CMSAPI/systemCategories', function(categories)
+  $.get('/CMSAPI/systemCategories', function(categories)
     {
       for (var i = 0; i < categories.length; i++)
       {
@@ -245,14 +245,14 @@ var initChannelSetInfo = function()
           .text(categories[i].name)
           .appendTo('#sys_directory');
       }
-      $.getJSON('/CMSAPI/defaultChannelSetCategory?msoId=' + $('#msoId').val(), function(category)
+      $.get('/CMSAPI/defaultChannelSetCategory?msoId=' + $('#msoId').val(), function(category)
         {
           if (category != null)
           {
             $('#sys_directory').val(category.key.id);
           }
-        });
-      $.getJSON('/CMSAPI/defaultChannelSetInfo?msoId=' + $('#msoId').val(), function(channelSet)
+        }, 'json');
+      $.get('/CMSAPI/defaultChannelSetInfo?msoId=' + $('#msoId').val(), function(channelSet)
         {
           if (channelSet != null)
           {
@@ -293,7 +293,7 @@ var initChannelSetInfo = function()
                 file_types:         '*.jpg;*.png',
                 file_types_description: 'Image Files',
                 file_post_name:     'file',
-                button_placeholder: document.getElementById('upload_image'),
+                button_placeholder: $('#upload_image').get(0),
                 button_action:       SWFUpload.BUTTON_ACTION.SELECT_FILE,
                 button_image_url:   '/images/cms/btn_upload.png',
                 button_width:       '95',
@@ -332,8 +332,8 @@ var initChannelSetInfo = function()
               };
             var swfu = new SWFUpload(swfupload_settings);
           }
-        });
-    });
+        }, 'json');
+    }, 'json');
 }
 
 var publishChannelSet = function()

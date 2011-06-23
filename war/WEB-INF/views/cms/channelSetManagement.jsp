@@ -52,7 +52,7 @@
             <img alt="" id="cc_image" src="/images/cms/upload_img.jpg" class="floatL"/><input type="hidden" id="cc_image_updated" value="false"/>
             <div class="floatL imgBtn">
               <p class="gray"><spring:message code="cms.channel_set_management.msg.best_resolution"/></p>
-              <a href="#" id="upload_image" class="uploadBtn"></a>
+              <a href="javascript:" id="upload_image" class="uploadBtn"></a>
               <span id="uploading" style="display:none"><spring:message code="cms.channel_set_management.msg.uploading"/></span>
               <input type="hidden" id="s3_policy" value="${s3Policy}"/>
               <input type="hidden" id="s3_signature" value="${s3Signature}"/>

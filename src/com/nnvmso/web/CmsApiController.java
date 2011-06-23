@@ -159,7 +159,7 @@ public class CmsApiController {
 	}
 	
 	@RequestMapping("changeChannelSetChannel")
-	public void changeChannelSetChannel(@RequestParam Long  channelSetId,
+	public @ResponseBody void changeChannelSetChannel(@RequestParam Long  channelSetId,
 	                                    @RequestParam Short from,
 	                                    @RequestParam Short to) {
 		
@@ -170,7 +170,7 @@ public class CmsApiController {
 	}
 	
 	@RequestMapping("addChannelSetChannel")
-	public void addChannelSetChannel(@RequestParam Long  channelSetId,
+	public @ResponseBody void addChannelSetChannel(@RequestParam Long  channelSetId,
 	                                 @RequestParam Long  channelId,
 	                                 @RequestParam Short seq) {
 		
@@ -190,7 +190,7 @@ public class CmsApiController {
 	}
 	
 	@RequestMapping("removeChannelSetChannel")
-	public void removeChannelSetChannel(@RequestParam Long  channelSetId,
+	public @ResponseBody void removeChannelSetChannel(@RequestParam Long  channelSetId,
 	                                    @RequestParam Short seq) {
 		
 		logger.info("channelSetId = " + channelSetId + ", seq = " + seq);
@@ -367,7 +367,7 @@ public class CmsApiController {
 			return "Invalid msoId";
 		
 		channel.setName(name);
-		//channel.setTag(tag); MsoChannel needs a tag property
+		channel.setTags(tag);
 		if (imageUrl != null) {
 			ContentWorkerService workerService = new ContentWorkerService();
 			Long timestamp = System.currentTimeMillis() / 1000L;
