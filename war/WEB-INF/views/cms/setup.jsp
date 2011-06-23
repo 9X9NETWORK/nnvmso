@@ -1,53 +1,49 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <div class="setup_context">
   <a href="javascript:" class="btnClose jqmClose"></a>
   <div class="setCon">
     <div class="setTitle">
       <ul class="setupTab">
-        <li id="tabA" class="setupTabItem link_Act"><a href="javascript:">帳號連結</a></li>
-        <li id="tabB" class="setupTabItem link_Normal"><a href="javascript:">管理員設定</a></li>
-        <li id="tabC" class="setupTabItem link_Normal"><a href="javascript:">修改密碼</a></li>
+        <li id="tabA" class="setupTabItem link_Act"><a href="javascript:"><spring:message code="cms.setup.label.account_sync"/></a></li>
+        <li id="tabB" class="setupTabItem link_Normal"><a href="javascript:"><spring:message code="cms.setup.label.admin_group"/></a></li>
+        <li id="tabC" class="setupTabItem link_Normal"><a href="javascript:"><spring:message code="cms.setup.label.change_password"/></a></li>
         <div class="clear"></div>
       </ul>
     </div>
     <div id="syncAcc" class="syncAcc setupContent">
-      <p>9x9 將會自動同步發佈您更新的節目至您設定連結帳號的平台</p>
-      <p>設定步驟 : </p>
-      <p>1. 選擇您欲同步發佈的平台，選擇「連結帳號」進行設定。</p>
-      <p>2. 至「推廣工具」選取3x3或頻道，勾選同步發佈至哪些平台。</p>
-      <p>3. 自動同步發佈功能設定完成！</p>
-      <p>未來，每當您的3x3或頻道內發佈新節目時，9x9即會自動幫您同步發佈至您連結帳號的平台！</p>
+      <spring:message code="cms.setup.msg.account_synchronization_explanation"/>
       <ul>
         <li class="syncFb">
-          <span>facebook</span>&nbsp;&nbsp;
-          <a href="javascript:">連結帳號</a>
+          <span><spring:message code="cms.setup.label.facebook"/></span>&nbsp;&nbsp;
+          <a href="javascript:"><spring:message code="cms.setup.button.account_connect"/></a>
           <!--
-          <a href="#">中斷帳戶連結</a>&nbsp; | &nbsp;<a href="#">停用自動分享 </a>
+          <a href="#"><spring:message code="cms.setup.button.account_disconnect"/></a>&nbsp; | &nbsp;<a href="#"><spring:message code="cms.setup.button.disable_autosharing"/> </a>
           -->
           <a href="javascript:" class="syncInfo"></a>
           <div class="sync_hint" id="fb_hint">
-            若內容更新非常頻繁，使用同步發佈功能有可能造成您社群粉絲接收資訊上的困擾，請審慎設定。
+            <spring:message code="cms.setup.msg.fb_sync_hint"/>
           </div>
         </li>
-        <li class="syncPlurk">
-          <span>plurk</span>&nbsp;&nbsp;
-          <a href="javascript:">連結帳號</a>
+        <li class="syncTwitter">
+          <span><spring:message code="cms.setup.label.twitter"/></span>&nbsp;&nbsp;
+          <a href="javascript:"><spring:message code="cms.setup.button.account_connect"/></a>
           <!--
-          <a href="#">中斷帳戶連結</a>&nbsp; | &nbsp;<a href="#">停用自動分享 </a>
+          <a href="#"><spring:message code="cms.setup.button.account_disconnect"/></a>&nbsp; | &nbsp;<a href="#"><spring:message code="cms.setup.button.disable_autosharing"/> </a>
           -->
         </li>
-        <li class="syncTwitter">
-          <span>twitter</span>&nbsp;&nbsp;
-          <a href="javascript:">連結帳號</a>
+        <li class="syncPlurk">
+          <span><spring:message code="cms.setup.label.plurk"/></span>&nbsp;&nbsp;
+          <a href="javascript:"><spring:message code="cms.setup.button.account_connect"/></a>
           <!--
-          <a href="#">中斷帳戶連結</a>&nbsp; | &nbsp;<a href="#">停用自動分享 </a>
+          <a href="#"><spring:message code="cms.setup.button.account_disconnect"/></a>&nbsp; | &nbsp;<a href="#"><spring:message code="cms.setup.button.disable_autosharing"/> </a>
           -->
         </li>
         <li class="syncSina">
-          <span>新浪微博</span>&nbsp;&nbsp;
-          <a href="javascript:">連結帳號</a>
+          <span><spring:message code="cms.setup.label.sina"/></span>&nbsp;&nbsp;
+          <a href="javascript:"><spring:message code="cms.setup.button.account_connect"/></a>
           <!--
-          <a href="#">中斷帳戶連結</a>&nbsp; | &nbsp;<a href="#">停用自動分享 </a>
+          <a href="#"><spring:message code="cms.setup.button.account_disconnect"/></a>&nbsp; | &nbsp;<a href="#"><spring:message code="cms.setup.button.disable_autosharing"/> </a>
           -->
         </li>
       </ul>
@@ -55,58 +51,58 @@
     <div id="addAcc" class="addAcc setupContent" style="display:none;">
       <table border="0" cellpadding="0" cellspacing="0" class="addForm">
         <tr>
-          <th align="left">新增子管理員帳號</th>
-          <th align="left">備註</th>
+          <th align="left"><spring:message code="cms.setup.title.add_admin_account"/></th>
+          <th align="left"><spring:message code="cms.setup.title.comment"/></th>
           <th></th>
         </tr>
         <tr>
           <td><input type="text"/></td>
           <td><input type="text"/></td>
-          <td><input type="button" value="確定新增"/></td>
+          <td><button><big><spring:message code="cms.setup.button.add_account"/></big></button></td>
         </tr>
         <tr>
-          <td colspan="3">請使用9x9帳號邀請其他9x9用戶成為子管理員。<br/>子管理員可以使用原先註冊的9x9帳號與密碼登入管理，如同雲端群組協作。</td>
+          <td colspan="3"><spring:message code="cms.setup.msg.add_account_explanation"/></td>
         </tr>
       </table>
       <table border="0" cellpadding="0" cellspacing="0" class="mainAcc">
         <tr>
-          <th align="left" width="200">管理員帳號</th>
-          <th align="left">備註</th>
+          <th align="left" width="200"><spring:message code="cms.setup.title.admin_account"/></th>
+          <th align="left"><spring:message code="cms.setup.title.comment"/></th>
         </tr>
         <tr>
           <td><span>daai@9x9.tv</span></td>
-          <td><span>主要管理員使用</span></td>
+          <td><span><spring:message code="cms.setup.msg.master_admin"/></span></td>
         </tr>
       </table>
       <div class="subAcc">
         <table border="0" cellpadding="0" cellspacing="0">
           <tr>
-            <th align="left" width="200">子管理員帳號</th>
-            <th align="left">備註</th>
+            <th align="left" width="200"><spring:message code="cms.setup.title.sub_admin"/></th>
+            <th align="left"><spring:message code="cms.setup.title.comment"/></th>
           </tr>
           <tr>
-            <td><span>daai@9x9.tv</span></td>
-            <td><span>備註文字</span></td>
+            <td><span>daai1@9x9.tv</span></td>
+            <td><span>commet</span></td>
           </tr>
           <tr>
-            <td><span>daai@9x9.tv</span></td>
-            <td><span>備註文字</span></td>
+            <td><span>daai2@9x9.tv</span></td>
+            <td><span>commet</span></td>
           </tr>
           <tr>
-            <td><span>daai@9x9.tv</span></td>
-            <td><span>備註文字</span></td>
+            <td><span>daai3@9x9.tv</span></td>
+            <td><span>commet</span></td>
           </tr>
           <tr>
-            <td><span>daai@9x9.tv</span></td>
-            <td><span>備註文字</span></td>
+            <td><span>daai4@9x9.tv</span></td>
+            <td><span>commet</span></td>
           </tr>
           <tr>
-            <td><span>daai@9x9.tv</span></td>
-            <td><span>備註文字</span></td>
+            <td><span>daai5@9x9.tv</span></td>
+            <td><span>commet</span></td>
           </tr>
           <tr>
-            <td><span>daai@9x9.tv</span></td>
-            <td><span>備註文字</span></td>
+            <td><span>daai6@9x9.tv</span></td>
+            <td><span>commet</span></td>
           </tr>
         </table>
       </div>
@@ -114,18 +110,20 @@
     <div id="setPs" class="setPs setupContent" style="display:none;">
       <table border="0" cellpadding="0" cellspacing="0">
         <tr>
-          <td>重新設定密碼</td>
+          <td><spring:message code="cms.setup.label.reset_password"/></td>
           <td><input type="text"/></td>
         </tr>
         <tr>
-          <td>請再次輸入密碼</td>
+          <td><spring:message code="cms.setup.label.retype_password"/></td>
           <td><input type="text"/></td>
         </tr>
         <tr>
           <td></td>
-          <td><button><big>儲存修改</big></button>&nbsp;&nbsp;<a href="javascript:">取消</a></td>
+          <td><button><big><spring:message code="cms.setup.button.save"/></big></button>&nbsp;&nbsp;<a href="javascript:"><spring:message code="cms.setup.button.cancel"/></a></td>
         </tr>
       </table>
     </div>
   </div>
 </div>
+<label class="lang" id="lang_warning_not_9x9_user"><spring:message code="cms.warning.not_9x9_user"/></label>
+<label class="lang" id="lang_warning_remove_admin_member"><spring:message code="cms.warning.remove_admin_member"/></label>

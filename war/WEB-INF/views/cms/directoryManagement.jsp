@@ -20,7 +20,7 @@
 <script type="text/javascript" src="http://www.netgrow.com.au/assets/files/jquery_plugins/jquery.dump.js"></script>
 <script type="text/javascript" src="/javascripts/cms/common.js"></script>
 <script type="text/javascript" src="/javascripts/cms/directoryManagement.js"></script>
-<title>目錄管理</title>
+<title><spring:message code="cms.directory_management.title"/></title>
 </head>
 <body>
 <div class="header">
@@ -44,133 +44,23 @@
     </ul>
     <div class="clear"></div>
     <div class="left_body">
-      <p class="ch_sub_title"><span>9x9提供您一個可以自訂的品牌目錄，讓您能夠將所擁有的頻道與頻道網收錄在您自有的目錄中，並被觀眾在9x9.tv瀏覽目錄時看到</span></p>
+      <p class="ch_sub_title"><span><spring:message code="cms.directory_management.msg.directory_explanation"/></span></p>
       <p>
-        <button id="btn_delete_directory">刪除目錄</button>
-        <button id="btn_create_directory">創建目錄</button>
-        <button id="btn_rename_directory">重新命名</button>
+        <button id="btn_delete_directory"><spring:message code="cms.directory_management.button.delete_directory"/></button>
+        <button id="btn_create_directory"><spring:message code="cms.directory_management.button.create_directory"/></button>
+        <button id="btn_rename_directory"><spring:message code="cms.directory_management.button.rename_directory"/></button>
       </p>
-      <div class="directoryList" id="treeview"><!--
-        <ul>
-          <li id="root" rel="folder">
-            <a href="javascript:">大愛電視目錄</a>
-            <ul>
-              <li id="ch1" rel="file">
-                <a href="javascript:">大愛醫生館</a>
-              </li>
-              <li id="ch2">
-                <a href="javascript:">大愛劇場</a>
-                <ul>
-                  <li rel="set">
-                    <a href="javascript:">芳草碧連天</a>
-                  </li>
-                  <li>
-                    <a href="javascript:">有情飲水飽</a>
-                  </li>
-                </ul>
-              </li>
-            </ul>
-          </li>
-        </ul>-->
-      </div>
+      <div class="directoryList" id="treeview"></div>
     </div>
     <div class="left_footer"></div>
   </div>
   <div class="right_content floatL">
     <div class="right_body">
-      <div class="right_title">頻道網與頻道庫</div>
+      <div class="right_title"><spring:message code="cms.directory_management.title.channel_and_set_pool"/></div>
       <div class="ch_pool">
-        <p class="ch_sub_title"><span>系統會自動將您所建立的頻道與頻道套餐收錄至您的根目錄中，您可以在左側新增子目錄後，自行拖曳頻道或頻道套餐，重新進行編排</span></p>
+        <p class="ch_sub_title"><span><spring:message code="cms.directory_management.channel_and_set_ecplanation"/></span></p>
         <div class="directoryChList jstree-drop">
-          <ul class="directory_ch" id="directory_list_ul">
-            <!--
-            <li class="ch_normal">
-              <img alt="" src="/images/cms/ch_img.jpg"/>
-              <p class="ch_name">頻道名稱名...</p>
-            </li>
-            <li class="ch_normal">
-              <img alt="" src="/images/cms/ch_img.jpg"/>
-              <p class="ch_name">頻道名稱名...</p>
-            </li>
-            <li class="ch_normal">
-              <img alt="" src="/images/cms/ch_img.jpg"/>
-              <p class="ch_name">頻道名稱名...</p>
-            </li>
-            <li class="ch_normal">
-              <img alt="" src="/images/cms/ch_img.jpg"/>
-              <p class="ch_name">頻道名稱名...</p>
-            </li>
-            <li class="ch_normal">
-              <img alt="" src="/images/cms/ch_img.jpg"/>
-              <p class="ch_name">頻道名稱名...</p>
-            </li>
-            <li class="ch_normal">
-              <img alt="" src="/images/cms/ch_img.jpg"/>
-              <p class="ch_name">頻道名稱名...</p>
-            </li>
-            <li class="ch_normal">
-              <img alt="" src="/images/cms/ch_img.jpg"/>
-              <p class="ch_name">頻道名稱名...</p>
-            </li>
-            <li class="ch_normal">
-              <img alt="" src="/images/cms/ch_img.jpg"/>
-              <p class="ch_name">頻道名稱名...</p>
-            </li>
-            <li class="ch_normal">
-              <img alt="" src="/images/cms/ch_img.jpg"/>
-              <p class="ch_name">頻道名稱名...</p>
-            </li>
-            <li class="ch_normal">
-              <img alt="" src="/images/cms/ch_img.jpg"/>
-              <p class="ch_name">頻道名稱名...</p>
-            </li>
-            <li class="ch_normal">
-              <img alt="" src="/images/cms/ch_img.jpg"/>
-              <p class="ch_name">頻道名稱名...</p>
-            </li>
-            <li class="ch_normal">
-              <img alt="" src="/images/cms/ch_img.jpg"/>
-              <p class="ch_name">頻道名稱名...</p>
-            </li>
-            <li class="ch_normal">
-              <img alt="" src="/images/cms/ch_img.jpg"/>
-              <p class="ch_name">頻道名稱名...</p>
-            </li>
-            <li class="ch_normal">
-              <img alt="" src="/images/cms/ch_img.jpg"/>
-              <p class="ch_name">頻道名稱名...</p>
-            </li>
-            <li class="ch_normal">
-              <img alt="" src="/images/cms/ch_img.jpg"/>
-              <p class="ch_name">頻道名稱名...</p>
-            </li>
-            <li class="ch_normal">
-              <img alt="" src="/images/cms/ch_img.jpg"/>
-              <p class="ch_name">頻道名稱名...</p>
-            </li>
-            <li class="ch_normal">
-              <img alt="" src="/images/cms/ch_img.jpg"/>
-              <p class="ch_name">頻道名稱名...</p>
-            </li>
-            <li class="ch_normal">
-              <img alt="" src="/images/cms/ch_img.jpg"/>
-              <p class="ch_name">頻道名稱名...</p>
-            </li>
-            <li class="ch_normal">
-              <img alt="" src="/images/cms/ch_img.jpg"/>
-              <p class="ch_name">頻道名稱名...</p>
-            </li>
-            <li class="ch_normal">
-              <img alt="" src="/images/cms/ch_img.jpg"/>
-              <p class="ch_name">頻道名稱名...</p>
-            </li>
-            <li class="ch_normal">
-              <img alt="" src="/images/cms/ch_img.jpg"/>
-              <p class="ch_name">頻道名稱名...</p>
-            </li>
-            <div style="clear:both"/>
-            -->
-          </ul>
+          <ul class="directory_ch" id="directory_list_ul"></ul>
         </div>
       </div>
     </div>
@@ -183,5 +73,10 @@
 <label class="lang" id="lang_label_program_count"><spring:message code="cms.directory_management.label.program_count"/></label>
 <label class="lang" id="lang_label_update_time"><spring:message code="cms.directory_management.label.update_time"/></label>
 <label class="lang" id="lang_label_channel_set"><spring:message code="cms.directory_management.label.channel_set"/></label>
+<label class="lang" id="lang_warning_error_occurs"><spring:message code="cms.warning.error_occurs"/></label>
+<label class="lang" id="lang_warning_you_must_select_directory"><spring:message code="cms.warning.you_must_select_directory"/></label>
+<label class="lang" id="lang_warning_cannot_drag_directory"><spring:message code="cms.warning.cannot_drag_root_directory"/></label>
+<label class="lang" id="lang_warning_cannot_remove_root"><spring:message code="cms.warning.cannot_remove_root_directory"/></label>
+<label class="lang" id="lang_confirm_remove_directory"><spring:message code="cms.warning.are_you_sure_to_remove_directory"/></label>
 </body>
 </html>

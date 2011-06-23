@@ -321,7 +321,7 @@ var programDetail =
         button_image_url:   '/images/cms/btn_upload.png',
         button_width:       '95',
         button_height:      '32',
-        button_text:        '從硬碟',
+        button_text:        $('#lang_button_from_disk').text(),
         button_cursor:      SWFUpload.CURSOR.HAND,
         button_window_mode : SWFUpload.WINDOW_MODE.TRANSPARENT,
         debug:              false,
@@ -632,7 +632,7 @@ var channelDetail =
     
     $.getJSON('/CMSAPI/systemCategories', function(categories)
     {
-      $('#channel_import_detail .sys_directory').html('<option value="0">請選擇分類</option>');
+      $('#channel_import_detail .sys_directory').html('<option value="0">' + $('#lang_select_category').text() + '</option>');
       for (i in categories)
       {
         $('<option></option>')

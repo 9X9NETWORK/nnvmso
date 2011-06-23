@@ -16,7 +16,7 @@
 <script type="text/javascript" src="http://www.netgrow.com.au/assets/files/jquery_plugins/jquery.dump.js"></script>
 <script type="text/javascript" src="/javascripts/cms/common.js"></script>
 <script type="text/javascript" src="/javascripts/cms/statistics.js"></script>
-<title>統計數據</title>
+<title><spring:message code="cms.statistics.title"/></title>
 </head>
 <body>
 <div class="header">
@@ -41,19 +41,19 @@
     <div class="clear"></div>
     <div class="left_body">
       <div class="createChList2">
-        <div class="left_title">頻道網清單</div>
+        <div class="left_title"><spring:message code="cms.statistics.title.channel_set_list"/></div>
         <ul class="chList" id="channel_set_list_ul">
         </ul>
-        <div class="left_title">頻道清單</div>
+        <div class="left_title"><spring:message code="cms.statistics.title.channel_list"/></div>
         <ul class="chList" id="channel_list_ul">
           <li style="display:none">
             <div class="chUnFocus channel_info_block" id="channel_info_block">
-              <div class="chUnFocusTitle channel_info_title"><div>小灰熊的大愛劇場</div></div>
+              <div class="chUnFocusTitle channel_info_title"><div>Title Title Title</div></div>
               <div class="chUnFocusImg channel_info_image"></div>
               <div class="floatL chInfo">
                 <a href="#" target="_player" class="floatL channel_info_promoteurl">http://www.9x9.tv/channel/3958</a>
                 <a class="floatL channel_info_addthis"><img src="http://cache.addthiscdn.com/icons/v1/thumbs/addthis.gif"/></a>
-                <a href="#" class="iconStatistics" title="觀看數據"></a>
+                <a href="javascript:" class="iconStatistics" title=""></a>
                 <div class="clear"></div>
                 <div class="floatL">
                   <p class="channel_info_contenttype"><spring:message code="cms.channel_management.label.channel_type"/> : <span>9x9</span></p>
@@ -75,84 +75,84 @@
   <div class="right_content floatL">
     <div class="right_body">
       <div class="set_stastics" style="display:none" id="channel_set_statistics"><!--set stastics-->
-        <div class="right_title"><div>大愛電視頻道網 - 套餐數據</div></div>
+        <div class="right_title"><div>Title Title Title</div></div>
         <div class="stastics_title">
-          <div>連續觀看15秒即算一次有效收看次數</div>
-          <div class="datePick">請選擇時間區間&nbsp;<input id="set_pickdate" type="text"/><!-- <a href="#"><img alt="" src="/images/cms/icon_calendar.png"/></a> --></div>
+          <div><spring:message code="cms.statistics.msg.effective_watch"/></div>
+          <div class="datePick"><spring:message code="cms.statistics.label.please_select_time_range"/>&nbsp;<input id="set_pickdate" type="text"/></div>
           <div class="clear"></div>
         </div>
         <div class="stastics_chart">
           <select name="">
-            <option>累計收看次數</option>
-            <option>每次平均觀看次數</option>
-            <option>訂閱戶數</option>
-            <option>每次平均停留時間</option>
-            <option>回訪率</option>
+            <option><spring:message code="cms.statistics.label.accumulated_watch_times"/></option>
+            <option><spring:message code="cms.statistics.label.average_watch_times_each"/></option>
+            <option><spring:message code="cms.statistics.label.subscription_count"/></option>
+            <option><spring:message code="cms.statistics.label.average_elapsed_time"/></option>
+            <option><spring:message code="cms.statistics.label.returning_rate"/></option>
           </select>
-          <img alt="數據圖表" src="/images/cms/img_stastics.png"/>
+          <img alt="" src="/images/cms/img_stastics.png"/>
         </div>
         <table border="0" cellpadding="0" cellspacing="0" class="stastics_list">
           <tr>
             <td>1,057,201</td>
-            <td><a href="javascript:">累計收看次數</a></td>
+            <td><a href="javascript:"><spring:message code="cms.statistics.label.accumulated_watch_times"/></a></td>
             <td>00:03:21</td>
-            <td><a href="javascript:">每次平均停留時間</a></td>
+            <td><a href="javascript:"><spring:message code="cms.statistics.label.average_elapsed_time"/></a></td>
           </tr>
           <tr>
             <td>3</td>
-            <td><a href="javascript:">每次平均觀看次數</a></td>
+            <td><a href="javascript:"><spring:message code="cms.statistics.label.average_watch_times_each"/></a></td>
             <td>20%</td>
-            <td><a href="javascript:">回訪率</a></td>
+            <td><a href="javascript:"><spring:message code="cms.statistics.label.returning_rate"/></a></td>
           </tr>
           <tr>
             <td id="set_subscription_count">13,596</td>
-            <td><a href="javascript:">訂閱戶數</a></td>
+            <td><a href="javascript:"><spring:message code="cms.statistics.label.subscription_count"/></a></td>
             <td>&nbsp;</td>
             <td>&nbsp;</td>
           </tr>
         </table>
       </div>
       <div class="ch_stastics" id="channel_statistics" style="display:none"><!--channel stastics-->
-        <div class="right_title"><div>小灰熊的大愛劇場</div></div>
+        <div class="right_title"><div>Title Title Title</div></div>
         <div class="stasticTab">
           <ul>
-            <li id="stasticTabA" class="tab_focus"><a href="javascript:"">頻道數據</a></li>
-            <li id="stasticTabB" class="tab_unfocus"><a href="javascript:">節目數據</a></li>
+            <li id="stasticTabA" class="tab_focus"><a href="javascript:""><spring:message code="cms.statistics.label.channel_statistics"/></a></li>
+            <li id="stasticTabB" class="tab_unfocus"><a href="javascript:"><spring:message code="cms.statistics.label.program_statistics"/></a></li>
             <div class="clear"></div>
           </ul>
         </div>
         <div class="ch_stastics" id="ch_stastics">
           <div class="stastics_title">
-            <div>連續觀看15秒即算一次有效收看次數</div>
-            <div class="datePick">請選擇時間區間&nbsp;<input type="text"/><!-- <a href="#"><img alt="" src="/images/cms/icon_calendar.png"/></a> --></div>
+            <div><spring:message code="cms.statistics.msg.effective_watch"/></div>
+            <div class="datePick"><spring:message code="cms.statistics.label.please_select_time_range"/>&nbsp;<input type="text"/></div>
             <div class="clear"></div>
           </div>
           <div class="stastics_chart">
             <select name="">
-              <option>累計收看次數</option>
-              <option>每次平均觀看次數</option>
-              <option>訂閱戶數</option>
-              <option>每次平均停留時間</option>
-              <option>回訪率</option>
+              <option><spring:message code="cms.statistics.label.accumulated_watch_times"/></option>
+              <option><spring:message code="cms.statistics.label.average_watch_times_each"/></option>
+              <option><spring:message code="cms.statistics.label.subscription_count"/></option>
+              <option><spring:message code="cms.statistics.label.average_elapsed_time"/></option>
+              <option><spring:message code="cms.statistics.label.returning_rate"/></option>
             </select>
-            <img alt="數據圖表" src="/images/cms/img_stastics.png"/>
+            <img alt="" src="/images/cms/img_stastics.png"/>
           </div>
           <table border="0" cellpadding="0" cellspacing="0" class="stastics_list">
             <tr>
               <td>1,057,201</td>
-              <td><a href="javascript:">累計收看次數</a></td>
+              <td><a href="javascript:"><spring:message code="cms.statistics.label.accumulated_watch_times"/></a></td>
               <td>00:03:21</td>
-              <td><a href="javascript:">每次平均停留時間</a></td>
+              <td><a href="javascript:"><spring:message code="cms.statistics.label.average_elapsed_time"/></a></td>
             </tr>
             <tr>
               <td>3</td>
-              <td><a href="javascript:">每次平均觀看次數</a></td>
+              <td><a href="javascript:"><spring:message code="cms.statistics.label.average_watch_times_each"/></a></td>
               <td>20%</td>
-              <td><a href="javascript:">回訪率</a></td>
+              <td><a href="javascript:"><spring:message code="cms.statistics.label.returning_rate"/></a></td>
             </tr>
             <tr>
               <td id="ch_subscription_count">13,596</td>
-              <td><a href="javascript:">訂閱戶數</a></td>
+              <td><a href="javascript:"><spring:message code="cms.statistics.label.subscription_count"/></a></td>
               <td>&nbsp;</td>
               <td>&nbsp;</td>
             </tr>
@@ -160,33 +160,31 @@
         </div>
         <div class="ep_stastics" id="ep_stastics" style="display:none">
           <div class="stastics_title">
-            <div>連續觀看15秒即算一次有效收看次數</div>
-            <div class="datePick">請選擇時間區間&nbsp;<input type="text"/><!-- <a href="#"><img alt="" src="/images/cms/icon_calendar.png"/></a> --></div>
+            <div><spring:message code="cms.statistics.msg.effective_watch"/></div>
+            <div class="datePick"><spring:message code="cms.statistics.label.please_select_time_range"/>&nbsp;<input type="text"/></div>
             <div class="clear"></div>
           </div>
           <div class="stastics_chart">
             <select id="ep_selector">
-              <option>請選擇節目</option>
-              <option>小灰熊的大愛劇場1</option>
-              <option>小灰熊的大愛劇場2</option>
+              <option><spring:message code="cms.statistics.lable.please_select_program"/></option>
             </select>&nbsp;&nbsp;&nbsp;
             <select name="">
-              <option>累計收看次數</option>
-              <option>分享次數</option>
-              <option>每次平均收看時間</option>
+              <option><spring:message code="cms.statistics.label.accumulated_watch_times"/></option>
+              <option><spring:message code="cms.statistics.label.shared_times"/></option>
+              <option><spring:message code="cms.statistics.label.average_watch_time_each"/></option>
             </select>
-            <img alt="數據圖表" src="/images/cms/img_stastics.png"/>
+            <img alt="" src="/images/cms/img_stastics.png"/>
           </div>
           <table border="0" cellpadding="0" cellspacing="0" class="stastics_list">
             <tr>
               <td>1,057,201</td>
-              <td><a href="javascript:">累計收看次數</a></td>
+              <td><a href="javascript:"><spring:message code="cms.statistics.label.accumulated_watch_times"/></a></td>
               <td id="ep_share_count">3</td>
-              <td><a href="javascript:">分享次數</a></td>
+              <td><a href="javascript:"><spring:message code="cms.statistics.label.shared_times"/></a></td>
             </tr>
             <tr>
               <td>00:03:21</td>
-              <td><a href="javascript:">每次平均收看時間</a></td>
+              <td><a href="javascript:"><spring:message code="cms.statistics.label.average_watch_time_each"/></a></td>
               <td></td>
               <td></td>
             </tr>
@@ -198,9 +196,9 @@
   </div>
   <div class="clear"></div>
 </div>
-<label class="lang" id="lang_view_statistics"><spring:message code="cms.channel_management.msg.view_statistics"/></label>
-<label class="lang" id="lang_label_channel_set">頻道網</label>
-<label class="lang" id="lang_title_set_statistics">套餐數據</label>
-<label class="lang" id="lang_label_please_select_program">請選擇節目</label>
+<label class="lang" id="lang_view_statistics"><spring:message code="cms.statistics.msg.view_statistics"/></label>
+<label class="lang" id="lang_label_channel_set"><spring:message code="cms.statistics.label.channel_set"/></label>
+<label class="lang" id="lang_title_set_statistics"><spring:message code="cms.statistics.title.channel_set_statistics"/></label>
+<label class="lang" id="lang_label_please_select_program"><spring:message code="cms.statistics.lable.please_select_program"/></label>
 </body>
 </html>

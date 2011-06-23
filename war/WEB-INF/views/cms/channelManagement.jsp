@@ -598,5 +598,6 @@
 <label class="lang" id="lang_confirm_leaving_program_creation"><spring:message code="cms.warning.confirm_leaving_program_creation"/></label>
 <label class="lang" id="lang_warning_import_channel_source"><spring:message code="cms.warning.import_channel_source"/></label>
 <label class="lang" id="lang_channel_source_is_wrong"><spring:message code="cms.warning.channel_source_is_wrong"/></label>
+<label class="lang" id="lang_button_from_disk">從硬碟</label>
 </body>
 </html>

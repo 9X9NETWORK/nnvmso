@@ -6,13 +6,11 @@ var draggableProperties =
 {
   'start': function()
   {
-    //$('.ch_exist').RemoveBubblePopup();
     $('.ch_normal').RemoveBubblePopup();
   },
   'stop': function()
   {
     channelAndSetPool.initBubbles();
-    //channelPool.manageControls();
   },
   'appendTo': '#directory_list_ul',
   'disabled': false,
@@ -30,7 +28,7 @@ var populateBubbleChannelSetContent = function(channelSet)
   var h2 = $('<h2 class="popTitle"></h2>').text('[' + label_channel_set + ']' + channelSet.name).textTruncate(20, '...').appendTo(span);
   
   var innerHtml = span.html();
-  innerHtml += '<br/>' + label_update_time + ' ：' + formatDate(channelSet.updateDate);
+  innerHtml += '<br/>' + label_update_time + ' : ' + formatDate(channelSet.updateDate);
   
   return innerHtml;
 }
@@ -43,8 +41,8 @@ var populateBubbleChannelContent = function(channel)
   var h2 = $('<h2 class="popTitle"></h2>').text(channel.name).textTruncate(20, '...').appendTo(span);
   
   var innerHtml = span.html();
-  innerHtml += '<br/>' + label_program_count + ' ：' + channel.programCount;
-  innerHtml += '<br/>' + label_update_time + ' ：' + formatDate(channel.updateDate);
+  innerHtml += '<br/>' + label_program_count + ' : ' + channel.programCount;
+  innerHtml += '<br/>' + label_update_time + ' : ' + formatDate(channel.updateDate);
   
   return innerHtml;
 }
@@ -53,8 +51,6 @@ var loadCategoryChannelsAndChannelSets = function(categoryId) {
   // load channels
   $.get('/CMSAPI/listCategoryChannels?categoryId=' + categoryId, function(channels)
   {
-    //var steal = $('#treeview').bind('create.jstree');
-    //$('#treeview').unbind('create.jstree');
     for (i in channels)
     {
       var channelId = channels[i].key.id;
@@ -70,16 +66,12 @@ var loadCategoryChannelsAndChannelSets = function(categoryId) {
         .removeClass('ch_normal')
         .removeClass('jstree-draggable')
         .addClass('ch_disable')
-        //.draggable('disable')
         .RemoveBubblePopup();
     }
-    //$('#treeview').bind('create.jstree', steal);
   }, 'json');
   // load channel sets
   $.get('/CMSAPI/listCategoryChannelSets?categoryId=' + categoryId, function(channelSets)
   {
-    //var steal = $('#treeview').bind('create.jstree');
-    //$('#treeview').unbind('create.jstree');
     for (i in channelSets)
     {
       var channelSetId = channelSets[i].key.id;
@@ -95,10 +87,8 @@ var loadCategoryChannelsAndChannelSets = function(categoryId) {
         .removeClass('ch_normal')
         .removeClass('jstree-draggable')
         .addClass('ch_disable')
-        //.draggable('disable')
         .RemoveBubblePopup();
     }
-    //$('#treeview').bind('create.jstree', steal);
   }, 'json');
 };
 
@@ -109,7 +99,7 @@ var composeCategoryTreeData = function(categories, all)
   for (var i = 0; i < categories.length; i++)
   {
     var categoryId = categories[i].key.id;
-    var item = $('<li/>').attr('rel', 'folder').attr('id', categoryId);//.addClass('jstree-drop');
+    var item = $('<li/>').attr('rel', 'folder').attr('id', categoryId);
     var a = $('<a/>').attr('href', 'javascript:').text(categories[i].name);
     item.append(a);
     var sub = [];
@@ -124,8 +114,6 @@ var composeCategoryTreeData = function(categories, all)
     {
       item.append(composeCategoryTreeData(sub, all));
     }
-    //loadCategoryChannelSets(categoryId);
-    //loadCategoryChannels(categoryId);
     loadCategoryChannelsAndChannelSets(categoryId);
     ul.append(item);
   }
@@ -141,21 +129,22 @@ var directoryArea =
     {
       var selected = $('#treeview').jstree('get_selected');
       if ($(selected).attr('rel') != 'folder') {
-        alert('你必須選擇一個目錄');
+        alert($('#lang_warning_you_must_select_directory').text());
         return;
       } else if ($(selected).parent().parent().attr('id') == 'treeview') {
-        alert('根目錄將無法被移除');
+        alert($('#lang_warning_cannot_remove_root').text());
         return;
       }
       var categoryId = $(selected).attr('id');
       var categoryName = $(selected).find('> a').text();
-      if (confirm('你確定要移除目錄 "'+categoryName+'" 所有的子目錄也會一併被移除') == false) {
+      var confirmMessage = $('#lang_confirm_remove_directory').text();
+      if (confirm(confirmMessage.replace('{categoryName}', categoryName)) == false) {
         return;
       }
       $.get('/CMSAPI/removeCategory?categoryId=' + categoryId, function(response)
       {
         if (response != 'OK') {
-          alert('發生錯誤');
+          alert($('#lang_warning_error_occurs').text());
           return;
         }
         $('#treeview').jstree('remove', selected);
@@ -165,7 +154,7 @@ var directoryArea =
     {
       var selected = $('#treeview').jstree('get_selected');
       if ($(selected).attr('rel') != 'folder') {
-        alert('你必須選擇一個目錄');
+        alert($('#lang_warning_you_must_select_directory').text());
         return;
       }
       var name = new Date().getTime().toString();
@@ -176,9 +165,8 @@ var directoryArea =
       };
       $.post('/CMSAPI/createCategory', parameters, function(categoryId)
       {
-        //alert(categoryId);
         if (!categoryId.toString().match(/^[0-9]+$/) || categoryId == 0) {
-          alert('發生錯誤');
+          alert($('#lang_warning_error_occurs').text());
           return;
         }
         $('#treeview').jstree('create', selected, 'first', {
@@ -196,12 +184,10 @@ var directoryArea =
     {
       var selected = $('#treeview').jstree('get_selected');
       if ($(selected).attr('rel') != 'folder') {
-        alert('你必須選擇一個目錄');
+        alert($('#lang_warning_you_must_select_directory').text());
         return;
       }
       $('#treeview').jstree('rename');
-      //alert($(selected).html());
-      //alert('rename directory');
     });
     $.get('/CMSAPI/listCategories?msoId=' + $('#msoId').val(), function(categories)
     {
@@ -214,7 +200,6 @@ var directoryArea =
         }
       }
       var treeData = composeCategoryTreeData(root, categories);
-      //alert(treeData);
       $('#treeview').jstree({
         'dnd': {
           'drop_finish': function(data)
@@ -234,22 +219,20 @@ var directoryArea =
               url = '/CMSAPI/removeCategoryChannelSet';
               parameters['channelSetId'] = objectId;
             } else {
-              alert('拖拽目錄無效');
+              alert($('#lang_warning_cannot_drag_directory').text());
               return;
             }
             $.post(url, parameters, function(response)
             {
               if (response != 'OK') {
-                alert('發生錯誤');
+                alert($('#lang_warning_error_occurs').text());
                 return;
               }
-              //alert('Qoo');
               $('#treeview').jstree('remove', data.o);
               var ch = $('.ch_disable input[name="id"][value="'+objectId+'"]')
                          .parent()
                          .removeClass('ch_disable')
                          .addClass('ch_normal')
-                         //.draggable('enable')
                          .addClass('jstree-draggable');
               bubblePopupProperties['innerHtml'] = ch.find('span').html();
               ch.CreateBubblePopup(bubblePopupProperties);
@@ -279,7 +262,7 @@ var directoryArea =
             $.post(url, parameters, function(response)
             {
               if (response != 'OK') {
-                alert('發生錯誤');
+                alert($('#lang_warning_error_occurs').text());
                 return;
               }
               $(data.r).find('ul > li[rel!="folder"]').remove();
@@ -354,7 +337,6 @@ var directoryArea =
       {
         var selected = $('#treeview').jstree('get_selected');
         var categoryId = $(selected).attr('id');
-        //alert(categoryId);
         var newName = data.rslt.new_name;
         var oldName = data.rslt.old_name;
         if (newName != oldName)
@@ -366,13 +348,12 @@ var directoryArea =
           $.post('/CMSAPI/renameCategory', parameter, function(response)
           {
             if (response != 'OK')
-              alert('發生錯誤');
+              alert($('#lang_warning_error_occurs').text());
           }, 'text');
         }
       });
       $('#treeview').bind('create.jstree', function(event, data)
       {
-        //alert(data.rslt.obj.attr('rel'));
         if (data.rslt.obj.attr('rel') != 'folder') {
           return;
         }
@@ -385,7 +366,7 @@ var directoryArea =
         $.post('/CMSAPI/renameCategory', parameter, function(response)
         {
           if (response != 'OK')
-            alert('發生錯誤');
+            alert($('#lang_warning_error_occurs').text());
         }, 'text');
       });
       $('#treeview').bind('move_node.jstree', function(event, data)
@@ -415,7 +396,7 @@ var directoryArea =
         $.post(url, parameters, function(response)
         {
           if (response != 'OK') {
-            alert('發生錯誤');
+            alert($('#lang_warning_error_occurs').text());
           }
         }, 'text');
         
@@ -456,7 +437,6 @@ var channelAndSetPool =
         {
           $(this).css('z-index', 1);
         });
-        //item.draggable(draggableProperties);
         
       }
       
@@ -478,7 +458,6 @@ var channelAndSetPool =
           {
             $(this).css('z-index', 1);
           });
-          //item.draggable(draggableProperties);
         }
         $('#directory_list_ul').append('<div style="clear:both"/>');
         channelAndSetPool.initBubbles();

@@ -322,13 +322,14 @@ $(function()
 {
   $('.pro_check').click(function()
   {
-    if (confirm($(this).text() + ' 帳號尚未開通，要前往設定頁面開通？') == true) {
+    var confirmMessage = $('#lang_confirm_goto_setting_page').text();
+    if (confirm(confirmMessage.replace('{sns}', $(this).text())) == true) {
       $('#setup').click();
     }
   });
   $('#9x9_rss_tutorial').click(function()
   {
-    alert('9x9 Video RSS 使用教學還沒被提拱');
+    alert('9x9 rss feed was not provided');
   });
   $('.promoteInfo').hover(function()
   {
