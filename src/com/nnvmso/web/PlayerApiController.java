@@ -729,7 +729,7 @@ public class PlayerApiController {
 	
 	/* ==========  CATEGORY: IPG RELATED ========== */
 	/**
-	 * Save User IPG (snapshot)
+	 * @deprecated Save User IPG (snapshot). Please use saveShare instead
 	 *
 	 * @param user user's unique identifier
 	 * @param channel channel id
@@ -801,7 +801,7 @@ public class PlayerApiController {
 	}
 	
 	/**
-	 * Load User IPG (snapshot)
+	 * @deprecated Load User IPG (snapshot). Please use saveShare and loadShare instead
 	 *
 	 * @param ipg IPG's unique identifier
 	 * @return  Returns a program to play follows ipg information.
