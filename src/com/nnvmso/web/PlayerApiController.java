@@ -604,7 +604,7 @@ public class PlayerApiController {
 	 *         <br/>
 	 *         status: STATUS_SUCCESS = 0; STATUS_ERROR = 1;
 	 *         <br/> 
-	 *         contentType: SYSTEM_CHANNEL=1; PODCAST=2; YOUTUBE_CHANNEL=3; YOUTUBE_PLAYERLIST=4 FACEBOOK_CHANNEL=5
+	 *         contentType: SYSTEM_CHANNEL=1; PODCAST=2; YOUTUBE_CHANNEL=3; YOUTUBE_PLAYERLIST=4 FACEBOOK_CHANNEL=5 MIX_CHANNEL=6
 	 *         <br/>
 	 *         channel episodes last update time: it does not always accurate on Youtube channels. It will pass channel create date on FB channels.
 	 *         <p> 
