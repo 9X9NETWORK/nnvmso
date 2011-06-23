@@ -7,7 +7,9 @@ public class NnStatusCode {
 	public static final int INFO = 1;
 	public static final int WARNING = 2;
 	public static final int FATAL = 3;
-	public static final int ERROR = 4;	
+	public static final int ERROR = 4;
+	
+	public static final int API_DEPRECATED = 50;
 	
 	//100 input error
 	public static final int INPUT_ERROR = 100;
