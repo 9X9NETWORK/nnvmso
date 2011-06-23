@@ -229,28 +229,7 @@ public class PlayerApiService {
 	}
 	
 	public String saveIpg(String userToken, String channelId, String programId) {
-		if (userToken == null || userToken.length() == 0 || userToken.equals("undefined") ||
-			channelId == null || programId == null || channelId.length() == 0 || programId.length() == 0) {
-			return NnStatusMsg.inputMissing(locale);
-		}				
-		if (!Pattern.matches("^\\d*$", channelId)) {
-			return NnStatusMsg.inputError(locale);
-		}
-				
-		NnUser foundUser = userMngr.findByToken(userToken);				
-		if (foundUser == null) { return NnStatusMsg.userInvalid(locale);}
-
-		Ipg ipg = new Ipg();
-		ipg.setChannelId(Long.parseLong(channelId));
-		if (Pattern.matches("^\\d*$", programId)) {
-			ipg.setProgramId(Long.parseLong(programId));
-		} else {
-			ipg.setProgramIdStr(programId);
-		}
-		ipg.setUserId(foundUser.getKey().getId());
-		IpgManager ipgMngr = new IpgManager();
-		ipgMngr.create(ipg, foundUser.getKey().getId());				
-		return NnStatusMsg.successStr(locale) + separatorStr + Long.toString(ipg.getId());				
+		return NnStatusCode.API_DEPRECATED + "\t" + "Depreacated";		
 	}
 
 	public String saveShare(String userToken, String channelId, String programId, String setId) {
@@ -308,31 +287,7 @@ public class PlayerApiService {
 	}
 	
 	public String loadIpg(long ipgId) {
-		IpgManager ipgMngr = new IpgManager();
-		Ipg ipg = ipgMngr.findById(ipgId);
-		if (ipg == null) { return messageSource.getMessage("nnstatus.ipg_invalid", new Object[] {NnStatusCode.IPG_INVALID} , locale);} 
-		List<MsoChannel> channels = ipgMngr.findIpgChannels(ipg);
-		//first block: status
-		String status = NnStatusMsg.successStr(locale);
-		//second block: episode information
-		String toPlay = separatorStr;
-		MsoProgramManager programMngr = new MsoProgramManager();
-		MsoProgram program = programMngr.findById(ipg.getProgramId());
-		if (program != null) {
-			List<MsoProgram> programs = new ArrayList<MsoProgram>();
-			programs.add(program);
-			MsoConfig config = new MsoConfigManager().findByMsoIdAndItem(mso.getKey().getId(), MsoConfig.CDN);
-			toPlay = toPlay + this.composeProgramInfoStr(programs, config);
-		} else {
-			toPlay = toPlay + ipg.getChannelId() + "\t" + ipg.getProgramIdStr() + "\n";			
-		}
-		String channelLineup = separatorStr;
-		//third block: channelLineup 
-		for (MsoChannel c : channels) {
-			channelLineup = channelLineup + this.composeChannelLineupStr(c, mso);
-			channelLineup = channelLineup + "\n";			
-		}
-		return status + toPlay + channelLineup;
+		return NnStatusCode.API_DEPRECATED + "\t" + "Depreacated";		
 	}
 	
 	public String moveChannel(String userToken, String grid1, String grid2) {		
