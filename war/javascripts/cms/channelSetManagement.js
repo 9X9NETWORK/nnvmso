@@ -16,11 +16,94 @@ var draggableProperties =
     },
     'appendTo': '#channel_set_area ul',
     'disabled': false,
-    'opacity':  0.5,
+    'opacity':  0.6,
     'helper':   "clone",
     'scroll':   false,
-    'revert':   'invalid'
+    'revert':   'invalid',
+    'zIndex':   2700
   };
+
+var droppableProperties =
+{
+  accept: 'li',
+  hoverClass: 'ch_drag',
+  drop: function(event, ui)
+  {
+    var from = $(ui.draggable).index('#channel_set_area li.ch_none') + 1;
+    var to = $(event.target).index('#channel_set_area li.ch_none') + 1;
+    if (from > 0) {
+      var parameters = {
+        'channelSetId': $('#cc_id').val(),
+        'from':         from,
+        'to':           to
+      };
+      $.post('/CMSAPI/changeChannelSetChannel', parameters, function(response)
+      {
+        if (response != 'OK') {
+          alert($('#lang_warning_error_occurs').text());
+          channelSetArea.reload();
+          return;
+        }
+        var dragObj = $(ui.draggable);
+        var dropObj = $(event.target);
+        var dragCloned = $(ui.draggable).clone();
+        var dropCloned = $(event.target).clone();
+        dragObj.draggable('disable').html('').removeClass('ch_exist').RemoveBubblePopup();
+        
+        dropObj.draggable(draggableProperties).html(dragCloned.html()).addClass('ch_exist');
+        bubblePopupProperties['innerHtml'] = $(dropObj).find('span').html();
+        $(dropObj).CreateBubblePopup(bubblePopupProperties);
+        
+        if (dropCloned.hasClass('ch_exist')) {
+          dragObj.draggable(draggableProperties).html(dropCloned.html()).addClass('ch_exist');
+          bubblePopupProperties['innerHtml'] = $(dragObj).find('span').html();
+          $(dragObj).CreateBubblePopup(bubblePopupProperties);
+        }
+      });
+    } else {
+      var channelId = $(ui.draggable).find('input[name="channelId"]').val();
+      var parameters = {
+        'channelSetId': $('#cc_id').val(),
+        'channelId':    channelId,
+        'seq':          to
+      }
+      $.post('/CMSAPI/addChannelSetChannel', parameters, function(response)
+      {
+        if (response != 'OK') {
+          alert($('#lang_warning_error_occurs').text());
+          channelSetArea.reload();
+          return;
+        }
+        var dragObj = $(ui.draggable);
+        var dropObj = $(event.target);
+        if (dropObj.hasClass('ch_exist')) {
+          var channelId = dropObj.find('input[name="channelId"]').val();
+          var channelPoolItem = $('li.ch_disable input[name="channelId"][value="'+channelId+'"]').parent();
+          bubblePopupProperties['innerHtml'] = channelPoolItem.find('span').html();
+          channelPoolItem.removeClass('ch_disable');
+          channelPoolItem.addClass('ch_normal');
+          channelPoolItem.draggable({ disabled: false });
+          channelPoolItem.CreateBubblePopup(bubblePopupProperties);
+          channelSetArea.channelIds = $.grep(channelSetArea.channelIds, function(value) { return value != channelId });
+          dropObj.html('');
+        }
+        var channelId = dragObj.find('input[name="channelId"]').val();
+        bubblePopupProperties['innerHtml'] = dragObj.find('span').html();
+        dropObj.addClass('ch_exist')
+          .append(dragObj.find('img').clone())
+          .append(dragObj.find('input[name="channelId"]').clone())
+          .append(dragObj.find('span').clone())
+          .draggable(draggableProperties)
+          .CreateBubblePopup(bubblePopupProperties);
+        channelSetArea.channelIds.push(channelId);
+        $(dragObj).addClass('ch_disable')
+          .removeClass('ch_normal')
+          .draggable({ disabled: true })
+          .RemoveBubblePopup();
+      });
+    }
+  }
+};
 
 var populateBubbleContent = function(channel)
 {
@@ -119,14 +202,32 @@ var channelPool =
         $('#slidesContainer').droppable(
           {
             'accept': '.ch_exist',
+            'hoverClass': 'ch_drag',
             'drop': function(event, ui)
             {
-              var seq = $(ui.draggable).index('#channel_set_area li.ch_none') + 1;
+              var dragObj = $(ui.draggable);
+              var seq = dragObj.index('#channel_set_area li.ch_none') + 1;
               var parameters = {
                 'channelSetId': $('#cc_id').val(),
                 'seq':          seq
               }
-              $.post('/CMSAPI/removeChannelSetChannel', parameters, function() { channelSetArea.reload(); });
+              $.post('/CMSAPI/removeChannelSetChannel', parameters, function(response)
+              {
+                if (response != 'OK') {
+                  alert($('#lang_warning_error_occurs').text());
+                  channelSetArea.reload();
+                  return;
+                }
+                var channelId = dragObj.find('input[name="channelId"]').val();
+                var channelPoolItem = $('li.ch_disable input[name="channelId"][value="'+channelId+'"]').parent();
+                bubblePopupProperties['innerHtml'] = channelPoolItem.find('span').html();
+                channelPoolItem.removeClass('ch_disable')
+                               .addClass('ch_normal')
+                               .draggable({ disabled: false })
+                               .CreateBubblePopup(bubblePopupProperties);
+                channelSetArea.channelIds = $.grep(channelSetArea.channelIds, function(value) { return value != channelId });
+                dragObj.draggable('disable').html('').removeClass('ch_exist').RemoveBubblePopup();
+              });
             }
           });
       }, 'json');
@@ -198,37 +299,14 @@ var channelSetArea =
         var img = $('<img/>').attr('src', channels[i].imageUrl);
         var dom = $('#channel_set_area li').get(seq - 1);
         $(dom).addClass('ch_exist').append(img);
+        $('<input/>').attr('type', 'hidden').attr('name', 'channelId').val(channels[i].key.id).appendTo(dom);
         $('<span></span>').hide().html(populateBubbleContent(channels[i])).appendTo(dom);
         channelSetArea.initBubbles();
         $(dom).draggable(draggableProperties);
         channelSetArea.channelIds.push(channels[i].key.id.toString());
       }
       channelPool.manageControls();
-      $('.ch_none').droppable(
-        {
-          accept: 'li',
-          drop: function(event, ui)
-          {
-            var from = $(ui.draggable).index('#channel_set_area li.ch_none') + 1;
-            var to = $(event.target).index('#channel_set_area li.ch_none') + 1;
-            if (from > 0) {
-              var parameters = {
-                'channelSetId': $('#cc_id').val(),
-                'from':         from,
-                'to':           to
-              };
-              $.post('/CMSAPI/changeChannelSetChannel', parameters, channelSetArea.reload);
-            } else {
-              var channelId = $(ui.draggable).find('input[name="channelId"]').val();
-              var parameters = {
-                'channelSetId': $('#cc_id').val(),
-                'channelId':    channelId,
-                'seq':          to
-              }
-              $.post('/CMSAPI/addChannelSetChannel', parameters, channelSetArea.reload);
-            }
-          }
-        });
+      $('.ch_none').droppable(droppableProperties);
     }, 'json');
   }
 };
@@ -257,6 +335,7 @@ var initChannelSetInfo = function()
           if (channelSet != null)
           {
             addthis_config['pubid'] = $('#msoId').val();
+            addthis_config['ui_click'] = true;
             var url = 'http://' + ((location.host == 'www.9x9.tv') ? '9x9.tv' : location.host) + '/';
             var addthis_share = 
               {

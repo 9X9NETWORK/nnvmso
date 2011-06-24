@@ -63,7 +63,7 @@
           <label class="floatL"><spring:message code="cms.channel_set_management.label.url"/></label>
           <div class="floatL">
             <a href="#" id="channel_set_promote_url" target="_player"></a>
-            <a id="addthis_button"><img src="http://cache.addthiscdn.com/icons/v1/thumbs/addthis.gif"/></a>
+            <a href="javascript:" id="addthis_button"><img src="http://cache.addthiscdn.com/icons/v1/thumbs/addthis.gif"/></a>
           </div>
           <div class="clear"></div><br/>
           <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_set_management.label.name"/></label>

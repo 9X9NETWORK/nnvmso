@@ -159,18 +159,21 @@ public class CmsApiController {
 	}
 	
 	@RequestMapping("changeChannelSetChannel")
-	public @ResponseBody void changeChannelSetChannel(@RequestParam Long  channelSetId,
+	public @ResponseBody String changeChannelSetChannel(@RequestParam Long  channelSetId,
 	                                    @RequestParam Short from,
 	                                    @RequestParam Short to) {
 		
 		logger.info("channelSetId = " + channelSetId + ", from = " + from + ", to = " + to);
 		
 		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
-		cscMngr.moveSeq(channelSetId, from, to);
+		if (cscMngr.moveSeq(channelSetId, from, to)) {
+			return "OK";
+		}
+		return "Failed";
 	}
 	
 	@RequestMapping("addChannelSetChannel")
-	public @ResponseBody void addChannelSetChannel(@RequestParam Long  channelSetId,
+	public @ResponseBody String addChannelSetChannel(@RequestParam Long  channelSetId,
 	                                 @RequestParam Long  channelId,
 	                                 @RequestParam Short seq) {
 		
@@ -181,23 +184,22 @@ public class CmsApiController {
 		
 		MsoChannel channel = channelMngr.findById(channelId);
 		if (channel == null) {
-			logger.warning("Invalid channelId");
-			return;
+			return "Invalid channelId";
 		}
 		channel.setSeq(seq);
 		cscMngr.addChannel(channelSetId, channel);
-		
+		return "OK";
 	}
 	
 	@RequestMapping("removeChannelSetChannel")
-	public @ResponseBody void removeChannelSetChannel(@RequestParam Long  channelSetId,
+	public @ResponseBody String removeChannelSetChannel(@RequestParam Long  channelSetId,
 	                                    @RequestParam Short seq) {
 		
 		logger.info("channelSetId = " + channelSetId + ", seq = " + seq);
 		
 		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
 		cscMngr.removeChannel(channelSetId, seq);
-		
+		return "OK";
 	}
 	
 	//////////////////// Channel/Program Management ////////////////////
