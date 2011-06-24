@@ -641,12 +641,13 @@ var channelDetail =
             .appendTo('#channel_import_detail .sys_directory');
       }
     });
-    $('#channel_import_detail [name="ch_import_button"]').click(function()
+    $('#channel_import_detail [name="ch_import_button"]').unbind().click(function()
     {
       if ($('#channel_import_detail [name="ch_import_url"]').val() == "") {
         alert($('#lang_channel_source_is_empty').text());
         return;
       }
+      $('#channel_import_detail [name="ch_image_updated"]').val('false');
       var sourceUrl = $('#channel_import_detail [name="ch_import_url"]').val();
       var parameters = {
         'sourceUrl': sourceUrl
@@ -714,6 +715,39 @@ var channelDetail =
         $('#channel_import_detail [name="ch_intro"]').val(channel.intro);
         $('#channel_import_detail [name="ch_image"]').attr('src', channel.imageUrl);
         $('#channel_import_detail [name="ch_image_updated"]').val('false');
+        if (channel.imageUrl == '/WEB-INF/../images/processing.png')
+        {
+          if (channel.sourceUrl.indexOf('youtube.com') >= 0)
+          {
+            var requestUrl;
+            if (channel.sourceUrl.indexOf('view_play_list') >= 0) {
+              var listId = channel.sourceUrl.match(/\/view_play_list\?p=([^\/]*)/)[1];
+              requestUrl = 'http://gdata.youtube.com/feeds/api/playlists/' + listId;
+            } else {
+              var username = channel.sourceUrl.match(/\/user\/([^\/]*)/)[1];
+              requestUrl = 'http://gdata.youtube.com/feeds/api/users/' + username + '/uploads';
+            }
+          } else {
+            return
+          }
+          var parameters = {
+            'alt': 'json',
+            'format': 5,
+            'v': 2
+          };
+          $.get(requestUrl, parameters, function(data)
+          {
+            if (data == null)
+              return;
+            var feed = data.feed;
+            $('#channel_import_detail [name="ch_name"]').val(feed.title.$t);
+            if (typeof feed.entry != 'undefined')
+              $('#channel_import_detail [name="ch_image"]').attr('src', feed.entry[0].media$group.media$thumbnail[1]['url']);
+            else
+              $('#channel_import_detail [name="ch_image"]').attr('src', feed.logo.$t);
+            $('#channel_import_detail [name="ch_image_updated"]').val('true');
+          }, 'json');
+        }
         $.getJSON('/CMSAPI/channelCategory?channelId=' + channelId, function(category)
         {
           if (category != null) {
