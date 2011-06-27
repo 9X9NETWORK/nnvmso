@@ -32,7 +32,7 @@ public class NnStatusCode {
 	public static final int MSO_INVALID = 251;
 	
 	//300 channel related
-	public static final int CHANNEL_ERROR = 00;
+	public static final int CHANNEL_ERROR = 300;
 	public static final int CHANNEL_URL_INVALID = 301;
 	public static final int CHANNEL_INVALID = 302;
 	public static final int CHANNEL_OR_USER_INVALID = 303;
