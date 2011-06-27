@@ -25,11 +25,11 @@ public class ContentWorkerService {
 		//String transcodingServer = transcodingEnv[0] + "?task=" + task;
 		//String transcodingServer = "http://ec2-184-73-152-29.compute-1.amazonaws.com/dev3/hello.php";
 		String transcodingServer = "http://ec2-184-73-152-29.compute-1.amazonaws.com/dev3/contentworker.php" + "?task=" + task;
-		System.out.println(transcodingServer);
 		String callbackUrl = transcodingEnv[1];
 		String devel = transcodingEnv[2];		
 		content.setCallback(callbackUrl);
 		content.setErrorCode(String.valueOf(NnStatusCode.SUCCESS));
+		log.info(content.toString());
 		if (!devel.equals("1"))
 			NnNetUtil.urlPostWithJson(transcodingServer, content);
 	}
