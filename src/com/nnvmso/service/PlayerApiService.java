@@ -803,6 +803,7 @@ public class PlayerApiService {
 		
 		//find channels
 		List<MsoChannel> channels = new ArrayList<MsoChannel>();
+		boolean channelPos = true;
 		if (channelIds == null) {
 			//find subscribed channels 
 			SubscriptionManager subMngr = new SubscriptionManager();
@@ -810,6 +811,7 @@ public class PlayerApiService {
 		} else {
 			//find specific channels
 			MsoChannelManager channelMngr = new MsoChannelManager();
+			channelPos = false;
 			String[] chArr = channelIds.split(",");
 			//check format
 			if (chArr.length > 1) {
@@ -822,54 +824,62 @@ public class PlayerApiService {
 			}
 		}
 		AreaOwnershipManager areaMngr = new AreaOwnershipManager();
-		List<AreaOwnership> sets = areaMngr.findByUserId(user.getKey().getId());
-		
-	    //set info
-		if (setInfo) {
-			for (AreaOwnership s : sets) {
-				String[] obj = {
-						String.valueOf(s.getAreaNo()),
-						String.valueOf(s.getKey().getId()),
-						s.getSetName(),						
-						s.getSetImageUrl(),
-						String.valueOf(s.getType()),
-				};
-				result = result + NnStringUtil.getDelimitedStr(obj);;
+		List<MsoChannel> setChannels = new ArrayList<MsoChannel>();
+		if (user != null) {
+			List<AreaOwnership> sets = areaMngr.findByUserId(user.getKey().getId());		
+		    //set info
+			if (setInfo) {
+				for (AreaOwnership s : sets) {
+					String[] obj = {
+							String.valueOf(s.getAreaNo()),
+							String.valueOf(s.getKey().getId()),
+							s.getSetName(),						
+							s.getSetImageUrl(),
+							String.valueOf(s.getType()),
+					};
+					result = result + NnStringUtil.getDelimitedStr(obj);;
+					result = result + "\n";
+				}
+				result = result + separatorStr;					
+			}		
+			
+			//find channels from set
+			ChannelSetManager setMngr = new ChannelSetManager();
+			for (AreaOwnership area : sets) {
+				if (area.getType() == AreaOwnership.TYPE_RO) {
+					List<MsoChannel> list = setMngr.findChannelsById(area.getSetId());
+					for (MsoChannel c : list) {
+						c.setSeq(this.convertSetPosToIPGSeq(c.getSeq(), area.getAreaNo()));
+					}
+					setChannels.addAll(list);				
+				}
+			}
+		}
+		//sort by key
+		if (channelPos) {
+			TreeMap<Integer, MsoChannel> channelMap = new TreeMap<Integer, MsoChannel>();
+			for (MsoChannel c : channels) {
+				channelMap.put(c.getSeq(), c);
+			}
+			if (user != null) {
+				//overwrite by set channels
+				for (MsoChannel c : setChannels) {
+					channelMap.put(c.getSeq(), c);
+				}
+			}
+			Iterator<Entry<Integer, MsoChannel>> it = channelMap.entrySet().iterator();
+		    while (it.hasNext()) {
+		        Map.Entry<Integer, MsoChannel> pairs = (Map.Entry<Integer, MsoChannel>)it.next();
+				result = result + this.composeChannelLineupStr((MsoChannel)pairs.getValue(), mso);
+				result = result + "\n";	       
+		    }
+		} else {
+			log.info("channelLineup: regardless the pos");
+			for (MsoChannel c : channels) {
+				result = result + this.composeChannelLineupStr(c, mso);
 				result = result + "\n";
 			}
-			result = result + separatorStr;					
-		}		
-		
-		//find channels from set
-		ChannelSetManager setMngr = new ChannelSetManager();
-		List<MsoChannel> setChannels = new ArrayList<MsoChannel>();
-		for (AreaOwnership area : sets) {
-			if (area.getType() == AreaOwnership.TYPE_RO) {
-				List<MsoChannel> list = setMngr.findChannelsById(area.getSetId());
-				for (MsoChannel c : list) {
-					//System.out.println(c.getName());
-					c.setSeq(this.convertSetPosToIPGSeq(c.getSeq(), area.getAreaNo()));
-				}
-				setChannels.addAll(list);				
-			}
-		}		
-		//sort by key
-		TreeMap<Integer, MsoChannel> channelMap = new TreeMap<Integer, MsoChannel>();
-		for (MsoChannel c : channels) {
-			channelMap.put(c.getSeq(), c);
 		}
-		//overwrite by set channels
-		for (MsoChannel c : setChannels) {
-			channelMap.put(c.getSeq(), c);
-		}
-		Iterator<Entry<Integer, MsoChannel>> it = channelMap.entrySet().iterator();
-	    while (it.hasNext()) {
-	        Map.Entry<Integer, MsoChannel> pairs = (Map.Entry<Integer, MsoChannel>)it.next();
-	        System.out.println(pairs.getKey() + " = " + pairs.getValue());
-			result = result + this.composeChannelLineupStr((MsoChannel)pairs.getValue(), mso);
-			result = result + "\n";	       
-	    }
-		
 		return result;
 	}
 	
@@ -943,6 +953,10 @@ public class PlayerApiService {
 			if (mso.getPreferredLangCode().equals(Mso.LANG_ZH_TW)) {
 				imageUrl = "/WEB-INF/../images/processing_cn.png";
 			}
+		} else if (c.getStatus() != MsoChannel.STATUS_WAIT_FOR_APPROVAL &&
+				   c.getStatus() != MsoChannel.STATUS_SUCCESS && 
+				   c.getStatus() != MsoChannel.STATUS_PROCESSING) {	
+				imageUrl = "http://9x9ui.s3.amazonaws.com/9x9playerV65/images/error.png";
 		}
 
 		String channelName = "";
