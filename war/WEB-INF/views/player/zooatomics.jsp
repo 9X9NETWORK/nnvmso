@@ -949,6 +949,18 @@ var brandinfo = "${brandInfo}";
   </div>
 </div>
 
+<div id="rename-layer">
+  <div class="rename-holder">
+    <p id="rename-input">
+      <input type="text" id="rename-field" value="Enter a new title for the set">
+    </p>
+    <ul class="action-list">
+      <li><a class="btn disable" id="btn-rename-save"><span>Save</span></a></li>
+      <li><a class="btn" id="btn-rename-cancel"><span>Cancel</span></a></li>
+    </ul>
+  </div>
+</div>
+
 <div id="log-layer" style="position: absolute; left: 0; top: 0; height: 100%; width: 100%; background: white; color: black; text-align: left; padding: 20px; overflow: scroll; z-index: 9999; display: none"></div>
 
 <div id="mask"></div>
