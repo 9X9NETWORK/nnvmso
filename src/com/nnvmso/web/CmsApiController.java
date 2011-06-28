@@ -29,6 +29,7 @@ import com.nnvmso.model.CategoryChannelSet;
 import com.nnvmso.model.ChannelAutosharing;
 import com.nnvmso.model.ChannelSet;
 import com.nnvmso.model.ChannelSetAutosharing;
+import com.nnvmso.model.ChannelSetChannel;
 import com.nnvmso.model.ContentOwnership;
 import com.nnvmso.model.Ipg;
 import com.nnvmso.model.Mso;
@@ -143,8 +144,6 @@ public class CmsApiController {
 		for (CategoryChannelSet ccs : ccss) {
 			if (ccs.getCategoryId() != categoryId) {
 				removable.add(ccs);
-				//ccsMngr.delete(ccs);
-				//ccss.remove(ccs);
 			}
 		}
 		for (CategoryChannelSet ccs : removable) {
@@ -303,9 +302,30 @@ public class CmsApiController {
 			ownershipMngr.delete(ownership);
 			logger.info("remove ownership");
 		}
-		ChannelSetManager csMngr = new ChannelSetManager();
-		// TODO: remove channels in set
-		// TODO: remove channels in directory
+		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
+		// remove channels in set
+		List<ChannelSet> channelSets = ownershipMngr.findOwnedChannelSetsByMsoId(msoId);
+		for (ChannelSet channelSet : channelSets) {
+			List<ChannelSetChannel> cscs = cscMngr.findByChannelSetId(channelSet.getKey().getId());
+			for (ChannelSetChannel csc : cscs) {
+				if (csc.getChannelId() == channelId) {
+					cscMngr.removeChannel(channelSet.getKey().getId(), csc.getSeq());
+				}
+			}
+		}
+		CategoryChannelManager ccMngr = new CategoryChannelManager();
+		CategoryManager catMngr = new CategoryManager();
+		// remove channels in directory
+		List<Category> categories = catMngr.findAllByMsoIdWithoutCache(msoId);
+		for (Category category : categories) {
+			CategoryChannel cc = ccMngr.findByCategoryIdAndChannelId(category.getKey().getId(), channelId);
+			if (cc != null) {
+				QueueFactory.getDefaultQueue().add(
+						TaskOptions.Builder.withUrl("/CMSAPI/removeCategoryChannel")
+						.param("categoryId", String.valueOf(cc.getCategoryId()))
+						.param("channelId", String.valueOf(cc.getChannelId())));
+			}
+		}
 	}
 	
 	@RequestMapping("programInfo")
@@ -404,8 +424,6 @@ public class CmsApiController {
 		for (CategoryChannel cc : ccs) {
 			if (cc.getCategoryId() != categoryId) {
 				removable.add(cc);
-				//ccMngr.delete(cc);
-				//ccs.remove(cc);
 			}
 		}
 		for (CategoryChannel cc : removable) {
