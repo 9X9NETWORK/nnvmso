@@ -24,8 +24,12 @@ public class SubscriptionLog implements Serializable {
 	private long channelId;
 	
 	@Persistent
+	private long setId;
+	
+	@Persistent
 	private int count;
 
+	public SubscriptionLog() {}
 	public SubscriptionLog(long msoId, long channelId) {
 		this.msoId = msoId;
 		this.channelId = channelId;
@@ -63,5 +67,13 @@ public class SubscriptionLog implements Serializable {
 	public void setCount(int count) {
 		this.count = count;
 	}
-		
+
+	public long getSetId() {
+		return setId;
+	}
+
+	public void setSetId(long setId) {
+		this.setId = setId;
+	}
+	
 }
