@@ -239,7 +239,7 @@
          3. the button  "save"   will keep disable status (class="btnDisable" ), until the upload progress bar has been finished then switch to class="epSave"
          -->
     <div class="createEp" style="display:none" id="program_create_detail">
-      <div class="right_title"><div class="floatL">小灰熊的大愛劇場</div> - <spring:message code="cms.channel_management.title.create_program"/> <a href="javascript:" class="floatR ep_return"><spring:message code="cms.channel_management.title.return_program_management"/>&nbsp;&gt;&gt;</a></div>
+      <div class="right_title"><div class="floatL">小灰熊的大愛劇場</div> - <spring:message code="cms.channel_management.title.create_program"/> <a onclick="return false;" href="javascript:" class="floatR ep_return"><spring:message code="cms.channel_management.title.return_program_management"/>&nbsp;&gt;&gt;</a></div>
       <div class="createEpList">
         <p class="hint_title"><span class="red">＊</span><spring:message code="cms.channel_management.msg.neccessary_info"/></p>
         <ul class="addEpSection" id="program_create_ul">
@@ -252,7 +252,7 @@
                     <!-- 
                     <span class="btnCreate floatL ep_upload_video">從硬碟</span>
                     -->
-                    <a href="javascript:" class="btnCreate floatL ep_urlbutton"><spring:message code="cms.channel_management.btn.from_url"/></a>
+                    <a onclick="return false;" href="javascript:" class="btnCreate floatL ep_urlbutton"><spring:message code="cms.channel_management.btn.from_url"/></a>
                     <span class="ep_upload_video">從硬碟</span>
                   </div>
                   <div style="width:100px;padding-left:5px" class="floatL ep_uploading_video" style="display:none">
@@ -260,7 +260,7 @@
                   </div>
                   <!--  upload by URL link -->
                   <div class="floatL uploadURL ep_url_block" style="display:none">
-                    <div class="bg_input floatL"><input type="text" size="25" maxlength="100" class="ep_url_input"/></div>&nbsp;<a href="javascript:" class="ep_url_cancel"><spring:message code="cms.channel_management.btn.cancel"/></a>
+                    <div class="bg_input floatL"><input type="text" size="25" maxlength="100" class="ep_url_input"/></div>&nbsp;<a onclick="return false;" href="javascript:" class="ep_url_cancel"><spring:message code="cms.channel_management.btn.cancel"/></a>
                     <div class="clear"></div>
                     <p class="hint"><spring:message code="cms.channel_management.msg.video_url_hint"/></p><br/>
                   </div>
@@ -269,7 +269,7 @@
                     <img alt="" src="/images/cms/upload_img.jpg" class="floatL ep_image"/><input type="hidden" class="ep_image_updated" value="fase"/>
                     <div class="floatL imgBtn">
                       <p class="gray"><spring:message code="cms.channel_management.msg.best_resolution"/></p>
-                      <a href="javascript:" class="uploadBtn ep_upload_image"></a>
+                      <a onclick="return false;" href="javascript:" class="uploadBtn ep_upload_image"></a>
                       <span class="ep_uploading_image" style="display:none"><spring:message code="cms.channel_management.msg.uploading"/></span>
                     </div>
                     <div class="clear"></div>
@@ -291,15 +291,15 @@
                   <p class="hint"><spring:message code="cms.channel_management.msg.camma_seperated"/></p><br/>
                   -->
                   <div class="epBtns" >
-                    <a href="javascript:" class="btnDisable floatL ep_savebutton"><spring:message code="cms.channel_management.btn.save"/></a>
-                    <a href="javascript:" class="btnCancel floatL ep_cancelbutton"><spring:message code="cms.channel_management.btn.cancel"/></a>
+                    <a onclick="return false;" href="javascript:" class="btnDisable floatL ep_savebutton"><spring:message code="cms.channel_management.btn.save"/></a>
+                    <a onclick="return false;" href="javascript:" class="btnCancel floatL ep_cancelbutton"><spring:message code="cms.channel_management.btn.cancel"/></a>
                   </div>
                 </fieldset>
               </form>
             </div>
           </li>
         </ul>
-        <a href="javascript:" class="addNew" id="continue_add_new_program_button"><spring:message code="cms.channel_management.btn.continue_creating_program"/></a>
+        <a onclick="return false;" href="javascript:" class="addNew" id="continue_add_new_program_button"><spring:message code="cms.channel_management.btn.continue_creating_program"/></a>
       </div>
     </div>
     <!-- upload channel = 9x9 channel s episode list
