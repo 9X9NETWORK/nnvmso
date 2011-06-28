@@ -137,13 +137,19 @@ public class CmsApiController {
 		channelSetMngr.save(channelSet);
 		
 		List<CategoryChannelSet> ccss = cmsApiService.whichCCSContainingTheChannelSet(channelSetId);
+		List<CategoryChannelSet> removable = new ArrayList<CategoryChannelSet>();
 		
 		// NOTE: channel set can only in one system category
 		for (CategoryChannelSet ccs : ccss) {
 			if (ccs.getCategoryId() != categoryId) {
-				ccsMngr.delete(ccs);
-				ccss.remove(ccs);
+				removable.add(ccs);
+				//ccsMngr.delete(ccs);
+				//ccss.remove(ccs);
 			}
+		}
+		for (CategoryChannelSet ccs : removable) {
+			ccsMngr.delete(ccs);
+			ccss.remove(ccs);
 		}
 		
 		logger.info("ccss size = " + ccss.size());
@@ -152,6 +158,7 @@ public class CmsApiController {
 			// create a new CategoryChannelSet
 			CategoryChannelSet ccs = new CategoryChannelSet(categoryId, channelSetId);
 			ccsMngr.create(ccs);
+			// TODO: dealing with channelCount
 			logger.info("create new CategoryChannelSet channelSetId = " + channelSetId + ", categoryId = " + categoryId);
 		}
 		
@@ -388,13 +395,19 @@ public class CmsApiController {
 		channelMngr.save(channel);
 		
 		List<CategoryChannel> ccs = cmsApiService.whichCCContainingTheChannel(channel.getKey().getId());
+		List<CategoryChannel> removable = new ArrayList<CategoryChannel>();
 		
 		// NOTE: channel can only in one system category
 		for (CategoryChannel cc : ccs) {
 			if (cc.getCategoryId() != categoryId) {
-				ccMngr.delete(cc);
-				ccs.remove(cc);
+				removable.add(cc);
+				//ccMngr.delete(cc);
+				//ccs.remove(cc);
 			}
+		}
+		for (CategoryChannel cc : removable) {
+			ccs.remove(cc);
+			ccMngr.delete(cc);
 		}
 		
 		logger.info("ccs size = " + ccs.size());
@@ -403,6 +416,7 @@ public class CmsApiController {
 			// create a new CategoryChannelSet
 			CategoryChannel cc = new CategoryChannel(categoryId, channel.getKey().getId());
 			ccMngr.create(cc);
+			// TODO: dealing with channelCount
 			logger.info("create new CategoryChannel channelId = " + channel.getKey().getId() + ", categoryId = " + categoryId);
 		}
 		
@@ -578,13 +592,17 @@ public class CmsApiController {
 		channelMngr.save(channel);
 		
 		List<CategoryChannel> ccs = cmsApiService.whichCCContainingTheChannel(channelId);
+		List<CategoryChannel> removable = new ArrayList<CategoryChannel>();
 		
 		// NOTE: channel can only in one system category
 		for (CategoryChannel cc : ccs) {
 			if (cc.getCategoryId() != categoryId) {
-				ccMngr.delete(cc);
-				ccs.remove(cc);
+				removable.add(cc);
 			}
+		}
+		for (CategoryChannel cc : removable) {
+			ccs.remove(cc);
+			ccMngr.delete(cc);
 		}
 		
 		logger.info("ccs size = " + ccs.size());
@@ -593,6 +611,7 @@ public class CmsApiController {
 			// create a new CategoryChannelSet
 			CategoryChannel cc = new CategoryChannel(categoryId, channelId);
 			ccMngr.create(cc);
+			// TODO: dealing with channelCount
 			logger.info("create new CategoryChannel channelId = " + channelId + ", categoryId = " + categoryId);
 		}
 		
@@ -691,7 +710,7 @@ public class CmsApiController {
 		Mso mso = msoMngr.findById(msoId);
 		if (mso == null)
 			return new ArrayList<Category>();
-		return catMngr.findAllByMsoIdWithoutCache(mso.getKey().getId());
+		return catMngr.findAllByMsoIdWithoutCache(mso.getKey().getId());  // accuracy
 	}
 	
 	/**
@@ -762,6 +781,7 @@ public class CmsApiController {
 		CategoryChannelSet found = ccsMngr.findByCategoryIdAndChannelSetId(categoryId, channelSetId);
 		if (found == null) {
 			ccsMngr.create(new CategoryChannelSet(categoryId, channelSetId));
+			// TODO: dealing with channelCount
 			return "OK";
 		}
 		return "CategoryChannelSet Exists";
@@ -787,6 +807,7 @@ public class CmsApiController {
 		CategoryChannel found = ccMngr.findByCategoryIdAndChannelId(categoryId, channelId);
 		if (found == null) {
 			ccMngr.create(new CategoryChannel(categoryId, channelId));
+			// TODO: dealing with channelCount
 			return "OK";
 		}
 		return "CategoryChannel Exists";
@@ -803,6 +824,7 @@ public class CmsApiController {
 		if (found == null)
 			return "Not Found";
 		ccMngr.delete(found);
+		// TODO: dealing with channelCount
 		return "OK";
 	}
 	
@@ -817,6 +839,7 @@ public class CmsApiController {
 		if (found == null)
 			return "Not Found";
 		ccsMngr.delete(found);
+		// TODO: dealing with channelCount
 		return "OK";
 	}
 	
@@ -859,9 +882,12 @@ public class CmsApiController {
 					.param("categoryId", String.valueOf(sub.getKey().getId())));
 		}
 		
+		// dealing with category cache
+		catMngr.deleteCache(category.getMsoId());
+		
 		category.setMsoId(0);
 		category.setParentId(0);
-		catMngr.save(category); // NOTE: delete or not ?
+		catMngr.save(category);
 		return "OK";
 	}
 	
@@ -895,12 +921,15 @@ public class CmsApiController {
 		logger.info("fromCategoryId = " + fromCategoryId);
 		logger.info("channelSetId = " + channelSetId);
 		
+		// TODO: check fromCategoryId
+		// TODO: check toCategoryId
 		CategoryChannelSetManager ccsMngr = new CategoryChannelSetManager();
 		CategoryChannelSet ccs = ccsMngr.findByCategoryIdAndChannelSetId(fromCategoryId, channelSetId);
 		if (ccs == null)
 			return "Not Found";
 		ccs.setCategoryId(toCategoryId);
 		ccsMngr.save(ccs);
+		// TODO: dealing with channelCount
 		return "OK";
 	}
 	
@@ -912,12 +941,15 @@ public class CmsApiController {
 		logger.info("fromCategoryId = " + fromCategoryId);
 		logger.info("channelId = " + channelId);
 		
+		// TODO: check fromCategoryId
+		// TODO: check toCategoryId
 		CategoryChannelManager ccMngr = new CategoryChannelManager();
 		CategoryChannel cc = ccMngr.findByCategoryIdAndChannelId(fromCategoryId, channelId);
 		if (cc == null)
 			return "Not Found";
 		cc.setCategoryId(toCategoryId);
 		ccMngr.save(cc);
+		// TODO: dealing with channelCount
 		return "OK";
 	}
 	
