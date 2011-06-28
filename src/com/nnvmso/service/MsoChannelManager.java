@@ -151,9 +151,12 @@ public class MsoChannelManager {
 			FacebookLib lib = new FacebookLib();
 			String[] info = lib.getFanpageInfo(sourceUrl);			
 			channel.setName(info[0]);
-			channel.setImageUrl(info[1]);
+			if (info[1] == null) {
+				channel.setImageUrl("/WEB-INF/../images/facebook-icon.gif");			
+			} else {
+				channel.setImageUrl(info[1]);
+			}
 			channel.setStatus(MsoChannel.STATUS_SUCCESS);
-			//channel.setImageUrl("/WEB-INF/../images/facebook-icon.gif");			
 		} else {
 			channel.setImageUrl("/WEB-INF/../images/processing.png");
 			channel.setName("Processing");
