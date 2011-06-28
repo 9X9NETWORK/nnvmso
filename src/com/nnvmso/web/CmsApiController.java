@@ -303,6 +303,9 @@ public class CmsApiController {
 			ownershipMngr.delete(ownership);
 			logger.info("remove ownership");
 		}
+		ChannelSetManager csMngr = new ChannelSetManager();
+		// TODO: remove channels in set
+		// TODO: remove channels in directory
 	}
 	
 	@RequestMapping("programInfo")
@@ -656,7 +659,7 @@ public class CmsApiController {
 		
 		MsoChannel channel = new MsoChannel("New Channel", "New Channel", "/WEB-INF/../images/processing.png", userMngr.findNNUser().getKey().getId());
 		channel.setPublic(false);
-		channel.setContentType(MsoChannel.CONTENTTYPE_PODCAST); //default set to podcast
+		channel.setContentType(MsoChannel.CONTENTTYPE_MIXED); // a channel type in podcast does not allow user to add program in it, so change to mixed type
 		channelMngr.create(channel, new ArrayList<Category>());
 		
 		//channel1 ownership
