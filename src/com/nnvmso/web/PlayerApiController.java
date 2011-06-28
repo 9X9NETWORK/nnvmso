@@ -623,7 +623,7 @@ public class PlayerApiController {
 												@RequestParam(value="setInfo", required=false) String setInfo,
 											    HttpServletRequest req) {
 		this.prepService(req);
-		log.info("userToken=" + userToken + ";isUserInfo:" + userInfo);				
+		log.info("userToken=" + userToken + ";isUserInfo:" + userInfo);
 		boolean isUserInfo = Boolean.parseBoolean(userInfo);
 		boolean isSetInfo = Boolean.parseBoolean(setInfo);
 		String output = NnStatusMsg.errorStr(locale);
@@ -876,7 +876,7 @@ public class PlayerApiController {
 	 * Listing featured sets 
 	 * 
 	 * @param mso name
-	 * @return set id, set name, set image (developing)
+	 * @return set id, set name, set image, channel count, subscription count (developing)
 	 */	
 	@RequestMapping(value="listFeaturedSets")
 	public ResponseEntity<String> listFeaturedSets(HttpServletRequest req) {				                                
