@@ -85,9 +85,8 @@ public class PlayerApiService {
 		} else {
 			cs = csMngr.findBybeautifulUrl(beautifulUrl);
 		}
-		if (cs == null) {
+		if (cs == null)
 			return messageSource.getMessage("nnstatus.set_invalid", new Object[] {NnStatusCode.SET_INVALID} , locale);			
-		}
 		
 		System.out.println("channel set id:" + cs.getKey().getId());
 		List<MsoChannel> channels = csMngr.findChannelsById(cs.getKey().getId());
@@ -425,7 +424,7 @@ public class PlayerApiService {
 		CookieHelper.setCookie(resp, cookieName, userId);
 	}	
 		
-	public String unsubscribe(String userToken, String channelId, String setId, String seq) {
+	public String unsubscribe(String userToken, String channelId, String setId, String grid) {
 		//verify input
 		if (userToken == null || userToken.equals("undefined"))			
 			return NnStatusMsg.inputMissing(locale);		
@@ -442,10 +441,11 @@ public class PlayerApiService {
 		if (channelId != null) {
 			SubscriptionManager subMngr = new SubscriptionManager();
 			Subscription s = null;
-			if (seq == null) {
+			if (grid == null) {
 				s = subMngr.findByUserIdAndChannelId(user.getKey().getId(), Long.parseLong(channelId));
 			} else {
-				s = subMngr.findChannelSubscription(user.getKey().getId(), Long.parseLong(channelId), Integer.parseInt(seq));
+				s = subMngr.findChannelSubscription(user.getKey().getId(), Long.parseLong(channelId), Integer.parseInt(grid));
+				System.out.print("find subscription:" + s);
 			}			
 			if (s == null || (s != null && s.getType() == MsoIpg.TYPE_READONLY)) {
 				return messageSource.getMessage("nnstatus.subscription_ro_channel", new Object[] {NnStatusCode.SUBSCRIPTION_ERROR} , locale);			
@@ -455,6 +455,10 @@ public class PlayerApiService {
 		if (setId != null) {
 			AreaOwnershipManager areaMngr = new AreaOwnershipManager();
 			AreaOwnership area = areaMngr.findByUserIdAndSetId(user.getKey().getId(), Long.parseLong(setId));
+			/*
+			if (area == null) 
+				return messageSource.getMessage("nnstatus.set_invalid", new Object[] {NnStatusCode.SUBSCRIPTION_ERROR} , locale);
+			*/
 			areaMngr.delete(area); 
 		}
 		return NnStatusMsg.successStr(locale);
@@ -506,43 +510,47 @@ public class PlayerApiService {
 		
 		SubscriptionManager subMngr = new SubscriptionManager();
 		if (setId != null) {			
-			//find all channels			
+			System.out.println("setId is not null!!!!!");
+			//find all channels		
 			List<Subscription> subscribeList = subMngr.findAllByUser(user.getKey().getId());
 			ChannelSetManager csMngr = new ChannelSetManager();
 			long sId = Long.parseLong(setId);
 			ChannelSet cs = csMngr.findById(sId);
-			if (cs != null) {
-				List<MsoChannel> channels = csMngr.findChannelsById(cs.getKey().getId());
-				Short[] startArr = {1,4,7,28,31,34,55,58,61};
-				Short start = startArr[Integer.parseInt(pos)-1]; 
-				for (MsoChannel c : channels) {					
-					short grid= 0;
-					if (c.getSeq() < 4)
-						grid = (short) (c.getSeq() + start - 1);
-					if (c.getSeq() > 3 && c.getSeq() < 7)
-						grid = (short) (start + 9 + c.getSeq()-4);
-					else if (c.getSeq() > 6)
-						grid = (short) (start + 18 + c.getSeq()-7);
-					for (Subscription l : subscribeList) {
-						if (l.getSeq() == grid) {
-							return messageSource.getMessage("nnstatus.subscription_set_occupied", new Object[] {NnStatusCode.SUBSCRIPTION_SET_OCCUPIED} , locale);							
-						}
+			if (cs == null)
+				return messageSource.getMessage("nnstatus.set_invalid", new Object[] {NnStatusCode.SET_INVALID} , locale);			
+			
+			System.out.println("enter whatever!!!!");
+			List<MsoChannel> channels = csMngr.findChannelsById(cs.getKey().getId());
+			Short[] startArr = {1,4,7,28,31,34,55,58,61};
+			Short start = startArr[Integer.parseInt(pos)-1]; 
+			for (MsoChannel c : channels) {					
+				short grid= 0;
+				if (c.getSeq() < 4)
+					grid = (short) (c.getSeq() + start - 1);
+				if (c.getSeq() > 3 && c.getSeq() < 7)
+					grid = (short) (start + 9 + c.getSeq()-4);
+				else if (c.getSeq() > 6)
+					grid = (short) (start + 18 + c.getSeq()-7);
+				for (Subscription l : subscribeList) {
+					if (l.getSeq() == grid) {
+						return messageSource.getMessage("nnstatus.subscription_set_occupied", new Object[] {NnStatusCode.SUBSCRIPTION_SET_OCCUPIED} , locale);							
 					}
 				}
-				AreaOwnershipManager areaMngr = new AreaOwnershipManager();
-				AreaOwnership area = areaMngr.findByUserIdAndSetId(user.getKey().getId(), cs.getKey().getId());
-				if (area != null) {
-					return messageSource.getMessage("nnstatus.subscription_duplicate_set", new Object[] {NnStatusCode.SUBSCRIPTION_DUPLICATE_SET} , locale);												
-				}
-				area = new AreaOwnership();											
-				area.setUserId(user.getKey().getId());
-				area.setSetId(cs.getKey().getId());
-				area.setSetName(cs.getName());
-				area.setSetImageUrl(cs.getImageUrl());
-				area.setAreaNo(Short.parseShort(pos));
-				area.setType(AreaOwnership.TYPE_RO);
-				areaMngr.save(area);
 			}
+			AreaOwnershipManager areaMngr = new AreaOwnershipManager();
+			AreaOwnership area = areaMngr.findByUserIdAndSetId(user.getKey().getId(), cs.getKey().getId());
+			if (area != null) {
+				return messageSource.getMessage("nnstatus.subscription_duplicate_set", new Object[] {NnStatusCode.SUBSCRIPTION_DUPLICATE_SET} , locale);												
+			}
+			System.out.println("<<<<<<<<<<< subscribe set >>>>>>>>>>>>>>");
+			area = new AreaOwnership();											
+			area.setUserId(user.getKey().getId());
+			area.setSetId(cs.getKey().getId());
+			area.setSetName(cs.getName());
+			area.setSetImageUrl(cs.getImageUrl());
+			area.setAreaNo(Short.parseShort(pos));
+			area.setType(AreaOwnership.TYPE_RO);
+			areaMngr.save(area);
 		}
 
 		//verify channel and grid
@@ -832,7 +840,7 @@ public class PlayerApiService {
 				for (AreaOwnership s : sets) {
 					String[] obj = {
 							String.valueOf(s.getAreaNo()),
-							String.valueOf(s.getKey().getId()),
+							String.valueOf(s.getSetId()),
 							s.getSetName(),						
 							s.getSetImageUrl(),
 							String.valueOf(s.getType()),
