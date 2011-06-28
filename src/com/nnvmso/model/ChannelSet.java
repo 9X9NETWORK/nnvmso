@@ -46,6 +46,9 @@ public class ChannelSet implements Serializable {
 	private String tag;
 	
 	@Persistent
+	private int channelCount;
+	
+	@Persistent
 	private boolean featured;
 	
 	@Persistent
@@ -160,7 +163,6 @@ public class ChannelSet implements Serializable {
 		this.nameSearch = nameSearch;
 	}
 
-	//<<<
 	public boolean isFeatured() {
 		return featured;
 	}
@@ -176,5 +178,12 @@ public class ChannelSet implements Serializable {
 	public int getSubscriptionCount() {
 		return subscriptionCount;
 	}
-	
+
+	public int getChannelCount() {
+		return channelCount;
+	}
+
+	public void setChannelCount(int channelCount) {
+		this.channelCount = channelCount;
+	}	
 }
