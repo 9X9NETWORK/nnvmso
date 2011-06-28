@@ -3,6 +3,7 @@ package com.nnvmso.dao;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
@@ -24,6 +25,19 @@ public class SubscriptionLogDao {
 		return log;
 	}
 	
+	public SubscriptionLog findById(long id) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();		
+		SubscriptionLog log = null;
+		try {
+			log = pm.getObjectById(SubscriptionLog.class, id);
+			log = pm.detachCopy(log);
+		} catch (JDOObjectNotFoundException e) {
+		} finally {
+			pm.close();			
+		}
+		return log;		
+	}	
+	
 	public SubscriptionLog findByMsoIdAndChannelId(long msoId, long channelId) {
 		SubscriptionLog s = null;
 		PersistenceManager pm = PMF.get().getPersistenceManager();
@@ -33,6 +47,25 @@ public class SubscriptionLogDao {
 			q.declareParameters("long msoIdParam, long channelIdParam");
 			@SuppressWarnings("unchecked")
 			List<SubscriptionLog> subs = (List<SubscriptionLog>)q.execute(msoId, channelId);
+			if (subs.size() > 0) {
+				s = subs.get(0);
+				s = pm.detachCopy(s);
+			}
+		} finally {
+			pm.close();
+		}
+		return s;		
+	}
+
+	public SubscriptionLog findByMsoIdAndSetId(long msoId, long setId) {
+		SubscriptionLog s = null;
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		try {
+			Query q = pm.newQuery(SubscriptionLog.class);
+			q.setFilter("msoId == msoIdParam && setId== setIdParam");
+			q.declareParameters("long msoIdParam, long setIdParam");
+			@SuppressWarnings("unchecked")
+			List<SubscriptionLog> subs = (List<SubscriptionLog>)q.execute(msoId, setId);
 			if (subs.size() > 0) {
 				s = subs.get(0);
 				s = pm.detachCopy(s);
