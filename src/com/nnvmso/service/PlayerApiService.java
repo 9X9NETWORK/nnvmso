@@ -45,6 +45,7 @@ import com.nnvmso.model.NnUser;
 import com.nnvmso.model.NnUserPref;
 import com.nnvmso.model.NnUserShare;
 import com.nnvmso.model.Subscription;
+import com.nnvmso.model.SubscriptionLog;
 
 @Service
 public class PlayerApiService {
@@ -510,8 +511,7 @@ public class PlayerApiService {
 		
 		SubscriptionManager subMngr = new SubscriptionManager();
 		if (setId != null) {			
-			System.out.println("setId is not null!!!!!");
-			//find all channels		
+			//find all channels
 			List<Subscription> subscribeList = subMngr.findAllByUser(user.getKey().getId());
 			ChannelSetManager csMngr = new ChannelSetManager();
 			long sId = Long.parseLong(setId);
@@ -519,7 +519,6 @@ public class PlayerApiService {
 			if (cs == null)
 				return messageSource.getMessage("nnstatus.set_invalid", new Object[] {NnStatusCode.SET_INVALID} , locale);			
 			
-			System.out.println("enter whatever!!!!");
 			List<MsoChannel> channels = csMngr.findChannelsById(cs.getKey().getId());
 			Short[] startArr = {1,4,7,28,31,34,55,58,61};
 			Short start = startArr[Integer.parseInt(pos)-1]; 
@@ -542,7 +541,6 @@ public class PlayerApiService {
 			if (area != null) {
 				return messageSource.getMessage("nnstatus.subscription_duplicate_set", new Object[] {NnStatusCode.SUBSCRIPTION_DUPLICATE_SET} , locale);												
 			}
-			System.out.println("<<<<<<<<<<< subscribe set >>>>>>>>>>>>>>");
 			area = new AreaOwnership();											
 			area.setUserId(user.getKey().getId());
 			area.setSetId(cs.getKey().getId());
@@ -551,6 +549,15 @@ public class PlayerApiService {
 			area.setAreaNo(Short.parseShort(pos));
 			area.setType(AreaOwnership.TYPE_RO);
 			areaMngr.save(area);
+			SubscriptionLogManager logMngr = new SubscriptionLogManager();
+			SubscriptionLog log = logMngr.findByMsoIdAndSetId(mso.getKey().getId(), cs.getKey().getId());
+			if (log == null) {
+				log = new SubscriptionLog();
+				log.setCount(1);
+				log.setSetId(cs.getKey().getId());
+				log.setMsoId(mso.getKey().getId());
+				logMngr.save(log);
+			}			
 		}
 
 		//verify channel and grid
@@ -1068,14 +1075,22 @@ public class PlayerApiService {
 	
 	public String findFeaturedSetsByMso() {
 		ChannelSetManager setMngr = new ChannelSetManager();
+		SubscriptionLogManager logMngr = new SubscriptionLogManager();		
+		
 		List<ChannelSet> sets = setMngr.findFeaturedSetsByMso(mso);		
 		String output = NnStatusMsg.successStr(locale) + separatorStr;		
 		for (ChannelSet set : sets) {
+			SubscriptionLog log = logMngr.findByMsoIdAndSetId(mso.getKey().getId(), set.getKey().getId());
+			int counter = 0;
+			if (log != null)
+				counter = log.getCount();
 			String[] obj = {
 				String.valueOf(set.getKey().getId()),
 				set.getName(),
-				set.getImageUrl()
-			};							
+				set.getImageUrl(),
+				String.valueOf(set.getChannelCount()),
+				String.valueOf(counter),
+			};
 			output += NnStringUtil.getDelimitedStr(obj) + "\n";			
 		}				
 		return output;		
