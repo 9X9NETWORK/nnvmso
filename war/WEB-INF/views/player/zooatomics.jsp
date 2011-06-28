@@ -955,7 +955,7 @@ var brandinfo = "${brandInfo}";
       <input type="text" id="rename-field" value="Enter a new title for the set">
     </p>
     <ul class="action-list">
-      <li><a class="btn disable" id="btn-rename-save"><span>Save</span></a></li>
+      <li><a class="btn" id="btn-rename-save"><span>Save</span></a></li>
       <li><a class="btn" id="btn-rename-cancel"><span>Cancel</span></a></li>
     </ul>
   </div>
