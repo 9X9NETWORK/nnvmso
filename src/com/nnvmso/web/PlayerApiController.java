@@ -464,7 +464,7 @@ public class PlayerApiController {
 	 * 
 	 * @param user user's unique identifier
 	 * @param channel channelId
-	 * @param seq grid location. use with channel.   
+	 * @param grid grid location. use with channel.   
 	 * giving channel only is valid (for backward compatibility), 
 	 * but since one channel can exist on multitple locations in a smart guide,
 	 * it could result in unsubscribing on an unexpected grid location. 
@@ -474,14 +474,14 @@ public class PlayerApiController {
 	@RequestMapping(value="unsubscribe")
 	public ResponseEntity<String> unsubscribe(@RequestParam(value="user", required=false) String userToken, 
 								              @RequestParam(value="channel", required=false) String channelId,
-								              @RequestParam(value="seq", required=false) String seq,
+								              @RequestParam(value="grid", required=false) String grid,
 								              @RequestParam(value="set", required=false) String setId,
 								              HttpServletRequest req) {			
 		this.prepService(req);
-		log.info("userToken=" + userToken + "; channel=" + channelId + "; set=" + setId + "; seq=" + seq);
+		log.info("userToken=" + userToken + "; channel=" + channelId + "; set=" + setId + "; seq=" + grid);
 		String output = NnStatusMsg.errorStr(locale);
 		try {
-			output = playerApiService.unsubscribe(userToken, channelId, setId, seq);
+			output = playerApiService.unsubscribe(userToken, channelId, setId, grid);
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}
