@@ -161,7 +161,7 @@ var channelPool =
   },
   init: function()
   {
-    $.get('/CMSAPI/listOwnedChannels?msoId=' + $('#msoId').val(), function(channels)
+    $.post('/CMSAPI/listOwnedChannels', { 'msoId': $('#msoId').val() }, function(channels)
       {
         channelPool.populateSlides(channels);
         
@@ -291,7 +291,7 @@ var channelSetArea =
   },
   init: function()
   {
-    $.get('/CMSAPI/defaultChannelSetChannels?msoId=' + $('#msoId').val(), function(channels)
+    $.post('/CMSAPI/defaultChannelSetChannels', { 'msoId': $('#msoId').val() }, function(channels)
     {
       for (var i = 0; i < channels.length; i++)
       {
@@ -323,14 +323,14 @@ var initChannelSetInfo = function()
           .text(categories[i].name)
           .appendTo('#sys_directory');
       }
-      $.get('/CMSAPI/defaultChannelSetCategory?msoId=' + $('#msoId').val(), function(category)
+      $.post('/CMSAPI/defaultChannelSetCategory', { 'msoId': $('#msoId').val() }, function(category)
         {
           if (category != null)
           {
             $('#sys_directory').val(category.key.id);
           }
         }, 'json');
-      $.get('/CMSAPI/defaultChannelSetInfo?msoId=' + $('#msoId').val(), function(channelSet)
+      $.post('/CMSAPI/defaultChannelSetInfo', { 'msoId': $('#msoId').val() }, function(channelSet)
         {
           if (channelSet != null)
           {

@@ -26,20 +26,20 @@ var skeletonCreation =
 {
   create9x9Channel: function()
   {
-    $.getJSON('/CMSAPI/createChannelSkeleton?msoId=' + $('#msoId').val(), function(channelId)
+    $.post('/CMSAPI/createChannelSkeleton', { 'msoId': $('#msoId').val() }, function(channelId)
     {
       $('<li/>').append('<div class="chShadow channel_info_block_cloned"><div class="chShadowTitle"></div><div class="chImg"></div></div>')
         .prependTo('#channel_list_ul');
       channelDetail.init(channelId);
-    });
+    }, 'json');
   },
   create9x9Program: function(channelId, channelName)
   {
-    $.getJSON('/CMSAPI/createProgramSkeleton', function(programId)
+    $.post('/CMSAPI/createProgramSkeleton', function(programId)
     {
       if (programId != null)
         programDetail.programCreation(programId, channelId, channelName);
-    });
+    }, 'json');
   }
 };
 
@@ -69,7 +69,7 @@ var programDetail =
   },
   init: function(programId, readonly)
   {
-    $.get('/CMSAPI/programInfo?programId=' + programId, function(program)
+    $.post('/CMSAPI/programInfo', { 'programId': programId }, function(program)
     {
       if (readonly) {
         $('#program_list_readonly').hide();
@@ -239,7 +239,7 @@ var programDetail =
     {
       skeletonCreation.create9x9Program(channelId, channelName);
     });
-    $.get('/CMSAPI/programInfo?programId=' + programId, function(program)
+    $.post('/CMSAPI/programInfo', { 'programId': programId }, function(program)
     {
       var programDetailBlock = $('#program_create_detail_block')
                                  .clone(true)
@@ -442,7 +442,7 @@ var programList =
   {
     if (overallLayout.destroyRightSideContent(false) == false) return false;
     
-    $.get('/CMSAPI/programList?channelId=' + channelId, function(programs)
+    $.post('/CMSAPI/programList', { 'channelId': channelId }, function(programs)
     {
       $('.create_program_button').unbind().click({ 'channelId': channelId, 'channelName': channelName }, function(event)
       {
@@ -524,14 +524,14 @@ var programList =
       });
       programInfoBlock.find('.program_info_publish').click({ 'programId': programId, 'switchObject': switchObject }, function(event)
       {
-        $.getJSON('/CMSAPI/switchProgramPublicity?programId=' + event.data.programId, function(response)
+        $.post('/CMSAPI/switchProgramPublicity', { 'programId': event.data.programId }, function(response)
         {
           if (response) {
             event.data.switchObject.removeClass('chUnPublic').addClass('chPublic');
           } else {
             event.data.switchObject.removeClass('chPublic').addClass('chUnPublic');
           }
-        });
+        }, 'json');
         return false;
       });
       programInfoBlock.find('.program_info_detailbutton').click({ 'programId': programId }, function(event)
@@ -630,7 +630,7 @@ var channelDetail =
   {
     if (overallLayout.destroyRightSideContent(false) == false) return false;
     
-    $.getJSON('/CMSAPI/systemCategories', function(categories)
+    $.get('/CMSAPI/systemCategories', function(categories)
     {
       $('#channel_import_detail .sys_directory').html('<option value="0">' + $('#lang_select_category').text() + '</option>');
       for (i in categories)
@@ -640,7 +640,7 @@ var channelDetail =
             .text(categories[i].name)
             .appendTo('#channel_import_detail .sys_directory');
       }
-    });
+    }, 'json');
     $('#channel_import_detail [name="ch_import_button"]').unbind().click(function()
     {
       if ($('#channel_import_detail [name="ch_import_url"]').val() == "") {
@@ -748,12 +748,12 @@ var channelDetail =
             $('#channel_import_detail [name="ch_image_updated"]').val('true');
           }, 'json');
         }
-        $.getJSON('/CMSAPI/channelCategory?channelId=' + channelId, function(category)
+        $.post('/CMSAPI/channelCategory', { 'channelId': channelId }, function(category)
         {
           if (category != null) {
             $('#channel_import_detail [name="ch_category"]').val(category.key.id);
           }
-        });
+        }, 'json');
         $('#channel_import_detail [name="ch_savebutton"]').unbind().click(function()
         {
           var name = $('#channel_import_detail [name="ch_name"]').val();
@@ -810,7 +810,7 @@ var channelDetail =
   {
     if (overallLayout.destroyRightSideContent(false) == false) return false;
     
-    $.getJSON('/CMSAPI/channelInfo?channelId=' + channelId, function(channel)
+    $.post('/CMSAPI/channelInfo', { 'channelId': channelId }, function(channel)
     {
       $('#ch_id').val(channel.key.id);
       $('#ch_name').val('').val(channel.name);
@@ -870,8 +870,8 @@ var channelDetail =
       };
       channelDetail.swfObject = new SWFUpload(swfupload_settings);
       $('#channel_detail').show();
-    });
-    $.getJSON('/CMSAPI/systemCategories', function(categories)
+    }, 'json');
+    $.get('/CMSAPI/systemCategories', function(categories)
     {
       var select_category = $('#lang_select_category').text();
       $('#channel_detail .sys_directory').html('<option value="0">' + select_category + '</option>');
@@ -882,13 +882,13 @@ var channelDetail =
             .text(categories[i].name)
             .appendTo('#channel_detail .sys_directory');
       }
-      $.getJSON('/CMSAPI/channelCategory?channelId=' + channelId, function(category)
+      $.post('/CMSAPI/channelCategory', { 'channelId': channelId }, function(category)
       {
         if (category != null) {
           $('#channel_detail .sys_directory').val(category.key.id);
         }
-      });
-    });
+      }, 'json');
+    }, 'json');
     $('#channel_detail_cancel').unbind().click(function()
     {
       channelDetail.init(channelId);
@@ -942,7 +942,7 @@ var channelList =
     channelList.destroy();
     
     // load channels
-    $.getJSON('/CMSAPI/listOwnedChannels?msoId=' + $('#msoId').val(), function(channels)
+    $.post('/CMSAPI/listOwnedChannels', { 'msoId': $('#msoId').val() }, function(channels)
     {
       if (channels.length == 0) {
         $('#channel_list_empty').show();
@@ -1017,14 +1017,14 @@ var channelList =
         });
         channelInfoBlock.find('.channel_info_publish').click({ 'channelId': channelId, 'switchObject': switchObject }, function(event)
         {
-          $.getJSON('/CMSAPI/switchChannelPublicity?channelId=' + event.data.channelId, function(response)
+          $.post('/CMSAPI/switchChannelPublicity', { 'channelId': event.data.channelId }, function(response)
           {
             if (response) {
               event.data.switchObject.removeClass('chUnPublic').addClass('chPublic');
             } else {
               event.data.switchObject.removeClass('chPublic').addClass('chUnPublic');
             }
-          });
+          }, 'json');
           return false;
         });
         channelInfoBlock.find('.channel_info_detailbutton').click({ 'channelId': channelId }, function(event)
@@ -1051,7 +1051,7 @@ var channelList =
         });
       }
       $('#channel_list').show();
-    });
+    }, 'json');
     $('.create_channel_button').unbind().click(function()
     {
       if (overallLayout.destroyRightSideContent(false) == false) return false;
