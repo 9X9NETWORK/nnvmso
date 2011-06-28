@@ -1,5 +1,7 @@
 package com.nnvmso.service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import com.nnvmso.dao.SubscriptionLogDao;
@@ -18,8 +20,16 @@ public class SubscriptionLogManager {
 		return subDao.save(log);
 	}
 	
+	public SubscriptionLog findById(long id) {
+		return subDao.findById(id);
+	}
+	
 	public SubscriptionLog findByMsoIdAndChannelId(long msoId, long channelId) {
 		return subDao.findByMsoIdAndChannelId(msoId, channelId);
+	}
+
+	public SubscriptionLog findByMsoIdAndSetId(long msoId, long setId) {
+		return subDao.findByMsoIdAndSetId(msoId, setId);
 	}
 	
 	public int findTotalCountByChannelId(long channelId) {
@@ -30,4 +40,12 @@ public class SubscriptionLogManager {
 		return subDao.findByChannelId(channelId);
 	}
 	
+	public List<SubscriptionLog> findBySetIds(List<Long> setIds) {
+		List<SubscriptionLog> logs = new ArrayList<SubscriptionLog>();
+		for (Long id : setIds) {
+			SubscriptionLog log = this.findById(id);
+			if (log!= null) logs.add(log);
+		}
+		return logs;
+	}	
 }
