@@ -31,7 +31,7 @@ public class ChannelSetManager {
 		Date now = new Date();
 		channelSet.setCreateDate(now);
 		channelSet.setUpdateDate(now);
-		
+		channelSet.setChannelCount(channels.size());
 		channelSetDao.save(channelSet);
 		
 		for (MsoChannel channel : channels) {
@@ -55,6 +55,9 @@ public class ChannelSetManager {
 	public ChannelSet save(ChannelSet channelSet) {	
 		//NOTE check name existence if needed
 		channelSet.setUpdateDate(new Date());
+		//shouldn't be too many, should be ok
+		List<MsoChannel> channels = this.findChannelsById(channelSet.getKey().getId());
+		channelSet.setChannelCount(channels.size());
 		channelSetDao.save(channelSet);
 		
 		return channelSet;
