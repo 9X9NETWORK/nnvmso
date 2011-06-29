@@ -183,6 +183,8 @@ public class MsoChannelManager {
 	public String verifyUrl(String url) {
 		if (url == null) return null;
 		TranscodingService tranService = new TranscodingService();
+		if (!url.contains("http://") && !url.contains("https://"))
+			return null;
 		if (!url.contains("youtube.com")) {
 			if (url.contains("deimos3.apple.com")) { //temp fix for demo
 				return url;
