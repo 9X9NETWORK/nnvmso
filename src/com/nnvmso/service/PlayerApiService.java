@@ -290,7 +290,7 @@ public class PlayerApiService {
 		return NnStatusCode.API_DEPRECATED + "\t" + "Depreacated";		
 	}
 	
-	public String moveChannel(String userToken, String grid1, String grid2, boolean isCopy) {		
+	public String moveChannel(String userToken, String grid1, String grid2) {		
 		//verify input
 		if (userToken == null || userToken.length() == 0 || userToken.equals("undefined") || grid1 == null || grid2 == null) {
 			return NnStatusMsg.inputMissing(locale);
@@ -304,12 +304,7 @@ public class PlayerApiService {
 		if (user == null) { return messageSource.getMessage("nnstatus.user_invalid", new Object[] {NnStatusCode.USER_INVALID} , locale); }
 		
 		SubscriptionManager subMngr = new SubscriptionManager();
-		boolean success = false;
-		if (isCopy) {
-			success = subMngr.copyChannel(user.getKey().getId(), Short.parseShort(grid1), Short.parseShort(grid2));
-		} else {
-			success = subMngr.moveSeq(user.getKey().getId(), Integer.parseInt(grid1), Integer.parseInt(grid2));
-		}
+		boolean success = subMngr.moveSeq(user.getKey().getId(), Integer.parseInt(grid1), Integer.parseInt(grid2));
 		String result = NnStatusMsg.successStr(locale);
 		if (!success) 
 			result = messageSource.getMessage("nnstatus.subscription_error", new Object[] {NnStatusCode.SUBSCRIPTION_ERROR} , locale);
