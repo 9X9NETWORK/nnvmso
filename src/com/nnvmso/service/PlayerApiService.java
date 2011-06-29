@@ -315,6 +315,26 @@ public class PlayerApiService {
 			result = messageSource.getMessage("nnstatus.subscription_error", new Object[] {NnStatusCode.SUBSCRIPTION_ERROR} , locale);
 		return result;
 	}
+
+	public String copyChannel(String userToken, String channelId, String grid) {		
+		//verify input
+		if (userToken == null || userToken.length() == 0 || userToken.equals("undefined") || grid == null) {
+			return NnStatusMsg.inputMissing(locale);
+		}
+		if (!Pattern.matches("^\\d*$", grid) ||
+			Integer.parseInt(grid) < 0 || Integer.parseInt(grid) > 81)
+			return NnStatusMsg.inputError(locale);		
+		NnUser user = userMngr.findByToken(userToken);
+		if (user == null) { return messageSource.getMessage("nnstatus.user_invalid", new Object[] {NnStatusCode.USER_INVALID} , locale); }
+		
+		SubscriptionManager subMngr = new SubscriptionManager();
+		boolean success = false;
+		success = subMngr.copyChannel(user.getKey().getId(), Long.parseLong(channelId), Short.parseShort(grid));
+		String result = NnStatusMsg.successStr(locale);
+		if (!success) 
+			result = messageSource.getMessage("nnstatus.subscription_error", new Object[] {NnStatusCode.SUBSCRIPTION_ERROR} , locale);
+		return result;
+	}
 	
 	public String findLocaleByHttpRequest(HttpServletRequest req) {
 		String ip = req.getRemoteAddr();
@@ -436,29 +456,50 @@ public class PlayerApiService {
 		//verify input
 		if (userToken == null || userToken.equals("undefined"))			
 			return NnStatusMsg.inputMissing(locale);		
-		if (channelId == null && setId == null) 
+		if (channelId == null && setId == null) {
 			return NnStatusMsg.inputMissing(locale);
-		if ((channelId != null && !Pattern.matches("^\\d*$", channelId)) || 
-			(setId != null && !Pattern.matches("^\\d*$", setId)))
-			return NnStatusMsg.inputError(locale);		
+		}
 		//verify user
 		NnUser user = new NnUserManager().findByToken(userToken);
 		if (user == null) {return NnStatusMsg.userInvalid(locale);}
+		SubscriptionManager subMngr = new SubscriptionManager();
 		
-		//unsubscribe
+		String result = NnStatusMsg.successStr(locale);		
 		if (channelId != null) {
-			SubscriptionManager subMngr = new SubscriptionManager();
-			Subscription s = null;
-			if (grid == null) {
-				s = subMngr.findByUserIdAndChannelId(user.getKey().getId(), Long.parseLong(channelId));
+			String[] chArr = channelId.split(",");
+			if (chArr.length == 1) {
+				log.info("unsubscribe single channel");
+				Subscription s = null;
+				if (grid == null) {
+					s = subMngr.findByUserIdAndChannelId(user.getKey().getId(), Long.parseLong(channelId));
+				} else {
+					s = subMngr.findChannelSubscription(user.getKey().getId(), Long.parseLong(channelId), Integer.parseInt(grid));
+				}			
+				if (s == null || (s != null && s.getType() == MsoIpg.TYPE_READONLY)) {
+					return messageSource.getMessage("nnstatus.subscription_ro_channel", new Object[] {NnStatusCode.SUBSCRIPTION_ERROR} , locale);			
+				}
+				subMngr.unsubscribeChannel(s);
+				result += channelId + "\t" + messageSource.getMessage("nnstatus.success", new Object[] {NnStatusCode.SUCCESS} , locale); 
 			} else {
-				s = subMngr.findChannelSubscription(user.getKey().getId(), Long.parseLong(channelId), Integer.parseInt(grid));
-				System.out.print("find subscription:" + s);
-			}			
-			if (s == null || (s != null && s.getType() == MsoIpg.TYPE_READONLY)) {
-				return messageSource.getMessage("nnstatus.subscription_ro_channel", new Object[] {NnStatusCode.SUBSCRIPTION_ERROR} , locale);			
-			}			
-			subMngr.unsubscribeChannel(s);
+				log.info("unsubscribe multiple channels");
+				if (grid == null) return NnStatusMsg.inputMissing(locale);
+				String[] gridArr = grid.split(",");
+				if (gridArr.length != chArr.length) return NnStatusMsg.inputMissing(locale);
+				List<Long> chlist = new ArrayList<Long>();
+				List<Integer> gridlist = new ArrayList<Integer>();
+				for (int i=0; i<chArr.length; i++) { chlist.add(Long.valueOf(chArr[i]));}
+				for (int i=0; i<gridArr.length; i++) { gridlist.add(Integer.valueOf(gridArr[i]));}
+				result = result + separatorStr;
+				for (int i=0; i<chlist.size(); i++) {
+					Subscription s = subMngr.findChannelSubscription(user.getKey().getId(), chlist.get(i), gridlist.get(i));
+					if (s == null || (s != null && s.getType() == MsoIpg.TYPE_READONLY)) {
+						 result = result + chlist.get(i) + "\t" + messageSource.getMessage("nnstatus.subscription_ro_channel", new Object[] {NnStatusCode.SUBSCRIPTION_ERROR} , locale);
+					} else {
+						subMngr.unsubscribeChannel(s);
+						result = result + chlist.get(i) + "\t" + messageSource.getMessage("nnstatus.success", new Object[] {NnStatusCode.SUCCESS} , locale);
+					}
+				}
+			}
 		}
 		if (setId != null) {
 			AreaOwnershipManager areaMngr = new AreaOwnershipManager();
@@ -469,7 +510,7 @@ public class PlayerApiService {
 			*/
 			areaMngr.delete(area); 
 		}
-		return NnStatusMsg.successStr(locale);
+		return result;
 	}
 	
 	public String changeSetInfo(String userToken, String name, String areaNo) {
@@ -515,7 +556,6 @@ public class PlayerApiService {
 		String output = messageSource.getMessage("nnstatus.channel_or_user_invalid", new Object[] {NnStatusCode.CHANNEL_OR_USER_INVALID} , locale);		
 		NnUser user = new NnUserManager().findByToken(userToken);
 		if (user == null) {return output;}	
-		
 		SubscriptionManager subMngr = new SubscriptionManager();
 		if (setId != null) {			
 			//find all channels
@@ -569,19 +609,22 @@ public class PlayerApiService {
 
 		//verify channel and grid
 		if (channelId != null) {
+			System.out.println("subscription channelid:" + channelId);
 			long cId = Long.parseLong(channelId);			
 			MsoChannel channel = new MsoChannelManager().findById(cId);			
 			if (channel == null || channel.getStatus() == MsoChannel.STATUS_ERROR) { 
 				return messageSource.getMessage("nnstatus.subscription_duplicate_channel", new Object[] {NnStatusCode.CHANNEL_STATUS_ERROR} , locale);
 			}
 			boolean status = subMngr.subscribeChannel(user.getKey().getId(), cId, Integer.parseInt(gridId), MsoIpg.TYPE_GENERAL, mso.getKey().getId());
+			System.out.println("status is ==" + status);
 			if (!status) {
 				//the general status shows error even there's only one error
 				output = messageSource.getMessage("nnstatus.subscription_duplicate_channel", new Object[] {NnStatusCode.SUBSCRIPTION_DUPLICATE_CHANNEL} , locale);
-			}			
+			} else {
+				output = NnStatusMsg.successStr(locale);
+			}
 		}
-		
-		output = NnStatusMsg.successStr(locale);		
+				
 		return output;
 	}
 
@@ -755,41 +798,46 @@ public class PlayerApiService {
 	}
 				
 	private int convertSetPosToIPGSeq(int seq, int pos) {
-		System.out.println("seq:" + seq + ";pos=" + pos);
+		log.info("seq:" + seq + ";pos=" + pos);
 		if (seq == 0) {
 			return 0;
 		}
-		switch(pos) {
-		  case 1:
-			Integer[] map1 = {1,2,3,10,11,12,19,20,21};
-			return map1[seq-1];
-		  case 2:
-			Integer[] map2 = {4,5,6,13,14,15,22,23,24};
-			return map2[seq-1];
-		  case 3:
-			Integer[] map3 = {7,8,9,16,17,18,25,26,27};
-			return map3[seq-1];
-		  case 4:
-			Integer[] map4 = {28,29,30,37,38,39,46,47,48};
-			return map4[seq-1];
-		  case 5:
-			Integer[] map5 = {31,32,33,40,41,42,49,50,51};
-			return map5[seq-1];
-		  case 6:
-			Integer[] map6 = {34,35,36,43,44,45,52,53,54};
-			return map6[seq-1];
-		  case 7:
-			Integer[] map7 = {55,56,57,64,65,66,74,75,75};
-			return map7[seq-1];
-		  case 8:
-			Integer[] map8 = {58,59,60,67,68,69,76,77,78};
-			return map8[seq-1];
-		  case 9:
-			Integer[] map9 = {61,62,63,70,71,72,79,80,81};
-			return map9[seq-1];
-		  default:
+		try {
+			switch(pos) {
+			  case 1:
+				Integer[] map1 = {1,2,3,10,11,12,19,20,21};
+				return map1[seq-1];
+			  case 2:
+				Integer[] map2 = {4,5,6,13,14,15,22,23,24};
+				return map2[seq-1];
+			  case 3:
+				Integer[] map3 = {7,8,9,16,17,18,25,26,27};
+				return map3[seq-1];
+			  case 4:
+				Integer[] map4 = {28,29,30,37,38,39,46,47,48};
+				return map4[seq-1];
+			  case 5:
+				Integer[] map5 = {31,32,33,40,41,42,49,50,51};
+				return map5[seq-1];
+			  case 6:
+				Integer[] map6 = {34,35,36,43,44,45,52,53,54};
+				return map6[seq-1];
+			  case 7:
+				Integer[] map7 = {55,56,57,64,65,66,74,75,75};
+				return map7[seq-1];
+			  case 8:
+				Integer[] map8 = {58,59,60,67,68,69,76,77,78};
+				return map8[seq-1];
+			  case 9:
+				Integer[] map9 = {61,62,63,70,71,72,79,80,81};
+				return map9[seq-1];
+			  default:
+				return 0;
+			}
+		} catch (IndexOutOfBoundsException e){
+			log.info("pass wrong data");
 			return 0;
-		}
+		}		
 	}
 	
 	private String convertEpochToTime(String transcodingUpdateDate, Date updateDate) {
