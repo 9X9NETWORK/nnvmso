@@ -476,18 +476,7 @@ public class CmsApiController {
 		MsoChannel channel = channelMngr.findById(channelId);
 		if (channel == null) {
 			return "Invalid channelId";
-		}
-		short oriContentType = channel.getContentType();
-		short contentType = channelMngr.getContentTypeByUrl(sourceUrl); //assuming youtube playlist and fb is eliminated
-		if (channel.getProgramCount() == 0) 
-			channel.setContentType(contentType);
-		else 
-			if (contentType != channel.getContentType())
-				channel.setContentType(MsoChannel.CONTENTTYPE_MIXED);
-		if (oriContentType != contentType)
-			channelMngr.save(channel);
-		
-		
+		}		
 		Long timestamp = System.currentTimeMillis() / 1000L;
 		MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
 		sha1.update(sourceUrl.getBytes());
