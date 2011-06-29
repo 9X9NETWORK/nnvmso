@@ -93,7 +93,20 @@ public class SubscriptionManager {
 		subDao.save(sub);
 		return true;
 	}
-
+	
+	public boolean copyChannel(long userId, long channelId, short seq) {
+		Subscription occupied = this.findByUserIdAndSeq(userId, seq);
+		if (occupied != null)
+			return false;
+		Subscription s = new Subscription(userId, channelId, seq, MsoIpg.TYPE_GENERAL);
+		Date now = new Date();
+		s.setCreateDate(now);
+		s.setUpdateDate(now);
+		subDao.save(s);		
+		return true;		
+	}
+	
+	/*
 	//move from seq1 to seq2
 	public boolean copyChannel(long userId, short seq1, short seq2) {						
 		Subscription sub = subDao.findByUserIdAndSeq(userId, seq1);
@@ -109,6 +122,7 @@ public class SubscriptionManager {
 		subDao.save(s);		
 		return true;
 	}
+	*/
 	
 	public List<Subscription> list(int page, int limit, String sidx, String sord) {
 		return subDao.list(page, limit, sidx, sord);
