@@ -2190,7 +2190,7 @@
 		user_data : {},
 
 		drag_start : function (e, data, html) { 
-			if($.vakata.dnd.is_drag) { $.vakata.drag_stop({}); }
+			if($.vakata.dnd.is_drag && $.vakata.drag_stop) { $.vakata.drag_stop({}); }
 			try {
 				e.currentTarget.unselectable = "on";
 				e.currentTarget.onselectstart = function() { return false; };

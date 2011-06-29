@@ -264,7 +264,7 @@
                     <div class="clear"></div>
                     <p class="hint"><spring:message code="cms.channel_management.msg.video_url_hint"/></p><br/>
                   </div>
-                  <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.program_logo"/></label>
+                  <label class="floatL"><spring:message code="cms.channel_management.label.program_logo"/></label>
                   <div class="uploadImg">
                     <img alt="" src="/images/cms/upload_img.jpg" class="floatL ep_image"/><input type="hidden" class="ep_image_updated" value="fase"/>
                     <div class="floatL imgBtn">

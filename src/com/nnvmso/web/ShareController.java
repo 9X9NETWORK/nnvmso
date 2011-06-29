@@ -14,13 +14,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.YouTubeLib;
-import com.nnvmso.model.Ipg;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoProgram;
 import com.nnvmso.model.NnUser;
 import com.nnvmso.model.NnUserShare;
 import com.nnvmso.service.FBService;
-import com.nnvmso.service.IpgManager;
 import com.nnvmso.service.MsoManager;
 import com.nnvmso.service.MsoProgramManager;
 import com.nnvmso.service.NnUserManager;

@@ -94,9 +94,9 @@ h2.popTitle { border-bottom:1px dashed #b3b3b3; padding-bottom:10px; max-width:3
 .ch_disable { background:url(/images/cms/ch_disable.jpg) no-repeat 5px 0px; width:76px; height:73px; }
 .slide ul { padding:10px 0 0 0; }
 li.ch_normal { width:100px; height:83px; text-align:center; padding: 5px 0 0 2px; }
-li.ch_drag { background:mediumseagreen; }
+li.ch_drag { background:MediumSeaGreen; }
 li.ch_drag img { opacity:0.5; filter:alpha(opacity=50) }
-.ch_drag , .ch_drag li img { background:LightGoldenRodYellow; opacity:0.8; filter:alpha(opacity=80) }
+.ch_drag , .ch_drag li img { background:LightGreen; opacity:0.8; filter:alpha(opacity=80) }
 
 /* Slideshow style rules.*/
 #slideshow {

@@ -17,8 +17,42 @@ var draggableProperties =
   'opacity':  0.5,
   'helper':   "clone",
   'scroll':   false,
-  'revert':   'invalid'
-  };
+  'revert':   'invalid',
+  'zIndex':   2700
+};
+
+var droppableProperties =
+{
+  accept: 'li',
+  hoverClass: 'ch_drag',
+  drop: function(event, ui)
+  {
+    var from = $(ui.draggable);
+    var to = $(event.target).parent();
+    var categoryId = to.attr('id');
+    var type = from.find('input[name="type"]').val();
+    var objectId = from.find('input[name="id"]').val();
+    var parameters = {
+      'categoryId': categoryId
+    };
+    if (type == 'channelSet') {
+      var url = '/CMSAPI/createCategoryChannelSet';
+      parameters['channelSetId'] = objectId;
+    } else {
+      var url = '/CMSAPI/createCategoryChannel';
+      parameters['channelId'] = objectId;
+    }
+    $.post(url, parameters, function(response)
+    {
+      if (response != 'OK') {
+        alert($('#lang_warning_error_occurs').text());
+        return;
+      }
+      to.find('> ul > li[rel!="folder"]').remove();
+      loadCategoryChannelsAndChannelSets(categoryId);
+    }, 'text');
+  }
+};
 
 var populateBubbleChannelSetContent = function(channelSet)
 {
@@ -49,7 +83,7 @@ var populateBubbleChannelContent = function(channel)
 
 var loadCategoryChannelsAndChannelSets = function(categoryId) {
   // load channels
-  $.get('/CMSAPI/listCategoryChannels?categoryId=' + categoryId, function(channels)
+  $.post('/CMSAPI/listCategoryChannels', { 'categoryId': categoryId }, function(channels)
   {
     for (i in channels)
     {
@@ -64,13 +98,14 @@ var loadCategoryChannelsAndChannelSets = function(categoryId) {
       $('.ch_normal input[name="id"][value="'+channelId+'"]')
         .parent()
         .removeClass('ch_normal')
-        .removeClass('jstree-draggable')
+        /*.removeClass('jstree-draggable')*/
+        .draggable('disable')
         .addClass('ch_disable')
         .RemoveBubblePopup();
     }
   }, 'json');
   // load channel sets
-  $.get('/CMSAPI/listCategoryChannelSets?categoryId=' + categoryId, function(channelSets)
+  $.post('/CMSAPI/listCategoryChannelSets', { 'categoryId': categoryId }, function(channelSets)
   {
     for (i in channelSets)
     {
@@ -85,7 +120,8 @@ var loadCategoryChannelsAndChannelSets = function(categoryId) {
       $('.ch_normal input[name="id"][value="'+channelSetId+'"]')
         .parent()
         .removeClass('ch_normal')
-        .removeClass('jstree-draggable')
+        /*.removeClass('jstree-draggable')*/
+        .draggable('disable')
         .addClass('ch_disable')
         .RemoveBubblePopup();
     }
@@ -115,6 +151,7 @@ var composeCategoryTreeData = function(categories, all)
       item.append(composeCategoryTreeData(sub, all));
     }
     loadCategoryChannelsAndChannelSets(categoryId);
+    //item.droppable(droppableProperties);
     ul.append(item);
   }
   result.append(ul);
@@ -141,7 +178,7 @@ var directoryArea =
       if (confirm(confirmMessage.replace('{categoryName}', categoryName)) == false) {
         return;
       }
-      $.get('/CMSAPI/removeCategory?categoryId=' + categoryId, function(response)
+      $.post('/CMSAPI/removeCategory', { 'categoryId': categoryId }, function(response)
       {
         if (response != 'OK') {
           alert($('#lang_warning_error_occurs').text());
@@ -189,7 +226,7 @@ var directoryArea =
       }
       $('#treeview').jstree('rename');
     });
-    $.get('/CMSAPI/listCategories?msoId=' + $('#msoId').val(), function(categories)
+    $.post('/CMSAPI/listCategories', { 'msoId': $('#msoId').val() }, function(categories)
     {
       var root = [];
       for (var i = 0; i < categories.length; i++)
@@ -199,7 +236,81 @@ var directoryArea =
           root.push(categories[i]);
         }
       }
-      var treeData = composeCategoryTreeData(root, categories);
+      $('#treeview').bind('rename.jstree', function(event, data)
+      {
+        var selected = $('#treeview').jstree('get_selected');
+        var categoryId = $(selected).attr('id');
+        var newName = data.rslt.new_name;
+        var oldName = data.rslt.old_name;
+        if (newName != oldName)
+        {
+          var parameter = {
+            'categoryId': categoryId,
+            'name': newName
+          };
+          $.post('/CMSAPI/renameCategory', parameter, function(response)
+          {
+            if (response != 'OK')
+              alert($('#lang_warning_error_occurs').text());
+          }, 'text');
+        }
+      });
+      $('#treeview').bind('create.jstree', function(event, data)
+      {
+        var folder = data.rslt.obj;
+        if (folder.attr('rel') != 'folder') {
+          return;
+        }
+        var categoryId = folder.attr('id');
+        var name = data.rslt.name;
+        var parameter = {
+          'categoryId': categoryId,
+          'name': name
+        };
+        $.post('/CMSAPI/renameCategory', parameter, function(response)
+        {
+          if (response != 'OK')
+            alert($('#lang_warning_error_occurs').text());
+        }, 'text');
+        folder.find('> a').droppable(droppableProperties).effect('highlight', null, 'slow');
+      });
+      $('#treeview').bind('move_node.jstree', function(event, data)
+      {
+        var toCategoryId = $(data.rslt.np).attr('id');
+        var type = $(data.rslt.o).attr('rel');
+        var objectId = $(data.rslt.o).attr('id');
+        var fromCategoryId = $(data.rslt.op).attr('id');
+        
+        var url;
+        var parameters = {
+          'toCategoryId': toCategoryId,
+          'fromCategoryId': fromCategoryId
+        }
+        if (type == 'file') {
+          url = '/CMSAPI/moveCategoryChannel';
+          parameters['channelId'] = objectId;
+        } else if (type == 'set') {
+          url = '/CMSAPI/moveCategoryChannelSet';
+          parameters['channelSetId'] = objectId;
+        } else if (type == 'folder') {
+          url = '/CMSAPI/moveCategory';
+          parameters['categoryId'] = objectId;
+        } else {
+          return;
+        }
+        $.post(url, parameters, function(response)
+        {
+          if (response != 'OK') {
+            alert($('#lang_warning_error_occurs').text());
+          }
+        }, 'text');
+        
+      });
+      $('#treeview').html(composeCategoryTreeData(root, categories));
+      $('#treeview').bind('loaded.jstree', function(event, data)
+      {
+        $('li[rel="folder"] > a').droppable(droppableProperties).effect('highlight', null, 'slow');
+      });
       $('#treeview').jstree({
         'dnd': {
           'drop_finish': function(data)
@@ -233,62 +344,15 @@ var directoryArea =
                          .parent()
                          .removeClass('ch_disable')
                          .addClass('ch_normal')
-                         .addClass('jstree-draggable');
+                         /*.addClass('jstree-draggable');*/
+                         .draggable('enable');
               bubblePopupProperties['innerHtml'] = ch.find('span').html();
               ch.CreateBubblePopup(bubblePopupProperties);
             }, 'text')
-          },
-          'drag_finish': function(data)
-          {
-            var categoryId = data.r.attr('id');
-            var obj;
-            if (data.o.tagName != 'LI')
-              obj = $(data.o).parent();
-            else
-              obj = $(data.o);
-            var type = obj.find('input[name="type"]').val();
-            var objectId = obj.find('input[name="id"]').val();
-            var url;
-            var parameters = {
-              'categoryId': categoryId
-            };
-            if (type == 'channelSet') {
-              url = '/CMSAPI/createCategoryChannelSet';
-              parameters['channelSetId'] = objectId;
-            } else {
-              url = '/CMSAPI/createCategoryChannel';
-              parameters['channelId'] = objectId;
-            }
-            $.post(url, parameters, function(response)
-            {
-              if (response != 'OK') {
-                alert($('#lang_warning_error_occurs').text());
-                return;
-              }
-              $(data.r).find('ul > li[rel!="folder"]').remove();
-              loadCategoryChannelsAndChannelSets(categoryId);
-            }, 'text');
-          },
-          'drag_check': function(data)
-          {
-            if (data.r.attr('rel') == 'folder') {
-              return {
-                before: false,
-                after: false,
-                inside: true
-              }
-            } else {
-              return {
-                before: false,
-                after: false,
-                inside: false
-              }
-            }
-          },
-          'drag_target': 'li.jstree-draggable'
+          }
         },
         'html_data': {
-          'data': treeData
+          //'data': treeData
         },
         'types': {
           'valid_children': ['folder'],
@@ -333,74 +397,6 @@ var directoryArea =
         },
         'plugins': ['themes', 'html_data', 'types', 'ui', 'crrm', 'dnd'] 
       });
-      $('#treeview').bind('rename.jstree', function(event, data)
-      {
-        var selected = $('#treeview').jstree('get_selected');
-        var categoryId = $(selected).attr('id');
-        var newName = data.rslt.new_name;
-        var oldName = data.rslt.old_name;
-        if (newName != oldName)
-        {
-          var parameter = {
-            'categoryId': categoryId,
-            'name': newName
-          };
-          $.post('/CMSAPI/renameCategory', parameter, function(response)
-          {
-            if (response != 'OK')
-              alert($('#lang_warning_error_occurs').text());
-          }, 'text');
-        }
-      });
-      $('#treeview').bind('create.jstree', function(event, data)
-      {
-        if (data.rslt.obj.attr('rel') != 'folder') {
-          return;
-        }
-        var categoryId = data.rslt.obj.attr('id');
-        var name = data.rslt.name;
-        var parameter = {
-          'categoryId': categoryId,
-          'name': name
-        };
-        $.post('/CMSAPI/renameCategory', parameter, function(response)
-        {
-          if (response != 'OK')
-            alert($('#lang_warning_error_occurs').text());
-        }, 'text');
-      });
-      $('#treeview').bind('move_node.jstree', function(event, data)
-      {
-        var toCategoryId = $(data.rslt.np).attr('id');
-        var type = $(data.rslt.o).attr('rel');
-        var objectId = $(data.rslt.o).attr('id');
-        var fromCategoryId = $(data.rslt.op).attr('id');
-        
-        var url;
-        var parameters = {
-          'toCategoryId': toCategoryId,
-          'fromCategoryId': fromCategoryId
-        }
-        if (type == 'file') {
-          url = '/CMSAPI/moveCategoryChannel';
-          parameters['channelId'] = objectId;
-        } else if (type == 'set') {
-          url = '/CMSAPI/moveCategoryChannelSet';
-          parameters['channelSetId'] = objectId;
-        } else if (type == 'folder') {
-          url = '/CMSAPI/moveCategory';
-          parameters['categoryId'] = objectId;
-        } else {
-          return;
-        }
-        $.post(url, parameters, function(response)
-        {
-          if (response != 'OK') {
-            alert($('#lang_warning_error_occurs').text());
-          }
-        }, 'text');
-        
-      });
     });
   }
 };
@@ -419,7 +415,7 @@ var channelAndSetPool =
   },
   init: function()
   {
-    $.get('/CMSAPI/listOwnedChannelSets?msoId=' + $('#msoId').val(), function(channelSets)
+    $.post('/CMSAPI/listOwnedChannelSets', { 'msoId': $('#msoId').val() }, function(channelSets)
     {
       for (var i = 0; i < channelSets.length; i++)
       {
@@ -432,7 +428,7 @@ var channelAndSetPool =
         
         var innerHtml = populateBubbleChannelSetContent(channelSets[i]);
         $('<span></span>').html(innerHtml).hide().appendTo(item);
-        item.addClass('jstree-draggable').css('z-index', 100);
+        item/*.addClass('jstree-draggable')*/.draggable(draggableProperties).css('z-index', 100);
         item.children().each(function()
         {
           $(this).css('z-index', 1);
@@ -440,7 +436,7 @@ var channelAndSetPool =
         
       }
       
-      $.get('/CMSAPI/listOwnedChannels?msoId=' + $('#msoId').val(), function(channels)
+      $.post('/CMSAPI/listOwnedChannels', { 'msoId': $('#msoId').val() }, function(channels)
       {
         for (var i = 0; i < channels.length; i++)
         {
@@ -453,7 +449,7 @@ var channelAndSetPool =
           
           var innerHtml = populateBubbleChannelContent(channels[i]);
           $('<span></span>').html(innerHtml).hide().appendTo(item);
-          item.addClass('jstree-draggable').css('z-index', 100);
+          item/*.addClass('jstree-draggable')*/.draggable(draggableProperties).css('z-index', 100);
           item.children().each(function()
           {
             $(this).css('z-index', 1);

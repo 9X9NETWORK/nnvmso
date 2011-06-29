@@ -103,4 +103,8 @@ var initSetupPage = function()
 $(function()
 {
   initSetupPage();
+  $.ajaxSetup ({
+    // Disable caching of AJAX responses
+    cache: false
+  });
 });
