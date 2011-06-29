@@ -648,14 +648,12 @@ public class PlayerApiController {
 	public ResponseEntity<String> moveChannel(@RequestParam(value="user", required=false) String userToken, 
 											  @RequestParam(value="grid1", required=false) String grid1,
 											  @RequestParam(value="grid2", required=false) String grid2,
-											  @RequestParam(value="copy", required=false) String copy,
 											  HttpServletRequest req){
 		this.prepService(req);
 		log.info("userToken=" + userToken + ";grid1=" + grid1 + ";grid2=" + grid2);
-		boolean isCopy = Boolean.parseBoolean(copy);
 		String output = NnStatusMsg.errorStr(locale);
 		try {
-			output = playerApiService.moveChannel(userToken, grid1, grid2, isCopy);
+			output = playerApiService.moveChannel(userToken, grid1, grid2);
 		} catch (Exception e){
 			output = playerApiService.handleException(e);
 		}	
