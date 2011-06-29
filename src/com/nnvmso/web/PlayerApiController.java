@@ -640,8 +640,7 @@ public class PlayerApiController {
 	 * 
 	 * @param user user's unique identifier
 	 * @param grid1 "from" grid
-	 * @param grid2 "to" grid
-	 * @param copy optional, it will copy grid1 channel to grid2 if set to true 
+	 * @param grid2 "to" grid 
 	 * 
 	 * @return status code and status message
 	*/
@@ -663,7 +662,33 @@ public class PlayerApiController {
 		log.info(output);
 		return NnNetUtil.textReturn(output);		
 	}					
-		
+
+	/**
+	 * Copy a channel to grid location
+	 * 
+	 * @param user user's unique identifier
+	 * @param channel channel id
+	 * @param grid grid location 
+	 * 
+	 * @return status code and status message
+	*/
+	@RequestMapping(value="copyChannel")
+	public ResponseEntity<String> copyChannel(@RequestParam(value="user", required=false) String userToken, 
+											  @RequestParam(value="channel", required=false) String channelId,
+											  @RequestParam(value="grid", required=false) String grid,
+											  HttpServletRequest req){
+		this.prepService(req);
+		log.info("userToken=" + userToken + ";grid=" + grid);
+		String output = NnStatusMsg.errorStr(locale);
+		try {
+			output = playerApiService.copyChannel(userToken, channelId, grid);
+		} catch (Exception e){
+			output = playerApiService.handleException(e);
+		}	
+		log.info(output);
+		return NnNetUtil.textReturn(output);		
+	}					
+	
 	/**
 	 * @deprecated
 	 * Get "new" program list. Current "new" definition: the latest 3 shows in a channel.   
