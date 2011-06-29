@@ -641,6 +641,7 @@ public class PlayerApiController {
 	 * @param user user's unique identifier
 	 * @param grid1 "from" grid
 	 * @param grid2 "to" grid
+	 * @param copy optional, it will copy grid1 channel to grid2 if set to true 
 	 * 
 	 * @return status code and status message
 	*/
@@ -648,12 +649,14 @@ public class PlayerApiController {
 	public ResponseEntity<String> moveChannel(@RequestParam(value="user", required=false) String userToken, 
 											  @RequestParam(value="grid1", required=false) String grid1,
 											  @RequestParam(value="grid2", required=false) String grid2,
+											  @RequestParam(value="copy", required=false) String copy,
 											  HttpServletRequest req){
 		this.prepService(req);
 		log.info("userToken=" + userToken + ";grid1=" + grid1 + ";grid2=" + grid2);
+		boolean isCopy = Boolean.parseBoolean(copy);
 		String output = NnStatusMsg.errorStr(locale);
 		try {
-			output = playerApiService.moveChannel(userToken, grid1, grid2);
+			output = playerApiService.moveChannel(userToken, grid1, grid2, isCopy);
 		} catch (Exception e){
 			output = playerApiService.handleException(e);
 		}	
