@@ -10,7 +10,6 @@ import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoProgram;
 import com.nnvmso.web.json.transcodingservice.ContentWorker;
-
 import com.nnvmso.web.json.transcodingservice.PostResponse;
 @Service
 public class ContentWorkerService {
@@ -18,17 +17,16 @@ public class ContentWorkerService {
 	private static int TASK_CHANNEL_LOGO_PROCESS = 0;
 	private static int TASK_PROGRAM_LOGO_PROCESS = 1;
 	private static int TASK_PROGRAM_VIDEO_PROCESS = 2; 	
-	
+		
 	public void submit(int task, ContentWorker content, HttpServletRequest req) {
 		TranscodingService service = new TranscodingService();
 		String[] transcodingEnv = service.getTranscodingEnv(req);
-		//String transcodingServer = transcodingEnv[0] + "?task=" + task;
-		//String transcodingServer = "http://ec2-184-73-152-29.compute-1.amazonaws.com/dev3/hello.php";
-		String transcodingServer = "http://ec2-184-73-152-29.compute-1.amazonaws.com/dev3/contentworker.php" + "?task=" + task;
+		String transcodingServer = transcodingEnv[0] + "contentworker.php" + "?task=" + task;
 		String callbackUrl = transcodingEnv[1];
 		String devel = transcodingEnv[2];		
 		content.setCallback(callbackUrl);
 		content.setErrorCode(String.valueOf(NnStatusCode.SUCCESS));
+		log.info("submit to " + transcodingServer + "; callbackUrl is " + callbackUrl);
 		log.info(content.toString());
 		if (!devel.equals("1"))
 			NnNetUtil.urlPostWithJson(transcodingServer, content);
