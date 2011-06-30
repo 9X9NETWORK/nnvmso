@@ -1007,6 +1007,8 @@ public class PlayerApiService {
 	private String composeChannelLineupStr(MsoChannel c, Mso mso) {
 		String intro = c.getIntro();
 		if (intro != null) {
+			intro = intro.replaceAll("\n", " ");
+			intro = intro.replaceAll("\t", " ");
 			int introLenth = (intro.length() > 256 ? 256 : intro.length()); 
 			intro = intro.substring(0, introLenth);
 		} else {
