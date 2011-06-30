@@ -93,6 +93,7 @@ public class MsoProgramManager {
 		msoProgramDao.delete(program);
 		log.info("delete program" + id);
 		//channel's program count
+		this.deleteCacheByChannel(program.getChannelId());
 		MsoChannelManager channelMngr = new MsoChannelManager();
 		channelMngr.calculateAndSaveChannelCount(program.getChannelId());
 		//cache
