@@ -964,7 +964,16 @@ var brandinfo = "${brandInfo}";
 <div id="log-layer" style="position: absolute; left: 0; top: 0; height: 100%; width: 100%; background: white; color: black; text-align: left; padding: 20px; overflow: scroll; z-index: 9999; display: none"></div>
 
 <div id="mask"></div>
-
+<div id="tribtn-layer">
+  <div class="tribtn-holder">
+    <p>This set has been added to your Smart Guide!</p>
+    <div class="actions">
+      <a class="btn" id="btn-watchSet"><span>Watch this set</span></a>
+      <a class="btn" id="btn-toFset"><span>Look at more featured sets</span></a>
+      <a class="btn" id="btn-toSG"><span>Return to Smart Guide</span></a>
+    </div>
+  </div>
+ </div>
 <div id="fb-root"></div>
 
 <!--/div-->
