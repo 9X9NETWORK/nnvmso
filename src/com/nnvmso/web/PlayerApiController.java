@@ -458,7 +458,7 @@ public class PlayerApiController {
 	/**
 	 * User unsubscribes a channel or a set. 
 	 * 
-	 * To unsubscribe a channel, use params channel and seq; to unsubscribe a set, use param set.
+	 * To unsubscribe a channel, use params channel and grid; to unsubscribe a set, use param set.
 	 * 
 	 * <p>Example: http://host:port/playerAPI/unsubscribe?user=QQl0l208W2C4F008980F&channel=51</p>
 	 * 
@@ -466,9 +466,9 @@ public class PlayerApiController {
 	 * @param channel channelId
 	 * @param grid grid location. use with channel.   
 	 * giving channel only is valid (for backward compatibility), 
-	 * but since one channel can exist on multitple locations in a smart guide,
+	 * but since one channel can exist on multiple  locations in a smart guide,
 	 * it could result in unsubscribing on an unexpected grid location. 
-	 * @param set set id. 
+	 * @param set set id.
 	 * @return status code and status message
 	 */			
 	@RequestMapping(value="unsubscribe")
