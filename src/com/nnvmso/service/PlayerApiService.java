@@ -599,7 +599,8 @@ public class PlayerApiService {
 				log.setSetId(cs.getKey().getId());
 				log.setMsoId(mso.getKey().getId());
 				logMngr.save(log);
-			}			
+			}		
+			output = NnStatusMsg.successStr(locale);
 		}
 
 		//verify channel and grid
