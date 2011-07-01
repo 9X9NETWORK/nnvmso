@@ -163,6 +163,23 @@ public class MsoChannelDao extends GenericDao<MsoChannel> {
 		}
 		return detached;
 	}	
+
+	public List<MsoChannel> findFeaturedChannels() {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		List<MsoChannel> detached = new ArrayList<MsoChannel>(); 
+		try {
+			Query q = pm.newQuery(MsoChannel.class);
+			q.setFilter("featured == featuredParam");
+			q.declareParameters("boolean featuredParam");
+			q.setOrdering("createDate asc");
+			@SuppressWarnings("unchecked")
+			List<MsoChannel> channels = (List<MsoChannel>) q.execute(true);
+			detached = (List<MsoChannel>)pm.detachCopyAll(channels);
+		} finally {
+			pm.close();
+		}
+		return detached;
+	}	
 	
 	public List<MsoChannel> findAllByStatus(short status) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
