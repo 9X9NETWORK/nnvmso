@@ -909,7 +909,7 @@ public class PlayerApiController {
 		this.prepService(req);
 		String output = NnStatusMsg.errorStr(locale);
 		try {
-			output = playerApiService.findFeaturedSetsByMso();
+			output = playerApiService.findFeaturedSets();
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}
@@ -927,7 +927,7 @@ public class PlayerApiController {
 		this.prepService(req);
 		String output = NnStatusMsg.errorStr(locale);
 		try {
-			output = playerApiService.findFeaturedChannelsByMso();
+			output = playerApiService.findFeaturedChannels();
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}
