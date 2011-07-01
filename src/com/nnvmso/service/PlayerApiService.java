@@ -1126,11 +1126,11 @@ public class PlayerApiService {
 		return output;		
 	}
 	
-	public String findFeaturedSetsByMso() {
+	public String findFeaturedSets() {
 		ChannelSetManager setMngr = new ChannelSetManager();
 		SubscriptionLogManager logMngr = new SubscriptionLogManager();		
 		
-		List<ChannelSet> sets = setMngr.findFeaturedSetsByMso(mso);		
+		List<ChannelSet> sets = setMngr.findFeaturedSets();		
 		String output = NnStatusMsg.successStr(locale) + separatorStr;		
 		for (ChannelSet set : sets) {
 			SubscriptionLog log = logMngr.findByMsoIdAndSetId(mso.getKey().getId(), set.getKey().getId());
@@ -1149,17 +1149,9 @@ public class PlayerApiService {
 		return output;		
 	}
 
-	public String findFeaturedChannelsByMso() {
+	public String findFeaturedChannels() {
 		MsoChannelManager channelMngr = new MsoChannelManager();
-		//!!! temp
-		NnUser user = null;
-		if (mso.getName().equals(Mso.NAME_5F)) {
-			user = userMngr.findByEmailAndMso("mso@5f.tv", mso);
-		} else  {
-			user = userMngr.findByEmailAndMso("mso@9x9.tv", mso);
-		}
-		
-		List<MsoChannel> channels = channelMngr.findFeaturedChannelsByMso(user);		
+		List<MsoChannel> channels = channelMngr.findFeaturedChannels();		
 		String output = NnStatusMsg.successStr(locale) + separatorStr;
 		for (MsoChannel c : channels) {
 			output += this.composeChannelLineupStr(c, mso) + "\n";							
