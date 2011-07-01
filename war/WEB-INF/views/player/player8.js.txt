@@ -4284,6 +4284,8 @@ function fb_fetched_1 (data)
   else
     {
     log ('******** link not in fbdata!');
+    $("#waiting").hide();
+    notice_ok (thumbing, "An error on Facebook has occurred", "switch_to_ipg()");
     return;
     }
 
