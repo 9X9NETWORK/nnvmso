@@ -274,6 +274,11 @@ public class MsoChannelManager {
 		List<MsoChannel> channels = msoChannelDao.findFeaturedChannelsByMso(user);
 		return channels;
 	}		
+
+	public List<MsoChannel> findFeaturedChannels() {
+		List<MsoChannel> channels = msoChannelDao.findFeaturedChannels();
+		return channels;
+	}		
 	
 	//!!! here or dao
 	public MsoChannel findBySourceUrlSearch(String url) {
