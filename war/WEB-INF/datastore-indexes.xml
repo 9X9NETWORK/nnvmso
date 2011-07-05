@@ -30,6 +30,10 @@
   <datastore-index kind="MsoChannel" ancestor="false" source="manual">
     <property name="__key__" direction="desc"/>
   </datastore-index>
+  <datastore-index kind="MsoChannel" ancestor="false" source="auto">
+      <property name="featured" direction="asc"/>
+      <property name="updateDate" direction="desc"/>
+  </datastore-index>
   <datastore-index kind="MsoChannel" ancestor="false" source="manual">
     <property name="featured" direction="asc"/>
     <property name="createDate" direction="asc"/>
@@ -167,6 +171,14 @@
   <datastore-index kind="MsoProgram" ancestor="false" source="auto">
     <property name="channelId" direction="asc"/>
     <property name="isPublic" direction="desc"/>
+  </datastore-index>
+  <datastore-index kind="MsoProgram" ancestor="false" source="auto">
+    <property name="channelId" direction="asc"/>
+    <property name="contentType" direction="asc"/>
+  </datastore-index>
+  <datastore-index kind="MsoProgram" ancestor="false" source="auto">
+    <property name="channelId" direction="asc"/>
+    <property name="contentType" direction="desc"/>
   </datastore-index>
   <datastore-index kind="CategoryChannel" ancestor="false" source="auto">
     <property name="categoryId" direction="asc"/>

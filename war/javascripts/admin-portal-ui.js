@@ -245,6 +245,32 @@ $(function()
         }
       },
       {
+        label:     'Featured',
+        name:      'featured',
+        index:     'featured',
+        width:     70,
+        align:     'center',
+        search:    true,
+        stype:     'select',
+        sortable:  true,
+        formatter: 'checkbox',
+        editable:  true,
+        edittype:  'checkbox',
+        editoptions:
+        {
+          value: 'true:false'
+        },
+        searchoptions:
+        {
+          sopt:  ['eq'],
+          value:
+          {
+            'true':  'true',
+            'false': 'false'
+          }
+        }
+      },
+      {
         label:    'Ep. Count',
         name:     'programCount',
         index:    'programCount',
@@ -561,6 +587,26 @@ $(function()
             {
               disabled: true,
               value:    '0:Unknown;1:Video;2:Audio'
+            }
+          },
+          {
+            label:     'Content Type',
+            name:      'contentType',
+            index:     'contentType',
+            width:     100,
+            align:     'center',
+            sortable:  true,
+            formatter: 'select',
+            editable:  true,
+            edittype:  'select',
+            editoptions:
+            {
+              disabled: true,
+              value:
+              {
+                0: 'Direct Link',
+                1: 'YouTube'
+              }
             }
           },
           {

@@ -139,7 +139,7 @@ public class AdminMsoChannelController {
 			}
 		} else if (searchField != null && searchOper != null && searchString != null
 		           && searchOper.equals("eq")
-		           && (searchField.equals("status") || searchField.equals("contentType") || searchField.equals("isPublic") || searchField.equals("sourceUrl") || searchField.equals("name"))) {
+		           && (searchField.equals("status") || searchField.equals("contentType") || searchField.equals("isPublic") || searchField.equals("featured") || searchField.equals("sourceUrl") || searchField.equals("name"))) {
 			
 			if (searchField.equals("sourceUrl") || searchField.equals("name")) {
 				searchString = NnStringUtil.escapedQuote(searchString.toLowerCase());
@@ -175,6 +175,7 @@ public class AdminMsoChannelController {
 			cell.add(channel.getStatus());
 			cell.add(channel.getContentType());
 			cell.add(channel.isPublic());
+			cell.add(channel.isFeatured());
 			cell.add(channel.getProgramCount());
 			cell.add(subLogMngr.findTotalCountByChannelId(channel.getKey().getId()));
 			cell.add(channel.getIntro());
@@ -374,6 +375,7 @@ public class AdminMsoChannelController {
 	                                   @RequestParam(required=false) String  imageUrl,
 	                                   @RequestParam(required=false) Short   status,
 	                                   @RequestParam(required=false) Boolean isPublic,
+	                                   @RequestParam(required=false) Boolean featured,
 	                                   @RequestParam(required=false) Integer programCount) {
 		
 		logger.info("admin = " + userService.getCurrentUser().getEmail());
@@ -405,6 +407,10 @@ public class AdminMsoChannelController {
 		if (isPublic != null) {
 			logger.info("isPublic = " + isPublic);
 			channel.setPublic(isPublic);
+		}
+		if (featured != null) {
+			logger.info("featured = " + featured);
+			channel.setFeatured(featured);
 		}
 		if (programCount != null) {
 			logger.info("programCount = " + programCount);
