@@ -27,7 +27,10 @@ import org.springframework.http.ResponseEntity;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import com.nnvmso.lib.*;
+import com.nnvmso.model.ChannelSet;
+import com.nnvmso.model.ContentOwnership;
 import com.nnvmso.model.Mso;
+import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.NnUser;
 import com.nnvmso.service.*;
 
@@ -57,6 +60,52 @@ public class AdminMsoController {
 			                           @RequestParam(value="contactEmail")String contactEmail) {
 		Mso mso = new Mso(name, intro, contactEmail, Mso.TYPE_MSO);		
 		msoMngr.create(mso);		
+		return "OK";
+	}
+	
+	@RequestMapping(value = "create", params = {"name", "contactEmail", "password", "logoUrl", "type"})
+	public @ResponseBody String create(@RequestParam String name,
+	                                   @RequestParam String contactEmail,
+	                                   @RequestParam String password,
+	                                   @RequestParam String logoUrl,
+	                                   @RequestParam Short  type) {
+		logger.info("name = " + name);
+		logger.info("contactEmail = " + contactEmail);
+		logger.info("password = " + password);
+		logger.info("logoUrl = " + logoUrl);
+		logger.info("type = " + type);
+		
+		NnUserManager userMngr = new NnUserManager();
+		MsoManager msoMngr = new MsoManager();
+		ChannelSetManager setMngr = new ChannelSetManager();
+		
+		Mso found = msoMngr.findByName(name);
+		if (found != null) {
+			return "Name In Used";
+		}
+		if (type != Mso.TYPE_3X3) {
+			return "Only Type 3x3 Is Applicable";
+		}
+		
+		Mso mso = new Mso(name, name, contactEmail, Mso.TYPE_3X3);
+		mso.setTitle(name);
+		mso.setPreferredLangCode(Mso.LANG_EN);
+		mso.setLogoUrl(logoUrl);
+		msoMngr.create(mso);
+		
+		NnUser user = new NnUser(contactEmail, password, name, NnUser.TYPE_3X3);
+		user.setMsoId(mso.getKey().getId());
+		userMngr.create(user);
+		
+		ChannelSet channelSet = new ChannelSet(mso.getKey().getId(), name, name, true);
+		channelSet.setDefaultUrl(String.valueOf(mso.getKey().getId()));
+		channelSet.setBeautifulUrl(name);
+		setMngr.create(channelSet, new ArrayList<MsoChannel>());
+		
+		//channelSet ownership
+		ContentOwnershipManager ownershipMngr = new ContentOwnershipManager();
+		ownershipMngr.create(new ContentOwnership(), mso, channelSet);
+		
 		return "OK";
 	}
 	
@@ -117,6 +166,7 @@ public class AdminMsoController {
 			cell.add(mso.getType());
 			cell.add(mso.getPreferredLangCode());
 			cell.add(mso.getContactEmail());
+			cell.add("********");
 			cell.add(mso.getIntro());
 			cell.add(userMngr.total("msoId == " + mso.getKey().getId() + " && email != '" + NnUser.GUEST_EMAIL + "'"));
 			

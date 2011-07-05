@@ -856,10 +856,10 @@ $(function()
     deltitle: 'Remove This Channel from Category'
   },
   {
-    // 'edit' proprtties
+    // 'edit' properties
   },
   {
-    // 'add' proprtties
+    // 'add' properties
     url:               '/admin/channel/addCategory',
     addCaption:        'Add This Channel to Category',
     width:             'auto',
@@ -1215,10 +1215,10 @@ $(function()
         deltitle: 'Remove This Channel from Category'
       },
       {
-        // 'edit' proprtties
+        // 'edit' properties
       },
       {
-        // 'add' proprtties
+        // 'add' properties
         url:               '/admin/channel/addCategory',
         addCaption:        'Add Channel to This Category',
         width:             'auto',
@@ -1260,7 +1260,7 @@ $(function()
     // 'edit' properties
   },
   {
-    // 'add' proprtties
+    // 'add' properties
     url:               '/admin/category/create',
     addCaption:        'Create A New Category',
     width:             'auto',
@@ -1304,7 +1304,7 @@ $(function()
         edittype: 'image',
         editoptions:
         {
-          disabled: true
+          disabled: false
         },
         editrules:
         {
@@ -1333,6 +1333,10 @@ $(function()
         align:    'center',
         sortable: true,
         editable: true,
+        editrules:
+        {
+          required: true
+        },
         editoptions:
         {
           maxlength: 100
@@ -1452,8 +1456,29 @@ $(function()
         editable: true,
         editrules:
         {
+          required:   true,
           edithidden: true,
           email:      true
+        }
+      },
+      {
+        label:    'Password',
+        name:     'password',
+        index:    'password',
+        width:    140,
+        align:    'center',
+        sortable: false,
+        editable: true,
+        edittype: 'password',
+        hidden:   true,
+        editoptions:
+        {
+          disabled: false
+        },
+        editrules:
+        {
+          required:   true,
+          edithidden: true
         }
       },
       {
@@ -1527,6 +1552,7 @@ $(function()
         },
         beforeShowForm: function(formId)
         {
+          $('#tr_password').hide();
           $('#logoUrl', formId).click(function()
           {
             var logoUrl = prompt('Please enter new logo URL', $(this).attr('src'));
@@ -1678,7 +1704,7 @@ $(function()
         // 'edit' properties
       },
       {
-        // 'add' proprtties
+        // 'add' properties
         url:               '/admin/msoIpg/add?mso=' + rowId,
         addCaption:        'Add A Channel to IPG',
         width:             'auto',
@@ -1710,10 +1736,63 @@ $(function()
   $('#mso_table').jqGrid('navGrid', '#mso_table_toppager',
   {
     edit:   false,
-    add:    false,
+    add:    true,
     del:    false,
     search: false,
-    view:   false
+    view:   false,
+    addtitle: 'Create A New MSO'
+  },
+  {
+    // 'edit' properties
+  },
+  {
+    // 'add' properties
+    url:               '/admin/mso/create',
+    addCaption:        'Create A New MSO',
+    width:             'auto',
+    modal:             false,
+    jqModal:           true,
+    closeAfterAdd:     true,
+    closeOnEscape:     true,
+    reloadAfterSubmit: true,
+    recreateForm:      true,
+    beforeSubmit: function(postData, formId)
+    {
+      var info = 'Please confirm following data:\n';
+      info += '\nmso / default set name = ' + $('#name', formId).val();
+      info += '\nemail / cms account = ' + $('#contactEmail', formId).val();
+      info += '\ncms password = ' + $('#password', formId).val();
+      if (confirm(info) == false) {
+        return [false, 'Not Confirmed'];
+      }
+      return [true, ''];
+    },
+    beforeCheckValues: function(postData, formId, mode)
+    {
+      postData['logoUrl'] = $('#logoUrl', formId).attr('src');
+      return postData;
+    },
+    beforeShowForm: function(formId)
+    {
+      $('#logoUrl', formId).attr('src', '/images/cms/upload_img.jpg');
+      $('#logoUrl', formId).click(function()
+      {
+        var logoUrl = prompt('Please enter logo URL', $(this).attr('src'));
+        if (logoUrl != null) {
+          $(this).attr('src', logoUrl);
+        }
+      });
+      $('#type', formId).val(3);
+      $('#tr_mso', formId).hide();
+      $('#tr_updateDate', formId).hide();
+      $('#tr_createDate', formId).hide();
+      $('#tr_title', formId).hide();
+      $('#tr_logoClickUrl', formId).hide();
+      $('#tr_jingleUrl', formId).hide();
+      $('#tr_preferredLangCode', formId).hide();
+      $('#tr_intro', formId).hide();
+    },
+    afterComplete: callbackAfterSubmitForm
   });
 
   //////// User Managment Tab ////////
