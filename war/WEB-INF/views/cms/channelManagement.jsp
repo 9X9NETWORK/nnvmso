@@ -21,16 +21,7 @@
 <title><spring:message code="cms.channel_management.title"/></title>
 </head>
 <body>
-<div class="header">
-  <input type="hidden" id="msoId" value="${msoId}"/>
-  <div class="floatL"><img alt="" src="${msoLogo}"/></div>
-  <div id="setup_page" class="jqmWindow"></div>
-  <div class="floatR">
-    <p><spring:message code="cms.header.welcome"/> <span><c:out value="${mso.contactEmail}"/></span></p>
-    <a href="javascript:" class="setup" id="setup"></a>
-    <a href="${logoutUrl}" class="logout"></a>
-  </div>
-</div>
+<%@include file="header.jsp"%>
 <div class="content">
   <div class="left_content floatL">
     <ul class="menu">
@@ -40,6 +31,7 @@
       <li><a href="promotionTools" class="menuD"></a></li>
       <li><a href="statistics" class="menuE"></a></li>
     </ul>
+    <label class="lang" id="image_menu"><spring:message code="cms.image.menu"/></label>
     <div class="clear"></div>
     <div class="left_body">
       <!-- channel management - never create channel yet -->
@@ -599,5 +591,8 @@
 <label class="lang" id="lang_warning_import_channel_source"><spring:message code="cms.warning.import_channel_source"/></label>
 <label class="lang" id="lang_channel_source_is_wrong"><spring:message code="cms.warning.channel_source_is_wrong"/></label>
 <label class="lang" id="lang_button_from_disk">從硬碟</label>
+<label class="lang" id="image_btn_upload"><spring:message code="cms.image.btn_upload"/></label>
+<label class="lang" id="image_ch_public"><spring:message code="cms.image.ch_public"/></label>
+<label class="lang" id="image_ch_unpublic"><spring:message code="cms.image.ch_unpublic"/></label>
 </body>
 </html>

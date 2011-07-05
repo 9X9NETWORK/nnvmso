@@ -153,7 +153,7 @@ var programDetail =
       file_post_name:     'file',
       button_placeholder: programDetailBlock.find('.ep_upload_image').get(0),
       button_action:      SWFUpload.BUTTON_ACTION.SELECT_FILE,
-      button_image_url:   '/images/cms/btn_upload.png',
+      button_image_url:   $('#image_btn_upload').text(),
       button_width:       '95',
       button_height:      '32',
       button_cursor:      SWFUpload.CURSOR.HAND,
@@ -318,7 +318,7 @@ var programDetail =
         file_post_name:     'file',
         button_placeholder: programDetailBlock.find('.ep_upload_video').get(0),
         button_action:      SWFUpload.BUTTON_ACTION.SELECT_FILE,
-        button_image_url:   '/images/cms/btn_upload.png',
+        button_image_url:   $('#image_btn_upload').text(),
         button_width:       '95',
         button_height:      '32',
         button_text:        $('#lang_button_from_disk').text(),
@@ -373,7 +373,7 @@ var programDetail =
         file_post_name:     'file',
         button_placeholder: programDetailBlock.find('.ep_upload_image').get(0),
         button_action:      SWFUpload.BUTTON_ACTION.SELECT_FILE,
-        button_image_url:   '/images/cms/btn_upload.png',
+        button_image_url:   $('#image_btn_upload').text(),
         button_width:       '95',
         button_height:      '32',
         button_cursor:      SWFUpload.CURSOR.HAND,
@@ -675,7 +675,7 @@ var channelDetail =
           file_post_name:     'file',
           button_placeholder: $('#channel_import_detail [name="ch_upload_image"]').get(0),
           button_action:       SWFUpload.BUTTON_ACTION.SELECT_FILE,
-          button_image_url:   '/images/cms/btn_upload.png',
+          button_image_url:   $('#image_btn_upload').text(),
           button_width:       '95',
           button_height:      '32',
           button_cursor:      SWFUpload.CURSOR.HAND,
@@ -832,7 +832,7 @@ var channelDetail =
         file_post_name:     'file',
         button_placeholder: document.getElementById('ch_upload_image'),
         button_action:       SWFUpload.BUTTON_ACTION.SELECT_FILE,
-        button_image_url:   '/images/cms/btn_upload.png',
+        button_image_url:   $('#image_btn_upload').text(),
         button_width:       '95',
         button_height:      '32',
         button_cursor:      SWFUpload.CURSOR.HAND,
@@ -1064,6 +1064,9 @@ var channelList =
 
 $(function()
 {
+  var css = '.chPublic { url(' + $('#image_ch_public').text() + ') no-repeat; }\n.chUnpublic { url(' + $('#image_ch_unpublic').text() + ') no-repeat; }';
+  $('<style/>').text(css).appendTo('<head/>');
+  
   channelList.init();
   $(window).bind('beforeunload', function()
   {

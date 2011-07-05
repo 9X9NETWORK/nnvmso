@@ -196,6 +196,9 @@ var channelAndChannelSetList =
 
 $(function()
 {
+  var css = '.chPublic { url(' + $('#image_ch_public').text() + ') no-repeat; }\n.chUnpublic { url(' + $('#image_ch_unpublic').text() + ') no-repeat; }';
+  $('<style/>').text(css).appendTo('<head/>');
+  
   $('#stasticTabA').click(function()
   {
     $('#ch_stastics').show();

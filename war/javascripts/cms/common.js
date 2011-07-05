@@ -102,6 +102,8 @@ var initSetupPage = function()
 
 $(function()
 {
+  $('.header .logout').css('background', 'url(' + $('#image_header_logout').text() + ') no-repeat;');
+  $('.header .setup').css('background', 'url(' + $('#image_header_setup').text() + ') no-repeat;');
   initSetupPage();
   $.ajaxSetup ({
     // Disable caching of AJAX responses

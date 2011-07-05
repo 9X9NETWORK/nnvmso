@@ -320,6 +320,9 @@ var channelAndChannelSetList =
 
 $(function()
 {
+  var css = '.chPublic { url(' + $('#image_ch_public').text() + ') no-repeat; }\n.chUnpublic { url(' + $('#image_ch_unpublic').text() + ') no-repeat; }';
+  $('<style/>').text(css).appendTo('<head/>');
+  
   $('.pro_check').click(function()
   {
     var confirmMessage = $('#lang_confirm_goto_setting_page').text();

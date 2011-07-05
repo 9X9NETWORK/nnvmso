@@ -9,6 +9,13 @@
 <title><spring:message code="cms.login.title"/></title>
 <link href="/stylesheets/cms.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.0/jquery.min.js"></script>
+<script type="text/jabascript">
+$(function()
+{
+  $('a.btnLogin').css('backround', 'url(' + $('#image_btn_login').text() + ')');
+  $('a.btnLogin:hover').css('backround', 'url(' + $('#image_btn_login_hover').text() + ')');
+});
+</script>
 </head>
 <body>
   <div class="header"></div>
@@ -32,5 +39,7 @@
       </form>
     </div>
 </div>
+<label class="lang" id="image_btn_login"><spring:message code="cms.image.btn_login"/></label>
+<label class="lang" id="image_btn_login_hover"><spring:message code="cms.image.btn_login_hover"/></label>
 </body>
 </html>

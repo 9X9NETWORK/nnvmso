@@ -374,7 +374,7 @@ var initChannelSetInfo = function()
                 file_post_name:     'file',
                 button_placeholder: $('#upload_image').get(0),
                 button_action:       SWFUpload.BUTTON_ACTION.SELECT_FILE,
-                button_image_url:   '/images/cms/btn_upload.png',
+                button_image_url:   $('#image_btn_upload').text(),
                 button_width:       '95',
                 button_height:      '32',
                 button_cursor:      SWFUpload.CURSOR.HAND,
@@ -469,6 +469,7 @@ var publishChannelSet = function()
 
 $(document).ready(function()
 {
+  $('.ch_bg').css('background', 'url(' + $('image_bg_album').text() + ') no-repeat;');
   
   initChannelSetInfo();
   channelPool.init();

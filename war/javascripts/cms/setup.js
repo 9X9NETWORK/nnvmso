@@ -2,6 +2,8 @@
  *
  */
 
+$('.setup_context').css('background', 'url(' + $('#image_bg_setup').text() + ') no-repeat;');
+
 $('.syncInfo').unbind().hover(function() {
   $('#fb_hint').show();
 },function() {

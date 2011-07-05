@@ -23,16 +23,7 @@
 <title><spring:message code="cms.directory_management.title"/></title>
 </head>
 <body>
-<div class="header">
-  <input type="hidden" id="msoId" value="${msoId}"/>
-  <div class="floatL"><img alt="" src="${msoLogo}"/></div>
-  <div id="setup_page" class="jqmWindow"></div>
-  <div class="floatR">
-    <p><spring:message code="cms.header.welcome"/> <span><c:out value="${mso.contactEmail}"/></span></p>
-    <a href="javascript:" class="setup" id="setup"></a>
-    <a href="${logoutUrl}" class="logout"></a>
-  </div>
-</div>
+<%@include file="header.jsp"%>
 <div class="content">
   <div class="left_content floatL">
     <ul class="menu">
@@ -42,6 +33,7 @@
       <li><a href="promotionTools" class="menuD"></a></li>
       <li><a href="statistics" class="menuE"></a></li>
     </ul>
+    <label class="lang" id="image_menu"><spring:message code="cms.image.menu"/></label>
     <div class="clear"></div>
     <div class="left_body">
       <p class="ch_sub_title"><span><spring:message code="cms.directory_management.msg.directory_explanation"/></span></p>

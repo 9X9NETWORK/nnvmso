@@ -127,3 +127,4 @@
 </div>
 <label class="lang" id="lang_warning_not_9x9_user"><spring:message code="cms.warning.not_9x9_user"/></label>
 <label class="lang" id="lang_warning_remove_admin_member"><spring:message code="cms.warning.remove_admin_member"/></label>
+<label class="lang" id="image_bg_setup"><spring:message code="cms.image.bg_setup"/></label>

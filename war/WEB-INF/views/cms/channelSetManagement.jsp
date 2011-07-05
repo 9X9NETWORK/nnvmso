@@ -21,16 +21,7 @@
 <title><spring:message code="cms.channel_set_management.title"/></title>
 </head>
 <body>
-<div class="header">
-  <input type="hidden" id="msoId" value="${msoId}"/>
-  <div class="floatL"><img alt="" src="${msoLogo}"/></div>
-  <div id="setup_page" class="jqmWindow"></div>
-  <div class="floatR">
-    <p><spring:message code="cms.header.welcome"/> <span><c:out value="${mso.contactEmail}"/></span></p>
-    <a href="javascript:" class="setup" id="setup"></a>
-    <a href="${logoutUrl}" class="logout"></a>
-  </div>
-</div>
+<%@include file="header.jsp"%>
 <div class="content">
   <div class="left_content floatL">
     <ul>
@@ -40,6 +31,7 @@
       <li><a href="promotionTools" class="menuD"></a></li>
       <li><a href="statistics" class="menuE"></a></li>
     </ul>
+    <label class="lang" id="image_menu"><spring:message code="cms.image.menu"/></label>
     <div class="clear"></div>
     <div class="left_body">
       <div class="left_title"><spring:message code="cms.channel_set_management.title.channel_set_info"/></div>
@@ -158,5 +150,7 @@
 <label class="lang" id="lang_warning_intro_over_limitation"><spring:message code="cms.warning.intro_over_limitation"/></label>
 <label class="lang" id="lang_warning_error_occurs"><spring:message code="cms.warning.error_occurs"/></label>
 <label class="lang" id="lang_update_successfully"><spring:message code="cms.warning.update_successfully"/></label>
+<label class="lang" id="image_bg_album"><spring:message code="cms.image.bg_album"/></label>
+<label class="lang" id="image_btn_upload"><spring:message code="cms.image.btn_upload"/></label>
 </body>
 </html>

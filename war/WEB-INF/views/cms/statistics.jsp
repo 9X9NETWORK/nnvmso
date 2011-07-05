@@ -19,16 +19,7 @@
 <title><spring:message code="cms.statistics.title"/></title>
 </head>
 <body>
-<div class="header">
-  <input type="hidden" id="msoId" value="${msoId}"/>
-  <div class="floatL"><img alt="" src="${msoLogo}"/></div>
-  <div id="setup_page" class="jqmWindow"></div>
-  <div class="floatR">
-    <p><spring:message code="cms.header.welcome"/> <span><c:out value="${mso.contactEmail}"/></span></p>
-    <a href="javascript:" class="setup" id="setup"></a>
-    <a href="${logoutUrl}" class="logout"></a>
-  </div>
-</div>
+<%@include file="header.jsp"%>
 <div class="content">
   <div class="left_content floatL">
     <ul class="menu">
@@ -38,6 +29,7 @@
       <li><a href="promotionTools" class="menuD"></a></li>
       <li><a href="statistics" class="menuE_active"></a></li>
     </ul>
+    <label class="lang" id="image_menu"><spring:message code="cms.image.menu"/></label>
     <div class="clear"></div>
     <div class="left_body">
       <div class="createChList2">
@@ -200,5 +192,7 @@
 <label class="lang" id="lang_label_channel_set"><spring:message code="cms.statistics.label.channel_set"/></label>
 <label class="lang" id="lang_title_set_statistics"><spring:message code="cms.statistics.title.channel_set_statistics"/></label>
 <label class="lang" id="lang_label_please_select_program"><spring:message code="cms.statistics.lable.please_select_program"/></label>
+<label class="lang" id="image_ch_public"><spring:message code="cms.image.ch_public"/></label>
+<label class="lang" id="image_ch_unpublic"><spring:message code="cms.image.ch_unpublic"/></label>
 </body>
 </html>
