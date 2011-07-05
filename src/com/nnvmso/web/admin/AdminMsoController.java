@@ -254,6 +254,7 @@ public class AdminMsoController {
 		List<Mso> msoList = msoMngr.findAll();
 		try {
 			writer.write("<select>");
+			writer.write("<option selected=\"selected\" value=\"0\">None</option>");
 			for (Mso mso : msoList) {
 				writer.write("<option value=\"" + mso.getKey().getId() + "\">" + mso.getName() + "</option>");
 			}

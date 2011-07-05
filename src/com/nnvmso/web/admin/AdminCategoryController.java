@@ -190,7 +190,7 @@ public class AdminCategoryController {
 		List<Map<String, Object>> dataRows = new ArrayList<Map<String, Object>>();
 		
 		String filter = "";
-		if (searchField != null && searchOper != null && searchString != null) {
+		if (searchField != null && searchOper != null && searchString != null && !searchString.isEmpty()) {
 			
 			Map<String, String> opMap = JqgridHelper.getOpMap();
 			if (opMap.containsKey(searchOper)) {

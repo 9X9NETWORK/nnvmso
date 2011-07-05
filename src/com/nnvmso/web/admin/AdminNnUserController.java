@@ -135,7 +135,7 @@ public class AdminNnUserController {
 		List<Map<String, Object>> dataRows = new ArrayList<Map<String, Object>>();
 		
 		String filter = "";
-		if (searchField != null && searchOper != null && searchString != null) {
+		if (searchField != null && searchOper != null && searchString != null && !searchString.isEmpty()) {
 			
 			Map<String, String> opMap = JqgridHelper.getOpMap();
 			if (opMap.containsKey(searchOper)) {
@@ -144,7 +144,15 @@ public class AdminNnUserController {
 			}
 		}
 		
-		int totalRecords = nnUserMngr.total(filter);
+		int totalRecords = 0;
+		try {
+			
+			totalRecords = nnUserMngr.total(filter);
+			
+		} catch(OutOfMemoryError e) {
+			totalRecords = 10000;
+		}
+		
 		int totalPages = (int)Math.ceil((double)totalRecords / rowsPerPage);
 		if (currentPage > totalPages)
 			currentPage = totalPages;
