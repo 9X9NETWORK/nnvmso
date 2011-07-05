@@ -953,6 +953,7 @@ $(function()
         sortable:  true,
         editable:  true,
         edittype:  'select',
+        stype:     'select',
         editoptions:
         {
           dataUrl:  '/admin/mso/msoHtmlSelectOptions',
@@ -977,6 +978,15 @@ $(function()
         align:    'center',
         search:   false,
         sortable: false
+      },
+      {
+        label:    'Parent ID',
+        name:     'parentId',
+        index:    'parentId',
+        width:    80,
+        align:    'center',
+        search:   false,
+        sortable: true
       },
       {
         label:    'Category Name',

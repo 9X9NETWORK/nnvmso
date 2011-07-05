@@ -295,6 +295,7 @@ public class AdminMsoChannelController {
 			return error;
 		}
 		ccMngr.delete(cc);
+		// TODO: deal with Category.channelCount
 		return "OK";
 	}
 		

@@ -213,6 +213,7 @@ public class AdminCategoryController {
 			
 			cell.add(category.getMsoId());
 			cell.add(category.getKey().getId());
+			cell.add(category.getParentId());
 			cell.add(category.getName());
 			cell.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(category.getUpdateDate()));
 			cell.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(category.getCreateDate()));
