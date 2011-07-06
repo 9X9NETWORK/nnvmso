@@ -936,6 +936,7 @@ var channelList =
     {
       $(this).parent().remove();
     });
+    $('#channel_list_empty').hide();
   },
   init: function()
   {

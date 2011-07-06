@@ -54,7 +54,8 @@ p.hint_title{ text-align:right; color:#2e2e2e; font-size:0.8em; padding-right:20
 .setAlbum { border:none; }
 .uploadImg{float:left; padding:0 0 10px 0;}
 .uploadImg img{ padding:3px; border:2px solid #dadada; max-width: 120px; max-height: 80px; }
-.imgBtn{ padding-left:10px;}
+.imgBtn { padding-left:10px; }
+.imgBtn p { width:210px; }
 .uploadBtn{ background:url(/images/cms/btn_upload.png) no-repeat; width:95px; height:32px; display:block;}
 
 form label{ color:#161616; font-size:0.9em; text-align:right; padding-right:15px; width:70px; clear:left;}
@@ -191,7 +192,7 @@ div.page{
   font-size:0.95em;
   padding:0 15px;
   margin-bottom:5px; *margin-bottom:3px;
-  width:60px;
+  width:120px;
 }
 
 a.btnCreate span{ line-height:30px; display:block;}
