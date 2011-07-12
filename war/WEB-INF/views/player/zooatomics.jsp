@@ -27,7 +27,7 @@
 <script type="text/javascript" charset="utf-8" src="${root}/javascripts/jquery.swfobject.1-1-1.min.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/scripts/flowplayer-3.2.4.min.js"></script>
 
-<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/player8.js"></script>
+<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/player9.js"></script>
 
 <script type="text/javascript">
 var analytz = false;
@@ -74,6 +74,10 @@ var brandinfo = "${brandInfo}";
 <div id="yt1" style="width: 100%; height: 100%; z-index: 1; visibility: visible; position: absolute; left: 0; top: 0; overflow: hidden;">
   <div id="ytapiplayer">
   </div>
+</div>
+
+
+<div id="ss" style="width: 100%; height: 100%; z-index: 4; visibility: visible; position: absolute; left: 0; top: 0; overflow: hidden; display: none">
 </div>
 
 <div id="blue" style="background: black; width: 100%; height: 100%; display: block; position: absolute; color: white">
@@ -961,9 +965,6 @@ var brandinfo = "${brandInfo}";
   </div>
 </div>
 
-<div id="log-layer" style="position: absolute; left: 0; top: 0; height: 100%; width: 100%; background: white; color: black; text-align: left; padding: 20px; overflow: scroll; z-index: 9999; display: none"></div>
-
-<div id="mask"></div>
 <div id="tribtn-layer">
   <div class="tribtn-holder">
     <p>This set has been added to your Smart Guide!</p>
@@ -974,6 +975,11 @@ var brandinfo = "${brandInfo}";
     </div>
   </div>
  </div>
+
+<div id="log-layer" style="position: absolute; left: 0; top: 0; height: 100%; width: 100%; background: white; color: black; text-align: left; padding: 20px; overflow: scroll; z-index: 9999; display: none"></div>
+
+<div id="mask"></div>
+
 <div id="fb-root"></div>
 
 <!--/div-->
