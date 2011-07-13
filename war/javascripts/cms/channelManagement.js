@@ -263,6 +263,22 @@ var programDetail =
       });
       programDetailBlock.find('.ep_url_input, .ep_name').focusout(function()
       {
+        if (programDetailBlock.find('.ep_url_input').val().length > 0) {
+          var inputUrl = programDetailBlock.find('.ep_url_input').val();
+          if (inputUrl.indexOf('youtube.com') >= 0) {
+            var videoId = inputUrl.match(/\/watch\?v=([^\/&]+)/)[1];
+            var parameters = {
+              'videoIdStr': videoId
+            };
+            $.post('/CMSAPI/getYouTubeVideoInfo', parameters, function(info)
+            {
+              programDetailBlock.find('.ep_name').val(info.title);
+              programDetailBlock.find('.ep_intro').val(info.description);
+              programDetailBlock.find('.ep_image').attr('src', info.thumbnail);
+              programDetailBlock.find('.ep_image_updated').val('true');
+            });
+          }
+        }
         if (programDetailBlock.find('.ep_url_input').val().length > 0
             && programDetailBlock.find('.ep_name').val().length > 0) {
           programDetailBlock

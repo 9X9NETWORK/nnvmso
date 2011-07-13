@@ -23,6 +23,7 @@ import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnStringUtil;
+import com.nnvmso.lib.YouTubeLib;
 import com.nnvmso.model.Category;
 import com.nnvmso.model.CategoryChannel;
 import com.nnvmso.model.CategoryChannelSet;
@@ -206,6 +207,11 @@ public class CmsApiController {
 		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
 		cscMngr.removeChannel(channelSetId, seq);
 		return "OK";
+	}
+	
+	@RequestMapping("getYouTubeVideoInfo")
+	public @ResponseBody Map<String, String> getYouTubeVideoInfo(@RequestParam String videoIdStr) {
+		return YouTubeLib.getYouTubeVideoEntry(videoIdStr);
 	}
 	
 	//////////////////// Channel/Program Management ////////////////////
