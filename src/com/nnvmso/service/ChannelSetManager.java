@@ -43,10 +43,6 @@ public class ChannelSetManager {
 	public ChannelSet findByBeautifulUrl(String url) {
 		return channelSetDao.findByBeautifulUrl(url);
 	}
-
-	public ChannelSet findBybeautifulUrl(String url) {
-		return channelSetDao.findByBeautifulUrl(url);
-	}
 	
 	public List<ChannelSet> findFeaturedSetsByMso(Mso mso) {
 		return channelSetDao.findFeaturedSetsByMso(mso);

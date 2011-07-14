@@ -5,6 +5,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.ui.Model;
 
 import com.nnvmso.lib.CookieHelper;
+import com.nnvmso.lib.NnStringUtil;
+import com.nnvmso.model.ChannelSet;
 import com.nnvmso.model.Mso;
 
 public class PlayerService {
@@ -26,6 +28,18 @@ public class PlayerService {
 			CookieHelper.deleteCookie(resp, CookieHelper.MSO); //delete brand cookie
 		}
 		return model;		
+	}
+
+	public Model prepareSetInfo(Model model, String name,
+			HttpServletResponse resp) {
+		
+		ChannelSetManager setMngr = new ChannelSetManager();
+		ChannelSet channelSet = setMngr.findByBeautifulUrl(name);
+		model.addAttribute("fbName", NnStringUtil.htmlSafeChars(channelSet.getName()));
+		model.addAttribute("fbDescription", NnStringUtil.htmlSafeChars(channelSet.getIntro()));
+		model.addAttribute("fbImg", NnStringUtil.htmlSafeChars(channelSet.getImageUrl()));
+		
+		return model;
 	}
 
 }

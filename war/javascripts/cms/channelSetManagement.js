@@ -422,7 +422,7 @@ var publishChannelSet = function()
     alert($('#lang_warning_select_category').text());
     return;
   }
-  var intro = $('#cc_intro').text();
+  var intro = $('#cc_intro').val();
   if (intro.length > 200) {
     alert($('#lang_warning_intro_over_limitation').text());
     return;
