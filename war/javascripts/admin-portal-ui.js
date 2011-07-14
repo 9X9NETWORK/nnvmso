@@ -348,7 +348,14 @@ $(function()
     ondblClickRow: function(rowId)
     {
       var imageUrl = $(this).jqGrid('getCell', rowId, 'imageUrl');
-      $(this).jqGrid('setColProp', 'imageUrl', {editoptions: {src: imageUrl}});
+      $(this).jqGrid('setColProp', 'imageUrl',
+      {
+        editoptions:
+        {
+          style: 'max-height:100px',
+          src: imageUrl
+        }
+      });
       $(this).jqGrid('editGridRow', rowId,
       {
         url:               '/admin/channel/modify',
@@ -681,7 +688,14 @@ $(function()
         ondblClickRow: function(rowId)
         {
           var imageUrl = $(this).jqGrid('getCell', rowId, 'imageUrl');
-          $(this).jqGrid('setColProp', 'imageUrl', {editoptions: {src: imageUrl}});
+          $(this).jqGrid('setColProp', 'imageUrl', 
+          {
+            editoptions:
+            {
+              style: 'max-height:100px',
+              src: imageUrl
+            }
+          });
           $(this).jqGrid('editGridRow', rowId,
           {
             url:               '/admin/program/modify',
