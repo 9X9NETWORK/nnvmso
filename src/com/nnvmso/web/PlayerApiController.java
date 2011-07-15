@@ -499,7 +499,10 @@ public class PlayerApiController {
 	 * @param user user's unique identifier
 	 * @param grid grid location, 0 - 81
 	 * @param category category id
-	 * @param langCode language code, en or zh.
+	 * @param lang language code, en or zh.
+	 * @param name user's customized name.
+	 * @param description user's customized description
+	 * @param imageUrl user's customized thumbnail
 	 * @param tag tag string, separated by comma
 	 * 
 	 * @return channel id, channel name, image url. <br/>
@@ -511,13 +514,19 @@ public class PlayerApiController {
 		String grid = req.getParameter("grid");
 		String categoryIds = req.getParameter("category");
 		String tags = req.getParameter("tag");
+		String name = req.getParameter("name");
+		String intro = req.getParameter("description");
+		String lang = req.getParameter("lang");
+		String imageUrl = req.getParameter("imageUrl");
 
 		this.prepService(req);		
-		log.info("player input - userToken=" + userToken+ "; url=" + url + ";grid=" + grid + ";categoryId=" + categoryIds);				
+		log.info("player input - userToken=" + userToken+ "; url=" + url + ";grid=" + grid + 
+				 ";categoryId=" + categoryIds + "; tag=" + tags + ";name=" + name + 
+				 ";intro=" + intro + ";lang=" + lang + ";imageUrl=" + imageUrl);				
 		String output = NnStatusMsg.errorStr(locale);		
 		
 		try {
-			output = playerApiService.createChannel(categoryIds, userToken, url, grid, tags, req);
+			output = playerApiService.createChannel(categoryIds, userToken, url, grid, tags, name, intro, lang, imageUrl, req);
 		} catch (Exception e){
 			output = playerApiService.handleException(e);
 		}
@@ -897,7 +906,7 @@ public class PlayerApiController {
 		}
 		return NnNetUtil.textReturn(output);
 	}
-
+	
 	/**
 	 * Listing featured sets 
 	 * 
