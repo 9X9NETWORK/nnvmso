@@ -56,7 +56,7 @@ public class ContentWorkerController {
 			MsoProgram oldest = programMngr.findOldestByChannelId(channel.getKey().getId());
 			programMngr.delete(oldest); 			
 		}
-		MsoProgram program = new MsoProgram(slide.getName(), slide.getIntro(), slide.getImageUrl(), MsoProgram.TYPE_SLIDE); 
+		MsoProgram program = new MsoProgram(slide.getName(), slide.getIntro(), slide.getImageUrl(), MsoProgram.TYPE_SCRIPT); 
 		program.setOtherFileUrl(slide.getFileUrl());
 		program.setDuration(slide.getDuration());
 		programMngr.create(channel, program);
