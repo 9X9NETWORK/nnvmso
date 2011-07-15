@@ -50,6 +50,7 @@ public class MsoProgram implements Serializable {
 	private short contentType;
 	public static final short CONTENTTYPE_DIRECTLINK = 0;
 	public static final short CONTENTTYPE_YOUTUBE = 1;
+	public static final short CONTENTTYPE_SCRIPT = 2;
 	
 	@Persistent
 	private String errorCode;
@@ -72,7 +73,7 @@ public class MsoProgram implements Serializable {
 	private short type;
 	public static short TYPE_VIDEO = 1;
 	public static short TYPE_AUDIO = 2;
-	public static short TYPE_SLIDE = 2;
+	public static short TYPE_SLIDE = 3;
 	
 	
 	@Persistent
