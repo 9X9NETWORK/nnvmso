@@ -36,6 +36,9 @@ public class MsoIpg  implements Serializable {
 	private int seq;
 
 	@Persistent
+	private boolean isPublic;
+	
+	@Persistent
 	private short start;
 	
 	@Persistent
@@ -113,6 +116,14 @@ public class MsoIpg  implements Serializable {
 
 	public void setStart(short start) {
 		this.start = start;
+	}
+
+	public boolean isPublic() {
+		return isPublic;
+	}
+
+	public void setPublic(boolean isPublic) {
+		this.isPublic = isPublic;
 	}
 	
 }
