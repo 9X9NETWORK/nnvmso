@@ -35,9 +35,11 @@ public class PlayerService {
 		
 		ChannelSetManager setMngr = new ChannelSetManager();
 		ChannelSet channelSet = setMngr.findByBeautifulUrl(name);
-		model.addAttribute("fbName", NnStringUtil.htmlSafeChars(channelSet.getName()));
-		model.addAttribute("fbDescription", NnStringUtil.htmlSafeChars(channelSet.getIntro()));
-		model.addAttribute("fbImg", NnStringUtil.htmlSafeChars(channelSet.getImageUrl()));
+		if (channelSet != null) {
+			model.addAttribute("fbName", NnStringUtil.htmlSafeChars(channelSet.getName()));
+			model.addAttribute("fbDescription", NnStringUtil.htmlSafeChars(channelSet.getIntro()));
+			model.addAttribute("fbImg", NnStringUtil.htmlSafeChars(channelSet.getImageUrl()));
+		}
 		
 		return model;
 	}
