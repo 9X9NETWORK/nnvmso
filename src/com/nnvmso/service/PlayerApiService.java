@@ -310,7 +310,7 @@ public class PlayerApiService {
 			result = messageSource.getMessage("nnstatus.subscription_error", new Object[] {NnStatusCode.SUBSCRIPTION_ERROR} , locale);
 		return result;
 	}
-
+	
 	public String copyChannel(String userToken, String channelId, String grid) {		
 		//verify input
 		if (userToken == null || userToken.length() == 0 || userToken.equals("undefined") || grid == null) {
@@ -712,17 +712,23 @@ public class PlayerApiService {
 		return output;
 	}
 
-	public String createChannel(String categoryIds, String userToken, String url, String grid, String tags, HttpServletRequest req) {
+	public String createChannel(String categoryIds, String userToken, 
+			                    String url, String grid, String tags, 
+			                    String name, String intro, String lang, 
+			                    String imageUrl, HttpServletRequest req) {
 		//verify input
 		if (url == null || url.length() == 0 ||  grid == null || grid.length() == 0 ||
-			categoryIds == null || categoryIds.equals("undefined") || categoryIds.length() == 0 ||
+			categoryIds == null || categoryIds.equals("undefined") || categoryIds.length() == 0 || 
+			lang == null || lang.length() == 0 ||
 			userToken== null || userToken.length() == 0) {
 			return NnStatusMsg.inputMissing(locale);
 		}
 		if (!Pattern.matches("^\\d*$", grid) || Integer.parseInt(grid) < 0 || Integer.parseInt(grid) > 81) {			
 			return NnStatusMsg.inputError(locale);
 		}
-		
+		if (!lang.equals(Mso.LANG_EN) && !lang.equals(Mso.LANG_ZH)) {
+			return NnStatusMsg.inputError(locale);
+		}
 		url = url.trim();
 		
 		//verify user
@@ -758,6 +764,9 @@ public class PlayerApiService {
 		} else {				
 			//create a new channel
 			channel = channelMngr.initChannelSubmittedFromPlayer(url, user);
+			channel.setFauxName(name);
+			channel.setFauxIntro(intro);
+			channel.setFauxImageUrl(imageUrl);
 			channel.setTags(tags);
 			log.info("User throws a new url:" + url);
 			channelMngr.create(channel, categories);
@@ -1005,15 +1014,6 @@ public class PlayerApiService {
 	}
 		
 	private String composeChannelLineupStr(MsoChannel c, Mso mso) {
-		String intro = c.getIntro();
-		if (intro != null) {
-			intro = intro.replaceAll("\n", " ");
-			intro = intro.replaceAll("\t", " ");
-			int introLenth = (intro.length() > 256 ? 256 : intro.length()); 
-			intro = intro.substring(0, introLenth);
-		} else {
-			intro = "";
-		}
 		String imageUrl = c.getImageUrl();
 		if (c.getStatus() == MsoChannel.STATUS_ERROR) {
 			imageUrl = "/WEB-INF/../images/error.png";
@@ -1025,23 +1025,42 @@ public class PlayerApiService {
 				   c.getStatus() != MsoChannel.STATUS_SUCCESS && 
 				   c.getStatus() != MsoChannel.STATUS_PROCESSING) {	
 				imageUrl = "http://9x9ui.s3.amazonaws.com/9x9playerV65/images/error.png";
+		} 
+		if (c.getFauxImageUrl() != null) {
+			imageUrl = c.getFauxImageUrl();
 		}
-
-		String channelName = "";
+		
+		String channelSource = "";
 		if (c.getSourceUrl() != null && c.getSourceUrl().contains("http://www.youtube.com"))
-			channelName = YouTubeLib.getYouTubeChannelName(c.getSourceUrl());
+			channelSource = YouTubeLib.getYouTubeChannelName(c.getSourceUrl());
 		if (c.getContentType() == MsoChannel.CONTENTTYPE_FACEBOOK) 
-			channelName = c.getSourceUrl();
+			channelSource = c.getSourceUrl();
+		String channelName = c.getName();
+		if (c.getFauxName() != null && c.getFauxName().length() > 0) {
+			channelName = c.getFauxName();
+		}
+		String intro = c.getIntro();
+		if (c.getFauxIntro() != null && c.getFauxIntro().length() > 0) {
+			intro = c.getFauxIntro();
+		}		
+		if (intro != null) {
+			intro = intro.replaceAll("\n", " ");
+			intro = intro.replaceAll("\t", " ");
+			int introLenth = (intro.length() > 256 ? 256 : intro.length()); 
+			intro = intro.substring(0, introLenth);
+		} else {
+			intro = "";
+		}
 		String[] ori = {Integer.toString(c.getSeq()), 
 					    String.valueOf(c.getKey().getId()),
-					    c.getName(),
+					    channelName,
 					    intro,
 					    imageUrl,
 					    String.valueOf(c.getProgramCount()),
 					    String.valueOf(c.getType()),
 					    String.valueOf(c.getStatus()),
 					    String.valueOf(c.getContentType()),
-					    channelName,
+					    channelSource,
 					    this.convertEpochToTime(c.getTranscodingUpdateDate(), c.getUpdateDate())
 					    };
 		String output = NnStringUtil.getDelimitedStr(ori);
