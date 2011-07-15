@@ -22,12 +22,21 @@ public class MsoChannel implements Serializable {
 		
 	@Persistent
 	private String name; 
+
+	@Persistent
+	private String fauxName; 
 	
 	@Persistent
 	private String nameSearch;
 
 	@Persistent
 	private String intro;
+	
+	@Persistent
+	private String fauxIntro;
+	
+	@Persistent
+	private String fauxImageUrl;
 	
 	@Persistent
 	private String imageUrl; 
@@ -333,5 +342,29 @@ public class MsoChannel implements Serializable {
 
 	public void setFeatured(boolean featured) {
 		this.featured = featured;
+	}
+
+	public String getFauxName() {
+		return fauxName;
+	}
+
+	public void setFauxName(String fauxName) {
+		this.fauxName = fauxName;
+	}
+
+	public String getFauxIntro() {
+		return fauxIntro;
+	}
+
+	public void setFauxIntro(String fauxIntro) {
+		this.fauxIntro = fauxIntro;
+	}
+
+	public String getFauxImageUrl() {
+		return fauxImageUrl;
+	}
+
+	public void setFauxImageUrl(String fauxImageUrl) {
+		this.fauxImageUrl = fauxImageUrl;
 	}	
 }
