@@ -47,11 +47,13 @@ public class MsoChannel implements Serializable {
 	@Persistent
 	private String langCode;
 	
+	/*
 	@Persistent
 	private short rating;
 	
 	@Persistent
 	private short license;
+	*/
 	
 	@Persistent
 	private String tags;
@@ -264,6 +266,7 @@ public class MsoChannel implements Serializable {
 		this.errorReason = errorReason;
 	}
 
+	/*
 	public short getRating() {
 		return rating;
 	}
@@ -279,7 +282,8 @@ public class MsoChannel implements Serializable {
 	public void setLicense(short license) {
 		this.license = license;
 	}
-
+	*/
+	
 	public short getAdvertsing() {
 		return advertsing;
 	}
