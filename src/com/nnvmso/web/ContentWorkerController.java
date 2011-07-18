@@ -61,7 +61,7 @@ public class ContentWorkerController {
 		program.setDuration(slide.getDuration());
 		program.setStorageId(slide.getStorageId());
 		program.setContentType(MsoProgram.CONTENTTYPE_SCRIPT);
-		program.setType(MsoProgram.TYPE_SLIDE);
+		program.setType(MsoProgram.TYPE_SCRIPT);
 		programMngr.create(channel, program);
 		slide.setProgramId(program.getKey().getId());
 		slide.setErrorCode(NnStatusCode.SUCCESS);
