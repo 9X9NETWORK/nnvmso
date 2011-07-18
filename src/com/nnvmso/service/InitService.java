@@ -706,16 +706,19 @@ public class InitService {
 				if (counter > limit) {break;}	
 				MsoChannel chn = channels.get(i);
 				if (counter < 2 && !chn.getName().equals("System Channel") && channelMngr.isCounterQualified(chn)) {
-					MsoIpg msoIpg = new MsoIpg(mso.getKey().getId(), chn.getKey().getId(), counter, MsoIpg.TYPE_READONLY);			
+					MsoIpg msoIpg = new MsoIpg(mso.getKey().getId(), chn.getKey().getId(), counter, MsoIpg.TYPE_READONLY);
+					msoIpg.setPublic(true);
 					msoIpgMngr.create(msoIpg);
 					counter++;			
 				} else if (counter < 3 && !chn.getName().equals("System Channel") && channelMngr.isCounterQualified(chn)) {
-					MsoIpg msoIpg = new MsoIpg(mso.getKey().getId(), chn.getKey().getId(), counter, MsoIpg.TYPE_GENERAL);			
+					MsoIpg msoIpg = new MsoIpg(mso.getKey().getId(), chn.getKey().getId(), counter, MsoIpg.TYPE_GENERAL);
+					msoIpg.setPublic(true);
 					msoIpgMngr.create(msoIpg);
 					counter++;
 				}						
 				if (chn.getName().equals("System Channel")) {
 					MsoIpg msoIpg = new MsoIpg(mso.getKey().getId(), chn.getKey().getId(), 81, MsoIpg.TYPE_READONLY);
+					msoIpg.setPublic(true);
 					msoIpgMngr.create(msoIpg);
 					counter++;
 				}
@@ -726,11 +729,13 @@ public class InitService {
 				MsoChannel c = channelMngr.findBySourceUrlSearch(channelMngr.verifyUrl(urls[i]));
 				System.out.println("i=" + i + ";" + urls[i]);
 				System.out.println("channel=" + c.getName() + ";");
-				MsoIpg msoIpg = new MsoIpg(mso.getKey().getId(), c.getKey().getId(), i+1, MsoIpg.TYPE_GENERAL);			
+				MsoIpg msoIpg = new MsoIpg(mso.getKey().getId(), c.getKey().getId(), i+1, MsoIpg.TYPE_GENERAL);
+				msoIpg.setPublic(true);
 				msoIpgMngr.create(msoIpg);							
 			}			
 			MsoChannel channel = new MsoChannelManager().findByName("System Channel");
 			MsoIpg msoIpg = new MsoIpg(mso.getKey().getId(), channel.getKey().getId(), 81, MsoIpg.TYPE_READONLY);
+			msoIpg.setPublic(true);
 			msoIpgMngr.create(msoIpg);	
 			System.out.println("mso1 ipg:" + urls.length);
 		}
@@ -745,7 +750,8 @@ public class InitService {
 		if (devel) {
 			Category c = new CategoryManager().findByName("活動中心");
 			List<MsoChannel> channels = new MsoChannelManager().findPublicChannelsByCategoryId(c.getKey().getId());
-			MsoIpg msoIpg = new MsoIpg(mso.getKey().getId(), channels.get(0).getKey().getId(), 1, MsoIpg.TYPE_READONLY);					
+			MsoIpg msoIpg = new MsoIpg(mso.getKey().getId(), channels.get(0).getKey().getId(), 1, MsoIpg.TYPE_READONLY);
+			msoIpg.setPublic(true);
 			msoIpgMngr.create(msoIpg);		
 		} else {		
 			String[] urls = this.getMso2IpgUrls();
@@ -755,7 +761,8 @@ public class InitService {
 				MsoChannel c = cMngr.findBySourceUrlSearch(cMngr.verifyUrl(urls[i]));
 				System.out.println("i=" + i + ";" + urls[i]);
 				System.out.println("channel=" + c.getName() + ";");				
-				MsoIpg msoIpg = new MsoIpg(mso.getKey().getId(), c.getKey().getId(), Integer.parseInt(seqs[i]), MsoIpg.TYPE_GENERAL);					
+				MsoIpg msoIpg = new MsoIpg(mso.getKey().getId(), c.getKey().getId(), Integer.parseInt(seqs[i]), MsoIpg.TYPE_GENERAL);
+				msoIpg.setPublic(true);
 				msoIpgMngr.create(msoIpg);					
 			}
 			System.out.println("mso2 ipg:" + urls.length);
