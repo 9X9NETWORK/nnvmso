@@ -2,6 +2,7 @@ package com.nnvmso.web.json.transcodingservice;
 
 public class Slide {
 	private long channelId;
+	private String storageId;
 	private String name;
 	private String intro;
 	private String imageUrl;
@@ -83,5 +84,11 @@ public class Slide {
         buffer.append("fileUrl:" + fileUrl + ";");
         buffer.append("programId:" + programId + ";");
         return buffer.toString();		
+	}
+	public void setStorageId(String storageId) {
+		this.storageId = storageId;
+	}
+	public String getStorageId() {
+		return storageId;
 	}	
 }

@@ -154,7 +154,6 @@ public class TranscodingService {
 			channel.setPublic(true);
 			channelMngr.save(channel);
 		}
-		
 		MsoProgram program = programMngr.findByStorageId(item.getItemId());
 		boolean isNew = false;
 		if (program == null) {
@@ -163,7 +162,7 @@ public class TranscodingService {
 		}
 		if (isNew) {
 			if (item.getTitle() != null) { program.setName(item.getTitle()); }					
-
+			
 			String intro = item.getDescription();
 			if (intro != null && intro.length() > 500) {
 				intro = item.getDescription().substring(0, 499);
@@ -184,7 +183,7 @@ public class TranscodingService {
 			}		
 		}
 		program.setStorageId(item.getItemId());	
-		
+			
 		if (item.getMp4() != null) {			
 			program.setMpeg4FileUrl(item.getMp4());
 		}		
@@ -203,7 +202,7 @@ public class TranscodingService {
 		if (item.getAudio() != null) {
 			program.setType(MsoProgram.TYPE_AUDIO);
 		} else {
-			program.setType(MsoProgram.TYPE_VIDEO);
+			//program.setType(MsoProgram.TYPE_VIDEO); // TYPE_SLIDE ??
 		}
 		if (item.getPubDate() != null) {
 			Date theDate = new Date(Long.parseLong(item.getPubDate())*1000);

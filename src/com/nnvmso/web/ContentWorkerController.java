@@ -59,6 +59,9 @@ public class ContentWorkerController {
 		MsoProgram program = new MsoProgram(slide.getName(), slide.getIntro(), slide.getImageUrl(), MsoProgram.TYPE_SCRIPT); 
 		program.setOtherFileUrl(slide.getFileUrl());
 		program.setDuration(slide.getDuration());
+		program.setStorageId(slide.getStorageId());
+		program.setContentType(MsoProgram.CONTENTTYPE_SCRIPT);
+		program.setType(MsoProgram.TYPE_SLIDE);
 		programMngr.create(channel, program);
 		slide.setProgramId(program.getKey().getId());
 		slide.setErrorCode(NnStatusCode.SUCCESS);

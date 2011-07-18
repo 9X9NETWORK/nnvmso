@@ -69,6 +69,8 @@ public class NnStringUtil {
 	 * @return
 	 */
 	public static String htmlSafeChars(String str) {
+		if (str == null)
+			return null;
 		return str.replaceAll("\n", " ")
 		          .replaceAll("\t", " ")
 		          .replaceAll("&", "&amp;")

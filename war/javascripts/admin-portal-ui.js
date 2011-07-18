@@ -593,7 +593,7 @@ $(function()
             editoptions:
             {
               disabled: true,
-              value:    '0:Unknown;1:Video;2:Audio'
+              value:    '0:Unknown;1:Video;2:Audio;3:Slide'
             }
           },
           {
@@ -612,7 +612,8 @@ $(function()
               value:
               {
                 0: 'Direct Link',
-                1: 'YouTube'
+                1: 'YouTube',
+                2: 'Script'
               }
             }
           },

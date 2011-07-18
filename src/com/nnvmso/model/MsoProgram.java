@@ -73,7 +73,7 @@ public class MsoProgram implements Serializable {
 	private short type;
 	public static short TYPE_VIDEO = 1;
 	public static short TYPE_AUDIO = 2;
-	public static short TYPE_SCRIPT = 2;	
+	public static short TYPE_SCRIPT = 3;	
 	
 	@Persistent
 	private Date createDate;
