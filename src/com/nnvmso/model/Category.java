@@ -33,6 +33,12 @@ public class Category implements Serializable {
 	
 	@Persistent
 	private boolean isPublic;
+			
+	@Persistent	
+	private short type;
+	public static final short TYPE_GENERAL = 0;
+	public static final short TYPE_YOUTUBE = 1;
+	public static final short TYPE_PERSONAL = 2;
 	
 	@Persistent
 	private int channelCount;
@@ -114,5 +120,12 @@ public class Category implements Serializable {
 	public long getParentId() {
 		return parentId;
 	}
-	
+
+	public short getType() {
+		return type;
+	}
+
+	public void setType(short type) {
+		this.type = type;
+	}
 }
