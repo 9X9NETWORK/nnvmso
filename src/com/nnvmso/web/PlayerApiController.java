@@ -542,7 +542,9 @@ public class PlayerApiController {
 	 * @return Category info and channels info. <br/>
 	 *  	   First section is category info, follows channels info. Each channel is \n separated.<br/>    
 	 *         Category info has category id. <br/>
-	 *         Channel info includes channel id, channel name, channel image url, program count, subscription count, channel type, channel episodes last update time <br/>
+	 *         Channel info includes channel id, channel name, channel image url, program count, 
+	 *         subscription count, channel type, channel episodes last update time,
+	 *         channel source (for example, youtube's channel name) <br/>
 	 *         Example: 	<br/>
 	 *         0	success<br/>
 	 *         --<br/>
@@ -554,12 +556,14 @@ public class PlayerApiController {
 	 *         channel episodes last update time: please look up the definition in channelLineup        
 	 */		
 	@RequestMapping(value="channelBrowse")
-	public ResponseEntity<String> channelBrowse(@RequestParam(value="category", required=false) String categoryIds, HttpServletRequest req) {
+	public ResponseEntity<String> channelBrowse(@RequestParam(value="category", required=false) String categoryIds,
+												@RequestParam(value="lang", required=false) String lang,
+			                                    HttpServletRequest req) {
 		this.prepService(req);
 		log.info(categoryIds);		
 		String output = NnStatusMsg.errorStr(locale);
 		try {
-			output = playerApiService.findPublicChannelsByCategory(categoryIds);
+			output = playerApiService.findPublicChannelsByCategory(categoryIds, lang);
 		} catch (Exception e){
 			output = playerApiService.handleException(e);
 		}
@@ -743,6 +747,9 @@ public class PlayerApiController {
 	 *            programThumbnailUrl, programLargeThumbnailUrl, <br/>
 	 *            url1(mpeg4/slideshow), url2(webm), url3(flv more likely), url4(audio), <br/> 
 	 *            publish date timestamp</p>
+	 *         <p>
+	 *            programType: 1 video, 2 audio, 3 script    
+	 *            
 	 */
 	@RequestMapping("programInfo")
 	public ResponseEntity<String> programInfo(@RequestParam(value="channel", required=false) String channelIds,
