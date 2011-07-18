@@ -180,7 +180,8 @@ public class TranscodingService {
 				program.setImageLargeUrl(item.getThumbnailLarge());
 			} else {
 				program.setImageUrl(channel.getImageUrl());
-			}		
+			}
+			program.setPublic(true);
 		}
 		program.setStorageId(item.getItemId());	
 			
