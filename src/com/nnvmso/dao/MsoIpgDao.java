@@ -43,16 +43,17 @@ public class MsoIpgDao extends GenericDao<MsoIpg> {
 		}
 	}
 
+	//add isPublic, didn't make it consistent naming convention
 	public List<MsoIpg> findAllByMsoId(long msoId) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		List<MsoIpg> detached = new ArrayList<MsoIpg>(); 
 		try {
 			Query q = pm.newQuery(MsoIpg.class);
-			q.setFilter("msoId == msoIdParam");
-			q.declareParameters("long msoIdParam");
+			q.setFilter("msoId == msoIdParam && isPublic == isPublicParam");
+			q.declareParameters("long msoIdParam, boolean isPublicParam");
 			q.setOrdering("seq asc");
 			@SuppressWarnings("unchecked")
-			List<MsoIpg> ipg = (List<MsoIpg>)q.execute(msoId);
+			List<MsoIpg> ipg = (List<MsoIpg>)q.execute(msoId, true);
 			detached = (List<MsoIpg>)pm.detachCopyAll(ipg);
 		} finally {
 			pm.close();
