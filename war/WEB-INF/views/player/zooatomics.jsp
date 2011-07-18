@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9playerV65"/>
+<c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9playerV67"/>
 
 <!-- $Revision$ -->
 
@@ -27,7 +27,7 @@
 <script type="text/javascript" charset="utf-8" src="${root}/javascripts/jquery.swfobject.1-1-1.min.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/scripts/flowplayer-3.2.4.min.js"></script>
 
-<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/player9.js"></script>
+<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/player10.js"></script>
 
 <script type="text/javascript">
 var analytz = false;
@@ -568,6 +568,77 @@ var brandinfo = "${brandInfo}";
 
   </div>
 </div>
+
+<div id="tvch-layer"> 
+  <div id="tvch-holder"> 
+    <div id="tvch-header"> 
+      <h2><span>News Channels</span></h2> 
+      <img src="${root}/images/arrow_up.png" id="tvch-arrow-up"> 
+    </div> 
+    <div id="tvch-container"> 
+      <ul id="tvch-list"> 
+        <li class="on"> 
+          <p class="tvch-thumb"><img src="${root}/thumb/03.png" class="thumb"><img src="${root}/images/icon_play.png" class="btn-tvpreview"></p> 
+          <p class="tvch-title"><span>ABC News</span></p> 
+          <p class="tvch-description"><span>ABC's Jason Ryan (@jasonryanabc) Just days after the perjury trial began, the federal judge overseeing...</span></p> 
+        </li> 
+        <li> 
+          <p class="tvch-thumb"><img src="${root}/thumb/02.jpg" class="thumb"><img src="${root}/images/icon_play.png" class="btn-tvpreview"></p> 
+          <p class="tvch-title"><span>CNN News Tonight World Wide</span></p> 
+          <p class="tvch-description"><span>CNN's Jason Ryan (@jasonryanabc) Just days after the perjury trial began, the federal judge overseeing...</span></p> 
+        </li> 
+        <li></li> 
+        <li></li> 
+        <li></li> 
+        <li></li> 
+        <li></li> 
+        <li></li> 
+        <li></li> 
+        <li></li> 
+        <li></li> 
+        <li></li> 
+      </ul> 
+    </div> 
+    <div id="tvch-footer"> 
+      <img src="${root}/images/arrow_down.png" id="tvch-arrow-down"> 
+    </div> 
+  </div> 
+</div> 
+ 
+<div id="tvpreview-layer"> 
+  <div id="tvpreview-holder"> 
+    <div id="tvpreview-header"> 
+      <h2><span id="btn-back"><img src="${root}/images/arrow_left_on.png" class="root">News Channels :</span><span>Select a Channel</span></h2> 
+      <p id="btn-returnCG"><img src="${root}/images/icon_sgt.png"><span>Return to Channel Guide</span></p> 
+    </div> 
+    <div id="tvpreview-container"> 
+      <div id="tvch-card"> 
+        <img src="${root}/thumb/03.png" class="tvch-thumb"> 
+        <p class="tvch-title"><span>ABC News</span></p> 
+        <p class="tvch-description"><span>ABC's Jason Ryan (@jasonryanabc) Just days after the perjury trial began, the federal judge overseeing...</span></p> 
+      </div> 
+      <div id="tvpreview-control"> 
+        <p class="btn" id="tri-left"><img src="${root}/images/tri_left.png"></p> 
+        <p class="btn" id="tri-right"><img src="${root}/images/tri_right.png"></p> 
+        <p class="btn" id="tri-up"><img src="${root}/images/tri_up.png"></p> 
+        <p class="btn" id="tri-down"><img src="${root}/images/tri_down.png"></p> 
+        <p class="btn-blue"><span>Add</span></p> 
+        <p class="txt" id="txt-left"><span>Prev<br>Episode</span></p> 
+        <p class="txt" id="txt-right"><span>Next<br>Episode</span></p> 
+        <p class="txt" id="txt-up"><span>Prev Channel</span></p> 
+        <p class="txt" id="txt-down"><span>Next Channel</span></p> 
+      </div> 
+      <div id="tvpreview-win"> 
+        <div id="tvpreview-video"></div> 
+        <img src="${root}/images/ep_panel_on.png" id="tvep-panel"> 
+        <p id="tv-arrow-right"><img src="${root}/images/arrow_right_off.png" id="tv-arrow-right-off"><img src="${root}/images/arrow_right_on.png" id="tv-arrow-right-on"></p> 
+        <p id="tv-arrow-left"><img src="${root}/images/arrow_left_off.png" id="tv-arrow-left-off"><img src="${root}/images/arrow_left_on.png" id="tv-arrow-left-on"></p> 
+        <ul class="tvep-list"><li><img src="${root}/images/bg_ep_off.png" class="ep-off"><img src="${root}/images/bg_ep_on.png" class="ep-on"><img src="${root}/thumb/14.jpeg" class="thumbnail"><p class="age"><span>Today</span></p><p class="duration"><span>10:10</span></p></li><li><img src="${root}/images/bg_ep_off.png" class="ep-off"><img src="${root}/images/bg_ep_on.png" class="ep-on"><img src="${root}/thumb/06.jpg" class="thumbnail"><p class="age"><span>Today</span></p><p class="duration"><span>10:10</span></p></li><li><img src="${root}/images/bg_ep_off.png" class="ep-off"><img src="${root}/images/bg_ep_on.png" class="ep-on"><img src="${root}/thumb/08.jpg" class="thumbnail"><p class="age"><span>Yesterday</span></p><p class="duration"><span>10:10</span></p></li><li><img src="${root}/images/bg_ep_off.png" class="ep-off"><img src="${root}/images/bg_ep_on.png" class="ep-on"><img src="${root}/thumb/04.jpg" class="thumbnail"><p class="age"><span>2 days ago</span></p><p class="duration"><span>10:10</span></p></li><li><img src="${root}/images/bg_ep_off.png" class="ep-off"><img src="${root}/images/bg_ep_on.png" class="ep-on"><img src="${root}/thumb/13.jpg" class="thumbnail"><p class="age"><span>2 weeks ago</span></p><p class="duration"><span>10:10</span></p></li></ul> 
+        <div id="tvep-meta"><p><span class="tvep-title">Jay Leno's eclectic car collection</span> - <span class="age">Today</span></p></div> 
+      </div> 
+    </div> 
+  </div> 
+</div> 
 
 <div id="ad-layer" style="display: none">
   <img src="${root}/images/ep_panel_on.png" id="ad-panel">
