@@ -356,7 +356,7 @@ public class PlayerApiService {
 		return NnStatusMsg.successStr(locale) + separatorStr + localeCode;
 	}
 	 			
-	public String findPublicChannelsByCategory(String categoryId) {		
+	public String findPublicChannelsByCategory(String categoryId, String lang) {		
 		//verify input
 		List<MsoChannel> channels = new ArrayList<MsoChannel>();
 		if (categoryId == null || categoryId.length() < 1) { return NnStatusMsg.inputMissing(locale); }
@@ -364,7 +364,7 @@ public class PlayerApiService {
 		
 		//find public channels by categoryId
 		MsoChannelManager channelMngr = new MsoChannelManager();
-		channels = channelMngr.findPublicChannelsByCategoryId(Long.parseLong(categoryId));
+		channels = channelMngr.findPublicChannelsByCategoryIdAndLang(Long.parseLong(categoryId), lang);
 		if (channels == null) { return NnStatusMsg.successStr(locale);}
 		
 		//assemble output
@@ -374,6 +374,11 @@ public class PlayerApiService {
 		for (int i=0; i< channels.size(); i++) {	
 			if (channels.get(i).getProgramCount() > 0 ) {
 				MsoChannel c = channels.get(i);
+				String channelSource = "";
+				if (c.getSourceUrl() != null && c.getSourceUrl().contains("http://www.youtube.com"))
+					channelSource = YouTubeLib.getYouTubeChannelName(c.getSourceUrl());
+				if (c.getContentType() == MsoChannel.CONTENTTYPE_FACEBOOK) 
+					channelSource = c.getSourceUrl();
 				String[] ori = {String.valueOf(c.getSeq()),
 						        String.valueOf(c.getKey().getId()), 
 						        c.getName(), 
@@ -381,7 +386,8 @@ public class PlayerApiService {
 						        Integer.toString(c.getProgramCount()),
 						        String.valueOf(c.getSubscriptionCount()),
 						        String.valueOf(c.getContentType()),
-						        this.convertEpochToTime(c.getTranscodingUpdateDate(), c.getUpdateDate())
+						        this.convertEpochToTime(c.getTranscodingUpdateDate(), c.getUpdateDate()),
+						        channelSource,						        
 						        };
 				result = result + NnStringUtil.getDelimitedStr(ori);
 				result = result + "\n";
@@ -718,14 +724,15 @@ public class PlayerApiService {
 			                    String imageUrl, HttpServletRequest req) {
 		//verify input
 		if (url == null || url.length() == 0 ||  grid == null || grid.length() == 0 ||
-			categoryIds == null || categoryIds.equals("undefined") || categoryIds.length() == 0 || 
-			lang == null || lang.length() == 0 ||
+			categoryIds == null || categoryIds.equals("undefined") || categoryIds.length() == 0 || 			
 			userToken== null || userToken.length() == 0) {
 			return NnStatusMsg.inputMissing(locale);
 		}
 		if (!Pattern.matches("^\\d*$", grid) || Integer.parseInt(grid) < 0 || Integer.parseInt(grid) > 81) {			
 			return NnStatusMsg.inputError(locale);
 		}
+		if (lang == null || lang.length() == 0) 
+			lang = Mso.LANG_EN;
 		if (!lang.equals(Mso.LANG_EN) && !lang.equals(Mso.LANG_ZH)) {
 			return NnStatusMsg.inputError(locale);
 		}
