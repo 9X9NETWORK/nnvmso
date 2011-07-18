@@ -129,8 +129,8 @@ public class MsoProgramDao extends GenericDao<MsoProgram> {
 			List<MsoProgram> programs = ((List<MsoProgram>) q.execute(channelIds));		
 			good = (List<MsoProgram>) pm.detachCopyAll(programs);
 			for (MsoProgram p : programs) {
-				  if (p.isPublic() && p.getStatus() != MsoProgram.STATUS_OK && p.getType() == MsoProgram.TYPE_VIDEO) {
-					  good.add(p);
+				  if (!p.isPublic() || p.getStatus() != MsoProgram.STATUS_OK) {
+					  good.remove(p);
 				  }			
 			}
 		} finally {
@@ -140,18 +140,18 @@ public class MsoProgramDao extends GenericDao<MsoProgram> {
 	}
 		
 	/**
-	 * Good: is Public, is STATUS_OK, is TYPE_VIDEO
+	 * Good: is Public, is STATUS_OK, //is not TYPE_VIDEO
 	 */
 	public List<MsoProgram> findGoodProgramsByChannelId(long channelId) {
 		List<MsoProgram> detached = new ArrayList<MsoProgram>();
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
 			Query q = pm.newQuery(MsoProgram.class);
-			q.setFilter("channelId == channelIdParam && status == statusParam && type == typeParam");
-			q.declareParameters("long channelIdParam, short statusParam, short typeParam");
+			q.setFilter("channelId == channelIdParam && isPublic == isPublicParam && status == statusParam");
+			q.declareParameters("long channelIdParam, boolean isPublicParam, short statusParam");			
 			q.setOrdering("pubDate desc");
 			@SuppressWarnings("unchecked")
-			List<MsoProgram> programs = (List<MsoProgram>)q.execute(channelId, MsoProgram.STATUS_OK, MsoProgram.TYPE_VIDEO);
+			List<MsoProgram> programs = (List<MsoProgram>)q.execute(channelId, true, MsoProgram.STATUS_OK);
 			detached = (List<MsoProgram>)pm.detachCopyAll(programs);
 		} finally {
 			pm.close();
