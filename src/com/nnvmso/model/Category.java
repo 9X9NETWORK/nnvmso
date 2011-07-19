@@ -33,11 +33,13 @@ public class Category implements Serializable {
 	
 	@Persistent
 	private boolean isPublic;
-			
+
+	@Persistent
+	private boolean isInIpg;
+	
 	@Persistent	
 	private short type;
-	public static final short TYPE_GENERAL = 0;
-	public static final short TYPE_YOUTUBE = 1;
+	public static final short TYPE_GENERAL = 1;	
 	public static final short TYPE_PERSONAL = 2;
 	
 	@Persistent
@@ -53,6 +55,8 @@ public class Category implements Serializable {
 		this.name = name;
 		this.isPublic = isPublic;
 		this.msoId= msoId;
+		this.isInIpg = true;
+		this.type = Category.TYPE_GENERAL;
 	}
 
 	public long getMsoId() {
@@ -121,11 +125,19 @@ public class Category implements Serializable {
 		return parentId;
 	}
 
+	public boolean isInIpg() {
+		return isInIpg;
+	}
+
+	public void setInIpg(boolean isInIpg) {
+		this.isInIpg = isInIpg;
+	}
+
 	public short getType() {
 		return type;
 	}
 
 	public void setType(short type) {
 		this.type = type;
-	}
+	}	
 }
