@@ -363,6 +363,7 @@ public class PlayerApiController {
 	 * User subscribes a channel on a designated grid location.
 	 * 
 	 * <p>Example: http://host:port/playerAPI/subscribe?user=QQl0l208W2C4F008980F&channel=51&grid=2</p>
+	 * <p>For demo: 
 	 * 
 	 * @param user user's unique identifier
 	 * @param channel channelId
@@ -432,22 +433,26 @@ public class PlayerApiController {
 
 	/**
 	 * Change set name. Please note a pre-defined set is not editable.
+	 * <p>
+	 * For demo: please provide user, pos and set 
 	 * 
 	 * @param user user token
 	 * @param name set name
 	 * @param pos set position, from 1 to 9 
+	 * @param set set id (category id)
 	 * @return status
 	*/
 	@RequestMapping(value="setSetInfo")
 	public ResponseEntity<String> setSetInfo (@RequestParam(value="user", required=false) String userToken,
 			                                  @RequestParam(value="name", required=false) String name,
 			                                  @RequestParam(value="pos", required=false) String pos,
+			                                  @RequestParam(value="set", required=false) String setId,
 			                                  HttpServletRequest req) {
-		log.info("setInfo: user=" + userToken + ";pos =" + pos);
+		log.info("setInfo: user=" + userToken + ";pos =" + pos + ";set=" + setId);
 		this.prepService(req);		
 		String output = NnStatusMsg.errorStr(locale);
 		try {
-			output = playerApiService.changeSetInfo(userToken, name, pos);
+			output = playerApiService.changeSetInfo(userToken, name, pos, setId);
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}
@@ -611,7 +616,8 @@ public class PlayerApiController {
 	 *         
 	 *         </blockquote>
 	 *         <p>
-	 *         set type: TYPE_USER = 1; TYPE_READONLY = 2;
+	 *         <strike>set type: TYPE_USER = 1; TYPE_READONLY = 2;</strike>
+	 *         set type: TYPE_GENERAL = 1;	TYPE_PERSONAL = 2;
 	 *         <br/>
 	 *         channel type: TYPE_GENERAL = 1; TYPE_READONLY = 2;
 	 *         <br/>
