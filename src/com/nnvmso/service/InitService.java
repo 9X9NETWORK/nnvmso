@@ -151,16 +151,25 @@ public class InitService {
 		
 		//initialize default categories
 		String[] categoryStr = {
-			"Activism", "Automotive", "Comedy", "Entertainment", "Finance", "Food & Wine",
-			"Gaming", "Gay & Lesbian", "Health & Fitness", "How to", 
-			"Lifestyle", "Music", "News & Politics", "Outdoor",
-			"People", "Pets & Animals", "Religion", "Sports", "Tech & Science",
-			"Travel"
+			"Ambient music", "Brands & Celebrity", "Food & Wine", "Lifestle", 
+			"News",
+			"Movie trailer", "Religion", "Sports", "Travel", "Others",
+			"My Youtube", "Friends & Family"
 		};
 				
 		CategoryManager categoryMngr = new CategoryManager();
 		for (String name : categoryStr) {			
-			categoryMngr.create(new Category(name, true, mso.getKey().getId()));
+			Category c = new Category(name, true, mso.getKey().getId());
+			if (c.getName().equals("Others") || c.getName().equals("Religion") || c.getName().equals("Sports")) {
+				System.out.println("enter equal:" + c.getName());
+				c.setInIpg(false);
+			} else {
+				c.setInIpg(true);
+			}
+			if (c.getName().equals("My Youtube") || c.getName().equals("Friends & Family")) {
+				c.setType(Category.TYPE_PERSONAL);
+			}
+			categoryMngr.create(c);			
 		}
 		log.info("initializeMso1AndCategories is done");
 	}
@@ -249,7 +258,7 @@ public class InitService {
 		CategoryManager categoryMngr = new CategoryManager();
 		MsoChannelManager channelMngr = new MsoChannelManager();
 		MsoProgramManager programMngr = new MsoProgramManager();
-		Category category = categoryMngr.findByName("Activism");
+		Category category = categoryMngr.findByName("Ambient music");
 		categories.add(category);
 
 		if (devel) {
@@ -698,7 +707,7 @@ public class InitService {
 		MsoChannelManager channelMngr = new MsoChannelManager();
 		CategoryManager categoryMngr = new CategoryManager();
 		if (devel) {
-			Category c = categoryMngr.findByName("Activism");
+			Category c = categoryMngr.findByName("Ambient music");
 			List<MsoChannel> channels = new MsoChannelManager().findPublicChannelsByCategoryId(c.getKey().getId());
 			int counter = 1;
 			int limit = 4;
@@ -778,7 +787,7 @@ public class InitService {
 		
 		if (devel) {
 			CategoryManager categoryMngr = new CategoryManager();
-			Category category = categoryMngr.findByName("Activism");
+			Category category = categoryMngr.findByName("Ambient music");
 			channels = new MsoChannelManager().findPublicChannelsByCategoryId(category.getKey().getId());
 			channels.get(0).setSeq(1);
 			channels.get(1).setSeq(2);
