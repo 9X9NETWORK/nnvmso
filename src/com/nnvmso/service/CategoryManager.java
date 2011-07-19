@@ -179,7 +179,51 @@ public class CategoryManager {
 			categories = this.findAllByIds(notCachedIds);
 			log.info("Categories are partial cached.");
 		} else {
-			categories = categoryDao.findAllByMsoId(msoId);
+			categories = categoryDao.findAllByMsoId(msoId); //!!!hack
+			log.info("Categories never been cached");
+		}
+		//save in cache
+		if (cache != null) {
+			List<Long> ids = new ArrayList<Long>();
+			for (int i=0; i < categories.size(); i++) {
+				long id = categories.get(i).getKey().getId();
+				String key = this.getCacheKey(msoId, id);  
+				cache.put(key, categories.get(i));
+				ids.add(id);
+			}
+			String key = this.getCacheCntKey(msoId); 
+			cache.put(key, ids);
+		}		
+		return categories;
+	}
+
+	//result will be cached
+	public List<Category> findAllInIpg(long msoId) {
+		List<Category> categories = new ArrayList<Category>();
+		Cache cache = CacheFactory.get();
+		List<Long> notCachedIds = new ArrayList<Long>();
+		//find from cache
+		if (cache != null) {
+			@SuppressWarnings("unchecked")
+			List<Long> ids = (List<Long>)cache.get(this.getCacheCntKey(msoId));
+			if (ids != null) {
+				for (int i=0; i < ids.size(); i++) {
+					Category c = (Category)cache.get(this.getCacheKey(msoId, ids.get(i)));
+					if (c != null) { 
+						categories.add(c);
+					} else {
+						notCachedIds.add(ids.get(i));
+					}										
+				}
+				if (notCachedIds.size() ==0) {return categories;}				
+			}
+		}
+		//find
+		if (notCachedIds.size() > 0) {
+			categories = this.findAllByIds(notCachedIds);
+			log.info("Categories are partial cached.");
+		} else {
+			categories = categoryDao.findAllInIpg(msoId);//!!!hack
 			log.info("Categories never been cached");
 		}
 		//save in cache
