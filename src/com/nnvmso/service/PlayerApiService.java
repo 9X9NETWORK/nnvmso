@@ -514,11 +514,17 @@ public class PlayerApiService {
 		return result;
 	}
 	
-	public String changeSetInfo(String userToken, String name, String areaNo) {
+	public String changeSetInfo(String userToken, String name, String areaNo, String setId) {
 		//verify input
+		/*
 		if (name == null || areaNo == null)  {			
 			return NnStatusMsg.inputMissing(locale);
 		}
+		*/
+		if (areaNo == null || setId == null)  {			
+			return NnStatusMsg.inputMissing(locale);
+		}
+		
 		if (!Pattern.matches("^\\d*$", areaNo) || Integer.parseInt(areaNo) < 0 || Integer.parseInt(areaNo) > 9) {			
 			return NnStatusMsg.inputError(locale);
 		}
@@ -531,15 +537,23 @@ public class PlayerApiService {
 		AreaOwnershipManager areaMngr = new AreaOwnershipManager();
 		short position = Short.valueOf(areaNo);
 		AreaOwnership area = areaMngr.findByUserIdAndAreaNo(user.getKey().getId(), Short.valueOf(position));
+		CategoryManager categoryMngr = new CategoryManager();
+		Category c = categoryMngr.findById(Short.valueOf(setId));		
 		if (area != null) {
+			/*
 			if (area.getType() == AreaOwnership.TYPE_RO)
-				return messageSource.getMessage("nnstatus.subscription_ro_set", new Object[] {NnStatusCode.SUBSCRIPTION_RO_SET} , locale); 
-			area.setSetName(name);
-			areaMngr.save(area);			
+				return messageSource.getMessage("nnstatus.subscription_ro_set", new Object[] {NnStatusCode.SUBSCRIPTION_RO_SET} , locale);
+			*/
+			area.setSetId(c.getKey().getId());
+			area.setSetName(c.getName());
+			area.setType(c.getType());
+			areaMngr.save(area);
 		} else {
 			area = new AreaOwnership();
 			area.setUserId(user.getKey().getId());
-			area.setSetName(name);				
+			area.setSetId(c.getKey().getId());
+			area.setSetName(c.getName());
+			area.setType(c.getType());
 			area.setAreaNo(position);
 			areaMngr.create(area);
 		}
@@ -553,13 +567,15 @@ public class PlayerApiService {
 		if (userToken == null || userToken.equals("undefined")) return NnStatusMsg.inputMissing(locale);
 		if ((setId != null && pos == null) || (setId == null && pos != null)) return NnStatusMsg.inputMissing(locale);
 		if ((channelId != null && gridId == null) || (channelId == null && gridId != null)) return NnStatusMsg.inputMissing(locale);
-		
+		if (channelId == null) return NnStatusMsg.inputMissing(locale); //channelId is mandatory for demo
 		String output = messageSource.getMessage("nnstatus.channel_or_user_invalid", new Object[] {NnStatusCode.CHANNEL_OR_USER_INVALID} , locale);		
 		NnUser user = new NnUserManager().findByToken(userToken);
 		if (user == null) {return output;}	
 		SubscriptionManager subMngr = new SubscriptionManager();
-		if (setId != null) {			
+		//set id is actually category id !!!hack?
+		if (setId != null) {
 			//find all channels
+			/*
 			List<Subscription> subscribeList = subMngr.findAllByUser(user.getKey().getId());
 			ChannelSetManager csMngr = new ChannelSetManager();
 			long sId = Long.parseLong(setId);
@@ -584,25 +600,31 @@ public class PlayerApiService {
 					}
 				}
 			}
+			*/
+			CategoryManager categoryMngr = new CategoryManager();
+			Category c = categoryMngr.findById(Long.parseLong(setId));
+			if (c == null)
+				return messageSource.getMessage("nnstatus.category_invalid", new Object[] {NnStatusCode.CATEGORY_INVALID} , locale);			
+			
 			AreaOwnershipManager areaMngr = new AreaOwnershipManager();
-			AreaOwnership area = areaMngr.findByUserIdAndSetId(user.getKey().getId(), cs.getKey().getId());
-			if (area != null) {
-				return messageSource.getMessage("nnstatus.subscription_duplicate_set", new Object[] {NnStatusCode.SUBSCRIPTION_DUPLICATE_SET} , locale);												
-			}
-			area = new AreaOwnership();											
+			AreaOwnership area = areaMngr.findByUserIdAndSetId(user.getKey().getId(), c.getKey().getId());
+			if (area == null) {
+				//return messageSource.getMessage("nnstatus.subscription_duplicate_set", new Object[] {NnStatusCode.SUBSCRIPTION_DUPLICATE_SET} , locale);
+				area = new AreaOwnership();
+			}			
 			area.setUserId(user.getKey().getId());
-			area.setSetId(cs.getKey().getId());
-			area.setSetName(cs.getName());
-			area.setSetImageUrl(cs.getImageUrl());
+			area.setSetId(c.getKey().getId());
+			area.setSetName(c.getName());
+			//area.setSetImageUrl(cs.getImageUrl());
 			area.setAreaNo(Short.parseShort(pos));
-			area.setType(AreaOwnership.TYPE_RO);
+			area.setType(c.getType());
 			areaMngr.save(area);
 			SubscriptionLogManager logMngr = new SubscriptionLogManager();
-			SubscriptionLog log = logMngr.findByMsoIdAndSetId(mso.getKey().getId(), cs.getKey().getId());
+			SubscriptionLog log = logMngr.findByMsoIdAndSetId(mso.getKey().getId(), c.getKey().getId());
 			if (log == null) {
 				log = new SubscriptionLog();
 				log.setCount(1);
-				log.setSetId(cs.getKey().getId());
+				log.setSetId(c.getKey().getId());
 				log.setMsoId(mso.getKey().getId());
 				logMngr.save(log);
 			}		
@@ -611,7 +633,6 @@ public class PlayerApiService {
 
 		//verify channel and grid
 		if (channelId != null) {
-			System.out.println("subscription channelid:" + channelId);
 			long cId = Long.parseLong(channelId);			
 			MsoChannel channel = new MsoChannelManager().findById(cId);			
 			if (channel == null || channel.getStatus() == MsoChannel.STATUS_ERROR) { 
@@ -910,7 +931,40 @@ public class PlayerApiService {
 		if (user != null) {
 			List<AreaOwnership> sets = areaMngr.findByUserId(user.getKey().getId());		
 		    //set info
-			if (setInfo) {
+			//!!! find from set, replace with category stuff
+			//findAllInIpg, replace with areaownership 
+			if (setInfo) {				
+				CategoryManager categoryMngr = new CategoryManager();
+				List<Category> categories = categoryMngr.findAllInIpg(mso.getKey().getId());
+				String[] objs = new String[9];
+				for (int i=0; i<9; i++) {
+					String[] obj = {
+							String.valueOf(i+1),
+							String.valueOf(categories.get(i).getKey().getId()),
+							categories.get(i).getName(),						
+							"",
+							String.valueOf(categories.get(i).getType()),
+					};					
+					objs[i] = NnStringUtil.getDelimitedStr(obj);;
+					System.out.println(objs[i]);
+				}
+				for (AreaOwnership s : sets) {					
+					String[] obj = {
+							String.valueOf(s.getAreaNo()),
+							String.valueOf(s.getSetId()),
+							s.getSetName(),						
+							"",
+							String.valueOf(s.getType()),
+					};					
+					objs[s.getAreaNo()-1] = NnStringUtil.getDelimitedStr(obj);
+					System.out.println(s.getAreaNo()-1 + ";" + objs[s.getAreaNo()-1]);
+					
+				}
+				for (int i=0;i<9;i++) {
+					result = result + objs[i];
+					result = result + "\n";										
+				}
+				/*
 				for (AreaOwnership s : sets) {
 					String[] obj = {
 							String.valueOf(s.getAreaNo()),
@@ -922,10 +976,12 @@ public class PlayerApiService {
 					result = result + NnStringUtil.getDelimitedStr(obj);;
 					result = result + "\n";
 				}
+				*/
 				result = result + separatorStr;					
 			}		
 			
-			//find channels from set
+			//find channels from set //so called live set, removed
+			/*
 			ChannelSetManager setMngr = new ChannelSetManager();
 			for (AreaOwnership area : sets) {
 				if (area.getType() == AreaOwnership.TYPE_RO) {
@@ -936,6 +992,7 @@ public class PlayerApiService {
 					setChannels.addAll(list);				
 				}
 			}
+			*/
 		}
 		//sort by key
 		if (channelPos) {
