@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9playerV67"/>
+<c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9playerV68"/>
 
 <!-- $Revision$ -->
 
@@ -130,6 +130,20 @@ var brandinfo = "${brandInfo}";
     <div id="ep-meta"><p><span class="ch-title" id="ep-layer-ch-title"></span> - <span class="ep-title" id="ep-layer-ep-title"></span> - <span class="age" id="ep-age"></span> - <span class="duration" id="ep-length"></span></p></div>
   </div>
 </div>
+
+<ul class="set-options"> 
+  <li class="on"><img src="${root}/images/icon_check.png" class="icon-check"><span>News</span></li> 
+  <li><img src="${root}/images/icon_check.png" class="icon-check"><span>Music</span></li> 
+  <li><img src="${root}/images/icon_check.png" class="icon-check"><span>Sports</span></li> 
+  <li><img src="${root}/images/icon_check.png" class="icon-check"><span>Movie Trailers</span></li> 
+  <li><img src="${root}/images/icon_check.png" class="icon-check"><span>Lifestyle</span></li> 
+  <li><img src="${root}/images/icon_check.png" class="icon-check"><span>Food & Wine</span></li> 
+  <li><img src="${root}/images/icon_check.png" class="icon-check"><span>Travel</span></li> 
+  <li><img src="${root}/images/icon_check.png" class="icon-check"><span>Local Deal</span></li> 
+  <li><img src="${root}/images/icon_check.png" class="icon-check"><span>Brands</span></li> 
+  <li><img src="${root}/images/icon_check.png" class="icon-check"><span>My YouTube Favorites</span></li> 
+  <li><img src="${root}/images/icon_check.png" class="icon-check"><span>Friends & Family</span></li> 
+</ul> 
 
 <div id="sg-layer" style="display: block">
   <div id="sg-holder">
@@ -608,14 +622,22 @@ var brandinfo = "${brandInfo}";
 <div id="tvpreview-layer"> 
   <div id="tvpreview-holder"> 
     <div id="tvpreview-header"> 
-      <h2><span id="btn-back"><img src="${root}/images/arrow_left_on.png" class="root">News Channels :</span><span>Select a Channel</span></h2> 
-      <p id="btn-returnCG"><img src="${root}/images/icon_sgt.png"><span>Return to Channel Guide</span></p> 
+      <h2><span class="index">News Channels (<span id="chNum">10</span>) :</span><span class="title">Select a Channel</span></h2> 
+      <ul class="navigation"> 
+        <li class="btn-store"><img src="${root}/images/icon_store.png" class="icon-store"><span>Channel Store</span></li> 
+        <li class="btn-home"><img src="${root}/images/icon_home.png" class="icon-home"><span>Return to 9x9 View</span></li> 
+      </ul> 
     </div> 
     <div id="tvpreview-container"> 
-      <div id="tvch-card"> 
-        <img src="${root}/thumb/03.png" class="tvch-thumb"> 
-        <p class="tvch-title"><span>ABC News</span></p> 
-        <p class="tvch-description"><span>ABC's Jason Ryan (@jasonryanabc) Just days after the perjury trial began, the federal judge overseeing...</span></p> 
+      <div id="tvch-cards"> 
+        <div id="current-card"> 
+          <img src="${root}/thumb/03.png" class="tvch-thumb"> 
+          <p class="tvch-title"><span>Channel: </span><span class="title">ABC News</span></p> 
+          <p class="tvch-description"><span>ABC's Jason Ryan (@jasonryanabc) Just days after the perjury trial began, the federal judge overseeing the Roger Clemens trial ended the...</span></p> 
+        </div> 
+        <div id="next1-card"><p class="tvch-title"><span>Channel: </span><span class="title">CNN News</span></p></div> 
+        <div id="next2-card"><p class="tvch-title"><span>Channel: </span><span class="title">NBC News</span></p></div> 
+        <div id="next3-card"><p class="tvch-title"><span>Channel: </span><span class="title">CTS News</span></p></div> 
       </div> 
       <div id="tvpreview-control"> 
         <p class="btn" id="tri-left"><img src="${root}/images/tri_left.png"></p> 
@@ -633,12 +655,12 @@ var brandinfo = "${brandInfo}";
         <img src="${root}/images/ep_panel_on.png" id="tvep-panel"> 
         <p id="tv-arrow-right"><img src="${root}/images/arrow_right_off.png" id="tv-arrow-right-off"><img src="${root}/images/arrow_right_on.png" id="tv-arrow-right-on"></p> 
         <p id="tv-arrow-left"><img src="${root}/images/arrow_left_off.png" id="tv-arrow-left-off"><img src="${root}/images/arrow_left_on.png" id="tv-arrow-left-on"></p> 
-        <ul class="tvep-list"><li><img src="${root}/images/bg_ep_off.png" class="ep-off"><img src="${root}/images/bg_ep_on.png" class="ep-on"><img src="${root}/thumb/14.jpeg" class="thumbnail"><p class="age"><span>Today</span></p><p class="duration"><span>10:10</span></p></li><li><img src="${root}/images/bg_ep_off.png" class="ep-off"><img src="${root}/images/bg_ep_on.png" class="ep-on"><img src="${root}/thumb/06.jpg" class="thumbnail"><p class="age"><span>Today</span></p><p class="duration"><span>10:10</span></p></li><li><img src="${root}/images/bg_ep_off.png" class="ep-off"><img src="${root}/images/bg_ep_on.png" class="ep-on"><img src="${root}/thumb/08.jpg" class="thumbnail"><p class="age"><span>Yesterday</span></p><p class="duration"><span>10:10</span></p></li><li><img src="${root}/images/bg_ep_off.png" class="ep-off"><img src="${root}/images/bg_ep_on.png" class="ep-on"><img src="${root}/thumb/04.jpg" class="thumbnail"><p class="age"><span>2 days ago</span></p><p class="duration"><span>10:10</span></p></li><li><img src="${root}/images/bg_ep_off.png" class="ep-off"><img src="${root}/images/bg_ep_on.png" class="ep-on"><img src="${root}/thumb/13.jpg" class="thumbnail"><p class="age"><span>2 weeks ago</span></p><p class="duration"><span>10:10</span></p></li></ul> 
+        <ul class="tvep-list"></ul> 
         <div id="tvep-meta"><p><span class="tvep-title">Jay Leno's eclectic car collection</span> - <span class="age">Today</span></p></div> 
       </div> 
     </div> 
   </div> 
-</div> 
+</div>
 
 <div id="ad-layer" style="display: none">
   <img src="${root}/images/ep_panel_on.png" id="ad-panel">
@@ -731,6 +753,70 @@ var brandinfo = "${brandInfo}";
   </div>
   </div>
 </div>
+
+<div id="yt-layer"> 
+  <div id="yt-holder"> 
+    <div id="yt-header"> 
+      <h2><span>Add My YouTube Favorites</span></h2> 
+      <ul class="navigation"> 
+        <li class="btn-store"><img src="${root}/images/icon_store.png" class="icon-store"><span>Channel Store</span></li> 
+        <li class="btn-home"><img src="${root}/images/icon_home.png" class="icon-home"><span>Return to 9x9 View</span></li> 
+      </ul> 
+    </div> 
+    <div id="yt-container"> 
+        <div id="yt-url"> 
+          <div class="url-input"> 
+            <input name="" type="text" class="url-field" value="Enter YouTube Channel or Playlist URL"> 
+          </div> 
+          <p class="note">* We don't accept URLs for single video</p> 
+        </div> 
+        <div id="yt-chName"> 
+          <div class="url-input yt-input"> 
+            <input name="" type="text" class="url-field" value="Enter Channel Name"> 
+          </div> 
+        </div> 
+        <div id="yt-authorName">         
+          <div class="url-input yt-input"> 
+            <input name="" type="text" class="url-field" value="Enter Author Name"> 
+          </div> 
+        </div> 
+        <div id="yt-lang"> 
+          <ul id="yt-lang-setting"> 
+            <li><span id="yt-program-lang" class="lang-selected">Select program language</span><img src="images/icon_downarrow.png" class="icon-downarrow"> 
+              <ul class="lang-options"> 
+                <li><img src="${root}/images/icon_check.png" class="icon-check"><span>English programs</span></li> 
+                <li><img src="${root}/images/icon_check.png" class="icon-check"><span>Chinese programs</span></li> 
+              </ul> 
+            </li> 
+           </ul> 
+        </div> 
+        <div id="yt-description"> 
+          <textarea name="" class="description-field">Enter Channel Description</textarea> 
+        </div> 
+        <div class="cate-selector" id="yt-cate"> 
+          <p>Choose category:</p> 
+          <ul class="cate-list"> 
+            <li><img src="${root}/images/check_off.png" class="check-off"><img src="${root}/images/check_on.png" class="check-on"><span>News</span></li> 
+            <li><img src="${root}/images/check_off.png" class="check-off"><img src="${root}/images/check_on.png" class="check-on"><span>Music</span></li> 
+            <li><img src="${root}/images/check_off.png" class="check-off"><img src="${root}/images/check_on.png" class="check-on"><span>Sports</span></li> 
+            <li><img src="${root}/images/check_off.png" class="check-off"><img src="${root}/images/check_on.png" class="check-on"><span>Movie Trailers</span></li> 
+            <li><img src="${root}/images/check_off.png" class="check-off"><img src="${root}/images/check_on.png" class="check-on"><span>Lifestyle</span></li> 
+            <li><img src="${root}/images/check_off.png" class="check-off"><img src="${root}/images/check_on.png" class="check-on"><span>Food & Wine</span></li> 
+            <li><img src="${root}/images/check_off.png" class="check-off"><img src="${root}/images/check_on.png" class="check-on"><span>Travel</span></li> 
+            <li><img src="${root}/images/check_off.png" class="check-off"><img src="${root}/images/check_on.png" class="check-on"><span>Local Deals</span></li> 
+            <li><img src="${root}/images/check_off.png" class="check-off"><img src="${root}/images/check_on.png" class="check-on"><span>Brands</span></li> 
+            <li><img src="${root}/images/check_off.png" class="check-off"><img src="${root}/images/check_on.png" class="check-on"><span>Others</span></li> 
+          </ul> 
+        </div> 
+        <div id="yt-submission"> 
+          <ul> 
+            <li class="btn" id="btn-add-yt"><span>Add</span></li><li class="btn" id="btn-cancel-yt"><span>Cancel</span></li> 
+          </ul> 
+          <p id="yt-feedback"><img src="${root}/images/loading.gif"><span>Processing...</span></p> 
+        </div> 
+    </div>   
+  </div> 
+</div> 
 
 <div id="signin-layer">
   <div id="signin-holder">
