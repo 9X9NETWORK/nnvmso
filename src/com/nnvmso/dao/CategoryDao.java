@@ -85,12 +85,32 @@ public class CategoryDao extends GenericDao<Category> {
 		}
 		return detached;		
 	}
+
+	public List<Category> findAllInIpg(long msoId) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		List<Category> detached = new ArrayList<Category>();
+		try {
+			Query q = pm.newQuery(Category.class);
+			q.setFilter("msoId == msoIdParam && isInIpg == isInIpgParam");
+			q.declareParameters("long msoIdParam, boolean isInIpgParam");
+			q.setOrdering("name asc");
+			@SuppressWarnings("unchecked")
+			List<Category> categories = (List<Category>)q.execute(msoId, true);
+			for (Category c : categories) {
+				System.out.println("<<<<<<<<< " + c.getName());
+			}
+			detached = (List<Category>)pm.detachCopyAll(categories);
+		} finally {
+			pm.close();			
+		}
+		return detached;		
+	}
 	
 	public List<Category> findAll() {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		List<Category> detached = new ArrayList<Category>();
 		try {
-			String query = "select from " + Category.class.getName() + " order by createDate";
+			String query = "select from " + Category.class.getName() + " order by name";
 			@SuppressWarnings("unchecked")
 			List<Category> categories = (List<Category>) pm.newQuery(query).execute();
 			detached = (List<Category>)pm.detachCopyAll(categories);
