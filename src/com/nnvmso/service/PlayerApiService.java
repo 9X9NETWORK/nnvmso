@@ -89,7 +89,6 @@ public class PlayerApiService {
 		if (cs == null)
 			return messageSource.getMessage("nnstatus.set_invalid", new Object[] {NnStatusCode.SET_INVALID} , locale);			
 		
-		System.out.println("channel set id:" + cs.getKey().getId());
 		List<MsoChannel> channels = csMngr.findChannelsById(cs.getKey().getId());
 		System.out.println(channels.size());
 		//first block: status
@@ -166,7 +165,6 @@ public class PlayerApiService {
 		results = results + this.assembleKeyValue("jingleUrl", mso.getJingleUrl());
 		results = results + this.assembleKeyValue("logoClickUrl", mso.getLogoClickUrl());
 		results = results + this.assembleKeyValue("preferredLangCode", mso.getPreferredLangCode());
-		results = results + this.assembleKeyValue("jingleUrl", mso.getJingleUrl());
 		results = results + this.assembleKeyValue("brandInfoCounter", String.valueOf(counter));
 		results = results + this.assembleKeyValue("debug", debug);
 		if (fbConfig!=null)
@@ -174,14 +172,22 @@ public class PlayerApiService {
 		
 		//set-1 id|type|name
 		CategoryManager categoryMngr = new CategoryManager();
-		List<Category> categories = categoryMngr.findAllInIpg(mso.getKey().getId());
+		List<Category> categories = categoryMngr.findAllByMsoId(mso.getKey().getId());
+		int i=1;
+		for (Category c : categories) {
+			String key = "set-" + i;
+			i++;
+			String value = c.getKey().getId() + "|" + c.getType() + "|" + c.getName();
+			results = results + this.assembleKeyValue(key, value);			
+		}
+		/*
 		for (int i=0; i<9; i++) {
 			int seq = i + 1;
 			String key = "set-" + seq;
 			String value = categories.get(i).getKey().getId() + "|" + categories.get(i).getType() + "|" + categories.get(i).getName();
 			results = results + this.assembleKeyValue(key, value);
 		}
-		
+		*/
 		
 		return results;
 	}
