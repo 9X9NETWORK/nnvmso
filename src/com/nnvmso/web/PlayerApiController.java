@@ -550,6 +550,7 @@ public class PlayerApiController {
 	 *         Channel info includes channel id, channel name, channel image url, program count, 
 	 *         subscription count, channel type, channel episodes last update time,
 	 *         channel source (for example, youtube's channel name) <br/>
+	 *         channel description
 	 *         Example: 	<br/>
 	 *         0	success<br/>
 	 *         --<br/>
