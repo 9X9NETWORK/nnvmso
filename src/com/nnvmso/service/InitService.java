@@ -167,9 +167,12 @@ public class InitService {
 				i++;
 				c.setInIpg(true);
 			}
-			if (c.getName().equals("My Youtube") || c.getName().equals("Friends & Family")) {
+			if (c.getName().equals("Friends & Family")) {
 				c.setType(Category.TYPE_PERSONAL);
-			}			
+			}	
+			if (c.getName().equals("My Youtube")) {
+				c.setType(Category.TYPE_YOUTUBE);
+			}
 			categoryMngr.create(c);
 		}
 		log.info("initializeMso1AndCategories is done");
