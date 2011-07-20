@@ -43,6 +43,9 @@ public class Category implements Serializable {
 	public static final short TYPE_PERSONAL = 2;
 	
 	@Persistent
+	private short seq;
+	
+	@Persistent
 	private int channelCount;
 	
 	@Persistent
@@ -139,5 +142,14 @@ public class Category implements Serializable {
 
 	public void setType(short type) {
 		this.type = type;
-	}	
+	}
+
+	public short getSeq() {
+		return seq;
+	}
+
+	public void setSeq(short seq) {
+		this.seq = seq;
+	}
+	
 }
