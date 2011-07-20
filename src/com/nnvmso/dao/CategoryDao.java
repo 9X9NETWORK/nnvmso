@@ -68,8 +68,8 @@ public class CategoryDao extends GenericDao<Category> {
 		}
 		return detached;
 	}
-	
-	public List<Category> findAllByMsoId(long msoId) {
+	/*
+	public List<Category> findAllByMsoIdAndRestricted(long msoId) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		List<Category> detached = new ArrayList<Category>();
 		try {
@@ -85,7 +85,25 @@ public class CategoryDao extends GenericDao<Category> {
 		}
 		return detached;		
 	}
+	*/
 
+	public List<Category> findAllByMsoId(long msoId) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		List<Category> detached = new ArrayList<Category>();
+		try {
+			Query q = pm.newQuery(Category.class);
+			q.setFilter("msoId == msoIdParam");
+			q.declareParameters("long msoIdParam");
+			q.setOrdering("name");
+			@SuppressWarnings("unchecked")
+			List<Category> categories = (List<Category>)q.execute(msoId);
+			detached = (List<Category>)pm.detachCopyAll(categories);
+		} finally {
+			pm.close();			
+		}
+		return detached;		
+	}
+	
 	public List<Category> findAllInIpg(long msoId) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		List<Category> detached = new ArrayList<Category>();
@@ -96,9 +114,6 @@ public class CategoryDao extends GenericDao<Category> {
 			q.setOrdering("seq asc");
 			@SuppressWarnings("unchecked")
 			List<Category> categories = (List<Category>)q.execute(msoId, true);
-			for (Category c : categories) {
-				System.out.println("<<<<<<<<< " + c.getName());
-			}
 			detached = (List<Category>)pm.detachCopyAll(categories);
 		} finally {
 			pm.close();			
