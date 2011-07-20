@@ -618,7 +618,7 @@ public class PlayerApiController {
 	 *         </blockquote>
 	 *         <p>
 	 *         <strike>set type: TYPE_USER = 1; TYPE_READONLY = 2;</strike>
-	 *         set type: TYPE_GENERAL = 1;	TYPE_PERSONAL = 2;
+	 *         set type: TYPE_NORESTRICTION = 0; TYPE_RESTRICTED = 1; TYPE_PERSONAL = 2;TYPE_YOUTUBE = 3;         
 	 *         <br/>
 	 *         channel type: TYPE_GENERAL = 1; TYPE_READONLY = 2;
 	 *         <br/>
