@@ -387,7 +387,8 @@ public class PlayerApiService {
 						        String.valueOf(c.getSubscriptionCount()),
 						        String.valueOf(c.getContentType()),
 						        this.convertEpochToTime(c.getTranscodingUpdateDate(), c.getUpdateDate()),
-						        channelSource,						        
+						        channelSource,
+						        c.getIntro(),
 						        };
 				result = result + NnStringUtil.getDelimitedStr(ori);
 				result = result + "\n";
