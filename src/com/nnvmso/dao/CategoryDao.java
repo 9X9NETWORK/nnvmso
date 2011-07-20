@@ -74,11 +74,11 @@ public class CategoryDao extends GenericDao<Category> {
 		List<Category> detached = new ArrayList<Category>();
 		try {
 			Query q = pm.newQuery(Category.class);
-			q.setFilter("msoId == msoIdParam");
-			q.declareParameters("long msoIdParam");
+			q.setFilter("msoId == msoIdParam && type == typeParam");
+			q.declareParameters("long msoIdParam, short typeParam");
 			q.setOrdering("name");
 			@SuppressWarnings("unchecked")
-			List<Category> categories = (List<Category>)q.execute(msoId);
+			List<Category> categories = (List<Category>)q.execute(msoId, Category.TYPE_GENERAL);
 			detached = (List<Category>)pm.detachCopyAll(categories);
 		} finally {
 			pm.close();			
@@ -93,7 +93,7 @@ public class CategoryDao extends GenericDao<Category> {
 			Query q = pm.newQuery(Category.class);
 			q.setFilter("msoId == msoIdParam && isInIpg == isInIpgParam");
 			q.declareParameters("long msoIdParam, boolean isInIpgParam");
-			q.setOrdering("name asc");
+			q.setOrdering("seq asc");
 			@SuppressWarnings("unchecked")
 			List<Category> categories = (List<Category>)q.execute(msoId, true);
 			for (Category c : categories) {
