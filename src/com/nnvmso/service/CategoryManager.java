@@ -157,8 +157,19 @@ public class CategoryManager {
 			}
 		}		
 		List<Category> categories = categoryDao.findAllByMsoId(msoId); //!!!hack
-		cache.put(key, categories);
-		return categories;
+		List<Category> sequence = new ArrayList<Category>();
+		Category others = null;
+		for (Category c : categories) {
+			if (!c.getName().equals("Others"))
+				sequence.add(c);
+			else
+				others = c;
+				
+		}
+		if (others != null)
+			sequence.add(others);
+		cache.put(key, sequence);
+		return sequence;
 	}
 
 	//result will be cached
