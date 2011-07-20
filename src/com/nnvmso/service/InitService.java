@@ -37,7 +37,7 @@ public class InitService {
 		createMso3OwnedChannels(devel, trans);
 		createMso1DefaultIpg(devel);
 		createMso2DefaultIpg(devel);
-		createMso1ChannelSet(devel);
+		//createMso1ChannelSet(devel);
 		createMso3ChannelSet(devel);
 	}
 	
@@ -151,25 +151,26 @@ public class InitService {
 		
 		//initialize default categories
 		String[] categoryStr = {
-			"Ambient music", "Brands & Celebrity", "Food & Wine", "Lifestle", 
-			"News",
-			"Movie trailer", "Religion", "Sports", "Travel", "Others",
-			"My Youtube", "Friends & Family"
+			"News", "Ambient music", "Friends & Family", 
+			"Sports", "Movie trailer", "My Youtube", "Lifestle", "Food & Wine", "Brands", 			
+			"Religion", "Travel", "Others",
 		};
 				
 		CategoryManager categoryMngr = new CategoryManager();
+		int i=1;
 		for (String name : categoryStr) {			
 			Category c = new Category(name, true, mso.getKey().getId());
-			if (c.getName().equals("Others") || c.getName().equals("Religion") || c.getName().equals("Sports")) {
-				System.out.println("enter equal:" + c.getName());
+			if (c.getName().equals("Others") || c.getName().equals("Religion") || c.getName().equals("Travel")) {
 				c.setInIpg(false);
 			} else {
+				c.setSeq((short)i);
+				i++;
 				c.setInIpg(true);
 			}
 			if (c.getName().equals("My Youtube") || c.getName().equals("Friends & Family")) {
 				c.setType(Category.TYPE_PERSONAL);
-			}
-			categoryMngr.create(c);			
+			}			
+			categoryMngr.create(c);
 		}
 		log.info("initializeMso1AndCategories is done");
 	}
@@ -258,10 +259,11 @@ public class InitService {
 		CategoryManager categoryMngr = new CategoryManager();
 		MsoChannelManager channelMngr = new MsoChannelManager();
 		MsoProgramManager programMngr = new MsoProgramManager();
-		Category category = categoryMngr.findByName("Ambient music");
+		Category category = categoryMngr.findByName("Brands");
 		categories.add(category);
 
 		if (devel) {
+			/*
 			//create channel		
 			MsoChannel channel1 = new MsoChannel("Etsy", "Etsy.com", "http://s3.amazonaws.com/9x9chthumb/54e2967caf4e60fe9bc19ef1920997977eae1578.gif", user.getKey().getId());
 			channel1.setSourceUrl("http://feeds.feedburner.com/etsyetsyetsy");
@@ -281,8 +283,10 @@ public class InitService {
 			program2.setMpeg4FileUrl("http://s3.amazonaws.com/9x9pod/5a14e5502fd5ab6b26e7f11f2a38ee718bc06eea_1288043514.m4v");	
 			program2.setPublic(true);
 			programMngr.create(channel1, program2);
+			*/
 		
 			//create channel
+			/*
 			MsoChannel channel2 = new MsoChannel("TEDTalks (hd)", "TED", "http://s3.amazonaws.com/9x9chthumb/f14a9bb972adfefab1c9c4f0ec44f251686d655a.jpg", user.getKey().getId());		
 			channel2.setSourceUrl("http://feeds.feedburner.com/tedtalksHD");
 			channel2.setPublic(true);
@@ -313,22 +317,40 @@ public class InitService {
 			program9.setPublic(true);
 			programMngr.create(channel2, program9);
 		
+			*/
 			//create channel				
-			MsoChannel channel5 = new MsoChannel("System Channel", "System Channel", "/WEB-INF/../images/logo_9x9.png", user.getKey().getId());
+			MsoChannel channel5 = new MsoChannel("System Channel", "System Channel", "https://s3.amazonaws.com/9x9pod/system.png ", user.getKey().getId());
 			channel5.setPublic(true);
 			channel5.setFeatured(true);
-			Category system = categoryMngr.findByName("Tech & Science");
-			List<Category> systemCategories = new ArrayList<Category>();
-			systemCategories.add(system);
+			//Category system = categoryMngr.findByName("Brands");
+			//List<Category> systemCategories = new ArrayList<Category>();
+			//systemCategories.add(system);
 			channelMngr.create(channel5, categories);
-	
-			MsoProgram program7 = new MsoProgram("System Program", "", "/WEB-INF/../images/logo_9x9.png", MsoProgram.TYPE_VIDEO);
+				
+			MsoProgram program9 = new MsoProgram("Copyright", "Copyright", "http://pod.9x9.tv/copyright.jpg", MsoProgram.TYPE_VIDEO);
+			program9.setPublic(true);
+			program9.setMpeg4FileUrl("http://pod.9x9.tv/copyright.mp4");
+			program9.setWebMFileUrl("http://pod.9x9.tv/copyright.mp4");
+			program9.setDuration("00:00:36.00");
+			programMngr.create(channel5, program9);
+
+			MsoProgram program8 = new MsoProgram("About Us", "About Us", "http://pod.9x9.tv/about%20us.jpg", MsoProgram.TYPE_VIDEO);
+			program8.setPublic(true);
+			program8.setMpeg4FileUrl("http://pod.9x9.tv/about9x9.mp4");
+			program8.setWebMFileUrl("http://pod.9x9.tv/about9x9.mp4");
+			program8.setDuration("00:00:35.00");
+			programMngr.create(channel5, program8);
+			
+			MsoProgram program7 = new MsoProgram("Tutorial", "Tutorial", "http://pod.9x9.tv/tutorial.jpg", MsoProgram.TYPE_VIDEO);
 			program7.setPublic(true);
 			program7.setMpeg4FileUrl("http://9x9pod.s3.amazonaws.com/default.mp4");
-			program7.setWebMFileUrl("http://9x9pod.s3.amazonaws.com/default.mp4");	
+			program7.setWebMFileUrl("http://9x9pod.s3.amazonaws.com/default.mp4");
+			program7.setDuration("00:01:26.02");
 			programMngr.create(channel5, program7);
+			
 					
 			//create a channel, but status set to error
+			/*
 			MsoChannel channel3 = new MsoChannel("Vegan A Go-Go", "A simple vegan cooking show.", "http://s3.amazonaws.com/9x9chthumb/6bb992aafe18c3054ca30035d7e5fe7cc9394d37.jpg", user.getKey().getId());		
 			channel3.setSourceUrl("http://feeds.feedburner.com/veganagogo");
 			channel3.setStatus(MsoChannel.STATUS_ERROR);
@@ -354,6 +376,7 @@ public class InitService {
 			channel4.setSourceUrl("http://feeds.feedburner.com/comedycentral/standup");
 			channel4.setPublic(true);
 			channelMngr.create(channel4, categories);
+			*/
 		} else {						
 			categories.clear();
 			Category c = categoryMngr.findByName("Activism");
@@ -705,8 +728,14 @@ public class InitService {
 		MsoIpgManager msoIpgMngr = new MsoIpgManager();
 		Mso mso = new MsoManager().findNNMso();
 		MsoChannelManager channelMngr = new MsoChannelManager();
-		CategoryManager categoryMngr = new CategoryManager();
+		//CategoryManager categoryMngr = new CategoryManager();
 		if (devel) {
+			MsoChannel c = channelMngr.findByName("System Channel");
+			MsoIpg msoIpg = new MsoIpg(mso.getKey().getId(), c.getKey().getId(), 81, MsoIpg.TYPE_READONLY);
+			msoIpg.setPublic(true);
+			msoIpgMngr.create(msoIpg);
+
+			/*
 			Category c = categoryMngr.findByName("Ambient music");
 			List<MsoChannel> channels = new MsoChannelManager().findPublicChannelsByCategoryId(c.getKey().getId());
 			int counter = 1;
@@ -732,6 +761,7 @@ public class InitService {
 					counter++;
 				}
 			}
+			*/
 		} else {
 			String[] urls = this.getMso1DefaultIpg();
 			for (int i=0; i< urls.length; i++) {
@@ -785,7 +815,7 @@ public class InitService {
 		ChannelSetManager channelSetMngr = new ChannelSetManager();
 		List<MsoChannel> channels = new ArrayList<MsoChannel>();
 		
-		if (devel) {
+		if (devel) {			
 			CategoryManager categoryMngr = new CategoryManager();
 			Category category = categoryMngr.findByName("Ambient music");
 			channels = new MsoChannelManager().findPublicChannelsByCategoryId(category.getKey().getId());
