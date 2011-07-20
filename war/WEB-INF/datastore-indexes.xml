@@ -9,7 +9,17 @@
   <datastore-index kind="Category" ancestor="false" source="manual">
     <property name="msoId" direction="asc"/>
     <property name="name" direction="asc"/>
-  </datastore-index>  
+  </datastore-index>
+  <datastore-index kind="Category" ancestor="false" source="manual">
+    <property name="isInIpg" direction="asc"/>
+    <property name="msoId" direction="asc"/>
+    <property name="seq" direction="asc"/>
+  </datastore-index>
+  <datastore-index kind="Category" ancestor="false" source="manual">
+    <property name="msoId" direction="asc"/>
+    <property name="type" direction="asc"/>
+    <property name="name" direction="asc"/>
+  </datastore-index>     
   <datastore-index kind="CategoryChannel" ancestor="false" source="manual">
     <property name="__key__" direction="desc"/>
   </datastore-index>
