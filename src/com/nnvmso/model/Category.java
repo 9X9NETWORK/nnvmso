@@ -39,8 +39,10 @@ public class Category implements Serializable {
 	
 	@Persistent	
 	private short type;
-	public static final short TYPE_GENERAL = 1;	
+	public static final short TYPE_NORESTRICTION = 0;
+	public static final short TYPE_RESTRICTED = 1;	
 	public static final short TYPE_PERSONAL = 2;
+	public static final short TYPE_YOUTUBE = 3;
 	
 	@Persistent
 	private short seq;
@@ -59,7 +61,7 @@ public class Category implements Serializable {
 		this.isPublic = isPublic;
 		this.msoId= msoId;
 		this.isInIpg = true;
-		this.type = Category.TYPE_GENERAL;
+		this.type = Category.TYPE_RESTRICTED;
 	}
 
 	public long getMsoId() {
