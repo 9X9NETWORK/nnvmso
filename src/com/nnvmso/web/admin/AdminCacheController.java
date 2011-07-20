@@ -102,6 +102,7 @@ public class AdminCacheController {
 			                                    @RequestParam(required=false)boolean delete,
 			                                    @RequestParam(required=false)boolean list,
 			                                    HttpServletRequest req) {
+		/*
 		CategoryManager categoryMngr = new CategoryManager();
 		String output = "";
 		if (delete) {
@@ -116,6 +117,8 @@ public class AdminCacheController {
 			}			
 		}
 		return NnNetUtil.textReturn(output);
+		*/
+		return NnNetUtil.textReturn("OK");
 	}	
 		
 	@RequestMapping("deleteAll")
