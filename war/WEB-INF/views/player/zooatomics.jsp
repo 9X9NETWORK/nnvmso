@@ -618,7 +618,7 @@ var brandinfo = "${brandInfo}";
     </div> 
   </div> 
 </div> 
- 
+
 <div id="tvpreview-layer"> 
   <div id="tvpreview-holder"> 
     <div id="tvpreview-header"> 
@@ -659,6 +659,39 @@ var brandinfo = "${brandInfo}";
         <div id="tvep-meta"><p><span class="tvep-title">Jay Leno's eclectic car collection</span> - <span class="age">Today</span></p></div> 
       </div> 
     </div> 
+  </div> 
+</div>
+
+<div id="store-layer"> 
+  <div id="store-holder"> 
+    <div id="store-header"> 
+      <h2><span>Channel Store</span></h2> 
+      <ul class="navigation"> 
+        <li class="btn-home"><img src="${root}/images/icon_home.png" class="icon-home"><span>Return to 9x9 View</span></li> 
+      </ul> 
+      <ul id="store-lang-setting"> 
+        <li><span id="store-program-lang" class="lang-selected">English programs</span><img src="${root}/images/icon_downarrow.png" class="icon-downarrow"> 
+          <ul class="lang-options"> 
+            <li class="on"><img src="${root}/images/icon_check.png" class="icon-check"><span>English programs</span></li> 
+            <li><img src="${root}/images/icon_check.png" class="icon-check"><span>Chinese programs</span></li> 
+          </ul> 
+        </li> 
+      </ul> 
+    </div> 
+    <div id="store-container"> 
+      <img src="${root}/images/arrow_up.png" id="store-arrow-up"> 
+      <img src="${root}/images/arrow_down.png" id="store-arrow-down"> 
+      <h3><span id="store-cat-1"></span></h3> 
+      <ul class="store-list" id="store-list-1"> 
+      </ul> 
+      <h3><span id="store-cat-2"></span></h3> 
+      <ul class="store-list" id="store-list-2"> 
+      </ul> 
+      <h3><span id="store-cat-3"></span></h3> 
+      <ul class="store-list" id="store-list-3"> 
+      </ul> 
+      <img src="${root}/images/tvch_shadow.png" id="store-shadow"></div> 
+    <div id="store-footer"></div> 
   </div> 
 </div>
 
