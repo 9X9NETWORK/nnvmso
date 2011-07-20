@@ -129,8 +129,8 @@ public class InitService {
 		Mso mso = new Mso("9x9", "9x9", "mso@9x9.tv", Mso.TYPE_NN);
 		mso.setTitle("9x9.tv");
 		mso.setPreferredLangCode(Mso.LANG_EN);
-		mso.setJingleUrl("/WEB-INF/../videos/opening.swf");
-		mso.setLogoUrl("/WEB-INF/../images/logo_9x9.png");
+		mso.setJingleUrl("http://s3.amazonaws.com/9x9ui/videos/opening.swf");
+		mso.setLogoUrl("http://s3.amazonaws.com/9x9ui/images/logo_9x9.png");
 		mso.setLogoClickUrl("/");
 		msoMngr.create(mso);
 		
