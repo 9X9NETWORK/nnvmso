@@ -88,6 +88,7 @@ public class TranscodingService {
 			if (intro != null) { intro = intro.replaceAll("\\s", " ");}
 			channel.setIntro(intro);
 			channel.setImageUrl(podcast.getImage());
+			channel.setStatus(MsoChannel.STATUS_SUCCESS);
 			//channel.setStatus(MsoChannel.STATUS_WAIT_FOR_APPROVAL);
 		}
 		
