@@ -172,6 +172,17 @@ public class PlayerApiService {
 		if (fbConfig!=null)
 			results = results + this.assembleKeyValue(MsoConfig.FBTOKEN, fbConfig.getValue());
 		
+		//set-1 id|type|name
+		CategoryManager categoryMngr = new CategoryManager();
+		List<Category> categories = categoryMngr.findAllInIpg(mso.getKey().getId());
+		for (int i=0; i<9; i++) {
+			int seq = i + 1;
+			String key = "set-" + seq;
+			String value = categories.get(i).getKey().getId() + "|" + categories.get(i).getType() + "|" + categories.get(i).getName();
+			results = results + this.assembleKeyValue(key, value);
+		}
+		
+		
 		return results;
 	}
 
@@ -947,7 +958,6 @@ public class PlayerApiService {
 							String.valueOf(categories.get(i).getType()),
 					};					
 					objs[i] = NnStringUtil.getDelimitedStr(obj);;
-					System.out.println(objs[i]);
 				}
 				for (AreaOwnership s : sets) {					
 					String[] obj = {
