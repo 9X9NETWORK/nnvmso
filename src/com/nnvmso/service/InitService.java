@@ -152,7 +152,7 @@ public class InitService {
 		//initialize default categories
 		String[] categoryStr = {
 			"News", "Ambient music", "Friends & Family", 
-			"Sports", "Movie trailer", "My Youtube", "Lifestle", "Food & Wine", "Brands", 			
+			"Sports", "Movie trailer", "My Youtube", "Lifestyle", "Food & Wine", "Brands", 			
 			"Religion", "Travel", "Others",
 		};
 				
