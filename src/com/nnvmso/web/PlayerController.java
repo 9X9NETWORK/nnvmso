@@ -33,6 +33,16 @@ public class PlayerController {
 	public String index() {
 		return "redirect:9x9";
 	}
+
+	/**
+	 * to become a 9x9 player, 1)delete cookie, 2)set fb info 
+	 */	
+	@RequestMapping("mini")
+	public String mini(@RequestParam(value="mso",required=false) String mso, HttpServletRequest req, HttpServletResponse resp, Model model) {
+		PlayerService service = new PlayerService();
+		model = service.prepareBrand(model, mso, resp);
+		return "player/mini";
+	}
 	
 	/**
 	 * to become a 9x9 player, 1)delete cookie, 2)set fb info 
