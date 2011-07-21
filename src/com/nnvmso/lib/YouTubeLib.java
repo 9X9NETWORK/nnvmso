@@ -56,7 +56,7 @@ public class YouTubeLib {
 		String[] invalid = {"index", "videos",
 		                    "entertainment", "music", "news", "movies",
 		                    "comedy", "gaming", "sports", "education",
-		                    "shows",  "trailers", 
+		                    "shows", 
 		                    "store", "channels", "contests_main"};		
 		HashSet<String> dic = new HashSet<String>();
 		for (int i=0; i<invalid.length; i++) {
@@ -139,6 +139,11 @@ public class YouTubeLib {
 		return name;
 	}
 		
+	//http://gdata.youtube.com/feeds/api/users/yiwent?alt=json
+	//http://gdata.youtube.com/feeds/api/playlists/03D59E2ECDDA66DF?alt=json
+	public static boolean youTubeCheck2(String urlStr) {
+		return false;
+	}	
 	
 	/**
 	 * YouTube API request format, http://gdata.youtube.com/feeds/api/users/androidcentral
@@ -151,6 +156,7 @@ public class YouTubeLib {
 	public static boolean youTubeCheck(String urlStr) {		
 		String[] splits = urlStr.split("/");
 		String apiReq = "http://gdata.youtube.com/feeds/api/users/" + splits[splits.length-1];
+		//http://gdata.youtube.com/feeds/api/users/yiwent&alt=json
 
 		URL url;
 		try {
