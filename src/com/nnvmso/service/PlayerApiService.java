@@ -396,16 +396,33 @@ public class PlayerApiService {
 					channelSource = YouTubeLib.getYouTubeChannelName(c.getSourceUrl());
 				if (c.getContentType() == MsoChannel.CONTENTTYPE_FACEBOOK) 
 					channelSource = c.getSourceUrl();
+
+				String channelName = c.getName();
+				if (c.getFauxName() != null && c.getFauxName().length() > 0) {
+					channelName = c.getFauxName();
+				}
+				String intro = c.getIntro();
+				if (c.getFauxIntro() != null && c.getFauxIntro().length() > 0) {
+					intro = c.getFauxIntro();
+				}		
+				if (intro != null) {
+					intro = intro.replaceAll("\n", " ");
+					intro = intro.replaceAll("\t", " ");
+					int introLenth = (intro.length() > 256 ? 256 : intro.length()); 
+					intro = intro.substring(0, introLenth);
+				} else {
+					intro = "";
+				}
 				String[] ori = {String.valueOf(c.getSeq()),
 						        String.valueOf(c.getKey().getId()), 
-						        c.getName(), 
+						        channelName, 
 						        c.getImageUrl(), 
 						        Integer.toString(c.getProgramCount()),
 						        String.valueOf(c.getSubscriptionCount()),
 						        String.valueOf(c.getContentType()),
 						        this.convertEpochToTime(c.getTranscodingUpdateDate(), c.getUpdateDate()),
 						        channelSource,
-						        c.getIntro(),
+						        intro,
 						        };
 				result = result + NnStringUtil.getDelimitedStr(ori);
 				result = result + "\n";
@@ -556,7 +573,7 @@ public class PlayerApiService {
 		short position = Short.valueOf(areaNo);
 		AreaOwnership area = areaMngr.findByUserIdAndAreaNo(user.getKey().getId(), Short.valueOf(position));
 		CategoryManager categoryMngr = new CategoryManager();
-		Category c = categoryMngr.findById(Short.valueOf(setId));		
+		Category c = categoryMngr.findById(Long.valueOf(setId));		
 		if (area != null) {
 			/*
 			if (area.getType() == AreaOwnership.TYPE_RO)
@@ -814,6 +831,7 @@ public class PlayerApiService {
 			channel.setFauxIntro(intro);
 			channel.setFauxImageUrl(imageUrl);
 			channel.setTags(tags);
+			channel.setLangCode(lang);
 			log.info("User throws a new url:" + url);
 			channelMngr.create(channel, categories);
 			if (channel.getKey() != null && channel.getContentType() != MsoChannel.CONTENTTYPE_FACEBOOK) { //!!!
