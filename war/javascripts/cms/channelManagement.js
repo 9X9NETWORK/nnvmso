@@ -649,10 +649,13 @@ var channelDetail =
     $('#channel_detail').hide();
     $('#channel_import_detail').hide();
     $('#channel_import_detail [name="ch_import_url"]').val('');
-    $('#channel_import_detail [name="ch_name"]').val('');
-    $('#channel_import_detail [name="ch_intro"]').val('');
+    $('#channel_import_detail [name="ch_name"]').val('').attr('disabled', true);
+    $('#channel_import_detail [name="ch_intro"]').val('').attr('disabled', true);
+    $('#channel_import_detail [name="ch_category"]').attr('disabled', true);
+    $('#channel_import_detail [name="ch_savebutton"]').removeClass('btn').addClass('btnDisable');
     $('#channel_import_detail [name="ch_image"]').attr('src', '/images/cms/upload_img.jpg');
     $('#channel_import_detail [name="ch_image_updated"]').val('false');
+    $('#channel_import_detail [name="ch_import_button"]').unbind();
   },
   displayImportDetail: function()
   {
@@ -669,6 +672,7 @@ var channelDetail =
             .appendTo('#channel_import_detail .sys_directory');
       }
     }, 'json');
+    
     $('#channel_import_detail [name="ch_import_button"]').unbind().click(function()
     {
       if ($('#channel_import_detail [name="ch_import_url"]').val() == "") {
@@ -689,6 +693,9 @@ var channelDetail =
         }
         var channelId = channel.key.id;
         $('#channel_import_detail [name="ch_import_url"]').val(channel.sourceUrl);
+        $('#channel_import_detail [name="ch_name"]').val('').attr('disabled', false);
+        $('#channel_import_detail [name="ch_intro"]').val('').attr('disabled', false);
+        $('#channel_import_detail [name="ch_category"]').attr('disabled', false);
         $('#channel_import_detail [name="upload_button_place"]').html('').append($('<span/>').attr('name', 'ch_upload_image'));
         if (channelDetail.swfObject != null) {
           channelDetail.swfObject.destroy();
@@ -745,6 +752,8 @@ var channelDetail =
         $('#channel_import_detail [name="ch_image_updated"]').val('false');
         if (channel.imageUrl == '/WEB-INF/../images/processing.png')
         {
+          $('#channel_import_detail [name="ch_image"]').attr('src', '/images/cms/upload_img.jpg');
+          $('#channel_import_detail [name="ch_image_updated"]').val('true');
           if (channel.sourceUrl.indexOf('youtube.com') >= 0)
           {
             var requestUrl;
@@ -799,6 +808,7 @@ var channelDetail =
             $('#channel_import_detail [name="ch_category"]').val(category.key.id);
           }
         }, 'json');
+        $('#channel_import_detail [name="ch_savebutton"]').removeClass('btnDisable').addClass('btn');
         $('#channel_import_detail [name="ch_savebutton"]').unbind().click(function()
         {
           var name = $('#channel_import_detail [name="ch_name"]').val();
