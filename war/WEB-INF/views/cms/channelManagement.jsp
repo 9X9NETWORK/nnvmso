@@ -163,7 +163,7 @@
           <p class="hint_title"><span class="red">＊</span><spring:message code="cms.channel_management.msg.neccessary_info"/></p>
           <form>
             <fieldset class="setAlbum">
-              <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.logo"/></label>
+              <label class="floatL"><!-- <span class="red">＊</span> --><spring:message code="cms.channel_management.label.logo"/></label>
               <div class="uploadImg">
                 <img id="ch_image" alt="" src="/images/cms/upload_img.jpg" class="floatL"/><input type="hidden" id="ch_image_updated" value="false"/>
                 <div class="floatL imgBtn">
@@ -201,7 +201,7 @@
                 <select name="" id="ch_category" class="sys_directory"></select>
               </div>
               <div class="clear"></div>
-              <p class="hint"><spring:message code="cms.channel_management.msg.system_category_explanation"/></p>
+              <%-- <p class="hint"><spring:message code="cms.channel_management.msg.system_category_explanation"/></p> --%>
               <div class="commitPlace">
                 <a href="javascript:" class="btn btnStep2 floatL" id="channel_detail_savebutton"><span><spring:message code="cms.channel_management.btn.save"/></span></a><a href="javascript:" class="floatL btn_cancel" id="channel_detail_cancel"><span><spring:message code="cms.channel_management.btn.cancel"/></span></a>
               </div>
@@ -512,7 +512,7 @@
               <div class="bg_input floatL"><input type="text" size="25" maxlength="100" name="ch_import_url"/></div>
               <a href="javascript:" class="btnCreate floatL" name="ch_import_button"><spring:message code="cms.channel_management.btn.import"/></a>
               <div class="clear"></div><br/>
-              <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.logo"/></label>
+              <label class="floatL"><!-- <span class="red">＊</span> --><spring:message code="cms.channel_management.label.logo"/></label>
               <div class="uploadImg">
                 <img name="ch_image" alt="" src="/images/cms/upload_img.jpg" class="floatL"/><input type="hidden" name="ch_image_updated" value="false"/>
                 <div class="floatL imgBtn">
@@ -564,7 +564,7 @@
                 </select>
               </div>
               <div class="clear"></div>
-              <p class="hint"><spring:message code="cms.channel_management.msg.system_category_explanation"/></p>
+              <%-- <p class="hint"><spring:message code="cms.channel_management.msg.system_category_explanation"/></p> --%>
               <div class="commitPlace">
                 <a href="javascript:" name="ch_savebutton" class="btn btnStep2 floatL"><span><spring:message code="cms.channel_management.btn.save"/></span></a><a href="javascript:" name="ch_cancelbutton" class="floatL btn_cancel"><span><spring:message code="cms.channel_management.btn.cancel"/></span></a>
               </div>
@@ -595,6 +595,7 @@
 <label class="lang" id="lang_channel_source_is_wrong"><spring:message code="cms.warning.channel_source_is_wrong"/></label>
 <label class="lang" id="lang_button_from_disk">從硬碟</label>
 <label class="lang" id="image_btn_upload"><spring:message code="cms.image.btn_upload"/></label>
+<label class="lang" id="image_btn_from_disk"><spring:message code="cms.image.btn_from_disk"/></label>
 <label class="lang" id="image_ch_public"><spring:message code="cms.image.ch_public"/></label>
 <label class="lang" id="image_ch_unpublic"><spring:message code="cms.image.ch_unpublic"/></label>
 </body>

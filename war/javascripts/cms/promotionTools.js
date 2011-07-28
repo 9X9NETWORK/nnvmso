@@ -320,8 +320,8 @@ var channelAndChannelSetList =
 
 $(function()
 {
-  var css = '.chPublic { url(' + $('#image_ch_public').text() + ') no-repeat; }\n.chUnpublic { url(' + $('#image_ch_unpublic').text() + ') no-repeat; }';
-  $('<style/>').text(css).appendTo('<head/>');
+  var css = '.chPublic { background:url(' + $('#image_ch_public').text() + ') no-repeat; }\n.chUnPublic { background:url(' + $('#image_ch_unpublic').text() + ') no-repeat; }';
+  $('<style/>').text(css).appendTo('head');
   
   $('.pro_check').click(function()
   {

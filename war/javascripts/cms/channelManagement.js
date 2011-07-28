@@ -349,10 +349,10 @@ var programDetail =
         file_post_name:     'file',
         button_placeholder: programDetailBlock.find('.ep_upload_video').get(0),
         button_action:      SWFUpload.BUTTON_ACTION.SELECT_FILE,
-        button_image_url:   $('#image_btn_upload').text(),
+        button_image_url:   $('#image_btn_from_disk').text(),
         button_width:       '95',
         button_height:      '32',
-        button_text:        $('#lang_button_from_disk').text(),
+        //button_text:        $('#lang_button_from_disk').text(),
         button_cursor:      SWFUpload.CURSOR.HAND,
         button_window_mode : SWFUpload.WINDOW_MODE.TRANSPARENT,
         debug:              false,
@@ -658,7 +658,7 @@ var channelDetail =
     $('#channel_import_detail [name="ch_savebutton"]').removeClass('btn').addClass('btnDisable');
     $('#channel_import_detail [name="ch_image"]').attr('src', '/images/cms/upload_img.jpg');
     $('#channel_import_detail [name="ch_image_updated"]').val('false');
-    $('#channel_import_detail [name="ch_import_button"]').unbind();
+    $('#channel_import_detail [name="ch_import_button"]').unbind().css('width', 90);
   },
   displayImportDetail: function()
   {
@@ -874,6 +874,11 @@ var channelDetail =
       $('#ch_name').val('').val(channel.name);
       $('#ch_image').attr('src', channel.imageUrl);
       $('#ch_image_updated').val('false');
+      if ($('#ch_image').attr('src') == '/WEB-INF/../images/processing.png')
+      {
+        $('#ch_image').attr('src', '/images/cms/upload_img.jpg');
+        $('#ch_image_updated').val('true');
+      }
       $('#ch_intro').val('').val(channel.intro);
       $('#ch_tag').val(channel.tags);
       if (channelDetail.swfObject != null) {
@@ -889,7 +894,7 @@ var channelDetail =
         file_types_description: 'Image Files',
         file_post_name:     'file',
         button_placeholder: document.getElementById('ch_upload_image'),
-        button_action:       SWFUpload.BUTTON_ACTION.SELECT_FILE,
+        button_action:      SWFUpload.BUTTON_ACTION.SELECT_FILE,
         button_image_url:   $('#image_btn_upload').text(),
         button_width:       '95',
         button_height:      '32',
@@ -1079,9 +1084,9 @@ var channelList =
           $.post('/CMSAPI/switchChannelPublicity', { 'channelId': event.data.channelId }, function(response)
           {
             if (response) {
-              event.data.switchObject.removeClass('chUnPublic').addClass('chPublic');
+              event.data.switchObject.css('background', 'url(' + $('#image_ch_public').text() + ') no-repeat');
             } else {
-              event.data.switchObject.removeClass('chPublic').addClass('chUnPublic');
+              event.data.switchObject.css('background', 'url(' + $('#image_ch_unpublic').text() + ') no-repeat');
             }
           }, 'json');
           return false;
@@ -1123,9 +1128,8 @@ var channelList =
 
 $(function()
 {
-  var css = '.chPublic { url(' + $('#image_ch_public').text() + ') no-repeat; }\n.chUnpublic { url(' + $('#image_ch_unpublic').text() + ') no-repeat; }';
-  $('<style/>').text(css).appendTo('<head/>');
-  
+  var css = '.chPublic { background:url(' + $('#image_ch_public').text() + ') no-repeat; }\n.chUnPublic { background:url(' + $('#image_ch_unpublic').text() + ') no-repeat; }';
+  $('<style/>').text(css).appendTo('head');
   
   channelList.init();
   $(window).bind('beforeunload', function()
@@ -1137,4 +1141,3 @@ $(function()
   });
 });
 
-//google.load("feeds", "1");

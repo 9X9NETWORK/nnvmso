@@ -20,6 +20,7 @@ body{ background:url(/images/cms/bg.jpg) top left repeat-x #dfe2e4; padding:0; m
 .header p{ color:#FFF; float:left; line-height:30px; padding-right:30px; font-size:1.1em}
 .header .setup{ background:url(/images/cms/header_setup.png) no-repeat; width:38px; height:56px; display:block; float:left}
 .header .logout{ background:url(/images/cms/header_logout.png) no-repeat; width:38px; height:56px; display:block; float:left}
+.header .sg{ background:url(/images/cms/icon_sg.png) no-repeat; width:38px; height:56px; display:block; float:left}
 .header img{ height: 65px; }
 
 .menuA:hover , .menuA_active{ background:url(/images/cms/menu.png) no-repeat 0 0; width:90px; height:55px; display:block;}
@@ -261,10 +262,11 @@ a.btnDel:hover { background:url(/images/cms/btnCloseHover.png) no-repeat;}
 
 .iconStatistics{ background:url(/images/cms/icon_statistics.png) no-repeat; display:block; width:16px; height:17px; float:left;}
 
-.chPublic{ background:url(/images/cms/ch_public.jpg) no-repeat; width:80px; height:27px; display:block;}
-.chUnPublic{ background:url(/images/cms/ch_unpublic.jpg) no-repeat; width:80px; height:27px; display:block;}
+.chPublic{ background:url(/images/cms/public.png) no-repeat; width:98px; height:28px; display:block;}
+.chUnPublic{ background:url(/images/cms/not-public.png) no-repeat; width:98px; height:28px; display:block;}
 .chInfo li{ padding:5px 0;}
-.chInfo ul { width: 80px; }
+.chInfo ul { width:80px; }
+.chInfo div { width:210px; }
 
 a.btnGray {
   height: 27px;
