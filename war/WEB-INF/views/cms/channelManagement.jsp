@@ -163,15 +163,12 @@
           <p class="hint_title"><span class="red">＊</span><spring:message code="cms.channel_management.msg.neccessary_info"/></p>
           <form>
             <fieldset class="setAlbum">
-              <label class="floatL"><!-- <span class="red">＊</span> --><spring:message code="cms.channel_management.label.logo"/></label>
+              <label class="floatL"><span class="red" style="display:none">＊</span><spring:message code="cms.channel_management.label.logo"/></label>
               <div class="uploadImg">
                 <img id="ch_image" alt="" src="/images/cms/upload_img.jpg" class="floatL"/><input type="hidden" id="ch_image_updated" value="false"/>
                 <div class="floatL imgBtn">
                   <p class="gray"><spring:message code="cms.channel_management.msg.best_resolution"/></p>
-                  <span id="upload_button_place"><!--
-                    <a href="#" id="ch_upload_image" class="uploadBtn"></a>
-                    -->
-                  </span>
+                  <span id="upload_button_place"></span>
                   <span id="ch_uploading" style="display:none"><spring:message code="cms.channel_management.msg.uploading"/></span>
                   <input type="hidden" id="s3_policy" value="${s3Policy}"/>
                   <input type="hidden" id="s3_signature" value="${s3Signature}"/>
@@ -196,12 +193,20 @@
               <div class="clear"></div>
               <p class="hint"><spring:message code="cms.channel_management.msg.camma_seperated"/></p>
               <br/>
+              <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.language"/></label>
+              <div class="floatL">
+                <select id="ch_language" class="language">
+                  <option value="zh-TW">中文</option>
+                  <option value="en">English</option>
+                </select>
+              </div>
+              <br/><br/>
               <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.system_category"/></label>
               <div class="floatL">
                 <select name="" id="ch_category" class="sys_directory"></select>
               </div>
               <div class="clear"></div>
-              <%-- <p class="hint"><spring:message code="cms.channel_management.msg.system_category_explanation"/></p> --%>
+              <p class="hint" style="display:none"><spring:message code="cms.channel_management.msg.system_category_explanation"/></p>
               <div class="commitPlace">
                 <a href="javascript:" class="btn btnStep2 floatL" id="channel_detail_savebutton"><span><spring:message code="cms.channel_management.btn.save"/></span></a><a href="javascript:" class="floatL btn_cancel" id="channel_detail_cancel"><span><spring:message code="cms.channel_management.btn.cancel"/></span></a>
               </div>
@@ -509,7 +514,7 @@
           <form>
             <fieldset class="setAlbum">
               <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.channel_source"/></label>
-              <div class="bg_input floatL"><input type="text" size="25" maxlength="100" name="ch_import_url"/></div>
+              <div class="bg_input floatL"><input type="text" size="33" maxlength="100" name="ch_import_url"/></div>
               <a href="javascript:" class="btnCreate floatL" name="ch_import_button"><spring:message code="cms.channel_management.btn.import"/></a>
               <div class="clear"></div><br/>
               <label class="floatL"><!-- <span class="red">＊</span> --><spring:message code="cms.channel_management.label.logo"/></label>
@@ -534,13 +539,20 @@
               <div class="bg_textarea floatL"><textarea name="ch_intro" cols="30" rows="5"></textarea></div>
               <div class="clear"></div>
               <p class="hint"><spring:message code="cms.channel_management.msg.two_hundred_characters"/></p>
-              <br/><!--
+              <br/>
               <label class="floatL"><spring:message code="cms.channel_management.label.tag"/></label>
-              <div class="bg_input floatL"><input type="text" size="40" maxlength="40"/></div>
+              <div class="bg_input floatL"><input name="ch_tag" type="text" size="30" maxlength="40"/></div>
               <div class="clear"></div>
               <p class="hint"><spring:message code="cms.channel_management.msg.camma_seperated"/></p>
               <br/>
-              -->
+              <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.language"/></label>
+              <div class="floatL">
+                <select name="ch_language" class="language">
+                  <option value="zh-TW">中文</option>
+                  <option value="en">English</option>
+                </select>
+              </div>
+              <br/><br/>
               <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.system_category"/></label>
               <div class="floatL">
                 <select name="ch_category" class="sys_directory">

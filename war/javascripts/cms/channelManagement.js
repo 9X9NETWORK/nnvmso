@@ -650,11 +650,14 @@ var channelDetail =
       channelDetail.swfObject = null;
     }
     $('#channel_detail .right_title').text($('#lang_title_create_channel_info').text());
+    $('#channel_detail #ch_language').val('zh-TW');
     $('#channel_detail').hide();
     $('#channel_import_detail').hide();
     $('#channel_import_detail [name="ch_import_url"]').val('');
     $('#channel_import_detail [name="ch_name"]').val('').attr('disabled', true);
     $('#channel_import_detail [name="ch_intro"]').val('').attr('disabled', true);
+    $('#channel_import_detail [name="ch_tag"]').val('').attr('disabled', true);
+    $('#channel_import_detail [name="ch_language"]').val('zh-TW').attr('disabled', true);
     $('#channel_import_detail [name="ch_category"]').attr('disabled', true);
     $('#channel_import_detail [name="ch_savebutton"]').removeClass('btn').addClass('btnDisable');
     $('#channel_import_detail [name="ch_image"]').attr('src', '/images/cms/upload_img.jpg');
@@ -699,6 +702,8 @@ var channelDetail =
         $('#channel_import_detail [name="ch_import_url"]').val(channel.sourceUrl);
         $('#channel_import_detail [name="ch_name"]').val('').attr('disabled', false);
         $('#channel_import_detail [name="ch_intro"]').val('').attr('disabled', false);
+        $('#channel_import_detail [name="ch_tag"]').val('').attr('disabled', false);
+        $('#channel_import_detail [name="ch_language"]').val('zh-TW').attr('disabled', false);
         $('#channel_import_detail [name="ch_category"]').attr('disabled', false);
         $('#channel_import_detail [name="upload_button_place"]').html('').append($('<span/>').attr('name', 'ch_upload_image'));
         if (channelDetail.swfObject != null) {
@@ -752,6 +757,8 @@ var channelDetail =
         channelDetail.swfObject = new SWFUpload(swfupload_settings);
         $('#channel_import_detail [name="ch_name"]').val(channel.name);
         $('#channel_import_detail [name="ch_intro"]').val(channel.intro);
+        $('#channel_import_detail [name="ch_tag"]').val(channel.tag);
+        $('#channel_import_detail [name="ch_language"]').val(channel.langCode);
         $('#channel_import_detail [name="ch_image"]').attr('src', channel.imageUrl);
         $('#channel_import_detail [name="ch_image_updated"]').val('false');
         if (channel.imageUrl == '/WEB-INF/../images/processing.png')
@@ -829,13 +836,16 @@ var channelDetail =
           var imageUrl = $('#channel_import_detail [name="ch_image"]').attr('src');
           var imageUpdated = $('#channel_import_detail [name="ch_image_updated"]').val();
           var sourceUrl = $('#channel_import_detail [name="ch_import_url"]').val();
+          var tag = $('#channel_import_detail [name="ch_tag"]').val();
+          var langCode = $('#channel_import_detail [name="ch_language"]').val();
           var parameters =
           {
             'name':       name,
             'intro':      intro,
             //'imageUrl':   imageUrl,
             'categoryId': category,
-            'tag':        '',
+            'tag':        tag,
+            'langCode':    langCode,
             'msoId':      $('#msoId').val(),
             'sourceUrl':  sourceUrl
           };
@@ -885,6 +895,7 @@ var channelDetail =
       }
       $('#ch_intro').val('').val(channel.intro);
       $('#ch_tag').val(channel.tags);
+      $('#ch_language').val(channel.langCode);
       if (channelDetail.swfObject != null) {
         channelDetail.swfObject.destroy();
       }
@@ -977,6 +988,7 @@ var channelDetail =
         'name':       $('#ch_name').val(),
         'intro':      $('#ch_intro').val(),
         'tag':        $('#ch_tag').val(),
+        'langCode':   $('#ch_language').val(),
         'categoryId': $('#ch_category').val()
       };
       if ($('#ch_image_updated').val() == 'true') {
