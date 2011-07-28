@@ -12,7 +12,7 @@
 <!--
 <script type="text/javascript" src="https://www.google.com/jsapi?key=ABQIAAAAXBRF5Us_IiZaSTJMsgWQ8hRj9HbpHlgQpxzEVfOizwCLurRGkBR_04r4-8kmbsy3NnOCnO0MzT1Qqw"></script>
 -->
- <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4dcccc98718a5dbe"></script>
+<script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4dcccc98718a5dbe"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.js"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/jquery-ui.min.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.textTruncate.js"></script>
@@ -30,9 +30,9 @@
     <ul class="menu">
       <li><a href="javascript:" class="menuA_active"></a></li>
       <li><a href="channelSetManagement" class="menuB"></a></li>
-      <li><a href="directoryManagement" class="menuC"></a></li>
+      <li><a _href="javascript://directoryManagement" class="menuC"></a></li>
       <li><a href="promotionTools" class="menuD"></a></li>
-      <li><a href="statistics" class="menuE"></a></li>
+      <li><a _href="javascript://statistics" class="menuE"></a></li>
     </ul>
     <label class="lang" id="image_menu"><spring:message code="cms.image.menu"/></label>
     <div class="clear"></div>
@@ -157,7 +157,7 @@
     </div>
     <!-- channel management - create ch step2 (create new channel)-->
     <div class="createChoose" style="display:none" id="channel_detail">
-      <div class="right_title"><spring:message code="cms.channel_management.title.create_channel_info"/></div>
+      <div class="right_title" id="ch_title"><spring:message code="cms.channel_management.title.create_channel_info"/></div>
       <div class="createEpList">
         <div class="chStep2">
           <p class="hint_title"><span class="red">＊</span><spring:message code="cms.channel_management.msg.neccessary_info"/></p>
@@ -318,7 +318,7 @@
                 <p class="program_info_updatedate"><spring:message code="cms.channel_management.label.update_time"/> : <span>2011/04/15 14:45</span></p>
               </div>
               <ul class="floatL">
-                <li><a class="chUnPublic program_info_publish"></a></li>
+                <li style="display:none"><a class="chUnPublic program_info_publish"></a></li>
                 <li><a class="btnGray program_info_detailbutton"><span><spring:message code="cms.channel_management.btn.program_info"/></span></a></li>
               </ul>
               <div class="clear"></div>
@@ -441,7 +441,7 @@
                 <p class="program_info_updatedate"><spring:message code="cms.channel_management.label.update_time"/> : <span>2011/04/15 14:45</span></p>
               </div>
               <ul class="floatL">
-                <li><a class="chUnPublic program_info_publish"></a></li>
+                <li style="display:none"><a class="chUnPublic program_info_publish"></a></li>
                 <li><a class="btnGray program_info_detailbutton"><span><spring:message code="cms.channel_management.btn.program_info"/></span></a></li>
               </ul>
               <div class="clear"></div>
@@ -578,6 +578,8 @@
   <div class="clear"></div>
 </div>
 <!-- language tags for javascript -->
+<label class="lang" id="lang_title_create_channel_info"><spring:message code="cms.channel_management.title.create_channel_info"/></label>
+<label class="lang" id="lang_title_edit_channel_info"><spring:message code="cms.channel_management.title.edit_channel_info"/></label>
 <label class="lang" id="lang_view_statistics"><spring:message code="cms.channel_management.msg.view_statistics"/></label>
 <label class="lang" id="lang_upload_finished"><spring:message code="cms.warning.upload_finished"/></label>
 <label class="lang" id="lang_upload_failed"><spring:message code="cms.warning.upload_failed"/></label>

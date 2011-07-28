@@ -30,7 +30,7 @@ var skeletonCreation =
     {
       $('<li/>').append('<div class="chShadow channel_info_block_cloned"><div class="chShadowTitle"></div><div class="chImg"></div></div>')
         .prependTo('#channel_list_ul');
-      channelDetail.init(channelId);
+      channelDetail.init(channelId, true);
     }, 'json');
   },
   create9x9Program: function(channelId, channelName)
@@ -649,6 +649,7 @@ var channelDetail =
       channelDetail.swfObject.destroy();
       channelDetail.swfObject = null;
     }
+    $('#channel_detail .right_title').text($('#lang_title_create_channel_info').text());
     $('#channel_detail').hide();
     $('#channel_import_detail').hide();
     $('#channel_import_detail [name="ch_import_url"]').val('');
@@ -864,9 +865,12 @@ var channelDetail =
     });
     $('#channel_import_detail').show();
   },
-  init: function(channelId)
+  init: function(channelId, isNew)
   {
     if (overallLayout.destroyRightSideContent(false) == false) return false;
+    if (!isNew) {
+      $('#ch_title').text($('#lang_title_edit_channel_info').text());
+    }
     
     $.post('/CMSAPI/channelInfo', { 'channelId': channelId }, function(channel)
     {
@@ -954,7 +958,7 @@ var channelDetail =
     }, 'json');
     $('#channel_detail_cancel').unbind().click(function()
     {
-      channelDetail.init(channelId);
+      channelDetail.init(channelId, isNew);
     });
     $('#channel_detail_savebutton').unbind().click(function()
     {
@@ -1093,7 +1097,7 @@ var channelList =
         });
         channelInfoBlock.find('.channel_info_detailbutton').click({ 'channelId': channelId }, function(event)
         {
-          channelDetail.init(event.data.channelId);
+          channelDetail.init(event.data.channelId, false);
           return false;
         });
         channelInfoBlock.find('.channel_info_promoteurl').text(promoteUrl).attr('href', promoteUrl);

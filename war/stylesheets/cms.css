@@ -27,11 +27,15 @@ body{ background:url(/images/cms/bg.jpg) top left repeat-x #dfe2e4; padding:0; m
 .menuA{background:url(/images/cms/menu.png) no-repeat 0 -59px; width:90px; height:55px; display:block; }
 .menuB:hover , .menuB_active{background:url(/images/cms/menu.png) no-repeat -90px 0; width:89px; height:55px; display:block;}
 .menuB{background:url(/images/cms/menu.png) no-repeat -90px -59px; width:89px; height:55px;  display:block;}
+/*
 .menuC:hover , .menuC_active{background:url(/images/cms/menu.png) no-repeat -179px 0; width:89px; height:55px; display:block;}
+*/
 .menuC{background:url(/images/cms/menu.png) no-repeat -179px -59px; width:89px; height:55px; display:block; }
 .menuD:hover , .menuD_active{background:url(/images/cms/menu.png) no-repeat -268px 0; width:89px; height:55px; display:block;}
 .menuD{background:url(/images/cms/menu.png) no-repeat -268px -59px; width:89px; height:55px; display:block;}
+/*
 .menuE:hover , .menuE_active{background:url(/images/cms/menu.png) no-repeat -357px 0; width:95px; height:55px; display:block;}
+*/
 .menuE{background:url(/images/cms/menu.png) no-repeat -357px -59px; width:95px; height:55px; display:block; }
 
 .content{ width:1000px; margin:0 auto; }
@@ -260,7 +264,7 @@ a.btnDel:hover { background:url(/images/cms/btnCloseHover.png) no-repeat;}
 .createChItem{ padding:20px 0}
 .createChItem .hint{ padding:10px 0 0 0; }
 
-.iconStatistics{ background:url(/images/cms/icon_statistics.png) no-repeat; display:block; width:16px; height:17px; float:left;}
+.iconStatistics{ background:url(/images/cms/icon_statistics.png) no-repeat; display:none; width:16px; height:17px; float:left;}
 
 .chPublic{ background:url(/images/cms/public.png) no-repeat; width:98px; height:28px; display:block;}
 .chUnPublic{ background:url(/images/cms/not-public.png) no-repeat; width:98px; height:28px; display:block;}
@@ -395,9 +399,9 @@ a.btnClose:hover { background:url(/images/cms/btnCloseHover.png) no-repeat; }
 .syncAcc li { padding-bottom:10px; font-size:0.9em }
 .syncAcc li span { width:80px; display:block; float:left }
 .syncFb { background:url(/images/cms/icon_fb.png) no-repeat; height:33px; padding-left:45px; line-height:33px; }
-.syncPlurk { background:url(/images/cms/icon_plurk.png) no-repeat; height:33px; padding-left:45px; line-height:33px; }
+.syncPlurk { background:url(/images/cms/icon_plurk.png) no-repeat; height:33px; padding-left:45px; line-height:33px; display:none; }
 .syncTwitter { background:url(/images/cms/icon_twitter.png) no-repeat; height:33px; padding-left:45px; line-height:33px; }
-.syncSina { background:url(/images/cms/icon_sina.png) no-repeat; height:33px; padding-left:45px; line-height:33px; }
+.syncSina { background:url(/images/cms/icon_sina.png) no-repeat; height:33px; padding-left:45px; line-height:33px; display:none; }
 .syncInfo { background:url(/images/cms/icon_info.png) no-repeat 10px 8px;  padding: 10px 25px 5px 10px; }
 .sync_hint { font-size:12px; color:#444; width:300px; background:#FFC; position:absolute; top:310px; right:40px; z-index:5;  padding:7px; line-height:15px; display:none; }
 .addAcc { padding-top:10px; }
