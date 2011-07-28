@@ -9,8 +9,11 @@
 <link rel="stylesheet" href="/stylesheets/cms.css" type="text/css"/>
 <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/themes/start/jquery-ui.css" type="text/css" />
 <link rel="stylesheet" href="/stylesheets/jquery.jqModal.css" type="text/css"/>
-<script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4dcccc98718a5dbe"></script>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.0/jquery.min.js"></script>
+<!--
+<script type="text/javascript" src="https://www.google.com/jsapi?key=ABQIAAAAXBRF5Us_IiZaSTJMsgWQ8hRj9HbpHlgQpxzEVfOizwCLurRGkBR_04r4-8kmbsy3NnOCnO0MzT1Qqw"></script>
+-->
+ <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4dcccc98718a5dbe"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.js"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/jquery-ui.min.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.textTruncate.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.jqModal.js"></script>

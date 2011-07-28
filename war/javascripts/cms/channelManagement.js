@@ -268,6 +268,17 @@ var programDetail =
           if (inputUrl.indexOf('youtube.com') >= 0) {
             var videoId = inputUrl.match(/\/watch\?v=([^\/&]+)/)[1];
             var parameters = {
+              'alt': 'json'
+            };
+            $.get('http://gdata.youtube.com/feeds/api/videos/' + videoId, parameters, function(data)
+            {
+              programDetailBlock.find('.ep_name').val(data.entry.title.$t);
+              programDetailBlock.find('.ep_intro').val(data.entry.content.$t);
+              programDetailBlock.find('.ep_image').attr('src', data.entry.media$group.media$thumbnail[0]['url']);
+              programDetailBlock.find('.ep_image_updated').val('true');
+            }, 'json');
+            /* server side approach
+            var parameters = {
               'videoIdStr': videoId
             };
             $.post('/CMSAPI/getYouTubeVideoInfo', parameters, function(info)
@@ -277,6 +288,7 @@ var programDetail =
               programDetailBlock.find('.ep_image').attr('src', info.thumbnail);
               programDetailBlock.find('.ep_image_updated').val('true');
             });
+            */
           }
         }
         if (programDetailBlock.find('.ep_url_input').val().length > 0
@@ -743,26 +755,43 @@ var channelDetail =
               var username = channel.sourceUrl.match(/\/user\/([^\/]*)/)[1];
               requestUrl = 'http://gdata.youtube.com/feeds/api/users/' + username + '/uploads';
             }
+            var parameters = {
+              'alt': 'json',
+              'format': 5,
+              'v': 2
+            };
+            $.get(requestUrl, parameters, function(data)
+            {
+              if (data == null)
+                return;
+              var feed = data.feed;
+              $('#channel_import_detail [name="ch_name"]').val(feed.title.$t);
+              if (typeof feed.entry != 'undefined')
+                $('#channel_import_detail [name="ch_image"]').attr('src', feed.entry[0].media$group.media$thumbnail[1]['url']);
+              else
+                $('#channel_import_detail [name="ch_image"]').attr('src', feed.logo.$t);
+              $('#channel_import_detail [name="ch_image_updated"]').val('true');
+            }, 'json');
           } else {
-            return
+            var parameters = {
+              'url': channel.sourceUrl
+            };
+            $.get('/CMSAPI/getPodcastInfo', parameters, function(feed)
+            {
+              $('#channel_import_detail [name="ch_name"]').val(feed.title);
+              $('#channel_import_detail [name="ch_intro"]').val(feed.description);
+              if (typeof feed.thumbnail != 'undefined')
+                $('#channel_import_detail [name="ch_image"]').attr('src', feed.thumbnail);
+              $('#channel_import_detail [name="ch_image_updated"]').val('true');
+            }, 'json');
+            /* client approach
+            var feed = new google.feeds.Feed(channel.sourceUrl);
+            feed.load(function(result)
+            {
+              $.dump(result);
+            });
+            */
           }
-          var parameters = {
-            'alt': 'json',
-            'format': 5,
-            'v': 2
-          };
-          $.get(requestUrl, parameters, function(data)
-          {
-            if (data == null)
-              return;
-            var feed = data.feed;
-            $('#channel_import_detail [name="ch_name"]').val(feed.title.$t);
-            if (typeof feed.entry != 'undefined')
-              $('#channel_import_detail [name="ch_image"]').attr('src', feed.entry[0].media$group.media$thumbnail[1]['url']);
-            else
-              $('#channel_import_detail [name="ch_image"]').attr('src', feed.logo.$t);
-            $('#channel_import_detail [name="ch_image_updated"]').val('true');
-          }, 'json');
         }
         $.post('/CMSAPI/channelCategory', { 'channelId': channelId }, function(category)
         {
@@ -1084,6 +1113,7 @@ $(function()
   var css = '.chPublic { url(' + $('#image_ch_public').text() + ') no-repeat; }\n.chUnpublic { url(' + $('#image_ch_unpublic').text() + ') no-repeat; }';
   $('<style/>').text(css).appendTo('<head/>');
   
+  
   channelList.init();
   $(window).bind('beforeunload', function()
   {
@@ -1093,3 +1123,5 @@ $(function()
     return;
   });
 });
+
+//google.load("feeds", "1");

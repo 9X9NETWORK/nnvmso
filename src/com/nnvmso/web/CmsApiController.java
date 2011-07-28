@@ -1,5 +1,7 @@
 package com.nnvmso.web;
 
+import java.io.IOException;
+import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -55,6 +57,11 @@ import com.nnvmso.service.NnUserManager;
 import com.nnvmso.service.SnsAuthManager;
 import com.nnvmso.service.SubscriptionLogManager;
 import com.nnvmso.service.TranscodingService;
+import com.sun.syndication.feed.synd.SyndEntry;
+import com.sun.syndication.feed.synd.SyndFeed;
+import com.sun.syndication.io.FeedException;
+import com.sun.syndication.io.SyndFeedInput;
+import com.sun.syndication.io.XmlReader;
 
 @Controller
 @RequestMapping("CMSAPI")
@@ -209,12 +216,40 @@ public class CmsApiController {
 		return "OK";
 	}
 	
+	//////////////////// Channel/Program Management ////////////////////
+	
+	@RequestMapping("getPodcastInfo")
+	public @ResponseBody Map<String, String> getPodcastInfo(@RequestParam String url) throws IllegalArgumentException, FeedException, IOException {
+		//URL feedUrl = new URL(url);
+		Map<String, String> result = new HashMap<String, String>();
+		SyndFeedInput input = new SyndFeedInput();
+		SyndFeed feed = input.build(new XmlReader(new URL(url)));
+		String title, description, thumbnail;
+		title = feed.getTitle();
+		description = feed.getDescription();
+		thumbnail = (feed.getImage() != null) ? feed.getImage().getUrl() : null;
+		if (title != null) {
+			result.put("title", title);
+			logger.info("title = " + title);
+		}
+		if (description != null) {
+			result.put("description", description);
+			logger.info("description = " + description);
+		}
+		if (thumbnail != null) {
+			result.put("thumbnail", thumbnail);
+			logger.info("thumbnail = " + thumbnail);
+		} else {
+			//List<SyndEntry> entries = feed.getEntries();
+		}
+		return result;
+	}
+	
+	// not in used
 	@RequestMapping("getYouTubeVideoInfo")
 	public @ResponseBody Map<String, String> getYouTubeVideoInfo(@RequestParam String videoIdStr) {
 		return YouTubeLib.getYouTubeVideoEntry(videoIdStr);
 	}
-	
-	//////////////////// Channel/Program Management ////////////////////
 	
 	/**
 	 * List all channels owned by mso
