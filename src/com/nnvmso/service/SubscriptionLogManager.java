@@ -33,7 +33,8 @@ public class SubscriptionLogManager {
 	}
 	
 	public int findTotalCountByChannelId(long channelId) {
-		return subDao.findTotalCountByChannelId(channelId);
+		MsoManager msoMngr = new MsoManager();
+		return subDao.findTotalCountByChannelId(channelId, msoMngr.findNNMso().getKey().getId());
 	}
 	
 	public SubscriptionLog findByChannelId(long channelId) {
