@@ -430,7 +430,7 @@
         <ul id="program_list_ul_readonly">
           <li style="display:none">
             <div class="epItem program_info_block_readonly" id="program_info_block_readonly">
-              <div class="epInfoTitle program_info_title"><span>何處是我家 </span></div>
+              <div class="epInfoTitle program_info_title"><div>何處是我家 </div></div>
               <div class="epInfoImg program_info_image"></div>
               <div class=" floatL epInfo" >
                 <a href="#" class="floatL program_info_promoteurl">http://www.9x9.tv/channel/3958</a>

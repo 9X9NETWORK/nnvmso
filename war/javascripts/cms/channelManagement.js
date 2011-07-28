@@ -587,7 +587,7 @@ var programList =
       var programId = programs[i].key.id;
       
       programInfoBlock.find('.iconStatistics').attr('title', $('#lang_view_statistics'));
-      programInfoBlock.find('.program_info_title span').text(programs[i].name);
+      programInfoBlock.find('.program_info_title div').text(programs[i].name);
       $('<img/>').attr('src', programs[i].imageUrl).appendTo(programInfoBlock.find('.program_info_image'));
       var type = 'Unknown';
       switch(programs[i].type) {
