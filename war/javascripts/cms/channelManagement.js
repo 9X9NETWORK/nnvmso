@@ -98,6 +98,9 @@ var programDetail =
     else if (program.audioFileUrl != null)
       source = program.audioFileUrl;
     programDetailBlock.find('.ep_source a').attr('href', source);
+    if (program.contentType == 1) {
+      programDetailBlock.find('.ep_source a').text('YouTube');
+    }
     programDetailBlock.find('.right_title div').text(title);
     programDetailBlock.find('.ep_name').val(program.name);
     programDetailBlock.find('.ep_intro').val(program.intro);
