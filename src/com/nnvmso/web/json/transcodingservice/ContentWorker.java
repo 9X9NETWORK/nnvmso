@@ -14,6 +14,8 @@ public class ContentWorker {
 	private String prefix; 
 	private boolean flag; //auto_generated_logo
 	private String callback;
+	private String errorCode;
+	private String errorReason;	
 	
 	public ContentWorker() {}
 	public ContentWorker(long id, String imageUrl, String videoUrl, String prefix, boolean flag) {
@@ -66,7 +68,10 @@ public class ContentWorker {
         buffer.append("id: " + id + ";");
         buffer.append("videoUrl: " + videoUrl + ";");
         buffer.append("prefix: " + prefix + ";");
+        buffer.append("imageUrl: " + imageUrl + ";");
         buffer.append("flag: " + flag + ";");
+        buffer.append("errorCode:" + errorCode + ";");
+        buffer.append("errorReason:" + errorReason + ";");
         return buffer.toString();		
 	}
 	
@@ -84,4 +89,17 @@ public class ContentWorker {
 		}
         return json;
 	}
+	public String getErrorCode() {
+		return errorCode;
+	}
+	public void setErrorCode(String errorCode) {
+		this.errorCode = errorCode;
+	}
+	public String getErrorReason() {
+		return errorReason;
+	}
+	public void setErrorReason(String errorReason) {
+		this.errorReason = errorReason;
+	}	
+	
 }

@@ -39,7 +39,7 @@ public class ShareController {
 	
 	@RequestMapping("{ipgId}")
 	public String zooatomics(@PathVariable String ipgId, HttpServletResponse resp, Model model) {
-		log.info("/share/" + ipgId);
+		log.info("new logging to share /share/" + ipgId);
 		//invalid ipgid
 		IpgManager ipgMngr = new IpgManager();
 		if (!Pattern.matches("^\\d*$", ipgId)) {
