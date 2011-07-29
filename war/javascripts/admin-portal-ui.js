@@ -9,7 +9,9 @@ $(function()
     1: 'System',
     2: 'Podcast',
     3: 'YouTube Channel',
-    4: 'YouTube Playlist'
+    4: 'YouTube Playlist',
+    5: 'Facebook',
+    6: '9x9'
   };
 
   var channelStatus = {
@@ -23,6 +25,23 @@ $(function()
     101:  'Bad Quality',
     1000: 'Tanscoding DB Error',
     1001: 'NNVMSO Json Error'
+  }
+  
+  var msoType = {
+    0: 'Unknown',
+    1: 'NN',
+    2: 'MSO',
+    3: '3X3'
+  }
+  
+  var userType = {
+    0: 'Unknown',
+    1: 'Admin',
+    2: 'TBC',
+    3: 'TCO',
+    4: 'User',
+    5: 'NN',
+    6: '3x3'
   }
 
   function callbackAfterSubmitForm(response, postData, formId)
@@ -203,6 +222,32 @@ $(function()
         label:     'Public',
         name:      'isPublic',
         index:     'isPublic',
+        width:     70,
+        align:     'center',
+        search:    true,
+        stype:     'select',
+        sortable:  true,
+        formatter: 'checkbox',
+        editable:  true,
+        edittype:  'checkbox',
+        editoptions:
+        {
+          value: 'true:false'
+        },
+        searchoptions:
+        {
+          sopt:  ['eq'],
+          value:
+          {
+            'true':  'true',
+            'false': 'false'
+          }
+        }
+      },
+      {
+        label:     'Featured',
+        name:      'featured',
+        index:     'featured',
         width:     70,
         align:     'center',
         search:    true,
@@ -545,6 +590,26 @@ $(function()
             }
           },
           {
+            label:     'Content Type',
+            name:      'contentType',
+            index:     'contentType',
+            width:     100,
+            align:     'center',
+            sortable:  true,
+            formatter: 'select',
+            editable:  true,
+            edittype:  'select',
+            editoptions:
+            {
+              disabled: true,
+              value:
+              {
+                0: 'Direct Link',
+                1: 'YouTube'
+              }
+            }
+          },
+          {
             label:     'Public',
             name:      'isPublic',
             index:     'isPublic',
@@ -837,10 +902,10 @@ $(function()
     deltitle: 'Remove This Channel from Category'
   },
   {
-    // 'edit' proprtties
+    // 'edit' properties
   },
   {
-    // 'add' proprtties
+    // 'add' properties
     url:               '/admin/channel/addCategory',
     addCaption:        'Add This Channel to Category',
     width:             'auto',
@@ -888,6 +953,7 @@ $(function()
         sortable:  true,
         editable:  true,
         edittype:  'select',
+        stype:     'select',
         editoptions:
         {
           dataUrl:  '/admin/mso/msoHtmlSelectOptions',
@@ -912,6 +978,15 @@ $(function()
         align:    'center',
         search:   false,
         sortable: false
+      },
+      {
+        label:    'Parent ID',
+        name:     'parentId',
+        index:    'parentId',
+        width:    80,
+        align:    'center',
+        search:   false,
+        sortable: true
       },
       {
         label:    'Category Name',
@@ -1196,10 +1271,10 @@ $(function()
         deltitle: 'Remove This Channel from Category'
       },
       {
-        // 'edit' proprtties
+        // 'edit' properties
       },
       {
-        // 'add' proprtties
+        // 'add' properties
         url:               '/admin/channel/addCategory',
         addCaption:        'Add Channel to This Category',
         width:             'auto',
@@ -1241,7 +1316,7 @@ $(function()
     // 'edit' properties
   },
   {
-    // 'add' proprtties
+    // 'add' properties
     url:               '/admin/category/create',
     addCaption:        'Create A New Category',
     width:             'auto',
@@ -1285,7 +1360,7 @@ $(function()
         edittype: 'image',
         editoptions:
         {
-          disabled: true
+          disabled: false
         },
         editrules:
         {
@@ -1314,6 +1389,10 @@ $(function()
         align:    'center',
         sortable: true,
         editable: true,
+        editrules:
+        {
+          required: true
+        },
         editoptions:
         {
           maxlength: 100
@@ -1404,7 +1483,7 @@ $(function()
         editoptions:
         {
           disabled: true,
-          value:    '0:Unknown;1:NN;2:MSO'
+          value:    msoType
         }
       },
       {
@@ -1433,8 +1512,29 @@ $(function()
         editable: true,
         editrules:
         {
+          required:   true,
           edithidden: true,
           email:      true
+        }
+      },
+      {
+        label:    'Password',
+        name:     'password',
+        index:    'password',
+        width:    140,
+        align:    'center',
+        sortable: false,
+        editable: true,
+        edittype: 'password',
+        hidden:   true,
+        editoptions:
+        {
+          disabled: false
+        },
+        editrules:
+        {
+          required:   true,
+          edithidden: true
         }
       },
       {
@@ -1508,6 +1608,7 @@ $(function()
         },
         beforeShowForm: function(formId)
         {
+          $('#tr_password').hide();
           $('#logoUrl', formId).click(function()
           {
             var logoUrl = prompt('Please enter new logo URL', $(this).attr('src'));
@@ -1659,7 +1760,7 @@ $(function()
         // 'edit' properties
       },
       {
-        // 'add' proprtties
+        // 'add' properties
         url:               '/admin/msoIpg/add?mso=' + rowId,
         addCaption:        'Add A Channel to IPG',
         width:             'auto',
@@ -1691,10 +1792,63 @@ $(function()
   $('#mso_table').jqGrid('navGrid', '#mso_table_toppager',
   {
     edit:   false,
-    add:    false,
+    add:    true,
     del:    false,
     search: false,
-    view:   false
+    view:   false,
+    addtitle: 'Create A New MSO'
+  },
+  {
+    // 'edit' properties
+  },
+  {
+    // 'add' properties
+    url:               '/admin/mso/create',
+    addCaption:        'Create A New MSO',
+    width:             'auto',
+    modal:             false,
+    jqModal:           true,
+    closeAfterAdd:     true,
+    closeOnEscape:     true,
+    reloadAfterSubmit: true,
+    recreateForm:      true,
+    beforeSubmit: function(postData, formId)
+    {
+      var info = 'Please confirm following data:\n';
+      info += '\nmso / default set name = ' + $('#name', formId).val();
+      info += '\nemail / cms account = ' + $('#contactEmail', formId).val();
+      info += '\ncms password = ' + $('#password', formId).val();
+      if (confirm(info) == false) {
+        return [false, 'Not Confirmed'];
+      }
+      return [true, ''];
+    },
+    beforeCheckValues: function(postData, formId, mode)
+    {
+      postData['logoUrl'] = $('#logoUrl', formId).attr('src');
+      return postData;
+    },
+    beforeShowForm: function(formId)
+    {
+      $('#logoUrl', formId).attr('src', '/images/cms/upload_img.jpg');
+      $('#logoUrl', formId).click(function()
+      {
+        var logoUrl = prompt('Please enter logo URL', $(this).attr('src'));
+        if (logoUrl != null) {
+          $(this).attr('src', logoUrl);
+        }
+      });
+      $('#type', formId).val(3);
+      $('#tr_mso', formId).hide();
+      $('#tr_updateDate', formId).hide();
+      $('#tr_createDate', formId).hide();
+      $('#tr_title', formId).hide();
+      $('#tr_logoClickUrl', formId).hide();
+      $('#tr_jingleUrl', formId).hide();
+      $('#tr_preferredLangCode', formId).hide();
+      $('#tr_intro', formId).hide();
+    },
+    afterComplete: callbackAfterSubmitForm
   });
 
   //////// User Managment Tab ////////
@@ -1832,7 +1986,7 @@ $(function()
         editoptions:
         {
           disabled: true,
-          value:    { 1: 'Admin', 2: 'TBC', 3: 'TCO', 4: 'User', 5: 'NN' }
+          value:    userType
         }
       },
       {
