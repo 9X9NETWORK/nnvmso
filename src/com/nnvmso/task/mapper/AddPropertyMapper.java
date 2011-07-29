@@ -22,14 +22,18 @@ public class AddPropertyMapper extends AppEngineMapper<Key, Entity, NullWritable
 		log.info("Adding property -- property name=" + propertyName + ";value=" + propertyValue + ";type=" + type);
 		
 		if (type.equals("int")) {
-			value.setProperty(propertyName, Integer.parseInt(propertyValue));			
+			value.setProperty(propertyName, Integer.parseInt(propertyValue));
+		} else if (type.equals("long")) {
+			value.setProperty(propertyName, Long.parseLong(propertyValue));
+		} else if (type.equals("short")) {
+			value.setProperty(propertyName, Short.parseShort(propertyValue));
 		} else if (type.equals("boolean")) {
 			value.setProperty(propertyName, Boolean.parseBoolean(propertyValue));
 		} else if (type.equals("date")) {
 			value.setProperty(propertyName, new Date());
 		} else if (type.equals("string")) {
 			value.setProperty(propertyName, propertyValue);
-		}
+		} 
 		DatastoreMutationPool mutationPool = this.getAppEngineContext(context).getMutationPool();
 		mutationPool.put(value);
 	}
