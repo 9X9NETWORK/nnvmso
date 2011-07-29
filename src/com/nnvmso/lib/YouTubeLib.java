@@ -14,7 +14,6 @@ import com.google.gdata.client.youtube.YouTubeService;
 import com.google.gdata.data.youtube.VideoEntry;
 import com.google.gdata.data.youtube.YouTubeMediaGroup;
 import com.google.gdata.data.media.mediarss.MediaThumbnail;
-import com.google.gdata.data.media.mediarss.MediaGroup;
 
 public class YouTubeLib {
 	
