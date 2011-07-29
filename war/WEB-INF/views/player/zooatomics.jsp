@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9playerV65"/>
+<c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9playerV66"/>
 
 <!-- $Revision$ -->
 
@@ -27,7 +27,7 @@
 <script type="text/javascript" charset="utf-8" src="${root}/javascripts/jquery.swfobject.1-1-1.min.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/scripts/flowplayer-3.2.4.min.js"></script>
 
-<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/player8.js"></script>
+<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/player9a.js"></script>
 
 <script type="text/javascript">
 var analytz = false;
@@ -74,6 +74,10 @@ var brandinfo = "${brandInfo}";
 <div id="yt1" style="width: 100%; height: 100%; z-index: 1; visibility: visible; position: absolute; left: 0; top: 0; overflow: hidden;">
   <div id="ytapiplayer">
   </div>
+</div>
+
+
+<div id="ss" style="width: 100%; height: 100%; z-index: 4; visibility: visible; position: absolute; left: 0; top: 0; overflow: hidden; display: none">
 </div>
 
 <div id="blue" style="background: black; width: 100%; height: 100%; display: block; position: absolute; color: white">
@@ -140,6 +144,20 @@ var brandinfo = "${brandInfo}";
         <li id="btn-about"><img src="${root}/images/icon_about.png" id="icon-about"><span><div id="btn-about-text">About Us</div><span class="arrow"></span></span></li>
         <li id="btn-help"><img src="${root}/images/icon_help.png" id="icon-help"><span><div id="btn-help-txt">Help</div><span class="arrow"></span></span></li>
       </ul>
+      <ul id="lang-setting"> 
+        <li id="sg-site-lang"><span id="site-lang" class="lang-selected">English site</span><img src="${root}/images/icon_downarrow.png" class="icon-downarrow"> 
+          <ul class="lang-options"> 
+            <li id="sg-site-en"><img src="${root}/images/icon_check.png" class="icon-check"><span>English site</span></li> 
+            <li id="sg-site-zh"><img src="${root}/images/icon_check.png" class="icon-check"><span>中文網站</span></li> 
+          </ul> 
+        </li> 
+        <li id="sg-program-lang"><span id="program-lang" class="lang-selected">English programs</span><img src="${root}/images/icon_downarrow.png" class="icon-downarrow"> 
+          <ul class="lang-options"> 
+            <li id="sg-program-en"><img src="${root}/images/icon_check.png" class="icon-check"><span>English programs</span></li> 
+            <li id="sg-program-zh"><img src="${root}/images/icon_check.png" class="icon-check"><span>中文節目</span></li> 
+          </ul> 
+        </li> 
+      </ul> 
     </div>
     
     <div id="sg-content">
@@ -657,43 +675,69 @@ var brandinfo = "${brandInfo}";
   </div>
 </div>
 
-<div id="signin-layer" style="display: none">
-  <div id="signin-holder">
-    <div id="btn-winclose"><img src="${root}/images/btn_winclose.png"></div>
-    <ul id="login-pannel">
-      <li><h2 id="returning1">Returning Users</h2></li>
-      <li>
-        <span id="email1">Email:</span>
-        <p class="textfieldbox"><input type="text" id="L-email" class="textfield" value=""></p>
-      </li>
-      <li>
-        <span id="pw1">Password:</span>
-        <p class="textfieldbox"><input type="password" id="L-password" class="textfield" value=""></p>
-      </li>
-      <li><a href="javascript:submit_login()" class="btn" id="L-button"><span id="loginbtn">Log in</span></a></li>
-    </ul>
-    <ul id="signup-pannel">
-      <li><h2 id="newusers">New Users</h2></li>
-      <li>
-        <span id="name2">Name:</span>
-        <p class="textfieldbox"><input type="text" id="S-name" class="textfield"></p>
-      </li>
-      <li>
-        <span id="email2">Email:</span>
-        <p class="textfieldbox"><input type="text" id="S-email" class="textfield"></p>
-      </li>
-      <li>
-        <span id="pw2">Password:</span>
-        <p class="textfieldbox"><input type="password" id="S-password" class="textfield"></p>
-      </li>
-      <li>
-        <span id="pwv2">Password verify:</span>
-        <p class="textfieldbox"><input type="password" id="S-password2" class="textfield"></p>
-      </li>
-      <li><a href="javascript:submit_signup()" class="btn" id="S-button"><span id="signup">Sign up</span></a></li>
-    </ul>
-  </div>
-</div>
+<div id="signin-layer">
+  <div id="signin-holder">
+    <div id="btn-winclose"><img src="${root}/images/btn_winclose.png"></div>
+    <ul id="tab-list">
+      <li id="login" class="on"><h2>Returning Users</h2></li>
+      <li id="signup"><h2>New Users</h2></li>
+    </ul>
+    <div id="login-panel" class="input-panel">
+      <ul class="input-list">
+        <li>
+          <span>Email:</span>
+          <p class="signin-input">
+            <input type="text" class="signin-field" id="L-email">
+          </p>
+        </li>
+        <li>
+          <span>Password:</span>
+          <p class="signin-input">
+            <input type="password" class="signin-field" id="L-password">
+          </p>
+        </li>
+        <li><a class="btn" id="btn-login"><span>Log in</span></a></li>
+      </ul>
+    </div>
+    <div id="signup-panel" class="input-panel">
+      <ul class="input-list">
+        <li>
+          <span>Name:</span>
+          <p class="signin-input">
+            <input type="text" class="signin-field" id="S-name">
+          </p>
+        </li>
+        <li>
+          <span>Email:</span>
+          <p class="signin-input">
+            <input type="text" class="signin-field" id="S-email">
+          </p>
+        </li>
+        <li>
+          <span>Password:</span>
+          <p class="signin-input">
+            <input type="password" class="signin-field" id="S-password">
+          </p>
+        </li>
+        <li>
+          <span>Password verify:</span>
+          <p class="signin-input">
+            <input type="password" class="signin-field" id="S-password2">
+          </p>
+        </li>
+        <li><a class="btn" id="btn-signup"><span>Sign up</span></a></li>
+      </ul>
+       
+      <div id="encouragement">
+        <p><span>Sign up to have a personalized Smart Guide, and to curate your own channels from YouTube or Facebook.</span></p>
+        <div id="signup-triger">
+          <p><img src="${root}/images/icon_tip.png" id="triger-icon"><span id="triger-txt">Learn more</span></p>
+          <p id="signup-tip"><span>To curate your own channels from YouTube or Facebook, simply copy and paste your YouTube channel, YouTube playlist or Facebook page URL to the Smart Guide.</span><span class="arrow"></span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div id="browse" style="display: none; z-index: 999"></div>
 
@@ -922,6 +966,29 @@ var brandinfo = "${brandInfo}";
     </ul>
   </div>
 </div>
+
+<div id="rename-layer">
+  <div class="rename-holder">
+    <p id="rename-input">
+      <input type="text" id="rename-field" value="Enter a new title for the set">
+    </p>
+    <ul class="action-list">
+      <li><a class="btn" id="btn-rename-save"><span>Save</span></a></li>
+      <li><a class="btn" id="btn-rename-cancel"><span>Cancel</span></a></li>
+    </ul>
+  </div>
+</div>
+
+<div id="tribtn-layer">
+  <div class="tribtn-holder">
+    <p>This set has been added to your Smart Guide!</p>
+    <div class="actions">
+      <a class="btn" id="btn-watchSet"><span>Watch this set</span></a>
+      <a class="btn" id="btn-toFset"><span>Look at more featured sets</span></a>
+      <a class="btn" id="btn-toSG"><span>Return to Smart Guide</span></a>
+    </div>
+  </div>
+ </div>
 
 <div id="log-layer" style="position: absolute; left: 0; top: 0; height: 100%; width: 100%; background: white; color: black; text-align: left; padding: 20px; overflow: scroll; z-index: 9999; display: none"></div>
 

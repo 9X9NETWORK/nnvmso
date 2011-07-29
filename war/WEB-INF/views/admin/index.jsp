@@ -151,3 +151,21 @@
     </ul>
   </li>
 </ul>
+
+<ul>
+    <li>CMS
+        <ul>
+            <li>
+                <a href="/admin/cms/ownership/list">list all ownership</a></li>
+            <li>list channel/channel set owned by mso<br/>
+                http://host/admin/cms/ownership/list?msoId=207
+            </li>
+            <li>grant mso ownership<br/>
+                http://host/admin/cms/ownership/addChannel?msoId=207&channelIds=622,618,587
+            </li>
+            <li>rempve mso ownership<br/>
+                http://host/admin/cms/ownership/deleteChannel?msoId=207&channelIds=622,618,587
+            </li>
+        </ul>
+    </li>
+</ul>

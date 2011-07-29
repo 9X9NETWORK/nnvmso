@@ -37,7 +37,7 @@
       <value template="optinonal">String</value>
     </property>
     <property>
-      <name human="Property Type (int, boolean, date, string)">propertyType</name>
+      <name human="Property Type (int, boolean, date, string, long, short)">propertyType</name>
       <value template="optinonal">String</value>
     </property>
   </configuration>  
@@ -83,186 +83,7 @@
       <value template="optinonal">String</value>
     </property>
   </configuration>
-  
-  <!-- Migrate Up Mapper -->
-  <configuration name="MigrateUp MsoProgram Mapper">
-    <property>
-      <name>mapreduce.map.class</name>
-      <value>com.nnvmso.task.mapper.MigrateUpMsoProgramMapper</value>
-    </property>
-    <property>
-      <name>mapreduce.inputformat.class</name>
-      <value>com.google.appengine.tools.mapreduce.DatastoreInputFormat</value>
-    </property>
-    <property>
-      <name human="Entity Kind to Map Over">mapreduce.mapper.inputformat.datastoreinputformat.entitykind</name>
-      <value template="optional">MsoProgram</value>      
-    </property>            
-  </configuration>
-
-  <configuration name="MigrateUp MsoChannel Mapper">
-    <property>
-      <name>mapreduce.map.class</name>
-      <value>com.nnvmso.task.mapper.MigrateUpMsoChannelMapper</value>
-    </property>
-    <property>
-      <name>mapreduce.inputformat.class</name>
-      <value>com.google.appengine.tools.mapreduce.DatastoreInputFormat</value>
-    </property>
-    <property>
-      <name human="Entity Kind to Map Over">mapreduce.mapper.inputformat.datastoreinputformat.entitykind</name>
-      <value template="optional">MsoChannel</value>      
-    </property>            
-  </configuration>
-
-  <configuration name="MigrateUp Ipg Mapper">
-    <property>
-      <name>mapreduce.map.class</name>
-      <value>com.nnvmso.task.mapper.MigrateUpIpgMapper</value>
-    </property>
-    <property>
-      <name>mapreduce.inputformat.class</name>
-      <value>com.google.appengine.tools.mapreduce.DatastoreInputFormat</value>
-    </property>
-    <property>
-      <name human="Entity Kind to Map Over">mapreduce.mapper.inputformat.datastoreinputformat.entitykind</name>
-      <value template="optional">Ipg</value>      
-    </property>            
-  </configuration>
-
-  <configuration name="MigrateUp Ipg Mapper2">
-    <property>
-      <name>mapreduce.map.class</name>
-      <value>com.nnvmso.task.mapper.MigrateUpIpgMapper2</value>
-    </property>
-    <property>
-      <name>mapreduce.inputformat.class</name>
-      <value>com.google.appengine.tools.mapreduce.DatastoreInputFormat</value>
-    </property>
-    <property>
-      <name human="Entity Kind to Map Over">mapreduce.mapper.inputformat.datastoreinputformat.entitykind</name>
-      <value template="optional">Ipg</value>      
-    </property>            
-  </configuration>
-
-  <configuration name="MigrateUp PdrRaw Mapper">
-    <property>
-      <name>mapreduce.map.class</name>
-      <value>com.nnvmso.task.mapper.MigrateUpPdrRawMapper</value>
-    </property>
-    <property>
-      <name>mapreduce.inputformat.class</name>
-      <value>com.google.appengine.tools.mapreduce.DatastoreInputFormat</value>
-    </property>
-    <property>
-      <name human="Entity Kind to Map Over">mapreduce.mapper.inputformat.datastoreinputformat.entitykind</name>
-      <value template="optional">PdrRaw</value>
-    </property>            
-  </configuration>
-
-  <!-- Migrate Down Mapper -->
-  <configuration name="MigrateDown MsoProgram Mapper">
-    <property>
-      <name>mapreduce.map.class</name>
-      <value>com.nnvmso.task.mapper.MigrateDownMsoProgramMapper</value>
-    </property>
-    <property>
-      <name>mapreduce.inputformat.class</name>
-      <value>com.google.appengine.tools.mapreduce.DatastoreInputFormat</value>
-    </property>
-    <property>
-      <name human="Entity Kind to Map Over">mapreduce.mapper.inputformat.datastoreinputformat.entitykind</name>
-      <value template="optional">MsoProgram</value>      
-    </property>            
-  </configuration>
-
-  <configuration name="MigrateDown MsoChannel Mapper">
-    <property>
-      <name>mapreduce.map.class</name>
-      <value>com.nnvmso.task.mapper.MigrateDownMsoChannelMapper</value>
-    </property>
-    <property>
-      <name>mapreduce.inputformat.class</name>
-      <value>com.google.appengine.tools.mapreduce.DatastoreInputFormat</value>
-    </property>
-    <property>
-      <name human="Entity Kind to Map Over">mapreduce.mapper.inputformat.datastoreinputformat.entitykind</name>
-      <value template="optional">MsoChannel</value>      
-    </property>            
-  </configuration>
-
-  <configuration name="MigrateDown Ipg Mapper">
-    <property>
-      <name>mapreduce.map.class</name>
-      <value>com.nnvmso.task.mapper.MigrateDownIpgMapper</value>
-    </property>
-    <property>
-      <name>mapreduce.inputformat.class</name>
-      <value>com.google.appengine.tools.mapreduce.DatastoreInputFormat</value>
-    </property>
-    <property>
-      <name human="Entity Kind to Map Over">mapreduce.mapper.inputformat.datastoreinputformat.entitykind</name>
-      <value template="optional">Ipg</value>      
-    </property>            
-  </configuration>
-
-  <configuration name="MigrateDown Ipg Mapper2">
-    <property>
-      <name>mapreduce.map.class</name>
-      <value>com.nnvmso.task.mapper.MigrateDownIpgMapper2</value>
-    </property>
-    <property>
-      <name>mapreduce.inputformat.class</name>
-      <value>com.google.appengine.tools.mapreduce.DatastoreInputFormat</value>
-    </property>
-    <property>
-      <name human="Entity Kind to Map Over">mapreduce.mapper.inputformat.datastoreinputformat.entitykind</name>
-      <value template="optional">Ipg</value>      
-    </property>            
-  </configuration>
-
-  <configuration name="MigrateDown PdrRaw Mapper">
-    <property>
-      <name>mapreduce.map.class</name>
-      <value>com.nnvmso.task.mapper.MigrateDownPdrRawMapper</value>
-    </property>
-    <property>
-      <name>mapreduce.inputformat.class</name>
-      <value>com.google.appengine.tools.mapreduce.DatastoreInputFormat</value>
-    </property>
-    <property>
-      <name human="Entity Kind to Map Over">mapreduce.mapper.inputformat.datastoreinputformat.entitykind</name>
-      <value template="optional">PdrRaw</value>
-    </property>            
-  </configuration>
-
-  <configuration name="Migrate DefaultIpg Mapper">
-    <property>
-      <name>mapreduce.map.class</name>
-      <value>com.nnvmso.task.mapper.MigrateDefaultIpgMapper</value>
-    </property>
-    <property>
-      <name>mapreduce.inputformat.class</name>
-      <value>com.google.appengine.tools.mapreduce.DatastoreInputFormat</value>
-    </property>
-    <property>
-      <name human="Position">position</name>
-      <value template="optinonal">Integer</value>
-    </property>
-    <property>
-      <name human="Original Channel Id">oldChannelId</name>
-      <value template="optinonal">Long</value>
-    </property>
-    <property>
-      <name human="New Channel Id">newChannelId</name>
-      <value template="optinonal">Long</value>
-    </property>    
-    <property>
-      <name human="Entity Kind to Map Over">mapreduce.mapper.inputformat.datastoreinputformat.entitykind</name>
-      <value template="optional">Subscription</value>
-    </property>            
-  </configuration>
-            
+              
   <!-- Data mining Mapper -->        
   <configuration name="Data mining User Count mapper">
     <property>
@@ -331,5 +152,93 @@
     </property>
   </configuration>  
   
+  <configuration name="MergeAccount Mapper">
+    <property>
+      <name>mapreduce.map.class</name>      
+      <value>com.nnvmso.task.mapper.MergeAccountMapper</value>
+    </property>
+    <property>
+      <name>mapreduce.inputformat.class</name>
+      <value>com.google.appengine.tools.mapreduce.DatastoreInputFormat</value>
+    </property>    
+    <property>
+      <name human="Entity Kind to Map Over">mapreduce.mapper.inputformat.datastoreinputformat.entitykind</name>
+      <value template="optional">NnUser</value>      
+    </property>   
+    <property>
+      <name human="msoId">msoId</name>
+      <value template="optinonal">8001</value>
+    </property>     
+  </configuration>
+  
+  <configuration name="MsoChannel Lang Mapper">
+    <property>
+      <name>mapreduce.map.class</name>      
+      <value>com.nnvmso.task.mapper.MsoChannelLangMapper</value>
+    </property>
+    <property>
+      <name>mapreduce.inputformat.class</name>
+      <value>com.google.appengine.tools.mapreduce.DatastoreInputFormat</value>
+    </property>    
+    <property>
+      <name human="Entity Kind to Map Over">mapreduce.mapper.inputformat.datastoreinputformat.entitykind</name>
+      <value template="optional">MsoChannel</value>      
+    </property>    
+  </configuration>
+
+  <configuration name="ReCategory Mapper">
+    <property>
+      <name>mapreduce.map.class</name>      
+      <value>com.nnvmso.task.mapper.ReCategoryMapper</value>
+    </property>
+    <property>
+      <name>mapreduce.inputformat.class</name>
+      <value>com.google.appengine.tools.mapreduce.DatastoreInputFormat</value>
+    </property>    
+    <property>
+      <name human="Entity Kind to Map Over">mapreduce.mapper.inputformat.datastoreinputformat.entitykind</name>
+      <value template="optional">CategoryChannel</value>      
+    </property>
+    <property>
+      <name human="FoodAndWine">FoodAndWine</name>
+      <value template="optinonal"></value>
+    </property>
+    <property>
+      <name human="HealthAndfitness">HealthAndfitness</name>
+      <value template="optinonal"></value>
+    </property>
+    <property>
+      <name human="Lifestyle">Lifestyle</name>
+      <value template="optinonal"></value>
+    </property>
+    <property>
+      <name human="GayAndlesbian">GayAndlesbian</name>
+      <value template="optinonal"></value>
+    </property>
+    <property>
+      <name human="Sports">Sports</name>
+      <value template="optinonal"></value>
+    </property>
+    <property>
+      <name human="TravelAndLiving">TravelAndLiving</name>
+      <value template="optinonal"></value>
+    </property>
+    <property>
+      <name human="LifestyleAndHobbies">LifestyleAndHobbies</name>
+      <value template="optinonal"></value>
+    </property>
+    <property>
+      <name human="SportsAndOutdoors">SportsAndOutdoors</name>
+      <value template="optinonal"></value>
+    </property>        
+    <property>
+      <name human="Entertainment">Entertainment</name>
+      <value template="optinonal"></value>
+    </property>        
+    <property>
+      <name human="Comedy">Comedy</name>
+      <value template="optinonal"></value>
+    </property>        
+  </configuration>  
       
 </configurations>
