@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -31,27 +32,35 @@ public class PlayerController {
 	@RequestMapping("/")
 	public String index() {
 		return "redirect:9x9";
-	}
+	}	
 	
 	/**
 	 * to become a 9x9 player, 1)delete cookie, 2)set fb info 
 	 */	
-	@RequestMapping("9x9")
-	public String zooatomics(@RequestParam(value="mso",required=false) String mso, HttpServletRequest req, HttpServletResponse resp, Model model) {
+	@RequestMapping("{name}")
+	public String zooatomics(@RequestParam(value="mso",required=false) String mso, HttpServletRequest req, HttpServletResponse resp, Model model, @PathVariable("name") String name) {
 		PlayerService service = new PlayerService();
-		model = service.prepareBrand(model, mso, resp);		
+		model = service.prepareBrand(model, mso, resp);
+
+		String prefLanguage = req.getHeader("Accept-Language");
+		System.out.print(prefLanguage); //en-US,en;q=0.8  
+		
 		return "player/zooatomics";
 	}
-
-	/**
-	 * to become a 9x9 player, 1)delete cookie, 2)set fb info 
-	 */	
+	
+	@RequestMapping("support")
+	public String support() {
+		return "general/support";
+	}	
+	
+	/*
 	@RequestMapping("daai")
-	public String daiah(@RequestParam(value="mso",required=false) String mso, HttpServletRequest req, HttpServletResponse resp, Model model) {
+	public String daai(@RequestParam(value="mso",required=false) String mso, HttpServletRequest req, HttpServletResponse resp, Model model) {
 		PlayerService service = new PlayerService();
 		model = service.prepareBrand(model, mso, resp);		
 		return "player/antelope";
 	}
+	*/
 	
 	/*
 	 * used for dns redirect watch dog 

@@ -167,11 +167,13 @@ public class TranscodingServiceController {
 			String callbackUrl = transcodingEnv[1];		
 			List<Channel> cs = new ArrayList<Channel>();
 			for (MsoChannel c : channels) {
-				cs.add(new Channel(String.valueOf(c.getKey().getId()), 
-						           c.getSourceUrl(), 
-						           c.getTranscodingUpdateDate(), 
-						           String.valueOf(c.getEnforceTranscoding()),
-						           String.valueOf(c.getSubscriptionCount())));
+				if (c.getContentType() != MsoChannel.CONTENTTYPE_FACEBOOK) {
+					cs.add(new Channel(String.valueOf(c.getKey().getId()), 
+							           c.getSourceUrl(), 
+							           c.getTranscodingUpdateDate(), 
+							           String.valueOf(c.getEnforceTranscoding()),
+							           String.valueOf(c.getSubscriptionCount())));
+				}
 			}
 			info.setErrorCode(String.valueOf(NnStatusCode.SUCCESS));
 			info.setErrorReason("Success");
@@ -258,5 +260,18 @@ public class TranscodingServiceController {
 	    }
 		return NnNetUtil.textReturn("OK");
 	}
-		
+	
+	@RequestMapping("updateFbToken")
+	public ResponseEntity<String> updateFbToken(@RequestParam(required=false) String access_token) throws IOException {
+		try {
+			if (access_token == null || access_token.length() == 0) {
+				return NnNetUtil.textReturn("not empty");
+			}
+			transcodingService.updateFbToken(access_token);
+		} catch (Exception e) {
+			transcodingService.handleException(e);
+		}
+		return NnNetUtil.textReturn("OK");
+	}
+	
 }

@@ -21,15 +21,9 @@ public class ErrorController {
 	
 	@RequestMapping("not-found")
 	public String notFound() {
-		System.out.println("enter");
-		return "error/404";
+		return "redirect:/";
 	}
-
-	@RequestMapping("internal-error")
-	public String internalEror() {
-		return "error/blank";
-	}
-	
+		
 	//final frontier
 	@RequestMapping("error")
 	public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {

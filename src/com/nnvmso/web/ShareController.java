@@ -14,15 +14,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.YouTubeLib;
-import com.nnvmso.model.Ipg;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoProgram;
 import com.nnvmso.model.NnUser;
+import com.nnvmso.model.NnUserShare;
 import com.nnvmso.service.FBService;
-import com.nnvmso.service.IpgManager;
 import com.nnvmso.service.MsoManager;
 import com.nnvmso.service.MsoProgramManager;
 import com.nnvmso.service.NnUserManager;
+import com.nnvmso.service.NnUserShareManager;
 import com.nnvmso.service.PlayerService;
 
 @Controller
@@ -37,26 +37,27 @@ public class ShareController {
 		return "error/exception";				
 	}
 	
-	@RequestMapping("{ipgId}")
-	public String zooatomics(@PathVariable String ipgId, HttpServletResponse resp, Model model) {
-		log.info("new logging to share /share/" + ipgId);
+	
+	@RequestMapping("{id}")
+	public String zooatomics(@PathVariable String id, HttpServletResponse resp, Model model) {
+		log.info("/share/" + id);
 		//invalid ipgid
-		IpgManager ipgMngr = new IpgManager();
-		if (!Pattern.matches("^\\d*$", ipgId)) {
-			log.info("invalid ipg id");
+		NnUserShareManager shareMngr = new NnUserShareManager();
+		if (!Pattern.matches("^\\d*$", id)) {
+			log.info("invalid share id");
 			return "redirect:/";
-		}				
-		Ipg ipg = ipgMngr.findById(Long.parseLong(ipgId));
-		if (ipg == null) {
-			log.info("can not find ipg:" + ipgId);
+		}
+		NnUserShare share = shareMngr.findById(Long.parseLong(id));
+		if (share == null) {
+			log.info("can not find ipg:" + id);
 			return "redirect:/";
 		}
 		
 		PlayerService playerService = new PlayerService();		
 		String msoName = null;
 		//find mso info of the user who shares the ipg
-		if (ipg.getUserId() != 0) { //old data does not have userId
-			NnUser user = new NnUserManager().findById(ipg.getUserId());		
+		if (share.getUserId() != 0) { //old data does not have userId
+			NnUser user = new NnUserManager().findById(share.getUserId());		
 			if (user != null) {
 				log.info("This user," + user.getKey().getId() + ", shares ipg.");
 				Mso mso = new MsoManager().findById(user.getMsoId());
@@ -68,12 +69,12 @@ public class ShareController {
 		//fb: change to episode mode
 		FBService fbService = new FBService();
 		MsoProgramManager programMngr = new MsoProgramManager();
-		MsoProgram p = programMngr.findById(ipg.getProgramId()); 		
+		MsoProgram p = programMngr.findById(share.getProgramId()); 		
 		if (p != null) {
 			model = fbService.setEpisodeMetadata(model, p.getName(), p.getIntro(), p.getImageUrl());
 		} else {
 			// client approach without programId but programIdStr instead
-			String programIdStr = ipg.getProgramIdStr();
+			String programIdStr = share.getProgramIdStr();
 			if (programIdStr != null && programIdStr.length() > 0) {
 				Map<String, String> videoEntry = YouTubeLib.getYouTubeVideoEntry(programIdStr);
 				model = fbService.setEpisodeMetadata(model, videoEntry.get("title"), videoEntry.get("description"), videoEntry.get("thumbnail"));
