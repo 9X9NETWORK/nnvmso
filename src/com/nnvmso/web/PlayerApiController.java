@@ -132,7 +132,8 @@ public class PlayerApiController {
 		}
 		*/
 		MsoManager msoMngr = new MsoManager();
-		Mso mso = msoMngr.findMsoViaHttpReq(req);
+		//Mso mso = msoMngr.findMsoViaHttpReq(req);
+		Mso mso = msoMngr.findNNMso();
 		Locale locale = Locale.ENGLISH;
 		if (mso.getPreferredLangCode().equals(Mso.LANG_ZH_TW)){
 			locale = Locale.TRADITIONAL_CHINESE;
@@ -150,6 +151,32 @@ public class PlayerApiController {
 		NnLogUtil.logException(e);
 		return "error/blank";
 	}
+	
+	/**
+	 * Set user preference. Preferences can be retrieved from login, or apis with isUserInfo option. 
+	 * 	
+	 * @param user user token
+	 * @param key preference name
+	 * @param value preference value
+	 * @return status block
+	 */          
+	@RequestMapping(value="setUserPref")
+	public ResponseEntity<String> setUserPref(@RequestParam(value="user", required=false)String user,
+			                               @RequestParam(value="key", required=false)String key,
+			                               @RequestParam(value="value", required=false)String value,
+			                               HttpServletRequest req) {
+		log.info("userPref: key(" + key + ");value(" + value + ")");
+		this.prepService(req);		
+		String output = NnStatusMsg.errorStr(locale);
+		try {
+			output = playerApiService.setUserPref(user, key, value);
+		} catch (Exception e) {
+			output = playerApiService.handleException(e);
+		}
+		log.info(output);
+		return NnNetUtil.textReturn(output);
+	}
+	
 	
 	/* ==========  CATEGORY: BRAND RELATED ========== */
 	/**
@@ -220,7 +247,7 @@ public class PlayerApiController {
 		}
 		log.info(output);
 		return NnNetUtil.textReturn(output);
-	}	
+	}
 
 	/**
 	 * Register a guest account. A "guest" cookie will be set.
@@ -330,7 +357,6 @@ public class PlayerApiController {
 		}
 		log.info(output);
 		return NnNetUtil.textReturn(output);
-
 	}	
 
 	/* ==========  CATEGORY: CHANNEL SUBSCRIPTION ========== */	
@@ -341,20 +367,24 @@ public class PlayerApiController {
 	 * 
 	 * @param user user's unique identifier
 	 * @param channel channelId
-	 * @param grid grid location, from 1 to 81
+	 * @param set setId
+	 * @param grid grid location, from 1 to 81. use with channel
+	 * @param pos set location, from 1 to 9. use with set       
 	 * @return status code and status message for the first block; <br/>
 	 *         second block shows channel id, status code and status message
 	 */		
 	@RequestMapping(value="subscribe")
 	public ResponseEntity<String> subscribe(@RequestParam(value="user", required=false) String userToken, 
-			                                @RequestParam(value="channel", required=false) String channelIds, 
-			                                @RequestParam(value="grid", required=false) String gridIds, 
+			                                @RequestParam(value="channel", required=false) String channelId,
+			                                @RequestParam(value="set", required=false) String setId,
+			                                @RequestParam(value="grid", required=false) String gridId, 
+			                                @RequestParam(value="pos", required=false) String pos,
 			                                HttpServletRequest req ) {		
-		log.info("subscribe: userToken=" + userToken+ "; channel=" + channelIds + "; grid=" + gridIds);
+		log.info("subscribe: userToken=" + userToken+ "; channel=" + channelId + "; grid=" + gridId + "; set=" + setId + ";pos=" + pos);
 		this.prepService(req);
 		String output = NnStatusMsg.errorStr(locale);
 		try {
-			output = playerApiService.subscribeChannel(userToken, channelIds, gridIds);
+			output = playerApiService.subscribe(userToken, channelId, setId, gridId, pos);
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}
@@ -363,23 +393,96 @@ public class PlayerApiController {
 	}
 	
 	/**
-	 * User unsubscribes a channel
+	 * Retrieves set information
+	 * 
+	 * @param set set id
+	 * @param landing the name used as part of the URL. query with either set or landing 
+	 * @return first block: status <br/>
+	 *         second block: brand info, returns in key and value pair. <br/>                     
+	 *         third block: set info, returns in key and value pair <br/>
+	 *         4th block: channel details. reference "channelLineup". <br/>
+	 *         <p>
+	 *         Example: <br/>
+	 *         0	success<br/>
+ 	 *         --<br/>
+	 *         name	daai<br/>
+	 *         imageUrl	http://9x9ui.s3.amazonaws.com/9x9playerV52/images/logo_tzuchi.png<br/>
+	 *         intro	daai<br/>
+	 *         --<br/>
+	 *         name	Daai3x3<br/>
+	 *         imageUrl	null<br/>
+	 *         --<br/>
+	 *         1	396	channel1	channel1 http://podcast.daaitv.org/Daai_TV_Podcast/da_ai_dian_shi/da_ai_dian_shi_files/shapeimage_3.png	3	0	0	2<br/>	
+	 *         2	399	channel2	channel2 http://podcast.daaitv.org/Daai_TV_Podcast/jing_si_yu/jing_si_yu_files/shapeimage_4.png	3	0	0	2	<br/>
+	 */
+	@RequestMapping(value="setInfo")
+	public ResponseEntity<String> setInfo(@RequestParam(value="set", required=false) String id,
+			                              @RequestParam(value="landing", required=false) String beautifulUrl,
+			                              HttpServletRequest req ) {
+		log.info("setInfo: id =" + id + ";landing=" + beautifulUrl);
+		this.prepService(req);		
+		String output = NnStatusMsg.errorStr(locale);
+		try {
+			output = playerApiService.findSetInfo(id, beautifulUrl);
+		} catch (Exception e) {
+			output = playerApiService.handleException(e);
+		}
+		log.info(output);
+		return NnNetUtil.textReturn(output);
+	}
+
+	/**
+	 * Change set name. Please note a pre-defined set is not editable.
+	 * 
+	 * @param user user token
+	 * @param name set name
+	 * @param pos set position, from 1 to 9 
+	 * @return status
+	*/
+	@RequestMapping(value="setSetInfo")
+	public ResponseEntity<String> setSetInfo (@RequestParam(value="user", required=false) String userToken,
+			                                  @RequestParam(value="name", required=false) String name,
+			                                  @RequestParam(value="pos", required=false) String pos,
+			                                  HttpServletRequest req) {
+		log.info("setInfo: user=" + userToken + ";pos =" + pos);
+		this.prepService(req);		
+		String output = NnStatusMsg.errorStr(locale);
+		try {
+			output = playerApiService.changeSetInfo(userToken, name, pos);
+		} catch (Exception e) {
+			output = playerApiService.handleException(e);
+		}
+		log.info(output);
+		return NnNetUtil.textReturn(output);
+	}	
+
+	/**
+	 * User unsubscribes a channel or a set. 
+	 * 
+	 * To unsubscribe a channel, use params channel and grid; to unsubscribe a set, use param set.
 	 * 
 	 * <p>Example: http://host:port/playerAPI/unsubscribe?user=QQl0l208W2C4F008980F&channel=51</p>
 	 * 
 	 * @param user user's unique identifier
 	 * @param channel channelId
-	 * @return status code and status message 
+	 * @param grid grid location. use with channel.   
+	 * giving channel only is valid (for backward compatibility), 
+	 * but since one channel can exist on multiple  locations in a smart guide,
+	 * it could result in unsubscribing on an unexpected grid location. 
+	 * @param set set id.
+	 * @return status code and status message
 	 */			
 	@RequestMapping(value="unsubscribe")
-	public ResponseEntity<String> unsubscribe(@RequestParam(value="user") String userToken, 
-								              @RequestParam(value="channel") String channelId,
+	public ResponseEntity<String> unsubscribe(@RequestParam(value="user", required=false) String userToken, 
+								              @RequestParam(value="channel", required=false) String channelId,
+								              @RequestParam(value="grid", required=false) String grid,
+								              @RequestParam(value="set", required=false) String setId,
 								              HttpServletRequest req) {			
 		this.prepService(req);
-		log.info("userToken=" + userToken + "; channel=" + channelId);
+		log.info("userToken=" + userToken + "; channel=" + channelId + "; set=" + setId + "; seq=" + grid);
 		String output = NnStatusMsg.errorStr(locale);
 		try {
-			output = playerApiService.unsubscribeChannel(userToken, channelId);
+			output = playerApiService.unsubscribe(userToken, channelId, setId, grid);
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}
@@ -398,6 +501,7 @@ public class PlayerApiController {
 	 * @param grid grid location, 0 - 81
 	 * @param category category id
 	 * @param langCode language code, en or zh.
+	 * @param tag tag string, separated by comma
 	 * 
 	 * @return channel id, channel name, image url. <br/>
 	 */	
@@ -407,13 +511,14 @@ public class PlayerApiController {
 		String userToken= req.getParameter("user");
 		String grid = req.getParameter("grid");
 		String categoryIds = req.getParameter("category");
+		String tags = req.getParameter("tag");
 
 		this.prepService(req);		
 		log.info("player input - userToken=" + userToken+ "; url=" + url + ";grid=" + grid + ";categoryId=" + categoryIds);				
 		String output = NnStatusMsg.errorStr(locale);		
 		
 		try {
-			output = playerApiService.createChannel(categoryIds, userToken, url, grid, req);
+			output = playerApiService.createChannel(categoryIds, userToken, url, grid, tags, req);
 		} catch (Exception e){
 			output = playerApiService.handleException(e);
 		}
@@ -429,22 +534,26 @@ public class PlayerApiController {
 	 * @return Category info and channels info. <br/>
 	 *  	   First section is category info, follows channels info. Each channel is \n separated.<br/>    
 	 *         Category info has category id. <br/>
-	 *         Channel info includes channel id, channel name, channel image url, program count, subscription count <br/>
+	 *         Channel info includes channel id, channel name, channel image url, program count, subscription count, channel type, channel episodes last update time <br/>
 	 *         Example: 	<br/>
 	 *         0	success<br/>
 	 *         --<br/>
 	 *         1174<br/>
 	 *         --<br/>
-	 *         0	1207	Etsy	http://s3.amazonaws.com/9x9chthumb/a.gif	2	2 <br/>
-	 *         0	1217	System	http://s3.amazonaws.com/9x9chthumb/b.gif	1	2 <br/>        
+	 *         0	1207	Etsy	http://s3.amazonaws.com/9x9chthumb/a.gif	2	2	2<br/>
+	 *         0	1217	System	http://s3.amazonaws.com/9x9chthumb/b.gif	1	2	2<br/>
+	 *         <p>
+	 *         channel episodes last update time: please look up the definition in channelLineup        
 	 */		
 	@RequestMapping(value="channelBrowse")
-	public ResponseEntity<String> channelBrowse(@RequestParam(value="category", required=false) String categoryIds, HttpServletRequest req) {
+	public ResponseEntity<String> channelBrowse(@RequestParam(value="category", required=false) String categoryIds,
+			                                    @RequestParam(value="lang", required=false) String lang,
+			                                    HttpServletRequest req) {
 		this.prepService(req);
-		log.info(categoryIds);		
+		log.info(categoryIds);
 		String output = NnStatusMsg.errorStr(locale);
 		try {
-			output = playerApiService.findPublicChannelsByCategory(categoryIds);
+			output = playerApiService.findPublicChannelsByCategoryAndLang(categoryIds, lang);
 		} catch (Exception e){
 			output = playerApiService.handleException(e);
 		}
@@ -458,14 +567,15 @@ public class PlayerApiController {
 	 *         Category info has category id, category name, channel count.<br/>
 	 */		
 	@RequestMapping(value="categoryBrowse")
-	public ResponseEntity<String> categoryBrowse(HttpServletRequest req) {
+	public ResponseEntity<String> categoryBrowse(@RequestParam(value="lang", required=false) String lang,
+			                                     HttpServletRequest req) {
 		this.prepService(req);
 		String output = NnStatusMsg.errorStr(locale);		
 		try {
-			output = playerApiService.findCategoriesByMso();
+			output = playerApiService.findCategoriesByLang(lang);			
 		} catch (Exception e){
 			output = playerApiService.handleException(e);
-		}	
+		}
 		return NnNetUtil.textReturn(output);
 	}
 
@@ -474,23 +584,38 @@ public class PlayerApiController {
 	 * 
 	 * @param user user's unique identifier
 	 * @param userInfo true or false. Whether to return user information as login. If asked, it will be returned after status code.
-	 * @param channel channel id, optional, can be one or multiple;  example, channel=1 or channel=1,2,3 
+	 * @param channel channel id, optional, can be one or multiple;  example, channel=1 or channel=1,2,3
+	 * @param setInfo true or false. Whether to return set information.  
 	 * @return A string of all of the user's subscribed channels' information.
+	 *         <p>
+	 *         First block: status. Second block: set information. This block will show only when setInfo is true. 
+	 *         Third block: channel information. It would be the second block if setInfo is false
+	 *         <p>
+	 *         Set info has following fields: <br/>
+	 *         position, set id, set name, set image url, set type
 	 *         <p>  
-	 *         Channel info has following fields:
-	 *         channel name, channel description, channel image url, <br/>
-	 *         program count, type(integer, see following), status(integer, see following),
-	 *         contentType(integer, see following), sourceUrl
+	 *         Channel info has following fields: <br/>
+	 *         grid position, channel id, channel name, channel description, channel image url, <br/>
+	 *         program count, channel type(integer, see following), channel status(integer, see following), <br/>
+	 *         contentType(integer, see following), source url, <br/>
+	 *         channel/episodes last update time (see note)
+	 *         
 	 *         </blockquote>
 	 *         <p>
-	 *         type: TYPE_GENERAL = 1; TYPE_READONLY = 2;
+	 *         set type: TYPE_USER = 1; TYPE_READONLY = 2;
+	 *         <br/>
+	 *         channel type: TYPE_GENERAL = 1; TYPE_READONLY = 2;
 	 *         <br/>
 	 *         status: STATUS_SUCCESS = 0; STATUS_ERROR = 1;
 	 *         <br/> 
-	 *         contentType: SYSTEM_CHANNEL=1; PODCAST=2; YOUTUBE_CHANNEL=3; YOUTUBE_PLAYERLIST=4
+	 *         contentType: SYSTEM_CHANNEL=1; PODCAST=2; YOUTUBE_CHANNEL=3; YOUTUBE_PLAYERLIST=4 FACEBOOK_CHANNEL=5 MIX_CHANNEL=6
+	 *         <br/>
+	 *         channel episodes last update time: it does not always accurate on Youtube channels. It will pass channel create date on FB channels.
 	 *         <p> 
 	 *         Example: <br/>
 	 *         0	success<br/>
+	 *         --<br/>
+	 *         1239   1   Daai3x3   null<br/>
 	 *         -- <br/>
 	 *         1	1207	Channel1	http://hostname/images/img.jpg	3	1	0	3	http://www.youtube.com/user/android<br/>
 	 *         </p>
@@ -499,13 +624,15 @@ public class PlayerApiController {
 	public ResponseEntity<String> channelLineup(@RequestParam(value="user", required=false) String userToken,
 												@RequestParam(value="userInfo", required=false) String userInfo,
 												@RequestParam(value="channel", required=false) String channelIds,
+												@RequestParam(value="setInfo", required=false) String setInfo,
 											    HttpServletRequest req) {
 		this.prepService(req);
-		log.info("userToken=" + userToken + ";isUserInfo:" + userInfo);				
+		log.info("userToken=" + userToken + ";isUserInfo:" + userInfo);
 		boolean isUserInfo = Boolean.parseBoolean(userInfo);
+		boolean isSetInfo = Boolean.parseBoolean(setInfo);
 		String output = NnStatusMsg.errorStr(locale);
 		try {
-			output = playerApiService.findChannelInfo(userToken, isUserInfo, channelIds);
+			output = playerApiService.findChannelInfo(userToken, isUserInfo, channelIds, isSetInfo);
 		} catch (Exception e){
 			output = playerApiService.handleException(e);
 		}
@@ -517,7 +644,7 @@ public class PlayerApiController {
 	 * 
 	 * @param user user's unique identifier
 	 * @param grid1 "from" grid
-	 * @param grid2 "to" grid
+	 * @param grid2 "to" grid 
 	 * 
 	 * @return status code and status message
 	*/
@@ -537,7 +664,33 @@ public class PlayerApiController {
 		log.info(output);
 		return NnNetUtil.textReturn(output);		
 	}					
-		
+
+	/**
+	 * Copy a channel to grid location
+	 * 
+	 * @param user user's unique identifier
+	 * @param channel channel id
+	 * @param grid grid location 
+	 * 
+	 * @return status code and status message
+	*/
+	@RequestMapping(value="copyChannel")
+	public ResponseEntity<String> copyChannel(@RequestParam(value="user", required=false) String userToken, 
+											  @RequestParam(value="channel", required=false) String channelId,
+											  @RequestParam(value="grid", required=false) String grid,
+											  HttpServletRequest req){
+		this.prepService(req);
+		log.info("userToken=" + userToken + ";grid=" + grid);
+		String output = NnStatusMsg.errorStr(locale);
+		try {
+			output = playerApiService.copyChannel(userToken, channelId, grid);
+		} catch (Exception e){
+			output = playerApiService.handleException(e);
+		}	
+		log.info(output);
+		return NnNetUtil.textReturn(output);		
+	}					
+	
 	/**
 	 * @deprecated
 	 * Get "new" program list. Current "new" definition: the latest 3 shows in a channel.   
@@ -606,7 +759,7 @@ public class PlayerApiController {
 	
 	/* ==========  CATEGORY: IPG RELATED ========== */
 	/**
-	 * Save User IPG (snapshot)
+	 * @deprecated Save User IPG (snapshot). Please use saveShare instead
 	 *
 	 * @param user user's unique identifier
 	 * @param channel channel id
@@ -628,9 +781,57 @@ public class PlayerApiController {
 		}
 		return NnNetUtil.textReturn(output);
 	}	
+
+	/**
+	 * Save User Shareing
+	 *
+	 * @param user user's unique identifier
+	 * @param channel channel id
+	 * @param program program id
+	 * @param set set id (place holder for now)
+	 * @return A unique sharing identifier
+	 */
+	@RequestMapping(value="saveShare")
+	public ResponseEntity<String> saveShare(@RequestParam(value="user", required=false) String userToken, 
+			                              @RequestParam(value="channel", required=false) String channelId,
+			                              @RequestParam(value="set", required=false) String setId,
+			                              @RequestParam(value="program", required=false) String programId, 
+			                              HttpServletRequest req) {		
+		this.prepService(req);
+		log.info("saveShare(" + userToken + ")");
+		String output = NnStatusMsg.errorStr(locale);		
+		try {
+			output = playerApiService.saveShare(userToken, channelId, programId, setId);
+		} catch (Exception e) {
+			output = playerApiService.handleException(e);
+		}
+		return NnNetUtil.textReturn(output);
+	}	
+
+	/**
+	 * Load User Sharing
+	 *
+	 * @param id unique identifier from saveShare
+	 * @return  Returns a program to play follows channel information.
+	 * 	        The program to play returns in the 2nd section, format please reference programInfo format.
+	 *          3rd section is channel information, format please reference channelLineup.
+	 */
+	@RequestMapping(value="loadShare")
+	public ResponseEntity<String> loadShare(@RequestParam(value="id") Long id, 
+										  HttpServletRequest req) {		
+		log.info("ipgShare:" + id);		
+		this.prepService(req);
+		String output = NnStatusMsg.errorStr(locale);		
+		try {
+			output = playerApiService.loadShare(id);
+		} catch (Exception e) {
+			output = playerApiService.handleException(e);
+		}
+		return NnNetUtil.textReturn(output);						
+	}
 	
 	/**
-	 * Load User IPG (snapshot)
+	 * @deprecated Load User IPG (snapshot). Please use saveShare and loadShare instead
 	 *
 	 * @param ipg IPG's unique identifier
 	 * @return  Returns a program to play follows ipg information.
@@ -695,6 +896,42 @@ public class PlayerApiController {
 		log.info("bad program:" + programId + ";reported by user:" + userToken);
 		try {
 			output = playerApiService.markBadProgram(programId, userToken);
+		} catch (Exception e) {
+			output = playerApiService.handleException(e);
+		}
+		return NnNetUtil.textReturn(output);
+	}
+
+	/**
+	 * Listing featured sets 
+	 * 
+	 * @param mso name
+	 * @return set id, set name, set image, channel count, subscription count (developing)
+	 */	
+	@RequestMapping(value="listFeaturedSets")
+	public ResponseEntity<String> listFeaturedSets(HttpServletRequest req) {				                                
+		this.prepService(req);
+		String output = NnStatusMsg.errorStr(locale);
+		try {
+			output = playerApiService.findFeaturedSets();
+		} catch (Exception e) {
+			output = playerApiService.handleException(e);
+		}
+		return NnNetUtil.textReturn(output);
+	}
+
+	/**
+	 * List featured channels 
+	 * 
+	 * @param mso name
+	 * @return please reference channelLineup
+	 */	
+	@RequestMapping(value="listFeaturedChannels")
+	public ResponseEntity<String> listFeaturedChannels(HttpServletRequest req) {				                                
+		this.prepService(req);
+		String output = NnStatusMsg.errorStr(locale);
+		try {
+			output = playerApiService.findFeaturedChannels();
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}
