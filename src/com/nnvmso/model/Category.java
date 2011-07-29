@@ -23,6 +23,9 @@ public class Category implements Serializable {
 	private Key key;
 	
 	@Persistent
+	private long parentId;
+	
+	@Persistent
 	private long msoId;
 	
 	@Persistent
@@ -102,6 +105,14 @@ public class Category implements Serializable {
         buffer.append("msoId: " + msoId + ";");
         buffer.append("channelCount: " + channelCount + ";");
         return buffer.toString();
+	}
+
+	public void setParentId(long parentId) {
+		this.parentId = parentId;
+	}
+
+	public long getParentId() {
+		return parentId;
 	}
 	
 }

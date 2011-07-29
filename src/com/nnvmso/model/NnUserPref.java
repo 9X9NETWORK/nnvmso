@@ -1,5 +1,6 @@
 package com.nnvmso.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
@@ -9,40 +10,32 @@ import javax.jdo.annotations.PrimaryKey;
 
 import com.google.appengine.api.datastore.Key;
 
+/**
+ * 9x9 User accounts
+ */
 @PersistenceCapable(detachable="true")
-public class MsoConfig {
+public class NnUserPref implements Serializable {	
+	private static final long serialVersionUID = -708171304411630395L;
+
 	@PrimaryKey
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
 	private Key key;
-
-	@Persistent
-	private long msoId;
 		
 	@Persistent
+	private long userId;
+
+	@Persistent
 	private String item;
-	public static String CDN = "cdn";
-	public static String DEBUG = "debug";
-	public static String FBTOKEN = "fbtoken";
 	
 	@Persistent
 	private String value;
-	public static String CDN_AMAZON = "amazon";
-	public static String CDN_AKAMAI = "akamai";
-
+	
 	@Persistent
 	private Date createDate;
 	
 	@Persistent
 	private Date updateDate;
-	
-	public MsoConfig() {}
-	
-	public MsoConfig(long msoId, String item, String value) {
-		this.msoId = msoId;
-		this.item = item;
-		this.value = value;
-	}
-	
+
 	public Key getKey() {
 		return key;
 	}
@@ -51,12 +44,12 @@ public class MsoConfig {
 		this.key = key;
 	}
 
-	public long getMsoId() {
-		return msoId;
+	public long getUserId() {
+		return userId;
 	}
 
-	public void setMsoId(long msoId) {
-		this.msoId = msoId;
+	public void setUserId(long userId) {
+		this.userId = userId;
 	}
 
 	public String getItem() {
@@ -89,6 +82,6 @@ public class MsoConfig {
 
 	public void setUpdateDate(Date updateDate) {
 		this.updateDate = updateDate;
-	}		
-	
+	}
+		
 }
