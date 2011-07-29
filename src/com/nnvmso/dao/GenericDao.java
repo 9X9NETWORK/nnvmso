@@ -1,5 +1,6 @@
 package com.nnvmso.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -12,11 +13,33 @@ import com.nnvmso.lib.PMF;
 
 public class GenericDao<T> {
 	
-	protected static final Logger log = Logger.getLogger(GenericDao.class.getName());
+	protected static final Logger logger = Logger.getLogger(GenericDao.class.getName());
 	private Class<T> daoClass;
 	
 	public GenericDao(Class<T> daoClass) {
 		this.daoClass = daoClass;
+	}
+	
+	public T save(T dao) {
+		if (dao == null) {return null;}
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		try {
+			pm.makePersistent(dao);
+			dao = pm.detachCopy(dao);
+		} finally {
+			pm.close();
+		}
+		return dao;
+	}
+	
+	public void delete(T dao) {
+		if (dao == null) return;
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		try {
+			pm.deletePersistent(dao);
+		} finally {
+			pm.close();
+		}
 	}
 	
 	/**
@@ -96,11 +119,25 @@ public class GenericDao<T> {
 		return results;
 	}
 	
+	public List<T> findAllByIds(List<Long> ids) {
+		
+		List<T> results = new ArrayList<T>();
+		
+		for (Long id : ids) {
+			T dao = null;
+			dao = this.findById(id);
+			if (dao != null) {
+				results.add(dao);
+			}
+		}
+		
+		return results;
+	}
+	
 	public T findById(long id) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		T dao = null;
 		try {
-			@SuppressWarnings("unchecked")
 			T tmp = (T)pm.getObjectById(daoClass, id);
 			dao = (T)pm.detachCopy(tmp);
 		} catch (JDOObjectNotFoundException e) {
@@ -114,7 +151,6 @@ public class GenericDao<T> {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		T dao = null;
 		try {
-			@SuppressWarnings("unchecked")
 			T tmp = (T)pm.getObjectById(daoClass, key);
 			dao = (T)pm.detachCopy(tmp);
 		} catch (JDOObjectNotFoundException e) {
@@ -122,6 +158,23 @@ public class GenericDao<T> {
 			pm.close();
 		}
 		return dao;		
+	}
+
+	public List<T> findAll() {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		List<T> results = new ArrayList<T>();
+		
+		try {
+			Query query = pm.newQuery(daoClass);
+			@SuppressWarnings("unchecked")
+			List<T> tmp = (List<T>)query.execute();
+			if (tmp.size() > 0)
+				results = (List<T>) pm.detachCopyAll(tmp);
+		} catch (JDOObjectNotFoundException e) {
+		} finally {
+			pm.close();
+		}
+		return results;
 	}
 	
 }

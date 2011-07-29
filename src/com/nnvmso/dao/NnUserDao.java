@@ -33,17 +33,53 @@ public class NnUserDao extends GenericDao<NnUser> {
 		}
 		return user;
 	}
-
-	public NnUser findAuthenticatedUser(String email, String password, long msoId) {
+	
+	// return MSO only
+	@SuppressWarnings("unchecked")
+	public NnUser findAuthenticatedMsoUser(String email, String password, long msoId) {
 		NnUser user = null;
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
 			Query query = pm.newQuery(NnUser.class);
-			query.setFilter("email == emailParam && msoId == msoIdParam");
-			query.declareParameters("String emailParam, long msoIdParam");				
-			@SuppressWarnings("unchecked")
-			List<NnUser> results = (List<NnUser>) query.execute(email, msoId);
+			query.setFilter("email == emailParam && msoId == msoIdParam && type == typeParam");
+			query.declareParameters("String emailParam, long msoIdParam, short typeParam");				
+			List<NnUser> results = (List<NnUser>) query.execute(email, msoId, NnUser.TYPE_3X3);
 			if (results.size() > 0) {
+				user = results.get(0);		
+			} else {
+				// make 9x9 and 5F login as possible
+				results = (List<NnUser>) query.execute(email, msoId, NnUser.TYPE_NN);
+				if (results.size() > 0) {
+					user = results.get(0);
+				} else {
+					results = (List<NnUser>) query.execute(email, msoId, NnUser.TYPE_TBC);
+					if (results.size() > 0)
+						user = results.get(0);
+				}
+			}
+			if (user != null) {
+				user = pm.detachCopy(user);
+				byte[] proposedDigest = AuthLib.passwordDigest(password, user.getSalt());
+				if (!Arrays.equals(user.getCryptedPassword(), proposedDigest)) {				
+					user = null;
+				}
+			}
+		} finally {
+			pm.close();
+		}
+		return user;		
+	}
+	
+	public NnUser findAuthenticatedUser(String email, String password) {
+		NnUser user = null;
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		try {
+			Query query = pm.newQuery(NnUser.class);
+			query.setFilter("email == emailParam");
+			query.declareParameters("String emailParam");				
+			@SuppressWarnings("unchecked")
+			List<NnUser> results = (List<NnUser>) query.execute(email);
+			if (results.size() > 0) {				
 				user = results.get(0);		
 				byte[] proposedDigest = AuthLib.passwordDigest(password, user.getSalt());
 				if (!Arrays.equals(user.getCryptedPassword(), proposedDigest)) {				
@@ -76,6 +112,57 @@ public class NnUserDao extends GenericDao<NnUser> {
 		return user;				
 	}
 
+	public List<NnUser> findNoneGuests() {
+		List<NnUser> detached = new ArrayList<NnUser>();
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		try {
+			Query query = pm.newQuery(NnUser.class);
+			query.setFilter("email != emailParam");
+			query.declareParameters("String emailParam");		
+			@SuppressWarnings("unchecked")
+			List<NnUser> results = (List<NnUser>) query.execute(NnUser.GUEST_EMAIL);
+			detached = (List<NnUser>)pm.detachCopyAll(results);			
+		} finally {
+			pm.close();
+		}
+		return detached;				
+	}
+
+	public List<NnUser> findAllByEmail(String email) {
+		List<NnUser> detached = new ArrayList<NnUser>();
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		try {
+			Query query = pm.newQuery(NnUser.class);
+			query.setFilter("email == emailParam");
+			query.declareParameters("String emailParam");		
+			@SuppressWarnings("unchecked")
+			List<NnUser> results = (List<NnUser>) query.execute(email);
+			detached = (List<NnUser>)pm.detachCopyAll(results);			
+		} finally {
+			pm.close();
+		}
+		return detached;				
+	}
+	
+	public NnUser findByEmail(String email) {
+		NnUser user = null;
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		try {
+			Query query = pm.newQuery(NnUser.class);
+			query.setFilter("email == emailParam");
+			query.declareParameters("String emailParam");		
+			@SuppressWarnings("unchecked")
+			List<NnUser> results = (List<NnUser>) query.execute(email);
+			if (results.size() > 0) {
+				user = results.get(0);			
+			}
+			user = pm.detachCopy(user);
+		} finally {
+			pm.close();
+		}
+		return user;				
+	}
+	
 	public NnUser findByToken(String token) {
 		NnUser user = null;
 		PersistenceManager pm = PMF.get().getPersistenceManager();

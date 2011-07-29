@@ -1,6 +1,5 @@
 package com.nnvmso.dao;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -11,31 +10,29 @@ import javax.jdo.Query;
 
 import com.nnvmso.lib.PMF;
 import com.nnvmso.model.Ipg;
+import com.nnvmso.model.NnUserShare;
 
-public class IpgDao {
+public class NnUserShareDao {
 
-	protected static final Logger log = Logger.getLogger(IpgDao.class.getName());
+	protected static final Logger log = Logger.getLogger(NnUserShare.class.getName());
 		
-	public Ipg save(Ipg ipg) {
+	public NnUserShare save(NnUserShare share) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
-			pm.makePersistent(ipg);
-			ipg = pm.detachCopy(ipg);
+			pm.makePersistent(share);
+			share= pm.detachCopy(share);
 		} finally {
 			pm.close();
 		}
-		return ipg;
+		return share;
 	}	
 	
-	public Ipg findById(Long id) {
-		log.info("IpgManager.findById(" + id + ")");
+	public NnUserShare findById(Long id) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Ipg ipg = null, detached = null;
+		NnUserShare share= null, detached = null;
 		try {
-			DateFormat df = DateFormat.getDateInstance();
-			ipg = (Ipg)pm.getObjectById(Ipg.class, id);
-			log.info("ipg channel count: " + ipg.getChannels().size() + ";owner: " + ipg.getUserId() + ";ipg date: " + df.format(ipg.getCreateDate())); 
-			detached = (Ipg)pm.detachCopy(ipg);
+			share = (NnUserShare)pm.getObjectById(NnUserShare.class, id); 
+			detached = (NnUserShare)pm.detachCopy(share);
 		} catch (JDOObjectNotFoundException e) {
 		} finally {
 			pm.close();			
@@ -44,34 +41,34 @@ public class IpgDao {
 	}	
 	
 	// count the number that program be shared
-	public List<Ipg> findByProgramId(long programId) {
+	public List<NnUserShare> findByProgramId(long programId) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		List<Ipg> detached = new ArrayList<Ipg>();
+		List<NnUserShare> detached = new ArrayList<NnUserShare>();
 		try {
 			Query query = pm.newQuery(Ipg.class);
 			query.setFilter("programId == programIdParam");
 			query.declareParameters("long programIdParam");
 			@SuppressWarnings("unchecked")
-			List<Ipg> results = (List<Ipg>)query.execute(programId);
+			List<NnUserShare> results = (List<NnUserShare>)query.execute(programId);
 			log.info("ipg count = " + results.size());
-			detached = (List<Ipg>)pm.detachCopyAll(results);
+			detached = (List<NnUserShare>)pm.detachCopyAll(results);
 		} finally {
 			pm.close();
 		}
 		return detached;
 	}
 	
-	public List<Ipg> findByUserId(long userId) {
+	public List<NnUserShare> findByUserId(long userId) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		List<Ipg> detached = new ArrayList<Ipg>();
+		List<NnUserShare> detached = new ArrayList<NnUserShare>();
 		try {
-			Query query = pm.newQuery(Ipg.class);
+			Query query = pm.newQuery(NnUserShare.class);
 			query.setFilter("userId == userIdParam");
 			query.declareParameters("long userIdParam");
 			@SuppressWarnings("unchecked")
-			List<Ipg> results = (List<Ipg>)query.execute(userId);
+			List<NnUserShare> results = (List<NnUserShare>)query.execute(userId);
 			log.info("ipg count = " + results.size());
-			detached = (List<Ipg>)pm.detachCopyAll(results);
+			detached = (List<NnUserShare>)pm.detachCopyAll(results);
 		} finally {
 			pm.close();
 		}
