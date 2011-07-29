@@ -13,9 +13,11 @@ import org.springframework.stereotype.Service;
 import com.google.appengine.api.datastore.Key;
 import com.nnvmso.dao.MsoChannelDao;
 import com.nnvmso.lib.CacheFactory;
+import com.nnvmso.lib.FacebookLib;
 import com.nnvmso.lib.YouTubeLib;
 import com.nnvmso.model.Category;
 import com.nnvmso.model.CategoryChannel;
+import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoIpg;
 import com.nnvmso.model.MsoProgram;
@@ -41,8 +43,12 @@ public class MsoChannelManager {
 	 */
 	public void create(MsoChannel channel, List<Category> categories) {
 		Date now = new Date();
-		if (channel.getSourceUrl() != null) 
+		if (channel.getSourceUrl() != null) {
 			channel.setSourceUrl(channel.getSourceUrl().trim());
+			channel.setSourceUrlSearch(channel.getSourceUrl().toLowerCase());
+		}
+		if (channel.getName() != null)
+			channel.setNameSearch(channel.getName().trim().toLowerCase());
 		channel.setCreateDate(now);
 		channel.setUpdateDate(now);
 		msoChannelDao.save(channel);
@@ -75,9 +81,14 @@ public class MsoChannelManager {
 	 *       
 	 */
 	public MsoChannel save(MsoChannel channel) {
-		if (channel.getSourceUrl() != null)
+		if (channel.getSourceUrl() != null) {
 			channel.setSourceUrl(channel.getSourceUrl().trim());
+			channel.setSourceUrlSearch(channel.getSourceUrl().toLowerCase());
+		}
+		if (channel.getName() != null)
+			channel.setNameSearch(channel.getName().trim().toLowerCase());
 		
+		channel.setUpdateDate(new Date());
 		channel = msoChannelDao.save(channel);
 		//save to cache
 		Cache cache = CacheFactory.get();		
@@ -137,15 +148,27 @@ public class MsoChannelManager {
 		if (sourceUrl == null) {return null;}
 		MsoChannel channel = new MsoChannel(sourceUrl, user.getKey().getId());
 		channel.setContentType(this.getContentTypeByUrl(sourceUrl));
-		channel.setImageUrl("/WEB-INF/../images/processing.png");
-		channel.setName("Processing");
+		if (channel.getContentType() == MsoChannel.CONTENTTYPE_FACEBOOK) {
+			FacebookLib lib = new FacebookLib();
+			String[] info = lib.getFanpageInfo(sourceUrl);			
+			channel.setName(info[0]);
+			if (info[1] == null) {
+				channel.setImageUrl("/WEB-INF/../images/facebook-icon.gif");			
+			} else {
+				channel.setImageUrl(info[1]);
+			}
+			channel.setStatus(MsoChannel.STATUS_SUCCESS);
+		} else {
+			channel.setImageUrl("/WEB-INF/../images/processing.png");
+			channel.setName("Processing");
+			channel.setStatus(MsoChannel.STATUS_PROCESSING);
+		}
 		channel.setSourceUrlSearch(sourceUrl.toLowerCase());
-		channel.setStatus(MsoChannel.STATUS_PROCESSING);
 		channel.setUserId(user.getKey().getId());
 		channel.setPublic(false);
 		return channel;
 	}
-
+	
 	//the url has to be verified(verifyUrl) first
 	public short getContentTypeByUrl(String url) {
 		short type = MsoChannel.CONTENTTYPE_PODCAST;
@@ -153,16 +176,23 @@ public class MsoChannelManager {
 			type = MsoChannel.CONTENTTYPE_YOUTUBE_CHANNEL;
 		if (url.contains("http://www.youtube.com/view_play_list?p="))
 			type = MsoChannel.CONTENTTYPE_YOUTUBE_PLAYLIST;
+		if (url.contains("facebook.com")) 
+			type = MsoChannel.CONTENTTYPE_FACEBOOK;
 		return type;
 	}		
 		
 	public String verifyUrl(String url) {
 		if (url == null) return null;
 		TranscodingService tranService = new TranscodingService();
+		if (!url.contains("http://") && !url.contains("https://"))
+			return null;
 		if (!url.contains("youtube.com")) {
 			if (url.contains("deimos3.apple.com")) { //temp fix for demo
 				return url;
-			}			
+			}
+			if (url.contains("facebook.com")) {
+				return url;
+			}
 			String podcastInfo[] = tranService.getPodcastInfo(url);			
 			if (!podcastInfo[0].equals("200") || !podcastInfo[1].contains("xml")) {
 				log.info("invalid url:" + url);		
@@ -234,13 +264,23 @@ public class MsoChannelManager {
 			}
 		}
 		return channels;
-	}	
-
+	}
+	
 	public List<MsoChannel> findAllByStatus(short status) {
 		List<MsoChannel> channels = msoChannelDao.findAllByStatus(status);		
 		return channels;
 	}	
-		
+
+	public List<MsoChannel> findFeaturedChannelsByMso(NnUser user) {
+		List<MsoChannel> channels = msoChannelDao.findFeaturedChannelsByMso(user);
+		return channels;
+	}		
+
+	public List<MsoChannel> findFeaturedChannels() {
+		List<MsoChannel> channels = msoChannelDao.findFeaturedChannels();
+		return channels;
+	}		
+	
 	//!!! here or dao
 	public MsoChannel findBySourceUrlSearch(String url) {
 		if (url == null) {return null;}
@@ -346,6 +386,54 @@ public class MsoChannelManager {
 				cache.remove(this.getCacheKey(c.getKey().getId()));
 			}						
 		}
+	}	
+
+	public List<MsoChannel> findPublicChannelsByCategoryIdAndLang(long categoryId, String lang) {
+		//channels within a category
+		CategoryChannelManager ccMngr = new CategoryChannelManager();
+		CategoryManager categoryMngr = new CategoryManager();
+		SubscriptionLogManager sublogMngr = new SubscriptionLogManager();
+		List<CategoryChannel> ccs = (List<CategoryChannel>) ccMngr.findAllByCategoryId(categoryId);
+
+		//retrieve channels
+		List<MsoChannel> chineseChannels = new ArrayList<MsoChannel>();
+		List<MsoChannel> englishChannels = new ArrayList<MsoChannel>();
+		for (CategoryChannel cc : ccs) {
+			MsoChannel channel = this.findById(cc.getChannelId());
+			if (channel != null && channel.getStatus() == MsoChannel.STATUS_SUCCESS && channel.getProgramCount() > 0 && channel.isPublic()) { 
+				//category is used to find this channel's mso, then find corresponding subscription count
+				Category category  = categoryMngr.findById(cc.getCategoryId());
+				if (category != null) {
+					SubscriptionLog sublog = sublogMngr.findByMsoIdAndChannelId(category.getMsoId(), channel.getKey().getId());			
+				    if (sublog != null) {channel.setSubscriptionCount(sublog.getCount());}
+				}
+				if (channel.getLangCode() != null && channel.getLangCode().equals(Mso.LANG_ZH))
+					chineseChannels.add(channel);
+				else 
+					englishChannels.add(channel);
+			}
+		}				
+		List<MsoChannel> channels = new ArrayList<MsoChannel>();
+		if (lang != null) {
+			if (lang.equals(Mso.LANG_ZH))					
+				channels.addAll(chineseChannels);
+			else
+				channels.addAll(englishChannels);
+		} else { 
+			channels.addAll(chineseChannels);
+			channels.addAll(englishChannels);
+		}
+		return channels;
+	}
+	
+	public List<MsoChannel> findChannelsByIdStr(String channelIds) {
+		List<Long> channelIdList = new ArrayList<Long>();	
+		String[] arr = channelIds.split(",");
+		for (int i = 0; i < arr.length; i++) {
+			channelIdList.add(Long.parseLong(arr[i]));
+		}
+		List<MsoChannel> channels = msoChannelDao.findAllByIds(channelIdList);
+		return channels;
 	}
 	
 }

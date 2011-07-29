@@ -6,8 +6,12 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
@@ -28,7 +32,9 @@ import com.nnvmso.lib.CookieHelper;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnStringUtil;
 import com.nnvmso.lib.YouTubeLib;
+import com.nnvmso.model.AreaOwnership;
 import com.nnvmso.model.Category;
+import com.nnvmso.model.ChannelSet;
 import com.nnvmso.model.Ipg;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
@@ -36,7 +42,10 @@ import com.nnvmso.model.MsoConfig;
 import com.nnvmso.model.MsoIpg;
 import com.nnvmso.model.MsoProgram;
 import com.nnvmso.model.NnUser;
+import com.nnvmso.model.NnUserPref;
+import com.nnvmso.model.NnUserShare;
 import com.nnvmso.model.Subscription;
+import com.nnvmso.model.SubscriptionLog;
 
 @Service
 public class PlayerApiService {
@@ -57,6 +66,78 @@ public class PlayerApiService {
 	
 	public void setMso(Mso mso) {
 		this.mso = mso;
+	}		
+
+	//create a set
+	//do findsetinfo
+	public String findSetInfo(String id, String beautifulUrl) {
+		//verify input
+		if (id == null && beautifulUrl == null) {
+			return NnStatusMsg.inputMissing(locale);
+		}		
+		if (id != null && !Pattern.matches("^\\d*$", id)) {
+			return NnStatusMsg.inputError(locale);
+		}
+		ChannelSetManager csMngr = new ChannelSetManager();
+		ChannelSet cs = null;
+		if (id != null) {
+			long setId = Long.parseLong(id);
+			cs = csMngr.findById(setId);
+		} else {
+			cs = csMngr.findBybeautifulUrl(beautifulUrl);
+		}
+		if (cs == null)
+			return messageSource.getMessage("nnstatus.set_invalid", new Object[] {NnStatusCode.SET_INVALID} , locale);			
+		
+		System.out.println("channel set id:" + cs.getKey().getId());
+		List<MsoChannel> channels = csMngr.findChannelsById(cs.getKey().getId());
+		System.out.println(channels.size());
+		//first block: status
+		String output = NnStatusMsg.successStr(locale) + separatorStr;
+		Mso csMso = msoMngr.findById(cs.getMsoId());
+		//2nd block		
+		output = output + assembleKeyValue("name", csMso.getName());
+		output = output + assembleKeyValue("imageUrl", csMso.getLogoUrl()); 
+		output = output + assembleKeyValue("intro", csMso.getIntro());
+		output = output + separatorStr;			
+		//3rd block: set info
+		output += assembleKeyValue("id", String.valueOf(cs.getKey().getId()));
+		output += assembleKeyValue("name", cs.getName());		
+		output += assembleKeyValue("imageUrl", cs.getImageUrl());
+		
+		//4rd block, channel info
+		String channelLineup = separatorStr;
+		for (MsoChannel c : channels) {
+			channelLineup = channelLineup + this.composeChannelLineupStr(c, csMso) + "\n";													
+		}
+		output += channelLineup;
+		return output;
+	}	
+		
+	public String setUserPref(String userToken, String item, String value) {
+		//verify input
+		if (userToken == null || userToken.length() == 0 || userToken.equals("undefined") ||
+			item == null || value == null || item.length() == 0 || value.length() == 0) {
+			return NnStatusMsg.inputMissing(locale);
+		}		
+		//verify user
+		NnUser user = userMngr.findByToken(userToken);
+		if (user == null) {return NnStatusMsg.userInvalid(locale);}
+		
+		//get preference
+		NnUserPrefManager prefMngr = new NnUserPrefManager();
+		NnUserPref pref = prefMngr.findByUserIdAndItem(user.getKey().getId(), item);
+		if (pref != null) {
+			pref.setValue(value);			
+			prefMngr.save(pref);
+		} else {
+			pref = new NnUserPref();
+			pref.setValue(value);
+			pref.setItem(item);			
+			pref.setUserId(user.getKey().getId());
+			prefMngr.create(pref);
+		}
+		return NnStatusMsg.successStr(locale);
 	}	
 	
 	public int addMsoInfoVisitCounter(String msoName) {
@@ -73,6 +154,7 @@ public class PlayerApiService {
 		int counter = this.addMsoInfoVisitCounter(theMso.getName());
 		MsoConfigManager configMngr = new MsoConfigManager();
 		MsoConfig config = configMngr.findByMsoIdAndItem(theMso.getKey().getId(), MsoConfig.DEBUG);
+		MsoConfig fbConfig = configMngr.findByItem(MsoConfig.FBTOKEN);
 		String debug = "1";
 		if (config != null) { debug = config.getValue(); }
 		
@@ -87,6 +169,8 @@ public class PlayerApiService {
 		results = results + this.assembleKeyValue("jingleUrl", mso.getJingleUrl());
 		results = results + this.assembleKeyValue("brandInfoCounter", String.valueOf(counter));
 		results = results + this.assembleKeyValue("debug", debug);
+		if (fbConfig!=null)
+			results = results + this.assembleKeyValue(MsoConfig.FBTOKEN, fbConfig.getValue());
 		
 		return results;
 	}
@@ -145,10 +229,14 @@ public class PlayerApiService {
 	}
 	
 	public String saveIpg(String userToken, String channelId, String programId) {
+		return NnStatusCode.API_DEPRECATED + "\t" + "Depreacated";		
+	}
+
+	public String saveShare(String userToken, String channelId, String programId, String setId) {
 		if (userToken == null || userToken.length() == 0 || userToken.equals("undefined") ||
 			channelId == null || programId == null || channelId.length() == 0 || programId.length() == 0) {
 			return NnStatusMsg.inputMissing(locale);
-		}				
+		}
 		if (!Pattern.matches("^\\d*$", channelId)) {
 			return NnStatusMsg.inputError(locale);
 		}
@@ -156,46 +244,51 @@ public class PlayerApiService {
 		NnUser foundUser = userMngr.findByToken(userToken);				
 		if (foundUser == null) { return NnStatusMsg.userInvalid(locale);}
 
-		Ipg ipg = new Ipg();
-		ipg.setChannelId(Long.parseLong(channelId));
+		NnUserShare share = new NnUserShare();
+		share.setChannelId(Long.parseLong(channelId));
 		if (Pattern.matches("^\\d*$", programId)) {
-			ipg.setProgramId(Long.parseLong(programId));
+			share.setProgramId(Long.parseLong(programId));
 		} else {
-			ipg.setProgramIdStr(programId);
+			share.setProgramIdStr(programId);
 		}
-		ipg.setUserId(foundUser.getKey().getId());
-		IpgManager ipgMngr = new IpgManager();
-		ipgMngr.create(ipg, foundUser.getKey().getId());				
-		return NnStatusMsg.successStr(locale) + separatorStr + Long.toString(ipg.getId());				
+		share.setUserId(foundUser.getKey().getId());
+		NnUserShareManager shareMngr = new NnUserShareManager();
+		shareMngr.create(share, foundUser.getKey().getId());				
+		return NnStatusMsg.successStr(locale) + separatorStr + Long.toString(share.getId());				
 	}
 	
-	public String loadIpg(long ipgId) {
-		IpgManager ipgMngr = new IpgManager();
-		Ipg ipg = ipgMngr.findById(ipgId);
-		if (ipg == null) { return messageSource.getMessage("nnstatus.ipg_invalid", new Object[] {NnStatusCode.IPG_INVALID} , locale);} 
-		List<MsoChannel> channels = ipgMngr.findIpgChannels(ipg);
+	public String loadShare(long id) {
+		NnUserShareManager shareMngr = new NnUserShareManager();
+		NnUserShare share= shareMngr.findById(id);
+		if (share== null) { return messageSource.getMessage("nnstatus.ipg_invalid", new Object[] {NnStatusCode.IPG_INVALID} , locale);} 
 		//first block: status
 		String status = NnStatusMsg.successStr(locale);
 		//second block: episode information
 		String toPlay = separatorStr;
 		MsoProgramManager programMngr = new MsoProgramManager();
-		MsoProgram program = programMngr.findById(ipg.getProgramId());
+		MsoProgram program = programMngr.findById(share.getProgramId());
 		if (program != null) {
 			List<MsoProgram> programs = new ArrayList<MsoProgram>();
 			programs.add(program);
 			MsoConfig config = new MsoConfigManager().findByMsoIdAndItem(mso.getKey().getId(), MsoConfig.CDN);
 			toPlay = toPlay + this.composeProgramInfoStr(programs, config);
-		} else {
-			toPlay = toPlay + ipg.getChannelId() + "\t" + ipg.getProgramIdStr() + "\n";			
+		} else {			
+			toPlay = toPlay + share.getChannelId() + "\t" + share.getProgramIdStr() + "\n";			
 		}
 		String channelLineup = separatorStr;
-		//third block: channelLineup 
-		for (MsoChannel c : channels) {
-			channelLineup = channelLineup + this.composeChannelLineupStr(c, mso);
-			channelLineup = channelLineup + "\n";			
+		MsoChannel channel = new MsoChannelManager().findById(share.getChannelId());
+		if (channel != null) {
+			channelLineup = channelLineup + this.composeChannelLineupStr(channel, mso);
 		}
-		return status + toPlay + channelLineup;		
-	}			
+		System.out.println("status:" + status);		
+		System.out.println("to play:" + toPlay);
+		System.out.println("channelLineupe:" + channelLineup);
+		return status + toPlay + channelLineup;
+	}
+	
+	public String loadIpg(long ipgId) {
+		return NnStatusCode.API_DEPRECATED + "\t" + "Depreacated";		
+	}
 	
 	public String moveChannel(String userToken, String grid1, String grid2) {		
 		//verify input
@@ -212,8 +305,30 @@ public class PlayerApiService {
 		
 		SubscriptionManager subMngr = new SubscriptionManager();
 		boolean success = subMngr.moveSeq(user.getKey().getId(), Integer.parseInt(grid1), Integer.parseInt(grid2));
-		if (success) { return NnStatusMsg.successStr(locale); }
-		return NnStatusMsg.successStr(locale);
+		String result = NnStatusMsg.successStr(locale);
+		if (!success) 
+			result = messageSource.getMessage("nnstatus.subscription_error", new Object[] {NnStatusCode.SUBSCRIPTION_ERROR} , locale);
+		return result;
+	}
+
+	public String copyChannel(String userToken, String channelId, String grid) {		
+		//verify input
+		if (userToken == null || userToken.length() == 0 || userToken.equals("undefined") || grid == null) {
+			return NnStatusMsg.inputMissing(locale);
+		}
+		if (!Pattern.matches("^\\d*$", grid) ||
+			Integer.parseInt(grid) < 0 || Integer.parseInt(grid) > 81)
+			return NnStatusMsg.inputError(locale);		
+		NnUser user = userMngr.findByToken(userToken);
+		if (user == null) { return messageSource.getMessage("nnstatus.user_invalid", new Object[] {NnStatusCode.USER_INVALID} , locale); }
+		
+		SubscriptionManager subMngr = new SubscriptionManager();
+		boolean success = false;
+		success = subMngr.copyChannel(user.getKey().getId(), Long.parseLong(channelId), Short.parseShort(grid));
+		String result = NnStatusMsg.successStr(locale);
+		if (!success) 
+			result = messageSource.getMessage("nnstatus.subscription_error", new Object[] {NnStatusCode.SUBSCRIPTION_ERROR} , locale);
+		return result;
 	}
 	
 	public String findLocaleByHttpRequest(HttpServletRequest req) {
@@ -241,15 +356,18 @@ public class PlayerApiService {
 		return NnStatusMsg.successStr(locale) + separatorStr + localeCode;
 	}
 	 			
-	public String findPublicChannelsByCategory(String categoryId) {		
+	public String findPublicChannelsByCategoryAndLang(String categoryId, String lang) {		
 		//verify input
 		List<MsoChannel> channels = new ArrayList<MsoChannel>();
 		if (categoryId == null || categoryId.length() < 1) { return NnStatusMsg.inputMissing(locale); }
 		if (!Pattern.matches("^\\d*$", categoryId)) { return NnStatusMsg.inputError(locale); }
 		
+		if (lang != null && !lang.equals(Mso.LANG_EN) && !lang.equals(Mso.LANG_ZH))
+			return NnStatusMsg.inputError(locale);		
+		
 		//find public channels by categoryId
 		MsoChannelManager channelMngr = new MsoChannelManager();
-		channels = channelMngr.findPublicChannelsByCategoryId(Long.parseLong(categoryId));
+		channels = channelMngr.findPublicChannelsByCategoryIdAndLang(Long.parseLong(categoryId), lang);
 		if (channels == null) { return NnStatusMsg.successStr(locale);}
 		
 		//assemble output
@@ -258,12 +376,16 @@ public class PlayerApiService {
 		result = result + categoryId + "\n" + separatorStr;
 		for (int i=0; i< channels.size(); i++) {	
 			if (channels.get(i).getProgramCount() > 0 ) {
-				String[] ori = {String.valueOf(channels.get(i).getSeq()),
-						        String.valueOf(channels.get(i).getKey().getId()), 
-						        channels.get(i).getName(), 
-						        channels.get(i).getImageUrl(), 
-						        Integer.toString(channels.get(i).getProgramCount()),
-						        String.valueOf(channels.get(i).getSubscriptionCount())};
+				MsoChannel c = channels.get(i);
+				String[] ori = {String.valueOf(c.getSeq()),
+						        String.valueOf(c.getKey().getId()), 
+						        c.getName(), 
+						        c.getImageUrl(), 
+						        Integer.toString(c.getProgramCount()),
+						        String.valueOf(c.getSubscriptionCount()),
+						        String.valueOf(c.getContentType()),
+						        this.convertEpochToTime(c.getTranscodingUpdateDate(), c.getUpdateDate())
+						        };
 				result = result + NnStringUtil.getDelimitedStr(ori);
 				result = result + "\n";
 			}
@@ -309,11 +431,18 @@ public class PlayerApiService {
 	}
 	
 	//Prepare user info, it is used by login, guest register, userTokenVerify
-	public String prepareUserInfo(NnUser user) {
+	public String prepareUserInfo(NnUser user) {		
 		String output = NnStatusMsg.successStr(locale) + separatorStr;		
 		output = output + assembleKeyValue("token", user.getToken());
 		output = output + assembleKeyValue("name", user.getName());
 		output = output + assembleKeyValue("lastLogin", String.valueOf(user.getUpdateDate().getTime()));
+		
+		NnUserPrefManager prefMngr = new NnUserPrefManager();
+		List<NnUserPref> list = prefMngr.findByUserId(user.getKey().getId());		
+		for (NnUserPref pref : list) {
+			output = output + this.assembleKeyValue(pref.getItem(), pref.getValue());
+		}
+			
 		return output;
 	}
 	
@@ -321,72 +450,180 @@ public class PlayerApiService {
 		CookieHelper.setCookie(resp, cookieName, userId);
 	}	
 		
-	public String unsubscribeChannel(String userToken, String channelId) {
+	public String unsubscribe(String userToken, String channelId, String setId, String grid) {
 		//verify input
-		if (userToken == null || channelId == null || userToken.equals("undefined")) {			
+		if (userToken == null || userToken.equals("undefined"))			
+			return NnStatusMsg.inputMissing(locale);		
+		if (channelId == null && setId == null) {
 			return NnStatusMsg.inputMissing(locale);
 		}
-		if (!Pattern.matches("^\\d*$", channelId)) {
-			return NnStatusMsg.inputError(locale);
-		}		
 		//verify user
 		NnUser user = new NnUserManager().findByToken(userToken);
 		if (user == null) {return NnStatusMsg.userInvalid(locale);}
-		
-		//unsubscribe
 		SubscriptionManager subMngr = new SubscriptionManager();
-		Subscription s = subMngr.findByUserIdAndChannelId(user.getKey().getId(), Long.parseLong(channelId));
-		if (s == null || (s != null && s.getType() == MsoIpg.TYPE_READONLY)) {
-			return messageSource.getMessage("nnstatus.subscription_ro_channel", new Object[] {NnStatusCode.SUBSCRIPTION_ERROR} , locale);			
-		}			
-		subMngr.unsubscribeChannel(s);
-		return NnStatusMsg.successStr(locale);
+		
+		String result = NnStatusMsg.successStr(locale);		
+		if (channelId != null) {
+			String[] chArr = channelId.split(",");
+			if (chArr.length == 1) {
+				log.info("unsubscribe single channel");
+				Subscription s = null;
+				if (grid == null) {
+					s = subMngr.findByUserIdAndChannelId(user.getKey().getId(), Long.parseLong(channelId));
+				} else {
+					s = subMngr.findChannelSubscription(user.getKey().getId(), Long.parseLong(channelId), Integer.parseInt(grid));
+				}			
+				if (s == null || (s != null && s.getType() == MsoIpg.TYPE_READONLY)) {
+					return messageSource.getMessage("nnstatus.subscription_ro_channel", new Object[] {NnStatusCode.SUBSCRIPTION_ERROR} , locale);			
+				}
+				subMngr.unsubscribeChannel(s);
+				result += channelId + "\t" + messageSource.getMessage("nnstatus.success", new Object[] {NnStatusCode.SUCCESS} , locale); 
+			} else {
+				log.info("unsubscribe multiple channels");
+				if (grid == null) return NnStatusMsg.inputMissing(locale);
+				String[] gridArr = grid.split(",");
+				if (gridArr.length != chArr.length) return NnStatusMsg.inputMissing(locale);
+				List<Long> chlist = new ArrayList<Long>();
+				List<Integer> gridlist = new ArrayList<Integer>();
+				for (int i=0; i<chArr.length; i++) { chlist.add(Long.valueOf(chArr[i]));}
+				for (int i=0; i<gridArr.length; i++) { gridlist.add(Integer.valueOf(gridArr[i]));}
+				result = result + separatorStr;
+				for (int i=0; i<chlist.size(); i++) {
+					Subscription s = subMngr.findChannelSubscription(user.getKey().getId(), chlist.get(i), gridlist.get(i));
+					if (s == null || (s != null && s.getType() == MsoIpg.TYPE_READONLY)) {
+						 result = result + chlist.get(i) + "\t" + messageSource.getMessage("nnstatus.subscription_ro_channel", new Object[] {NnStatusCode.SUBSCRIPTION_ERROR} , locale);
+					} else {
+						subMngr.unsubscribeChannel(s);
+						result = result + chlist.get(i) + "\t" + messageSource.getMessage("nnstatus.success", new Object[] {NnStatusCode.SUCCESS} , locale);
+					}
+				}
+			}
+		}
+		if (setId != null) {
+			AreaOwnershipManager areaMngr = new AreaOwnershipManager();
+			AreaOwnership area = areaMngr.findByUserIdAndSetId(user.getKey().getId(), Long.parseLong(setId));
+			/*
+			if (area == null) 
+				return messageSource.getMessage("nnstatus.set_invalid", new Object[] {NnStatusCode.SUBSCRIPTION_ERROR} , locale);
+			*/
+			areaMngr.delete(area); 
+		}
+		return result;
 	}
 	
-	public String subscribeChannel(String userToken, String channelIds, String gridIds) {
+	public String changeSetInfo(String userToken, String name, String areaNo) {
 		//verify input
-		if (userToken == null || channelIds == null || gridIds == null || userToken.equals("undefined")) {			
+		if (name == null || areaNo == null)  {			
 			return NnStatusMsg.inputMissing(locale);
 		}
+		if (!Pattern.matches("^\\d*$", areaNo) || Integer.parseInt(areaNo) < 0 || Integer.parseInt(areaNo) > 9) {			
+			return NnStatusMsg.inputError(locale);
+		}
+
+		NnUser user = new NnUserManager().findByToken(userToken);
+		if (user == null) {
+			return NnStatusMsg.userInvalid(locale);
+		}	
+		
+		AreaOwnershipManager areaMngr = new AreaOwnershipManager();
+		short position = Short.valueOf(areaNo);
+		AreaOwnership area = areaMngr.findByUserIdAndAreaNo(user.getKey().getId(), Short.valueOf(position));
+		if (area != null) {
+			if (area.getType() == AreaOwnership.TYPE_RO)
+				return messageSource.getMessage("nnstatus.subscription_ro_set", new Object[] {NnStatusCode.SUBSCRIPTION_RO_SET} , locale); 
+			area.setSetName(name);
+			areaMngr.save(area);			
+		} else {
+			area = new AreaOwnership();
+			area.setUserId(user.getKey().getId());
+			area.setSetName(name);				
+			area.setAreaNo(position);
+			areaMngr.create(area);
+		}
+		
+		String result = NnStatusMsg.successStr(locale);
+		return result;
+	}
+	
+	public String subscribe(String userToken, String channelId, String setId, String gridId, String pos) {
+		//verify input
+		if (userToken == null || userToken.equals("undefined")) return NnStatusMsg.inputMissing(locale);
+		if ((setId != null && pos == null) || (setId == null && pos != null)) return NnStatusMsg.inputMissing(locale);
+		if ((channelId != null && gridId == null) || (channelId == null && gridId != null)) return NnStatusMsg.inputMissing(locale);
+		
 		String output = messageSource.getMessage("nnstatus.channel_or_user_invalid", new Object[] {NnStatusCode.CHANNEL_OR_USER_INVALID} , locale);		
 		NnUser user = new NnUserManager().findByToken(userToken);
 		if (user == null) {return output;}	
-		
-		//verify channel and grid
-		String[] chArr = channelIds.split(",");
-		String[] gridArr = gridIds.split(",");
-		List<Long> chList = new ArrayList<Long>();
-		List<Short> gridList = new ArrayList<Short>();
-		try {
-			for (int i=0; i<chArr.length; i++) { chList.add(Long.valueOf(chArr[i]));}		
-			for (int i=0; i<gridArr.length; i++) { gridList.add(Short.valueOf(gridArr[i]));}
-		} catch (NumberFormatException e){
-			return NnStatusMsg.inputError(locale);
+		SubscriptionManager subMngr = new SubscriptionManager();
+		if (setId != null) {			
+			//find all channels
+			List<Subscription> subscribeList = subMngr.findAllByUser(user.getKey().getId());
+			ChannelSetManager csMngr = new ChannelSetManager();
+			long sId = Long.parseLong(setId);
+			ChannelSet cs = csMngr.findById(sId);
+			if (cs == null)
+				return messageSource.getMessage("nnstatus.set_invalid", new Object[] {NnStatusCode.SET_INVALID} , locale);			
+			
+			List<MsoChannel> channels = csMngr.findChannelsById(cs.getKey().getId());
+			Short[] startArr = {1,4,7,28,31,34,55,58,61};
+			Short start = startArr[Integer.parseInt(pos)-1]; 
+			for (MsoChannel c : channels) {					
+				short grid= 0;
+				if (c.getSeq() < 4)
+					grid = (short) (c.getSeq() + start - 1);
+				if (c.getSeq() > 3 && c.getSeq() < 7)
+					grid = (short) (start + 9 + c.getSeq()-4);
+				else if (c.getSeq() > 6)
+					grid = (short) (start + 18 + c.getSeq()-7);
+				for (Subscription l : subscribeList) {
+					if (l.getSeq() == grid) {
+						return messageSource.getMessage("nnstatus.subscription_set_occupied", new Object[] {NnStatusCode.SUBSCRIPTION_SET_OCCUPIED} , locale);							
+					}
+				}
+			}
+			AreaOwnershipManager areaMngr = new AreaOwnershipManager();
+			AreaOwnership area = areaMngr.findByUserIdAndSetId(user.getKey().getId(), cs.getKey().getId());
+			if (area != null) {
+				return messageSource.getMessage("nnstatus.subscription_duplicate_set", new Object[] {NnStatusCode.SUBSCRIPTION_DUPLICATE_SET} , locale);												
+			}
+			area = new AreaOwnership();											
+			area.setUserId(user.getKey().getId());
+			area.setSetId(cs.getKey().getId());
+			area.setSetName(cs.getName());
+			area.setSetImageUrl(cs.getImageUrl());
+			area.setAreaNo(Short.parseShort(pos));
+			area.setType(AreaOwnership.TYPE_RO);
+			areaMngr.save(area);
+			SubscriptionLogManager logMngr = new SubscriptionLogManager();
+			SubscriptionLog log = logMngr.findByMsoIdAndSetId(mso.getKey().getId(), cs.getKey().getId());
+			if (log == null) {
+				log = new SubscriptionLog();
+				log.setCount(1);
+				log.setSetId(cs.getKey().getId());
+				log.setMsoId(mso.getKey().getId());
+				logMngr.save(log);
+			}		
+			output = NnStatusMsg.successStr(locale);
 		}
-		if (chArr.length != gridArr.length) { return NnStatusMsg.inputError(locale); }
-		
-		if (chList.size() == 1) { //should do all, omit the work for now
-			MsoChannel channel = new MsoChannelManager().findById(chList.get(0));			
+
+		//verify channel and grid
+		if (channelId != null) {
+			System.out.println("subscription channelid:" + channelId);
+			long cId = Long.parseLong(channelId);			
+			MsoChannel channel = new MsoChannelManager().findById(cId);			
 			if (channel == null || channel.getStatus() == MsoChannel.STATUS_ERROR) { 
 				return messageSource.getMessage("nnstatus.subscription_duplicate_channel", new Object[] {NnStatusCode.CHANNEL_STATUS_ERROR} , locale);
 			}
-		}
-
-		//subscribe
-		SubscriptionManager subMngr = new SubscriptionManager();
-		String detail = separatorStr;
-		output = NnStatusMsg.successStr(locale);
-		for (int i=0; i<chList.size(); i++) {
-			boolean status = subMngr.subscribeChannel(user.getKey().getId(), chList.get(i), gridList.get(i), MsoIpg.TYPE_GENERAL, mso.getKey().getId());			
+			boolean status = subMngr.subscribeChannel(user.getKey().getId(), cId, Integer.parseInt(gridId), MsoIpg.TYPE_GENERAL, mso.getKey().getId());
+			System.out.println("status is ==" + status);
 			if (!status) {
 				//the general status shows error even there's only one error
 				output = messageSource.getMessage("nnstatus.subscription_duplicate_channel", new Object[] {NnStatusCode.SUBSCRIPTION_DUPLICATE_CHANNEL} , locale);
-				detail = detail + chList.get(i) + "\t" + output;  
 			} else {
-				detail = detail + chList.get(i) + "\t" + NnStatusMsg.successStr(locale);
+				output = NnStatusMsg.successStr(locale);
 			}
 		}
-		if (chList.size() > 0) {output = output + detail;}		
+				
 		return output;
 	}
 
@@ -409,7 +646,7 @@ public class PlayerApiService {
 		if (mso == null) { return NnStatusMsg.msoInvalid(locale);}
 		
 		//verify email
-		NnUser user = userMngr.findByEmailAndMso(email, mso);
+		NnUser user = userMngr.findByEmail(email);
 		if (user != null) {
 			log.info("user email taken:" + user.getEmail() + "; mso=" + mso.getName() + ";user token=" + user.getToken());
 			return messageSource.getMessage("nnstatus.user_email_taken", new Object[] {NnStatusCode.USER_EMAIL_TAKEN} , locale);
@@ -448,8 +685,14 @@ public class PlayerApiService {
 	public String findUserByToken(String token, HttpServletRequest req, HttpServletResponse resp) {
 		if (token == null) {return NnStatusMsg.inputMissing(locale);}
 		
-		NnUser found = userMngr.findByToken(token);			
+		NnUser found = userMngr.findByToken(token);
+		/*
 		if (found == null || (found != null && found.getMsoId() != mso.getKey().getId())) {
+			CookieHelper.deleteCookie(resp, CookieHelper.USER);
+			return NnStatusMsg.userInvalid(locale);
+		}
+		*/
+		if (found == null) {
 			CookieHelper.deleteCookie(resp, CookieHelper.USER);
 			return NnStatusMsg.userInvalid(locale);
 		}
@@ -464,12 +707,12 @@ public class PlayerApiService {
 	}
 	
 	public String findAuthenticatedUser(String email, String password, HttpServletRequest req, HttpServletResponse resp) {		
-		log.info("login: email=" + email + "; mso=" + mso.getKey().getId() + ";password=" + password);
+		log.info("login: email=" + email + "; mso=" + mso.getKey().getId());
 		if (email == null || email.length() == 0 ||  password == null || password.length() == 0) {
 			return NnStatusMsg.inputMissing(locale);
 		}		
 		String output = messageSource.getMessage("nnstatus.user_login_failed", new Object[] {NnStatusCode.USER_LOGIN_FAILED} , locale);		
-		NnUser user = userMngr.findAuthenticatedUser(email, password, mso.getKey().getId());
+		NnUser user = userMngr.findAuthenticatedUser(email, password);
 		if (user != null) {
 			output = this.prepareUserInfo(user);
 			userMngr.save(user); //change last login time (ie updateTime)
@@ -478,7 +721,7 @@ public class PlayerApiService {
 		return output;
 	}
 
-	public String createChannel(String categoryIds, String userToken, String url, String grid, HttpServletRequest req) {
+	public String createChannel(String categoryIds, String userToken, String url, String grid, String tags, HttpServletRequest req) {
 		//verify input
 		if (url == null || url.length() == 0 ||  grid == null || grid.length() == 0 ||
 			categoryIds == null || categoryIds.equals("undefined") || categoryIds.length() == 0 ||
@@ -524,14 +767,16 @@ public class PlayerApiService {
 		} else {				
 			//create a new channel
 			channel = channelMngr.initChannelSubmittedFromPlayer(url, user);
+			channel.setTags(tags);
 			log.info("User throws a new url:" + url);
 			channelMngr.create(channel, categories);
-			if (channel.getKey() != null) { //!!!
+			if (channel.getKey() != null && channel.getContentType() != MsoChannel.CONTENTTYPE_FACEBOOK) { //!!!
 				TranscodingService tranService = new TranscodingService();
 				tranService.submitToTranscodingService(channel.getKey().getId(), url, req);
 			}
 		}
 		
+		//!!!!!!!!!!!! BROADCAST BRODCAST
 		//subscribe
 		SubscriptionManager subMngr = new SubscriptionManager();
 		boolean success = subMngr.subscribeChannel(user.getKey().getId(), channel.getKey().getId(), Integer.parseInt(grid), MsoIpg.TYPE_GENERAL, mso.getKey().getId());
@@ -540,17 +785,84 @@ public class PlayerApiService {
 			output = messageSource.getMessage("nnstatus.subscription_duplicate_channel", new Object[] {NnStatusCode.SUBSCRIPTION_DUPLICATE_CHANNEL} , locale);
 			return output;
 		} else {
+			String channelName = "";
+			//!!!!! make it function
+			if (channel.getSourceUrl() != null && channel.getSourceUrl().contains("http://www.youtube.com"))
+				channelName = YouTubeLib.getYouTubeChannelName(channel.getSourceUrl());
+			if (channel.getContentType() == MsoChannel.CONTENTTYPE_FACEBOOK) 
+				channelName = channel.getSourceUrl();
+			
 			String result[]= {String.valueOf(channel.getKey().getId()),				  	 	  
 			  	 	  channel.getName(),
-			  	 	  channel.getImageUrl()};
+			  	 	  channel.getImageUrl(),
+			  	 	  String.valueOf(channel.getContentType()),
+			  	      channelName};
 			output = NnStringUtil.getDelimitedStr(result);
 		}
 		return NnStatusMsg.successStr(locale) + separatorStr + output;
 	}
 				
-	public String findChannelInfo(String userToken, boolean userInfo, String channelIds) {
+	private int convertSetPosToIPGSeq(int seq, int pos) {
+		log.info("seq:" + seq + ";pos=" + pos);
+		if (seq == 0) {
+			return 0;
+		}
+		try {
+			switch(pos) {
+			  case 1:
+				Integer[] map1 = {1,2,3,10,11,12,19,20,21};
+				return map1[seq-1];
+			  case 2:
+				Integer[] map2 = {4,5,6,13,14,15,22,23,24};
+				return map2[seq-1];
+			  case 3:
+				Integer[] map3 = {7,8,9,16,17,18,25,26,27};
+				return map3[seq-1];
+			  case 4:
+				Integer[] map4 = {28,29,30,37,38,39,46,47,48};
+				return map4[seq-1];
+			  case 5:
+				Integer[] map5 = {31,32,33,40,41,42,49,50,51};
+				return map5[seq-1];
+			  case 6:
+				Integer[] map6 = {34,35,36,43,44,45,52,53,54};
+				return map6[seq-1];
+			  case 7:
+				Integer[] map7 = {55,56,57,64,65,66,74,75,75};
+				return map7[seq-1];
+			  case 8:
+				Integer[] map8 = {58,59,60,67,68,69,76,77,78};
+				return map8[seq-1];
+			  case 9:
+				Integer[] map9 = {61,62,63,70,71,72,79,80,81};
+				return map9[seq-1];
+			  default:
+				return 0;
+			}
+		} catch (IndexOutOfBoundsException e){
+			log.info("pass wrong data");
+			return 0;
+		}		
+	}
+	
+	private String convertEpochToTime(String transcodingUpdateDate, Date updateDate) {
+		String output = "";
+		try {
+			if (transcodingUpdateDate != null) {
+				long epoch = Long.parseLong(transcodingUpdateDate);
+				Date myDate = new Date (epoch*1000);
+				output = String.valueOf(myDate.getTime());
+			} else if (updateDate != null){
+				output = String.valueOf(updateDate.getTime());
+			}
+		} catch (NumberFormatException e) {			
+		}
+		return output;
+	}
+	
+	public String findChannelInfo(String userToken, boolean userInfo, String channelIds, boolean setInfo) {
 		//verify input
-		if ((userToken == null && userInfo == true) || (userToken == null && channelIds == null)) {
+		if ((userToken == null && userInfo == true) || (userToken == null && channelIds == null) || (userToken == null && setInfo == true)) {
 			return NnStatusMsg.inputMissing(locale);
 		}		
 		NnUser user = null;
@@ -563,7 +875,10 @@ public class PlayerApiService {
 		String result = NnStatusMsg.successStr(locale) + separatorStr;
 		if (userInfo) {
 			result = this.prepareUserInfo(user) + separatorStr;	}
+		
+		//find channels
 		List<MsoChannel> channels = new ArrayList<MsoChannel>();
+		boolean channelPos = true;
 		if (channelIds == null) {
 			//find subscribed channels 
 			SubscriptionManager subMngr = new SubscriptionManager();
@@ -571,6 +886,7 @@ public class PlayerApiService {
 		} else {
 			//find specific channels
 			MsoChannelManager channelMngr = new MsoChannelManager();
+			channelPos = false;
 			String[] chArr = channelIds.split(",");
 			//check format
 			if (chArr.length > 1) {
@@ -581,11 +897,64 @@ public class PlayerApiService {
 				MsoChannel channel = channelMngr.findById(Long.parseLong(channelIds));
 				channels.add(channel);
 			}
-		}			
-		for (MsoChannel c : channels) {
-			result = result + this.composeChannelLineupStr(c, mso);
-			result = result + "\n";
-		}	
+		}
+		AreaOwnershipManager areaMngr = new AreaOwnershipManager();
+		List<MsoChannel> setChannels = new ArrayList<MsoChannel>();
+		if (user != null) {
+			List<AreaOwnership> sets = areaMngr.findByUserId(user.getKey().getId());		
+		    //set info
+			if (setInfo) {
+				for (AreaOwnership s : sets) {
+					String[] obj = {
+							String.valueOf(s.getAreaNo()),
+							String.valueOf(s.getSetId()),
+							s.getSetName(),						
+							s.getSetImageUrl(),
+							String.valueOf(s.getType()),
+					};
+					result = result + NnStringUtil.getDelimitedStr(obj);;
+					result = result + "\n";
+				}
+				result = result + separatorStr;					
+			}		
+			
+			//find channels from set
+			ChannelSetManager setMngr = new ChannelSetManager();
+			for (AreaOwnership area : sets) {
+				if (area.getType() == AreaOwnership.TYPE_RO) {
+					List<MsoChannel> list = setMngr.findChannelsById(area.getSetId());
+					for (MsoChannel c : list) {
+						c.setSeq(this.convertSetPosToIPGSeq(c.getSeq(), area.getAreaNo()));
+					}
+					setChannels.addAll(list);				
+				}
+			}
+		}
+		//sort by key
+		if (channelPos) {
+			TreeMap<Integer, MsoChannel> channelMap = new TreeMap<Integer, MsoChannel>();
+			for (MsoChannel c : channels) {
+				channelMap.put(c.getSeq(), c);
+			}
+			if (user != null) {
+				//overwrite by set channels
+				for (MsoChannel c : setChannels) {
+					channelMap.put(c.getSeq(), c);
+				}
+			}
+			Iterator<Entry<Integer, MsoChannel>> it = channelMap.entrySet().iterator();
+		    while (it.hasNext()) {
+		        Map.Entry<Integer, MsoChannel> pairs = (Map.Entry<Integer, MsoChannel>)it.next();
+				result = result + this.composeChannelLineupStr((MsoChannel)pairs.getValue(), mso);
+				result = result + "\n";	       
+		    }
+		} else {
+			log.info("channelLineup: regardless the pos");
+			for (MsoChannel c : channels) {
+				result = result + this.composeChannelLineupStr(c, mso);
+				result = result + "\n";
+			}
+		}
 		return result;
 	}
 	
@@ -629,24 +998,33 @@ public class PlayerApiService {
 		return result + this.composeProgramInfoStr(programs, config);
 	}
 
-	public String findCategoriesByMso() {
+	public String findCategoriesByLang(String lang) {
+		if (lang != null && !lang.equals(Mso.LANG_EN) && !lang.equals(Mso.LANG_ZH))
+			return NnStatusMsg.inputError(locale);
+		if (lang == null)
+			lang = Mso.LANG_EN;
 		CategoryManager categoryMngr = new CategoryManager();	
 		List<Category> categories = categoryMngr.findAllByMsoId(mso.getKey().getId());
 				
 		String output = NnStatusMsg.successStr(locale) + separatorStr;
 		for (Category c : categories) {
-			String[] str = {String.valueOf(c.getKey().getId()), c.getName(), String.valueOf(c.getChannelCount())};
-			output = output + NnStringUtil.getDelimitedStr(str) + "\n";			
+			String name =  c.getName();
+			if (lang.equals(Mso.LANG_ZH))
+				name = categoryMngr.translate(name);
+			String[] str = {String.valueOf(c.getKey().getId()), name, String.valueOf(c.getChannelCount())};				
+			output = output + NnStringUtil.getDelimitedStr(str) + "\n";
 		}
 		
 		if (categories.size() < 1) { return messageSource.getMessage("nnstatus.category_invalid", new Object[] {NnStatusCode.CATEGORY_INVALID} , locale);}
 			
 		return output;
-	}
-		
+	}		 
+	
 	private String composeChannelLineupStr(MsoChannel c, Mso mso) {
 		String intro = c.getIntro();
 		if (intro != null) {
+			intro = intro.replaceAll("\n", " ");
+			intro = intro.replaceAll("\t", " ");
 			int introLenth = (intro.length() > 256 ? 256 : intro.length()); 
 			intro = intro.substring(0, introLenth);
 		} else {
@@ -659,11 +1037,17 @@ public class PlayerApiService {
 			if (mso.getPreferredLangCode().equals(Mso.LANG_ZH_TW)) {
 				imageUrl = "/WEB-INF/../images/processing_cn.png";
 			}
+		} else if (c.getStatus() != MsoChannel.STATUS_WAIT_FOR_APPROVAL &&
+				   c.getStatus() != MsoChannel.STATUS_SUCCESS && 
+				   c.getStatus() != MsoChannel.STATUS_PROCESSING) {	
+				imageUrl = "http://9x9ui.s3.amazonaws.com/9x9playerV65/images/error.png";
 		}
 
 		String channelName = "";
 		if (c.getSourceUrl() != null && c.getSourceUrl().contains("http://www.youtube.com"))
 			channelName = YouTubeLib.getYouTubeChannelName(c.getSourceUrl());
+		if (c.getContentType() == MsoChannel.CONTENTTYPE_FACEBOOK) 
+			channelName = c.getSourceUrl();
 		String[] ori = {Integer.toString(c.getSeq()), 
 					    String.valueOf(c.getKey().getId()),
 					    c.getName(),
@@ -673,9 +1057,9 @@ public class PlayerApiService {
 					    String.valueOf(c.getType()),
 					    String.valueOf(c.getStatus()),
 					    String.valueOf(c.getContentType()),
-					    channelName
+					    channelName,
+					    this.convertEpochToTime(c.getTranscodingUpdateDate(), c.getUpdateDate())
 					    };
- 					    
 		String output = NnStringUtil.getDelimitedStr(ori);
 		return output;
 	}
@@ -755,6 +1139,40 @@ public class PlayerApiService {
 		for (MsoProgram p : programs) {
 			output = output + p.getKey().getId() + "\n";			
 		}
+		return output;		
+	}
+	
+	public String findFeaturedSets() {
+		ChannelSetManager setMngr = new ChannelSetManager();
+		SubscriptionLogManager logMngr = new SubscriptionLogManager();		
+		
+		List<ChannelSet> sets = setMngr.findFeaturedSets();		
+		String output = NnStatusMsg.successStr(locale) + separatorStr;		
+		for (ChannelSet set : sets) {
+			SubscriptionLog log = logMngr.findByMsoIdAndSetId(mso.getKey().getId(), set.getKey().getId());
+			int counter = 0;
+			if (log != null)
+				counter = log.getCount();
+			String[] obj = {
+				String.valueOf(set.getKey().getId()),
+				set.getName(),
+				set.getImageUrl(),
+				String.valueOf(set.getChannelCount()),
+				String.valueOf(counter),
+			};
+			output += NnStringUtil.getDelimitedStr(obj) + "\n";			
+		}				
+		return output;		
+	}
+
+	public String findFeaturedChannels() {
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		List<MsoChannel> channels = channelMngr.findFeaturedChannels();		
+		String output = NnStatusMsg.successStr(locale) + separatorStr;
+		for (MsoChannel c : channels) {
+			output += this.composeChannelLineupStr(c, mso) + "\n";							
+						
+		}				
 		return output;		
 	}
 	
