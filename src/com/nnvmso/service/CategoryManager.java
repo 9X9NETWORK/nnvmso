@@ -5,10 +5,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 import net.sf.jsr107cache.Cache;
 
+import org.springframework.context.MessageSource;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Service;
 
 import com.google.appengine.api.datastore.Key;
@@ -22,6 +25,7 @@ import com.nnvmso.model.MsoChannel;
 public class CategoryManager {
 	
 	protected static final Logger log = Logger.getLogger(CategoryManager.class.getName());
+	private static MessageSource messageSource = new ClassPathXmlApplicationContext("locale.xml");
 	
 	private CategoryDao categoryDao = new CategoryDao();
 		
@@ -45,6 +49,43 @@ public class CategoryManager {
 			}			
 		}
 	}
+	public String translate(String name) {
+		if (name == null) return null;
+		Locale locale = Locale.TRADITIONAL_CHINESE;
+		if (name.equals("News & Politics")) 
+			return messageSource.getMessage("category.news", null, locale);
+		if (name.equals("Finance & Management")) 
+			return messageSource.getMessage("category.finance", null, locale);
+		if (name.equals("Entertainment")) 
+			return messageSource.getMessage("category.entertainment", null, locale);
+		if (name.equals("Music")) 
+			return messageSource.getMessage("category.music", null, locale);
+		if (name.equals("Sports & Outdoors")) 
+			return messageSource.getMessage("category.sports", null, locale);
+		if (name.equals("Tech & Science")) 
+			return messageSource.getMessage("category.tech", null, locale);
+		if (name.equals("Gaming")) 
+			return messageSource.getMessage("category.gaming", null, locale);
+		if (name.equals("Lifestyle & Hobbies")) 
+			return messageSource.getMessage("category.lifestyle", null, locale);
+		if (name.equals("Travel & Living")) 
+			return messageSource.getMessage("category.travel", null, locale);
+		if (name.equals("Arts & Creative")) 
+			return messageSource.getMessage("category.arts", null, locale);
+		if (name.equals("Society & Organizations")) 
+			return messageSource.getMessage("category.org", null, locale);
+		if (name.equals("Education & How to")) 
+			return messageSource.getMessage("category.education", null, locale);
+		if (name.equals("Nature & Animals")) 
+			return messageSource.getMessage("category.nature", null, locale);
+		if (name.equals("People")) 
+			return messageSource.getMessage("category.people", null, locale);
+		if (name.equals("Religion & Spirituality")) 
+			return messageSource.getMessage("category.religion", null, locale);
+		if (name.equals("Others")) 
+			return messageSource.getMessage("category.others", null, locale);
+		return "其他類";
+	}			
 	
 	public Category save(Category category) {
 		category.setUpdateDate(new Date());		
@@ -147,6 +188,10 @@ public class CategoryManager {
 	
 	public int total(String filter) {
 		return categoryDao.total(filter);
+	}
+	
+	public List<Category> findAllByMsoIdWithoutCache(long msoId) {
+		return categoryDao.findAllByMsoId(msoId);
 	}
 	
 	//result will be cached
@@ -252,6 +297,10 @@ public class CategoryManager {
 			}
 		}
 		return output + listOutput;
+	}
+
+	public List<Category> findAllByParentId(long parentId) {
+		return categoryDao.findAllByParanetId(parentId);
 	}
 	
 }

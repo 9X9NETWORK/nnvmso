@@ -26,6 +26,17 @@ public class MsoProgramManager {
 	
 	private MsoProgramDao msoProgramDao = new MsoProgramDao();
 	
+	/**
+	 * Create program skeleton only, not relate to any channel
+	 * 
+	 * @param program
+	 */
+	public void create(MsoProgram program) {
+		
+		program.setChannelId(0);
+		msoProgramDao.save(program);
+	}
+	
 	public void create(MsoChannel channel, MsoProgram program) {		
 		Date now = new Date();
 		program.setCreateDate(now);
@@ -59,7 +70,8 @@ public class MsoProgramManager {
 	} 
 
 	public MsoProgram save(MsoProgram program) {
-		program.setUpdateDate(new Date());
+		
+		program.setUpdateDate(new Date()); // NOTE: a trying to modify program update time (from admin) will be omitted by this
 		program = msoProgramDao.save(program);
 		Cache cache = CacheFactory.get();
 		if (cache != null) {
@@ -81,6 +93,7 @@ public class MsoProgramManager {
 		msoProgramDao.delete(program);
 		log.info("delete program" + id);
 		//channel's program count
+		this.deleteCacheByChannel(program.getChannelId());
 		MsoChannelManager channelMngr = new MsoChannelManager();
 		channelMngr.calculateAndSaveChannelCount(program.getChannelId());
 		//cache
@@ -323,6 +336,6 @@ public class MsoProgramManager {
 			}
 			cache.remove(this.getCacheProgramListKey(channelId));
 		}
-	}	 
+	}
 	
 }

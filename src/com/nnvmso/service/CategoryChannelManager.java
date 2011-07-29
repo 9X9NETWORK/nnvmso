@@ -1,5 +1,6 @@
 package com.nnvmso.service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
@@ -20,8 +21,14 @@ public class CategoryChannelManager {
 		cc.setCreateDate(now);
 		cc.setUpdateDate(now);
 		ccDao.save(cc);
-	}	
-
+	}
+	
+	public void save(CategoryChannel cc) {
+		Date now = new Date();
+		cc.setUpdateDate(now);
+		ccDao.save(cc);
+	}
+	
 	public void delete(CategoryChannel cc) {
 		CategoryManager categoryMngr = new CategoryManager();
 		Category category = categoryMngr.findById(cc.getCategoryId()); 
@@ -52,7 +59,7 @@ public class CategoryChannelManager {
 		List<CategoryChannel> ccs = ccDao.findAllByChannelId(channelId);
 		return ccs;
 	}
-
+	
 	public CategoryChannel findByCategoryIdAndChannelId(long categoryId, long channelId) {
 		return ccDao.findByCategoryIdAndChannelId(categoryId, channelId);
 	}
@@ -76,4 +83,15 @@ public class CategoryChannelManager {
 	public int total(String filter) {
 		return ccDao.total(filter);
 	}
+	
+	public List<CategoryChannel> findByChannelIdAndCategoryIds(Long channelId, List<Long> categoryIds) {
+		List<CategoryChannel> results = new ArrayList<CategoryChannel>();
+		for (Long categoryId : categoryIds) {
+			CategoryChannel cc = ccDao.findByCategoryIdAndChannelId(categoryId, channelId);
+			if (cc != null)
+				results.add(cc);
+		}
+		return results;
+	}
+	
 }

@@ -43,8 +43,18 @@ public class SubscriptionManager {
 		return true;
 	}
 	
+	public Subscription findByUserIdAndSeq(long userId, short seq) {
+		Subscription s = subDao.findByUserIdAndSeq(userId, seq);
+		return s;
+	}
+	
 	public Subscription findByUserIdAndChannelId(long userId, long channelId) {
 		Subscription s = subDao.findByUserIdAndChannelId(userId, channelId);
+		return s;
+	}
+
+	public Subscription findChannelSubscription(long userId, long channelId, int seq) {
+		Subscription s = subDao.findChannelSubscription(userId, channelId, seq);
 		return s;
 	}
 	
@@ -84,12 +94,46 @@ public class SubscriptionManager {
 		return true;
 	}
 	
+	public boolean copyChannel(long userId, long channelId, short seq) {
+		Subscription occupied = this.findByUserIdAndSeq(userId, seq);
+		if (occupied != null)
+			return false;
+		Subscription s = new Subscription(userId, channelId, seq, MsoIpg.TYPE_GENERAL);
+		Date now = new Date();
+		s.setCreateDate(now);
+		s.setUpdateDate(now);
+		subDao.save(s);		
+		return true;		
+	}
+	
+	/*
+	//move from seq1 to seq2
+	public boolean copyChannel(long userId, short seq1, short seq2) {						
+		Subscription sub = subDao.findByUserIdAndSeq(userId, seq1);
+		if (sub == null) 
+			return false;
+		Subscription occupied = this.findByUserIdAndSeq(userId, seq2);
+		if (occupied != null)
+			return false;
+		Subscription s = new Subscription(userId, sub.getChannelId(), seq2, sub.getType());
+		Date now = new Date();
+		s.setCreateDate(now);
+		s.setUpdateDate(now);
+		subDao.save(s);		
+		return true;
+	}
+	*/
+	
 	public List<Subscription> list(int page, int limit, String sidx, String sord) {
 		return subDao.list(page, limit, sidx, sord);
 	}
 	
 	public List<Subscription> list(int page, int limit, String sidx, String sord, String filter) {
 		return subDao.list(page, limit, sidx, sord, filter);
+	}
+
+	public void deleteAll(List<Subscription> list) {
+		subDao.deleteAll(list);
 	}
 	
 	public int total() {

@@ -12,6 +12,7 @@ import com.nnvmso.dao.NnUserDao;
 import com.nnvmso.lib.AuthLib;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
+import com.nnvmso.model.MsoProgram;
 import com.nnvmso.model.NnUser;
 
 @Service
@@ -42,6 +43,10 @@ public class NnUserManager {
 		return nnUserDao.save(user);
 	}
 
+	public void delete(NnUser user) {
+		nnUserDao.delete(user);
+	}
+	
 	/**
 	 * GAE can only write 5 records a sec, maybe safe enough to do so w/out DB retrieving.
 	 * taking the chance to speed up signin (meaning not to consult DB before creating the account).
@@ -64,8 +69,35 @@ public class NnUserManager {
 		return null;
 	}
 	
-	public NnUser findAuthenticatedUser(String email, String password, long msoId) {
-		return nnUserDao.findAuthenticatedUser(email.toLowerCase(), password, msoId);
+	public NnUser findMsoUser(Mso mso) {
+		
+		if (mso.getType() == Mso.TYPE_NN) {
+			return this.findNNUser();
+		} else if (mso.getType() == Mso.TYPE_MSO) {
+			List<NnUser> users = nnUserDao.findByType(NnUser.TYPE_TBC);
+			for (NnUser user : users) {
+				if (user.getMsoId() == mso.getKey().getId()) {
+					return user;
+				}
+			}
+		} else if (mso.getType() == Mso.TYPE_3X3) {
+			List<NnUser> users = nnUserDao.findByType(NnUser.TYPE_3X3);
+			for (NnUser user : users) {
+				if (user.getMsoId() == mso.getKey().getId()) {
+					return user;
+				}
+			}
+		}
+		
+		return null;
+	}
+	
+	public NnUser findAuthenticatedUser(String email, String password) {
+		return nnUserDao.findAuthenticatedUser(email.toLowerCase(), password);
+	}
+	
+	public NnUser findAuthenticatedMsoUser(String email, String password, long msoId) {
+		return nnUserDao.findAuthenticatedMsoUser(email.toLowerCase(), password, msoId);
 	}
 	
 	public void subscibeDefaultChannels(NnUser user) {
@@ -82,6 +114,18 @@ public class NnUserManager {
 		return nnUserDao.findByEmailAndMsoId(email.toLowerCase(), mso.getKey().getId());
 	}
 
+	public List<NnUser> findNoneGuests() {
+		return nnUserDao.findNoneGuests();
+	}
+
+	public NnUser findByEmail(String email) {
+		return nnUserDao.findByEmail(email.toLowerCase());
+	}	
+	
+	public List<NnUser> findAllByEmail(String email) {
+		return nnUserDao.findAllByEmail(email.toLowerCase());
+	}	
+	
 	public NnUser findByToken(String token) {
 		return nnUserDao.findByToken(token);
 	}

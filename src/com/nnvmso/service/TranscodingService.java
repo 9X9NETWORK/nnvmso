@@ -225,7 +225,7 @@ public class TranscodingService {
 		postUrl.setKey(String.valueOf(channelId));
 		postUrl.setRss(sourceUrl);	
 		String[] transcodingEnv = this.getTranscodingEnv(req);
-		String transcodingServer = transcodingEnv[0];
+		String transcodingServer = transcodingEnv[0] + "podcatcher.php";
 		String callbackUrl = transcodingEnv[1];
 		String devel = transcodingEnv[2];		
 		postUrl.setCallback(callbackUrl);
@@ -242,6 +242,16 @@ public class TranscodingService {
 			e.printStackTrace();
 		}
 		return pro;
+	}
+	
+	public void updateFbToken(String fbToken) {
+		MsoConfigManager configMngr = new MsoConfigManager();		
+		MsoConfig config = configMngr.findByItem(MsoConfig.FBTOKEN);
+		if (config == null) { config = new MsoConfig();	}
+		config.setItem(MsoConfig.FBTOKEN);
+		config.setValue(fbToken);
+		configMngr.save(config);
+		
 	}
 	
 	public String[] getTranscodingEnv(HttpServletRequest req) {
