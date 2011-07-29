@@ -1,13 +1,8 @@
 package com.nnvmso.web.admin;
 
-import com.google.appengine.api.users.User;
-import com.google.appengine.api.users.UserService;
-import com.google.appengine.api.users.UserServiceFactory;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.Math;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -78,7 +73,7 @@ public class AdminNnUserController {
 		SubscriptionManager subMngr = new SubscriptionManager();
 		MsoChannelManager channelMngr = new MsoChannelManager();
 		ObjectMapper mapper = new ObjectMapper();
-		List<Map> dataRows = new ArrayList<Map>();
+		List<Map<String, Object>> dataRows = new ArrayList<Map<String, Object>>();
 		
 		String filter = "userId == " + userId;
 		int totalRecords = subMngr.total(filter);
@@ -137,10 +132,10 @@ public class AdminNnUserController {
 	                                                 OutputStream out) {
 		
 		ObjectMapper mapper = new ObjectMapper();
-		List<Map> dataRows = new ArrayList<Map>();
+		List<Map<String, Object>> dataRows = new ArrayList<Map<String, Object>>();
 		
 		String filter = "";
-		if (searchField != null && searchOper != null && searchString != null) {
+		if (searchField != null && searchOper != null && searchString != null && !searchString.isEmpty()) {
 			
 			Map<String, String> opMap = JqgridHelper.getOpMap();
 			if (opMap.containsKey(searchOper)) {
@@ -149,7 +144,15 @@ public class AdminNnUserController {
 			}
 		}
 		
-		int totalRecords = nnUserMngr.total(filter);
+		int totalRecords = 0;
+		try {
+			
+			totalRecords = nnUserMngr.total(filter);
+			
+		} catch(OutOfMemoryError e) {
+			totalRecords = 10000;
+		}
+		
 		int totalPages = (int)Math.ceil((double)totalRecords / rowsPerPage);
 		if (currentPage > totalPages)
 			currentPage = totalPages;

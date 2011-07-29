@@ -118,7 +118,7 @@ public class AdminMsoChannelController {
 		
 		SubscriptionLogManager subLogMngr = new SubscriptionLogManager();
 		ObjectMapper mapper = new ObjectMapper();
-		List<Map> dataRows = new ArrayList<Map>();
+		List<Map<String, Object>> dataRows = new ArrayList<Map<String, Object>>();
 		
 		List<MsoChannel> results;
 		int totalRecords, totalPages;
@@ -139,7 +139,7 @@ public class AdminMsoChannelController {
 			}
 		} else if (searchField != null && searchOper != null && searchString != null
 		           && searchOper.equals("eq")
-		           && (searchField.equals("status") || searchField.equals("contentType") || searchField.equals("isPublic") || searchField.equals("sourceUrl") || searchField.equals("name"))) {
+		           && (searchField.equals("status") || searchField.equals("contentType") || searchField.equals("isPublic") || searchField.equals("featured") || searchField.equals("sourceUrl") || searchField.equals("name"))) {
 			
 			if (searchField.equals("sourceUrl") || searchField.equals("name")) {
 				searchString = NnStringUtil.escapedQuote(searchString.toLowerCase());
@@ -175,6 +175,7 @@ public class AdminMsoChannelController {
 			cell.add(channel.getStatus());
 			cell.add(channel.getContentType());
 			cell.add(channel.isPublic());
+			cell.add(channel.isFeatured());
 			cell.add(channel.getProgramCount());
 			cell.add(subLogMngr.findTotalCountByChannelId(channel.getKey().getId()));
 			cell.add(channel.getIntro());
@@ -294,6 +295,7 @@ public class AdminMsoChannelController {
 			return error;
 		}
 		ccMngr.delete(cc);
+		// TODO: deal with Category.channelCount
 		return "OK";
 	}
 		
@@ -319,12 +321,12 @@ public class AdminMsoChannelController {
 		CategoryManager categoryMngr = new CategoryManager();
 		CategoryChannelManager ccMngr = new CategoryChannelManager();
 		ObjectMapper mapper = new ObjectMapper();
-		List<Map> dataRows = new ArrayList<Map>();
+		List<Map<String, Object>> dataRows = new ArrayList<Map<String, Object>>();
 		
 		// no channel was specified
 		if (channelId == 0) {
 			try {
-				mapper.writeValue(out, JqgridHelper.composeJqgridResponse(1, 1, 0, new ArrayList<Map>()));
+				mapper.writeValue(out, JqgridHelper.composeJqgridResponse(1, 1, 0, new ArrayList<Map<String, Object>>()));
 			} catch (IOException e) {
 				logger.warning(e.getMessage());
 			}
@@ -374,6 +376,7 @@ public class AdminMsoChannelController {
 	                                   @RequestParam(required=false) String  imageUrl,
 	                                   @RequestParam(required=false) Short   status,
 	                                   @RequestParam(required=false) Boolean isPublic,
+	                                   @RequestParam(required=false) Boolean featured,
 	                                   @RequestParam(required=false) Integer programCount) {
 		
 		logger.info("admin = " + userService.getCurrentUser().getEmail());
@@ -405,6 +408,10 @@ public class AdminMsoChannelController {
 		if (isPublic != null) {
 			logger.info("isPublic = " + isPublic);
 			channel.setPublic(isPublic);
+		}
+		if (featured != null) {
+			logger.info("featured = " + featured);
+			channel.setFeatured(featured);
 		}
 		if (programCount != null) {
 			logger.info("programCount = " + programCount);
