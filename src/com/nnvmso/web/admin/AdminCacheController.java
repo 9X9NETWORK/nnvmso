@@ -97,6 +97,7 @@ public class AdminCacheController {
 		
 	//cache add, one mso at a time
 	//cache listing, list all mso's
+	/*
 	@RequestMapping("category")
 	public ResponseEntity<String> cacheCategory(@RequestParam(required=false)Long mso, 
 			                                    @RequestParam(required=false)boolean delete,
@@ -116,7 +117,8 @@ public class AdminCacheController {
 			}			
 		}
 		return NnNetUtil.textReturn(output);
-	}	
+	}
+	*/	
 		
 	@RequestMapping("deleteAll")
 	public ResponseEntity<String> deleteAll() {		
