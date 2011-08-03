@@ -69,7 +69,7 @@ public class AdminCategoryController {
 		boolean needNewCategories = true;
 		int cnt = 0;
 		String list[] = new String[10];
-		for (Category c : categories) {
+		for (Category c : categories) {			
 			if (c.getName().equals("Activism")) {
 				c.setName("Society & Organizations");
 				cnt++;
@@ -90,7 +90,7 @@ public class AdminCategoryController {
 				c.setName("Travel & Living");
 				cnt++;
 				cMngr.save(c);
-			} else if (c.getName().equals("Pets & Animals")) {
+			} else if (c.getName().equals("Pets & animals")) {
 				c.setName("Nature & Animals");
 				cnt++;
 				cMngr.save(c);
@@ -106,7 +106,7 @@ public class AdminCategoryController {
 				needNewCategories = false;
 			} else if (c.getName().equals("Others")) {
 				needNewCategories = false;
-			} else if (c.getName().equals("Gay & Lesbian")) {
+			} else if (c.getName().equals("Gay & lesbian")) {
 				c.setPublic(false);
 				cMngr.save(c);
 			} else if (c.getName().equals("Comedy")) {
