@@ -241,7 +241,7 @@ var brandinfo = "${brandInfo}";
     <div id="add-content">
       <div id="add-col">
         <h2>Add Channels</h2>
-        <h3>from your own</h3>
+        <h3 id="fromown">from your own</h3>
         <ul id="private-list" class="option-list">
           <li id="myFacebook"><span>My Facebook</span></li>
           <li id="myPodcast"><span>My Podcast</span></li>
@@ -249,7 +249,7 @@ var brandinfo = "${brandInfo}";
           <li id="myYouTube"><span>My YouTube</span></li>
           <!--<li id="myTwitter"><span>My Twitter</span></li>-->
         </ul>
-        <h3>from 9x9</h3>
+        <h3 id="from9x9">from 9x9</h3>
         <ul id="public-list" class="option-list">
           <li id="fSets"><span>Featured sets</span></li>
           <li id="fChannels"><span>Featured channels</span></li>
