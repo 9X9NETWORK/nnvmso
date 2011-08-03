@@ -3,13 +3,10 @@ package com.nnvmso.task.mapper;
 import java.util.logging.Logger;
 
 import org.apache.hadoop.io.NullWritable;
-import org.apache.hadoop.mapreduce.Counter;
 
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.tools.mapreduce.AppEngineMapper;
-import com.google.appengine.tools.mapreduce.DatastoreMutationPool;
-import com.nnvmso.model.NnUser;
 
 public class MergeAccountMapper extends AppEngineMapper<Key, Entity, NullWritable, NullWritable>{
 
