@@ -80,6 +80,39 @@ var programDetail =
       }
     });
   },
+  initYouTube: function(url)
+  {
+    $.get(url, { alt: 'json' }, function(data)
+    {
+      if (typeof data.entry != 'undefined') {
+        $('#program_list').hide();
+        programDetail.displayYouTube(data.entry);
+      }
+    }, 'json');
+  },
+  displayYouTube: function(entry)
+  {
+    var programDetailBlock = $('#program_detail_readonly');
+    var title = entry.media$group.media$title.$t;
+    if (title.length > 20) {
+      title = title.substring(0, 20) + '...';
+    }
+    programDetailBlock.find('.right_title div').text(title);
+    programDetailBlock.find('.ep_name').text(entry.media$group.media$title.$t);
+    programDetailBlock.find('.ep_intro').text(entry.media$group.media$description.$t);
+    var promoteUrl = entry.link[0].href;
+    programDetailBlock.find('.ep_url').attr('href', promoteUrl).text(promoteUrl);
+    programDetailBlock.find('.ep_image').attr('src', entry.media$group.media$thumbnail[1].url);
+    programDetailBlock.find('.ep_createdate').text(entry.published.$t.substring(0, 19).replace('T', ' ').replace(/-/g, '/'));
+    programDetailBlock.find('.ep_return').unbind().click(function()
+    {
+      programDetail.destroy();
+      $('#program_list_readonly').show();
+    });
+    var dom = programDetailBlock.find('.ep_source').text('YouTube').attr('href', promoteUrl);
+    $('#program_list_readonly').hide();
+    $('#program_detail_readonly').show();
+  },
   displayProgram: function(program)
   {
     var programDetailBlock = $('#program_detail');
@@ -273,9 +306,9 @@ var programDetail =
             };
             $.get('http://gdata.youtube.com/feeds/api/videos/' + videoId, parameters, function(data)
             {
-              programDetailBlock.find('.ep_name').val(data.entry.title.$t);
-              programDetailBlock.find('.ep_intro').val(data.entry.content.$t);
-              programDetailBlock.find('.ep_image').attr('src', data.entry.media$group.media$thumbnail[0]['url']);
+              programDetailBlock.find('.ep_name').val(data.entry.media$group.media$title.$t);
+              programDetailBlock.find('.ep_intro').val(data.entry.media$group.media$description.$t);
+              programDetailBlock.find('.ep_image').attr('src', data.entry.media$group.media$thumbnail[1].url);
               programDetailBlock.find('.ep_image_updated').val('true');
             }, 'json');
             /* server side approach
@@ -1121,11 +1154,7 @@ var channelList =
         channelInfoBlock.find('.channel_info_promoteurl').text(promoteUrl).attr('href', promoteUrl);
         $('<li></li>').append(channelInfoBlock).appendTo('#channel_list_ul');
         // channel info block click event
-        if (channels[i].contentType == 6)
-          var readonly = false;
-        else
-          var readonly = true;
-        channelInfoBlock.click({ 'channelId': channelId, 'readonly':  readonly, 'channelName': channels[i].name}, function(event)
+        channelInfoBlock.click({ 'channel': channels[i] }, function(event)
         {
           $('.channel_info_block').removeClass('chFocus').addClass('chUnFocus');
           $('.channel_info_title').removeClass('chFocusTitle').addClass('chUnFocusTitle');

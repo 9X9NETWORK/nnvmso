@@ -9,9 +9,6 @@
 <link rel="stylesheet" href="/stylesheets/cms.css" type="text/css"/>
 <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/themes/start/jquery-ui.css" type="text/css" />
 <link rel="stylesheet" href="/stylesheets/jquery.jqModal.css" type="text/css"/>
-<!--
-<script type="text/javascript" src="https://www.google.com/jsapi?key=ABQIAAAAXBRF5Us_IiZaSTJMsgWQ8hRj9HbpHlgQpxzEVfOizwCLurRGkBR_04r4-8kmbsy3NnOCnO0MzT1Qqw"></script>
--->
 <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4dcccc98718a5dbe"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.js"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/jquery-ui.min.js"></script>
@@ -436,7 +433,7 @@
               <div class="epInfoTitle program_info_title"><div>何處是我家 </div></div>
               <div class="epInfoImg program_info_image"></div>
               <div class=" floatL epInfo" >
-                <a href="#" class="floatL program_info_promoteurl">http://www.9x9.tv/channel/3958</a>
+                <a href="javascript:" target="_player" class="floatL program_info_promoteurl">http://www.9x9.tv/channel/3958</a>
                 <a class="floatL program_info_addthis"><img src="http://cache.addthiscdn.com/icons/v1/thumbs/addthis.gif"/></a>
                 <a href="#" class="iconStatistics" title="觀看數據"></a>
                 <div class="clear"></div>
