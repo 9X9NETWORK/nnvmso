@@ -14,6 +14,7 @@ import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
 import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.model.Category;
+import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoProgram;
 import com.nnvmso.service.CategoryManager;
@@ -71,7 +72,18 @@ public class CalibrationTask {
 		
 		MsoChannelManager channelMngr = new MsoChannelManager();
 		List<MsoChannel> channels = channelMngr.findPublicChannelsByCategoryId(category.getKey().getId());
-		category.setChannelCount(channels.size());
+
+		int engCnt = 0;
+		int chnCnt = 0;
+		for (MsoChannel c : channels) {
+			if (c.getLangCode().equals(Mso.LANG_ZH))
+				chnCnt++;
+			else 
+				engCnt++;
+		}
+		
+		category.setChannelCount(engCnt);
+		category.setChnChannelCount(chnCnt);
 		cMngr.save(category);
 		log.info("calibrat category:" + category.getName() + "(" + category.getKey().getId() + ") with " + channels.size() + " channels.");
 		return NnNetUtil.textReturn("OK");
