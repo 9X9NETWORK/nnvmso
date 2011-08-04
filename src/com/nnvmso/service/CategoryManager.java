@@ -19,6 +19,7 @@ import com.nnvmso.dao.CategoryDao;
 import com.nnvmso.lib.CacheFactory;
 import com.nnvmso.model.Category;
 import com.nnvmso.model.CategoryChannel;
+import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
 
 @Service
@@ -151,11 +152,15 @@ public class CategoryManager {
 		MsoChannelManager channelMngr = new MsoChannelManager();
 		if (channelMngr.isCounterQualified(channel)) {
 			List<CategoryChannel> ccs = new ArrayList<CategoryChannel>();
-			ccs = ccMngr.findAllByChannelId(channel.getKey().getId());
+			//find all the category a channel belongs to
+			ccs = ccMngr.findAllByChannelId(channel.getKey().getId());						
 			for (CategoryChannel cc : ccs) {
 				Category c = this.findById(cc.getCategoryId());
 				log.info("count added: category id" + c.getKey().getId() + ";channelId " + channel.getKey().getId() + ";name " + channel.getName());
-				c.setChannelCount(c.getChannelCount() + 1);
+				if (channel.getLangCode().equals(Mso.LANG_ZH))
+					c.setChnChannelCount(c.getChnChannelCount()+1);
+				else
+					c.setChannelCount(c.getChannelCount() + 1);
 				this.save(c);					
 			}
 		}						

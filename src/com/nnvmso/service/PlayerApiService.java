@@ -721,7 +721,8 @@ public class PlayerApiService {
 		return output;
 	}
 
-	public String createChannel(String categoryIds, String userToken, String url, String grid, String tags, HttpServletRequest req) {
+	public String createChannel(String categoryIds, String userToken, String url, String grid, 
+			                    String tags, String lang, HttpServletRequest req) {
 		//verify input
 		if (url == null || url.length() == 0 ||  grid == null || grid.length() == 0 ||
 			categoryIds == null || categoryIds.equals("undefined") || categoryIds.length() == 0 ||
@@ -731,9 +732,13 @@ public class PlayerApiService {
 		if (!Pattern.matches("^\\d*$", grid) || Integer.parseInt(grid) < 0 || Integer.parseInt(grid) > 81) {			
 			return NnStatusMsg.inputError(locale);
 		}
-		
-		url = url.trim();
-		
+		if (lang == null || lang.length() == 0) 
+			lang = Mso.LANG_EN;
+		if (!lang.equals(Mso.LANG_EN) && !lang.equals(Mso.LANG_ZH)) {
+			return NnStatusMsg.inputError(locale);
+		}
+				
+		url = url.trim();	
 		//verify user
 		NnUser user = userMngr.findByToken(userToken);
 		if (user == null) { return NnStatusMsg.userInvalid(locale);}		
@@ -768,6 +773,7 @@ public class PlayerApiService {
 			//create a new channel
 			channel = channelMngr.initChannelSubmittedFromPlayer(url, user);
 			channel.setTags(tags);
+			channel.setLangCode(lang);
 			log.info("User throws a new url:" + url);
 			channelMngr.create(channel, categories);
 			if (channel.getKey() != null && channel.getContentType() != MsoChannel.CONTENTTYPE_FACEBOOK) { //!!!
@@ -1009,9 +1015,12 @@ public class PlayerApiService {
 		String output = NnStatusMsg.successStr(locale) + separatorStr;
 		for (Category c : categories) {
 			String name =  c.getName();
-			if (lang.equals(Mso.LANG_ZH))
+			int cnt = c.getChannelCount();
+			if (lang.equals(Mso.LANG_ZH)) {
 				name = categoryMngr.translate(name);
-			String[] str = {String.valueOf(c.getKey().getId()), name, String.valueOf(c.getChannelCount())};				
+				cnt = c.getChnChannelCount();
+			}
+			String[] str = {String.valueOf(c.getKey().getId()), name, String.valueOf(cnt)};				
 			output = output + NnStringUtil.getDelimitedStr(str) + "\n";
 		}
 		
