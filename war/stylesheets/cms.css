@@ -259,10 +259,10 @@ a.btnDel:hover { background:url(/images/cms/btnCloseHover.png) no-repeat;}
 .btn:hover { background:url(/images/cms/btn_red_hover.jpg) 0 0 repeat-x;}
 .btn span{ line-height:30px; display:block;}
 .createAbout li { background:url(/images/cms/icon_check.jpg) no-repeat 0 0; padding-left:25px; height:18px; color:#5e5e5e; font-size:0.9em}
-.createBtn{ padding:5px 20px 0 0;}
-.chStep1{ padding:20px 0 0 20px;}
+.createBtn{ padding:5px 10px 0 0;}
+.chStep1{ padding:20px 0 0 10px;}
 .createChItem{ padding:20px 0}
-.createChItem .hint{ padding:10px 0 0 0; }
+.createChItem .hint{ padding:10px 0 0 0; width: 450px; }
 
 .iconStatistics{ background:url(/images/cms/icon_statistics.png) no-repeat; display:none; width:16px; height:17px; float:left;}
 
