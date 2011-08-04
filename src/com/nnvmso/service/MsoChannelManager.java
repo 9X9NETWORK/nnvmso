@@ -291,44 +291,6 @@ public class MsoChannelManager {
 		return msoChannelDao.findByName(name);
 	}
 	
-	public List<MsoChannel> findPublicChannelsByCategoryIdAndLang(long categoryId, String lang) {
-		//channels within a category
-		CategoryChannelManager ccMngr = new CategoryChannelManager();
-		CategoryManager categoryMngr = new CategoryManager();
-		SubscriptionLogManager sublogMngr = new SubscriptionLogManager();
-		List<CategoryChannel> ccs = (List<CategoryChannel>) ccMngr.findAllByCategoryId(categoryId);
-
-		//retrieve channels
-		List<MsoChannel> chineseChannels = new ArrayList<MsoChannel>();
-		List<MsoChannel> englishChannels = new ArrayList<MsoChannel>();
-		for (CategoryChannel cc : ccs) {
-			MsoChannel channel = this.findById(cc.getChannelId());
-			if (channel != null && channel.getStatus() == MsoChannel.STATUS_SUCCESS && channel.getProgramCount() > 0 && channel.isPublic()) { 
-				//category is used to find this channel's mso, then find corresponding subscription count
-				Category category  = categoryMngr.findById(cc.getCategoryId());
-				if (category != null) {
-					SubscriptionLog sublog = sublogMngr.findByMsoIdAndChannelId(category.getMsoId(), channel.getKey().getId());			
-				    if (sublog != null) {channel.setSubscriptionCount(sublog.getCount());}
-				}
-				if (channel.getLangCode() != null && channel.getLangCode().equals(Mso.LANG_ZH))
-					chineseChannels.add(channel);
-				else 
-					englishChannels.add(channel);
-			}
-		}				
-		List<MsoChannel> channels = new ArrayList<MsoChannel>();
-		if (lang != null) {
-			if (lang.equals(Mso.LANG_ZH))					
-				channels.addAll(chineseChannels);
-			else
-				channels.addAll(englishChannels);
-		} else { 
-			channels.addAll(chineseChannels);
-			channels.addAll(englishChannels);
-		}
-		return channels;
-	}
-
 	public List<MsoChannel> findPublicChannelsByCategoryId(long categoryId) {
 		//channels within a category
 		CategoryChannelManager ccMngr = new CategoryChannelManager();
@@ -425,6 +387,44 @@ public class MsoChannelManager {
 		}
 	}	
 
+	public List<MsoChannel> findPublicChannelsByCategoryIdAndLang(long categoryId, String lang) {
+		//channels within a category
+		CategoryChannelManager ccMngr = new CategoryChannelManager();
+		CategoryManager categoryMngr = new CategoryManager();
+		SubscriptionLogManager sublogMngr = new SubscriptionLogManager();
+		List<CategoryChannel> ccs = (List<CategoryChannel>) ccMngr.findAllByCategoryId(categoryId);
+
+		//retrieve channels
+		List<MsoChannel> chineseChannels = new ArrayList<MsoChannel>();
+		List<MsoChannel> englishChannels = new ArrayList<MsoChannel>();
+		for (CategoryChannel cc : ccs) {
+			MsoChannel channel = this.findById(cc.getChannelId());
+			if (channel != null && channel.getStatus() == MsoChannel.STATUS_SUCCESS && channel.getProgramCount() > 0 && channel.isPublic()) { 
+				//category is used to find this channel's mso, then find corresponding subscription count
+				Category category  = categoryMngr.findById(cc.getCategoryId());
+				if (category != null) {
+					SubscriptionLog sublog = sublogMngr.findByMsoIdAndChannelId(category.getMsoId(), channel.getKey().getId());			
+				    if (sublog != null) {channel.setSubscriptionCount(sublog.getCount());}
+				}
+				if (channel.getLangCode() != null && channel.getLangCode().equals(Mso.LANG_ZH))
+					chineseChannels.add(channel);
+				else 
+					englishChannels.add(channel);
+			}
+		}				
+		List<MsoChannel> channels = new ArrayList<MsoChannel>();
+		if (lang != null) {
+			if (lang.equals(Mso.LANG_ZH))					
+				channels.addAll(chineseChannels);
+			else
+				channels.addAll(englishChannels);
+		} else { 
+			channels.addAll(chineseChannels);
+			channels.addAll(englishChannels);
+		}
+		return channels;
+	}
+	
 	public List<MsoChannel> findChannelsByIdStr(String channelIds) {
 		List<Long> channelIdList = new ArrayList<Long>();	
 		String[] arr = channelIds.split(",");

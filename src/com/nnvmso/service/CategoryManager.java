@@ -5,10 +5,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 import net.sf.jsr107cache.Cache;
 
+import org.springframework.context.MessageSource;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Service;
 
 import com.google.appengine.api.datastore.Key;
@@ -22,6 +25,7 @@ import com.nnvmso.model.MsoChannel;
 public class CategoryManager {
 	
 	protected static final Logger log = Logger.getLogger(CategoryManager.class.getName());
+	private static MessageSource messageSource = new ClassPathXmlApplicationContext("locale.xml");
 	
 	private CategoryDao categoryDao = new CategoryDao();
 		
@@ -35,16 +39,53 @@ public class CategoryManager {
 		}
 	}
 	
+	public void cacheRefresh(Category category) {
+		this.findAllByMsoId(category.getMsoId());
+	}
+	
+	public String translate(String name) {
+		if (name == null) return null;
+		Locale locale = Locale.TRADITIONAL_CHINESE;
+		if (name.equals("News & Politics")) 
+			return messageSource.getMessage("category.news", null, locale);
+		if (name.equals("Finance & Management")) 
+			return messageSource.getMessage("category.finance", null, locale);
+		if (name.equals("Entertainment")) 
+			return messageSource.getMessage("category.entertainment", null, locale);
+		if (name.equals("Music")) 
+			return messageSource.getMessage("category.music", null, locale);
+		if (name.equals("Sports & Outdoors")) 
+			return messageSource.getMessage("category.sports", null, locale);
+		if (name.equals("Tech & Science")) 
+			return messageSource.getMessage("category.tech", null, locale);
+		if (name.equals("Gaming")) 
+			return messageSource.getMessage("category.gaming", null, locale);
+		if (name.equals("Lifestyle & Hobbies")) 
+			return messageSource.getMessage("category.lifestyle", null, locale);
+		if (name.equals("Travel & Living")) 
+			return messageSource.getMessage("category.travel", null, locale);
+		if (name.equals("Arts & Creative")) 
+			return messageSource.getMessage("category.arts", null, locale);
+		if (name.equals("Society & Organizations")) 
+			return messageSource.getMessage("category.org", null, locale);
+		if (name.equals("Education & How to")) 
+			return messageSource.getMessage("category.education", null, locale);
+		if (name.equals("Nature & Animals")) 
+			return messageSource.getMessage("category.nature", null, locale);
+		if (name.equals("People")) 
+			return messageSource.getMessage("category.people", null, locale);
+		if (name.equals("Religion & Spirituality")) 
+			return messageSource.getMessage("category.religion", null, locale);
+		if (name.equals("Others")) 
+			return messageSource.getMessage("category.others", null, locale);
+		return "其他類";
+	}			
+	
 	public Category save(Category category) {
 		category.setUpdateDate(new Date());		
 		category = categoryDao.save(category);
 		this.cacheRefresh(category);
 		return category;
-	}
-	
-	public void cacheRefresh(Category category) {
-		this.findAllByMsoId(category.getMsoId());
-		this.findAllInIpg(category.getMsoId());
 	}
 	
 	public List<Category> findCategoriesByChannelId(long channelId) {
@@ -147,7 +188,7 @@ public class CategoryManager {
 	//result will be cached
 	public List<Category> findAllByMsoId(long msoId) {
 		Cache cache = CacheFactory.get();
-		String key = this.getCacheKey(msoId, true);
+		String key = this.getCacheKey(msoId);
 		if (cache != null) {
 			@SuppressWarnings("unchecked")
 			List<Category> categories= (List<Category>) cache.get(key);
@@ -171,23 +212,6 @@ public class CategoryManager {
 		cache.put(key, sequence);
 		return sequence;
 	}
-
-	//result will be cached
-	public List<Category> findAllInIpg(long msoId) {
-		Cache cache = CacheFactory.get();
-		String key = this.getCacheKey(msoId, false);
-		if (cache != null) {
-			@SuppressWarnings("unchecked")
-			List<Category> categories= (List<Category>) cache.get(key);
-			if (categories != null) { 
-				log.info("categories from cahce:" + categories.size());
-				return categories;
-			}
-		}
-		List<Category> categories = categoryDao.findAllInIpg(msoId);//!!!hack
-		cache.put(key, categories);
-		return categories;
-	}
 	
 	public List<Category> findAll() {
 		return categoryDao.findAll();
@@ -204,20 +228,15 @@ public class CategoryManager {
 	public Category findById(long id) {
 		return categoryDao.findById(id);
 	}
-		
-	//example: mso(1)category(123), returns category
-	private String getCacheKey(long msoId, boolean isAll) {
-		String option = "all";
-		if (!isAll)
-			option = "ipg";
-		return "mso(" + msoId + ")category(" + option + ")";
+			
+	private String getCacheKey(long msoId) {
+		return "mso(" + msoId + ")category(all)";
 	}
 	
 	public void deleteCache(long msoId) {
 		Cache cache = CacheFactory.get();
 		if (cache != null) {
-			cache.remove(this.getCacheKey(msoId, true));
-			cache.remove(this.getCacheKey(msoId, false));
+			cache.remove(this.getCacheKey(msoId));
 		}
 	}		
 

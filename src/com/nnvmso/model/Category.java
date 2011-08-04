@@ -129,29 +129,5 @@ public class Category implements Serializable {
 	public long getParentId() {
 		return parentId;
 	}
-
-	public boolean isInIpg() {
-		return isInIpg;
-	}
-
-	public void setInIpg(boolean isInIpg) {
-		this.isInIpg = isInIpg;
-	}
-
-	public short getType() {
-		return type;
-	}
-
-	public void setType(short type) {
-		this.type = type;
-	}
-
-	public short getSeq() {
-		return seq;
-	}
-
-	public void setSeq(short seq) {
-		this.seq = seq;
-	}
 	
 }

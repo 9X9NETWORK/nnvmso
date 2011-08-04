@@ -132,7 +132,8 @@ public class PlayerApiController {
 		}
 		*/
 		MsoManager msoMngr = new MsoManager();
-		Mso mso = msoMngr.findMsoViaHttpReq(req);
+		//Mso mso = msoMngr.findMsoViaHttpReq(req);
+		Mso mso = msoMngr.findNNMso();
 		Locale locale = Locale.ENGLISH;
 		if (mso.getPreferredLangCode().equals(Mso.LANG_ZH_TW)){
 			locale = Locale.TRADITIONAL_CHINESE;
@@ -432,26 +433,22 @@ public class PlayerApiController {
 
 	/**
 	 * Change set name. Please note a pre-defined set is not editable.
-	 * <p>
-	 * For demo: please provide user, pos and set 
 	 * 
 	 * @param user user token
 	 * @param name set name
 	 * @param pos set position, from 1 to 9 
-	 * @param set set id (category id)
 	 * @return status
 	*/
 	@RequestMapping(value="setSetInfo")
 	public ResponseEntity<String> setSetInfo (@RequestParam(value="user", required=false) String userToken,
 			                                  @RequestParam(value="name", required=false) String name,
 			                                  @RequestParam(value="pos", required=false) String pos,
-			                                  @RequestParam(value="set", required=false) String setId,
 			                                  HttpServletRequest req) {
-		log.info("setInfo: user=" + userToken + ";pos =" + pos + ";set=" + setId);
+		log.info("setInfo: user=" + userToken + ";pos =" + pos);
 		this.prepService(req);		
 		String output = NnStatusMsg.errorStr(locale);
 		try {
-			output = playerApiService.changeSetInfo(userToken, name, pos, setId);
+			output = playerApiService.changeSetInfo(userToken, name, pos);
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}
@@ -503,10 +500,7 @@ public class PlayerApiController {
 	 * @param user user's unique identifier
 	 * @param grid grid location, 0 - 81
 	 * @param category category id
-	 * @param lang language code, en or zh.
-	 * @param name user's customized name.
-	 * @param description user's customized description
-	 * @param imageUrl user's customized thumbnail
+	 * @param langCode language code, en or zh.
 	 * @param tag tag string, separated by comma
 	 * 
 	 * @return channel id, channel name, image url. <br/>
@@ -518,19 +512,14 @@ public class PlayerApiController {
 		String grid = req.getParameter("grid");
 		String categoryIds = req.getParameter("category");
 		String tags = req.getParameter("tag");
-		String name = req.getParameter("name");
-		String intro = req.getParameter("description");
-		String lang = req.getParameter("lang");
-		String imageUrl = req.getParameter("imageUrl");
 
 		this.prepService(req);		
 		log.info("player input - userToken=" + userToken+ "; url=" + url + ";grid=" + grid + 
-				 ";categoryId=" + categoryIds + "; tag=" + tags + ";name=" + name + 
-				 ";intro=" + intro + ";lang=" + lang + ";imageUrl=" + imageUrl);				
+				 ";categoryId=" + categoryIds + "; tag=" + tags);				
 		String output = NnStatusMsg.errorStr(locale);		
 		
 		try {
-			output = playerApiService.createChannel(categoryIds, userToken, url, grid, tags, name, intro, lang, imageUrl, req);
+			output = playerApiService.createChannel(categoryIds, userToken, url, grid, tags, req);
 		} catch (Exception e){
 			output = playerApiService.handleException(e);
 		}
@@ -546,10 +535,7 @@ public class PlayerApiController {
 	 * @return Category info and channels info. <br/>
 	 *  	   First section is category info, follows channels info. Each channel is \n separated.<br/>    
 	 *         Category info has category id. <br/>
-	 *         Channel info includes channel id, channel name, channel image url, program count, 
-	 *         subscription count, channel type, channel episodes last update time,
-	 *         channel source (for example, youtube's channel name) <br/>
-	 *         channel description
+	 *         Channel info includes channel id, channel name, channel image url, program count, subscription count, channel type, channel episodes last update time <br/>
 	 *         Example: 	<br/>
 	 *         0	success<br/>
 	 *         --<br/>
@@ -562,13 +548,13 @@ public class PlayerApiController {
 	 */		
 	@RequestMapping(value="channelBrowse")
 	public ResponseEntity<String> channelBrowse(@RequestParam(value="category", required=false) String categoryIds,
-												@RequestParam(value="lang", required=false) String lang,
+			                                    @RequestParam(value="lang", required=false) String lang,
 			                                    HttpServletRequest req) {
 		this.prepService(req);
-		log.info(categoryIds);		
+		log.info(categoryIds);
 		String output = NnStatusMsg.errorStr(locale);
 		try {
-			output = playerApiService.findPublicChannelsByCategory(categoryIds, lang);
+			output = playerApiService.findPublicChannelsByCategoryAndLang(categoryIds, lang);
 		} catch (Exception e){
 			output = playerApiService.handleException(e);
 		}
@@ -582,14 +568,15 @@ public class PlayerApiController {
 	 *         Category info has category id, category name, channel count.<br/>
 	 */		
 	@RequestMapping(value="categoryBrowse")
-	public ResponseEntity<String> categoryBrowse(HttpServletRequest req) {
+	public ResponseEntity<String> categoryBrowse(@RequestParam(value="lang", required=false) String lang,
+			                                     HttpServletRequest req) {
 		this.prepService(req);
 		String output = NnStatusMsg.errorStr(locale);		
 		try {
-			output = playerApiService.findCategoriesByMso();
+			output = playerApiService.findCategoriesByLang(lang);			
 		} catch (Exception e){
 			output = playerApiService.handleException(e);
-		}	
+		}
 		return NnNetUtil.textReturn(output);
 	}
 
@@ -616,16 +603,13 @@ public class PlayerApiController {
 	 *         
 	 *         </blockquote>
 	 *         <p>
-	 *         <strike>set type: TYPE_USER = 1; TYPE_READONLY = 2;</strike>
-	 *         set type: TYPE_NORESTRICTION = 0; TYPE_RESTRICTED = 1; TYPE_PERSONAL = 2;TYPE_YOUTUBE = 3;         
+	 *         set type: TYPE_USER = 1; TYPE_READONLY = 2;
 	 *         <br/>
 	 *         channel type: TYPE_GENERAL = 1; TYPE_READONLY = 2;
 	 *         <br/>
 	 *         status: STATUS_SUCCESS = 0; STATUS_ERROR = 1;
 	 *         <br/> 
-	 *         contentType: SYSTEM_CHANNEL=1; PODCAST=2; YOUTUBE_CHANNEL=3; 
-	 *                      YOUTUBE_PLAYERLIST=4; FACEBOOK_CHANNEL=5; MIX_CHANNEL=6;
-	 *                      SLIDE=7
+	 *         contentType: SYSTEM_CHANNEL=1; PODCAST=2; YOUTUBE_CHANNEL=3; YOUTUBE_PLAYERLIST=4 FACEBOOK_CHANNEL=5 MIX_CHANNEL=6
 	 *         <br/>
 	 *         channel episodes last update time: it does not always accurate on Youtube channels. It will pass channel create date on FB channels.
 	 *         <p> 
@@ -921,7 +905,7 @@ public class PlayerApiController {
 		}
 		return NnNetUtil.textReturn(output);
 	}
-	
+
 	/**
 	 * Listing featured sets 
 	 * 

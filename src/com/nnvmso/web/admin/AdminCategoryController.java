@@ -62,6 +62,105 @@ public class AdminCategoryController {
 		return "error/exception";				
 	}
 	
+	@RequestMapping(value="newStuff")
+	public ResponseEntity<String> newStuff() {
+		CategoryManager cMngr = new CategoryManager();
+		List<Category> categories = cMngr.findAll();
+		boolean needNewCategories = true;
+		int cnt = 0;
+		String list[] = new String[10];
+		for (Category c : categories) {			
+			if (c.getName().equals("Activism")) {
+				c.setName("Society & Organizations");
+				cnt++;
+				cMngr.save(c);
+			} else if (c.getName().equals("How to")) {			
+				c.setName("Education & How to");
+				cnt++;
+				cMngr.save(c);
+			} else if (c.getName().equals("Religion")) {			
+				c.setName("Religion & Spirituality");
+				cnt++;
+				cMngr.save(c);
+			} else if (c.getName().equals("Finance")) {
+				c.setName("Finance & Management");
+				cnt++;
+				cMngr.save(c);
+			} else if (c.getName().equals("Travel")) {
+				c.setName("Travel & Living");
+				cnt++;
+				cMngr.save(c);
+			} else if (c.getName().equals("Pets & animals")) {
+				c.setName("Nature & Animals");
+				cnt++;
+				cMngr.save(c);
+			} else if (c.getName().equals("Automotive")) {
+				c.setName("Lifestyle & Hobbies");
+				cnt++;
+				cMngr.save(c);
+			} else if (c.getName().equals("Outdoor")) {
+				c.setName("Sports & Outdoors");
+				cnt++;
+				cMngr.save(c);
+			} else if (c.getName().equals("Arts & Creative")) {
+				needNewCategories = false;
+			} else if (c.getName().equals("Others")) {
+				needNewCategories = false;
+			} else if (c.getName().equals("Gay & lesbian")) {
+				c.setPublic(false);
+				cMngr.save(c);
+			} else if (c.getName().equals("Comedy")) {
+				c.setPublic(false);
+				cMngr.save(c);
+			} else if (c.getName().equals("Food & Wine")) {
+				c.setPublic(false);
+				cMngr.save(c);
+			} else if (c.getName().equals("Health & Fitness")) {
+				c.setPublic(false);
+				cMngr.save(c);
+			} else if (c.getName().equals("Lifestyle")) {
+				c.setPublic(false);
+				cMngr.save(c);
+			} else if (c.getName().equals("Sports")) {
+				c.setPublic(false);
+				cMngr.save(c);
+			}
+			if (c.getName().equals("Comedy")) {
+				list[0] = "Comedy:" + c.getKey().getId();
+			} else if (c.getName().equals("Entertainment")) {
+				list[1] = "Entertainment:" + c.getKey().getId();
+			} else if (c.getName().equals("Food & wine")) {
+				list[2] = "Food & Wine:" + c.getKey().getId();
+			} else if (c.getName().equals("Gay & lesbian")) {
+				list[3] = "Gay & Lesbian:" + c.getKey().getId();
+			} else if (c.getName().equals("Health & fitness")) {
+				list[4] = "Health & Fitness:" + c.getKey().getId();
+			} else if (c.getName().equals("Lifestyle")) {
+				list[5] = "Lifestyle:" + c.getKey().getId();
+			} else if (c.getName().equals("Lifestyle & Hobbies")) {
+				list[6] = "Lifestyle & Hobbies:" + c.getKey().getId();
+			} else if (c.getName().equals("Sports")) {
+				list[7] = "Sports:" + c.getKey().getId();
+			} else if (c.getName().equals("Sports & Outdoors")) {
+				list[8] = "Sports & Outdoors:" + c.getKey().getId();
+			} else if (c.getName().equals("Travel & Living")) {
+				list[9] = "Travel & Living:" + c.getKey().getId();
+			}
+		}
+		MsoManager msoMngr = new MsoManager();
+		Mso mso = msoMngr.findByName("9x9");
+		if (needNewCategories) {
+			cMngr.create(new Category("Arts & Creative", true, mso.getKey().getId()));
+			cMngr.create(new Category("Others", true, mso.getKey().getId()));
+			cnt = cnt + 2;
+		}
+		String output = "category changes:" + cnt + "\n\n";
+		for (int i=0;i<10;i++) {
+			output = output + list[i] + "\n";
+		}
+		return NnNetUtil.textReturn(output);
+	}
+	
 	//list every channel under a category
 	@RequestMapping(value="channelList")
 	public ResponseEntity<String> channelList(@RequestParam("category")long id) {		
@@ -217,8 +316,6 @@ public class AdminCategoryController {
 			cell.add(category.getName());
 			cell.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(category.getUpdateDate()));
 			cell.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(category.getCreateDate()));
-			cell.add(category.getType());
-			cell.add(category.isInIpg());
 			cell.add(category.isPublic());
 			cell.add(category.getChannelCount());
 			
@@ -260,7 +357,6 @@ public class AdminCategoryController {
 	public @ResponseBody String modify(@RequestParam(required=true)  Long    id,
 	                                   @RequestParam(required=false) String  name,
 	                                   @RequestParam(required=false) Boolean isPublic,
-	                                   @RequestParam(required=false) Boolean isInIpg,
 	                                   @RequestParam(required=false) Long    msoId,
 	                                   @RequestParam(required=false) Integer channelCount) {
 		
@@ -287,10 +383,6 @@ public class AdminCategoryController {
 		if (name != null) {
 			logger.info("name = " + name);
 			category.setName(name);
-		}
-		if (isInIpg != null) {
-			logger.info("isInIpg = " + isInIpg);
-			category.setInIpg(isInIpg);
 		}
 		if (isPublic != null) {
 			logger.info("isPublic = " + isPublic);

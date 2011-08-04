@@ -54,6 +54,17 @@ public class SubscriptionDao extends GenericDao<Subscription>{
 			}
 		}
 	}
+
+	public void deleteAll(List<Subscription> list) {
+		if (list != null) {
+			PersistenceManager pm = PMF.get().getPersistenceManager();
+			try {
+				pm.deletePersistentAll(list);
+			} finally {
+				pm.close();
+			}
+		}
+	}
 	
 	public Subscription findByUserIdAndSeq(long userId, int seq) {
 		Subscription s = null;

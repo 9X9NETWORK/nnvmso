@@ -52,12 +52,18 @@ public class PlayerController {
 		PlayerService service = new PlayerService();
 		model = service.prepareBrand(model, mso, resp);
 		model = service.prepareSetInfo(model, name, resp);
+
+		String prefLanguage = req.getHeader("Accept-Language");
+		System.out.print(prefLanguage); //en-US,en;q=0.8  
+		
 		return "player/zooatomics";
 	}
 	
-	/**
-	 * to become a 9x9 player, 1)delete cookie, 2)set fb info 
-	 */	
+	@RequestMapping("support")
+	public String support() {
+		return "general/support";
+	}	
+	
 	/*
 	@RequestMapping("daai")
 	public String daai(@RequestParam(value="mso",required=false) String mso, HttpServletRequest req, HttpServletResponse resp, Model model) {

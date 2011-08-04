@@ -70,16 +70,16 @@ public class NnUserDao extends GenericDao<NnUser> {
 		return user;		
 	}
 	
-	public NnUser findAuthenticatedUser(String email, String password, long msoId) {
+	public NnUser findAuthenticatedUser(String email, String password) {
 		NnUser user = null;
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
 			Query query = pm.newQuery(NnUser.class);
-			query.setFilter("email == emailParam && msoId == msoIdParam");
-			query.declareParameters("String emailParam, long msoIdParam");				
+			query.setFilter("email == emailParam");
+			query.declareParameters("String emailParam");				
 			@SuppressWarnings("unchecked")
-			List<NnUser> results = (List<NnUser>) query.execute(email, msoId);
-			if (results.size() > 0) {
+			List<NnUser> results = (List<NnUser>) query.execute(email);
+			if (results.size() > 0) {				
 				user = results.get(0);		
 				byte[] proposedDigest = AuthLib.passwordDigest(password, user.getSalt());
 				if (!Arrays.equals(user.getCryptedPassword(), proposedDigest)) {				
@@ -112,6 +112,57 @@ public class NnUserDao extends GenericDao<NnUser> {
 		return user;				
 	}
 
+	public List<NnUser> findNoneGuests() {
+		List<NnUser> detached = new ArrayList<NnUser>();
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		try {
+			Query query = pm.newQuery(NnUser.class);
+			query.setFilter("email != emailParam");
+			query.declareParameters("String emailParam");		
+			@SuppressWarnings("unchecked")
+			List<NnUser> results = (List<NnUser>) query.execute(NnUser.GUEST_EMAIL);
+			detached = (List<NnUser>)pm.detachCopyAll(results);			
+		} finally {
+			pm.close();
+		}
+		return detached;				
+	}
+
+	public List<NnUser> findAllByEmail(String email) {
+		List<NnUser> detached = new ArrayList<NnUser>();
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		try {
+			Query query = pm.newQuery(NnUser.class);
+			query.setFilter("email == emailParam");
+			query.declareParameters("String emailParam");		
+			@SuppressWarnings("unchecked")
+			List<NnUser> results = (List<NnUser>) query.execute(email);
+			detached = (List<NnUser>)pm.detachCopyAll(results);			
+		} finally {
+			pm.close();
+		}
+		return detached;				
+	}
+	
+	public NnUser findByEmail(String email) {
+		NnUser user = null;
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		try {
+			Query query = pm.newQuery(NnUser.class);
+			query.setFilter("email == emailParam");
+			query.declareParameters("String emailParam");		
+			@SuppressWarnings("unchecked")
+			List<NnUser> results = (List<NnUser>) query.execute(email);
+			if (results.size() > 0) {
+				user = results.get(0);			
+			}
+			user = pm.detachCopy(user);
+		} finally {
+			pm.close();
+		}
+		return user;				
+	}
+	
 	public NnUser findByToken(String token) {
 		NnUser user = null;
 		PersistenceManager pm = PMF.get().getPersistenceManager();

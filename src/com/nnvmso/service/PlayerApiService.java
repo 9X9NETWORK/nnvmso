@@ -89,6 +89,7 @@ public class PlayerApiService {
 		if (cs == null)
 			return messageSource.getMessage("nnstatus.set_invalid", new Object[] {NnStatusCode.SET_INVALID} , locale);			
 		
+		System.out.println("channel set id:" + cs.getKey().getId());
 		List<MsoChannel> channels = csMngr.findChannelsById(cs.getKey().getId());
 		System.out.println(channels.size());
 		//first block: status
@@ -169,25 +170,6 @@ public class PlayerApiService {
 		results = results + this.assembleKeyValue("debug", debug);
 		if (fbConfig!=null)
 			results = results + this.assembleKeyValue(MsoConfig.FBTOKEN, fbConfig.getValue());
-		
-		//set-1 id|type|name
-		CategoryManager categoryMngr = new CategoryManager();
-		List<Category> categories = categoryMngr.findAllByMsoId(mso.getKey().getId());
-		int i=1;
-		for (Category c : categories) {
-			String key = "set-" + i;
-			i++;
-			String value = c.getKey().getId() + "|" + c.getType() + "|" + c.getName();
-			results = results + this.assembleKeyValue(key, value);			
-		}
-		/*
-		for (int i=0; i<9; i++) {
-			int seq = i + 1;
-			String key = "set-" + seq;
-			String value = categories.get(i).getKey().getId() + "|" + categories.get(i).getType() + "|" + categories.get(i).getName();
-			results = results + this.assembleKeyValue(key, value);
-		}
-		*/
 		
 		return results;
 	}
@@ -373,11 +355,14 @@ public class PlayerApiService {
 		return NnStatusMsg.successStr(locale) + separatorStr + localeCode;
 	}
 	 			
-	public String findPublicChannelsByCategory(String categoryId, String lang) {		
+	public String findPublicChannelsByCategoryAndLang(String categoryId, String lang) {		
 		//verify input
 		List<MsoChannel> channels = new ArrayList<MsoChannel>();
 		if (categoryId == null || categoryId.length() < 1) { return NnStatusMsg.inputMissing(locale); }
 		if (!Pattern.matches("^\\d*$", categoryId)) { return NnStatusMsg.inputError(locale); }
+		
+		if (lang != null && !lang.equals(Mso.LANG_EN) && !lang.equals(Mso.LANG_ZH))
+			return NnStatusMsg.inputError(locale);		
 		
 		//find public channels by categoryId
 		MsoChannelManager channelMngr = new MsoChannelManager();
@@ -391,38 +376,14 @@ public class PlayerApiService {
 		for (int i=0; i< channels.size(); i++) {	
 			if (channels.get(i).getProgramCount() > 0 ) {
 				MsoChannel c = channels.get(i);
-				String channelSource = "";
-				if (c.getSourceUrl() != null && c.getSourceUrl().contains("http://www.youtube.com"))
-					channelSource = YouTubeLib.getYouTubeChannelName(c.getSourceUrl());
-				if (c.getContentType() == MsoChannel.CONTENTTYPE_FACEBOOK) 
-					channelSource = c.getSourceUrl();
-
-				String channelName = c.getName();
-				if (c.getFauxName() != null && c.getFauxName().length() > 0) {
-					channelName = c.getFauxName();
-				}
-				String intro = c.getIntro();
-				if (c.getFauxIntro() != null && c.getFauxIntro().length() > 0) {
-					intro = c.getFauxIntro();
-				}		
-				if (intro != null) {
-					intro = intro.replaceAll("\n", " ");
-					intro = intro.replaceAll("\t", " ");
-					int introLenth = (intro.length() > 256 ? 256 : intro.length()); 
-					intro = intro.substring(0, introLenth);
-				} else {
-					intro = "";
-				}
 				String[] ori = {String.valueOf(c.getSeq()),
 						        String.valueOf(c.getKey().getId()), 
-						        channelName, 
+						        c.getName(), 
 						        c.getImageUrl(), 
 						        Integer.toString(c.getProgramCount()),
 						        String.valueOf(c.getSubscriptionCount()),
 						        String.valueOf(c.getContentType()),
-						        this.convertEpochToTime(c.getTranscodingUpdateDate(), c.getUpdateDate()),
-						        channelSource,
-						        intro,
+						        this.convertEpochToTime(c.getTranscodingUpdateDate(), c.getUpdateDate())
 						        };
 				result = result + NnStringUtil.getDelimitedStr(ori);
 				result = result + "\n";
@@ -549,17 +510,11 @@ public class PlayerApiService {
 		return result;
 	}
 	
-	public String changeSetInfo(String userToken, String name, String areaNo, String setId) {
+	public String changeSetInfo(String userToken, String name, String areaNo) {
 		//verify input
-		/*
 		if (name == null || areaNo == null)  {			
 			return NnStatusMsg.inputMissing(locale);
 		}
-		*/
-		if (areaNo == null || setId == null)  {			
-			return NnStatusMsg.inputMissing(locale);
-		}
-		
 		if (!Pattern.matches("^\\d*$", areaNo) || Integer.parseInt(areaNo) < 0 || Integer.parseInt(areaNo) > 9) {			
 			return NnStatusMsg.inputError(locale);
 		}
@@ -572,23 +527,15 @@ public class PlayerApiService {
 		AreaOwnershipManager areaMngr = new AreaOwnershipManager();
 		short position = Short.valueOf(areaNo);
 		AreaOwnership area = areaMngr.findByUserIdAndAreaNo(user.getKey().getId(), Short.valueOf(position));
-		CategoryManager categoryMngr = new CategoryManager();
-		Category c = categoryMngr.findById(Long.valueOf(setId));		
 		if (area != null) {
-			/*
 			if (area.getType() == AreaOwnership.TYPE_RO)
-				return messageSource.getMessage("nnstatus.subscription_ro_set", new Object[] {NnStatusCode.SUBSCRIPTION_RO_SET} , locale);
-			*/
-			area.setSetId(c.getKey().getId());
-			area.setSetName(c.getName());
-			area.setType(c.getType());
-			areaMngr.save(area);
+				return messageSource.getMessage("nnstatus.subscription_ro_set", new Object[] {NnStatusCode.SUBSCRIPTION_RO_SET} , locale); 
+			area.setSetName(name);
+			areaMngr.save(area);			
 		} else {
 			area = new AreaOwnership();
 			area.setUserId(user.getKey().getId());
-			area.setSetId(c.getKey().getId());
-			area.setSetName(c.getName());
-			area.setType(c.getType());
+			area.setSetName(name);				
 			area.setAreaNo(position);
 			areaMngr.create(area);
 		}
@@ -602,15 +549,13 @@ public class PlayerApiService {
 		if (userToken == null || userToken.equals("undefined")) return NnStatusMsg.inputMissing(locale);
 		if ((setId != null && pos == null) || (setId == null && pos != null)) return NnStatusMsg.inputMissing(locale);
 		if ((channelId != null && gridId == null) || (channelId == null && gridId != null)) return NnStatusMsg.inputMissing(locale);
-		if (channelId == null) return NnStatusMsg.inputMissing(locale); //channelId is mandatory for demo
+		
 		String output = messageSource.getMessage("nnstatus.channel_or_user_invalid", new Object[] {NnStatusCode.CHANNEL_OR_USER_INVALID} , locale);		
 		NnUser user = new NnUserManager().findByToken(userToken);
 		if (user == null) {return output;}	
 		SubscriptionManager subMngr = new SubscriptionManager();
-		//set id is actually category id !!!hack?
-		if (setId != null) {
+		if (setId != null) {			
 			//find all channels
-			/*
 			List<Subscription> subscribeList = subMngr.findAllByUser(user.getKey().getId());
 			ChannelSetManager csMngr = new ChannelSetManager();
 			long sId = Long.parseLong(setId);
@@ -635,31 +580,25 @@ public class PlayerApiService {
 					}
 				}
 			}
-			*/
-			CategoryManager categoryMngr = new CategoryManager();
-			Category c = categoryMngr.findById(Long.parseLong(setId));
-			if (c == null)
-				return messageSource.getMessage("nnstatus.category_invalid", new Object[] {NnStatusCode.CATEGORY_INVALID} , locale);			
-			
 			AreaOwnershipManager areaMngr = new AreaOwnershipManager();
-			AreaOwnership area = areaMngr.findByUserIdAndSetId(user.getKey().getId(), c.getKey().getId());
-			if (area == null) {
-				//return messageSource.getMessage("nnstatus.subscription_duplicate_set", new Object[] {NnStatusCode.SUBSCRIPTION_DUPLICATE_SET} , locale);
-				area = new AreaOwnership();
-			}			
+			AreaOwnership area = areaMngr.findByUserIdAndSetId(user.getKey().getId(), cs.getKey().getId());
+			if (area != null) {
+				return messageSource.getMessage("nnstatus.subscription_duplicate_set", new Object[] {NnStatusCode.SUBSCRIPTION_DUPLICATE_SET} , locale);												
+			}
+			area = new AreaOwnership();											
 			area.setUserId(user.getKey().getId());
-			area.setSetId(c.getKey().getId());
-			area.setSetName(c.getName());
-			//area.setSetImageUrl(cs.getImageUrl());
+			area.setSetId(cs.getKey().getId());
+			area.setSetName(cs.getName());
+			area.setSetImageUrl(cs.getImageUrl());
 			area.setAreaNo(Short.parseShort(pos));
-			area.setType(c.getType());
+			area.setType(AreaOwnership.TYPE_RO);
 			areaMngr.save(area);
 			SubscriptionLogManager logMngr = new SubscriptionLogManager();
-			SubscriptionLog log = logMngr.findByMsoIdAndSetId(mso.getKey().getId(), c.getKey().getId());
+			SubscriptionLog log = logMngr.findByMsoIdAndSetId(mso.getKey().getId(), cs.getKey().getId());
 			if (log == null) {
 				log = new SubscriptionLog();
 				log.setCount(1);
-				log.setSetId(c.getKey().getId());
+				log.setSetId(cs.getKey().getId());
 				log.setMsoId(mso.getKey().getId());
 				logMngr.save(log);
 			}		
@@ -668,6 +607,7 @@ public class PlayerApiService {
 
 		//verify channel and grid
 		if (channelId != null) {
+			System.out.println("subscription channelid:" + channelId);
 			long cId = Long.parseLong(channelId);			
 			MsoChannel channel = new MsoChannelManager().findById(cId);			
 			if (channel == null || channel.getStatus() == MsoChannel.STATUS_ERROR) { 
@@ -705,7 +645,7 @@ public class PlayerApiService {
 		if (mso == null) { return NnStatusMsg.msoInvalid(locale);}
 		
 		//verify email
-		NnUser user = userMngr.findByEmailAndMso(email, mso);
+		NnUser user = userMngr.findByEmail(email);
 		if (user != null) {
 			log.info("user email taken:" + user.getEmail() + "; mso=" + mso.getName() + ";user token=" + user.getToken());
 			return messageSource.getMessage("nnstatus.user_email_taken", new Object[] {NnStatusCode.USER_EMAIL_TAKEN} , locale);
@@ -744,8 +684,14 @@ public class PlayerApiService {
 	public String findUserByToken(String token, HttpServletRequest req, HttpServletResponse resp) {
 		if (token == null) {return NnStatusMsg.inputMissing(locale);}
 		
-		NnUser found = userMngr.findByToken(token);			
+		NnUser found = userMngr.findByToken(token);
+		/*
 		if (found == null || (found != null && found.getMsoId() != mso.getKey().getId())) {
+			CookieHelper.deleteCookie(resp, CookieHelper.USER);
+			return NnStatusMsg.userInvalid(locale);
+		}
+		*/
+		if (found == null) {
 			CookieHelper.deleteCookie(resp, CookieHelper.USER);
 			return NnStatusMsg.userInvalid(locale);
 		}
@@ -765,7 +711,7 @@ public class PlayerApiService {
 			return NnStatusMsg.inputMissing(locale);
 		}		
 		String output = messageSource.getMessage("nnstatus.user_login_failed", new Object[] {NnStatusCode.USER_LOGIN_FAILED} , locale);		
-		NnUser user = userMngr.findAuthenticatedUser(email, password, mso.getKey().getId());
+		NnUser user = userMngr.findAuthenticatedUser(email, password);
 		if (user != null) {
 			output = this.prepareUserInfo(user);
 			userMngr.save(user); //change last login time (ie updateTime)
@@ -774,10 +720,7 @@ public class PlayerApiService {
 		return output;
 	}
 
-	public String createChannel(String categoryIds, String userToken, 
-			                    String url, String grid, String tags, 
-			                    String name, String intro, String lang, 
-			                    String imageUrl, HttpServletRequest req) {
+	public String createChannel(String categoryIds, String userToken, String url, String grid, String tags, HttpServletRequest req) {
 		//verify input
 		if (url == null || url.length() == 0 ||  grid == null || grid.length() == 0 ||
 			categoryIds == null || categoryIds.equals("undefined") || categoryIds.length() == 0 || 			
@@ -787,11 +730,7 @@ public class PlayerApiService {
 		if (!Pattern.matches("^\\d*$", grid) || Integer.parseInt(grid) < 0 || Integer.parseInt(grid) > 81) {			
 			return NnStatusMsg.inputError(locale);
 		}
-		if (lang == null || lang.length() == 0) 
-			lang = Mso.LANG_EN;
-		if (!lang.equals(Mso.LANG_EN) && !lang.equals(Mso.LANG_ZH)) {
-			return NnStatusMsg.inputError(locale);
-		}
+		
 		url = url.trim();
 		
 		//verify user
@@ -827,11 +766,7 @@ public class PlayerApiService {
 		} else {				
 			//create a new channel
 			channel = channelMngr.initChannelSubmittedFromPlayer(url, user);
-			channel.setFauxName(name);
-			channel.setFauxIntro(intro);
-			channel.setFauxImageUrl(imageUrl);
 			channel.setTags(tags);
-			channel.setLangCode(lang);
 			log.info("User throws a new url:" + url);
 			channelMngr.create(channel, categories);
 			if (channel.getKey() != null && channel.getContentType() != MsoChannel.CONTENTTYPE_FACEBOOK) { //!!!
@@ -967,39 +902,7 @@ public class PlayerApiService {
 		if (user != null) {
 			List<AreaOwnership> sets = areaMngr.findByUserId(user.getKey().getId());		
 		    //set info
-			//!!! find from set, replace with category stuff
-			//findAllInIpg, replace with areaownership 
-			if (setInfo) {				
-				CategoryManager categoryMngr = new CategoryManager();
-				List<Category> categories = categoryMngr.findAllInIpg(mso.getKey().getId());
-				String[] objs = new String[9];
-				for (int i=0; i<9; i++) {
-					String[] obj = {
-							String.valueOf(i+1),
-							String.valueOf(categories.get(i).getKey().getId()),
-							categories.get(i).getName(),						
-							"",
-							String.valueOf(categories.get(i).getType()),
-					};					
-					objs[i] = NnStringUtil.getDelimitedStr(obj);;
-				}
-				for (AreaOwnership s : sets) {					
-					String[] obj = {
-							String.valueOf(s.getAreaNo()),
-							String.valueOf(s.getSetId()),
-							s.getSetName(),						
-							"",
-							String.valueOf(s.getType()),
-					};					
-					objs[s.getAreaNo()-1] = NnStringUtil.getDelimitedStr(obj);
-					System.out.println(s.getAreaNo()-1 + ";" + objs[s.getAreaNo()-1]);
-					
-				}
-				for (int i=0;i<9;i++) {
-					result = result + objs[i];
-					result = result + "\n";										
-				}
-				/*
+			if (setInfo) {
 				for (AreaOwnership s : sets) {
 					String[] obj = {
 							String.valueOf(s.getAreaNo()),
@@ -1011,12 +914,10 @@ public class PlayerApiService {
 					result = result + NnStringUtil.getDelimitedStr(obj);;
 					result = result + "\n";
 				}
-				*/
 				result = result + separatorStr;					
 			}		
 			
-			//find channels from set //so called live set, removed
-			/*
+			//find channels from set
 			ChannelSetManager setMngr = new ChannelSetManager();
 			for (AreaOwnership area : sets) {
 				if (area.getType() == AreaOwnership.TYPE_RO) {
@@ -1027,7 +928,6 @@ public class PlayerApiService {
 					setChannels.addAll(list);				
 				}
 			}
-			*/
 		}
 		//sort by key
 		if (channelPos) {
@@ -1097,22 +997,38 @@ public class PlayerApiService {
 		return result + this.composeProgramInfoStr(programs, config);
 	}
 
-	public String findCategoriesByMso() {
+	public String findCategoriesByLang(String lang) {
+		if (lang != null && !lang.equals(Mso.LANG_EN) && !lang.equals(Mso.LANG_ZH))
+			return NnStatusMsg.inputError(locale);
+		if (lang == null)
+			lang = Mso.LANG_EN;
 		CategoryManager categoryMngr = new CategoryManager();	
 		List<Category> categories = categoryMngr.findAllByMsoId(mso.getKey().getId());
 				
 		String output = NnStatusMsg.successStr(locale) + separatorStr;
 		for (Category c : categories) {
-			String[] str = {String.valueOf(c.getKey().getId()), c.getName(), String.valueOf(c.getChannelCount())};
-			output = output + NnStringUtil.getDelimitedStr(str) + "\n";			
+			String name =  c.getName();
+			if (lang.equals(Mso.LANG_ZH))
+				name = categoryMngr.translate(name);
+			String[] str = {String.valueOf(c.getKey().getId()), name, String.valueOf(c.getChannelCount())};				
+			output = output + NnStringUtil.getDelimitedStr(str) + "\n";
 		}
 		
 		if (categories.size() < 1) { return messageSource.getMessage("nnstatus.category_invalid", new Object[] {NnStatusCode.CATEGORY_INVALID} , locale);}
 			
 		return output;
-	}
-		
+	}		 
+	
 	private String composeChannelLineupStr(MsoChannel c, Mso mso) {
+		String intro = c.getIntro();
+		if (intro != null) {
+			intro = intro.replaceAll("\n", " ");
+			intro = intro.replaceAll("\t", " ");
+			int introLenth = (intro.length() > 256 ? 256 : intro.length()); 
+			intro = intro.substring(0, introLenth);
+		} else {
+			intro = "";
+		}
 		String imageUrl = c.getImageUrl();
 		if (c.getStatus() == MsoChannel.STATUS_ERROR) {
 			imageUrl = "/WEB-INF/../images/error.png";
@@ -1124,32 +1040,13 @@ public class PlayerApiService {
 				   c.getStatus() != MsoChannel.STATUS_SUCCESS && 
 				   c.getStatus() != MsoChannel.STATUS_PROCESSING) {	
 				imageUrl = "http://9x9ui.s3.amazonaws.com/9x9playerV65/images/error.png";
-		} 
-		if (c.getFauxImageUrl() != null) {
-			imageUrl = c.getFauxImageUrl();
 		}
 		
-		String channelSource = "";
+		String channelName = "";
 		if (c.getSourceUrl() != null && c.getSourceUrl().contains("http://www.youtube.com"))
-			channelSource = YouTubeLib.getYouTubeChannelName(c.getSourceUrl());
+			channelName = YouTubeLib.getYouTubeChannelName(c.getSourceUrl());
 		if (c.getContentType() == MsoChannel.CONTENTTYPE_FACEBOOK) 
-			channelSource = c.getSourceUrl();
-		String channelName = c.getName();
-		if (c.getFauxName() != null && c.getFauxName().length() > 0) {
-			channelName = c.getFauxName();
-		}
-		String intro = c.getIntro();
-		if (c.getFauxIntro() != null && c.getFauxIntro().length() > 0) {
-			intro = c.getFauxIntro();
-		}		
-		if (intro != null) {
-			intro = intro.replaceAll("\n", " ");
-			intro = intro.replaceAll("\t", " ");
-			int introLenth = (intro.length() > 256 ? 256 : intro.length()); 
-			intro = intro.substring(0, introLenth);
-		} else {
-			intro = "";
-		}
+			channelName = c.getSourceUrl();
 		String[] ori = {Integer.toString(c.getSeq()), 
 					    String.valueOf(c.getKey().getId()),
 					    channelName,
@@ -1159,7 +1056,7 @@ public class PlayerApiService {
 					    String.valueOf(c.getType()),
 					    String.valueOf(c.getStatus()),
 					    String.valueOf(c.getContentType()),
-					    channelSource,
+					    channelName,
 					    this.convertEpochToTime(c.getTranscodingUpdateDate(), c.getUpdateDate())
 					    };
 		String output = NnStringUtil.getDelimitedStr(ori);

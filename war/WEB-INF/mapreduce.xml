@@ -152,5 +152,93 @@
     </property>
   </configuration>  
   
+  <configuration name="MergeAccount Mapper">
+    <property>
+      <name>mapreduce.map.class</name>      
+      <value>com.nnvmso.task.mapper.MergeAccountMapper</value>
+    </property>
+    <property>
+      <name>mapreduce.inputformat.class</name>
+      <value>com.google.appengine.tools.mapreduce.DatastoreInputFormat</value>
+    </property>    
+    <property>
+      <name human="Entity Kind to Map Over">mapreduce.mapper.inputformat.datastoreinputformat.entitykind</name>
+      <value template="optional">NnUser</value>      
+    </property>   
+    <property>
+      <name human="msoId">msoId</name>
+      <value template="optinonal">8001</value>
+    </property>     
+  </configuration>
+  
+  <configuration name="MsoChannel Lang Mapper">
+    <property>
+      <name>mapreduce.map.class</name>      
+      <value>com.nnvmso.task.mapper.MsoChannelLangMapper</value>
+    </property>
+    <property>
+      <name>mapreduce.inputformat.class</name>
+      <value>com.google.appengine.tools.mapreduce.DatastoreInputFormat</value>
+    </property>    
+    <property>
+      <name human="Entity Kind to Map Over">mapreduce.mapper.inputformat.datastoreinputformat.entitykind</name>
+      <value template="optional">MsoChannel</value>      
+    </property>    
+  </configuration>
+
+  <configuration name="ReCategory Mapper">
+    <property>
+      <name>mapreduce.map.class</name>      
+      <value>com.nnvmso.task.mapper.ReCategoryMapper</value>
+    </property>
+    <property>
+      <name>mapreduce.inputformat.class</name>
+      <value>com.google.appengine.tools.mapreduce.DatastoreInputFormat</value>
+    </property>    
+    <property>
+      <name human="Entity Kind to Map Over">mapreduce.mapper.inputformat.datastoreinputformat.entitykind</name>
+      <value template="optional">CategoryChannel</value>      
+    </property>
+    <property>
+      <name human="FoodAndWine">FoodAndWine</name>
+      <value template="optinonal"></value>
+    </property>
+    <property>
+      <name human="HealthAndfitness">HealthAndfitness</name>
+      <value template="optinonal"></value>
+    </property>
+    <property>
+      <name human="Lifestyle">Lifestyle</name>
+      <value template="optinonal"></value>
+    </property>
+    <property>
+      <name human="GayAndlesbian">GayAndlesbian</name>
+      <value template="optinonal"></value>
+    </property>
+    <property>
+      <name human="Sports">Sports</name>
+      <value template="optinonal"></value>
+    </property>
+    <property>
+      <name human="TravelAndLiving">TravelAndLiving</name>
+      <value template="optinonal"></value>
+    </property>
+    <property>
+      <name human="LifestyleAndHobbies">LifestyleAndHobbies</name>
+      <value template="optinonal"></value>
+    </property>
+    <property>
+      <name human="SportsAndOutdoors">SportsAndOutdoors</name>
+      <value template="optinonal"></value>
+    </property>        
+    <property>
+      <name human="Entertainment">Entertainment</name>
+      <value template="optinonal"></value>
+    </property>        
+    <property>
+      <name human="Comedy">Comedy</name>
+      <value template="optinonal"></value>
+    </property>        
+  </configuration>  
       
 </configurations>

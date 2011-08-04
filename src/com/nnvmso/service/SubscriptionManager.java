@@ -131,6 +131,10 @@ public class SubscriptionManager {
 	public List<Subscription> list(int page, int limit, String sidx, String sord, String filter) {
 		return subDao.list(page, limit, sidx, sord, filter);
 	}
+
+	public void deleteAll(List<Subscription> list) {
+		subDao.deleteAll(list);
+	}
 	
 	public int total() {
 		return subDao.total();
