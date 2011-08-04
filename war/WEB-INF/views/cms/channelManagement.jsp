@@ -17,6 +17,7 @@
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/jquery-ui.min.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.textTruncate.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.jqModal.js"></script>
+<script type="text/javascript" src="/javascripts/jquery.progressbar.js"></script>
 <script type="text/javascript" src="http://www.netgrow.com.au/assets/files/jquery_plugins/jquery.dump.js"></script>
 <script type="text/javascript" src="/javascripts/swfupload/swfupload.js"></script>
 <script type="text/javascript" src="/javascripts/cms/common.js"></script>
@@ -249,20 +250,16 @@
                 <fieldset class="setAlbum">
                   <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.upload_file"/></label>
                   <div class="floatL epImport ep_select_block">
-                    <!-- 
-                    <span class="btnCreate floatL ep_upload_video">從硬碟</span>
-                    -->
-                    <a onclick="return false;" href="javascript:" class="btnCreate floatL ep_urlbutton"><spring:message code="cms.channel_management.btn.from_url"/></a>
-                    <span class="ep_upload_video">從硬碟</span>
+                    <div class="floatL"><a onclick="return false;" href="javascript:"><span class="ep_upload_video"></span></a>&nbsp;</div>
+                    <div class="floatL"><a onclick="return false;" href="javascript:" class="btnCreate ep_urlbutton"><spring:message code="cms.channel_management.btn.from_url"/></a>&nbsp;</div>
+                    <div class="floatL"><a onclick="return false;" href="javascript:" class="btnCreate ep_ytbutton"><spring:message code="cms.channel_management.btn.from_youtube"/></a></div>
                   </div>
-                  <div style="width:100px;padding-left:5px" class="floatL ep_uploading_video" style="display:none">
-                    <div></div>
-                  </div>
+                  <div style="width:300px;padding-left:80px" class="floatL ep_uploading_video" style="display:none"><div></div></div>
                   <!--  upload by URL link -->
                   <div class="floatL uploadURL ep_url_block" style="display:none">
-                    <div class="bg_input floatL"><input type="text" size="25" maxlength="100" class="ep_url_input"/></div>&nbsp;<a onclick="return false;" href="javascript:" class="ep_url_cancel"><spring:message code="cms.channel_management.btn.cancel"/></a>
+                    <div class="bg_input floatL"><input type="text" size="33" maxlength="100" class="ep_url_input"/></div>&nbsp;<div class="floatL"><a onclick="return false;" href="javascript:" class="ep_url_import btnCreate"><spring:message code="cms.channel_management.btn.import"/></a></div>
                     <div class="clear"></div>
-                    <p class="hint"><spring:message code="cms.channel_management.msg.video_url_hint"/></p><br/>
+                    <p class="hint" style="display:none"><spring:message code="cms.channel_management.msg.video_url_hint"/></p><br/>
                   </div>
                   <label class="floatL"><spring:message code="cms.channel_management.label.program_logo"/></label>
                   <div class="uploadImg">
@@ -275,7 +272,7 @@
                     <div class="clear"></div>
                   </div>
                   <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.program_name"/></label>
-                  <div class="bg_input floatL"><input class="ep_name" type="text" size="25" maxlength="40"/></div>
+                  <div class="bg_input floatL"><input class="ep_name" type="text" size="33" maxlength="40"/></div>
                   <div class="clear"></div>
                   <p class="hint"><spring:message code="cms.channel_management.msg.fourty_characters"/></p>
                   <br/>
@@ -606,6 +603,7 @@
 <label class="lang" id="lang_confirm_cancel"><spring:message code="cms.warning.confirm_cancel"/></label>
 <label class="lang" id="lang_confirm_leaving_program_creation"><spring:message code="cms.warning.confirm_leaving_program_creation"/></label>
 <label class="lang" id="lang_warning_import_channel_source"><spring:message code="cms.warning.import_channel_source"/></label>
+<label class="lang" id="lang_warning_import_program_source"><spring:message code="cms.warning.import_program_source"/></label>
 <label class="lang" id="lang_channel_source_is_wrong"><spring:message code="cms.warning.channel_source_is_wrong"/></label>
 <label class="lang" id="lang_button_from_disk">從硬碟</label>
 <label class="lang" id="image_btn_upload"><spring:message code="cms.image.btn_upload"/></label>

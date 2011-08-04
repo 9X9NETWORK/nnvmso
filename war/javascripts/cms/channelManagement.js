@@ -251,20 +251,23 @@ var programDetail =
       var programId = program.key.id;
       
       programDetailBlock.find('.ep_name').val(program.name);
+      if (program.imageUrl == '/WEB-INF/../images/processing.png') {
+        program.imageUrl = '/images/cms/upload_img.jpg';
+      }
       programDetailBlock.find('.ep_image').attr('src', program.imageUrl);
       programDetailBlock.find('.ep_image_updated').val('false');
       programDetailBlock.find('.ep_intro').val(program.intro);
-      programDetailBlock.find('.ep_urlbutton').click(function()
+      programDetailBlock.find('.ep_urlbutton').css('width', 80).click(function()
       {
+        programDetailBlock.find('.ep_uploading_video').hide();
         programDetailBlock.find('.ep_url_block').show();
       });
-      programDetailBlock.find('.ep_url_cancel').click(function()
+      /*
       {
-        programDetailBlock.find('.ep_url_input').val('');
-        programDetailBlock.find('.ep_url_block').hide();
-        programDetailBlock.find('.ep_savebutton').unbind().addClass('btnDisable').removeClass('btnSave');
       });
       programDetailBlock.find('.ep_url_input, .ep_name').focusout(function()
+      */
+      programDetailBlock.find('.ep_url_import').css('width', 60).click(function()
       {
         if (programDetailBlock.find('.ep_url_input').val().length > 0) {
           var inputUrl = programDetailBlock.find('.ep_url_input').val();
@@ -305,6 +308,10 @@ var programDetail =
             {
               if (programDetailBlock.find('.ep_name').val() == '') {
                 alert($('#lang_warning_empty_name').text());
+                return;
+              }
+              if (programDetailBlock.find('.ep_url_input').val() == '') {
+                alert($('#lang_warning_import_program_source').text());
                 return;
               }
               var parameters =
@@ -359,18 +366,17 @@ var programDetail =
         http_success :      [201],
         upload_progress_handler: function(file, completed, total)
         {
-          programDetailBlock.find('.ep_uploading_video div').progressbar('value', (completed * 100) / total);
+          programDetailBlock.find('.ep_uploading_video div').progressBar((completed * 100) / total);
         },
         upload_success_handler: function(file, serverData, recievedResponse)
         {
-          programDetailBlock.find('.ep_uploading_video div').progressbar('destroy').text($('#lang_upload_finished').text()).show();
-          programDetailBlock.find('.ep_url_input')
-            .val('http://9x9tmp.s3.amazonaws.com/' + 'prog_video_' + programId + file.type)
-            .focusout();
+          //programDetailBlock.find('.ep_uploading_video div').text($('#lang_upload_finished').text()).show();
+          programDetailBlock.find('.ep_url_input').val('http://9x9tmp.s3.amazonaws.com/' + 'prog_video_' + programId + file.type);
+          programDetailBlock.find('.ep_url_import').click();
         },
         upload_error_handler: function(file, code, message)
         {
-          programDetailBlock.find('.ep_uploading_video div').progressbar('destroy').text($('#lang_upload_failed').text()).show();
+          programDetailBlock.find('.ep_uploading_video div').text($('#lang_upload_failed').text()).show();
           alert('error: ' + message);
         },
         file_queued_handler: function(file)
@@ -387,8 +393,12 @@ var programDetail =
           };
           this.setPostParams(post_params);
           this.startUpload(file.id);
-          programDetailBlock.find('.ep_uploading_video div').text('').show().progressbar();
+          programDetailBlock.find('.ep_uploading_video div').text('').progressBar({
+            barImage: '/images/cms/progressbg_green.gif'
+          }).parent().show();
+          programDetailBlock.find('.ep_url_input').val('');
           programDetailBlock.find('.ep_url_block').hide();
+          programDetailBlock.find('.ep_savebutton').unbind().addClass('btnDisable').removeClass('btnSave');
         }
       };
       var swfObject = new SWFUpload(swfupload_settings);

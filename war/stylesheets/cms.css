@@ -286,7 +286,7 @@ a.btnGray:hover { background:url(/images/cms/btn_gray_hover.jpg) 0 0 repeat-x;}
 a.btnGray  span{ line-height:27px;}
 
 .uploadSection{border:1px solid #C6D1EB; width:460px; min-height:430px; padding:10px 10px 5px 10px;}
-.epImport a{ margin:0 5px 20px 0; *margin:0 3px 10px 0;}
+.epImport a{ margin:0 5px 5px 0; *margin:0 3px 10px 0;}
 .uploadURL a { line-height:30px; font-size:0.9em; }
 .uploadURL .bg_input { margin-left: 80px; }
 
