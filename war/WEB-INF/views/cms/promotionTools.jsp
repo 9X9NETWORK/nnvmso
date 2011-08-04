@@ -53,7 +53,7 @@
                   <p class="channel_info_subscribers"><spring:message code="cms.promotion_tools.label.subscribers"/> : <span>0</span></p>
                   <p class="channel_info_updatedate"><spring:message code="cms.promotion_tools.label.update_time"/> : <span>2011/04/15 14:45</span></p>
                 </div>
-                <ul class="floatL">
+                <ul class="floatL" style="display:none">
                   <li><a class="chUnPublic channel_info_publish"></a></li>
                 </ul>
               </div>

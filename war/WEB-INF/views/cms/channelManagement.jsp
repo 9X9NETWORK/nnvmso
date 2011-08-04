@@ -209,7 +209,8 @@
               <div class="clear"></div>
               <p class="hint" style="display:none"><spring:message code="cms.channel_management.msg.system_category_explanation"/></p>
               <div class="commitPlace">
-                <a href="javascript:" class="btn btnStep2 floatL" id="channel_detail_savebutton"><span><spring:message code="cms.channel_management.btn.save"/></span></a><a href="javascript:" class="floatL btn_cancel" id="channel_detail_cancel"><span><spring:message code="cms.channel_management.btn.cancel"/></span></a>
+                <a href="javascript:" class="btnCreate floatL" id="channel_detail_savebutton"><span><spring:message code="cms.channel_management.btn.save"/></span></a>
+                <a href="javascript:" class="floatL btnGray" id="channel_detail_cancel" style="margin-left:5px"><span><spring:message code="cms.channel_management.btn.cancel"/></span></a>
               </div>
             </fieldset>
           </form>
@@ -281,15 +282,15 @@
                   <div class="clear"></div>
                   <p class="hint"><spring:message code="cms.channel_management.msg.two_hundred_characters"/></p>
                   <br/>
-                  <!-- 
-                  <label class="floatL"><spring:message code="cms.channel_management.label.tag"/></label>
-                  <div class="bg_input floatL"><input type="text" size="35" maxlength="40"/></div>
-                  <div class="clear"></div>
-                  <p class="hint"><spring:message code="cms.channel_management.msg.camma_seperated"/></p><br/>
-                  -->
+                  <div style="display:none"><!-- tag of program -->
+                    <label class="floatL"><spring:message code="cms.channel_management.label.tag"/></label>
+                    <div class="bg_input floatL"><input type="text" size="35" maxlength="40"/></div>
+                    <div class="clear"></div>
+                    <p class="hint"><spring:message code="cms.channel_management.msg.camma_seperated"/></p><br/>
+                  </div>
                   <div class="epBtns" >
-                    <a onclick="return false;" href="javascript:" class="btnDisable floatL ep_savebutton"><spring:message code="cms.channel_management.btn.save"/></a>
-                    <a onclick="return false;" href="javascript:" class="btnCancel floatL ep_cancelbutton"><spring:message code="cms.channel_management.btn.cancel"/></a>
+                    <a onclick="return false;" href="javascript:" class="btnDisable floatL ep_savebutton" style="width:80px"><spring:message code="cms.channel_management.btn.save"/></a>
+                    <a onclick="return false;" href="javascript:" class="btnGray floatL ep_cancelbutton"><span><spring:message code="cms.channel_management.btn.cancel"/></span></a>
                   </div>
                 </fieldset>
               </form>
@@ -367,9 +368,7 @@
                 <img alt="" src="/images/cms/upload_img.jpg" class="floatL ep_image"/><input type="hidden" class="ep_image_updated" value="fase"/>
                 <div class="floatL imgBtn">
                   <p class="gray"><spring:message code="cms.channel_management.msg.best_resolution"/></p>
-                  <span class="upload_button_place"><!-- 
-                  <a href="javascript:" class="uploadBtn ep_upload_image"></a>
-                  --></span>
+                  <span class="upload_button_place"></span>
                   <span style="display:none" class="ep_uploading_image"><spring:message code="cms.channel_management.msg.uploading"/></span>
                 </div>
                 <div class="clear"></div>
@@ -386,39 +385,41 @@
               <div class="bg_textarea floatL"><textarea name="" cols="30" rows="5" class="ep_intro"></textarea></div>
               <div class="clear"></div>
               <p class="hint"><spring:message code="cms.channel_management.msg.two_hundred_characters"/></p>
-              <br/><!-- 
-              <label class="floatL"><spring:message code="cms.channel_management.label.tag"/></label>
-              <div class="bg_input floatL"><input type="text" size="40" maxlength="40" disabled="disabled"/></div>
-              <div class="clear"></div>
-              <p class="hint"><spring:message code="cms.channel_management.msg.camma_seperated"/></p>
               <br/>
-              <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.system_category"/></label>
-              <div class="floatL">
-                <select name="" class="sys_directory" disabled="disabled">
-                  <option selected="selected">請選擇分類</option>
-                  <option>新聞 / 政治</option>
-                  <option>財經企管</option>
-                  <option>影視娛樂</option>
-                  <option>運動休閒</option>
-                  <option>科技 / 軟體應用</option>
-                  <option>電玩遊戲</option>
-                  <option>嗜好興趣</option>
-                  <option>旅遊生活</option>
-                  <option>藝術 / 文創</option>
-                  <option>非營利組織與社會行動</option>
-                  <option>教育 / 教學</option>
-                  <option>自然 / 動物</option>
-                  <option>個人 / 名人</option>
-                  <option>企業品牌 / 社團單位</option>
-                  <option>宗教 / 心靈</option>
-                  <option>其他</option>
-                </select>
+              <div style="display:none">
+                <label class="floatL"><spring:message code="cms.channel_management.label.tag"/></label>
+                <div class="bg_input floatL"><input type="text" size="40" maxlength="40" disabled="disabled"/></div>
+                <div class="clear"></div>
+                <p class="hint"><spring:message code="cms.channel_management.msg.camma_seperated"/></p>
+                <br/>
+                <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.system_category"/></label>
+                <div class="floatL">
+                  <select name="" class="sys_directory" disabled="disabled">
+                    <option selected="selected">請選擇分類</option>
+                    <option>新聞 / 政治</option>
+                    <option>財經企管</option>
+                    <option>影視娛樂</option>
+                    <option>運動休閒</option>
+                    <option>科技 / 軟體應用</option>
+                    <option>電玩遊戲</option>
+                    <option>嗜好興趣</option>
+                    <option>旅遊生活</option>
+                    <option>藝術 / 文創</option>
+                    <option>非營利組織與社會行動</option>
+                    <option>教育 / 教學</option>
+                    <option>自然 / 動物</option>
+                    <option>個人 / 名人</option>
+                    <option>企業品牌 / 社團單位</option>
+                    <option>宗教 / 心靈</option>
+                    <option>其他</option>
+                  </select>
+                </div>
+                <div class="clear"></div>
+                <p class="hint"><spring:message code="cms.channel_management.msg.system_category_explanation"/></p>
               </div>
-              <div class="clear"></div>
-              <p class="hint"><spring:message code="cms.channel_management.msg.system_category_explanation"/></p>
-              -->
               <div class="commitPlace">
-                <a href="javascript:" class="btn btnStep2 floatL ep_savebutton"><span><spring:message code="cms.channel_management.btn.save"/></span></a><a href="javascript:" class="floatL btn_cancel ep_cancel"><span><spring:message code="cms.channel_management.btn.cancel"/></span></a>
+                <a href="javascript:" class="btnCreate floatL ep_savebutton"><span><spring:message code="cms.channel_management.btn.save"/></span></a>
+                <a href="javascript:" class="floatL btnGray ep_cancel" style="margin-left:5px"><span><spring:message code="cms.channel_management.btn.cancel"/></span></a>
               </div>
             </fieldset>
           </form>
@@ -514,7 +515,7 @@
               <div class="bg_input floatL"><input type="text" size="33" maxlength="100" name="ch_import_url"/></div>
               <a href="javascript:" class="btnCreate floatL" name="ch_import_button"><spring:message code="cms.channel_management.btn.import"/></a>
               <div class="clear"></div><br/>
-              <label class="floatL"><!-- <span class="red">＊</span> --><spring:message code="cms.channel_management.label.logo"/></label>
+              <label class="floatL"><span style="display:none" class="red">＊</span><spring:message code="cms.channel_management.label.logo"/></label>
               <div class="uploadImg">
                 <img name="ch_image" alt="" src="/images/cms/upload_img.jpg" class="floatL"/><input type="hidden" name="ch_image_updated" value="false"/>
                 <div class="floatL imgBtn">
@@ -573,9 +574,10 @@
                 </select>
               </div>
               <div class="clear"></div>
-              <%-- <p class="hint"><spring:message code="cms.channel_management.msg.system_category_explanation"/></p> --%>
+              <p class="hint" style="display:none"><spring:message code="cms.channel_management.msg.system_category_explanation"/></p>
               <div class="commitPlace">
-                <a href="javascript:" name="ch_savebutton" class="btn btnStep2 floatL"><span><spring:message code="cms.channel_management.btn.save"/></span></a><a href="javascript:" name="ch_cancelbutton" class="floatL btn_cancel"><span><spring:message code="cms.channel_management.btn.cancel"/></span></a>
+                <a href="javascript:" name="ch_savebutton" class="btnCreate floatL"><span><spring:message code="cms.channel_management.btn.save"/></span></a>
+                <a href="javascript:" name="ch_cancelbutton" class="floatL btnGray" style="margin-left:5px"><span><spring:message code="cms.channel_management.btn.cancel"/></span></a>
               </div>
             </fieldset>
           </form>

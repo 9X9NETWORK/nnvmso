@@ -77,24 +77,6 @@
           <div class="floatL">
             <select id="sys_directory" name="sys_directory" class="sys_directory">
               <option value="0" selected="selected"><spring:message code="cms.channel_set_management.msg.select_category"/></option>
-              <!--
-              <option>新聞 / 政治</option>
-              <option>財經企管</option>
-              <option>影視娛樂</option>
-              <option>運動休閒</option>
-              <option>科技 / 軟體應用</option>
-              <option>電玩遊戲</option>
-              <option>嗜好興趣</option>
-              <option>旅遊生活</option>
-              <option>藝術 / 文創</option>
-              <option>非營利組織與社會行動</option>
-              <option>教育 / 教學</option>
-              <option>自然 / 動物</option>
-              <option>個人 / 名人</option>
-              <option>企業品牌 / 社團單位</option>
-              <option>宗教 / 心靈</option>
-              <option>其他</option>
-              -->
             </select>
           </div>
           <div class="clear"></div>
@@ -110,9 +92,6 @@
       <div class="ch_arrange" id="channel_set_area">
         <div class="ch_bg">
           <ul>
-            <!--             
-            <li class="ch_none ch_exist"><img src="http://i2.ytimg.com/vi/qxwPtIOs9Q8/default.jpg" width="93" height="56" alt=""/></li>
-            -->
             <li class="ch_none"></li>
             <li class="ch_none"></li>
             <li class="ch_none"></li>
@@ -131,7 +110,7 @@
         <div id="slideshow">
           <div id="slidesContainer">
           </div>
-          <a href="javascript:" class="btn btnStep2 floatR" id="publish_channel_set"><span><spring:message code="cms.channel_set_management.btn.pubish"/></span></a>
+          <a href="javascript:" class="btnCreate floatR" id="publish_channel_set"><span><spring:message code="cms.channel_set_management.btn.pubish"/></span></a>
         </div>
       </div>
     </div>

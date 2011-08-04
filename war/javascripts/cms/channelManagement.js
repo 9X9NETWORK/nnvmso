@@ -119,7 +119,7 @@ var programDetail =
       programDetail.destroy();
       $('#program_list').show();
     });
-    programDetailBlock.find('.ep_savebutton').unbind().click(function()
+    programDetailBlock.find('.ep_savebutton').css('width', 80).unbind().click(function()
     {
       if (programDetailBlock.find('.ep_name').val() == "") {
         alert($('#lang_warning_empty_name').text());
@@ -257,17 +257,12 @@ var programDetail =
       programDetailBlock.find('.ep_image').attr('src', program.imageUrl);
       programDetailBlock.find('.ep_image_updated').val('false');
       programDetailBlock.find('.ep_intro').val(program.intro);
-      programDetailBlock.find('.ep_urlbutton').css('width', 80).click(function()
+      programDetailBlock.find('.ep_urlbutton, .ep_ytbutton').css('width', 90).click(function()
       {
         programDetailBlock.find('.ep_uploading_video').hide();
         programDetailBlock.find('.ep_url_block').show();
       });
-      /*
-      {
-      });
-      programDetailBlock.find('.ep_url_input, .ep_name').focusout(function()
-      */
-      programDetailBlock.find('.ep_url_import').css('width', 60).click(function()
+      programDetailBlock.find('.ep_url_import').css('width', 60).unbind().click(function()
       {
         if (programDetailBlock.find('.ep_url_input').val().length > 0) {
           var inputUrl = programDetailBlock.find('.ep_url_input').val();
@@ -301,6 +296,7 @@ var programDetail =
             && programDetailBlock.find('.ep_name').val().length > 0) {
           programDetailBlock
             .find('.ep_savebutton')
+            .css('width', 80)
             .unbind()
             .removeClass('btnDisable')
             .addClass('btnSave')
@@ -669,7 +665,7 @@ var channelDetail =
     $('#channel_import_detail [name="ch_tag"]').val('').attr('disabled', true);
     $('#channel_import_detail [name="ch_language"]').val('zh-TW').attr('disabled', true);
     $('#channel_import_detail [name="ch_category"]').attr('disabled', true);
-    $('#channel_import_detail [name="ch_savebutton"]').removeClass('btn').addClass('btnDisable');
+    $('#channel_import_detail [name="ch_savebutton"]').removeClass('btnCreate').addClass('btnDisable');
     $('#channel_import_detail [name="ch_image"]').attr('src', '/images/cms/upload_img.jpg');
     $('#channel_import_detail [name="ch_image_updated"]').val('false');
     $('#channel_import_detail [name="ch_import_button"]').unbind().css('width', 90);
@@ -829,7 +825,7 @@ var channelDetail =
             $('#channel_import_detail [name="ch_category"]').val(category.key.id);
           }
         }, 'json');
-        $('#channel_import_detail [name="ch_savebutton"]').removeClass('btnDisable').addClass('btn');
+        $('#channel_import_detail [name="ch_savebutton"]').removeClass('btnDisable').addClass('btnCreate');
         $('#channel_import_detail [name="ch_savebutton"]').unbind().click(function()
         {
           var name = $('#channel_import_detail [name="ch_name"]').val();
@@ -875,7 +871,7 @@ var channelDetail =
         });
       }, 'json');
     });
-    $('#channel_import_detail [name="ch_savebutton"]').unbind().click(function()
+    $('#channel_import_detail [name="ch_savebutton"]').css('width', 80).unbind().click(function()
     {
       alert($('#lang_warning_import_channel_source').text());
     });
@@ -981,7 +977,7 @@ var channelDetail =
     {
       channelDetail.init(channelId, isNew);
     });
-    $('#channel_detail_savebutton').unbind().click(function()
+    $('#channel_detail_savebutton').css('width', 80).unbind().click(function()
     {
       if ($('#ch_name').val() == "") {
         alert($('#lang_warning_empty_name').text());
