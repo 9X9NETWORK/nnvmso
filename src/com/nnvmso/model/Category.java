@@ -36,6 +36,9 @@ public class Category implements Serializable {
 	
 	@Persistent
 	private int channelCount;
+
+	@Persistent
+	private int chnChannelCount;
 	
 	@Persistent
 	private Date createDate;
@@ -113,6 +116,14 @@ public class Category implements Serializable {
 
 	public long getParentId() {
 		return parentId;
+	}
+
+	public int getChnChannelCount() {
+		return chnChannelCount;
+	}
+
+	public void setChnChannelCount(int chnChannelCount) {
+		this.chnChannelCount = chnChannelCount;
 	}
 	
 }
