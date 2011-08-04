@@ -231,7 +231,7 @@ a.btnCreate span{ line-height:30px; display:block;}
 a.btnDel{ background:url(/images/cms/btnClose.png) no-repeat; width:24px; height:23px; display:block; position:relative; top:-28px; left:375px;}
 a.btnDel:hover { background:url(/images/cms/btnCloseHover.png) no-repeat;}
 .chInfo p { color:#343434; padding-top:2px; width:220px;}
-.epInfo { color:#343434; padding-top:2px; width:260px; }
+.epInfo { color:#343434; padding-top:2px; width:350px; }
 .chInfo a , .epInfo , .chInfo p { font-size:0.85em; }
 .chInfo a { margin-right:3px; }
 .chFocusTitle div, .chUnFocusTitle div { max-height:30px; overflow:hidden; }
@@ -286,7 +286,7 @@ a.btnGray:hover { background:url(/images/cms/btn_gray_hover.jpg) 0 0 repeat-x;}
 a.btnGray  span{ line-height:27px;}
 
 .uploadSection{border:1px solid #C6D1EB; width:460px; min-height:430px; padding:10px 10px 5px 10px;}
-.epImport a{ margin:0 5px 5px 0; *margin:0 3px 10px 0;}
+.epImport a{ margin:0 5px 0 0; *margin:0 3px 0 0;}
 .uploadURL a { line-height:30px; font-size:0.9em; }
 .uploadURL .bg_input { margin-left: 80px; }
 
@@ -313,7 +313,7 @@ a.addNew{ padding:10px 0 0 0; display:block; font-size:0.9em;}
   margin-bottom:5px; *margin-bottom:3px;
 }
 
-.right_title a.floatR , .right_title a.floatR:active , .right_title a.floatR:visited{ color:#FFF; font-size:0.8em; padding-right:10px; }
+.right_title a.floatR , .right_title a.floatR:active , .right_title a.floatR:visited { color:#FFF; font-size:0.8em; padding-right:10px; }
 .right_title a.floatR:hover{text-decoration:none; color:#fff;}
 
 .epItem{ border:1px solid #d0d0d0; height:120px; width:460px; cursor:pointer;}
@@ -324,7 +324,7 @@ a.addNew{ padding:10px 0 0 0; display:block; font-size:0.9em;}
 .epItemFocusTitle div, .epInfoTitle div { max-width:400px; max-height:30px; overflow:hidden; }
 .epItem:hover { background:#fefce3; border:1px solid #ffd885; }
 .epItemFocus ul, .epItem ul { padding-top:5px; }
-.epInfo a { padding-right:3px; }
+.epInfo .icon { padding-left:5px; }
 
 .epItem a.btnDel , .epItemFocus a.btnDel{background:url(/images/cms/btnClose.png) no-repeat; width:24px; height:23px; display:block; position:relative; top:-28px; left:420px;}
 .chList li , .epList li{ padding-bottom:5px;}

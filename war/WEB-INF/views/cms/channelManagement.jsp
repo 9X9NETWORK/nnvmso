@@ -253,12 +253,14 @@
                     <div class="floatL"><a onclick="return false;" href="javascript:" class="btnCreate ep_urlbutton"><spring:message code="cms.channel_management.btn.from_url"/></a>&nbsp;</div>
                     <div class="floatL"><a onclick="return false;" href="javascript:" class="btnCreate ep_ytbutton"><spring:message code="cms.channel_management.btn.from_youtube"/></a></div>
                   </div>
-                  <div style="width:300px;padding-left:80px" class="floatL ep_uploading_video" style="display:none"><div></div></div>
+                  <div style="width:300px;padding-left:80px;padding-bottom:10px;" class="floatL ep_uploading_video" style="display:none"><div></div></div>
                   <!--  upload by URL link -->
                   <div class="floatL uploadURL ep_url_block" style="display:none">
                     <div class="bg_input floatL"><input type="text" size="33" maxlength="100" class="ep_url_input"/></div>&nbsp;<div class="floatL"><a onclick="return false;" href="javascript:" class="ep_url_import btnCreate"><spring:message code="cms.channel_management.btn.import"/></a></div>
                     <div class="clear"></div>
-                    <p class="hint" style="display:none"><spring:message code="cms.channel_management.msg.video_url_hint"/></p><br/>
+                    <p class="hint video_url_hint" style="display:none"><spring:message code="cms.channel_management.msg.video_url_hint"/></p>
+                    <p class="hint youtube_hint" style="display:none"><spring:message code="cms.channel_management.msg.youtube_hint"/></p>
+                    <br/>
                   </div>
                   <label class="floatL"><spring:message code="cms.channel_management.label.program_logo"/></label>
                   <div class="uploadImg">
@@ -311,17 +313,19 @@
               <div class="epInfoTitle program_info_title"><div>何處是我家</div> <a href="javascript:" class="btnDel program_info_removebutton"></a></div>
               <div class="epInfoImg program_info_image"></div>
               <div class="floatL epInfo">
-                <a href="#" class="floatL program_info_promoteurl">http://www.9x9.tv/channel/3958</a>
-                <a class="floatL program_info_addthis"><img src="http://cache.addthiscdn.com/icons/v1/thumbs/addthis.gif"/></a>
+                <a href="javascript:" target="_player" class="floatL program_info_promoteurl">http://www.9x9.tv/channel/3958</a>
+                <a class="icon floatL program_info_addthis"><img src="http://cache.addthiscdn.com/icons/v1/thumbs/addthis.gif"/></a>
                 <a href="#" class="iconStatistics" title="觀看數據"></a>
                 <div class="clear"></div>
-                <p class="program_info_type"><spring:message code="cms.channel_management.label.program_type"/> : <span>9x9</span></p>
-                <p class="program_info_updatedate"><spring:message code="cms.channel_management.label.update_time"/> : <span>2011/04/15 14:45</span></p>
+                <div class="floatL" style="width:230px;padding-top:3px;">
+                  <p class="program_info_type"><spring:message code="cms.channel_management.label.program_type"/> : <span>9x9</span></p>
+                  <p class="program_info_updatedate"><spring:message code="cms.channel_management.label.update_time"/> : <span>2011/04/15 14:45</span></p>
+                </div>
+                <ul class="floatL">
+                  <li style="display:none"><a class="chUnPublic program_info_publish"></a></li>
+                  <li><a class="btnGray program_info_detailbutton"><span><spring:message code="cms.channel_management.btn.program_info"/></span></a></li>
+                </ul>
               </div>
-              <ul class="floatL">
-                <li style="display:none"><a class="chUnPublic program_info_publish"></a></li>
-                <li><a class="btnGray program_info_detailbutton"><span><spring:message code="cms.channel_management.btn.program_info"/></span></a></li>
-              </ul>
               <div class="clear"></div>
             </div>
           </li>
@@ -433,18 +437,20 @@
             <div class="epItem program_info_block_readonly" id="program_info_block_readonly">
               <div class="epInfoTitle program_info_title"><div>何處是我家 </div></div>
               <div class="epInfoImg program_info_image"></div>
-              <div class=" floatL epInfo" >
+              <div class="floatL epInfo">
                 <a href="javascript:" target="_player" class="floatL program_info_promoteurl">http://www.9x9.tv/channel/3958</a>
-                <a class="floatL program_info_addthis"><img src="http://cache.addthiscdn.com/icons/v1/thumbs/addthis.gif"/></a>
+                <a class="icon floatL program_info_addthis"><img src="http://cache.addthiscdn.com/icons/v1/thumbs/addthis.gif"/></a>
                 <a href="#" class="iconStatistics" title="觀看數據"></a>
                 <div class="clear"></div>
-                <p class="program_info_type"><spring:message code="cms.channel_management.label.program_type"/> : <span>9x9</span></p>
-                <p class="program_info_updatedate"><spring:message code="cms.channel_management.label.update_time"/> : <span>2011/04/15 14:45</span></p>
+                <div class="floatL" style="width:230px;padding-top:3px;">
+                  <p class="program_info_type"><spring:message code="cms.channel_management.label.program_type"/> : <span>9x9</span></p>
+                  <p class="program_info_updatedate"><spring:message code="cms.channel_management.label.update_time"/> : <span>2011/04/15 14:45</span></p>
+                </div>
+                <ul class="floatL">
+                  <li style="display:none"><a class="chUnPublic program_info_publish"></a></li>
+                  <li><a class="btnGray program_info_detailbutton"><span><spring:message code="cms.channel_management.btn.program_info"/></span></a></li>
+                </ul>
               </div>
-              <ul class="floatL">
-                <li style="display:none"><a class="chUnPublic program_info_publish"></a></li>
-                <li><a class="btnGray program_info_detailbutton"><span><spring:message code="cms.channel_management.btn.program_info"/></span></a></li>
-              </ul>
               <div class="clear"></div>
             </div>
           </li>
@@ -479,9 +485,9 @@
           <form>
             <fieldset class="setAlbum">
               <label class="floatL"><spring:message code="cms.channel_management.label.program_source"/></label>
-              <p><a target="_player" class="ep_source" href="#">http://blip.tv/file/get/Qtv-JulianSchnabelOnQTV732.m4v</a></p><br/><br/>
+              <p style="width:400px;"><a target="_player" class="ep_source" href="#">http://blip.tv/file/get/Qtv-JulianSchnabelOnQTV732.m4v</a></p><br/><br/>
               <label class="floatL"><spring:message code="cms.channel_management.label.program_url"/></label>
-              <p><a target="_player" class="ep_url" href="#">http://www.9x9.tv/share/3958</a><p><br/><br/>
+              <p style="width:400px;"><a target="_player" class="ep_url" href="#">http://www.9x9.tv/share/3958</a><p><br/><br/>
               <label class="floatL"><spring:message code="cms.channel_management.label.create_time"/></label>
               <p class="ep_createdate">2011/04/25 14:30</p><br/><br/>
               <label class="floatL"><spring:message code="cms.channel_management.label.logo"/></label>
@@ -490,11 +496,11 @@
               </div>
               <div class="clear"></div><br/><br/>
               <label class="floatL"><spring:message code="cms.channel_management.label.name"/></label>
-              <p class="floatL ep_name">20110326《慈濟新聞深度報導》十噸賑災愛心物資 親手送給日本災民</p><br/><br/>
+              <p class="floatL ep_name" style="width:400px;">20110326《慈濟新聞深度報導》十噸賑災愛心物資 親手送給日本災民</p><br/><br/>
               <div class="clear"></div>
               <br/>
               <label class="floatL"><spring:message code="cms.channel_management.label.introduction"/></label>
-              <p class="floatL ep_intro">慈濟前往日本福島地區協助災民重建工作</p><br/><br/>
+              <p class="floatL ep_intro" style="width:400px;">慈濟前往日本福島地區協助災民重建工作</p><br/><br/>
               <div class="clear"></div>
             </fieldset>
           </form>

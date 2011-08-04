@@ -131,8 +131,15 @@ var programDetail =
     else if (program.audioFileUrl != null)
       source = program.audioFileUrl;
     programDetailBlock.find('.ep_source a').attr('href', source);
-    if (program.contentType == 1) {
+    switch(program.contentType) {
+      case 0:
+      programDetailBlock.find('.ep_source a').text('9x9');
+      break;
+      case 1:
       programDetailBlock.find('.ep_source a').text('YouTube');
+      break;
+      default:
+      programDetailBlock.find('.ep_source a').text('Unknown');
     }
     programDetailBlock.find('.right_title div').text(title);
     programDetailBlock.find('.ep_name').val(program.name);
@@ -257,10 +264,17 @@ var programDetail =
       source = program.otherFileUrl;
     else if (program.audioFileUrl != null)
       source = program.audioFileUrl;
-    var source_truncated = source;
-    if (source_truncated.length > 50)
-      source_truncated = source_truncated.substring(0, 50) + '...';
-    var dom = programDetailBlock.find('.ep_source').text(source_truncated).attr('href', source);
+    var sourceName = 'Unknown';
+    switch(program.contentType) {
+      case 0:
+      sourceName = 'Podcast';
+      break;
+      case 1:
+      sourceName = 'YouTube';
+      break;
+      default:
+    }
+    var dom = programDetailBlock.find('.ep_source').text(sourceName).attr('href', source);
     $('#program_list_readonly').hide();
     $('#program_detail_readonly').show();
   },
@@ -294,6 +308,11 @@ var programDetail =
       {
         programDetailBlock.find('.ep_uploading_video').hide();
         programDetailBlock.find('.ep_url_block').show();
+        programDetailBlock.find('.video_url_hint, .youtube_hint').hide();
+        if ($(this).hasClass('ep_urlbutton'))
+          programDetailBlock.find('.video_url_hint').show();
+        if ($(this).hasClass('ep_ytbutton'))
+          programDetailBlock.find('.youtube_hint').show();
       });
       programDetailBlock.find('.ep_url_import').css('width', 60).unbind().click(function()
       {
@@ -423,7 +442,7 @@ var programDetail =
           this.setPostParams(post_params);
           this.startUpload(file.id);
           programDetailBlock.find('.ep_uploading_video div').text('').progressBar({
-            barImage: '/images/cms/progressbg_green.gif'
+            barImage: '/images/cms/progressbg_black.gif'
           }).parent().show();
           programDetailBlock.find('.ep_url_input').val('');
           programDetailBlock.find('.ep_url_block').hide();
@@ -537,7 +556,77 @@ var programList =
         programList.displayProgramList(programs);
       }
     });
+  },
+  initYouTube: function(username, channelName, callback)
+  {
+    if (overallLayout.destroyRightSideContent(false) == false) return false;
     
+    var requestUrl = 'http://gdata.youtube.com/feeds/api/users/' + username + '/uploads';
+    var parameters = {
+      'orderby':     'published',
+      'start-index': 1,
+      'max-results': 50,
+      'alt':         'json',
+      'format':      5,
+      'v':           2
+    };
+    $.get(requestUrl, parameters, function(data)
+    {
+      if (data == null)
+        return;
+      var feed = data.feed;
+      if (typeof feed.entry != 'undefined')
+      {
+        if (feed.entry.length == 0) {
+          $('#program_list_empty_readonly .right_title div').text(channelName);
+          $('#program_list_empty_readonly').show();
+          return;
+        } else {
+          $('#program_list_readonly .right_title div').text(channelName);
+          var programCount = feed.entry.length;
+          callback(programCount);
+          programList.displayYouTube(feed.entry);
+        }
+      }
+    }, 'json');
+  },
+  displayYouTube: function(entries)
+  {
+    for (i in entries)
+    {
+      var programInfoBlock = $('#program_info_block_readonly').clone(true).removeAttr('id').addClass('program_info_block_cloned');
+      var entry = entries[i];
+      
+      programInfoBlock.find('.program_info_title div').text(entry.media$group.media$title.$t);
+      $('<img/>').attr('src', entry.media$group.media$thumbnail[1]['url']).appendTo(programInfoBlock.find('.program_info_image'));
+      programInfoBlock.find('.program_info_type span').text('YouTube');
+      programInfoBlock.find('.program_info_updatedate span').text(entry.updated.$t.substring(0, 19).replace('T', ' ').replace(/-/g, '/'));
+      // add this
+      var promoteUrl = entry.link[0].href;
+      var addthis_share =
+      {
+        'title': entry.media$group.media$title.$t,
+        'description': entry.media$group.media$description.$t,
+        'url': promoteUrl
+      }
+      addthis_config['pubid'] = $('#msoId').val();
+      addthis.button(programInfoBlock.find('.program_info_addthis').get(0), null, addthis_share);
+      programInfoBlock.find('.program_info_detailbutton').click({ 'entry': entry }, function(event)
+      {
+        programDetail.initYouTube(event.data.entry.link[4].href);
+        return false;
+      });
+      programInfoBlock.find('.program_info_promoteurl').text(promoteUrl.substring(0, 40) + '...').attr('href', promoteUrl);
+      $('<li></li>').append(programInfoBlock).appendTo('#program_list_ul_readonly');
+      programInfoBlock.click(function()
+      {
+        $('.program_info_block').removeClass('epItemFocus').addClass('epItem');
+        $('.program_info_title').removeClass('epItemFocusTitle').addClass('epInfoTitle');
+        $(this).removeClass('epItem').addClass('epItemFocus');
+        $('.program_info_title', this).removeClass('epInfoTitle').addClass('epItemFocusTitle');
+      });
+    }
+    $('#program_list_readonly').show();
   },
   displayProgramList: function(programs)
   {
@@ -550,12 +639,12 @@ var programList =
       programInfoBlock.find('.program_info_title div').text(programs[i].name);
       $('<img/>').attr('src', programs[i].imageUrl).appendTo(programInfoBlock.find('.program_info_image'));
       var type = 'Unknown';
-      switch(programs[i].type) {
-        case 1:
-        type = 'Video';
+      switch(programs[i].contentType) {
+        case 0:
+        type = '9x9';
         break;
-        case 2:
-        type = 'Audio';
+        case 1:
+        type = 'YouTube';
         break;
         default:
       }
@@ -632,12 +721,12 @@ var programList =
       programInfoBlock.find('.program_info_title div').text(programs[i].name);
       $('<img/>').attr('src', programs[i].imageUrl).appendTo(programInfoBlock.find('.program_info_image'));
       var type = 'Unknown';
-      switch(programs[i].type) {
-        case 1:
-        type = 'Video';
+      switch(programs[i].contentType) {
+        case 0:
+        type = 'Podcast';
         break;
-        case 2:
-        type = 'Audio';
+        case 1:
+        type = 'YouTube';
         break;
         default:
       }
@@ -1156,13 +1245,27 @@ var channelList =
         // channel info block click event
         channelInfoBlock.click({ 'channel': channels[i] }, function(event)
         {
+          var infoBlock = $(this);
           $('.channel_info_block').removeClass('chFocus').addClass('chUnFocus');
           $('.channel_info_title').removeClass('chFocusTitle').addClass('chUnFocusTitle');
           $('.channel_info_image').removeClass('chFocusImg').addClass('chUnFocusImg');
-          $(this).removeClass('chUnFocus').addClass('chFocus');
-          $('.channel_info_title', this).removeClass('chUnFocusTitle').addClass('chFocusTitle');
-          $('.channel_info_image', this).removeClass('chUnFocusImg').addClass('chFocusImg');
-          programList.init(event.data.channelId, event.data.readonly, event.data.channelName);
+          infoBlock.removeClass('chUnFocus').addClass('chFocus');
+          $('.channel_info_title', infoBlock).removeClass('chUnFocusTitle').addClass('chFocusTitle');
+          $('.channel_info_image', infoBlock).removeClass('chUnFocusImg').addClass('chFocusImg');
+          var channel = event.data.channel;
+          if (channel.contentType == 6)
+            var readonly = false;
+          else
+            var readonly = true;
+          if (channel.contentType == 3) {
+            var username = channel.sourceUrl.match(/\/user\/([^\/]*)/)[1];
+            programList.initYouTube(username, channel.name, function(programCount)
+            {
+              $('.channel_info_programcount span', infoBlock).text(programCount);
+            });
+          } else {
+            programList.init(channel.key.id, readonly, channel.name);
+          }
         });
       }
       $('#channel_list').show();
