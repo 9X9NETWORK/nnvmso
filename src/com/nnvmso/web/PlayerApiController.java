@@ -512,13 +512,14 @@ public class PlayerApiController {
 		String grid = req.getParameter("grid");
 		String categoryIds = req.getParameter("category");
 		String tags = req.getParameter("tag");
+		String lang = req.getParameter("lang");
 
 		this.prepService(req);		
 		log.info("player input - userToken=" + userToken+ "; url=" + url + ";grid=" + grid + ";categoryId=" + categoryIds);				
 		String output = NnStatusMsg.errorStr(locale);		
 		
 		try {
-			output = playerApiService.createChannel(categoryIds, userToken, url, grid, tags, req);
+			output = playerApiService.createChannel(categoryIds, userToken, url, grid, tags, lang, req);
 		} catch (Exception e){
 			output = playerApiService.handleException(e);
 		}
