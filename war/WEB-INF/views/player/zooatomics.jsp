@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9playerV66"/>
+<c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9playerV68"/>
 
 <!-- $Revision$ -->
 
@@ -27,7 +27,7 @@
 <script type="text/javascript" charset="utf-8" src="${root}/javascripts/jquery.swfobject.1-1-1.min.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/scripts/flowplayer-3.2.4.min.js"></script>
 
-<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/player9a.js"></script>
+<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/player10.js"></script>
 
 <script type="text/javascript">
 var analytz = false;
@@ -158,20 +158,6 @@ var brandinfo = "${brandInfo}";
         <li id="btn-about"><img src="${root}/images/icon_about.png" id="icon-about"><span><div id="btn-about-text">About Us</div><span class="arrow"></span></span></li>
         <li id="btn-help"><img src="${root}/images/icon_help.png" id="icon-help"><span><div id="btn-help-txt">Help</div><span class="arrow"></span></span></li>
       </ul>
-      <ul id="lang-setting"> 
-        <li id="sg-site-lang"><span id="site-lang" class="lang-selected">English site</span><img src="${root}/images/icon_downarrow.png" class="icon-downarrow"> 
-          <ul class="lang-options"> 
-            <li id="sg-site-en"><img src="${root}/images/icon_check.png" class="icon-check"><span>English site</span></li> 
-            <li id="sg-site-zh"><img src="${root}/images/icon_check.png" class="icon-check"><span>中文網站</span></li> 
-          </ul> 
-        </li> 
-        <li id="sg-program-lang"><span id="program-lang" class="lang-selected">English programs</span><img src="${root}/images/icon_downarrow.png" class="icon-downarrow"> 
-          <ul class="lang-options"> 
-            <li id="sg-program-en"><img src="${root}/images/icon_check.png" class="icon-check"><span>English programs</span></li> 
-            <li id="sg-program-zh"><img src="${root}/images/icon_check.png" class="icon-check"><span>中文節目</span></li> 
-          </ul> 
-        </li> 
-      </ul> 
     </div>
     
     <div id="sg-content">
@@ -255,7 +241,7 @@ var brandinfo = "${brandInfo}";
     <div id="add-content">
       <div id="add-col">
         <h2>Add Channels</h2>
-        <h3 id="fromown">from your own</h3>
+        <h3>from your own</h3>
         <ul id="private-list" class="option-list">
           <li id="myFacebook"><span>My Facebook</span></li>
           <li id="myPodcast"><span>My Podcast</span></li>
@@ -263,7 +249,7 @@ var brandinfo = "${brandInfo}";
           <li id="myYouTube"><span>My YouTube</span></li>
           <!--<li id="myTwitter"><span>My Twitter</span></li>-->
         </ul>
-        <h3 id="from9x9">from 9x9</h3>
+        <h3>from 9x9</h3>
         <ul id="public-list" class="option-list">
           <li id="fSets"><span>Featured sets</span></li>
           <li id="fChannels"><span>Featured channels</span></li>
@@ -800,6 +786,70 @@ var brandinfo = "${brandInfo}";
   </div>
   </div>
 </div>
+
+<div id="yt-layer"> 
+  <div id="yt-holder"> 
+    <div id="yt-header"> 
+      <h2><span>Add My YouTube Favorites</span></h2> 
+      <ul class="navigation"> 
+        <li class="btn-store"><img src="${root}/images/icon_store.png" class="icon-store"><span>Channel Store</span></li> 
+        <li class="btn-home"><img src="${root}/images/icon_home.png" class="icon-home"><span>Return to 9x9 View</span></li> 
+      </ul> 
+    </div> 
+    <div id="yt-container"> 
+        <div id="yt-url"> 
+          <div class="url-input"> 
+            <input name="" type="text" class="url-field" value="Enter YouTube Channel or Playlist URL"> 
+          </div> 
+          <p class="note">* We don't accept URLs for single video</p> 
+        </div> 
+        <div id="yt-chName"> 
+          <div class="url-input yt-input"> 
+            <input name="" type="text" class="url-field" value="Enter Channel Name"> 
+          </div> 
+        </div> 
+        <div id="yt-authorName">         
+          <div class="url-input yt-input"> 
+            <input name="" type="text" class="url-field" value="Enter Author Name"> 
+          </div> 
+        </div> 
+        <div id="yt-lang"> 
+          <ul id="yt-lang-setting"> 
+            <li><span id="yt-program-lang" class="lang-selected">Select program language</span><img src="images/icon_downarrow.png" class="icon-downarrow"> 
+              <ul class="lang-options"> 
+                <li><img src="${root}/images/icon_check.png" class="icon-check"><span>English programs</span></li> 
+                <li><img src="${root}/images/icon_check.png" class="icon-check"><span>Chinese programs</span></li> 
+              </ul> 
+            </li> 
+           </ul> 
+        </div> 
+        <div id="yt-description"> 
+          <textarea name="" class="description-field">Enter Channel Description</textarea> 
+        </div> 
+        <div class="cate-selector" id="yt-cate"> 
+          <p>Choose category:</p> 
+          <ul class="cate-list"> 
+            <li><img src="${root}/images/check_off.png" class="check-off"><img src="${root}/images/check_on.png" class="check-on"><span>News</span></li> 
+            <li><img src="${root}/images/check_off.png" class="check-off"><img src="${root}/images/check_on.png" class="check-on"><span>Music</span></li> 
+            <li><img src="${root}/images/check_off.png" class="check-off"><img src="${root}/images/check_on.png" class="check-on"><span>Sports</span></li> 
+            <li><img src="${root}/images/check_off.png" class="check-off"><img src="${root}/images/check_on.png" class="check-on"><span>Movie Trailers</span></li> 
+            <li><img src="${root}/images/check_off.png" class="check-off"><img src="${root}/images/check_on.png" class="check-on"><span>Lifestyle</span></li> 
+            <li><img src="${root}/images/check_off.png" class="check-off"><img src="${root}/images/check_on.png" class="check-on"><span>Food & Wine</span></li> 
+            <li><img src="${root}/images/check_off.png" class="check-off"><img src="${root}/images/check_on.png" class="check-on"><span>Travel</span></li> 
+            <li><img src="${root}/images/check_off.png" class="check-off"><img src="${root}/images/check_on.png" class="check-on"><span>Local Deals</span></li> 
+            <li><img src="${root}/images/check_off.png" class="check-off"><img src="${root}/images/check_on.png" class="check-on"><span>Brands</span></li> 
+            <li><img src="${root}/images/check_off.png" class="check-off"><img src="${root}/images/check_on.png" class="check-on"><span>Others</span></li> 
+          </ul> 
+        </div> 
+        <div id="yt-submission"> 
+          <ul> 
+            <li class="btn" id="btn-add-yt"><span>Add</span></li><li class="btn" id="btn-cancel-yt"><span>Cancel</span></li> 
+          </ul> 
+          <p id="yt-feedback"><img src="${root}/images/loading.gif"><span>Processing...</span></p> 
+        </div> 
+    </div>   
+  </div> 
+</div> 
 
 <div id="signin-layer">
   <div id="signin-holder">
