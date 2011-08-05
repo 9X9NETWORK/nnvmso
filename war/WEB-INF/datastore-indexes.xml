@@ -11,10 +11,10 @@
     <property name="name" direction="asc"/>
   </datastore-index>
   <datastore-index kind="Category" ancestor="false" source="manual">
-    <property name="isInIpg" direction="asc"/>
+    <property name="isPublic" direction="asc"/>
     <property name="msoId" direction="asc"/>
-    <property name="seq" direction="asc"/>
-  </datastore-index>
+    <property name="name" direction="asc"/>
+    </datastore-index>
   <datastore-index kind="Category" ancestor="false" source="manual">
     <property name="msoId" direction="asc"/>
     <property name="type" direction="asc"/>
