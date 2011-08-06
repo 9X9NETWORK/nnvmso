@@ -27,7 +27,7 @@
 <script type="text/javascript" charset="utf-8" src="${root}/javascripts/jquery.swfobject.1-1-1.min.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/scripts/flowplayer-3.2.4.min.js"></script>
 
-<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/player10.js"></script>
+<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/player11.js"></script>
 
 <script type="text/javascript">
 var analytz = false;
@@ -72,10 +72,19 @@ var brandinfo = "${brandInfo}";
 </div>
 
 <div id="yt1" style="width: 100%; height: 100%; z-index: 1; visibility: visible; position: absolute; left: 0; top: 0; overflow: hidden;">
-  <div id="ytapiplayer">
+  <div id="ytapiplayer1">
   </div>
 </div>
 
+<div id="yt2" style="width: 100%; height: 100%; z-index: 1; visibility: visible; position: absolute; left: 0; top: 0; overflow: hidden;">
+  <div id="ytapiplayer2">
+  </div>
+</div>
+
+<div id="yt3" style="width: 100%; height: 100%; z-index: 1; visibility: visible; position: absolute; left: 0; top: 0; overflow: hidden;">
+  <div id="ytapiplayer3">
+  </div>
+</div>
 
 <div id="ss" style="width: 100%; height: 100%; z-index: 4; visibility: visible; position: absolute; left: 0; top: 0; overflow: hidden; display: none">
 </div>
@@ -619,7 +628,7 @@ var brandinfo = "${brandInfo}";
   </div> 
 </div> 
 
-<div id="tvpreview-layer"> 
+<div id="tvpreview-layer" style="display:block;"> 
   <div id="tvpreview-holder"> 
     <div id="tvpreview-header"> 
       <h2><span class="index">News Channels (<span id="chNum">10</span>) :</span><span class="title">Select a Channel</span></h2> 
@@ -627,40 +636,50 @@ var brandinfo = "${brandInfo}";
         <li class="btn-store"><img src="${root}/images/icon_store.png" class="icon-store"><span>Channel Store</span></li> 
         <li class="btn-home"><img src="${root}/images/icon_home.png" class="icon-home"><span>Return to 9x9 View</span></li> 
       </ul> 
+      <ul id="tvpreview-lang-setting"> 
+        <li><span id="tvpreview-program-lang" class="lang-selected">English programs</span><img src="${root}/images/icon_downarrow.png" class="icon-downarrow"> 
+          <ul class="lang-options"> 
+            <li id="tvp-lang-en"><img src="${root}/images/icon_check.png" class="icon-check"><span>English programs</span></li> 
+            <li id="tvp-lang-zh"><img src="${root}/images/icon_check.png" class="icon-check"><span>中文節目</span></li> 
+          </ul> 
+        </li> 
+      </ul> 
     </div> 
     <div id="tvpreview-container"> 
       <div id="tvch-cards"> 
         <div id="current-card"> 
-          <img src="${root}/thumb/03.png" class="tvch-thumb"> 
+          <img src="" class="tvch-thumb"> 
           <p class="tvch-title"><span>Channel: </span><span class="title">ABC News</span></p> 
-          <p class="tvch-description"><span>ABC's Jason Ryan (@jasonryanabc) Just days after the perjury trial began, the federal judge overseeing the Roger Clemens trial ended the...</span></p> 
+          <p class="tvch-description"><span></span></p> 
+          <p class="tvch-author"><span>Author: XXX YYY</span></p> 
         </div> 
-        <div id="next1-card"><p class="tvch-title"><span>Channel: </span><span class="title">CNN News</span></p></div> 
-        <div id="next2-card"><p class="tvch-title"><span>Channel: </span><span class="title">NBC News</span></p></div> 
-        <div id="next3-card"><p class="tvch-title"><span>Channel: </span><span class="title">CTS News</span></p></div> 
+        <div id="next1-card"><p class="tvch-title"><span>Channel: </span><span class="title"></span></p></div> 
+        <div id="next2-card"><p class="tvch-title"><span>Channel: </span><span class="title"></span></p></div> 
+        <div id="next3-card"><p class="tvch-title"><span>Channel: </span><span class="title"></span></p></div> 
       </div> 
       <div id="tvpreview-control"> 
         <p class="btn" id="tri-left"><img src="${root}/images/tri_left.png"></p> 
         <p class="btn" id="tri-right"><img src="${root}/images/tri_right.png"></p> 
         <p class="btn" id="tri-up"><img src="${root}/images/tri_up.png"></p> 
         <p class="btn" id="tri-down"><img src="${root}/images/tri_down.png"></p> 
-        <p class="btn-blue"><span>Add</span></p> 
+        <p class="btn" id="btn-plus"><img src="${root}/images/icon_plus.png"></p> 
         <p class="txt" id="txt-left"><span>Prev<br>Episode</span></p> 
         <p class="txt" id="txt-right"><span>Next<br>Episode</span></p> 
         <p class="txt" id="txt-up"><span>Prev Channel</span></p> 
         <p class="txt" id="txt-down"><span>Next Channel</span></p> 
       </div> 
       <div id="tvpreview-win"> 
+        <p class="btn-blue"><img src="${root}/images/icon_plus.png"><span>Add</span></p> 
         <div id="tvpreview-video"></div> 
         <img src="${root}/images/ep_panel_on.png" id="tvep-panel"> 
         <p id="tv-arrow-right"><img src="${root}/images/arrow_right_off.png" id="tv-arrow-right-off"><img src="${root}/images/arrow_right_on.png" id="tv-arrow-right-on"></p> 
         <p id="tv-arrow-left"><img src="${root}/images/arrow_left_off.png" id="tv-arrow-left-off"><img src="${root}/images/arrow_left_on.png" id="tv-arrow-left-on"></p> 
         <ul class="tvep-list"></ul> 
-        <div id="tvep-meta"><p><span class="tvep-title">Jay Leno's eclectic car collection</span> - <span class="age">Today</span></p></div> 
+        <div id="tvep-meta"><p><span class="tvep-title"></span> - <span class="age"></span></p></div>
       </div> 
     </div> 
   </div> 
-</div>
+</div> 
 
 <div id="store-layer"> 
   <div id="store-holder"> 
@@ -672,8 +691,8 @@ var brandinfo = "${brandInfo}";
       <ul id="store-lang-setting"> 
         <li><span id="store-program-lang" class="lang-selected">English programs</span><img src="${root}/images/icon_downarrow.png" class="icon-downarrow"> 
           <ul class="lang-options"> 
-            <li class="on"><img src="${root}/images/icon_check.png" class="icon-check"><span>English programs</span></li> 
-            <li><img src="${root}/images/icon_check.png" class="icon-check"><span>Chinese programs</span></li> 
+            <li id="store-lang-en"><img src="${root}/images/icon_check.png" class="icon-check"><span>English programs</span></li> 
+            <li id="store-lang-zh"><img src="${root}/images/icon_check.png" class="icon-check"><span>中文節目</span></li> 
           </ul> 
         </li> 
       </ul> 
@@ -815,10 +834,10 @@ var brandinfo = "${brandInfo}";
         </div> 
         <div id="yt-lang"> 
           <ul id="yt-lang-setting"> 
-            <li><span id="yt-program-lang" class="lang-selected">Select program language</span><img src="images/icon_downarrow.png" class="icon-downarrow"> 
+            <li><span id="yt-program-lang" class="lang-selected">Select program language</span><img src="${root}/images/icon_downarrow.png" class="icon-downarrow"> 
               <ul class="lang-options"> 
-                <li><img src="${root}/images/icon_check.png" class="icon-check"><span>English programs</span></li> 
-                <li><img src="${root}/images/icon_check.png" class="icon-check"><span>Chinese programs</span></li> 
+                <li id="yt-lang-en"><img src="${root}/images/icon_check.png" class="icon-check"><span>English programs</span></li> 
+                <li id="yt-lang-zh"><img src="${root}/images/icon_check.png" class="icon-check"><span>中文節目</span></li> 
               </ul> 
             </li> 
            </ul> 
@@ -1051,7 +1070,7 @@ var brandinfo = "${brandInfo}";
   <div id="direct-content">
     <img src="${root}/images/logo_about.png" id="direct-logo">
     <h1><span>9x9 is your personal video album</span></h1>
-    <p class="description"><span>All of your favorite videos in one place. Like videos from your podcasts, YouTuve channels, Facebook and Twitter. Plus discover video albums created for your unique lifestyle. You feed all these videos as TV channels into a personalized program guide you create and personalize.</span></p>
+    <p class="description"><span>All of your favorite videos in one place. Like videos from your podcasts, YouTube channels, Facebook and Twitter. Plus discover video albums created for your unique lifestyle. You feed all these videos as TV channels into a personalized program guide you create and personalize.</span></p>
     <p class="btn-blue" id="btn-direct-enter"><span>Watch it Now</span></p>
     <p class="promotion"><span>Personalize your video album and<br>save it to your <strong>Smart Guide</strong></span></p>
     <p class="btn-blue" id="btn-direct-signup"><span>Create Account</span></p>
@@ -1171,6 +1190,16 @@ var brandinfo = "${brandInfo}";
 <div id="mask"></div>
 
 <div id="fb-root"></div>
+
+<div id="relaydiv" style="z-index: 1; position: absolute; top: 0px; left: 0px">
+<object id="relay" width=481 height=86>
+<param name=movie value="relay.swf">
+<embed play=false swliveconnect="true" name="relay" 
+src="http://50.17.15.33/relay.swf" quality=high bgcolor=#FFFFFF 
+width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="always" allowScripting="on" wmode="transparent">
+</embed>
+</object>
+</div>
 
 <!--/div-->
 </body>
