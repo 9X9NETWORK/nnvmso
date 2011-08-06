@@ -411,6 +411,7 @@ public class PlayerApiController {
 	 *         --<br/>
 	 *         name	Daai3x3<br/>
 	 *         imageUrl	null<br/>
+	 *         description Daai <br/>
 	 *         --<br/>
 	 *         1	396	channel1	channel1 http://podcast.daaitv.org/Daai_TV_Podcast/da_ai_dian_shi/da_ai_dian_shi_files/shapeimage_3.png	3	0	0	2<br/>	
 	 *         2	399	channel2	channel2 http://podcast.daaitv.org/Daai_TV_Podcast/jing_si_yu/jing_si_yu_files/shapeimage_4.png	3	0	0	2	<br/>
