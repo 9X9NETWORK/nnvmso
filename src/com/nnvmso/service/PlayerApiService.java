@@ -104,7 +104,8 @@ public class PlayerApiService {
 		output += assembleKeyValue("id", String.valueOf(cs.getKey().getId()));
 		output += assembleKeyValue("name", cs.getName());		
 		output += assembleKeyValue("imageUrl", cs.getImageUrl());
-		
+		output += assembleKeyValue("description", cs.getIntro());
+
 		//4rd block, channel info
 		String channelLineup = separatorStr;
 		for (MsoChannel c : channels) {
