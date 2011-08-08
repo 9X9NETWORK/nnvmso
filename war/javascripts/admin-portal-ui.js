@@ -1055,6 +1055,37 @@ $(function()
         }
       },
       {
+        label:     'Type',
+        name:      'type',
+        index:     'type',
+        width:     70,
+        align:     'center',
+        sortable:  true,
+        formatter: 'select',
+        editable:  false,
+        edittype:  'select',
+        editoptions:
+        {
+          value: '0:NoRestricted;1:Restricted;2:Personal;3:YouTube'
+        }
+      },
+      {
+        label:     'InIpg',
+        name:      'isInIpg',
+        index:     'isInIpg',
+        width:     70,
+        align:     'center',
+        search:    false,
+        sortable:  true,
+        formatter: 'checkbox',
+        editable:  true,
+        edittype:  'checkbox',
+        editoptions:
+        {
+          value:    'true:false'
+        }
+      },
+      {
         label:     'Public',
         name:      'isPublic',
         index:     'isPublic',

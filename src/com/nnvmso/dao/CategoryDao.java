@@ -68,7 +68,25 @@ public class CategoryDao extends GenericDao<Category> {
 		}
 		return detached;
 	}
-	
+	/*
+	public List<Category> findAllByMsoIdAndRestricted(long msoId) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		List<Category> detached = new ArrayList<Category>();
+		try {
+			Query q = pm.newQuery(Category.class);
+			q.setFilter("msoId == msoIdParam && type == typeParam");
+			q.declareParameters("long msoIdParam, short typeParam");
+			q.setOrdering("name");
+			@SuppressWarnings("unchecked")
+			List<Category> categories = (List<Category>)q.execute(msoId, Category.TYPE_RESTRICTED);
+			detached = (List<Category>)pm.detachCopyAll(categories);
+		} finally {
+			pm.close();			
+		}
+		return detached;		
+	}
+	*/
+
 	public List<Category> findAllByMsoId(long msoId) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		List<Category> detached = new ArrayList<Category>();

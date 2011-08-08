@@ -39,10 +39,6 @@ public class CategoryManager {
 		}
 	}
 	
-	public void cacheRefresh(Category category) {
-		this.findAllByMsoId(category.getMsoId());
-	}
-	
 	public String translate(String name) {
 		if (name == null) return null;
 		Locale locale = Locale.TRADITIONAL_CHINESE;
@@ -86,6 +82,11 @@ public class CategoryManager {
 		category = categoryDao.save(category);
 		this.cacheRefresh(category);
 		return category;
+	}
+	
+	public void cacheRefresh(Category category) {
+		this.findAllByMsoId(category.getMsoId());
+		this.findAllInIpg(category.getMsoId());
 	}
 	
 	public List<Category> findCategoriesByChannelId(long channelId) {
@@ -188,7 +189,7 @@ public class CategoryManager {
 	//result will be cached
 	public List<Category> findAllByMsoId(long msoId) {
 		Cache cache = CacheFactory.get();
-		String key = this.getCacheKey(msoId);
+		String key = this.getCacheKey(msoId, true);
 		if (cache != null) {
 			@SuppressWarnings("unchecked")
 			List<Category> categories= (List<Category>) cache.get(key);
@@ -212,6 +213,23 @@ public class CategoryManager {
 		cache.put(key, sequence);
 		return sequence;
 	}
+
+	//result will be cached
+	public List<Category> findAllInIpg(long msoId) {
+		Cache cache = CacheFactory.get();
+		String key = this.getCacheKey(msoId, false);
+		if (cache != null) {
+			@SuppressWarnings("unchecked")
+			List<Category> categories= (List<Category>) cache.get(key);
+			if (categories != null) { 
+				log.info("categories from cahce:" + categories.size());
+				return categories;
+			}
+		}
+		List<Category> categories = categoryDao.findAllInIpg(msoId);//!!!hack
+		cache.put(key, categories);
+		return categories;
+	}
 	
 	public List<Category> findAll() {
 		return categoryDao.findAll();
@@ -228,7 +246,15 @@ public class CategoryManager {
 	public Category findById(long id) {
 		return categoryDao.findById(id);
 	}
-			
+		
+	//example: mso(1)category(123), returns category
+	private String getCacheKey(long msoId, boolean isAll) {
+		String option = "all";
+		if (!isAll)
+			option = "ipg";
+		return "mso(" + msoId + ")category(" + option + ")";
+	}
+	
 	private String getCacheKey(long msoId) {
 		return "mso(" + msoId + ")category(all)";
 	}
@@ -236,6 +262,8 @@ public class CategoryManager {
 	public void deleteCache(long msoId) {
 		Cache cache = CacheFactory.get();
 		if (cache != null) {
+			cache.remove(this.getCacheKey(msoId, true));
+			cache.remove(this.getCacheKey(msoId, false));
 			cache.remove(this.getCacheKey(msoId));
 		}
 	}		

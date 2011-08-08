@@ -316,6 +316,8 @@ public class AdminCategoryController {
 			cell.add(category.getName());
 			cell.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(category.getUpdateDate()));
 			cell.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(category.getCreateDate()));
+			cell.add(category.getType());
+			cell.add(category.isInIpg());
 			cell.add(category.isPublic());
 			cell.add(category.getChannelCount());
 			
@@ -357,6 +359,7 @@ public class AdminCategoryController {
 	public @ResponseBody String modify(@RequestParam(required=true)  Long    id,
 	                                   @RequestParam(required=false) String  name,
 	                                   @RequestParam(required=false) Boolean isPublic,
+	                                   @RequestParam(required=false) Boolean isInIpg,
 	                                   @RequestParam(required=false) Long    msoId,
 	                                   @RequestParam(required=false) Integer channelCount) {
 		
@@ -383,6 +386,10 @@ public class AdminCategoryController {
 		if (name != null) {
 			logger.info("name = " + name);
 			category.setName(name);
+		}
+		if (isInIpg != null) {
+			logger.info("isInIpg = " + isInIpg);
+			category.setInIpg(isInIpg);
 		}
 		if (isPublic != null) {
 			logger.info("isPublic = " + isPublic);

@@ -346,5 +346,29 @@ public class MsoChannel implements Serializable {
 
 	public void setFeatured(boolean featured) {
 		this.featured = featured;
+	}
+
+	public String getFauxName() {
+		return fauxName;
+	}
+
+	public void setFauxName(String fauxName) {
+		this.fauxName = fauxName;
+	}
+
+	public String getFauxIntro() {
+		return fauxIntro;
+	}
+
+	public void setFauxIntro(String fauxIntro) {
+		this.fauxIntro = fauxIntro;
+	}
+
+	public String getFauxImageUrl() {
+		return fauxImageUrl;
+	}
+
+	public void setFauxImageUrl(String fauxImageUrl) {
+		this.fauxImageUrl = fauxImageUrl;
 	}	
 }

@@ -141,18 +141,14 @@ public class InitService {
 		String debugStr = "1";
 		if (!debug) {debugStr = "0";}
 		MsoConfig config1 = new MsoConfig(mso.getKey().getId(), MsoConfig.DEBUG, debugStr);
-		configMngr.create(config1);	
+		configMngr.create(config1);
 		
 		//a default MSO user
 		NnUserManager userMngr = new NnUserManager();
 		NnUser user = new NnUser("mso@9x9.tv", "9x9mso", "9x9 mso", NnUser.TYPE_NN);
 		user.setMsoId(mso.getKey().getId()); //!!!
 		userMngr.create(user);
-
-		NnUser a = new NnUser("a@a.com", "foobie", "a", NnUser.TYPE_NN);
-		a.setMsoId(mso.getKey().getId()); //!!!
-		userMngr.create(a);
-				
+		
 		//initialize default categories
 		String[] categoryStr = {
 			"News", "Ambient music", "Friends & Family", 
@@ -164,7 +160,6 @@ public class InitService {
 		int i=1;
 		for (String name : categoryStr) {			
 			Category c = new Category(name, true, mso.getKey().getId());
-			/*
 			if (c.getName().equals("Others") || c.getName().equals("Religion") || c.getName().equals("Travel")) {
 				c.setInIpg(false);
 			} else {
@@ -178,7 +173,6 @@ public class InitService {
 			if (c.getName().equals("My Youtube")) {
 				c.setType(Category.TYPE_YOUTUBE);
 			}
-			*/
 			categoryMngr.create(c);
 		}
 		log.info("initializeMso1AndCategories is done");
@@ -209,10 +203,6 @@ public class InitService {
 		NnUser user = new NnUser("mso@5f.tv", "5ffmso", "5f mso", NnUser.TYPE_TBC);		
 		user.setMsoId(mso.getKey().getId()); //!!! constructor, or create
 		userMngr.create(user);
-		
-		NnUser a = new NnUser("a@a.com", "foobie", "a", NnUser.TYPE_NN);
-		a.setMsoId(mso.getKey().getId()); //!!!
-		userMngr.create(a);
 		
 		//initialize default categories
 		String[] categoryStr = {
@@ -274,10 +264,6 @@ public class InitService {
 		MsoProgramManager programMngr = new MsoProgramManager();
 		Category category = categoryMngr.findByName("Brands");
 		categories.add(category);
-		Category category1 = categoryMngr.findByName("Automotive");
-		categories.add(category1);
-		Category category2 = categoryMngr.findByName("Comedy");
-		categories.add(category2);
 
 		if (devel) {
 			/*

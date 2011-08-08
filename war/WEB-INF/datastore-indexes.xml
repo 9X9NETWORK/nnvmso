@@ -30,7 +30,14 @@
     <property name="featured" direction="asc"/>
     <property name="msoId" direction="asc"/>
     <property name="createDate" direction="asc"/>
-  </datastore-index>  
+  </datastore-index> 
+  <datastore-index kind="ChannelSet" ancestor="false" source="manual">
+    <property name="featured" direction="asc"/>
+    <property name="createDate" direction="asc"/>
+  </datastore-index>
+  <datastore-index kind="ChannelSetChannel" ancestor="false" source="manual">
+    <property name="__key__" direction="desc"/>
+  </datastore-index>
   <datastore-index kind="Ipg" ancestor="false" source="manual">
     <property name="__key__" direction="desc"/>
   </datastore-index>
