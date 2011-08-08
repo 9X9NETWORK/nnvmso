@@ -568,6 +568,10 @@ public class PlayerApiController {
 			                                    HttpServletRequest req) {
 		this.prepService(req);
 		log.info(categoryIds);
+		if (lang != null && lang.equals("undefined")) {
+			MsoManager msoMngr = new MsoManager();
+			lang = msoMngr.findNNMso().getPreferredLangCode(); // hack also, for player compatibility
+		}
 		String output = NnStatusMsg.errorStr(locale);
 		try {
 			output = playerApiService.findPublicChannelsByCategoryAndLang(categoryIds, lang);
