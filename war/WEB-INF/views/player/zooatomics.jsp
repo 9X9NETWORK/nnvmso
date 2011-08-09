@@ -86,9 +86,6 @@ var brandinfo = "${brandInfo}";
   </div>
 </div>
 
-<div id="ytx" style="width: 100%; height: 100%; z-index: 2; visibility: visible; position: absolute; left: 0; top: 0; overflow: hidden; background-color: black">
-</div>
-
 <div id="ss" style="width: 100%; height: 100%; z-index: 4; visibility: visible; position: absolute; left: 0; top: 0; overflow: hidden; display: none">
 </div>
 
