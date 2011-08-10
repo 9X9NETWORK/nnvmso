@@ -41,23 +41,21 @@ public class PlayerController {
 	public String zooatomics(@RequestParam(value="mso",required=false) String mso, HttpServletRequest req, HttpServletResponse resp, Model model, @PathVariable("name") String name) {
 		PlayerService service = new PlayerService();
 		model = service.prepareBrand(model, mso, resp);
-
-		String prefLanguage = req.getHeader("Accept-Language");
-		System.out.print(prefLanguage); //en-US,en;q=0.8  
-		
+		//String prefLanguage = req.getHeader("Accept-Language");
 		return "player/zooatomics";
 	}
 
 	@RequestMapping("view")
 	public String view(@RequestParam(value="mso",required=false) String mso, 
-			                     HttpServletRequest req, HttpServletResponse resp, 
-			                     Model model, 
-			                     @RequestParam("channel") String cid,
-			                     @RequestParam("episode") String pid) {
+			           HttpServletRequest req, HttpServletResponse resp, Model model, 
+			           @RequestParam(value="channel", required=false) String channel,
+			           @RequestParam(value="episode", required=false) String episode,
+				       @RequestParam(value="ch", required=false) String ch,
+				       @RequestParam(value="ep", required=false) String ep) {
 		PlayerService service = new PlayerService();
 		model = service.prepareBrand(model, mso, resp);
 		return "player/zooatomics";
-	}	
+	}
 	
 	@RequestMapping("support")
 	public String support() {
