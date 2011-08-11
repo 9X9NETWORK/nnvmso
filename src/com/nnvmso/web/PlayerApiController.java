@@ -626,14 +626,16 @@ public class PlayerApiController {
 												@RequestParam(value="userInfo", required=false) String userInfo,
 												@RequestParam(value="channel", required=false) String channelIds,
 												@RequestParam(value="setInfo", required=false) String setInfo,
+												@RequestParam(value="required", required=false) String required,
 											    HttpServletRequest req) {
 		this.prepService(req);
-		log.info("userToken=" + userToken + ";isUserInfo:" + userInfo);
+		log.info("userToken=" + userToken + ";isUserInfo:" + userInfo);	
 		boolean isUserInfo = Boolean.parseBoolean(userInfo);
 		boolean isSetInfo = Boolean.parseBoolean(setInfo);
+		boolean isRequired = Boolean.parseBoolean(required);
 		String output = NnStatusMsg.errorStr(locale);
 		try {
-			output = playerApiService.findChannelInfo(userToken, isUserInfo, channelIds, isSetInfo);
+			output = playerApiService.findChannelInfo(userToken, isUserInfo, channelIds, isSetInfo, isRequired);
 		} catch (Exception e){
 			output = playerApiService.handleException(e);
 		}
