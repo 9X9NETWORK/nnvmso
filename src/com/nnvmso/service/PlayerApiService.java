@@ -866,7 +866,8 @@ public class PlayerApiService {
 		return output;
 	}
 	
-	public String findChannelInfo(String userToken, boolean userInfo, String channelIds, boolean setInfo) {
+	public String findChannelInfo(String userToken, boolean userInfo, 
+			                      String channelIds, boolean setInfo, boolean isRequired) {
 		//verify input
 		if ((userToken == null && userInfo == true) || (userToken == null && channelIds == null) || (userToken == null && setInfo == true)) {
 			return NnStatusMsg.inputMissing(locale);
@@ -901,7 +902,8 @@ public class PlayerApiService {
 				channels = channelMngr.findAllByChannelIds(list);
 			} else {
 				MsoChannel channel = channelMngr.findById(Long.parseLong(channelIds));
-				channels.add(channel);
+				if (channel != null)
+					channels.add(channel);
 			}
 		}
 		AreaOwnershipManager areaMngr = new AreaOwnershipManager();
@@ -956,9 +958,13 @@ public class PlayerApiService {
 		    }
 		} else {
 			log.info("channelLineup: regardless the pos");
-			for (MsoChannel c : channels) {
-				result = result + this.composeChannelLineupStr(c, mso);
-				result = result + "\n";
+			if (isRequired && channels.size() == 0)
+				result = messageSource.getMessage("nnstatus.channel_invalid", new Object[] {NnStatusCode.CHANNEL_INVALID} , locale);
+			if (!isRequired) {
+				for (MsoChannel c : channels) {
+					result = result + this.composeChannelLineupStr(c, mso);
+					result = result + "\n";
+				}
 			}
 		}
 		return result;
@@ -1030,6 +1036,8 @@ public class PlayerApiService {
 	}		 
 	
 	private String composeChannelLineupStr(MsoChannel c, Mso mso) {
+		if (c == null)
+			System.out.println("<<<<<<<<<< null >>>>>>>>>>>");
 		String intro = c.getIntro();
 		if (intro != null) {
 			intro = intro.replaceAll("\n", " ");
