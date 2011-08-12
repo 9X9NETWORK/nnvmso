@@ -619,6 +619,7 @@ var programList =
         programDetail.initYouTube(event.data.entry.link[4].href, channelId);
         return false;
       });
+      var promoteUrlTruncated = promoteUrl;
       if (promoteUrl.length > 40) {
         promoteUrlTruncated = promoteUrl.substring(0, 36) + '...';
       }
@@ -705,6 +706,7 @@ var programList =
         programDetail.init(event.data.programId, false);
         return false;
       });
+      var promoteUrlTruncated = promoteUrl;
       if (promoteUrl.length > 40) {
         promoteUrlTruncated = promoteUrl.substring(0, 36) + '...';
       }
@@ -764,6 +766,7 @@ var programList =
         programDetail.init(event.data.programId, true);
         return false;
       });
+      var promoteUrlTruncated = promoteUrl;
       if (promoteUrl.length > 40) {
         promoteUrlTruncated = promoteUrl.substring(0, 36) + '...';
       }
@@ -1254,6 +1257,7 @@ var channelList =
           channelDetail.init(event.data.channelId, false);
           return false;
         });
+        var promoteUrlTruncated = promoteUrl;
         if (promoteUrl.length > 40) {
           promoteUrlTruncated = promoteUrl.substring(0, 36) + '...';
         }
