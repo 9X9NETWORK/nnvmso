@@ -1,10 +1,17 @@
 package com.nnvmso.lib;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.logging.Logger;
+
+import com.nnvmso.model.MsoConfig;
+import com.nnvmso.service.MsoConfigManager;
+import com.nnvmso.web.json.transcodingservice.FBPost;
 
 public class FacebookLib {
 	protected static final Logger log = Logger.getLogger(FacebookLib.class.getName());
@@ -63,4 +70,34 @@ public class FacebookLib {
 		return fbInfo;
 	}
 	
+	public void postToFacebook(String fbUserId, FBPost fbPost) throws IOException {
+		
+		MsoConfigManager configMngr = new MsoConfigManager();
+		MsoConfig fbConfig = configMngr.findByItem(MsoConfig.FBTOKEN);
+		String accessToken = fbConfig.getValue();
+		
+		URL url = new URL("https://graph.facebook.com/" + fbUserId + "/feed");
+		String post =
+			"access_token=" + URLEncoder.encode(accessToken, "US-ASCII") +
+			"&message=" + URLEncoder.encode(fbPost.getMessage(), "UTF-8") +
+			"&picture=" + URLEncoder.encode(fbPost.getPicture(), "US-ASCII") +
+			"&name=" + URLEncoder.encode(fbPost.getName(), "UTF-8") +
+			"&link=" + URLEncoder.encode(fbPost.getLink(), "US-ASCII")+
+			"&caption=" + URLEncoder.encode(fbPost.getCaption(), "UTF-8") +
+			"&description=" + URLEncoder.encode(fbPost.getDescription(), "UTF-8");
+		log.info(post);
+		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+		connection.setDoOutput(true);
+		connection.setRequestMethod("POST");
+		
+		OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
+		writer.write(post);
+		writer.close();
+		
+		BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+		String line = reader.readLine();
+		reader.close();
+		log.info(line);
+	}
+
 }
