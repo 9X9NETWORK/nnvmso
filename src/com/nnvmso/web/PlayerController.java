@@ -57,6 +57,11 @@ public class PlayerController {
 				       @RequestParam(value="ep", required=false) String ep) {
 		PlayerService service = new PlayerService();
 		model = service.prepareBrand(model, mso, resp);
+		if (episode != null) {
+			model = service.prepareEpisode(model, episode, resp);
+		} else {
+			model = service.prepareChannel(model, channel, resp);
+		}
 		return "player/zooatomics";
 	}
 	
