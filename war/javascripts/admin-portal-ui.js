@@ -219,6 +219,29 @@ $(function()
         }
       },
       {
+        label:     'Language',
+        name:      'langCode',
+        index:     'langCode',
+        width:     70,
+        align:     'center',
+        search:    true,
+        stype:     'select',
+        sortable:  true,
+        formatter: 'select',
+        editable:  true,
+        edittype:  'select',
+        editoptions:
+        {
+          disabled: false,
+          value:    "en:en;zh:zh;zh-TW:zh-TW"
+        },
+        searchoptions:
+        {
+          sopt:  ['eq'],
+          value: "en:en;zh:zh;zh-TW:zh-TW"
+        }
+      },
+      {
         label:     'Public',
         name:      'isPublic',
         index:     'isPublic',
@@ -1256,6 +1279,29 @@ $(function()
             editoptions:
             {
               value:    'true:false'
+            }
+          },
+          {
+            label:     'Language',
+            name:      'langCode',
+            index:     'langCode',
+            width:     70,
+            align:     'center',
+            search:    false,
+            stype:     'select',
+            sortable:  false,
+            formatter: 'select',
+            editable:  false,
+            edittype:  'select',
+            editoptions:
+            {
+              disabled: false,
+              value:    "en:en;zh:zh;zh-TW:zh-TW"
+            },
+            searchoptions:
+            {
+              sopt:  ['eq'],
+              value: "en:en;zh:zh;zh-TW:zh-TW"
             }
           },
           {

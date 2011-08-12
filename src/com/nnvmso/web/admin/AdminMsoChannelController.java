@@ -139,11 +139,13 @@ public class AdminMsoChannelController {
 			}
 		} else if (searchField != null && searchOper != null && searchString != null
 		           && searchOper.equals("eq")
-		           && (searchField.equals("status") || searchField.equals("contentType") || searchField.equals("isPublic") || searchField.equals("featured") || searchField.equals("sourceUrl") || searchField.equals("name"))) {
+		           && (searchField.equals("status") || searchField.equals("contentType") || searchField.equals("isPublic") || searchField.equals("featured") || searchField.equals("sourceUrl") || searchField.equals("name")  || searchField.equals("langCode"))) {
 			
 			if (searchField.equals("sourceUrl") || searchField.equals("name")) {
 				searchString = NnStringUtil.escapedQuote(searchString.toLowerCase());
 				searchField += "Search";
+			} else if (searchField.equals("langCode")) {
+				searchString = NnStringUtil.escapedQuote(searchString);
 			}
 			
 			String filter = searchField + " == " + searchString;
@@ -174,6 +176,7 @@ public class AdminMsoChannelController {
 			cell.add(channel.getSourceUrl());
 			cell.add(channel.getStatus());
 			cell.add(channel.getContentType());
+			cell.add(channel.getLangCode());
 			cell.add(channel.isPublic());
 			cell.add(channel.isFeatured());
 			cell.add(channel.getProgramCount());
@@ -375,6 +378,7 @@ public class AdminMsoChannelController {
 	                                   @RequestParam(required=false) String  intro,
 	                                   @RequestParam(required=false) String  imageUrl,
 	                                   @RequestParam(required=false) Short   status,
+	                                   @RequestParam(required=false) String  langCode,
 	                                   @RequestParam(required=false) Boolean isPublic,
 	                                   @RequestParam(required=false) Boolean featured,
 	                                   @RequestParam(required=false) Integer programCount) {
@@ -404,6 +408,10 @@ public class AdminMsoChannelController {
 		if (status != null) {
 			logger.info("status = " + status);
 			channel.setStatus(status);
+		}
+		if (langCode != null) {
+			logger.info("langCode = " + langCode);
+			channel.setLangCode(langCode);
 		}
 		if (isPublic != null) {
 			logger.info("isPublic = " + isPublic);
