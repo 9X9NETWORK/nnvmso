@@ -1,5 +1,7 @@
 package com.nnvmso.web;
 
+import java.io.IOException;
+import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -23,6 +25,7 @@ import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnStringUtil;
+import com.nnvmso.lib.YouTubeLib;
 import com.nnvmso.model.Category;
 import com.nnvmso.model.CategoryChannel;
 import com.nnvmso.model.CategoryChannelSet;
@@ -54,6 +57,10 @@ import com.nnvmso.service.NnUserManager;
 import com.nnvmso.service.SnsAuthManager;
 import com.nnvmso.service.SubscriptionLogManager;
 import com.nnvmso.service.TranscodingService;
+import com.sun.syndication.feed.synd.SyndFeed;
+import com.sun.syndication.io.FeedException;
+import com.sun.syndication.io.SyndFeedInput;
+import com.sun.syndication.io.XmlReader;
 
 @Controller
 @RequestMapping("CMSAPI")
@@ -209,6 +216,39 @@ public class CmsApiController {
 	}
 	
 	//////////////////// Channel/Program Management ////////////////////
+	
+	@RequestMapping("getPodcastInfo")
+	public @ResponseBody Map<String, String> getPodcastInfo(@RequestParam String url) throws IllegalArgumentException, FeedException, IOException {
+		//URL feedUrl = new URL(url);
+		Map<String, String> result = new HashMap<String, String>();
+		SyndFeedInput input = new SyndFeedInput();
+		SyndFeed feed = input.build(new XmlReader(new URL(url)));
+		String title, description, thumbnail;
+		title = feed.getTitle();
+		description = feed.getDescription();
+		thumbnail = (feed.getImage() != null) ? feed.getImage().getUrl() : null;
+		if (title != null) {
+			result.put("title", title);
+			logger.info("title = " + title);
+		}
+		if (description != null) {
+			result.put("description", description);
+			logger.info("description = " + description);
+		}
+		if (thumbnail != null) {
+			result.put("thumbnail", thumbnail);
+			logger.info("thumbnail = " + thumbnail);
+		} else {
+			//List<SyndEntry> entries = feed.getEntries();
+		}
+		return result;
+	}
+	
+	// not in used
+	@RequestMapping("getYouTubeVideoInfo")
+	public @ResponseBody Map<String, String> getYouTubeVideoInfo(@RequestParam String videoIdStr) {
+		return YouTubeLib.getYouTubeVideoEntry(videoIdStr);
+	}
 	
 	/**
 	 * List all channels owned by mso
@@ -374,6 +414,7 @@ public class CmsApiController {
 	                                            @RequestParam String name,
 	                                            @RequestParam String intro,
 	                                            @RequestParam String tag,
+	                                            @RequestParam String langCode,
 	                                            @RequestParam Long categoryId,
 	                                            @RequestParam Long msoId) throws NoSuchAlgorithmException {
 		
@@ -382,6 +423,7 @@ public class CmsApiController {
 		logger.info("name = " + name);
 		logger.info("intro = " + intro);
 		logger.info("tag = " + tag);
+		logger.info("langCode = " + langCode);
 		logger.info("categoryId = " + categoryId);
 		logger.info("msoId = " + msoId);
 		
@@ -400,6 +442,7 @@ public class CmsApiController {
 		
 		channel.setName(name);
 		channel.setTags(tag);
+		channel.setLangCode(langCode);
 		if (imageUrl != null) {
 			ContentWorkerService workerService = new ContentWorkerService();
 			Long timestamp = System.currentTimeMillis() / 1000L;
@@ -415,6 +458,7 @@ public class CmsApiController {
 			workerService.channelLogoProcess(channel.getKey().getId(), imageUrl, prefix, req);
 		}
 		channel.setIntro(intro);
+		channel.setStatus(MsoChannel.STATUS_SUCCESS); // default import status
 		channelMngr.save(channel);
 		
 		List<CategoryChannel> ccs = cmsApiService.whichCCContainingTheChannel(channel.getKey().getId());
@@ -563,6 +607,7 @@ public class CmsApiController {
 	                                        @RequestParam String name,
 	                                        @RequestParam String intro,
 	                                        @RequestParam String tag,
+	                                        @RequestParam String langCode,
 	                                        @RequestParam Long categoryId) throws NoSuchAlgorithmException {
 		
 		logger.info("channelId = " + channelId);
@@ -570,6 +615,7 @@ public class CmsApiController {
 		logger.info("name = " + name);
 		logger.info("intro = " + intro);
 		logger.info("tag = " + tag);
+		logger.info("langCode = " + langCode);
 		logger.info("categoryId = " + categoryId);
 		
 		CmsApiService cmsApiService = new CmsApiService();
@@ -581,6 +627,7 @@ public class CmsApiController {
 			return "Invalid ChannelId";
 		
 		channel.setTags(tag);
+		channel.setLangCode(langCode);
 		if (imageUrl != null) {
 			ContentWorkerService workerService = new ContentWorkerService();
 			Long timestamp = System.currentTimeMillis() / 1000L;

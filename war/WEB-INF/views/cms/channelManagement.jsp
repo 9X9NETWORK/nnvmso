@@ -10,10 +10,11 @@
 <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/themes/start/jquery-ui.css" type="text/css" />
 <link rel="stylesheet" href="/stylesheets/jquery.jqModal.css" type="text/css"/>
 <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4dcccc98718a5dbe"></script>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.0/jquery.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.js"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/jquery-ui.min.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.textTruncate.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.jqModal.js"></script>
+<script type="text/javascript" src="/javascripts/jquery.progressbar.js"></script>
 <script type="text/javascript" src="http://www.netgrow.com.au/assets/files/jquery_plugins/jquery.dump.js"></script>
 <script type="text/javascript" src="/javascripts/swfupload/swfupload.js"></script>
 <script type="text/javascript" src="/javascripts/cms/common.js"></script>
@@ -27,9 +28,9 @@
     <ul class="menu">
       <li><a href="javascript:" class="menuA_active"></a></li>
       <li><a href="channelSetManagement" class="menuB"></a></li>
-      <li><a href="directoryManagement" class="menuC"></a></li>
+      <li><a _href="javascript://directoryManagement" class="menuC"></a></li>
       <li><a href="promotionTools" class="menuD"></a></li>
-      <li><a href="statistics" class="menuE"></a></li>
+      <li><a _href="javascript://statistics" class="menuE"></a></li>
     </ul>
     <label class="lang" id="image_menu"><spring:message code="cms.image.menu"/></label>
     <div class="clear"></div>
@@ -53,8 +54,8 @@
       <!--more than one channel has been create -->
       <div class="createCh1" id="channel_list" style="display:none">
         <div class="left_title"><spring:message code="cms.channel_management.title.channel_list"/></div>
-        <a href="javascript:" class="btnCreate create_channel_button"><spring:message code="cms.channel_management.btn.create_channel"/></a>
-        <div class="createChList">
+        <div class="createChList2">
+          <a href="javascript:" class="btnCreate create_channel_button"><spring:message code="cms.channel_management.btn.create_channel"/></a>
           <ul class="chList" id="channel_list_ul">
             <li style="display:none">
               <div class="chFocus">
@@ -154,21 +155,18 @@
     </div>
     <!-- channel management - create ch step2 (create new channel)-->
     <div class="createChoose" style="display:none" id="channel_detail">
-      <div class="right_title"><spring:message code="cms.channel_management.title.create_channel_info"/></div>
+      <div class="right_title" id="ch_title"><spring:message code="cms.channel_management.title.create_channel_info"/></div>
       <div class="createEpList">
         <div class="chStep2">
           <p class="hint_title"><span class="red">＊</span><spring:message code="cms.channel_management.msg.neccessary_info"/></p>
           <form>
             <fieldset class="setAlbum">
-              <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.logo"/></label>
+              <label class="floatL"><span class="red" style="display:none">＊</span><spring:message code="cms.channel_management.label.logo"/></label>
               <div class="uploadImg">
                 <img id="ch_image" alt="" src="/images/cms/upload_img.jpg" class="floatL"/><input type="hidden" id="ch_image_updated" value="false"/>
                 <div class="floatL imgBtn">
                   <p class="gray"><spring:message code="cms.channel_management.msg.best_resolution"/></p>
-                  <span id="upload_button_place"><!--
-                    <a href="#" id="ch_upload_image" class="uploadBtn"></a>
-                    -->
-                  </span>
+                  <span id="upload_button_place"></span>
                   <span id="ch_uploading" style="display:none"><spring:message code="cms.channel_management.msg.uploading"/></span>
                   <input type="hidden" id="s3_policy" value="${s3Policy}"/>
                   <input type="hidden" id="s3_signature" value="${s3Signature}"/>
@@ -193,14 +191,24 @@
               <div class="clear"></div>
               <p class="hint"><spring:message code="cms.channel_management.msg.camma_seperated"/></p>
               <br/>
+              <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.language"/></label>
+              <div class="floatL">
+                <select id="ch_language" class="language">
+                  <option value="zh-TW">中文</option>
+                  <option value="en">English</option>
+                </select>
+              </div>
+              <br/><br/>
               <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.system_category"/></label>
               <div class="floatL">
-                <select name="" id="ch_category" class="sys_directory"></select>
+                <select id="ch_category" class="sys_directory"></select>
               </div>
               <div class="clear"></div>
-              <p class="hint"><spring:message code="cms.channel_management.msg.system_category_explanation"/></p>
+              <p class="hint" style="display:none"><spring:message code="cms.channel_management.msg.system_category_explanation"/></p>
+              <p class="hint" style="display:none"><spring:message code="cms.channel_management.msg.create_program_hint"/></p>
               <div class="commitPlace">
-                <a href="javascript:" class="btn btnStep2 floatL" id="channel_detail_savebutton"><span><spring:message code="cms.channel_management.btn.save"/></span></a><a href="javascript:" class="floatL btn_cancel" id="channel_detail_cancel"><span><spring:message code="cms.channel_management.btn.cancel"/></span></a>
+                <a href="javascript:" class="btnCreate floatL" id="channel_detail_savebutton"><span><spring:message code="cms.channel_management.btn.save"/></span></a>
+                <a href="javascript:" class="floatL btnGray" id="channel_detail_cancel" style="margin-left:5px"><span><spring:message code="cms.channel_management.btn.cancel"/></span></a>
               </div>
             </fieldset>
           </form>
@@ -241,20 +249,18 @@
                 <fieldset class="setAlbum">
                   <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.upload_file"/></label>
                   <div class="floatL epImport ep_select_block">
-                    <!-- 
-                    <span class="btnCreate floatL ep_upload_video">從硬碟</span>
-                    -->
-                    <a onclick="return false;" href="javascript:" class="btnCreate floatL ep_urlbutton"><spring:message code="cms.channel_management.btn.from_url"/></a>
-                    <span class="ep_upload_video">從硬碟</span>
+                    <div class="floatL"><a onclick="return false;" href="javascript:"><span class="ep_upload_video"></span></a>&nbsp;</div>
+                    <div class="floatL"><a onclick="return false;" href="javascript:" class="btnCreate ep_urlbutton"><spring:message code="cms.channel_management.btn.from_url"/></a>&nbsp;</div>
+                    <div class="floatL"><a onclick="return false;" href="javascript:" class="btnCreate ep_ytbutton"><spring:message code="cms.channel_management.btn.from_youtube"/></a></div>
                   </div>
-                  <div style="width:100px;padding-left:5px" class="floatL ep_uploading_video" style="display:none">
-                    <div></div>
-                  </div>
+                  <div style="width:300px;padding-left:80px;padding-bottom:10px;" class="floatL ep_uploading_video" style="display:none"><div></div></div>
                   <!--  upload by URL link -->
                   <div class="floatL uploadURL ep_url_block" style="display:none">
-                    <div class="bg_input floatL"><input type="text" size="25" maxlength="100" class="ep_url_input"/></div>&nbsp;<a onclick="return false;" href="javascript:" class="ep_url_cancel"><spring:message code="cms.channel_management.btn.cancel"/></a>
+                    <div class="bg_input floatL"><input type="text" size="33" maxlength="100" class="ep_url_input"/></div>&nbsp;<div class="floatL"><a onclick="return false;" href="javascript:" class="ep_url_import btnCreate"><spring:message code="cms.channel_management.btn.import"/></a></div>
                     <div class="clear"></div>
-                    <p class="hint"><spring:message code="cms.channel_management.msg.video_url_hint"/></p><br/>
+                    <p class="hint video_url_hint" style="display:none"><spring:message code="cms.channel_management.msg.video_url_hint"/></p>
+                    <p class="hint youtube_hint" style="display:none"><spring:message code="cms.channel_management.msg.youtube_hint"/></p>
+                    <br/>
                   </div>
                   <label class="floatL"><spring:message code="cms.channel_management.label.program_logo"/></label>
                   <div class="uploadImg">
@@ -267,7 +273,7 @@
                     <div class="clear"></div>
                   </div>
                   <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.program_name"/></label>
-                  <div class="bg_input floatL"><input class="ep_name" type="text" size="25" maxlength="40"/></div>
+                  <div class="bg_input floatL"><input class="ep_name" type="text" size="33" maxlength="40"/></div>
                   <div class="clear"></div>
                   <p class="hint"><spring:message code="cms.channel_management.msg.fourty_characters"/></p>
                   <br/>
@@ -276,15 +282,15 @@
                   <div class="clear"></div>
                   <p class="hint"><spring:message code="cms.channel_management.msg.two_hundred_characters"/></p>
                   <br/>
-                  <!-- 
-                  <label class="floatL"><spring:message code="cms.channel_management.label.tag"/></label>
-                  <div class="bg_input floatL"><input type="text" size="35" maxlength="40"/></div>
-                  <div class="clear"></div>
-                  <p class="hint"><spring:message code="cms.channel_management.msg.camma_seperated"/></p><br/>
-                  -->
+                  <div style="display:none"><!-- tag of program -->
+                    <label class="floatL"><spring:message code="cms.channel_management.label.tag"/></label>
+                    <div class="bg_input floatL"><input type="text" size="35" maxlength="40"/></div>
+                    <div class="clear"></div>
+                    <p class="hint"><spring:message code="cms.channel_management.msg.camma_seperated"/></p><br/>
+                  </div>
                   <div class="epBtns" >
-                    <a onclick="return false;" href="javascript:" class="btnDisable floatL ep_savebutton"><spring:message code="cms.channel_management.btn.save"/></a>
-                    <a onclick="return false;" href="javascript:" class="btnCancel floatL ep_cancelbutton"><spring:message code="cms.channel_management.btn.cancel"/></a>
+                    <a onclick="return false;" href="javascript:" class="btnDisable floatL ep_savebutton" style="width:80px"><spring:message code="cms.channel_management.btn.save"/></a>
+                    <a onclick="return false;" href="javascript:" class="btnGray floatL ep_cancelbutton"><span><spring:message code="cms.channel_management.btn.cancel"/></span></a>
                   </div>
                 </fieldset>
               </form>
@@ -307,17 +313,19 @@
               <div class="epInfoTitle program_info_title"><div>何處是我家</div> <a href="javascript:" class="btnDel program_info_removebutton"></a></div>
               <div class="epInfoImg program_info_image"></div>
               <div class="floatL epInfo">
-                <a href="#" class="floatL program_info_promoteurl">http://www.9x9.tv/channel/3958</a>
-                <a class="floatL program_info_addthis"><img src="http://cache.addthiscdn.com/icons/v1/thumbs/addthis.gif"/></a>
+                <a href="javascript:" target="_player" class="floatL program_info_promoteurl">http://www.9x9.tv/channel/3958</a>
+                <a class="icon floatL program_info_addthis"><img src="http://cache.addthiscdn.com/icons/v1/thumbs/addthis.gif"/></a>
                 <a href="#" class="iconStatistics" title="觀看數據"></a>
                 <div class="clear"></div>
-                <p class="program_info_type"><spring:message code="cms.channel_management.label.program_type"/> : <span>9x9</span></p>
-                <p class="program_info_updatedate"><spring:message code="cms.channel_management.label.update_time"/> : <span>2011/04/15 14:45</span></p>
+                <div class="floatL" style="width:230px;padding-top:3px;">
+                  <p class="program_info_type"><spring:message code="cms.channel_management.label.program_type"/> : <span>9x9</span></p>
+                  <p class="program_info_updatedate"><spring:message code="cms.channel_management.label.update_time"/> : <span>2011/04/15 14:45</span></p>
+                </div>
+                <ul class="floatL">
+                  <li style="display:none"><a class="chUnPublic program_info_publish"></a></li>
+                  <li><a class="btnGray program_info_detailbutton"><span><spring:message code="cms.channel_management.btn.program_info"/></span></a></li>
+                </ul>
               </div>
-              <ul class="floatL">
-                <li><a class="chUnPublic program_info_publish"></a></li>
-                <li><a class="btnGray program_info_detailbutton"><span><spring:message code="cms.channel_management.btn.program_info"/></span></a></li>
-              </ul>
               <div class="clear"></div>
             </div>
           </li>
@@ -354,7 +362,7 @@
               <label class="floatL"><spring:message code="cms.channel_management.label.program_source"/></label>
               <p class="ep_source"><a target="_player" href="javascript:">9x9</a></p><br/>
               <label class="floatL"><spring:message code="cms.channel_management.label.program_url"/></label>
-              <p><a target="_player" href="#" class="ep_url">http://www.9x9.tv/share/3958</a><p><br/>
+              <p><a target="_player" href="#" class="ep_url">http://www.9x9.tv/share/3958</a></p><br/>
               <label class="floatL"><spring:message code="cms.channel_management.label.create_time"/></label>
               <p class="ep_createdate">2011/04/25 14:30</p><br/>
               <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.logo"/></label>
@@ -362,9 +370,7 @@
                 <img alt="" src="/images/cms/upload_img.jpg" class="floatL ep_image"/><input type="hidden" class="ep_image_updated" value="fase"/>
                 <div class="floatL imgBtn">
                   <p class="gray"><spring:message code="cms.channel_management.msg.best_resolution"/></p>
-                  <span class="upload_button_place"><!-- 
-                  <a href="javascript:" class="uploadBtn ep_upload_image"></a>
-                  --></span>
+                  <span class="upload_button_place"></span>
                   <span style="display:none" class="ep_uploading_image"><spring:message code="cms.channel_management.msg.uploading"/></span>
                 </div>
                 <div class="clear"></div>
@@ -381,39 +387,41 @@
               <div class="bg_textarea floatL"><textarea name="" cols="30" rows="5" class="ep_intro"></textarea></div>
               <div class="clear"></div>
               <p class="hint"><spring:message code="cms.channel_management.msg.two_hundred_characters"/></p>
-              <br/><!-- 
-              <label class="floatL"><spring:message code="cms.channel_management.label.tag"/></label>
-              <div class="bg_input floatL"><input type="text" size="40" maxlength="40" disabled="disabled"/></div>
-              <div class="clear"></div>
-              <p class="hint"><spring:message code="cms.channel_management.msg.camma_seperated"/></p>
               <br/>
-              <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.system_category"/></label>
-              <div class="floatL">
-                <select name="" class="sys_directory" disabled="disabled">
-                  <option selected="selected">請選擇分類</option>
-                  <option>新聞 / 政治</option>
-                  <option>財經企管</option>
-                  <option>影視娛樂</option>
-                  <option>運動休閒</option>
-                  <option>科技 / 軟體應用</option>
-                  <option>電玩遊戲</option>
-                  <option>嗜好興趣</option>
-                  <option>旅遊生活</option>
-                  <option>藝術 / 文創</option>
-                  <option>非營利組織與社會行動</option>
-                  <option>教育 / 教學</option>
-                  <option>自然 / 動物</option>
-                  <option>個人 / 名人</option>
-                  <option>企業品牌 / 社團單位</option>
-                  <option>宗教 / 心靈</option>
-                  <option>其他</option>
-                </select>
+              <div style="display:none">
+                <label class="floatL"><spring:message code="cms.channel_management.label.tag"/></label>
+                <div class="bg_input floatL"><input type="text" size="40" maxlength="40" disabled="disabled"/></div>
+                <div class="clear"></div>
+                <p class="hint"><spring:message code="cms.channel_management.msg.camma_seperated"/></p>
+                <br/>
+                <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.system_category"/></label>
+                <div class="floatL">
+                  <select name="" class="sys_directory" disabled="disabled">
+                    <option selected="selected">請選擇分類</option>
+                    <option>新聞 / 政治</option>
+                    <option>財經企管</option>
+                    <option>影視娛樂</option>
+                    <option>運動休閒</option>
+                    <option>科技 / 軟體應用</option>
+                    <option>電玩遊戲</option>
+                    <option>嗜好興趣</option>
+                    <option>旅遊生活</option>
+                    <option>藝術 / 文創</option>
+                    <option>非營利組織與社會行動</option>
+                    <option>教育 / 教學</option>
+                    <option>自然 / 動物</option>
+                    <option>個人 / 名人</option>
+                    <option>企業品牌 / 社團單位</option>
+                    <option>宗教 / 心靈</option>
+                    <option>其他</option>
+                  </select>
+                </div>
+                <div class="clear"></div>
+                <p class="hint"><spring:message code="cms.channel_management.msg.system_category_explanation"/></p>
               </div>
-              <div class="clear"></div>
-              <p class="hint"><spring:message code="cms.channel_management.msg.system_category_explanation"/></p>
-              -->
               <div class="commitPlace">
-                <a href="javascript:" class="btn btnStep2 floatL ep_savebutton"><span><spring:message code="cms.channel_management.btn.save"/></span></a><a href="javascript:" class="floatL btn_cancel ep_cancel"><span><spring:message code="cms.channel_management.btn.cancel"/></span></a>
+                <a href="javascript:" class="btnCreate floatL ep_savebutton"><span><spring:message code="cms.channel_management.btn.save"/></span></a>
+                <a href="javascript:" class="floatL btnGray ep_cancel" style="margin-left:5px"><span><spring:message code="cms.channel_management.btn.cancel"/></span></a>
               </div>
             </fieldset>
           </form>
@@ -427,20 +435,22 @@
         <ul id="program_list_ul_readonly">
           <li style="display:none">
             <div class="epItem program_info_block_readonly" id="program_info_block_readonly">
-              <div class="epInfoTitle program_info_title"><span>何處是我家 </span></div>
+              <div class="epInfoTitle program_info_title"><div>何處是我家 </div></div>
               <div class="epInfoImg program_info_image"></div>
-              <div class=" floatL epInfo" >
-                <a href="#" class="floatL program_info_promoteurl">http://www.9x9.tv/channel/3958</a>
-                <a class="floatL program_info_addthis"><img src="http://cache.addthiscdn.com/icons/v1/thumbs/addthis.gif"/></a>
+              <div class="floatL epInfo">
+                <a href="javascript:" target="_player" class="floatL program_info_promoteurl">http://www.9x9.tv/channel/3958</a>
+                <a class="icon floatL program_info_addthis"><img src="http://cache.addthiscdn.com/icons/v1/thumbs/addthis.gif"/></a>
                 <a href="#" class="iconStatistics" title="觀看數據"></a>
                 <div class="clear"></div>
-                <p class="program_info_type"><spring:message code="cms.channel_management.label.program_type"/> : <span>9x9</span></p>
-                <p class="program_info_updatedate"><spring:message code="cms.channel_management.label.update_time"/> : <span>2011/04/15 14:45</span></p>
+                <div class="floatL" style="width:230px;padding-top:3px;">
+                  <p class="program_info_type"><spring:message code="cms.channel_management.label.program_type"/> : <span>9x9</span></p>
+                  <p class="program_info_updatedate"><spring:message code="cms.channel_management.label.update_time"/> : <span>2011/04/15 14:45</span></p>
+                </div>
+                <ul class="floatL">
+                  <li style="display:none"><a class="chUnPublic program_info_publish"></a></li>
+                  <li><a class="btnGray program_info_detailbutton"><span><spring:message code="cms.channel_management.btn.program_info"/></span></a></li>
+                </ul>
               </div>
-              <ul class="floatL">
-                <li><a class="chUnPublic program_info_publish"></a></li>
-                <li><a class="btnGray program_info_detailbutton"><span><spring:message code="cms.channel_management.btn.program_info"/></span></a></li>
-              </ul>
               <div class="clear"></div>
             </div>
           </li>
@@ -475,9 +485,9 @@
           <form>
             <fieldset class="setAlbum">
               <label class="floatL"><spring:message code="cms.channel_management.label.program_source"/></label>
-              <p><a target="_player" class="ep_source" href="#">http://blip.tv/file/get/Qtv-JulianSchnabelOnQTV732.m4v</a></p><br/><br/>
+              <p style="width:380px;"><a target="_player" class="ep_source" href="#">http://blip.tv/file/get/Qtv-JulianSchnabelOnQTV732.m4v</a></p><br/><br/>
               <label class="floatL"><spring:message code="cms.channel_management.label.program_url"/></label>
-              <p><a target="_player" class="ep_url" href="#">http://www.9x9.tv/share/3958</a><p><br/><br/>
+              <p style="width:380px;"><a target="_player" class="ep_url" href="#">http://www.9x9.tv/share/3958</a></p><br/><br/>
               <label class="floatL"><spring:message code="cms.channel_management.label.create_time"/></label>
               <p class="ep_createdate">2011/04/25 14:30</p><br/><br/>
               <label class="floatL"><spring:message code="cms.channel_management.label.logo"/></label>
@@ -486,11 +496,11 @@
               </div>
               <div class="clear"></div><br/><br/>
               <label class="floatL"><spring:message code="cms.channel_management.label.name"/></label>
-              <p class="floatL ep_name">20110326《慈濟新聞深度報導》十噸賑災愛心物資 親手送給日本災民</p><br/><br/>
+              <p class="floatL ep_name" style="width:380px;">20110326《慈濟新聞深度報導》十噸賑災愛心物資 親手送給日本災民</p><br/><br/>
               <div class="clear"></div>
               <br/>
               <label class="floatL"><spring:message code="cms.channel_management.label.introduction"/></label>
-              <p class="floatL ep_intro">慈濟前往日本福島地區協助災民重建工作</p><br/><br/>
+              <p class="floatL ep_intro" style="width:380px;">慈濟前往日本福島地區協助災民重建工作</p><br/><br/>
               <div class="clear"></div>
             </fieldset>
           </form>
@@ -506,10 +516,10 @@
           <form>
             <fieldset class="setAlbum">
               <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.channel_source"/></label>
-              <div class="bg_input floatL"><input type="text" size="25" maxlength="100" name="ch_import_url"/></div>
+              <div class="bg_input floatL"><input type="text" size="33" maxlength="100" name="ch_import_url"/></div>
               <a href="javascript:" class="btnCreate floatL" name="ch_import_button"><spring:message code="cms.channel_management.btn.import"/></a>
               <div class="clear"></div><br/>
-              <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.logo"/></label>
+              <label class="floatL"><span style="display:none" class="red">＊</span><spring:message code="cms.channel_management.label.logo"/></label>
               <div class="uploadImg">
                 <img name="ch_image" alt="" src="/images/cms/upload_img.jpg" class="floatL"/><input type="hidden" name="ch_image_updated" value="false"/>
                 <div class="floatL imgBtn">
@@ -531,13 +541,20 @@
               <div class="bg_textarea floatL"><textarea name="ch_intro" cols="30" rows="5"></textarea></div>
               <div class="clear"></div>
               <p class="hint"><spring:message code="cms.channel_management.msg.two_hundred_characters"/></p>
-              <br/><!--
+              <br/>
               <label class="floatL"><spring:message code="cms.channel_management.label.tag"/></label>
-              <div class="bg_input floatL"><input type="text" size="40" maxlength="40"/></div>
+              <div class="bg_input floatL"><input name="ch_tag" type="text" size="30" maxlength="40"/></div>
               <div class="clear"></div>
               <p class="hint"><spring:message code="cms.channel_management.msg.camma_seperated"/></p>
               <br/>
-              -->
+              <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.language"/></label>
+              <div class="floatL">
+                <select name="ch_language" class="language">
+                  <option value="zh-TW">中文</option>
+                  <option value="en">English</option>
+                </select>
+              </div>
+              <br/><br/>
               <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.system_category"/></label>
               <div class="floatL">
                 <select name="ch_category" class="sys_directory">
@@ -561,9 +578,11 @@
                 </select>
               </div>
               <div class="clear"></div>
-              <p class="hint"><spring:message code="cms.channel_management.msg.system_category_explanation"/></p>
+              <p class="hint" style="display:none"><spring:message code="cms.channel_management.msg.system_category_explanation"/></p>
+              <p class="hint" style="display:none"><spring:message code="cms.channel_management.msg.create_program_hint"/></p>
               <div class="commitPlace">
-                <a href="javascript:" name="ch_savebutton" class="btn btnStep2 floatL"><span><spring:message code="cms.channel_management.btn.save"/></span></a><a href="javascript:" name="ch_cancelbutton" class="floatL btn_cancel"><span><spring:message code="cms.channel_management.btn.cancel"/></span></a>
+                <a href="javascript:" name="ch_savebutton" class="btnCreate floatL"><span><spring:message code="cms.channel_management.btn.save"/></span></a>
+                <a href="javascript:" name="ch_cancelbutton" class="floatL btnGray" style="margin-left:5px"><span><spring:message code="cms.channel_management.btn.cancel"/></span></a>
               </div>
             </fieldset>
           </form>
@@ -575,6 +594,8 @@
   <div class="clear"></div>
 </div>
 <!-- language tags for javascript -->
+<label class="lang" id="lang_title_create_channel_info"><spring:message code="cms.channel_management.title.create_channel_info"/></label>
+<label class="lang" id="lang_title_edit_channel_info"><spring:message code="cms.channel_management.title.edit_channel_info"/></label>
 <label class="lang" id="lang_view_statistics"><spring:message code="cms.channel_management.msg.view_statistics"/></label>
 <label class="lang" id="lang_upload_finished"><spring:message code="cms.warning.upload_finished"/></label>
 <label class="lang" id="lang_upload_failed"><spring:message code="cms.warning.upload_failed"/></label>
@@ -589,9 +610,11 @@
 <label class="lang" id="lang_confirm_cancel"><spring:message code="cms.warning.confirm_cancel"/></label>
 <label class="lang" id="lang_confirm_leaving_program_creation"><spring:message code="cms.warning.confirm_leaving_program_creation"/></label>
 <label class="lang" id="lang_warning_import_channel_source"><spring:message code="cms.warning.import_channel_source"/></label>
+<label class="lang" id="lang_warning_import_program_source"><spring:message code="cms.warning.import_program_source"/></label>
 <label class="lang" id="lang_channel_source_is_wrong"><spring:message code="cms.warning.channel_source_is_wrong"/></label>
 <label class="lang" id="lang_button_from_disk">從硬碟</label>
 <label class="lang" id="image_btn_upload"><spring:message code="cms.image.btn_upload"/></label>
+<label class="lang" id="image_btn_from_disk"><spring:message code="cms.image.btn_from_disk"/></label>
 <label class="lang" id="image_ch_public"><spring:message code="cms.image.ch_public"/></label>
 <label class="lang" id="image_ch_unpublic"><spring:message code="cms.image.ch_unpublic"/></label>
 </body>

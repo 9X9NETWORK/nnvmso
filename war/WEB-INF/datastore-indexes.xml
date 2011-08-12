@@ -70,6 +70,10 @@
     <property name="nameSearch" direction="asc"/>
     <property name="updateDate" direction="desc"/>
   </datastore-index>
+  <datastore-index kind="MsoChannel" ancestor="false" source="manual">
+    <property name="langCode" direction="asc"/>
+    <property name="updateDate" direction="desc"/>
+  </datastore-index>
   <datastore-index kind="MsoConfig" ancestor="false" source="manual">
     <property name="__key__" direction="desc"/>
   </datastore-index>        

@@ -1,13 +1,20 @@
 package com.nnvmso.service;
 
+import java.util.logging.Logger;
+
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.ui.Model;
 
 import com.nnvmso.lib.CookieHelper;
+import com.nnvmso.lib.NnStringUtil;
+import com.nnvmso.model.ChannelSet;
 import com.nnvmso.model.Mso;
+import com.nnvmso.web.PlayerController;
 
 public class PlayerService {
+	
+	protected static final Logger logger = Logger.getLogger(PlayerService.class.getName());
 	
 	public Model prepareBrand(Model model, String msoName, HttpServletResponse resp) {
 		if (msoName != null) {
@@ -26,6 +33,21 @@ public class PlayerService {
 			CookieHelper.deleteCookie(resp, CookieHelper.MSO); //delete brand cookie
 		}
 		return model;		
+	}
+
+	public Model prepareSetInfo(Model model, String name,
+			HttpServletResponse resp) {
+		
+		ChannelSetManager setMngr = new ChannelSetManager();
+		ChannelSet channelSet = setMngr.findByBeautifulUrl(name);
+		if (channelSet != null) {
+			logger.info("found set name = " + name);
+			model.addAttribute("fbName", NnStringUtil.htmlSafeChars(channelSet.getName()));
+			model.addAttribute("fbDescription", NnStringUtil.htmlSafeChars(channelSet.getIntro()));
+			model.addAttribute("fbImg", NnStringUtil.htmlSafeChars(channelSet.getImageUrl()));
+		}
+		
+		return model;
 	}
 
 }

@@ -219,6 +219,29 @@ $(function()
         }
       },
       {
+        label:     'Language',
+        name:      'langCode',
+        index:     'langCode',
+        width:     70,
+        align:     'center',
+        search:    true,
+        stype:     'select',
+        sortable:  true,
+        formatter: 'select',
+        editable:  true,
+        edittype:  'select',
+        editoptions:
+        {
+          disabled: false,
+          value:    "en:en;zh:zh;zh-TW:zh-TW"
+        },
+        searchoptions:
+        {
+          sopt:  ['eq'],
+          value: "en:en;zh:zh;zh-TW:zh-TW"
+        }
+      },
+      {
         label:     'Public',
         name:      'isPublic',
         index:     'isPublic',
@@ -348,7 +371,14 @@ $(function()
     ondblClickRow: function(rowId)
     {
       var imageUrl = $(this).jqGrid('getCell', rowId, 'imageUrl');
-      $(this).jqGrid('setColProp', 'imageUrl', {editoptions: {src: imageUrl}});
+      $(this).jqGrid('setColProp', 'imageUrl',
+      {
+        editoptions:
+        {
+          style: 'max-height:100px',
+          src: imageUrl
+        }
+      });
       $(this).jqGrid('editGridRow', rowId,
       {
         url:               '/admin/channel/modify',
@@ -586,7 +616,7 @@ $(function()
             editoptions:
             {
               disabled: true,
-              value:    '0:Unknown;1:Video;2:Audio'
+              value:    '0:Unknown;1:Video;2:Audio;3:Slide'
             }
           },
           {
@@ -605,7 +635,8 @@ $(function()
               value:
               {
                 0: 'Direct Link',
-                1: 'YouTube'
+                1: 'YouTube',
+                2: 'Script'
               }
             }
           },
@@ -681,7 +712,14 @@ $(function()
         ondblClickRow: function(rowId)
         {
           var imageUrl = $(this).jqGrid('getCell', rowId, 'imageUrl');
-          $(this).jqGrid('setColProp', 'imageUrl', {editoptions: {src: imageUrl}});
+          $(this).jqGrid('setColProp', 'imageUrl', 
+          {
+            editoptions:
+            {
+              style: 'max-height:100px',
+              src: imageUrl
+            }
+          });
           $(this).jqGrid('editGridRow', rowId,
           {
             url:               '/admin/program/modify',
@@ -1210,6 +1248,29 @@ $(function()
             editoptions:
             {
               value:    'true:false'
+            }
+          },
+          {
+            label:     'Language',
+            name:      'langCode',
+            index:     'langCode',
+            width:     70,
+            align:     'center',
+            search:    false,
+            stype:     'select',
+            sortable:  false,
+            formatter: 'select',
+            editable:  false,
+            edittype:  'select',
+            editoptions:
+            {
+              disabled: false,
+              value:    "en:en;zh:zh;zh-TW:zh-TW"
+            },
+            searchoptions:
+            {
+              sopt:  ['eq'],
+              value: "en:en;zh:zh;zh-TW:zh-TW"
             }
           },
           {

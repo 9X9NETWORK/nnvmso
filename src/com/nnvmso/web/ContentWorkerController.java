@@ -1,6 +1,8 @@
 package com.nnvmso.web;
 
 import java.util.logging.Logger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.nnvmso.lib.NnLogUtil;
+import com.nnvmso.lib.NnStringUtil;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoProgram;
 import com.nnvmso.service.ContentWorkerService;
@@ -19,6 +22,7 @@ import com.nnvmso.service.MsoChannelManager;
 import com.nnvmso.service.MsoProgramManager;
 import com.nnvmso.service.NnStatusCode;
 import com.nnvmso.web.json.transcodingservice.ContentWorker;
+import com.nnvmso.web.json.transcodingservice.MailCastVideo;
 import com.nnvmso.web.json.transcodingservice.PostResponse;
 import com.nnvmso.web.json.transcodingservice.Slide;
 
@@ -40,6 +44,47 @@ public class ContentWorkerController {
 		return "error/blank";
 	}
 	
+	@RequestMapping("saveNewMailCastVideo")
+	public @ResponseBody MailCastVideo saveNewMailCastVideo(@RequestBody MailCastVideo video, HttpServletRequest req) throws NoSuchAlgorithmException {
+		
+		log.info(video.toString());
+		
+		MsoProgramManager programMngr = new MsoProgramManager();
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		ContentWorkerService workerService = new ContentWorkerService();
+		
+		MsoChannel channel = channelMngr.findById(video.getChannelId());
+		if (channel == null) {
+			video.setErrorCode(NnStatusCode.CHANNEL_INVALID);
+			video.setErrorReason("CHANNEL_INVALID");
+			return video;
+		}
+		if (channel.getProgramCount() >= MsoChannelManager.MAX_CHANNEL_SIZE) {
+			MsoProgram oldest = programMngr.findOldestByChannelId(channel.getKey().getId());
+			programMngr.delete(oldest); 			
+		}
+		MsoProgram program = new MsoProgram(video.getName(), video.getIntro(), "/images/cms/upload_img.jpg", MsoProgram.CONTENTTYPE_DIRECTLINK); 
+		program.setOtherFileUrl(video.getFileUrl());
+		program.setStorageId(video.getStorageId());
+		program.setType(MsoProgram.TYPE_VIDEO);
+		program.setContentType(MsoProgram.CONTENTTYPE_DIRECTLINK);
+		program.setPublic(true);
+		programMngr.create(channel, program);
+		
+		Long timestamp = System.currentTimeMillis() / 1000L;
+		MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
+		sha1.update(video.getFileUrl().getBytes());
+		String prefix = NnStringUtil.bytesToHex(sha1.digest()) + "_" + timestamp + "_";
+		log.info("prefix = " + prefix);
+		video.setProgramId(program.getKey().getId());
+		
+		workerService.programVideoProcess(video.getProgramId(), video.getFileUrl(), prefix, true, req);
+		
+		video.setErrorCode(NnStatusCode.SUCCESS);
+		video.setErrorReason("SUCCESS");
+		return video;
+	}
+	
 	@RequestMapping("saveNewSlide")
 	public @ResponseBody Slide saveNewSlide(@RequestBody Slide slide,
             							    HttpServletRequest req) {
@@ -56,9 +101,13 @@ public class ContentWorkerController {
 			MsoProgram oldest = programMngr.findOldestByChannelId(channel.getKey().getId());
 			programMngr.delete(oldest); 			
 		}
-		MsoProgram program = new MsoProgram(slide.getName(), slide.getIntro(), slide.getImageUrl(), MsoProgram.TYPE_SLIDE); 
+		MsoProgram program = new MsoProgram(slide.getName(), slide.getIntro(), slide.getImageUrl(), MsoProgram.TYPE_SCRIPT); 
 		program.setOtherFileUrl(slide.getFileUrl());
 		program.setDuration(slide.getDuration());
+		program.setStorageId(slide.getStorageId());
+		program.setContentType(MsoProgram.CONTENTTYPE_SCRIPT);
+		program.setType(MsoProgram.TYPE_SCRIPT);
+		program.setPublic(true);
 		programMngr.create(channel, program);
 		slide.setProgramId(program.getKey().getId());
 		slide.setErrorCode(NnStatusCode.SUCCESS);

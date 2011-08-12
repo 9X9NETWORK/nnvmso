@@ -61,4 +61,21 @@ public class NnStringUtil {
 		return stringBuilder.toString();
 	}
 	
+	
+	/**
+	 * Translate string to html safe characters
+	 * 
+	 * @param str
+	 * @return
+	 */
+	public static String htmlSafeChars(String str) {
+		if (str == null)
+			return null;
+		return str.replaceAll("\n", " ")
+		          .replaceAll("\t", " ")
+		          .replaceAll("&", "&amp;")
+		          .replaceAll("<", "&lt;")
+		          .replaceAll(">", "&gt;")
+		          .replaceAll("\"", "&quot;");
+	}
 }
