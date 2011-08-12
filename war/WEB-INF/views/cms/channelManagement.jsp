@@ -485,9 +485,9 @@
           <form>
             <fieldset class="setAlbum">
               <label class="floatL"><spring:message code="cms.channel_management.label.program_source"/></label>
-              <p style="width:400px;"><a target="_player" class="ep_source" href="#">http://blip.tv/file/get/Qtv-JulianSchnabelOnQTV732.m4v</a></p><br/><br/>
+              <p style="width:380px;"><a target="_player" class="ep_source" href="#">http://blip.tv/file/get/Qtv-JulianSchnabelOnQTV732.m4v</a></p><br/><br/>
               <label class="floatL"><spring:message code="cms.channel_management.label.program_url"/></label>
-              <p style="width:400px;"><a target="_player" class="ep_url" href="#">http://www.9x9.tv/share/3958</a></p><br/><br/>
+              <p style="width:380px;"><a target="_player" class="ep_url" href="#">http://www.9x9.tv/share/3958</a></p><br/><br/>
               <label class="floatL"><spring:message code="cms.channel_management.label.create_time"/></label>
               <p class="ep_createdate">2011/04/25 14:30</p><br/><br/>
               <label class="floatL"><spring:message code="cms.channel_management.label.logo"/></label>
@@ -496,11 +496,11 @@
               </div>
               <div class="clear"></div><br/><br/>
               <label class="floatL"><spring:message code="cms.channel_management.label.name"/></label>
-              <p class="floatL ep_name" style="width:400px;">20110326《慈濟新聞深度報導》十噸賑災愛心物資 親手送給日本災民</p><br/><br/>
+              <p class="floatL ep_name" style="width:380px;">20110326《慈濟新聞深度報導》十噸賑災愛心物資 親手送給日本災民</p><br/><br/>
               <div class="clear"></div>
               <br/>
               <label class="floatL"><spring:message code="cms.channel_management.label.introduction"/></label>
-              <p class="floatL ep_intro" style="width:400px;">慈濟前往日本福島地區協助災民重建工作</p><br/><br/>
+              <p class="floatL ep_intro" style="width:380px;">慈濟前往日本福島地區協助災民重建工作</p><br/><br/>
               <div class="clear"></div>
             </fieldset>
           </form>

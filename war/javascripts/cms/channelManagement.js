@@ -557,11 +557,14 @@ var programList =
       }
     });
   },
-  initYouTube: function(username, channelName, callback)
+  initYouTube: function(username, channelName, callback, isPlaylist)
   {
     if (overallLayout.destroyRightSideContent(false) == false) return false;
     
-    var requestUrl = 'http://gdata.youtube.com/feeds/api/users/' + username + '/uploads';
+    if (isPlaylist)
+      var requestUrl = 'http://gdata.youtube.com/feeds/api/playlists/' + username;
+    else
+      var requestUrl = 'http://gdata.youtube.com/feeds/api/users/' + username + '/uploads';
     var parameters = {
       'orderby':     'published',
       'start-index': 1,
@@ -1260,12 +1263,16 @@ var channelList =
             var readonly = false;
           else
             var readonly = true;
-          if (channel.contentType == 3) {
-            var username = channel.sourceUrl.match(/\/user\/([^\/]*)/)[1];
+          if (channel.contentType == 3 || channel.contentType == 4)
+          {
+            if (channel.contentType == 3)
+              var username = channel.sourceUrl.match(/\/user\/([^\/]*)/)[1];
+            else
+              var username = channel.sourceUrl.match(/\/view_play_list\?p=([^&]*)/)[1];
             programList.initYouTube(username, channel.name, function(programCount)
             {
               $('.channel_info_programcount span', infoBlock).text(programCount);
-            });
+            }, (channel.contentType == 4));
           } else {
             programList.init(channel.key.id, readonly, channel.name);
           }

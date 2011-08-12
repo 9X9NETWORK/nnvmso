@@ -342,7 +342,7 @@ a.addNew{ padding:10px 0 0 0; display:block; font-size:0.9em;}
 .left_body .ch_sub_title span{ color:#5f5f5f; font-size:0.9em; padding-left:0px; display:block; width:430px; line-height:20px;}
 
 .createChList{ height:470px; overflow:auto;}
-.createChList2{ height:509px; overflow:auto;}
+.createChList2{ height:504px; overflow:auto;}
 .createEpList{ overflow:auto; height:548px; width:500px; }
 .createEpList2{ overflow:auto; height:510px;}
 .createEp { width:500px; }
