@@ -1240,7 +1240,10 @@ var channelList =
           channelDetail.init(event.data.channelId, false);
           return false;
         });
-        channelInfoBlock.find('.channel_info_promoteurl').text(promoteUrl).attr('href', promoteUrl);
+        if (promoteUrl.length > 40) {
+          promoteUrlTruncated = promoteUrl.substring(0, 36) + '...';
+        }
+        channelInfoBlock.find('.channel_info_promoteurl').text(promoteUrlTruncated).attr('href', promoteUrl);
         $('<li></li>').append(channelInfoBlock).appendTo('#channel_list_ul');
         // channel info block click event
         channelInfoBlock.click({ 'channel': channels[i] }, function(event)

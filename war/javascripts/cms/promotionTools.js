@@ -246,7 +246,10 @@ var channelAndChannelSetList =
         } else {
           switchObject.removeClass('chPublic').addClass('chUnPublic');
         }
-        channelInfoBlock.find('.channel_info_promoteurl').text(promoteUrl).attr('href', promoteUrl);
+        if (promoteUrl.length > 40) {
+          promoteUrlTruncated = promoteUrl.substring(0, 36) + '...';
+        }
+        channelInfoBlock.find('.channel_info_promoteurl').text(promoteUrlTruncated).attr('href', promoteUrl);
         $('<li></li>').append(channelInfoBlock).appendTo('#channel_list_ul');
         // channel info block click event
         channelInfoBlock.click({ 'channelId': channelId, 'channelName': channels[i].name}, function(event)
@@ -264,6 +267,7 @@ var channelAndChannelSetList =
       }
       //$('#channel_list').show();
     });
+    /*
     // load channel sets
     $.getJSON('/CMSAPI/listOwnedChannelSets?msoId=' + $('#msoId').val(), function(channelSets)
     {
@@ -315,6 +319,7 @@ var channelAndChannelSetList =
       }
       $('#channel_set_list_ul').append('<div class="clear"/>');
     });
+    */
   }
 }
 

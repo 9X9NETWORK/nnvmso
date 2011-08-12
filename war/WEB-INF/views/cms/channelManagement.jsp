@@ -54,8 +54,8 @@
       <!--more than one channel has been create -->
       <div class="createCh1" id="channel_list" style="display:none">
         <div class="left_title"><spring:message code="cms.channel_management.title.channel_list"/></div>
-        <a href="javascript:" class="btnCreate create_channel_button"><spring:message code="cms.channel_management.btn.create_channel"/></a>
-        <div class="createChList">
+        <div class="createChList2">
+          <a href="javascript:" class="btnCreate create_channel_button"><spring:message code="cms.channel_management.btn.create_channel"/></a>
           <ul class="chList" id="channel_list_ul">
             <li style="display:none">
               <div class="chFocus">
@@ -201,7 +201,7 @@
               <br/><br/>
               <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.system_category"/></label>
               <div class="floatL">
-                <select name="" id="ch_category" class="sys_directory"></select>
+                <select id="ch_category" class="sys_directory"></select>
               </div>
               <div class="clear"></div>
               <p class="hint" style="display:none"><spring:message code="cms.channel_management.msg.system_category_explanation"/></p>
@@ -362,7 +362,7 @@
               <label class="floatL"><spring:message code="cms.channel_management.label.program_source"/></label>
               <p class="ep_source"><a target="_player" href="javascript:">9x9</a></p><br/>
               <label class="floatL"><spring:message code="cms.channel_management.label.program_url"/></label>
-              <p><a target="_player" href="#" class="ep_url">http://www.9x9.tv/share/3958</a><p><br/>
+              <p><a target="_player" href="#" class="ep_url">http://www.9x9.tv/share/3958</a></p><br/>
               <label class="floatL"><spring:message code="cms.channel_management.label.create_time"/></label>
               <p class="ep_createdate">2011/04/25 14:30</p><br/>
               <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.logo"/></label>
@@ -487,7 +487,7 @@
               <label class="floatL"><spring:message code="cms.channel_management.label.program_source"/></label>
               <p style="width:400px;"><a target="_player" class="ep_source" href="#">http://blip.tv/file/get/Qtv-JulianSchnabelOnQTV732.m4v</a></p><br/><br/>
               <label class="floatL"><spring:message code="cms.channel_management.label.program_url"/></label>
-              <p style="width:400px;"><a target="_player" class="ep_url" href="#">http://www.9x9.tv/share/3958</a><p><br/><br/>
+              <p style="width:400px;"><a target="_player" class="ep_url" href="#">http://www.9x9.tv/share/3958</a></p><br/><br/>
               <label class="floatL"><spring:message code="cms.channel_management.label.create_time"/></label>
               <p class="ep_createdate">2011/04/25 14:30</p><br/><br/>
               <label class="floatL"><spring:message code="cms.channel_management.label.logo"/></label>

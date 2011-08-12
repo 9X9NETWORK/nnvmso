@@ -32,11 +32,9 @@
     <label class="lang" id="image_menu"><spring:message code="cms.image.menu"/></label>
     <div class="clear"></div>
     <div class="left_body">
+ 
+      <div class="left_title"><spring:message code="cms.promotion_tools.title.channel_list"/></div>
       <div class="createChList2">
-        <div class="left_title"><spring:message code="cms.promotion_tools.title.channel_set_list"/></div>
-        <ul class="chList" id="channel_set_list_ul">
-        </ul>
-        <div class="left_title"><spring:message code="cms.promotion_tools.title.channel_list"/></div>
         <ul class="chList" id="channel_list_ul">
           <li style="display:none">
             <div class="chUnFocus channel_info_block" id="channel_info_block">
@@ -59,6 +57,9 @@
               </div>
             </div>
           </li>
+        </ul>
+        <div style="display:none" class="left_title"><spring:message code="cms.promotion_tools.title.channel_set_list"/></div>
+        <ul class="chList" id="channel_set_list_ul">
         </ul>
       </div>
     </div>
