@@ -64,9 +64,14 @@ public class PlayerController {
 			                     HttpServletRequest req, HttpServletResponse resp, 
 			                     Model model, 
 			                     @RequestParam("channel") String cid,
-			                     @RequestParam("episode") String pid) {
+			                     @RequestParam(value="episode",required=false) String pid) {
 		PlayerService service = new PlayerService();
 		model = service.prepareBrand(model, mso, resp);
+		if (pid != null) {
+			model = service.prepareEpisode(model, pid, resp);
+		} else {
+			model = service.prepareChannel(model, cid, resp);
+		}
 		return "player/zooatomics";
 	}	
 	

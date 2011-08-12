@@ -246,6 +246,7 @@ var channelAndChannelSetList =
         } else {
           switchObject.removeClass('chPublic').addClass('chUnPublic');
         }
+        var promoteUrlTruncated = promoteUrl;
         if (promoteUrl.length > 40) {
           promoteUrlTruncated = promoteUrl.substring(0, 36) + '...';
         }
