@@ -7,6 +7,14 @@ public class FBPost {
 	private String name;
 	private String caption;
 	private String description;
+	private String facebookId;
+	public FBPost(String name, String description, String picture) {
+		this.name = name;
+		this.description = description;
+		this.picture = picture;
+	}
+	public FBPost() {
+	}
 	public void setMessage(String message) {
 		this.message = message;
 	}
@@ -42,5 +50,18 @@ public class FBPost {
 	}
 	public String getDescription() {
 		return description;
+	}
+	public void setFacebookId(String facebookId) {
+		this.facebookId = facebookId;
+	}
+	public String getFacebookId() {
+		return facebookId;
+	}
+	@Override
+	public String toString() {
+		return "FBPost [message=" + message + ", picture=" + picture
+				+ ", link=" + link + ", name=" + name + ", caption=" + caption
+				+ ", description=" + description + ", facebookId=" + facebookId
+				+ "]";
 	}
 }

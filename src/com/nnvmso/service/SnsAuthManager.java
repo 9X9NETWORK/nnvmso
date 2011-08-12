@@ -18,6 +18,11 @@ public class SnsAuthManager {
 	
 	public void create(SnsAuth auth) {
 		auth.setCreateDate(new Date());
+		auth.setEnabled(true);
+		authDao.save(auth);
+	}
+	
+	public void save(SnsAuth auth) {
 		authDao.save(auth);
 	}
 	
@@ -43,5 +48,9 @@ public class SnsAuthManager {
 	
 	public SnsAuth findSinaAuthByMsoId(long msoId) {
 		return authDao.findByMsoIdAndType(msoId, SnsAuth.TYPE_SINA);
+	}
+	
+	public SnsAuth findMsoIdAndType(Long msoId, Short type) {
+		return authDao.findByMsoIdAndType(msoId, type);
 	}
 }

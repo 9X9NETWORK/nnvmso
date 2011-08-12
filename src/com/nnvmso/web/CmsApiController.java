@@ -17,12 +17,14 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
+import com.nnvmso.lib.FacebookLib;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnStringUtil;
 import com.nnvmso.lib.YouTubeLib;
@@ -57,6 +59,7 @@ import com.nnvmso.service.NnUserManager;
 import com.nnvmso.service.SnsAuthManager;
 import com.nnvmso.service.SubscriptionLogManager;
 import com.nnvmso.service.TranscodingService;
+import com.nnvmso.web.json.transcodingservice.FBPost;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.SyndFeedInput;
@@ -1012,6 +1015,39 @@ public class CmsApiController {
 	
 	//////////////////// Promotion Tools ////////////////////
 	
+	@RequestMapping("removeSnsAuth")
+	public @ResponseBody String removeSnsAuth(@RequestParam Long msoId,
+	                                          @RequestParam Short type) {
+		SnsAuthManager snsMngr = new SnsAuthManager();
+		SnsAuth snsAuth = snsMngr.findMsoIdAndType(msoId, type);
+		if (snsAuth != null) {
+			snsMngr.delete(snsAuth);
+		}
+		return "OK";
+	}
+	
+	@RequestMapping("createSnsAuth")
+	public @ResponseBody String createSnsAuth(@RequestParam Long msoId,
+	                                          @RequestParam Short type,
+	                                          @RequestParam String token,
+	                                          @RequestParam(required=false) String secrete) {
+		
+		SnsAuthManager snsMngr = new SnsAuthManager();
+		SnsAuth snsAuth = snsMngr.findMsoIdAndType(msoId, type);
+		if (snsAuth == null) {
+			snsAuth = new SnsAuth(msoId, type, token);
+			if (secrete != null)
+				snsAuth.setSecrete(secrete);
+			snsMngr.create(snsAuth);
+		} else {
+			snsAuth.setToken(token);
+			if (secrete != null)
+				snsAuth.setSecrete(secrete);
+			snsMngr.save(snsAuth);
+		}
+		return "OK";
+	}
+	
 	@RequestMapping("listSnsAuth")
 	public @ResponseBody List<SnsAuth> listSnsAuth(@RequestParam Long msoId) {
 		logger.info("msoId = " + msoId);
@@ -1092,6 +1128,20 @@ public class CmsApiController {
 			shareService.delete(autosharing);
 		}
 	}
+	
+	@RequestMapping("postToFacebook")
+	public @ResponseBody void postToFacebook(@RequestBody FBPost fbPost, HttpServletRequest req) {
+		FacebookLib fbLib = new FacebookLib();
+		try {
+			fbPost.setLink(fbPost.getLink().replaceFirst("localhost", req.getServerName()));
+			logger.info(fbPost.toString());
+			fbLib.postToFacebook(fbPost);
+		} catch (IOException e) {
+			exception(e);
+		}
+	}
+	
+	//////////////////// statistics ////////////////////
 	
 	@RequestMapping("channelStatisticsInfo")
 	public @ResponseBody Map<String, Integer> channelStatisticsInfo(@RequestParam Long channelId) {

@@ -70,21 +70,23 @@ public class FacebookLib {
 		return fbInfo;
 	}
 	
-	public void postToFacebook(String fbUserId, FBPost fbPost) throws IOException {
+	public void postToFacebook(FBPost fbPost) throws IOException {
 		
 		MsoConfigManager configMngr = new MsoConfigManager();
 		MsoConfig fbConfig = configMngr.findByItem(MsoConfig.FBTOKEN);
 		String accessToken = fbConfig.getValue();
 		
-		URL url = new URL("https://graph.facebook.com/" + fbUserId + "/feed");
+		URL url = new URL("https://graph.facebook.com/" + fbPost.getFacebookId() + "/feed");
 		String post =
 			"access_token=" + URLEncoder.encode(accessToken, "US-ASCII") +
-			"&message=" + URLEncoder.encode(fbPost.getMessage(), "UTF-8") +
 			"&picture=" + URLEncoder.encode(fbPost.getPicture(), "US-ASCII") +
 			"&name=" + URLEncoder.encode(fbPost.getName(), "UTF-8") +
 			"&link=" + URLEncoder.encode(fbPost.getLink(), "US-ASCII")+
 			"&caption=" + URLEncoder.encode(fbPost.getCaption(), "UTF-8") +
 			"&description=" + URLEncoder.encode(fbPost.getDescription(), "UTF-8");
+		if (fbPost.getMessage() != null) {
+			post += "&message=" + URLEncoder.encode(fbPost.getMessage(), "UTF-8");
+		}
 		log.info(post);
 		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 		connection.setDoOutput(true);

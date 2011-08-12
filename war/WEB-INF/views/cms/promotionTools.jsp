@@ -7,11 +7,11 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <link rel="stylesheet" type="text/css" href="/stylesheets/cms.css" />
-<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/themes/start/jquery-ui.css" />
+<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.15/themes/start/jquery-ui.css" />
 <link rel="stylesheet" href="/stylesheets/jquery.jqModal.css" type="text/css"/>
 <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4dcccc98718a5dbe"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.js"></script>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/jquery-ui.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.15/jquery-ui.min.js"></script>
 <script type="text/javascript" src="http://www.netgrow.com.au/assets/files/jquery_plugins/jquery.dump.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.jqModal.js"></script>
 <script type="text/javascript" src="/javascripts/cms/common.js"></script>
@@ -82,7 +82,8 @@
         </div>
         <br/>
         <label class="pro_check"><input type="checkbox" class="sns_checkbox" name="sns_facebook" disabled="disabled"/>&nbsp; <spring:message code="cms.promotion_tools.label.facebook"/></label>
-        <label class="pro_check"><input type="checkbox" class="sns_checkbox" name="sns_twitter" disabled="disabled"/>&nbsp; <spring:message code="cms.promotion_tools.label.twitter"/></label>
+        <br/>
+        <label class="pro_check" style="display:none"><input type="checkbox" class="sns_checkbox" name="sns_twitter" disabled="disabled"/>&nbsp; <spring:message code="cms.promotion_tools.label.twitter"/></label>
         <label class="pro_check" style="display:none"><input type="checkbox" class="sns_checkbox" name="sns_plurk" disabled="disabled"/>&nbsp; <spring:message code="cms.promotion_tools.label.plurk"/></label>
         <label class="pro_check" style="display:none"><input type="checkbox" class="sns_checkbox" name="sns_sina" disabled="disabled"/>&nbsp; <spring:message code="cms.promotion_tools.label.sina"/></label>
         <br/><br/><br/>

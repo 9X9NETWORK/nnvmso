@@ -12,7 +12,7 @@ var autosharingSettings =
       'channelSetId': channelSetId,
       'msoId': $('#msoId').val()
     }
-    $.get('/CMSAPI/listChannelSetAutosharing', parameters, function(autosharings)
+    $.post('/CMSAPI/listChannelSetAutosharing', parameters, function(autosharings)
     {
       for (i in autosharings) {
         switch(autosharings[i].type) {
@@ -31,7 +31,7 @@ var autosharingSettings =
           default:
         }
       }
-      if (!$('input[name="sns_facebook"]').attr('disabled')) {
+      if ($('input[name="sns_facebook"]').attr('disabled') != 'disabled') {
         $('input[name="sns_facebook"]').unbind('change').change(function()
         {
           var parameters = {
@@ -40,13 +40,13 @@ var autosharingSettings =
             'type': 1
           };
           if ($(this).attr('checked') == 'checked') {
-            $.get('/CMSAPI/createChannelSetAutosharing', parameters);
+            $.post('/CMSAPI/createChannelSetAutosharing', parameters);
           } else {
-            $.get('/CMSAPI/removeChannelSetAutosharing', parameters);
+            $.post('/CMSAPI/removeChannelSetAutosharing', parameters);
           }
         });
       }
-      if (!$('input[name="sns_twitter"]').attr('disabled')) {
+      if ($('input[name="sns_twitter"]').attr('disabled') != 'disabled') {
         $('input[name="sns_twitter"]').unbind('change').change(function()
         {
           var parameters = {
@@ -55,13 +55,13 @@ var autosharingSettings =
             'type': 2
           };
           if ($(this).attr('checked') == 'checked') {
-            $.get('/CMSAPI/createChannelSetAutosharing', parameters);
+            $.post('/CMSAPI/createChannelSetAutosharing', parameters);
           } else {
-            $.get('/CMSAPI/removeChannelSetAutosharing', parameters);
+            $.post('/CMSAPI/removeChannelSetAutosharing', parameters);
           }
         });
       }
-      if (!$('input[name="sns_plurk"]').unbind('change').attr('disabled')) {
+      if ($('input[name="sns_plurk"]').unbind('change').attr('disabled') != 'disabled') {
         $('input[name="sns_plurk"]').change(function()
         {
           var parameters = {
@@ -70,13 +70,13 @@ var autosharingSettings =
             'type': 3
           };
           if ($(this).attr('checked') == 'checked') {
-            $.get('/CMSAPI/createChannelSetAutosharing', parameters);
+            $.post('/CMSAPI/createChannelSetAutosharing', parameters);
           } else {
-            $.get('/CMSAPI/removeChannelSetAutosharing', parameters);
+            $.post('/CMSAPI/removeChannelSetAutosharing', parameters);
           }
         });
       }
-      if (!$('input[name="sns_sina"]').unbind('change').attr('disabled')) {
+      if ($('input[name="sns_sina"]').unbind('change').attr('disabled') != 'disabled') {
         $('input[name="sns_sina"]').change(function()
         {
           var parameters = {
@@ -85,9 +85,9 @@ var autosharingSettings =
             'type': 3
           };
           if ($(this).attr('checked') == 'checked') {
-            $.get('/CMSAPI/createChannelSetAutosharing', parameters);
+            $.post('/CMSAPI/createChannelSetAutosharing', parameters);
           } else {
-            $.get('/CMSAPI/removeChannelSetAutosharing', parameters);
+            $.post('/CMSAPI/removeChannelSetAutosharing', parameters);
           }
         });
       }
@@ -103,7 +103,7 @@ var autosharingSettings =
       'channelId': channelId,
       'msoId': $('#msoId').val()
     }
-    $.get('/CMSAPI/listChannelAutosharing', parameters, function(autosharings)
+    $.post('/CMSAPI/listChannelAutosharing', parameters, function(autosharings)
     {
       for (i in autosharings) {
         switch(autosharings[i].type) {
@@ -122,7 +122,7 @@ var autosharingSettings =
           default:
         }
       }
-      if (!$('input[name="sns_facebook"]').attr('disabled')) {
+      if ($('input[name="sns_facebook"]').attr('disabled') != 'disabled') {
         $('input[name="sns_facebook"]').unbind('change').change(function()
         {
           var parameters = {
@@ -131,13 +131,13 @@ var autosharingSettings =
             'type': 1
           };
           if ($(this).attr('checked') == 'checked') {
-            $.get('/CMSAPI/createChannelAutosharing', parameters);
+            $.post('/CMSAPI/createChannelAutosharing', parameters);
           } else {
-            $.get('/CMSAPI/removeChannelAutosharing', parameters);
+            $.post('/CMSAPI/removeChannelAutosharing', parameters);
           }
         });
       }
-      if (!$('input[name="sns_twitter"]').attr('disabled')) {
+      if ($('input[name="sns_twitter"]').attr('disabled') != 'disabled') {
         $('input[name="sns_twitter"]').unbind('change').change(function()
         {
           var parameters = {
@@ -146,13 +146,13 @@ var autosharingSettings =
             'type': 2
           };
           if ($(this).attr('checked') == 'checked') {
-            $.get('/CMSAPI/createChannelAutosharing', parameters);
+            $.post('/CMSAPI/createChannelAutosharing', parameters);
           } else {
-            $.get('/CMSAPI/removeChannelAutosharing', parameters);
+            $.post('/CMSAPI/removeChannelAutosharing', parameters);
           }
         });
       }
-      if (!$('input[name="sns_plurk"]').attr('disabled')) {
+      if ($('input[name="sns_plurk"]').attr('disabled') != 'disabled') {
         $('input[name="sns_plurk"]').unbind('change').change(function()
         {
           var parameters = {
@@ -161,13 +161,13 @@ var autosharingSettings =
             'type': 3
           };
           if ($(this).attr('checked') == 'checked') {
-            $.get('/CMSAPI/createChannelAutosharing', parameters);
+            $.post('/CMSAPI/createChannelAutosharing', parameters);
           } else {
-            $.get('/CMSAPI/removeChannelAutosharing', parameters);
+            $.post('/CMSAPI/removeChannelAutosharing', parameters);
           }
         });
       }
-      if (!$('input[name="sns_sina"]').attr('disabled')) {
+      if ($('input[name="sns_sina"]').attr('disabled') != 'disabled') {
         $('input[name="sns_sina"]').unbind('change').change(function()
         {
           var parameters = {
@@ -176,9 +176,9 @@ var autosharingSettings =
             'type': 3
           };
           if ($(this).attr('checked') == 'checked') {
-            $.get('/CMSAPI/createChannelAutosharing', parameters);
+            $.post('/CMSAPI/createChannelAutosharing', parameters);
           } else {
-            $.get('/CMSAPI/removeChannelAutosharing', parameters);
+            $.post('/CMSAPI/removeChannelAutosharing', parameters);
           }
         });
       }
@@ -347,7 +347,7 @@ $(function()
   {
     $('#pro_hint').hide();
   });
-  $.get('/CMSAPI/listSnsAuth?msoId=' + $('#msoId').val(), function(snsAuths)
+  $.post('/CMSAPI/listSnsAuth?msoId=' + $('#msoId').val(), function(snsAuths)
   {
     for (i in snsAuths) {
       switch (snsAuths[i].type) {

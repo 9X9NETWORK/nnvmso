@@ -1,5 +1,8 @@
 package com.nnvmso.service;
 
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -10,14 +13,23 @@ import java.util.logging.Logger;
 
 import net.sf.jsr107cache.Cache;
 
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.stereotype.Service;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.taskqueue.QueueFactory;
+import com.google.appengine.api.taskqueue.TaskOptions;
 import com.nnvmso.dao.MsoProgramDao;
 import com.nnvmso.lib.CacheFactory;
+import com.nnvmso.lib.NnLogUtil;
+import com.nnvmso.model.ChannelAutosharing;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoProgram;
+import com.nnvmso.model.SnsAuth;
 import com.nnvmso.model.ViewLog;
+import com.nnvmso.web.json.transcodingservice.FBPost;
 
 @Service
 public class MsoProgramManager {
@@ -67,6 +79,36 @@ public class MsoProgramManager {
 			programs.add(program);
 			this.storeInCache(cache, programs, program.getChannelId());
 		}				
+		
+		// hook, auto share to facebook
+		AutosharingService sharingService = new AutosharingService();
+		SnsAuthManager snsMngr = new SnsAuthManager();
+		List<ChannelAutosharing> channelAutosharings = sharingService.findAllByChannelIdAndType(channel.getKey().getId(), SnsAuth.TYPE_FACEBOOK);
+		log.info("autosharing count = " + channelAutosharings.size());
+		try {
+			FBPost fbPost = new FBPost(program.getName(), program.getIntro(), program.getImageUrl());
+			InetAddress local = InetAddress.getLocalHost();
+			String url = "http://" + local.getHostName() + "/view?channel=" + channel.getKey().getId() + "&episode=" + program.getKey().getId();
+			fbPost.setLink(url);
+			fbPost.setCaption("9x9.tv");
+			for (ChannelAutosharing autosharing : channelAutosharings) {
+				SnsAuth snsAuth = snsMngr.findFacebookAuthByMsoId(autosharing.getMsoId());
+				if (snsAuth != null && snsAuth.isEnabled()) {
+					fbPost.setFacebookId(snsAuth.getToken());
+					QueueFactory.getDefaultQueue().add(TaskOptions.Builder
+                            .withUrl("/CMSAPI/postToFacebook")
+                            .payload(new ObjectMapper().writeValueAsBytes(fbPost), "application/json"));
+				}
+			}
+		} catch (UnknownHostException e) {
+			NnLogUtil.logException(e);
+		} catch (JsonGenerationException e) {
+			NnLogUtil.logException(e);
+		} catch (JsonMappingException e) {
+			NnLogUtil.logException(e);
+		} catch (IOException e) {
+			NnLogUtil.logException(e);
+		}
 	} 
 
 	public MsoProgram save(MsoProgram program) {

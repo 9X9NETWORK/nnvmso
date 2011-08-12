@@ -39,8 +39,17 @@ public class SnsAuth implements Serializable {
 	private String secrete;
 	
 	@Persistent
+	private boolean enabled;
+	
+	@Persistent
 	private Date createDate;
-
+	
+	public SnsAuth(long msoId, short type, String token) {
+		this.msoId = msoId;
+		this.type = type;
+		this.token = token;
+	}
+	
 	public void setKey(Key key) {
 		this.key = key;
 	}
@@ -87,5 +96,13 @@ public class SnsAuth implements Serializable {
 
 	public Date getCreateDate() {
 		return createDate;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+
+	public boolean isEnabled() {
+		return enabled;
 	}
 }
