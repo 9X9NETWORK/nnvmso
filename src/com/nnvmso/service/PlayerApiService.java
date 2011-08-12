@@ -962,13 +962,12 @@ public class PlayerApiService {
 		    }
 		} else {
 			log.info("channelLineup: regardless the pos");
-			if (isRequired && channels.size() == 0)
-				result = messageSource.getMessage("nnstatus.channel_invalid", new Object[] {NnStatusCode.CHANNEL_INVALID} , locale);
-			if (!isRequired) {
-				for (MsoChannel c : channels) {
-					result = result + this.composeChannelLineupStr(c, mso);
-					result = result + "\n";
-				}
+			if (isRequired && channels.size() == 0) {
+				return messageSource.getMessage("nnstatus.channel_invalid", new Object[] {NnStatusCode.CHANNEL_INVALID} , locale);
+			}
+			for (MsoChannel c : channels) {
+				result = result + this.composeChannelLineupStr(c, mso);
+				result = result + "\n";
 			}
 		}
 		return result;
