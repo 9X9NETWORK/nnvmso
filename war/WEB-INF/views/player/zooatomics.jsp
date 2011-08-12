@@ -139,6 +139,7 @@ var brandinfo = "${brandInfo}";
       <img src="${root}/images/logo.png" id="sg-logo">
       <p id="slogan"><span>Your Personal Video Album</span></p>  
       <ul id="menu-list">
+        <li id="btn-curate"><img src="${root}/images/icon_curate.png" id="icon-curate"><span><div id="btn-curate-txt">Curate</div><span class="arrow"></span></span></li>
         <li id="btn-sgt"><img src="${root}/images/icon_sgt.png" id="icon-signin"><span><div id="btn-sg-txt">Smart Guide</div><span class="arrow"></span></span></li>
         <li id="btn-signin"><img src="${root}/images/icon_signin.png" id="icon-signin"><span><div id="btn-signin-txt">Sign in / Sign up</div><span class="arrow"></span></span></li>
         <li id="btn-about"><img src="${root}/images/icon_about.png" id="icon-about"><span><div id="btn-about-text">About Us</div><span class="arrow"></span></span></li>
