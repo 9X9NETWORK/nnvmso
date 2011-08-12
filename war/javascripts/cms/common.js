@@ -96,12 +96,18 @@ var initSetupPage = function()
     onLoad: function()
     {
       $.getScript('/javascripts/cms/setup.js');
+    },
+    onHide: function()
+    {
+      location.reload();
     }
   });
 };
 
 $(function()
 {
+  $.getScript('https://connect.facebook.net/en_US/all.js');
+  
   $('.header .logout').css('background', 'url(' + $('#image_header_logout').text() + ') no-repeat;');
   $('.header .setup').css('background', 'url(' + $('#image_header_setup').text() + ') no-repeat;');
   $('.header .sg').css('background', 'url(' + $('#image_header_sg').text() + ') no-repeat;');

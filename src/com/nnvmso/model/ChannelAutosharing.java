@@ -32,6 +32,9 @@ public class ChannelAutosharing implements Serializable {
 	private short type;
 	
 	@Persistent
+	private String parameter;
+	
+	@Persistent
 	private Date createDate;
 	
 	public ChannelAutosharing(long msoId, long channelId, short type) {
@@ -78,5 +81,13 @@ public class ChannelAutosharing implements Serializable {
 
 	public Date getCreateDate() {
 		return createDate;
+	}
+
+	public void setParameter(String parameter) {
+		this.parameter = parameter;
+	}
+
+	public String getParameter() {
+		return parameter;
 	}
 }

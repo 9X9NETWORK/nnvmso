@@ -68,4 +68,9 @@ public class AutosharingService {
 	public void delete(ChannelSetAutosharing autosharing) {
 		channelSetAutosharingDao.delete(autosharing);
 	}
+	
+	public List<ChannelAutosharing> findAllByChannelIdAndType(long channelId, short type) {
+		return channelAutosharingDao.findAllByChannelIdAndType(channelId, type);
+		
+	}
 }

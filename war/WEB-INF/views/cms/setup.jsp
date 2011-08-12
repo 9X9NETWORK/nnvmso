@@ -13,13 +13,12 @@
     </div>
     <div id="syncAcc" class="syncAcc setupContent">
       <spring:message code="cms.setup.msg.account_synchronization_explanation"/>
+      <div id="fb-root"></div>
       <ul>
         <li class="syncFb">
           <span><spring:message code="cms.setup.label.facebook"/></span>&nbsp;&nbsp;
-          <a href="javascript:"><spring:message code="cms.setup.button.account_connect"/></a>
-          <!--
-          <a href="#"><spring:message code="cms.setup.button.account_disconnect"/></a>&nbsp; | &nbsp;<a href="#"><spring:message code="cms.setup.button.disable_autosharing"/> </a>
-          -->
+          <a style="display:inline" href="javascript:" id="facebook_connect"><spring:message code="cms.setup.button.account_connect"/></a>
+          <a style="display:none" href="javascript:" id="facebook_disconnect"><spring:message code="cms.setup.button.account_disconnect"/></a><!-- &nbsp; | &nbsp;<a href="#"><spring:message code="cms.setup.button.disable_autosharing"/> </a> -->
           <a href="javascript:" class="syncInfo"></a>
           <div class="sync_hint" id="fb_hint">
             <spring:message code="cms.setup.msg.fb_sync_hint"/>
@@ -28,23 +27,17 @@
         <li class="syncTwitter">
           <span><spring:message code="cms.setup.label.twitter"/></span>&nbsp;&nbsp;
           <a href="javascript:"><spring:message code="cms.setup.button.account_connect"/></a>
-          <!--
-          <a href="#"><spring:message code="cms.setup.button.account_disconnect"/></a>&nbsp; | &nbsp;<a href="#"><spring:message code="cms.setup.button.disable_autosharing"/> </a>
-          -->
+          <a href="#" style="display:none"><spring:message code="cms.setup.button.account_disconnect"/></a>&nbsp; | &nbsp;<a href="#"><spring:message code="cms.setup.button.disable_autosharing"/> </a>
         </li>
         <li class="syncPlurk">
           <span><spring:message code="cms.setup.label.plurk"/></span>&nbsp;&nbsp;
           <a href="javascript:"><spring:message code="cms.setup.button.account_connect"/></a>
-          <!--
-          <a href="#"><spring:message code="cms.setup.button.account_disconnect"/></a>&nbsp; | &nbsp;<a href="#"><spring:message code="cms.setup.button.disable_autosharing"/> </a>
-          -->
+          <a href="#" style="display:none"><spring:message code="cms.setup.button.account_disconnect"/></a>&nbsp; | &nbsp;<a href="#"><spring:message code="cms.setup.button.disable_autosharing"/> </a>
         </li>
         <li class="syncSina">
           <span><spring:message code="cms.setup.label.sina"/></span>&nbsp;&nbsp;
           <a href="javascript:"><spring:message code="cms.setup.button.account_connect"/></a>
-          <!--
-          <a href="#"><spring:message code="cms.setup.button.account_disconnect"/></a>&nbsp; | &nbsp;<a href="#"><spring:message code="cms.setup.button.disable_autosharing"/> </a>
-          -->
+          <a href="#" style="display:none"><spring:message code="cms.setup.button.account_disconnect"/></a>&nbsp; | &nbsp;<a href="#"><spring:message code="cms.setup.button.disable_autosharing"/> </a>
         </li>
       </ul>
     </div>
@@ -128,3 +121,5 @@
 <label class="lang" id="lang_warning_not_9x9_user"><spring:message code="cms.warning.not_9x9_user"/></label>
 <label class="lang" id="lang_warning_remove_admin_member"><spring:message code="cms.warning.remove_admin_member"/></label>
 <label class="lang" id="image_bg_setup"><spring:message code="cms.image.bg_setup"/></label>
+<label class="lang" id="lang_warning_error_occurs"><spring:message code="cms.warning.error_occurs"/></label>
+<label class="lang" id="lang_confirm_disconnect_with_facebook"><spring:message code="cms.setup.confirm_disconnect_with_facebook"/></label>

@@ -43,10 +43,8 @@ public class SnsAuthDao extends GenericDao<SnsAuth> {
 		
 		try {
 			Query query = pm.newQuery(SnsAuth.class);
-			query.setFilter("msoId == msoIdParam");
-			query.setFilter("type == typeParam");
-			query.declareParameters("long msoIdParam");
-			query.declareParameters("short type");
+			query.setFilter("msoId == msoIdParam && type == typeParam");
+			query.declareParameters("long msoIdParam, short typeParam");
 			@SuppressWarnings("unchecked")
 			List<SnsAuth> tmp = (List<SnsAuth>)query.execute(msoId, type);
 			results = (ArrayList<SnsAuth>) pm.detachCopyAll(tmp);
