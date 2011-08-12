@@ -58,6 +58,17 @@ public class PlayerController {
 		
 		return "player/zooatomics";
 	}
+
+	@RequestMapping("view")
+	public String view(@RequestParam(value="mso",required=false) String mso, 
+			                     HttpServletRequest req, HttpServletResponse resp, 
+			                     Model model, 
+			                     @RequestParam("channel") String cid,
+			                     @RequestParam("episode") String pid) {
+		PlayerService service = new PlayerService();
+		model = service.prepareBrand(model, mso, resp);
+		return "player/zooatomics";
+	}	
 	
 	@RequestMapping("support")
 	public String support() {

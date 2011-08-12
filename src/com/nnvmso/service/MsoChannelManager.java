@@ -49,6 +49,9 @@ public class MsoChannelManager {
 		}
 		if (channel.getName() != null)
 			channel.setNameSearch(channel.getName().trim().toLowerCase());
+		if (channel.getLangCode() == null || channel.getLangCode().length() == 0) {
+			channel.setLangCode(Mso.LANG_EN);
+		}
 		channel.setCreateDate(now);
 		channel.setUpdateDate(now);
 		msoChannelDao.save(channel);
