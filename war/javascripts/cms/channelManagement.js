@@ -80,17 +80,17 @@ var programDetail =
       }
     });
   },
-  initYouTube: function(url)
+  initYouTube: function(url, channelId)
   {
     $.get(url, { alt: 'json' }, function(data)
     {
       if (typeof data.entry != 'undefined') {
         $('#program_list').hide();
-        programDetail.displayYouTube(data.entry);
+        programDetail.displayYouTube(data.entry, channelId);
       }
     }, 'json');
   },
-  displayYouTube: function(entry)
+  displayYouTube: function(entry, channelId)
   {
     var programDetailBlock = $('#program_detail_readonly');
     var title = entry.media$group.media$title.$t;
@@ -100,7 +100,7 @@ var programDetail =
     programDetailBlock.find('.right_title div').text(title);
     programDetailBlock.find('.ep_name').text(entry.media$group.media$title.$t);
     programDetailBlock.find('.ep_intro').text(entry.media$group.media$description.$t);
-    var promoteUrl = entry.link[0].href;
+    var promoteUrl = 'http://' + location.host + '/view?channel=' + channelId + '&episode=' + entry.media$group.yt$videoid.$t;
     programDetailBlock.find('.ep_url').attr('href', promoteUrl).text(promoteUrl);
     programDetailBlock.find('.ep_image').attr('src', entry.media$group.media$thumbnail[1].url);
     programDetailBlock.find('.ep_createdate').text(entry.published.$t.substring(0, 19).replace('T', ' ').replace(/-/g, '/'));
@@ -109,7 +109,7 @@ var programDetail =
       programDetail.destroy();
       $('#program_list_readonly').show();
     });
-    var dom = programDetailBlock.find('.ep_source').text('YouTube').attr('href', promoteUrl);
+    var dom = programDetailBlock.find('.ep_source').text('YouTube').attr('href', entry.link[0].href);
     $('#program_list_readonly').hide();
     $('#program_detail_readonly').show();
   },
@@ -144,7 +144,7 @@ var programDetail =
     programDetailBlock.find('.right_title div').text(title);
     programDetailBlock.find('.ep_name').val(program.name);
     programDetailBlock.find('.ep_intro').val(program.intro);
-    var promoteUrl = 'http://' + location.host + '/episode/' + programId;
+    var promoteUrl = 'http://' + location.host + '/view?channel=' + program.channelId + '&episode=' + programId;
     programDetailBlock.find('.ep_url').attr('href', promoteUrl).text(promoteUrl);
     programDetailBlock.find('.ep_image').attr('src', program.imageUrl);
     programDetailBlock.find('.ep_image_updated').val('false');
@@ -179,7 +179,7 @@ var programDetail =
       {
         if (response != 'OK') {
           alert($('#lang_warning_error_occurs').text());
-        }else {
+        } else {
           alert($('#lang_update_successfully').text());
           programList.init(program.channelId, false, $('#program_list .right_title div').text());
         }
@@ -246,7 +246,7 @@ var programDetail =
     programDetailBlock.find('.right_title div').text(title);
     programDetailBlock.find('.ep_name').text(program.name);
     programDetailBlock.find('.ep_intro').text(program.intro);
-    var promoteUrl = 'http://' + location.host + '/episode/' + programId;
+    var promoteUrl = 'http://' + location.host + '/view?channel=' + program.channelId + '&episode=' + programId;
     programDetailBlock.find('.ep_url').attr('href', promoteUrl).text(promoteUrl);
     programDetailBlock.find('.ep_image').attr('src', program.imageUrl);
     programDetailBlock.find('.ep_createdate').text(formatDate(program.createDate));
@@ -557,7 +557,7 @@ var programList =
       }
     });
   },
-  initYouTube: function(username, channelName, callback, isPlaylist)
+  initYouTube: function(username, channelName, callback, isPlaylist, channelId)
   {
     if (overallLayout.destroyRightSideContent(false) == false) return false;
     
@@ -588,12 +588,12 @@ var programList =
           $('#program_list_readonly .right_title div').text(channelName);
           var programCount = feed.entry.length;
           callback(programCount);
-          programList.displayYouTube(feed.entry);
+          programList.displayYouTube(feed.entry, channelId);
         }
       }
     }, 'json');
   },
-  displayYouTube: function(entries)
+  displayYouTube: function(entries, channelId)
   {
     for (i in entries)
     {
@@ -605,7 +605,7 @@ var programList =
       programInfoBlock.find('.program_info_type span').text('YouTube');
       programInfoBlock.find('.program_info_updatedate span').text(entry.updated.$t.substring(0, 19).replace('T', ' ').replace(/-/g, '/'));
       // add this
-      var promoteUrl = entry.link[0].href;
+      var promoteUrl = 'http://' + location.host + '/view?channel=' + channelId + '&episode=' + entry.media$group.yt$videoid.$t;
       var addthis_share =
       {
         'title': entry.media$group.media$title.$t,
@@ -616,10 +616,14 @@ var programList =
       addthis.button(programInfoBlock.find('.program_info_addthis').get(0), null, addthis_share);
       programInfoBlock.find('.program_info_detailbutton').click({ 'entry': entry }, function(event)
       {
-        programDetail.initYouTube(event.data.entry.link[4].href);
+        programDetail.initYouTube(event.data.entry.link[4].href, channelId);
         return false;
       });
-      programInfoBlock.find('.program_info_promoteurl').text(promoteUrl.substring(0, 40) + '...').attr('href', promoteUrl);
+      var promoteUrlTruncated = promoteUrl;
+      if (promoteUrl.length > 40) {
+        promoteUrlTruncated = promoteUrl.substring(0, 36) + '...';
+      }
+      programInfoBlock.find('.program_info_promoteurl').text(promoteUrlTruncated).attr('href', promoteUrl);
       $('<li></li>').append(programInfoBlock).appendTo('#program_list_ul_readonly');
       programInfoBlock.click(function()
       {
@@ -637,6 +641,7 @@ var programList =
     {
       var programInfoBlock = $('#program_info_block').clone(true).removeAttr('id').addClass('program_info_block_cloned');
       var programId = programs[i].key.id;
+      var program = programs[i];
       
       programInfoBlock.find('.iconStatistics').attr('title', $('#lang_view_statistics').text());
       programInfoBlock.find('.program_info_title div').text(programs[i].name);
@@ -654,7 +659,7 @@ var programList =
       programInfoBlock.find('.program_info_type span').text(type);
       programInfoBlock.find('.program_info_updatedate span').text(formatDate(programs[i].updateDate));
       // add this
-      var promoteUrl = 'http://' + location.host + '/episode/' + programId;
+      var promoteUrl = 'http://' + location.host + '/view?channel=' + program.channelId + '&episode=' + programId;
       var addthis_share =
       {
         'title': programs[i].name,
@@ -701,7 +706,11 @@ var programList =
         programDetail.init(event.data.programId, false);
         return false;
       });
-      programInfoBlock.find('.program_info_promoteurl').text(promoteUrl).attr('href', promoteUrl);
+      var promoteUrlTruncated = promoteUrl;
+      if (promoteUrl.length > 40) {
+        promoteUrlTruncated = promoteUrl.substring(0, 36) + '...';
+      }
+      programInfoBlock.find('.program_info_promoteurl').text(promoteUrlTruncated).attr('href', promoteUrl);
       $('<li></li>').append(programInfoBlock).appendTo('#program_list_ul');
       programInfoBlock.click({ 'programId': programId }, function(event)
       {
@@ -719,6 +728,7 @@ var programList =
     {
       var programInfoBlock = $('#program_info_block_readonly').clone(true).removeAttr('id').addClass('program_info_block_cloned');
       var programId = programs[i].key.id;
+      var program = programs[i];
       
       programInfoBlock.find('.iconStatistics').attr('title', $('#lang_view_statistics'));
       programInfoBlock.find('.program_info_title div').text(programs[i].name);
@@ -736,7 +746,7 @@ var programList =
       programInfoBlock.find('.program_info_type span').text(type);
       programInfoBlock.find('.program_info_updatedate span').text(formatDate(programs[i].updateDate));
       // add this
-      var promoteUrl = 'http://' + location.host + '/episode/' + programId;
+      var promoteUrl = 'http://' + location.host + '/view?channel=' + program.channelId + '&episode=' + programId;
       var addthis_share =
       {
         'title': programs[i].name,
@@ -756,7 +766,11 @@ var programList =
         programDetail.init(event.data.programId, true);
         return false;
       });
-      programInfoBlock.find('.program_info_promoteurl').text(promoteUrl).attr('href', promoteUrl);
+      var promoteUrlTruncated = promoteUrl;
+      if (promoteUrl.length > 40) {
+        promoteUrlTruncated = promoteUrl.substring(0, 36) + '...';
+      }
+      programInfoBlock.find('.program_info_promoteurl').text(promoteUrlTruncated).attr('href', promoteUrl);
       $('<li></li>').append(programInfoBlock).appendTo('#program_list_ul_readonly');
       programInfoBlock.click({ 'programId': programId }, function(event)
       {
@@ -1194,7 +1208,7 @@ var channelList =
         channelInfoBlock.find('.channel_info_subscribers span').text(channels[i].subscriptionCount);
         channelInfoBlock.find('.channel_info_updatedate span').text(formatDate(channels[i].updateDate));
         // add this
-        var promoteUrl = 'http://' + location.host + '/channel/' + channelId;
+        var promoteUrl = 'http://' + location.host + '/view?channel=' + channelId;
         var addthis_share = 
         {
           'title': channels[i].name,
@@ -1243,6 +1257,7 @@ var channelList =
           channelDetail.init(event.data.channelId, false);
           return false;
         });
+        var promoteUrlTruncated = promoteUrl;
         if (promoteUrl.length > 40) {
           promoteUrlTruncated = promoteUrl.substring(0, 36) + '...';
         }
@@ -1272,7 +1287,7 @@ var channelList =
             programList.initYouTube(username, channel.name, function(programCount)
             {
               $('.channel_info_programcount span', infoBlock).text(programCount);
-            }, (channel.contentType == 4));
+            }, (channel.contentType == 4), channelId);
           } else {
             programList.init(channel.key.id, readonly, channel.name);
           }

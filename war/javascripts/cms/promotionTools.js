@@ -230,7 +230,7 @@ var channelAndChannelSetList =
         channelInfoBlock.find('.channel_info_subscribers span').text(channels[i].subscriptionCount);
         channelInfoBlock.find('.channel_info_updatedate span').text(formatDate(channels[i].updateDate));
         // add this
-        var promoteUrl = 'http://' + location.host + '/channel/' + channelId;
+        var promoteUrl = 'http://' + location.host + '/view?channel=' + channelId;
         var addthis_share = 
         {
           'title': channels[i].name,

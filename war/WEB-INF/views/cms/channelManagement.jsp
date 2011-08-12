@@ -305,7 +305,7 @@
          -->
     <div class="epList" style="display:none" id="program_list">
       <div class="right_title"><div class="floatL">小灰熊的大愛劇場</div> - <spring:message code="cms.channel_management.title.program_management"/> </div>
-      <div class="createEpList2">
+      <div class="createEpList">
         <a class="btnCreate create_program_button" href="javascript:"><spring:message code="cms.channel_management.btn.create_program"/></a>
         <ul id="program_list_ul">
           <li style="display:none">
