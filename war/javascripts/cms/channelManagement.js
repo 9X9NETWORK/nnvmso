@@ -606,14 +606,7 @@ var programList =
       programInfoBlock.find('.program_info_updatedate span').text(entry.updated.$t.substring(0, 19).replace('T', ' ').replace(/-/g, '/'));
       // add this
       var promoteUrl = 'http://' + location.host + '/view?channel=' + channelId + '&episode=' + entry.media$group.yt$videoid.$t;
-      var addthis_share =
-      {
-        'title': entry.media$group.media$title.$t,
-        'description': entry.media$group.media$description.$t,
-        'url': promoteUrl
-      }
-      addthis_config['pubid'] = $('#msoId').val();
-      addthis.button(programInfoBlock.find('.program_info_addthis').get(0), null, addthis_share);
+      programInfoBlock.find('.program_info_addthis').attr('href', 'http://api.addthis.com/oexchange/0.8/offer?url=' + encodeURIComponent(promoteUrl));
       programInfoBlock.find('.program_info_detailbutton').click({ 'entry': entry }, function(event)
       {
         programDetail.initYouTube(event.data.entry.link[4].href, channelId);
@@ -660,15 +653,7 @@ var programList =
       programInfoBlock.find('.program_info_updatedate span').text(formatDate(programs[i].updateDate));
       // add this
       var promoteUrl = 'http://' + location.host + '/view?channel=' + program.channelId + '&episode=' + programId;
-      var addthis_share =
-      {
-        'title': programs[i].name,
-        'description': programs[i].intro,
-        'url': promoteUrl
-      }
-      addthis_config['pubid'] = $('#msoId').val();
-      addthis_config['ui_click'] = true;
-      addthis.button(programInfoBlock.find('.program_info_addthis').get(0), null, addthis_share);
+      programInfoBlock.find('.program_info_addthis').attr('href', 'http://api.addthis.com/oexchange/0.8/offer?url=' + encodeURIComponent(promoteUrl));
       var switchObject = programInfoBlock.find('.program_info_publish');
       if (programs[i]['public']) {
         switchObject.removeClass('chUnPublic').addClass('chPublic');
@@ -747,14 +732,7 @@ var programList =
       programInfoBlock.find('.program_info_updatedate span').text(formatDate(programs[i].updateDate));
       // add this
       var promoteUrl = 'http://' + location.host + '/view?channel=' + program.channelId + '&episode=' + programId;
-      var addthis_share =
-      {
-        'title': programs[i].name,
-        'description': programs[i].intro,
-        'url': promoteUrl
-      }
-      addthis_config['pubid'] = $('#msoId').val();
-      addthis.button(programInfoBlock.find('.program_info_addthis').get(0), null, addthis_share);
+      programInfoBlock.find('.program_info_addthis').attr('href', 'http://api.addthis.com/oexchange/0.8/offer?url=' + encodeURIComponent(promoteUrl));
       var switchObject = programInfoBlock.find('.program_info_publish');
       if (programs[i]['public']) {
         switchObject.removeClass('chUnPublic').addClass('chPublic');
@@ -1209,15 +1187,7 @@ var channelList =
         channelInfoBlock.find('.channel_info_updatedate span').text(formatDate(channels[i].updateDate));
         // add this
         var promoteUrl = 'http://' + location.host + '/view?channel=' + channelId;
-        var addthis_share = 
-        {
-          'title': channels[i].name,
-          'description': channels[i].intro,
-          'url': promoteUrl
-        }
-        addthis_config['pubid'] = $('#msoId').val();
-        addthis_config['ui_click'] = true;
-        addthis.button(channelInfoBlock.find('.channel_info_addthis').get(0), null, addthis_share);
+        channelInfoBlock.find('.channel_info_addthis').attr('href', 'http://api.addthis.com/oexchange/0.8/offer?url=' + encodeURIComponent(promoteUrl));
         var switchObject = channelInfoBlock.find('.channel_info_publish');
         if (channels[i]['public']) {
           switchObject.removeClass('chUnPublic').addClass('chPublic');
@@ -1263,7 +1233,6 @@ var channelList =
         }
         channelInfoBlock.find('.channel_info_promoteurl').text(promoteUrlTruncated).attr('href', promoteUrl);
         $('<li></li>').append(channelInfoBlock).appendTo('#channel_list_ul');
-        // channel info block click event
         channelInfoBlock.click({ 'channel': channels[i] }, function(event)
         {
           var infoBlock = $(this);
@@ -1287,7 +1256,7 @@ var channelList =
             programList.initYouTube(username, channel.name, function(programCount)
             {
               $('.channel_info_programcount span', infoBlock).text(programCount);
-            }, (channel.contentType == 4), channelId);
+            }, (channel.contentType == 4), channel.key.id);
           } else {
             programList.init(channel.key.id, readonly, channel.name);
           }

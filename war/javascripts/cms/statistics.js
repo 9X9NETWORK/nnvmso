@@ -107,15 +107,7 @@ var channelAndChannelSetList =
         channelInfoBlock.find('.channel_info_updatedate span').text(formatDate(channels[i].updateDate));
         // add this
         var promoteUrl = 'http://' + location.host + '/channel/' + channelId;
-        var addthis_share = 
-        {
-          'title': channels[i].name,
-          'description': channels[i].intro,
-          'url': promoteUrl
-        }
-        addthis_config['pubid'] = $('#msoId').val();
-        addthis_config['ui_click'] = true;
-        addthis.button(channelInfoBlock.find('.channel_info_addthis').get(0), null, addthis_share);
+        channelInfoBlock.find('.channel_info_addthis').attr('href', 'http://api.addthis.com/oexchange/0.8/offer?url=' + encodeURIComponent(promoteUrl));
         var switchObject = channelInfoBlock.find('.channel_info_publish');
         if (channels[i]['public']) {
           switchObject.removeClass('chUnPublic').addClass('chPublic');
@@ -158,15 +150,7 @@ var channelAndChannelSetList =
         // add this
         var promoteUrl = 'http://' + location.host + '/';
         promoteUrl += ((channelSets[i].beautifulUrl != null) ? channelSets[i].beautifulUrl : channelSets[i].defaultUrl);
-        var addthis_share =
-        {
-          'title': channelSets[i].name,
-          'description': channelSets[i].intro,
-          'url': promoteUrl
-        }
-        addthis_config['pubid'] = $('#msoId').val();
-        addthis_config['ui_click'] = true;
-        addthis.button(channelSetInfoBlock.find('.channel_info_addthis').get(0), null, addthis_share);
+        channelSetInfoBlock.find('.channel_info_addthis').attr('href', 'http://api.addthis.com/oexchange/0.8/offer?url=' + encodeURIComponent(promoteUrl));
         var switchObject = channelSetInfoBlock.find('.channel_info_publish');
         if (channelSets[i]['public']) {
           switchObject.removeClass('chUnPublic').addClass('chPublic');

@@ -334,20 +334,12 @@ var initChannelSetInfo = function()
         {
           if (channelSet != null)
           {
-            addthis_config['pubid'] = $('#msoId').val();
-            addthis_config['ui_click'] = true;
             var url = 'http://' + ((location.host == 'www.9x9.tv') ? '9x9.tv' : location.host) + '/';
-            var addthis_share = 
-              {
-                'title': channelSet.name,
-                'description': channelSet.intro
-              }
             url += ((channelSet.beautifulUrl != null) ? channelSet.beautifulUrl : channelSet.defaultUrl);
             if (channelSet.beautifulUrl != null || channelSet.defaultUrl != null)
             {
               $('#channel_set_promote_url').text(url).attr('href', url);
-              addthis_share['url'] = url;
-              addthis.button('#addthis_button', null, addthis_share);
+              $('#addthis_button').attr('href', 'http://api.addthis.com/oexchange/0.8/offer?url=' + encodeURIComponent(url));
             }
             $('#cc_name').val(channelSet.name);
             $('#cc_tag').val(channelSet.tag);

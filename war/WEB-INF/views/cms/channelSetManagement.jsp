@@ -9,7 +9,6 @@
 <link href="/stylesheets/jquery.bubble.css" rel="stylesheet" type="text/css"/>
 <link href="/stylesheets/cms.css" rel="stylesheet" type="text/css"/>
 <link rel="stylesheet" href="/stylesheets/jquery.jqModal.css" type="text/css"/>
-<script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4dcccc98718a5dbe"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.0/jquery.min.js"></script>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/jquery-ui.min.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.bubble.js"></script>
@@ -55,7 +54,7 @@
           <label class="floatL"><spring:message code="cms.channel_set_management.label.url"/></label>
           <div class="floatL">
             <a href="#" id="channel_set_promote_url" target="_player"></a>
-            <a href="javascript:" id="addthis_button"><img src="http://cache.addthiscdn.com/icons/v1/thumbs/addthis.gif"/></a>
+            <a target="_addthis" href="javascript:" id="addthis_button"><img src="http://cache.addthiscdn.com/icons/v1/thumbs/addthis.gif"/></a>
           </div>
           <div class="clear"></div><br/>
           <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_set_management.label.name"/></label>

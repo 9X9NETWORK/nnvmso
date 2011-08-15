@@ -9,7 +9,6 @@
 <link rel="stylesheet" type="text/css" href="/stylesheets/cms.css" />
 <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/themes/start/jquery-ui.css" />
 <link rel="stylesheet" href="/stylesheets/jquery.jqModal.css" type="text/css"/>
-<script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4dcccc98718a5dbe"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.js"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/jquery-ui.min.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.jqModal.js"></script>
@@ -44,7 +43,7 @@
               <div class="chUnFocusImg channel_info_image"></div>
               <div class="floatL chInfo">
                 <a href="#" target="_player" class="floatL channel_info_promoteurl">http://www.9x9.tv/channel/3958</a>
-                <a class="floatL channel_info_addthis"><img src="http://cache.addthiscdn.com/icons/v1/thumbs/addthis.gif"/></a>
+                <a target="_addthis" class="floatL channel_info_addthis"><img src="http://cache.addthiscdn.com/icons/v1/thumbs/addthis.gif"/></a>
                 <a href="javascript:" class="iconStatistics" title=""></a>
                 <div class="clear"></div>
                 <div class="floatL">
