@@ -14,6 +14,9 @@ Run
 ================================
 it currently takes 4 params, hello, brand_counter, category_create, channel_create_related.
 an example would be,
-> java -jar nnqueue.jar hello
 
+> java -jar nnqueue.jar hello
+> java -jar nnqueue.jar brand_counter
+> java -jar nnqueue.jar category_create
+> java -jar nnqueue.jar channel_create_related
  
