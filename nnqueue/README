@@ -20,3 +20,8 @@ an example would be,
 > java -jar nnqueue.jar category_create
 > java -jar nnqueue.jar channel_create_related
  
+================================
+In the pipeline
+================================ 
+- build by maven
+- error handling, logging 
