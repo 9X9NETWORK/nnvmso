@@ -1,0 +1,19 @@
+================================
+Packaging from Eclipse
+================================
+- Right click the project
+- Export -> Java -> Runnable jar file
+- Configuration:
+  Launch configuration, Main
+  Export destination, nnqueue\nnqueue.jar
+  Library handling: Package required libraries into generated jars
+  Finish
+  
+================================
+Run
+================================
+it currently takes 4 params, hello, brand_counter, category_create, channel_create_related.
+an example would be,
+> java -jar nnqueue.jar hello
+
+ 
