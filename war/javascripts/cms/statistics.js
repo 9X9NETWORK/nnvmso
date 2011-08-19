@@ -104,11 +104,11 @@ var channelAndChannelSetList =
         channelInfoBlock.find('.channel_info_contenttype span').text(contentType);
         channelInfoBlock.find('.channel_info_programcount span').text(channels[i].programCount);
         channelInfoBlock.find('.channel_info_subscribers span').text(channels[i].subscriptionCount);
-        channelInfoBlock.find('.channel_info_updatedate span').text(formatDate(channels[i].updateDate));
+        channelInfoBlock.find('.channel_info_updatedate span').text(cms.formatDate(channels[i].updateDate));
         // add this
         var promoteUrl = 'http://' + location.host + '/channel/' + channelId;
         channelInfoBlock.find('.addthis_button_expanded').attr('addthis:url', promoteUrl);
-        addthis_init();
+        cms.initAddthis();
         var switchObject = channelInfoBlock.find('.channel_info_publish');
         if (channels[i]['public']) {
           switchObject.removeClass('chUnPublic').addClass('chPublic');
@@ -147,7 +147,7 @@ var channelAndChannelSetList =
         channelSetInfoBlock.find('.channel_info_contenttype span').text($('#lang_label_channel_set').text());
         channelSetInfoBlock.find('.channel_info_programcount span').text('N/A');
         channelSetInfoBlock.find('.channel_info_subscribers span').text(channelSets[i].subscriptionCount);
-        channelSetInfoBlock.find('.channel_info_updatedate span').text(formatDate(channelSets[i].updateDate));
+        channelSetInfoBlock.find('.channel_info_updatedate span').text(cms.formatDate(channelSets[i].updateDate));
         // add this
         var promoteUrl = 'http://' + location.host + '/';
         promoteUrl += ((channelSets[i].beautifulUrl != null) ? channelSets[i].beautifulUrl : channelSets[i].defaultUrl);
