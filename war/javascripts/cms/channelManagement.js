@@ -606,7 +606,7 @@ var programList =
       programInfoBlock.find('.program_info_updatedate span').text(entry.updated.$t.substring(0, 19).replace('T', ' ').replace(/-/g, '/'));
       // add this
       var promoteUrl = 'http://' + location.host + '/view?channel=' + channelId + '&episode=' + entry.media$group.yt$videoid.$t;
-      programInfoBlock.find('.program_info_addthis').attr('href', 'http://api.addthis.com/oexchange/0.8/offer?url=' + encodeURIComponent(promoteUrl));
+      programInfoBlock.find('.addthis_button_expanded').attr('addthis:url', promoteUrl);
       programInfoBlock.find('.program_info_detailbutton').click({ 'entry': entry }, function(event)
       {
         programDetail.initYouTube(event.data.entry.link[4].href, channelId);
@@ -627,6 +627,7 @@ var programList =
       });
     }
     $('#program_list_readonly').show();
+    addthis_init();
   },
   displayProgramList: function(programs)
   {
@@ -653,7 +654,7 @@ var programList =
       programInfoBlock.find('.program_info_updatedate span').text(formatDate(programs[i].updateDate));
       // add this
       var promoteUrl = 'http://' + location.host + '/view?channel=' + program.channelId + '&episode=' + programId;
-      programInfoBlock.find('.program_info_addthis').attr('href', 'http://api.addthis.com/oexchange/0.8/offer?url=' + encodeURIComponent(promoteUrl));
+      programInfoBlock.find('.addthis_button_expanded').attr('addthis:url', promoteUrl);
       var switchObject = programInfoBlock.find('.program_info_publish');
       if (programs[i]['public']) {
         switchObject.removeClass('chUnPublic').addClass('chPublic');
@@ -706,6 +707,7 @@ var programList =
       });
     }
     $('#program_list').show();
+    addthis_init();
   },
   displayProgramListReadonly: function(programs)
   {
@@ -732,7 +734,7 @@ var programList =
       programInfoBlock.find('.program_info_updatedate span').text(formatDate(programs[i].updateDate));
       // add this
       var promoteUrl = 'http://' + location.host + '/view?channel=' + program.channelId + '&episode=' + programId;
-      programInfoBlock.find('.program_info_addthis').attr('href', 'http://api.addthis.com/oexchange/0.8/offer?url=' + encodeURIComponent(promoteUrl));
+      programInfoBlock.find('.addthis_button_expanded').attr('addthis:url', promoteUrl);
       var switchObject = programInfoBlock.find('.program_info_publish');
       if (programs[i]['public']) {
         switchObject.removeClass('chUnPublic').addClass('chPublic');
@@ -759,6 +761,7 @@ var programList =
       });
     }
     $('#program_list_readonly').show();
+    addthis_init();
   }
 };
 
@@ -1187,7 +1190,7 @@ var channelList =
         channelInfoBlock.find('.channel_info_updatedate span').text(formatDate(channels[i].updateDate));
         // add this
         var promoteUrl = 'http://' + location.host + '/view?channel=' + channelId;
-        channelInfoBlock.find('.channel_info_addthis').attr('href', 'http://api.addthis.com/oexchange/0.8/offer?url=' + encodeURIComponent(promoteUrl));
+        channelInfoBlock.find('.addthis_button_expanded').attr('addthis:url', promoteUrl);
         var switchObject = channelInfoBlock.find('.channel_info_publish');
         if (channels[i]['public']) {
           switchObject.removeClass('chUnPublic').addClass('chPublic');
@@ -1263,6 +1266,7 @@ var channelList =
         });
       }
       $('#channel_list').show();
+      addthis_init();
     }, 'json');
     $('.create_channel_button').unbind().click(function()
     {

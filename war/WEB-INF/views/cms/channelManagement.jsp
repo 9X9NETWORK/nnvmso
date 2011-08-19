@@ -88,7 +88,7 @@
                 <div class="chUnFocusImg channel_info_image"></div>
                 <div class="floatL chInfo">
                   <a href="#" target="_player" class="floatL channel_info_promoteurl">http://www.9x9.tv/channel/3958</a>
-                  <a target="_addthis" class="floatL channel_info_addthis"><img src="http://cache.addthiscdn.com/icons/v1/thumbs/addthis.gif"/></a>
+                  <a class="addthis_button_expanded"></a>
                   <a href="#" class="iconStatistics" title="觀看數據"></a>
                   <div class="clear"></div>
                   <div class="floatL">
@@ -313,7 +313,7 @@
               <div class="epInfoImg program_info_image"></div>
               <div class="floatL epInfo">
                 <a href="javascript:" target="_player" class="floatL program_info_promoteurl">http://www.9x9.tv/channel/3958</a>
-                <a target="_addthis" class="icon floatL program_info_addthis"><img src="http://cache.addthiscdn.com/icons/v1/thumbs/addthis.gif"/></a>
+                <a class="floatL icon addthis_button_expanded"></a>
                 <a href="#" class="iconStatistics" title="觀看數據"></a>
                 <div class="clear"></div>
                 <div class="floatL" style="width:230px;padding-top:3px;">
@@ -438,7 +438,7 @@
               <div class="epInfoImg program_info_image"></div>
               <div class="floatL epInfo">
                 <a href="javascript:" target="_player" class="floatL program_info_promoteurl">http://www.9x9.tv/channel/3958</a>
-                <a target="_addthis" class="icon floatL program_info_addthis"><img src="http://cache.addthiscdn.com/icons/v1/thumbs/addthis.gif"/></a>
+                <a class="floatL icon addthis_button_expanded"></a>
                 <a href="#" class="iconStatistics" title="觀看數據"></a>
                 <div class="clear"></div>
                 <div class="floatL" style="width:230px;padding-top:3px;">

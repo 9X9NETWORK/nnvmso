@@ -231,7 +231,7 @@ var channelAndChannelSetList =
         channelInfoBlock.find('.channel_info_updatedate span').text(formatDate(channels[i].updateDate));
         // add this
         var promoteUrl = 'http://' + location.host + '/view?channel=' + channelId;
-        channelInfoBlock.find('.channel_info_addthis').attr('href', 'http://api.addthis.com/oexchange/0.8/offer?url=' + encodeURIComponent(promoteUrl));
+        channelInfoBlock.find('.addthis_button_expanded').attr('addthis:url', promoteUrl);
         var switchObject = channelInfoBlock.find('.channel_info_publish');
         if (channels[i]['public']) {
           switchObject.removeClass('chUnPublic').addClass('chPublic');
@@ -259,6 +259,7 @@ var channelAndChannelSetList =
         });
       }
       //$('#channel_list').show();
+      addthis_init();
     });
     /*
     // load channel sets
@@ -279,7 +280,7 @@ var channelAndChannelSetList =
         // add this
         var promoteUrl = 'http://' + location.host + '/';
         promoteUrl += ((channelSets[i].beautifulUrl != null) ? channelSets[i].beautifulUrl : channelSets[i].defaultUrl);
-        channelSetInfoBlock.find('.channel_info_addthis').attr('href', 'http://api.addthis.com/oexchange/0.8/offer?url=' + encodeURIComponent(promoteUrl));
+        channelSetInfoBlock.find('.addthis_button_expanded').attr('addthis:url', promoteUrl);
         var switchObject = channelSetInfoBlock.find('.channel_info_publish');
         if (channelSets[i]['public']) {
           switchObject.removeClass('chUnPublic').addClass('chPublic');
@@ -306,7 +307,7 @@ var channelAndChannelSetList =
     });
     */
   }
-}
+};
 
 $(function()
 {

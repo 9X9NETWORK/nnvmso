@@ -107,7 +107,8 @@ var channelAndChannelSetList =
         channelInfoBlock.find('.channel_info_updatedate span').text(formatDate(channels[i].updateDate));
         // add this
         var promoteUrl = 'http://' + location.host + '/channel/' + channelId;
-        channelInfoBlock.find('.channel_info_addthis').attr('href', 'http://api.addthis.com/oexchange/0.8/offer?url=' + encodeURIComponent(promoteUrl));
+        channelInfoBlock.find('.addthis_button_expanded').attr('addthis:url', promoteUrl);
+        addthis_init();
         var switchObject = channelInfoBlock.find('.channel_info_publish');
         if (channels[i]['public']) {
           switchObject.removeClass('chUnPublic').addClass('chPublic');

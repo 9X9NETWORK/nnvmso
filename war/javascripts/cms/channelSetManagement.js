@@ -339,7 +339,8 @@ var initChannelSetInfo = function()
             if (channelSet.beautifulUrl != null || channelSet.defaultUrl != null)
             {
               $('#channel_set_promote_url').text(url).attr('href', url);
-              $('#addthis_button').attr('href', 'http://api.addthis.com/oexchange/0.8/offer?url=' + encodeURIComponent(url));
+              $('.addthis_button_expanded').attr('addthis:url', url);
+              addthis_init();
             }
             $('#cc_name').val(channelSet.name);
             $('#cc_tag').val(channelSet.tag);

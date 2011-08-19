@@ -73,7 +73,6 @@ var bubblePopupProperties =
 {
   'position':  'top',
   'align':     'center',
-  //'innerHtml': innerHtml,
   'innerHtmlStyle':
   {
     'color':      '#292929',
@@ -95,7 +94,13 @@ var initSetupPage = function()
     trigger: '#setup',
     onLoad: function()
     {
-      $.getScript('/javascripts/cms/setup.js');
+      var cache = $.ajaxSettings.cache;
+      $.ajaxSettings.cache = true;
+      $.getScript('https://connect.facebook.net/en_US/all.js', function()
+      {
+        $.getScript('/javascripts/cms/setup.js');
+      });
+      $.ajaxSettings.cache = cache;
     },
     onHide: function()
     {
@@ -104,10 +109,29 @@ var initSetupPage = function()
   });
 };
 
+var addthisSourceUrl = 'http://s7.addthis.com/js/250/addthis_widget.js';
+var addthis_config =
+{
+  'data_use_cookies':     false,
+  'data_use_flash':       false,
+  'data_track_clickback': false,
+  'services_expanded':    'email,facebook,twitter,tumblr,sinaweibo,funp',
+  'pubid':                'ra-4dcccc98718a5dbe'
+};
+var addthis_init = function()
+{
+  window.addthis = null;
+  var cache = $.ajaxSettings.cache;
+  $.ajaxSettings.cache = true;
+  $.getScript(addthisSourceUrl, function()
+  {
+    addthis.init();
+  });
+  $.ajaxSettings.cache = cache;
+};
+
 $(function()
 {
-  $.getScript('https://connect.facebook.net/en_US/all.js');
-  
   $('.header .logout').css('background', 'url(' + $('#image_header_logout').text() + ') no-repeat;');
   $('.header .setup').css('background', 'url(' + $('#image_header_setup').text() + ') no-repeat;');
   $('.header .sg').css('background', 'url(' + $('#image_header_sg').text() + ') no-repeat;');

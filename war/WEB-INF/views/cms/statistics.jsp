@@ -43,7 +43,7 @@
               <div class="chUnFocusImg channel_info_image"></div>
               <div class="floatL chInfo">
                 <a href="#" target="_player" class="floatL channel_info_promoteurl">http://www.9x9.tv/channel/3958</a>
-                <a target="_addthis" class="floatL channel_info_addthis"><img src="http://cache.addthiscdn.com/icons/v1/thumbs/addthis.gif"/></a>
+                <a class="floatL icon addthis_button_expanded"></a>
                 <a href="javascript:" class="iconStatistics" title=""></a>
                 <div class="clear"></div>
                 <div class="floatL">
