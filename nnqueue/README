@@ -25,4 +25,4 @@ In the pipeline
 ================================
 - ps. currently it has problem running as a standalone app, can only run in eclipse 
 - build by maven
-- error handling, logging 
+- error handling, logging
