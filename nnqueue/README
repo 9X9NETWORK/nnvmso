@@ -1,6 +1,6 @@
 ================================
 Packaging from Eclipse
-================================
+================================ 
 - Right click the project
 - Export -> Java -> Runnable jar file
 - Configuration:
@@ -22,6 +22,7 @@ an example would be,
  
 ================================
 In the pipeline
-================================ 
+================================
+- ps. currently it has problem running as a standalone app, can only run in eclipse 
 - build by maven
 - error handling, logging 
