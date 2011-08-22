@@ -15,12 +15,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-
 import com.nnvmso.lib.AmazonLib;
+import com.nnvmso.lib.CookieHelper;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.model.Mso;
+import com.nnvmso.model.NnUser;
 import com.nnvmso.service.AuthService;
 import com.nnvmso.service.MsoManager;
+import com.nnvmso.service.NnUserManager;
 import com.nnvmso.service.SessionService;
 
 @Controller
@@ -34,12 +36,83 @@ public class CmsController {
 		return "error/blank";
 	}
 	
+	@RequestMapping("cms/logout")
+	public String genericCMSLogout(HttpServletResponse resp) {
+		CookieHelper.deleteCookie(resp, CookieHelper.USER);
+		return "redirect:/9x9";
+	}
+	
+	@RequestMapping(value = "cms/{cmaTab}", method = RequestMethod.GET)
+	public String genericCMSLogin(HttpServletRequest request, @PathVariable("cmaTab") String cmsTab, Model model) throws SignatureException {
+		String userToken = CookieHelper.getCookie(request, CookieHelper.USER);
+		if (userToken == null) {
+			logger.warning("user not login");
+			return "redirect:/9x9";
+		} else {
+			NnUserManager userMngr = new NnUserManager();
+			MsoManager msoMngr = new MsoManager();
+			
+			NnUser user = userMngr.findByToken(userToken);
+			if (user == null) {
+				logger.warning("user not found");
+				return "error/404";
+			}
+			if (user.getType() == NnUser.TYPE_USER) {
+				// generate TCO account
+				Mso mso = new Mso(user.getName(), user.getIntro(), user.getEmail(), Mso.TYPE_TCO);
+				mso.setTitle("TCO");
+				mso.setPreferredLangCode(Mso.LANG_EN);
+				mso.setLogoUrl("/images/logo_9x9.png");
+				msoMngr.create(mso);
+				logger.info("create a tco");
+				user.setMsoId(mso.getKey().getId());
+				user.setType(NnUser.TYPE_TCO);
+				userMngr.save(user);
+			}
+			if (user.getType() == NnUser.TYPE_TCO) {
+				Mso mso = msoMngr.findById(user.getMsoId());
+				if (mso == null) {
+					logger.warning("mso not found");
+					return "error/404";
+				} else if (mso.getType() != Mso.TYPE_TCO) {
+					logger.warning("invalid mso type");
+					return "error/404";
+				}
+				if (cmsTab.equals("admin")) {
+					return "redirect:/cms/channelManagement";
+				}
+				model.addAttribute("msoLogo", mso.getLogoUrl());
+				model.addAttribute("mso", mso);
+				model.addAttribute("msoId", mso.getKey().getId());
+				model.addAttribute("msoType", mso.getType());
+				model.addAttribute("logoutUrl", "/cms/logout");
+				if (cmsTab.equals("channelManagement") || cmsTab.equals("channelSetManagement")) {
+					String policy = AmazonLib.buildS3Policy("9x9tmp", "public-read", "");
+					model.addAttribute("s3Policy", policy);
+					model.addAttribute("s3Signature", AmazonLib.calculateRFC2104HMAC(policy));
+					model.addAttribute("s3Id", AmazonLib.AWS_ID);
+					return "cms/" + cmsTab;
+				} else if (cmsTab.equals("directoryManagement") || cmsTab.equals("promotionTools") || cmsTab.equals("setup") || cmsTab.equals("statistics")) {
+					return "cms/" + cmsTab;
+				} else {
+					return "error/404";
+				}
+			} else {
+				logger.warning("invalid mso type");
+				return "error/404";
+			}
+		}
+	}
+	
 	@RequestMapping(value = "{msoName}/admin", method = RequestMethod.GET)
-	public String admin(HttpServletRequest request, @PathVariable("msoName") String msoName, Model model) {
+	public String admin(HttpServletRequest request, @PathVariable("msoName") String msoName, Model model) throws SignatureException {
+		
+		if (msoName.equals("cms"))
+			return this.genericCMSLogin(request, "admin", model);
 		
 		SessionService sessionService = new SessionService(request);
 		HttpSession session = sessionService.getSession();
-		
+		logger.info("msoName = " + msoName);
 		MsoManager msoMngr = new MsoManager();
 		Mso mso = msoMngr.findByName(msoName);
 		if (mso == null)
@@ -125,7 +198,7 @@ public class CmsController {
 	}
 	
 	@RequestMapping(value = "{msoName}/{cmsTab}")
-	public String channelManagement(HttpServletRequest request, @PathVariable String msoName, @PathVariable String cmsTab, Model model) throws SignatureException {
+	public String management(HttpServletRequest request, @PathVariable String msoName, @PathVariable String cmsTab, Model model) throws SignatureException {
 		
 		SessionService sessionService = new SessionService(request);
 		HttpSession session = sessionService.getSession();
@@ -140,6 +213,7 @@ public class CmsController {
 			model.addAttribute("msoLogo", mso.getLogoUrl());
 			model.addAttribute("mso", mso);
 			model.addAttribute("msoId", mso.getKey().getId());
+			model.addAttribute("msoType", mso.getType());
 			model.addAttribute("logoutUrl", "/" + msoName + "/logout");
 			if (cmsTab.equals("channelManagement") || cmsTab.equals("channelSetManagement")) {
 				String policy = AmazonLib.buildS3Policy("9x9tmp", "public-read", "");

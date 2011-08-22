@@ -703,7 +703,7 @@ var page$ = {
     displayImportDetail: function() {
       if (page$.overallLayout.destroyRightSideContent(false) == false) return false;
       
-      $.get('/CMSAPI/systemCategories', function(categories) {
+      cms.loadJSON('/CMSAPI/systemCategories', function(categories) {
         $('#channel_import_detail .sys_directory').html('<option value="0">' + $('#lang_select_category').text() + '</option>');
         for (i in categories) {
           $('<option></option>')
@@ -711,7 +711,7 @@ var page$ = {
               .text(categories[i].name)
               .appendTo('#channel_import_detail .sys_directory');
         }
-      }, 'json');
+      });
       
       $('#channel_import_detail [name="ch_import_button"]').unbind().click(function() {
         if ($('#channel_import_detail [name="ch_import_url"]').val() == "") {
@@ -956,7 +956,7 @@ var page$ = {
         page$.channelDetail.swfObject = new SWFUpload(swfupload_settings);
         $('#channel_detail').show();
       }, 'json');
-      $.get('/CMSAPI/systemCategories', function(categories) {
+      cms.loadJSON('/CMSAPI/systemCategories', function(categories) {
         var select_category = $('#lang_select_category').text();
         $('#channel_detail .sys_directory').html('<option value="0">' + select_category + '</option>');
         for (i in categories) {
@@ -970,7 +970,7 @@ var page$ = {
             $('#channel_detail .sys_directory').val(category.key.id);
           }
         }, 'json');
-      }, 'json');
+      });
       $('#channel_detail_cancel').unbind().click(function() {
         page$.channelDetail.init(channelId, isNew);
       });
@@ -1134,6 +1134,9 @@ var page$ = {
         $('#choose_channel_type').show();
       });
     }
+  },
+  initGenericOne: function() {
+    $('.create_channel_hint').show();
   },
   init: function() {
     var css = '.chPublic { background:url(' + $('#image_ch_public').text() + ') no-repeat; }\n.chUnPublic { background:url(' + $('#image_ch_unpublic').text() + ') no-repeat; }';

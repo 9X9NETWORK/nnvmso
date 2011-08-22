@@ -3,6 +3,10 @@
  */
 
 var cms = {
+  debug: true,
+  isGeneric: function() {
+    return ($('#msoType').val() == '4');
+  },
   initAddthis: function() {
     window.addthis = null;
     cms.loadScript('http://s7.addthis.com/js/250/addthis_widget.js', function() {
@@ -85,6 +89,12 @@ var cms = {
       return 'video/unknown';
     }
   },
+  loadJSON: function(url, callback) {
+    var cache = $.ajaxSettings.cache;
+    $.ajaxSettings.cache = true;
+    $.get(url, callback, 'json');
+    $.ajaxSettings.cache = cache;
+  },
   loadScript: function(url, callback) {
     var cache = $.ajaxSettings.cache;
     $.ajaxSettings.cache = true;
@@ -99,9 +109,12 @@ var cms = {
       ajax:    'setup',
       trigger: '#setup',
       onLoad: function() {
-        cms.loadScript('https://connect.facebook.net/en_US/all.js', function() {
+        cms.loadScript('http://connect.facebook.net/en_US/all.js', function() {
           cms.loadScript('/javascripts/cms/setup.js', function() {
             pageSetup.init();
+            if (cms.isGeneric()) {
+              pageSetup.initGenericOne();
+            }
           });
         });
       },
@@ -109,6 +122,11 @@ var cms = {
         location.reload();
       }
     });
+  },
+  initGenericOne: function() {
+    $('#mso_logo').wrapAll('<a href="/9x9"></a>');
+    $('.menuB').removeAttr('href');
+    $('<style/>').text('.menuB:hover { background-position: -90px -59px; cursor: default}').appendTo('head');
   },
   init: function() {
     $('.header .logout').css('background', 'url(' + $('#image_header_logout').text() + ') no-repeat');
@@ -132,15 +150,24 @@ var addthis_config = {
   'pubid':                'ra-4dcccc98718a5dbe'
 };
 
+// everything is start from here
 $(function() {
+  
+  if (cms.debug) {
+    cms.loadScript('http://www.netgrow.com.au/assets/files/jquery_plugins/jquery.dump.js');
+  }
   
   cms.init();
   
-  cms.loadScript('http://www.netgrow.com.au/assets/files/jquery_plugins/jquery.dump.js');
+  if (cms.isGeneric()) {
+    cms.initGenericOne();
+  }
   
   if (typeof (page$) != 'undefined' && typeof (page$.init) == 'function') {
-    
     page$.init();
+    if (cms.isGeneric() && typeof (page$.initGenericOne) == 'function') {
+      page$.initGenericOne();
+    }
   }
   
 });

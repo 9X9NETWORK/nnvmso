@@ -1,6 +1,7 @@
 <div class="header">
   <input type="hidden" id="msoId" value="${msoId}"/>
-  <div class="floatL"><img alt="" src="${msoLogo}"/></div>
+  <input type="hidden" id="msoType" value="${msoType}"/>
+  <div class="floatL" id="mso_logo"><img alt="" src="${msoLogo}"/></div>
   <div id="setup_page" class="jqmWindow"></div>
   <div class="floatR">
     <p><spring:message code="cms.header.welcome"/> <span><c:out value="${mso.contactEmail}"/></span></p>

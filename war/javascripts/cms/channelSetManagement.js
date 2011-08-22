@@ -5,7 +5,7 @@
 var page$ = {
   objChannelSetInfo: {
     init: function() {
-      $.post('/CMSAPI/systemCategories', function(categories) {
+      cms.loadJSON('/CMSAPI/systemCategories', function(categories) {
         for (var i = 0; i < categories.length; i++) {
           $('<option></option>')
             .attr('value', categories[i].key.id)
@@ -83,7 +83,7 @@ var page$ = {
             var swfu = new SWFUpload(swfupload_settings);
           }
         }, 'json');
-      }, 'json');
+      });
     }
   },
   channelSetArea: {

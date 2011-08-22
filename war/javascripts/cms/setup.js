@@ -5,6 +5,9 @@
 var pageSetup = {
   
   sFacebookPermissions: 'email,read_stream,publish_stream,manage_pages,offline_access,user_birthday,friends_birthday,user_checkins,user_education_history,user_likes,friends_likes,user_location,user_photo_video_tags,friends_photo_video_tags,user_photos,friends_photos,user_videos,friends_videos,user_work_history,read_friendlists',
+  initGenericOne: function() {
+    $('#tabB').hide();
+  },
   init: function() {
     $('.setup_context').css('background', 'url(' + $('#image_bg_setup').text() + ') no-repeat;');
     

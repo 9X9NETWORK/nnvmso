@@ -202,7 +202,7 @@
               </div>
               <div class="clear"></div>
               <p class="hint" style="display:none"><spring:message code="cms.channel_management.msg.system_category_explanation"/></p>
-              <p class="hint" style="display:none"><spring:message code="cms.channel_management.msg.create_program_hint"/></p>
+              <p class="hint create_channel_hint" style="display:none"><spring:message code="cms.channel_management.msg.create_channel_hint"/></p>
               <div class="commitPlace">
                 <a href="javascript:" class="btnCreate floatL" id="channel_detail_savebutton"><span><spring:message code="cms.channel_management.btn.save"/></span></a>
                 <a href="javascript:" class="floatL btnGray" id="channel_detail_cancel" style="margin-left:5px"><span><spring:message code="cms.channel_management.btn.cancel"/></span></a>
@@ -576,7 +576,7 @@
               </div>
               <div class="clear"></div>
               <p class="hint" style="display:none"><spring:message code="cms.channel_management.msg.system_category_explanation"/></p>
-              <p class="hint" style="display:none"><spring:message code="cms.channel_management.msg.create_program_hint"/></p>
+              <p class="hint create_channel_hint" style="display:none"><spring:message code="cms.channel_management.msg.create_channel_hint"/></p>
               <div class="commitPlace">
                 <a href="javascript:" name="ch_savebutton" class="btnCreate floatL"><span><spring:message code="cms.channel_management.btn.save"/></span></a>
                 <a href="javascript:" name="ch_cancelbutton" class="floatL btnGray" style="margin-left:5px"><span><spring:message code="cms.channel_management.btn.cancel"/></span></a>

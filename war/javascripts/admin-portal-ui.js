@@ -31,7 +31,8 @@ $(function()
     0: 'Unknown',
     1: 'NN',
     2: 'MSO',
-    3: '3X3'
+    3: '3X3',
+    4: 'TCO'
   }
   
   var userType = {

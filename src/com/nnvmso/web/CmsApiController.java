@@ -10,10 +10,12 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -777,11 +779,19 @@ public class CmsApiController {
 	 * List all system categories (mso in TYPE_NN)
 	 */
 	@RequestMapping("systemCategories")
-	public @ResponseBody List<Category> systemCategories() {
+	public @ResponseBody List<Category> systemCategories(HttpServletRequest request, HttpServletResponse response) {
+		Locale locale = request.getLocale();
+		response.addDateHeader("Expires", System.currentTimeMillis() + 3600000);
 		CategoryManager catMngr = new CategoryManager();
 		MsoManager msoMngr = new MsoManager();
 		Mso nnmso = msoMngr.findNNMso();
-		return catMngr.findAllByMsoId(nnmso.getKey().getId());
+		List<Category> categories = catMngr.findAllByMsoId(nnmso.getKey().getId());
+		if (locale.equals(Locale.TAIWAN)) {
+			for (Category category : categories) {
+				category.setName(catMngr.translate(category.getName()));
+			}
+		}
+		return categories;
 	}
 	
 	@RequestMapping("renameCategory")
