@@ -81,7 +81,7 @@ public class PlayerService {
 		MsoChannel channel = channelMngr.findById(Long.valueOf(cid));
 		if (channel != null) {
 			logger.info("found channel = " + cid);
-			model.addAttribute("fbName", NnStringUtil.htmlSafeChars(channel.getName()));
+			model.addAttribute("fbName", NnStringUtil.htmlSafeChars(channel.getName()) + " | 9x9.tv");
 			model.addAttribute("fbDescription", NnStringUtil.htmlSafeChars(channel.getIntro()));
 			model.addAttribute("fbImg", NnStringUtil.htmlSafeChars(channel.getImageUrl()));
 		}
