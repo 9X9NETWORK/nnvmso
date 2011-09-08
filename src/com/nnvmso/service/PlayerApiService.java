@@ -27,7 +27,6 @@ import com.google.appengine.api.datastore.DatastoreFailureException;
 import com.google.appengine.api.datastore.DatastoreNeedIndexException;
 import com.google.appengine.api.datastore.DatastoreTimeoutException;
 import com.google.apphosting.api.DeadlineExceededException;
-import com.google.apphosting.api.ApiProxy;
 import com.nnvmso.dao.ShardedCounter;
 import com.nnvmso.lib.CookieHelper;
 import com.nnvmso.lib.NnLogUtil;
@@ -358,7 +357,28 @@ public class PlayerApiService {
 		}
 		return NnStatusMsg.successStr(locale) + separatorStr + localeCode;
 	}
-	 			
+	 	
+	private String composeChannelByCategoroy(List<MsoChannel> channels) {
+		String result = "";
+		for (int i=0; i< channels.size(); i++) {	
+			if (channels.get(i).getProgramCount() > 0 ) {
+				MsoChannel c = channels.get(i);
+				String[] ori = {String.valueOf(c.getSeq()),
+						        String.valueOf(c.getKey().getId()), 
+						        c.getName(), 
+						        c.getImageUrl(), 
+						        Integer.toString(c.getProgramCount()),
+						        String.valueOf(c.getSubscriptionCount()),
+						        String.valueOf(c.getContentType()),
+						        this.convertEpochToTime(c.getTranscodingUpdateDate(), c.getUpdateDate())
+						        };
+				result = result + NnStringUtil.getDelimitedStr(ori);
+				result = result + "\n";
+			}
+		}
+		return result;		
+	}
+	
 	public String findPublicChannelsByCategoryAndLang(String categoryId, String lang) {		
 		//verify input
 		List<MsoChannel> channels = new ArrayList<MsoChannel>();
@@ -1194,23 +1214,49 @@ public class PlayerApiService {
 		return output;		
 	}
 
+    private String assembleMsgs(int status, String[] raw) {
+        String result = NnStatusMsg.getMsg(status, locale);
+        String separatorStr = "--\n";
+        if (raw != null && raw.length > 0) {
+            result = result + separatorStr;
+            for (String s : raw) {
+                s = s.replaceAll("null", "");
+                result += s + separatorStr;
+            }
+        }
+        if (result.substring(result.length()-3, result.length()).equals(separatorStr)) {
+            result = result.substring(0, result.length()-3);
+        }
+                 
+        return result;
+    }
+	
 	public String findCategoryInfo(String id, String lang) {
 		//if catgory == null, query top id
 		//if category != null, query everyone who has the same parentId
 		//select * from categories where parentId = 3; assuming there's only one category
 		//if empty, then get all the channels?
 
+		String[] result = {"", "", ""};
+		//return this.assembleMsgs(NnStatusCode.SUCCESS, result);
+		
 		if (lang == null)
 			lang = Mso.LANG_EN;
-		String output = "";
+		
 		CategoryManager categoryMngr = new CategoryManager();
-		if (output.length() == 0)
+		if (id == null) {
 			id = "0";
+		}
+		result[0] = id + "\n";
 		List<Category> categories = categoryMngr.findPlayerCategories(Long.parseLong(id), mso.getKey().getId());
 		if (categories.size() == 0) {
-			return this.findPublicChannelsByCategoryAndLang(id, lang);
+			MsoChannelManager channelMngr = new MsoChannelManager();
+			List<MsoChannel> channels = channelMngr.findPublicChannelsByCategoryIdAndLang(Long.parseLong(id), lang);
+			result[2] = this.composeChannelByCategoroy(channels);
+			return this.assembleMsgs(NnStatusCode.SUCCESS, result);
+			//return this.findPublicChannelsByCategoryAndLang(id, lang);
 		}
-		output = NnStatusMsg.successStr(locale) + separatorStr;		
+				
 		for (Category c : categories) {
 			String name =  c.getName();
 			int cnt = c.getChannelCount();
@@ -1219,9 +1265,9 @@ public class PlayerApiService {
 				cnt = c.getChnChannelCount();
 			}
 			String[] str = {String.valueOf(c.getKey().getId()), name, String.valueOf(cnt)};				
-			output = output + NnStringUtil.getDelimitedStr(str) + "\n";
-		}		
-		return output;
+			result[1] += NnStringUtil.getDelimitedStr(str) + "\n";
+		}
+		return this.assembleMsgs(NnStatusCode.SUCCESS, result);
 	}
 
 	public String findUserWatched(String user, String channel, String count) {
