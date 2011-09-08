@@ -105,6 +105,10 @@ public class CategoryManager {
 		return categories;
 	}
 	
+	public List<Category> findPlayerCategories(long parentId, long msoId) {
+		return categoryDao.findPlayerCategories(parentId, msoId);
+	}
+	
 	public List<Category> findCategoriesByIdStr(String categoryIds) {
 		List<Long> categoryIdList = new ArrayList<Long>();	
 		String[] arr = categoryIds.split(",");
@@ -220,6 +224,10 @@ public class CategoryManager {
 	
 	public List<Category> findAll() {
 		return categoryDao.findAll();
+	}
+
+	public List<Category> findByParentId(long id) {
+		return categoryDao.findByParentId(id);
 	}
 	
 	public Category findByName(String name) {

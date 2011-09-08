@@ -42,6 +42,7 @@ import com.nnvmso.service.NnStatusMsg;
 import com.nnvmso.service.TranscodingService;
 import com.nnvmso.web.json.transcodingservice.Channel;
 import com.nnvmso.web.json.transcodingservice.ChannelInfo;
+import com.nnvmso.web.json.transcodingservice.MapelChannel;
 import com.nnvmso.web.json.transcodingservice.PostResponse;
 import com.nnvmso.web.json.transcodingservice.Program;
 import com.nnvmso.web.json.transcodingservice.ProgramInfo;
@@ -80,6 +81,19 @@ public class TranscodingServiceController {
 		return "error/blank";
 	}
 	
+	@RequestMapping("test")
+	public @ResponseBody MapelChannel test(HttpServletRequest req) {
+		MapelChannel channel = new MapelChannel();
+		channel.setTitle("lala");
+		channel.setDescription("bubu");
+		try {
+			channel = transcodingService.createChannel(channel);
+		} catch (Exception e) {			
+		}
+		return channel;
+	}
+	
+	
 	/**
 	 * Transcoding Service update Podcast Program information
 	 * 
@@ -105,7 +119,6 @@ public class TranscodingServiceController {
  	 *      "itemkey":"item_key_id",<br/>
      *  } 
 	 */
-	//http://www.objectbiz.com/
 	@RequestMapping("itemUpdate")
 	public @ResponseBody PostResponse itemUpdate(@RequestBody RtnProgram rtnProgram, HttpServletRequest req) {
 		log.info(rtnProgram.toString());
@@ -230,6 +243,33 @@ public class TranscodingServiceController {
 	 */
 	@RequestMapping("channelUpdate")
 	public  @ResponseBody PostResponse channelUpdate(@RequestBody RtnChannel podcast) {
+		log.info(podcast.toString());
+		PostResponse resp = new PostResponse(String.valueOf(NnStatusCode.ERROR), NnStatusMsg.errorStr(Locale.ENGLISH));
+		try {
+			resp = transcodingService.updateChannel(podcast);
+		} catch (Exception e) {
+			resp = transcodingService.handleException(e);
+		}
+		return resp;
+	}
+
+	/**
+	 * Transcoding service update Podcast Channel Information
+	 * 
+	 * @param podcast podcast in json type <br/>
+	 * {  <br/>
+	 *    "action":"updateChannel", <br/>
+	 *    "key":"channel_key_id", <br/>
+	 *    "title":"channel_title", <br/>
+	 *    "description":"channel_description", <br/>    
+	 *    "pubDate":"channel_pubDate", <br/>
+	 *    "image":"channel_thumbnail",<br/>   
+	 *    "errorCode":0, <br/>
+	 *    "errorReason":"error description" <br/>     
+	 * } 
+	 */
+	@RequestMapping("channelCreate")
+	public  @ResponseBody PostResponse channelCreate(@RequestBody RtnChannel podcast) {
 		log.info(podcast.toString());
 		PostResponse resp = new PostResponse(String.valueOf(NnStatusCode.ERROR), NnStatusMsg.errorStr(Locale.ENGLISH));
 		try {

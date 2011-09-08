@@ -30,6 +30,9 @@ public class Category implements Serializable {
 	
 	@Persistent
 	private String name;
+
+	@Persistent
+	private String chnName;
 	
 	@Persistent
 	private boolean isPublic;
@@ -124,6 +127,14 @@ public class Category implements Serializable {
 
 	public void setChnChannelCount(int chnChannelCount) {
 		this.chnChannelCount = chnChannelCount;
+	}
+
+	public String getChnName() {
+		return chnName;
+	}
+
+	public void setChnName(String chnName) {
+		this.chnName = chnName;
 	}
 	
 }

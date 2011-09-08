@@ -84,6 +84,12 @@ public class MsoProgram implements Serializable {
 	@Persistent
 	private Date pubDate;
 	
+	@Persistent
+	private short seq;
+
+	@Persistent
+	private String comment;
+	
 	public MsoProgram(String name, String intro, String imageUrl, short type) {
 		this.name = name;
 		this.intro = intro;
@@ -249,6 +255,22 @@ public class MsoProgram implements Serializable {
 
 	public void setContentType(short contentType) {
 		this.contentType = contentType;
+	}
+
+	public short getSeq() {
+		return seq;
+	}
+
+	public void setSeq(short seq) {
+		this.seq = seq;
+	}
+
+	public String getComment() {
+		return comment;
+	}
+
+	public void setComment(String comment) {
+		this.comment = comment;
 	}
 	
 }

@@ -52,6 +52,39 @@ public class CategoryDao extends GenericDao<Category> {
 		}
 		return detached;
 	}
+
+	public List<Category> findPlayerCategories(long parentId, long msoId) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		List<Category> detached = new ArrayList<Category>();
+		try {
+			Query query = pm.newQuery(Category.class);
+			query.setFilter("parentId == parentIdParam && msoId == msoIdParam && isPublic == isPublicParam");
+			query.declareParameters("long parentIdParam, long msoIdParam, boolean isPublicParam");			
+			query.setOrdering("name");
+			@SuppressWarnings("unchecked")
+			List<Category> results = (List<Category>) query.execute(parentId, msoId, true);			
+			detached = (List<Category>)pm.detachCopyAll(results);
+		} finally {
+			pm.close();
+		}
+		return detached;		
+	}
+	
+	public List<Category> findByParentId(long id) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		List<Category> detached = new ArrayList<Category>();
+		try {
+			Query query = pm.newQuery(Category.class);
+			query.setFilter("parentId == " + id);
+			query.setOrdering("name");
+			@SuppressWarnings("unchecked")
+			List<Category> results = (List<Category>) query.execute();			
+			detached = (List<Category>)pm.detachCopyAll(results);
+		} finally {
+			pm.close();
+		}
+		return detached;
+	}
 	
 	public List<Category> findAllByParanetId(long parentId) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();

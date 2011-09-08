@@ -916,7 +916,7 @@ public class PlayerApiController {
 		this.prepService(req);
 		String output = NnStatusMsg.errorStr(locale);
 		try {
-			output = playerApiService.findFeaturedSets();
+			output = playerApiService.findFeaturedSets(Mso.LANG_EN);
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}
@@ -940,5 +940,49 @@ public class PlayerApiController {
 		}
 		return NnNetUtil.textReturn(output);
 	}
+	
+	@RequestMapping(value="listRecommended")
+	public ResponseEntity<String> listRecommended(
+			@RequestParam(value="lang", required=false) String lang,
+			HttpServletRequest req) {				                                
+		this.prepService(req);
+		String output = NnStatusMsg.errorStr(locale);
+		try {
+			output = playerApiService.findFeaturedSets(lang);
+		} catch (Exception e) {
+			output = playerApiService.handleException(e);
+		}
+		return NnNetUtil.textReturn(output);
+	}
+
+	@RequestMapping(value="category")
+	public ResponseEntity<String> category(@RequestParam(value="category", required=false) String category,
+										   @RequestParam(value="lang", required=false) String lang,
+			                               HttpServletRequest req) {				                                
+		this.prepService(req);
+		String output = NnStatusMsg.errorStr(locale);
+		try {
+			output = playerApiService.findCategoryInfo(category, lang);
+		} catch (Exception e) {
+			output = playerApiService.handleException(e);
+		}
+		return NnNetUtil.textReturn(output);
+	}
+
+	@RequestMapping(value="recentlyWatched")
+	public ResponseEntity<String> recentlyWatched(@RequestParam(value="user", required=false) String user,
+	                                              @RequestParam(value="channel", required=false) String channel,
+										          @RequestParam(value="count", required=false) String count,
+			                                      HttpServletRequest req) {				                                
+		this.prepService(req);
+		String output = NnStatusMsg.errorStr(locale);
+		try {
+			output = playerApiService.findUserWatched(user, channel, count);
+		} catch (Exception e) {
+			output = playerApiService.handleException(e);
+		}
+		return NnNetUtil.textReturn(output);
+	}
+	
 	
 }

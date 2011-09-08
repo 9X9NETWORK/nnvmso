@@ -50,16 +50,16 @@ public class ChannelSetDao extends GenericDao<ChannelSet> {
 		return detached;
 	}	
 
-	public List<ChannelSet> findFeaturedSets() {
+	public List<ChannelSet> findFeaturedSets(String lang) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		List<ChannelSet> detached = new ArrayList<ChannelSet>(); 
 		try {
 			Query q = pm.newQuery(ChannelSet.class);
-			q.setFilter("featured == featuredParam");
-			q.declareParameters("boolean featuredParam");
+			q.setFilter("featured == featuredParam && lang == langParam");
+			q.declareParameters("boolean featuredParam, String langParam");
 			q.setOrdering("createDate asc");
 			@SuppressWarnings("unchecked")
-			List<ChannelSet> sets = (List<ChannelSet>) q.execute(true);
+			List<ChannelSet> sets = (List<ChannelSet>) q.execute(true, lang);
 			detached = (List<ChannelSet>)pm.detachCopyAll(sets);
 		} finally {
 			pm.close();

@@ -23,7 +23,8 @@ public class MsoChannelDao extends GenericDao<MsoChannel> {
 	}
 	
 	public MsoChannel save(MsoChannel channel) {
-		if (channel == null) {return null;}
+		if (channel == null)
+			return null;
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
 			pm.makePersistent(channel);

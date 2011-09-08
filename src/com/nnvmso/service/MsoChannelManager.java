@@ -47,8 +47,9 @@ public class MsoChannelManager {
 			channel.setSourceUrl(channel.getSourceUrl().trim());
 			channel.setSourceUrlSearch(channel.getSourceUrl().toLowerCase());
 		}
-		if (channel.getName() != null)
+		if (channel.getName() != null) {
 			channel.setNameSearch(channel.getName().trim().toLowerCase());
+		}
 		if (channel.getLangCode() == null || channel.getLangCode().length() == 0) {
 			channel.setLangCode(Mso.LANG_EN);
 		}
@@ -65,7 +66,6 @@ public class MsoChannelManager {
 		//set category channelCount if necessary
 		CategoryManager categoryMngr = new CategoryManager();
 		if (this.isCounterQualified(channel)) {
-		    System.out.println("channel manager, channel create, addChannelCount");
 			categoryMngr.addChannelCounter(channel);
 		}
 		

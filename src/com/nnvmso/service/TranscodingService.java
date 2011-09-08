@@ -3,7 +3,9 @@ package com.nnvmso.service;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -16,9 +18,20 @@ import org.springframework.stereotype.Service;
 import com.google.appengine.api.datastore.DatastoreFailureException;
 import com.google.appengine.api.datastore.DatastoreNeedIndexException;
 import com.google.appengine.api.datastore.DatastoreTimeoutException;
-import com.nnvmso.web.json.transcodingservice.*;
-import com.nnvmso.model.*;
-import com.nnvmso.lib.*;
+import com.nnvmso.lib.NnLogUtil;
+import com.nnvmso.lib.NnNetUtil;
+import com.nnvmso.model.Category;
+import com.nnvmso.model.Mso;
+import com.nnvmso.model.MsoChannel;
+import com.nnvmso.model.MsoConfig;
+import com.nnvmso.model.MsoProgram;
+import com.nnvmso.model.NnUser;
+import com.nnvmso.web.json.transcodingservice.MapelChannel;
+import com.nnvmso.web.json.transcodingservice.PostResponse;
+import com.nnvmso.web.json.transcodingservice.PostUrl;
+import com.nnvmso.web.json.transcodingservice.RtnChannel;
+import com.nnvmso.web.json.transcodingservice.RtnProgram;
+import com.nnvmso.web.json.transcodingservice.RtnProgramItem;
 
 @Service
 public class TranscodingService {
@@ -61,6 +74,46 @@ public class TranscodingService {
 			  return MsoChannel.STATUS_INVALID_FORMAT;
 		}
 		return MsoChannel.STATUS_SUCCESS;				
+	}
+
+	public MapelChannel createChannel(MapelChannel mapel) {
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		CategoryManager categoryMngr = new CategoryManager();
+		List<Category> categories = new ArrayList<Category>();
+		Category c = categoryMngr.findByName("Entertainment");
+		categories.add(c);
+		if (c == null) {
+			mapel.setErrorCode(String.valueOf(NnStatusCode.CATEGORY_ERROR));
+			mapel.setErrorReason("CATEGORY_ERROR");
+			return mapel;
+		}
+		MsoChannel channel = channelMngr.findBySourceUrlSearch(mapel.getSourceUrl());										
+		if (channel != null && (channel.getStatus() == MsoChannel.STATUS_ERROR)) {
+			log.info("channel key and status :" + channel.getKey()+ ";" + channel.getStatus());
+			mapel.setErrorCode(String.valueOf(NnStatusCode.CHANNEL_ERROR));
+			mapel.setErrorReason("CHANNEL_ERROR");		
+		} else {
+			NnUserManager userMngr = new NnUserManager();
+			NnUser user = userMngr.findNNUser();			
+			channel = new MsoChannel(mapel.getSourceUrl(), user.getKey().getId());
+		}
+		channel.setImageUrl(mapel.getImage());	
+		if (mapel.getTitle() != null) 
+			channel.setNameSearch(mapel.getTitle().toLowerCase());
+		channel.setName(mapel.getTitle());					
+		if (mapel.getDescription() != null) { 
+			mapel.setDescription(mapel.getDescription().replaceAll("\\s", " "));
+			if (mapel.getDescription().length() > 500)
+				mapel.setDescription(mapel.getDescription().substring(0, 499));
+			channel.setIntro(mapel.getDescription());
+		}
+		channel.setStatus(MsoChannel.STATUS_SUCCESS);		
+		channel.setLangCode(Mso.LANG_ZH_TW);		
+		channelMngr.create(channel, categories);
+		mapel.setKey(String.valueOf(channel.getKey().getId()));
+		mapel.setErrorCode(String.valueOf(NnStatusCode.SUCCESS));
+		mapel.setErrorReason("SUCCESS");
+		return mapel;
 	}
 	
 	public PostResponse updateChannel(RtnChannel podcast) {

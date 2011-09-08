@@ -57,6 +57,9 @@ public class ChannelSet implements Serializable {
 	@Persistent
 	private Date updateDate;
 	
+	@Persistent
+	private String lang;
+	
 	@NotPersistent
 	private int subscriptionCount;
 	
@@ -185,5 +188,14 @@ public class ChannelSet implements Serializable {
 
 	public void setChannelCount(int channelCount) {
 		this.channelCount = channelCount;
-	}	
+	}
+
+	public String getLang() {
+		return lang;
+	}
+
+	public void setLang(String lang) {
+		this.lang = lang;
+	}
+		
 }

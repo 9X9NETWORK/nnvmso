@@ -27,6 +27,7 @@ import com.google.appengine.api.datastore.DatastoreFailureException;
 import com.google.appengine.api.datastore.DatastoreNeedIndexException;
 import com.google.appengine.api.datastore.DatastoreTimeoutException;
 import com.google.apphosting.api.DeadlineExceededException;
+import com.google.apphosting.api.ApiProxy;
 import com.nnvmso.dao.ShardedCounter;
 import com.nnvmso.lib.CookieHelper;
 import com.nnvmso.lib.NnLogUtil;
@@ -87,9 +88,8 @@ public class PlayerApiService {
 			cs = csMngr.findBybeautifulUrl(beautifulUrl);
 		}
 		if (cs == null)
-			return messageSource.getMessage("nnstatus.set_invalid", new Object[] {NnStatusCode.SET_INVALID} , locale);			
+			return messageSource.getMessage("nnstatus.set_invalid", new Object[] {NnStatusCode.SET_INVALID} , locale);
 		
-		System.out.println("channel set id:" + cs.getKey().getId());
 		List<MsoChannel> channels = csMngr.findChannelsById(cs.getKey().getId());
 		System.out.println(channels.size());
 		//first block: status
@@ -177,7 +177,9 @@ public class PlayerApiService {
 
 	public String handleException (Exception e) {
 		String output = NnStatusMsg.errorStr(locale);
-		if (e.getClass().equals(DatastoreTimeoutException.class)) {
+    	if (e.getClass().equals(NumberFormatException.class)) {
+			output = NnStatusCode.INPUT_BAD + "\t" + "INPUT BAD";			
+    	} else if (e.getClass().equals(DatastoreTimeoutException.class)) {
 			output = NnStatusCode.DATABASE_TIMEOUT + "\t" + "database timeout";			
 		} else if (e.getClass().equals(NoSuchMessageException.class)) {			
 			output = NnStatusCode.OUTPUT_NO_MSG_DEFINED + "\t" + "oops, system does not define this error msg.";
@@ -188,6 +190,7 @@ public class PlayerApiService {
 		} else if (e.getClass().equals(DeadlineExceededException.class)) {
 			output = NnStatusCode.GAE_TIMEOUT + "\t" + "GAE timeout";
 		}
+		                               
 		NnLogUtil.logException((Exception) e);
 		return output;
 	}	
@@ -1162,38 +1165,69 @@ public class PlayerApiService {
 		return output;		
 	}
 	
-	public String findFeaturedSets() {
+	public String findFeaturedSets(String lang) {
+		if (lang == null)
+			lang = Mso.LANG_EN;
 		ChannelSetManager setMngr = new ChannelSetManager();
-		SubscriptionLogManager logMngr = new SubscriptionLogManager();		
-		
-		List<ChannelSet> sets = setMngr.findFeaturedSets();		
+		List<ChannelSet> sets = setMngr.findFeaturedSets(lang);		
 		String output = NnStatusMsg.successStr(locale) + separatorStr;		
 		for (ChannelSet set : sets) {
-			SubscriptionLog log = logMngr.findByMsoIdAndSetId(mso.getKey().getId(), set.getKey().getId());
-			int counter = 0;
-			if (log != null)
-				counter = log.getCount();
 			String[] obj = {
 				String.valueOf(set.getKey().getId()),
 				set.getName(),
+				set.getIntro(),
 				set.getImageUrl(),
 				String.valueOf(set.getChannelCount()),
-				String.valueOf(counter),
 			};
 			output += NnStringUtil.getDelimitedStr(obj) + "\n";			
 		}				
 		return output;		
 	}
-
+	
 	public String findFeaturedChannels() {
 		MsoChannelManager channelMngr = new MsoChannelManager();
 		List<MsoChannel> channels = channelMngr.findFeaturedChannels();		
 		String output = NnStatusMsg.successStr(locale) + separatorStr;
 		for (MsoChannel c : channels) {
-			output += this.composeChannelLineupStr(c, mso) + "\n";							
-						
+			output += this.composeChannelLineupStr(c, mso) + "\n";
 		}				
 		return output;		
 	}
-	
+
+	public String findCategoryInfo(String id, String lang) {
+		//if catgory == null, query top id
+		//if category != null, query everyone who has the same parentId
+		//select * from categories where parentId = 3; assuming there's only one category
+		//if empty, then get all the channels?
+
+		if (lang == null)
+			lang = Mso.LANG_EN;
+		String output = "";
+		CategoryManager categoryMngr = new CategoryManager();
+		if (output.length() == 0)
+			id = "0";
+		List<Category> categories = categoryMngr.findPlayerCategories(Long.parseLong(id), mso.getKey().getId());
+		if (categories.size() == 0) {
+			return this.findPublicChannelsByCategoryAndLang(id, lang);
+		}
+		output = NnStatusMsg.successStr(locale) + separatorStr;		
+		for (Category c : categories) {
+			String name =  c.getName();
+			int cnt = c.getChannelCount();
+			if (lang.equals(Mso.LANG_ZH)) {
+				name = c.getChnName();
+				cnt = c.getChnChannelCount();
+			}
+			String[] str = {String.valueOf(c.getKey().getId()), name, String.valueOf(cnt)};				
+			output = output + NnStringUtil.getDelimitedStr(str) + "\n";
+		}		
+		return output;
+	}
+
+	public String findUserWatched(String user, String channel, String count) {
+		String output = "";
+		
+		return output;
+		//output = playerApiService.findUserWatched(user, channel, count);
+	}
 }
