@@ -3,7 +3,6 @@
 	<classpathentry excluding="**/.svn*" kind="src" path="src"/>
 	<classpathentry kind="src" path="resources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/apache-standard-taglib"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/commons-logging"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Spring-3.0.4"/>
@@ -14,5 +13,8 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/commons-lang"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/commons-codec"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/gdata-java-client"/>
+	<classpathentry kind="lib" path="C:/Java/projects/nnvmso-prod/war/WEB-INF/lib/rome-1.0.jar"/>
+	<classpathentry kind="lib" path="C:/Java/projects/nnvmso-prod/war/WEB-INF/lib/jdom-1.0.jar"/>
+	<classpathentry kind="con" path="com.google.appengine.eclipse.core.GAE_CONTAINER/appengine-java-sdk-1.5.3"/>
 	<classpathentry kind="output" path="war/WEB-INF/classes"/>
 </classpath>
