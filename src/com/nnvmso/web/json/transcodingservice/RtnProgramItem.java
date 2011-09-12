@@ -17,6 +17,7 @@ public class RtnProgramItem {
 	private String thumbnail;
 	private String thumbnailLarge;
 	private String type;
+	private String sortId;
 	
 	public String getTitle() {
 		return title;
@@ -89,8 +90,14 @@ public class RtnProgramItem {
 	}
 	public void setThumbnailLarge(String thumbnailLarge) {
 		this.thumbnailLarge = thumbnailLarge;
+	}	
+    public String getSortId() {
+		return sortId;
 	}
-    public String toString() {
+	public void setSortId(String sortId) {
+		this.sortId = sortId;
+	}
+	public String toString() {
         StringBuffer buffer = new StringBuffer();
         buffer.append("itemId: " + itemId + ";");
         buffer.append("pubDate: " + pubDate + ";");
