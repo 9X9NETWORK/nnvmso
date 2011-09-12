@@ -970,19 +970,38 @@ public class PlayerApiController {
 	}
 
 	@RequestMapping(value="recentlyWatched")
-	public ResponseEntity<String> recentlyWatched(@RequestParam(value="user", required=false) String user,
+	public ResponseEntity<String> recentlyWatched(@RequestParam(value="user", required=false) String userToken,
 	                                              @RequestParam(value="channel", required=false) String channel,
 										          @RequestParam(value="count", required=false) String count,
 			                                      HttpServletRequest req) {				                                
 		this.prepService(req);
 		String output = NnStatusMsg.errorStr(locale);
 		try {
-			output = playerApiService.findUserWatched(user, channel, count);
+			output = playerApiService.findUserWatched(userToken, channel, count);
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}
 		return NnNetUtil.textReturn(output);
 	}
-	
+
+	/*
+	@RequestMapping(value="test")
+	public ResponseEntity<String> test(@RequestParam(value="user", required=false) String userToken,
+									  @RequestParam(value="session", required=false) String session,
+									  @RequestParam(value="pdr", required=false) String pdr,
+									  HttpServletRequest req) {
+		this.prepService(req);
+		String output = NnStatusMsg.errorStr(locale);
+		log.info("user=" + userToken + ";session=" + session);
+		try {
+			userToken="8s12689Ns28RN2992sut";
+			pdr = "w \t 7 \t 9\nw \t 10 \t 11\nabw\nw \t 12 \t abcde";
+			output = playerApiService.processPdr(userToken, pdr, session);
+		} catch (Exception e) {
+			output = playerApiService.handleException(e);
+		}
+		return NnNetUtil.textReturn(output);
+	}
+	*/
 	
 }
