@@ -44,6 +44,7 @@ import com.nnvmso.model.MsoProgram;
 import com.nnvmso.model.NnUser;
 import com.nnvmso.model.NnUserPref;
 import com.nnvmso.model.NnUserShare;
+import com.nnvmso.model.NnUserWatched;
 import com.nnvmso.model.Subscription;
 import com.nnvmso.model.SubscriptionLog;
 
@@ -208,7 +209,7 @@ public class PlayerApiService {
 		//pdr process
 		String output = NnStatusMsg.errorStr(locale);
 		PdrRawManager pdrMngr = new PdrRawManager();
-		pdrMngr.processPdr(pdr, user.getKey().getId(), session);
+		pdrMngr.processPdr(pdr, user, session);
 		output = NnStatusMsg.successStr(locale);
 		return output;
 	}
@@ -1232,14 +1233,7 @@ public class PlayerApiService {
     }
 	
 	public String findCategoryInfo(String id, String lang) {
-		//if catgory == null, query top id
-		//if category != null, query everyone who has the same parentId
-		//select * from categories where parentId = 3; assuming there's only one category
-		//if empty, then get all the channels?
-
 		String[] result = {"", "", ""};
-		//return this.assembleMsgs(NnStatusCode.SUCCESS, result);
-		
 		if (lang == null)
 			lang = Mso.LANG_EN;
 		
@@ -1252,9 +1246,10 @@ public class PlayerApiService {
 		if (categories.size() == 0) {
 			MsoChannelManager channelMngr = new MsoChannelManager();
 			List<MsoChannel> channels = channelMngr.findPublicChannelsByCategoryIdAndLang(Long.parseLong(id), lang);
-			result[2] = this.composeChannelByCategoroy(channels);
+			for (MsoChannel c : channels) {
+				result[2] += this.composeChannelLineupStr(c, mso);
+			}
 			return this.assembleMsgs(NnStatusCode.SUCCESS, result);
-			//return this.findPublicChannelsByCategoryAndLang(id, lang);
 		}
 				
 		for (Category c : categories) {
@@ -1270,10 +1265,33 @@ public class PlayerApiService {
 		return this.assembleMsgs(NnStatusCode.SUCCESS, result);
 	}
 
-	public String findUserWatched(String user, String channel, String count) {
-		String output = "";
+	public String findUserWatched(String userToken, String channel, String count) {
 		
-		return output;
-		//output = playerApiService.findUserWatched(user, channel, count);
+		String[] result = {"", ""};
+		NnUserWatchedManager watchedMngr = new NnUserWatchedManager();
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		List<NnUserWatched> watched = watchedMngr.findAllByUserToken(userToken);
+		List<MsoChannel> channels = new ArrayList<MsoChannel>();
+		int cnt = Integer.parseInt(count);
+		int i = 1;
+		for (NnUserWatched w : watched) {
+			if (i > cnt)
+				break;
+			result[0] += w.getChannelId() + "\t" + w.getProgram() + "\n";
+			System.out.println("count i :" + i);
+			MsoChannel c = channelMngr.findById(w.getChannelId());
+			if (c != null) {
+				System.out.println("found one channel" + c.getKey().getId()); 
+				channels.add(c);
+			} else {
+				System.out.println("can't find anything");
+			}
+			i++;
+		}
+		System.out.println("channel size:" + channels.size());
+		for (MsoChannel c : channels) {
+			result[1] += this.composeChannelLineupStr(c, mso) + "\n";
+		}
+		return this.assembleMsgs(NnStatusCode.SUCCESS, result);
 	}
 }

@@ -1,0 +1,31 @@
+package com.nnvmso.service;
+
+import java.util.Date;
+import java.util.List;
+import java.util.logging.Logger;
+
+import com.nnvmso.dao.NnUserWatchedDao;
+import com.nnvmso.model.NnUserWatched;
+
+public class NnUserWatchedManager {
+
+	protected static final Logger log = Logger.getLogger(NnUserWatchedManager.class.getName());
+	
+	private NnUserWatchedDao watchedDao= new NnUserWatchedDao();
+					
+	public NnUserWatched save(NnUserWatched watched) {
+		Date now = new Date();
+		if (watched.getCreateDate() == null) {watched.setCreateDate(now);}
+		watched.setUpdateDate(now);		
+		return watchedDao.save(watched);
+	}
+	
+	public NnUserWatched findByUserIdAndChannelId(long userId, long channelId) {
+		return watchedDao.findByUserIdAndChannelId(userId, channelId);
+	}
+	
+	public List<NnUserWatched> findAllByUserToken(String token) {
+		return watchedDao.findAllByUserToken(token);
+	}
+
+}

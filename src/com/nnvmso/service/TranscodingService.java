@@ -265,6 +265,8 @@ public class TranscodingService {
 			program.setPubDate(new Date());
 		}
 		program.setPublic(true);
+		if (item.getSortId() != null)
+			program.setSeq(Short.valueOf(item.getSortId()));
 		if (isNew) {
 			programMngr.create(channel, program);
 		} else {
