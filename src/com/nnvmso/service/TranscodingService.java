@@ -88,10 +88,13 @@ public class TranscodingService {
 			return mapel;
 		}
 		MsoChannel channel = channelMngr.findBySourceUrlSearch(mapel.getSourceUrl());										
-		if (channel != null && (channel.getStatus() == MsoChannel.STATUS_ERROR)) {
+		if (channel != null) {
 			log.info("channel key and status :" + channel.getKey()+ ";" + channel.getStatus());
+			mapel.setKey(String.valueOf(channel.getKey().getId()));
+			mapel.setLastUpdateTime(channel.getTranscodingUpdateDate());
 			mapel.setErrorCode(String.valueOf(NnStatusCode.CHANNEL_ERROR));
-			mapel.setErrorReason("CHANNEL_ERROR");		
+			mapel.setErrorReason("CHANNEL_EXISTS");
+			return mapel;
 		} else {
 			NnUserManager userMngr = new NnUserManager();
 			NnUser user = userMngr.findNNUser();			
