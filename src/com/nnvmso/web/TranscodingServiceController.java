@@ -19,6 +19,7 @@ import java.io.IOException;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.NoSuchMessageException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -27,6 +28,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.google.appengine.api.datastore.DatastoreFailureException;
+import com.google.appengine.api.datastore.DatastoreNeedIndexException;
+import com.google.appengine.api.datastore.DatastoreTimeoutException;
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
 import com.nnvmso.lib.NnLogUtil;
@@ -84,6 +88,7 @@ public class TranscodingServiceController {
 	@RequestMapping("test")
 	public @ResponseBody MapelChannel test(HttpServletRequest req) {
 		MapelChannel channel = new MapelChannel();
+		channel.setSourceUrl("http://www.mevio.com/feeds/hdv.xml");
 		channel.setTitle("lala");
 		channel.setDescription("bubu");
 		try {
@@ -269,13 +274,17 @@ public class TranscodingServiceController {
 	 * } 
 	 */
 	@RequestMapping("channelCreate")
-	public  @ResponseBody PostResponse channelCreate(@RequestBody RtnChannel podcast) {
-		log.info(podcast.toString());
-		PostResponse resp = new PostResponse(String.valueOf(NnStatusCode.ERROR), NnStatusMsg.errorStr(Locale.ENGLISH));
+	public  @ResponseBody MapelChannel channelCreate(@RequestBody MapelChannel mapel) {
+		log.info(mapel.toString());
+		MapelChannel resp = new MapelChannel();
 		try {
-			resp = transcodingService.updateChannel(podcast);
+			resp = transcodingService.createChannel(mapel);
 		} catch (Exception e) {
-			resp = transcodingService.handleException(e);
+			PostResponse post = transcodingService.handleException(e);
+			mapel.setErrorCode(post.getErrorCode());
+			mapel.setErrorReason(post.getErrorReason());
+			NnLogUtil.logException((Exception) e);
+			return resp;
 		}
 		return resp;
 	}
