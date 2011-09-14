@@ -2,7 +2,12 @@ package com.nnvmso.model;
 
 import java.io.Serializable;
 import java.util.Date;
-import javax.jdo.annotations.*;
+
+import javax.jdo.annotations.IdGeneratorStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+
 import com.google.appengine.api.datastore.Key;
 
 /**
@@ -85,7 +90,7 @@ public class MsoProgram implements Serializable {
 	private Date pubDate;
 	
 	@Persistent
-	private short seq;
+	private int seq;
 
 	@Persistent
 	private String comment;
@@ -257,20 +262,20 @@ public class MsoProgram implements Serializable {
 		this.contentType = contentType;
 	}
 
-	public short getSeq() {
-		return seq;
-	}
-
-	public void setSeq(short seq) {
-		this.seq = seq;
-	}
-
 	public String getComment() {
 		return comment;
 	}
 
 	public void setComment(String comment) {
 		this.comment = comment;
+	}
+
+	public int getSeq() {
+		return seq;
+	}
+
+	public void setSeq(int seq) {
+		this.seq = seq;
 	}
 	
 }

@@ -269,7 +269,7 @@ public class TranscodingService {
 		}
 		program.setPublic(true);
 		if (item.getSortId() != null)
-			program.setSeq(Short.valueOf(item.getSortId()));
+			program.setSeq(Integer.valueOf(item.getSortId()));
 		if (isNew) {
 			programMngr.create(channel, program);
 		} else {
