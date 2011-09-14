@@ -110,7 +110,8 @@ public class TranscodingService {
 				mapel.setDescription(mapel.getDescription().substring(0, 499));
 			channel.setIntro(mapel.getDescription());
 		}
-		channel.setStatus(MsoChannel.STATUS_SUCCESS);		
+		channel.setContentType(Short.valueOf(mapel.getContentType()));
+		channel.setStatus(MsoChannel.STATUS_SUCCESS);
 		channel.setLangCode(Mso.LANG_ZH_TW);		
 		channelMngr.create(channel, categories);
 		mapel.setKey(String.valueOf(channel.getKey().getId()));
@@ -187,7 +188,7 @@ public class TranscodingService {
         }
 		return podcastInfo;
 	}
-					
+
 	public PostResponse updateProgram(RtnProgram rtnProgram) {
 		MsoProgramManager programMngr = new MsoProgramManager();
 		MsoChannelManager channelMngr = new MsoChannelManager();			
