@@ -36,11 +36,13 @@ import com.nnvmso.model.AreaOwnership;
 import com.nnvmso.model.Category;
 import com.nnvmso.model.ChannelSet;
 import com.nnvmso.model.Ipg;
+import com.nnvmso.model.LangTable;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoConfig;
 import com.nnvmso.model.MsoIpg;
 import com.nnvmso.model.MsoProgram;
+import com.nnvmso.model.NnContent;
 import com.nnvmso.model.NnUser;
 import com.nnvmso.model.NnUserPref;
 import com.nnvmso.model.NnUserShare;
@@ -468,6 +470,26 @@ public class PlayerApiService {
 		}
 			
 		return output;
+	}
+	
+    private String langCheck(String lang) {
+        if (lang != null && !lang.equals(LangTable.LANG_EN) && !lang.equals(LangTable.LANG_ZH))
+            return null;
+        if (lang == null)
+            return LangTable.LANG_EN;
+        return lang;
+    }
+	
+	public String findStaticContent(String key, String lang) {
+		NnContentManager contentMngr = new NnContentManager();
+		NnContent content = contentMngr.findByItemAndLang(key, lang);		
+		if (content == null)
+			return this.assembleMsgs(NnStatusCode.INPUT_BAD, null);
+        lang = this.langCheck(lang);
+        if (lang == null)
+            return this.assembleMsgs(NnStatusCode.INPUT_BAD, null);		
+		String[] result = {content.getContent().getValue()};
+		return this.assembleMsgs(NnStatusCode.SUCCESS, result);
 	}
 	
 	public void setUserCookie(HttpServletResponse resp, String cookieName, String userId) {		
@@ -1265,8 +1287,7 @@ public class PlayerApiService {
 		return this.assembleMsgs(NnStatusCode.SUCCESS, result);
 	}
 
-	public String findUserWatched(String userToken, String channel, String count) {
-		
+	public String findUserWatched(String userToken, String channel, String count) {		
 		String[] result = {"", ""};
 		NnUserWatchedManager watchedMngr = new NnUserWatchedManager();
 		MsoChannelManager channelMngr = new MsoChannelManager();

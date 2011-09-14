@@ -13,11 +13,15 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.google.appengine.api.datastore.Blob;
+import com.google.appengine.api.datastore.Text;
 import com.nnvmso.lib.CookieHelper;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.model.Mso;
+import com.nnvmso.model.NnContent;
 import com.nnvmso.service.MsoManager;
+import com.nnvmso.service.NnContentManager;
 import com.nnvmso.service.NnStatusMsg;
 import com.nnvmso.service.PlayerApiService;
 
@@ -984,6 +988,20 @@ public class PlayerApiController {
 		return NnNetUtil.textReturn(output);
 	}
 
+	@RequestMapping(value="staticContent")
+	public ResponseEntity<String> staticContent(@RequestParam(value="key", required=false) String key,
+			                                    @RequestParam(value="lang", required=false) String lang,
+			                                    HttpServletRequest req) {				                                
+		this.prepService(req);
+		String output = NnStatusMsg.errorStr(locale);
+		try {
+			output = playerApiService.findStaticContent(key, lang);
+		} catch (Exception e) {
+			output = playerApiService.handleException(e);
+		}
+		return NnNetUtil.textReturn(output);
+	}
+	
 	/*
 	@RequestMapping(value="test")
 	public ResponseEntity<String> test(@RequestParam(value="user", required=false) String userToken,
