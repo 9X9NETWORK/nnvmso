@@ -154,6 +154,9 @@ var cms = {
       });
     });
     cms.loadScript('/javascripts/plugins/jquery.textTruncate.js');
+    cms.loadScript('/javascripts/plugins/jquery.log.js', function() {
+      $.log('logger initialized');
+    });
   }
 };
 
