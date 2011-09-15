@@ -23,20 +23,70 @@ body{ background:url(/images/cms/bg.jpg) top left repeat-x #dfe2e4; padding:0; m
 .header .sg{ background:url(/images/cms/icon_sg.png) no-repeat; width:38px; height:56px; display:block; float:left}
 .header img{ height: 65px; }
 
-.menuA:hover , .menuA_active{ background:url(/images/cms/menu.png) no-repeat 0 0; width:90px; height:55px; display:block;}
-.menuA{background:url(/images/cms/menu.png) no-repeat 0 -59px; width:90px; height:55px; display:block; }
-.menuB:hover , .menuB_active{background:url(/images/cms/menu.png) no-repeat -90px 0; width:89px; height:55px; display:block;}
-.menuB{background:url(/images/cms/menu.png) no-repeat -90px -59px; width:89px; height:55px;  display:block;}
+.menuA:hover, .menuA_active {
+  background: url(/images/cms/menu.png) no-repeat 0 0;
+  width:      90px;
+  height:     55px;
+  display:    block;
+}
+.menuA {
+  background: url(/images/cms/menu.png) no-repeat 0 -59px;
+  width:90px;
+  height:55px;
+  display:block;
+}
+.menuB:hover, .menuB_active {
+  background: url(/images/cms/menu.png) no-repeat -90px 0;
+  width:      89px;
+  height:     55px;
+  display:    block;
+}
+.menuB {
+  background: url(/images/cms/menu.png) no-repeat -90px -59px;
+  width:      89px;
+  height:     55px;
+  display:    block;
+}
+.menuC:hover, .menuC_active {
 /*
-.menuC:hover , .menuC_active{background:url(/images/cms/menu.png) no-repeat -179px 0; width:89px; height:55px; display:block;}
+  background: url(/images/cms/menu.png) no-repeat -179px 0;
+  width:      89px;
+  height:     55px;
+  display:    block;
 */
-.menuC{background:url(/images/cms/menu.png) no-repeat -179px -59px; width:89px; height:55px; display:block; }
-.menuD:hover , .menuD_active{background:url(/images/cms/menu.png) no-repeat -268px 0; width:89px; height:55px; display:block;}
-.menuD{background:url(/images/cms/menu.png) no-repeat -268px -59px; width:89px; height:55px; display:block;}
+}
+.menuC {
+  background: url(/images/cms/menu.png) no-repeat -179px -59px;
+  width:      89px;
+  height:     55px;
+  display:    block;
+}
+.menuD:hover, .menuD_active {
+  background: url(/images/cms/menu.png) no-repeat -268px 0;
+  width:      89px;
+  height:     55px;
+  display:    block;
+}
+.menuD {
+  background: url(/images/cms/menu.png) no-repeat -268px -59px;
+  width:89px;
+  height:55px;
+  display:block;
+}
+.menuE:hover, .menuE_active {
 /*
-.menuE:hover , .menuE_active{background:url(/images/cms/menu.png) no-repeat -357px 0; width:95px; height:55px; display:block;}
+  background: url(/images/cms/menu.png) no-repeat -357px 0;
+  width:      95px;
+  height:     55px;
+  display:    block;
 */
-.menuE{background:url(/images/cms/menu.png) no-repeat -357px -59px; width:95px; height:55px; display:block; }
+}
+.menuE {
+  background: url(/images/cms/menu.png) no-repeat -357px -59px;
+  width:      95px;
+  height:     55px;
+  display:    block;
+}
 
 .content{ width:1000px; margin:0 auto; }
 

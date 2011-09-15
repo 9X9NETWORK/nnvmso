@@ -132,6 +132,15 @@ var cms = {
     $('.header .logout').css('background', 'url(' + $('#image_header_logout').text() + ') no-repeat');
     $('.header .setup').css('background', 'url(' + $('#image_header_setup').text() + ') no-repeat');
     $('.header .sg').css('background', 'url(' + $('#image_header_sg').text() + ') no-repeat');
+    var style =
+      '.menuA, .menuA:hover, .menuA_active, ' +
+      '.menuB, .menuB:hover, .menuB_active, ' +
+      '.menuC, .menuC:hover, .menuC_active, ' +
+      '.menuD, .menuD:hover, .menuD_active, ' +
+      '.menuE, .menuE:hover, .menuE_active {' +
+      '  background-image: url(' + $('#image_menu').text() + ');' +
+      '}'
+    $('<style/>').text(style).appendTo('head');
     
     $.ajaxSetup ({
       // Disable caching of AJAX responses
