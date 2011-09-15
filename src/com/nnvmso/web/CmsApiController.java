@@ -124,6 +124,7 @@ public class CmsApiController {
 	                                           @RequestParam String name,
 	                                           @RequestParam String intro,
 	                                           @RequestParam String tag,
+	                                           @RequestParam String lang,
 	                                           @RequestParam Long categoryId) {
 		
 		logger.info("channelSetId = " + channelSetId);
@@ -131,6 +132,7 @@ public class CmsApiController {
 		logger.info("name = " + name);
 		logger.info("intro = " + intro);
 		logger.info("tag = " + tag);
+		logger.info("lang = " + lang);
 		logger.info("categoryId = " + categoryId);
 		
 		CmsApiService cmsApiService = new CmsApiService();
@@ -143,6 +145,7 @@ public class CmsApiController {
 		
 		channelSet.setName(name);
 		channelSet.setTag(tag);
+		channelSet.setLang(lang);
 		if (imageUrl != null) {
 			channelSet.setImageUrl(imageUrl);
 			// TODO: channel set also needs to be processed

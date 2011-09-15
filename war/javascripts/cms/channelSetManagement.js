@@ -28,6 +28,7 @@ var page$ = {
             }
             $('#cc_name').val(channelSet.name);
             $('#cc_tag').val(channelSet.tag);
+            $('#cc_language').val(channelSet.lang);
             $('#cc_intro').text(channelSet.intro);
             if (channelSet.imageUrl != null) {
               $('#cc_image').attr('src', channelSet.imageUrl);
@@ -388,6 +389,7 @@ var page$ = {
       alert($('#lang_warning_tag_over_limitation').text());
       return;
     }
+    var language = $('#cc_language').val();
     var imageUrl = $('#cc_image').attr('src');
     var imageUpdated = $('#cc_image_updated').val();
     if (imageUrl.length == 0 || imageUrl == '/images/cms/upload_img.jpg') {
@@ -399,6 +401,7 @@ var page$ = {
       'name':         name,
       'intro':        intro,
       'tag':          tag,
+      'lang':         language,
       'categoryId':   categoryId
     };
     if (imageUpdated == 'true') {

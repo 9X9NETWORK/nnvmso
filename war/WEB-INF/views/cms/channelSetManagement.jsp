@@ -77,8 +77,16 @@
               <option value="0" selected="selected"><spring:message code="cms.channel_set_management.msg.select_category"/></option>
             </select>
           </div>
+          <br/><br/>
+          <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.language"/></label>
+          <div class="floatL">
+            <select id="cc_language" class="language">
+              <option value="zh-TW">中文</option>
+              <option value="en">English</option>
+            </select>
+          </div>
           <div class="clear"></div>
-          <p class="hint"><spring:message code="cms.channel_set_management.msg.system_category_explanation"/></p>
+          <p class="hint" style="display:none"><spring:message code="cms.channel_set_management.msg.system_category_explanation"/></p>
         </fieldset>
       </form>
     </div>
