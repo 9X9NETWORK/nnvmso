@@ -223,4 +223,22 @@ public class NnUserDao extends GenericDao<NnUser> {
 		return user;		
 	}
 	
+	public List<NnUser> findByTypeAndMsoId(Short type, Long msoId) {
+		List<NnUser> detached = new ArrayList<NnUser>();
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		try {
+			Query query = pm.newQuery(NnUser.class);
+			query.setFilter("type == typeParam && msoId == msoIdParam");
+			query.declareParameters("short typeParam, long msoIdParam");
+			@SuppressWarnings("unchecked")
+			List<NnUser> results = (List<NnUser>) query.execute(type, msoId);
+			if (results.size() > 0) {
+				detached = (List<NnUser>) pm.detachCopyAll(results);
+			}
+		} finally {
+			pm.close();
+		}
+		return detached;
+	}
+	
 }

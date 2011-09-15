@@ -76,6 +76,7 @@ public class NnUserManager {
 			List<NnUser> users = nnUserDao.findByType(NnUser.TYPE_TBC);
 			for (NnUser user : users) {
 				if (user.getMsoId() == mso.getKey().getId()) {
+					log.info("found TYPE_MSO");
 					return user;
 				}
 			}
@@ -83,11 +84,16 @@ public class NnUserManager {
 			List<NnUser> users = nnUserDao.findByType(NnUser.TYPE_3X3);
 			for (NnUser user : users) {
 				if (user.getMsoId() == mso.getKey().getId()) {
+					log.info("found TYPE_3X3");
 					return user;
 				}
 			}
+		} else if (mso.getType() == Mso.TYPE_TCO) {
+			List<NnUser> users = nnUserDao.findByTypeAndMsoId(NnUser.TYPE_TCO, mso.getKey().getId());
+			if (users.size() > 0)
+				log.info("found TYPE_TCO");
+				return users.get(0);
 		}
-		
 		return null;
 	}
 	

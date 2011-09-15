@@ -104,15 +104,15 @@
       <table border="0" cellpadding="0" cellspacing="0">
         <tr>
           <td><spring:message code="cms.setup.label.reset_password"/></td>
-          <td><input type="text"/></td>
+          <td><input id="password" type="password" length="20" type="text"/></td>
         </tr>
         <tr>
           <td><spring:message code="cms.setup.label.retype_password"/></td>
-          <td><input type="text"/></td>
+          <td><input id="retype" type="password" length="20" type="text"/></td>
         </tr>
         <tr>
           <td></td>
-          <td><button><big><spring:message code="cms.setup.button.save"/></big></button>&nbsp;&nbsp;<a href="javascript:"><spring:message code="cms.setup.button.cancel"/></a></td>
+          <td><button id="save_password_button"><big><spring:message code="cms.setup.button.save"/></big></button>&nbsp;&nbsp;<a href="javascript:" id="cancel_password_button"><spring:message code="cms.setup.button.cancel"/></a></td>
         </tr>
       </table>
     </div>
@@ -123,3 +123,6 @@
 <label class="lang" id="image_bg_setup"><spring:message code="cms.image.bg_setup"/></label>
 <label class="lang" id="lang_warning_error_occurs"><spring:message code="cms.warning.error_occurs"/></label>
 <label class="lang" id="lang_confirm_disconnect_with_facebook"><spring:message code="cms.setup.confirm_disconnect_with_facebook"/></label>
+<label class="lang" id="lang_warning_retype_not_match"><spring:message code="cms.warning.retype_not_match"/></label>
+<label class="lang" id="lang_update_successfully"><spring:message code="cms.warning.update_successfully"/></label>
+

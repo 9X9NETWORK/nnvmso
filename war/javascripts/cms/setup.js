@@ -11,6 +11,16 @@ var pageSetup = {
   init: function() {
     $('.setup_context').css('background', 'url(' + $('#image_bg_setup').text() + ') no-repeat;');
     
+    $.post('/CMSAPI/listSnsAuth', { 'msoId': $('#msoId').val() }, function(snsList) {
+      for (i in snsList) {
+        var sns = snsList[i];
+        if (sns.type == 1) {
+          $('#facebook_connect').hide();
+          $('#facebook_disconnect').show();
+        }
+      }
+    });
+    
     $('.syncInfo').unbind().hover(function() {
       $('#fb_hint').show();
     },function() {
@@ -99,14 +109,34 @@ var pageSetup = {
       }
     });
     
-    $.post('/CMSAPI/listSnsAuth', { 'msoId': $('#msoId').val() }, function(snsList) {
-      for (i in snsList) {
-        var sns = snsList[i];
-        if (sns.type == 1) {
-          $('#facebook_connect').hide();
-          $('#facebook_disconnect').show();
-        }
+    $('#password').unbind().change(function() {
+      if ($('#password').val() == '')
+        $('#save_password_button').attr('disabled', true);
+      else
+        $('#save_password_button').attr('disabled', false);
+    });
+    $('#save_password_button').unbind().click(function() {
+      if ($('#password').val() == '') { return; }
+      if ($('#password').val() != $('#retype').val()) {
+        alert($('#lang_warning_retype_not_match').text());
+        return;
       }
+      var parameters = {
+        'msoId': $('#msoId').val(),
+        'newPassword': $('#password').val()
+      };
+      $.post('/CMSAPI/changePassword', parameters, function(response) {
+        if (response != "OK") {
+          alert($('#lang_warning_error_occurs').text());
+        } else {
+          alert($('#lang_update_successfully').text());
+          $('[type="password"]').val('');
+        }
+      });
+    });
+    
+    $('#cancel_password_button').unbind().click(function() {
+      $('[type="password"]').val('');
     });
   }
 };

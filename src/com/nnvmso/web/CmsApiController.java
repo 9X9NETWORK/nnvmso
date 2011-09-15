@@ -42,6 +42,7 @@ import com.nnvmso.model.Ipg;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoProgram;
+import com.nnvmso.model.NnUser;
 import com.nnvmso.model.SnsAuth;
 import com.nnvmso.service.AreaOwnershipManager;
 import com.nnvmso.service.AutosharingService;
@@ -1179,6 +1180,32 @@ public class CmsApiController {
 		List<Ipg> ipgs = ipgMngr.findByProgramId(programId);
 		result.put("shareCount", ipgs.size());
 		return result;
+	}
+	
+	//////////////////// others ////////////////////
+	
+	@RequestMapping("changePassword")
+	public @ResponseBody String changePassword(@RequestParam Long msoId, @RequestParam String newPassword) {
+		
+		MsoManager msoMngr = new MsoManager();
+		NnUserManager userMngr = new NnUserManager();
+		Mso mso = msoMngr.findById(msoId);
+		
+		NnUser user = null;
+		switch (mso.getType()) {
+		case Mso.TYPE_NN:
+		case Mso.TYPE_3X3:
+		case Mso.TYPE_MSO:
+		case Mso.TYPE_TCO:
+			user = userMngr.findMsoUser(mso);
+		default:
+		}
+		if (user == null)
+			return "Invalid msoType";
+		user.setPassword(newPassword);
+		userMngr.save(user);
+		
+		return "OK";
 	}
 }
 
