@@ -62,6 +62,17 @@ public class AdminCategoryController {
 		return "error/exception";				
 	}
 	
+	@RequestMapping(value="uncategorized")
+	public ResponseEntity<String> uncategorized() {
+		CategoryManager cMngr = new CategoryManager();
+		MsoManager msoMngr = new MsoManager();
+		Mso mso = msoMngr.findByName("9x9");
+		Category c = new Category(Category.UNCATEGORIZED, true, mso.getKey().getId());
+		c.setPublic(false);		
+		cMngr.create(c);
+		return NnNetUtil.textReturn("OK");
+	}
+	
 	@RequestMapping(value="newStuff")
 	public ResponseEntity<String> newStuff() {
 		CategoryManager cMngr = new CategoryManager();

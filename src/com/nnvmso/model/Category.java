@@ -29,6 +29,7 @@ public class Category implements Serializable {
 	private long msoId;
 	
 	@Persistent
+	public static String UNCATEGORIZED = "UNCATEGORIZED";
 	private String name;
 
 	@Persistent

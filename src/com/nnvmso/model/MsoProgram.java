@@ -90,7 +90,7 @@ public class MsoProgram implements Serializable {
 	private Date pubDate;
 	
 	@Persistent
-	private int seq;
+	private String seq; //mainly for mapel, not only for seq, but also its app id
 
 	@Persistent
 	private String comment;
@@ -270,12 +270,12 @@ public class MsoProgram implements Serializable {
 		this.comment = comment;
 	}
 
-	public int getSeq() {
+	public String getSeq() {
 		return seq;
 	}
 
-	public void setSeq(int seq) {
+	public void setSeq(String seq) {
 		this.seq = seq;
 	}
-	
+
 }

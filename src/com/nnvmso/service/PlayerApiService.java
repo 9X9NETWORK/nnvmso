@@ -771,7 +771,6 @@ public class PlayerApiService {
 			                    String tags, String lang, HttpServletRequest req) {
 		//verify input
 		if (url == null || url.length() == 0 ||  grid == null || grid.length() == 0 ||
-			categoryIds == null || categoryIds.equals("undefined") || categoryIds.length() == 0 ||
 			userToken== null || userToken.length() == 0) {
 			return NnStatusMsg.inputMissing(locale);
 		}
@@ -792,9 +791,14 @@ public class PlayerApiService {
 			return messageSource.getMessage("nnstatus.user_permission_error", new Object[] {NnStatusCode.USER_PERMISSION_ERROR} , locale);
 		}
 				
-		//verify category
 		CategoryManager categoryMngr = new CategoryManager();
-		List<Category> categories = categoryMngr.findCategoriesByIdStr(categoryIds);
+		List<Category> categories = new ArrayList<Category>();
+		//verify category
+		if (categoryIds == null || categoryIds.equals("undefined") || categoryIds.length() == 0) {
+			categories.add(categoryMngr.findByName(Category.UNCATEGORIZED));
+		} else {
+			categories.addAll(categoryMngr.findCategoriesByIdStr(categoryIds));
+		}
 		if (categories.size() == 0) { return messageSource.getMessage("nnstatus.category_invalid", new Object[] {NnStatusCode.CATEGORY_INVALID} , locale); }
 		
 		MsoChannelManager channelMngr = new MsoChannelManager();		
