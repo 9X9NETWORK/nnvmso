@@ -2,6 +2,7 @@
  * 
  */
 
+var log = function() { };
 var cms = {
   debug: true,
   isGeneric: function() {
@@ -155,7 +156,8 @@ var cms = {
     });
     cms.loadScript('/javascripts/plugins/jquery.textTruncate.js');
     cms.loadScript('/javascripts/plugins/jquery.log.js', function() {
-      $.log('logger initialized');
+      log = $.log;
+      log('logger initialized');
     });
   }
 };
