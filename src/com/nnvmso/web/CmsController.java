@@ -1,6 +1,7 @@
 package com.nnvmso.web;
 
 import java.security.SignatureException;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 import javax.servlet.http.Cookie;
@@ -8,6 +9,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.springframework.context.MessageSource;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -29,6 +32,7 @@ import com.nnvmso.service.SessionService;
 public class CmsController {
 	
 	protected static final Logger logger = Logger.getLogger(CmsController.class.getName());
+	private static MessageSource messageSource = new ClassPathXmlApplicationContext("locale.xml");
 	
 	@ExceptionHandler(Exception.class)
 	public String exception(Exception e) {
@@ -159,24 +163,33 @@ public class CmsController {
 		SessionService sessionService = new SessionService(request);
 		AuthService authService = new AuthService();
 		MsoManager msoMngr = new MsoManager();
+		NnUserManager userMngr = new NnUserManager();
+		Locale locale = request.getLocale();
 		
 		Mso mso = msoMngr.findByName(msoName);
 		if (mso == null)
 			return "error/404";
 		String msoLogo = mso.getLogoUrl();
-		mso = authService.msoAuthenticate(email, password, mso.getKey().getId());
-		if (mso == null) {
+		Mso msoAuth = authService.msoAuthenticate(email, password, mso.getKey().getId());
+		if (msoAuth == null) {
 			logger.info("login failed");
+			NnUser user = userMngr.findMsoUser(mso);
+			String error;
+			if (user.getEmail().equals(email)) {
+				error = messageSource.getMessage("cms.warning.invalid_password", null, locale);
+			} else {
+				error = messageSource.getMessage("cms.warning.invalid_account", null, locale);
+			}
 			model.addAttribute("email", email);
 			model.addAttribute("password", password);
-			model.addAttribute("error", "Invalid email / password");
 			model.addAttribute("msoLogo", msoLogo);
+			model.addAttribute("error", error);
 			sessionService.removeSession();
 			return "cms/login";
 		}
 		
 		HttpSession session = sessionService.getSession();
-		session.setAttribute("mso", mso);
+		session.setAttribute("mso", msoAuth);
 		sessionService.saveSession(session);
 		
 		// set cookie
