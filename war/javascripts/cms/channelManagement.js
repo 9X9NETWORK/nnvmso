@@ -111,12 +111,20 @@ var page$ = {
       else if (program.audioFileUrl != null)
         source = program.audioFileUrl;
       programDetailBlock.find('.ep_source a').attr('href', source);
+      programDetailBlock.find('.ep_name').attr('disabled', false);
+      programDetailBlock.find('.ep_intro').attr('disabled', false);
+      programDetailBlock.find('.ep_comment_block').hide();
       switch(program.contentType) {
         case 0:
         programDetailBlock.find('.ep_source a').text('9x9');
         break;
         case 1:
         programDetailBlock.find('.ep_source a').text('YouTube');
+        if (cms.isGeneric()) {
+          programDetailBlock.find('.ep_name').attr('disabled', true);
+          programDetailBlock.find('.ep_intro').attr('disabled', true);
+          programDetailBlock.find('.ep_comment_block').show();
+        }
         break;
         default:
         programDetailBlock.find('.ep_source a').text('Unknown');
@@ -124,6 +132,7 @@ var page$ = {
       programDetailBlock.find('.right_title div').text(title);
       programDetailBlock.find('.ep_name').val(program.name);
       programDetailBlock.find('.ep_intro').val(program.intro);
+      programDetailBlock.find('.ep_comment').val(program.comment);
       var promoteUrl = 'http://' + location.host + '/view?channel=' + program.channelId + '&episode=' + programId;
       programDetailBlock.find('.ep_url').attr('href', promoteUrl).text(promoteUrl);
       programDetailBlock.find('.ep_image').attr('src', program.imageUrl);
@@ -145,7 +154,8 @@ var page$ = {
         var parameters = {
           'programId': programId,
           'name':      programDetailBlock.find('.ep_name').val(),
-          'intro':     programDetailBlock.find('.ep_intro').val()
+          'intro':     programDetailBlock.find('.ep_intro').val(),
+          'comment':   programDetailBlock.find('.ep_comment').val()
         };
         if (programDetailBlock.find('.ep_image_updated').val() == 'true') {
           parameters['imageUrl'] = programDetailBlock.find('.ep_image').attr('src');
@@ -260,14 +270,21 @@ var page$ = {
                                    .addClass('program_create_detail_block_cloned');
         var programId = program.key.id;
         
-        programDetailBlock.find('.ep_name').val(program.name);
+        programDetailBlock.find('.ep_name').val(program.name).attr('disabled', true);
+        programDetailBlock.find('.ep_image').attr('src', program.imageUrl);
+        programDetailBlock.find('.ep_image_updated').val('false');
+        programDetailBlock.find('.ep_intro').val(program.intro).attr('disabled', true);
+        programDetailBlock.find('.ep_upload_button_place').hide();
         if (program.imageUrl == '/WEB-INF/../images/processing.png') {
           program.imageUrl = '/images/cms/upload_img.jpg';
         }
-        programDetailBlock.find('.ep_image').attr('src', program.imageUrl);
-        programDetailBlock.find('.ep_image_updated').val('false');
-        programDetailBlock.find('.ep_intro').val(program.intro);
         programDetailBlock.find('.ep_urlbutton, .ep_ytbutton').css('width', 90).click(function() {
+          programDetailBlock.find('.ep_name').attr('disabled', true);
+          programDetailBlock.find('.ep_intro').attr('disabled', true);
+          programDetailBlock.find('.ep_upload_button_place').hide();
+          programDetailBlock.find('.ep_comment_block').hide();
+          programDetailBlock.find('.ep_savebutton').unbind().addClass('btnDisable').removeClass('btnSave');
+          
           programDetailBlock.find('.ep_uploading_video').hide();
           programDetailBlock.find('.ep_url_block').show();
           programDetailBlock.find('.video_url_hint, .youtube_hint').hide();
@@ -279,6 +296,10 @@ var page$ = {
         programDetailBlock.find('.ep_url_import').css('width', 60).unbind().click(function() {
           if (programDetailBlock.find('.ep_url_input').val().length > 0) {
             var inputUrl = programDetailBlock.find('.ep_url_input').val();
+            programDetailBlock.find('.ep_name').attr('disabled', false);
+            programDetailBlock.find('.ep_intro').attr('disabled', false);
+            programDetailBlock.find('.ep_upload_button_place').show();
+            programDetailBlock.find('.ep_comment_block').hide();
             if (inputUrl.indexOf('youtube.com') >= 0) {
               var videoId = inputUrl.match(/\/watch\?v=([^\/&]+)/)[1];
               var parameters = {
@@ -289,6 +310,12 @@ var page$ = {
                 programDetailBlock.find('.ep_intro').val(data.entry.media$group.media$description.$t);
                 programDetailBlock.find('.ep_image').attr('src', data.entry.media$group.media$thumbnail[1].url);
                 programDetailBlock.find('.ep_image_updated').val('true');
+                if (cms.isGeneric()) {
+                  programDetailBlock.find('.ep_name').attr('disabled', true);
+                  programDetailBlock.find('.ep_intro').attr('disabled', true);
+                  programDetailBlock.find('.ep_upload_button_place').hide();
+                  programDetailBlock.find('.ep_comment_block').show();
+                }
               }, 'json');
               /* server side approach
               var parameters = {
@@ -326,7 +353,8 @@ var page$ = {
                   'programId': programId,
                   'sourceUrl': programDetailBlock.find('.ep_url_input').val(),
                   'name':      programDetailBlock.find('.ep_name').val(),
-                  'intro':     programDetailBlock.find('.ep_intro').val()
+                  'intro':     programDetailBlock.find('.ep_intro').val(),
+                  'comment':   programDetailBlock.find('.ep_comment').val()
                 };
                 if (programDetailBlock.find('.ep_image_updated').val() == 'true') {
                   parameters['imageUrl'] = programDetailBlock.find('.ep_image').attr('src');
@@ -395,7 +423,12 @@ var page$ = {
             programDetailBlock.find('.ep_url_input').val('');
             programDetailBlock.find('.ep_url_block').hide();
             programDetailBlock.find('.ep_savebutton').unbind().addClass('btnDisable').removeClass('btnSave');
-          }
+            
+            programDetailBlock.find('.ep_name').attr('disabled', false);
+            programDetailBlock.find('.ep_intro').attr('disabled', false);
+            programDetailBlock.find('.ep_upload_button_place').show();
+            programDetailBlock.find('.ep_comment_block').hide();
+         }
         };
         var swfObject = new SWFUpload(swfupload_settings);
         page$.programDetail.swfObjectVideo.push(swfObject);

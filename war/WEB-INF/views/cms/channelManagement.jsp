@@ -263,11 +263,12 @@
                     <img alt="" src="/images/cms/upload_img.jpg" class="floatL ep_image"/><input type="hidden" class="ep_image_updated" value="fase"/>
                     <div class="floatL imgBtn">
                       <p class="gray"><spring:message code="cms.channel_management.msg.best_resolution"/></p>
-                      <a onclick="return false;" href="javascript:" class="uploadBtn ep_upload_image"></a>
+                      <span class="ep_upload_button_place"><a onclick="return false;" href="javascript:" class="uploadBtn ep_upload_image"></a></span>
                       <span class="ep_uploading_image" style="display:none"><spring:message code="cms.channel_management.msg.uploading"/></span>
                     </div>
                     <div class="clear"></div>
                   </div>
+                  <div class="clear"></div><br/>
                   <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.program_name"/></label>
                   <div class="bg_input floatL"><input class="ep_name" type="text" size="33" maxlength="40"/></div>
                   <div class="clear"></div>
@@ -278,6 +279,12 @@
                   <div class="clear"></div>
                   <p class="hint"><spring:message code="cms.channel_management.msg.two_hundred_characters"/></p>
                   <br/>
+                  <div class="ep_comment_block" style="display:none">
+                    <label class="floatL"><spring:message code="cms.channel_management.label.program_comment"/></label>
+                    <div class="bg_textarea floatL"><textarea class="ep_comment" name="" cols="33" rows="5"></textarea></div>
+                    <div class="clear"></div>
+                    <br/>
+                  </div>
                   <div style="display:none"><!-- tag of program -->
                     <label class="floatL"><spring:message code="cms.channel_management.label.tag"/></label>
                     <div class="bg_input floatL"><input type="text" size="35" maxlength="40"/></div>
@@ -384,6 +391,12 @@
               <div class="clear"></div>
               <p class="hint"><spring:message code="cms.channel_management.msg.two_hundred_characters"/></p>
               <br/>
+              <div class="ep_comment_block" style="display:none">
+                <label class="floatL"><spring:message code="cms.channel_management.label.program_comment"/></label>
+                <div class="bg_textarea floatL"><textarea class="ep_comment" name="" cols="33" rows="5"></textarea></div>
+                <div class="clear"></div>
+                <br/>
+              </div>
               <div style="display:none">
                 <label class="floatL"><spring:message code="cms.channel_management.label.tag"/></label>
                 <div class="bg_input floatL"><input type="text" size="40" maxlength="40" disabled="disabled"/></div>

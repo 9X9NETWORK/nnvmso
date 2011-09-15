@@ -508,8 +508,9 @@ public class CmsApiController {
 	                                           @RequestParam Long channelId,
 	                                           @RequestParam String sourceUrl,
 	                                           @RequestParam(required = false) String imageUrl,
-	                                           @RequestParam String name,
-	                                           @RequestParam String intro) throws NoSuchAlgorithmException {
+	                                           @RequestParam(required = false) String name,
+	                                           @RequestParam(required = false) String comment,
+	                                           @RequestParam(required = false) String intro) throws NoSuchAlgorithmException {
 		
 		logger.info("programId = " + programId);
 		logger.info("channelId = " + channelId);
@@ -517,6 +518,7 @@ public class CmsApiController {
 		logger.info("imageUrl = " + imageUrl);
 		logger.info("name = " + name);
 		logger.info("intro = " + intro);
+		logger.info("comment = " + comment);
 		
 		MsoProgramManager programMngr = new MsoProgramManager();
 		MsoChannelManager channelMngr = new MsoChannelManager();
@@ -553,8 +555,15 @@ public class CmsApiController {
 			program.setImageUrl(imageUrl);
 			workerService.programLogoProcess(program.getKey().getId(), imageUrl, prefix, req);
 		}
-		program.setName(name);
-		program.setIntro(intro);
+		if (name != null) {
+			program.setName(name);
+		}
+		if (intro != null) {
+			program.setIntro(intro);
+		}
+		if (comment != null) {
+			program.setComment(comment);
+		}
 		program.setPublic(true);
 		programMngr.create(channel, program);
 		
@@ -565,19 +574,26 @@ public class CmsApiController {
 	public @ResponseBody String saveProgram(HttpServletRequest req,
 	                                        @RequestParam Long programId,
 	                                        @RequestParam(required = false) String imageUrl,
-	                                        @RequestParam String name,
-	                                        @RequestParam String intro) throws NoSuchAlgorithmException {
+	                                        @RequestParam(required = false) String name,
+	                                        @RequestParam(required = false) String intro,
+	                                        @RequestParam(required = false) String comment) throws NoSuchAlgorithmException {
 		logger.info("programId = " + programId);
 		logger.info("imageUrl = " + imageUrl);
 		logger.info("name = " + name);
 		logger.info("intro = " + intro);
+		logger.info("comment = " + comment);
 		
 		MsoProgramManager programMngr = new MsoProgramManager();
 		MsoProgram program = programMngr.findById(programId);
 		if (program == null) {
 			return "Invalid programId";
 		}
-		program.setName(name);
+		if (name != null)
+			program.setName(name);
+		if (intro != null)
+			program.setIntro(intro);
+		if (comment != null)
+			program.setComment(comment);
 		if (imageUrl != null) {
 			ContentWorkerService workerService = new ContentWorkerService();
 			Long timestamp = System.currentTimeMillis() / 1000L;
@@ -603,7 +619,6 @@ public class CmsApiController {
 			program.setImageUrl(imageUrl);
 			workerService.programLogoProcess(program.getKey().getId(), imageUrl, prefix, req);
 		}
-		program.setIntro(intro);
 		programMngr.save(program);
 		
 		return "OK";
