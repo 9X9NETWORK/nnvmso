@@ -10,6 +10,7 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import com.google.appengine.api.datastore.Key;
+import com.nnvmso.lib.NnStringUtil;
 import com.nnvmso.lib.PMF;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.NnUser;
@@ -26,6 +27,7 @@ public class MsoChannelDao extends GenericDao<MsoChannel> {
 		if (channel == null)
 			return null;
 		PersistenceManager pm = PMF.get().getPersistenceManager();
+		channel.setIntro(NnStringUtil.truncateUTF8(channel.getIntro())); // to fit JDO 500 bytes limitation
 		try {
 			pm.makePersistent(channel);
 		} finally {

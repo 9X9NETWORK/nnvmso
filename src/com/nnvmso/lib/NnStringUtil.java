@@ -1,12 +1,71 @@
 package com.nnvmso.lib;
 
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.logging.Logger;
 
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 
 public class NnStringUtil {
+	
+	protected static final Logger logger = Logger.getLogger(NnStringUtil.class.getName());
+	
+	public static final int MAX_JDO_STRING_LENGTH = 500;
+	
+	/**
+	 * To to truncate an UTF-8 string to fit proper bytes
+	 *
+	 * source: http://stackoverflow.com/questions/119328/how-do-i-truncate-a-java-string-to-fit-in-a-given-number-of-bytes-once-utf-8-enc
+	 * @throws UnsupportedEncodingException 
+	 */
+	public static String truncateUTF8(String str, int maxBytes) {
+		Charset utf8 = Charset.forName("UTF-8");
+		int totalBytes = str.getBytes(utf8).length;
+		if (totalBytes <= maxBytes) { return str; }
+		for (int i = 0, b = 0; i < str.length(); i++) {
+			char c = str.charAt(i);
+			
+			// ranges from http://en.wikipedia.org/wiki/UTF-8
+			int skip = 0;
+			int more;
+			if (c <= 0x007f) {
+				more = 1;
+			}
+			else if (c <= 0x07FF) {
+				more = 2;
+			} else if (c <= 0xd7ff) {
+				more = 3;
+			} else if (c <= 0xDFFF) {
+				// surrogate area, consume next char as well
+				more = 4;
+				skip = 1;
+			} else {
+				more = 3;
+			}
+			
+			if (b + more > maxBytes) {
+				String truncStr = str.substring(0, i);
+				int truncBytes = truncStr.getBytes(utf8).length;
+				logger.info("truncate string length " + str.length() + " (" + totalBytes + " bytes) --> " + i + " (" + truncBytes + " bytes)");
+				return truncStr;
+			}
+			b += more;
+			i += skip;
+		}
+		return str;
+	}
+	
+	/**
+	 * Truncate string to fit GAE JDO limitation
+	 * @throws UnsupportedEncodingException 
+	 */
+	public static String truncateUTF8(String str) {
+		return truncateUTF8(str, MAX_JDO_STRING_LENGTH);
+	}
+	
 	public static String capitalize(String str) {
 		if (str == null) {return null;}
 		str = str.toLowerCase();

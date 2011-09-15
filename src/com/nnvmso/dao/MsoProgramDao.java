@@ -11,6 +11,7 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import com.google.appengine.api.datastore.Key;
+import com.nnvmso.lib.NnStringUtil;
 import com.nnvmso.lib.PMF;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoProgram;
@@ -28,6 +29,7 @@ public class MsoProgramDao extends GenericDao<MsoProgram> {
 	public MsoProgram save(MsoProgram program) {
 		if (program == null) {return null;}		
 		PersistenceManager pm = PMF.get().getPersistenceManager();
+		program.setIntro(NnStringUtil.truncateUTF8(program.getIntro())); // to fit JDO 500 bytes limitation
 		try {
 			pm.makePersistent(program);
 			program = pm.detachCopy(program);

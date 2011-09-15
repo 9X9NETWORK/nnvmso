@@ -76,7 +76,7 @@ public class CalibrationTask {
 		int engCnt = 0;
 		int chnCnt = 0;
 		for (MsoChannel c : channels) {
-			if (c.getLangCode().equals(Mso.LANG_ZH))
+			if (c.getLangCode() != null && c.getLangCode().equals(Mso.LANG_ZH))
 				chnCnt++;
 			else 
 				engCnt++;
