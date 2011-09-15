@@ -792,7 +792,9 @@ public class CmsApiController {
 		List<Category> categories = catMngr.findAllByMsoId(nnmso.getKey().getId());
 		if (locale.equals(Locale.TAIWAN)) {
 			for (Category category : categories) {
-				category.setName(catMngr.translate(category.getName()));
+				if (category.getChnName() != null && !category.getChnName().isEmpty()) {
+					category.setName(category.getChnName());
+				}
 			}
 		}
 		return categories;

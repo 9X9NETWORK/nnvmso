@@ -1189,6 +1189,22 @@ var page$ = {
             }
           },
           {
+            label:    'Chinese Name',
+            name:     'chnName',
+            index:    'chnName',
+            width:    200,
+            align:    'center',
+            search:   false,
+            sortable: true,
+            editable: true,
+            editoptions: {
+              maxlength: 100
+            },
+            editrules: {
+              required: true
+            }
+          },
+          {
             label:    'Updated Time',
             name:     'updateDate',
             index:    'updateDate',

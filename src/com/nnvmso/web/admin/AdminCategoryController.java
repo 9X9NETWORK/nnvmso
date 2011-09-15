@@ -326,6 +326,7 @@ public class AdminCategoryController {
 			cell.add(category.getKey().getId());
 			cell.add(category.getParentId());
 			cell.add(category.getName());
+			cell.add(category.getChnName());
 			cell.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(category.getUpdateDate()));
 			cell.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(category.getCreateDate()));
 			cell.add(category.isPublic());
@@ -345,13 +346,15 @@ public class AdminCategoryController {
 	
 	@RequestMapping("create")
 	public @ResponseBody String create(@RequestParam(required=true)  String  name,
+	                                   @RequestParam(required=true)  String  chnName,
 	                                   @RequestParam(required=false) Boolean isPublic,
 	                                   @RequestParam(required=true)  Long    msoId) {
 		
 		logger.info("admin = " + userService.getCurrentUser().getEmail());
-		
 		logger.info("msoId = " + msoId);
 		logger.info("name = " + name);
+		logger.info("chnName = " + chnName);
+		
 		MsoManager msoMngr = new MsoManager();
 		Mso mso = msoMngr.findById(msoId);
 		if (mso == null) {
@@ -361,13 +364,16 @@ public class AdminCategoryController {
 		}
 		if (isPublic == null)
 			isPublic = true;
-		categoryMngr.create(new Category(name, isPublic, msoId));
+		Category category = new Category(name, isPublic, msoId);
+		category.setChnName(chnName);
+		categoryMngr.create(category);
 		return "OK";
 	}
 	
 	@RequestMapping("modify")
 	public @ResponseBody String modify(@RequestParam(required=true)  Long    id,
 	                                   @RequestParam(required=false) String  name,
+	                                   @RequestParam(required=false) String  chnName,
 	                                   @RequestParam(required=false) Boolean isPublic,
 	                                   @RequestParam(required=false) Long    msoId,
 	                                   @RequestParam(required=false) Integer channelCount) {
@@ -395,6 +401,10 @@ public class AdminCategoryController {
 		if (name != null) {
 			logger.info("name = " + name);
 			category.setName(name);
+		}
+		if (chnName != null) {
+			logger.info("chnName = " + chnName);
+			category.setChnName(chnName);
 		}
 		if (isPublic != null) {
 			logger.info("isPublic = " + isPublic);
