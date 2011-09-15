@@ -4,7 +4,8 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9playerV66"/>
+<c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9playerV68a"/>
+<c:set var="nroot" value="http://9x9ui.s3.amazonaws.com/9x9playerV73"/>
 
 <!-- $Revision$ -->
 
@@ -14,6 +15,7 @@
 
 <link rel="image_src" href="${fbImg}" />
 
+<link rel="stylesheet" href="${nroot}/stylesheets/main.css" />
 <link rel="stylesheet" href="${root}/stylesheets/main.css" />
 <link rel="stylesheet" href="http://9x9ui.s3.amazonaws.com/contest/contest.css" />
 
@@ -27,7 +29,10 @@
 <script type="text/javascript" charset="utf-8" src="${root}/javascripts/jquery.swfobject.1-1-1.min.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/scripts/flowplayer-3.2.4.min.js"></script>
 
-<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/player9c.js"></script>
+<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/player13.js"></script>
+<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/vertical.slider.js"></script>
+<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/jquery.mousewheel.min.js"></script>
+
 
 <script type="text/javascript">
 var analytz = false;
@@ -58,6 +63,12 @@ var brandinfo = "${brandInfo}";
 
 <title>9x9.tv</title>
 
+<style type="text/css">
+#slider-wrap{float:left;background-color:lightgrey;width:20px;border:1px solid gray;border-left:none;}
+#slider-vertical{position:relative;height:100%}
+.ui-slider-handle{width:20px;height:10px;margin:0 auto;background-color:darkgray;display:block;position:absolute}
+</style>
+
 </head>
 
 <body id="body" style="overflow: hidden">
@@ -72,10 +83,19 @@ var brandinfo = "${brandInfo}";
 </div>
 
 <div id="yt1" style="width: 100%; height: 100%; z-index: 1; visibility: visible; position: absolute; left: 0; top: 0; overflow: hidden;">
-  <div id="ytapiplayer">
+  <div id="ytapiplayer1">
   </div>
 </div>
 
+<div id="yt2" style="width: 100%; height: 100%; z-index: 1; visibility: visible; position: absolute; left: 0; top: 0; overflow: hidden;">
+  <div id="ytapiplayer2">
+  </div>
+</div>
+
+<div id="yt3" style="width: 100%; height: 100%; z-index: 1; visibility: visible; position: absolute; left: 0; top: 0; overflow: hidden;">
+  <div id="ytapiplayer3">
+  </div>
+</div>
 
 <div id="ss" style="width: 100%; height: 100%; z-index: 4; visibility: visible; position: absolute; left: 0; top: 0; overflow: hidden; display: none">
 </div>
@@ -131,6 +151,20 @@ var brandinfo = "${brandInfo}";
   </div>
 </div>
 
+<ul class="set-options"> 
+  <li class="on"><img src="${root}/images/icon_check.png" class="icon-check"><span>News</span></li> 
+  <li><img src="${root}/images/icon_check.png" class="icon-check"><span>Music</span></li> 
+  <li><img src="${root}/images/icon_check.png" class="icon-check"><span>Sports</span></li> 
+  <li><img src="${root}/images/icon_check.png" class="icon-check"><span>Movie Trailers</span></li> 
+  <li><img src="${root}/images/icon_check.png" class="icon-check"><span>Lifestyle</span></li> 
+  <li><img src="${root}/images/icon_check.png" class="icon-check"><span>Food & Wine</span></li> 
+  <li><img src="${root}/images/icon_check.png" class="icon-check"><span>Travel</span></li> 
+  <li><img src="${root}/images/icon_check.png" class="icon-check"><span>Local Deal</span></li> 
+  <li><img src="${root}/images/icon_check.png" class="icon-check"><span>Brands</span></li> 
+  <li><img src="${root}/images/icon_check.png" class="icon-check"><span>My YouTube Favorites</span></li> 
+  <li><img src="${root}/images/icon_check.png" class="icon-check"><span>Friends & Family</span></li> 
+</ul> 
+
 <div id="sg-layer" style="display: block">
   <div id="sg-holder">
   
@@ -139,26 +173,11 @@ var brandinfo = "${brandInfo}";
       <img src="${root}/images/logo.png" id="sg-logo">
       <p id="slogan"><span>Your Personal Video Album</span></p>  
       <ul id="menu-list">
-        <li id="btn-curate"><img src="${root}/images/icon_curate.png" id="icon-curate"><span><div id="btn-curate-txt">Curate</div><span class="arrow"></span></span></li>
         <li id="btn-sgt"><img src="${root}/images/icon_sgt.png" id="icon-signin"><span><div id="btn-sg-txt">Smart Guide</div><span class="arrow"></span></span></li>
         <li id="btn-signin"><img src="${root}/images/icon_signin.png" id="icon-signin"><span><div id="btn-signin-txt">Sign in / Sign up</div><span class="arrow"></span></span></li>
         <li id="btn-about"><img src="${root}/images/icon_about.png" id="icon-about"><span><div id="btn-about-text">About Us</div><span class="arrow"></span></span></li>
         <li id="btn-help"><img src="${root}/images/icon_help.png" id="icon-help"><span><div id="btn-help-txt">Help</div><span class="arrow"></span></span></li>
       </ul>
-      <ul id="lang-setting"> 
-        <li id="sg-site-lang"><span id="site-lang" class="lang-selected">English site</span><img src="${root}/images/icon_downarrow.png" class="icon-downarrow"> 
-          <ul class="lang-options"> 
-            <li id="sg-site-en"><img src="${root}/images/icon_check.png" class="icon-check"><span>English site</span></li> 
-            <li id="sg-site-zh"><img src="${root}/images/icon_check.png" class="icon-check"><span>中文網站</span></li> 
-          </ul> 
-        </li> 
-        <li id="sg-program-lang"><span id="program-lang" class="lang-selected">English programs</span><img src="${root}/images/icon_downarrow.png" class="icon-downarrow"> 
-          <ul class="lang-options"> 
-            <li id="sg-program-en"><img src="${root}/images/icon_check.png" class="icon-check"><span>English programs</span></li> 
-            <li id="sg-program-zh"><img src="${root}/images/icon_check.png" class="icon-check"><span>中文節目</span></li> 
-          </ul> 
-        </li> 
-      </ul> 
     </div>
     
     <div id="sg-content">
@@ -242,7 +261,7 @@ var brandinfo = "${brandInfo}";
     <div id="add-content">
       <div id="add-col">
         <h2>Add Channels</h2>
-        <h3 id="fromown">from your own</h3>
+        <h3>from your own</h3>
         <ul id="private-list" class="option-list">
           <li id="myFacebook"><span>My Facebook</span></li>
           <li id="myPodcast"><span>My Podcast</span></li>
@@ -250,7 +269,7 @@ var brandinfo = "${brandInfo}";
           <li id="myYouTube"><span>My YouTube</span></li>
           <!--<li id="myTwitter"><span>My Twitter</span></li>-->
         </ul>
-        <h3 id="from9x9">from 9x9</h3>
+        <h3>from 9x9</h3>
         <ul id="public-list" class="option-list">
           <li id="fSets"><span>Featured sets</span></li>
           <li id="fChannels"><span>Featured channels</span></li>
@@ -584,6 +603,128 @@ var brandinfo = "${brandInfo}";
   </div>
 </div>
 
+<div id="tvch-layer"> 
+  <div id="tvch-holder"> 
+    <div id="tvch-header"> 
+      <h2><span>News Channels</span></h2> 
+      <img src="${root}/images/arrow_up.png" id="tvch-arrow-up"> 
+    </div> 
+    <div id="tvch-container"> 
+      <ul id="tvch-list"> 
+        <li class="on"> 
+          <p class="tvch-thumb"><img src="${root}/thumb/03.png" class="thumb"><img src="${root}/images/icon_play.png" class="btn-tvpreview"></p> 
+          <p class="tvch-title"><span>ABC News</span></p> 
+          <p class="tvch-description"><span>ABC's Jason Ryan (@jasonryanabc) Just days after the perjury trial began, the federal judge overseeing...</span></p> 
+        </li> 
+        <li> 
+          <p class="tvch-thumb"><img src="${root}/thumb/02.jpg" class="thumb"><img src="${root}/images/icon_play.png" class="btn-tvpreview"></p> 
+          <p class="tvch-title"><span>CNN News Tonight World Wide</span></p> 
+          <p class="tvch-description"><span>CNN's Jason Ryan (@jasonryanabc) Just days after the perjury trial began, the federal judge overseeing...</span></p> 
+        </li> 
+        <li></li> 
+        <li></li> 
+        <li></li> 
+        <li></li> 
+        <li></li> 
+        <li></li> 
+        <li></li> 
+        <li></li> 
+        <li></li> 
+        <li></li> 
+      </ul> 
+    </div> 
+    <div id="tvch-footer"> 
+      <img src="${root}/images/arrow_down.png" id="tvch-arrow-down"> 
+    </div> 
+  </div> 
+</div> 
+
+<div id="tvpreview-layer" style="display:block;"> 
+  <div id="tvpreview-holder"> 
+    <div id="tvpreview-header"> 
+      <h2><span class="index">News Channels (<span id="chNum">10</span>) :</span><span class="title">Select a Channel</span></h2> 
+      <ul class="navigation"> 
+        <li class="btn-store"><img src="${root}/images/icon_store.png" class="icon-store"><span>Channel Store</span></li> 
+        <li class="btn-home"><img src="${root}/images/icon_home.png" class="icon-home"><span>Return to 9x9 View</span></li> 
+      </ul> 
+      <ul id="tvpreview-lang-setting"> 
+        <li><span id="tvpreview-program-lang" class="lang-selected">English programs</span><img src="${root}/images/icon_downarrow.png" class="icon-downarrow"> 
+          <ul class="lang-options"> 
+            <li id="tvp-lang-en"><img src="${root}/images/icon_check.png" class="icon-check"><span>English programs</span></li> 
+            <li id="tvp-lang-zh"><img src="${root}/images/icon_check.png" class="icon-check"><span>中文節目</span></li> 
+          </ul> 
+        </li> 
+      </ul> 
+    </div> 
+    <div id="tvpreview-container"> 
+      <div id="tvch-cards"> 
+        <div id="current-card"> 
+          <img src="" class="tvch-thumb"> 
+          <p class="tvch-title"><span>Channel: </span><span class="title">ABC News</span></p> 
+          <p class="tvch-description"><span></span></p> 
+          <p class="tvch-author"><span>Author: XXX YYY</span></p> 
+        </div> 
+        <div id="next1-card"><p class="tvch-title"><span>Channel: </span><span class="title"></span></p></div> 
+        <div id="next2-card"><p class="tvch-title"><span>Channel: </span><span class="title"></span></p></div> 
+        <div id="next3-card"><p class="tvch-title"><span>Channel: </span><span class="title"></span></p></div> 
+      </div> 
+      <div id="tvpreview-control"> 
+        <p class="btn" id="tri-left"><img src="${root}/images/tri_left.png"></p> 
+        <p class="btn" id="tri-right"><img src="${root}/images/tri_right.png"></p> 
+        <p class="btn" id="tri-up"><img src="${root}/images/tri_up.png"></p> 
+        <p class="btn" id="tri-down"><img src="${root}/images/tri_down.png"></p> 
+        <p class="btn" id="btn-plus"><img src="${root}/images/icon_plus.png"></p> 
+        <p class="txt" id="txt-left"><span>Prev<br>Episode</span></p> 
+        <p class="txt" id="txt-right"><span>Next<br>Episode</span></p> 
+        <p class="txt" id="txt-up"><span>Prev Channel</span></p> 
+        <p class="txt" id="txt-down"><span>Next Channel</span></p> 
+      </div> 
+      <div id="tvpreview-win"> 
+        <p class="btn-blue"><img src="${root}/images/icon_plus.png"><span>Add</span></p> 
+        <div id="tvpreview-video"></div> 
+        <img src="${root}/images/ep_panel_on.png" id="tvep-panel"> 
+        <p id="tv-arrow-right"><img src="${root}/images/arrow_right_off.png" id="tv-arrow-right-off"><img src="${root}/images/arrow_right_on.png" id="tv-arrow-right-on"></p> 
+        <p id="tv-arrow-left"><img src="${root}/images/arrow_left_off.png" id="tv-arrow-left-off"><img src="${root}/images/arrow_left_on.png" id="tv-arrow-left-on"></p> 
+        <ul class="tvep-list"></ul> 
+        <div id="tvep-meta"><p><span class="tvep-title"></span> - <span class="age"></span></p></div>
+      </div> 
+    </div> 
+  </div> 
+</div> 
+
+<div id="store-layer"> 
+  <div id="store-holder"> 
+    <div id="store-header"> 
+      <h2><span>Channel Store</span></h2> 
+      <ul class="navigation"> 
+        <li class="btn-home"><img src="${root}/images/icon_home.png" class="icon-home"><span>Return to 9x9 View</span></li> 
+      </ul> 
+      <ul id="store-lang-setting"> 
+        <li><span id="store-program-lang" class="lang-selected">English programs</span><img src="${root}/images/icon_downarrow.png" class="icon-downarrow"> 
+          <ul class="lang-options"> 
+            <li id="store-lang-en"><img src="${root}/images/icon_check.png" class="icon-check"><span>English programs</span></li> 
+            <li id="store-lang-zh"><img src="${root}/images/icon_check.png" class="icon-check"><span>中文節目</span></li> 
+          </ul> 
+        </li> 
+      </ul> 
+    </div> 
+    <div id="store-container"> 
+      <img src="${root}/images/arrow_up.png" id="store-arrow-up"> 
+      <img src="${root}/images/arrow_down.png" id="store-arrow-down"> 
+      <h3><span id="store-cat-1"></span></h3> 
+      <ul class="store-list" id="store-list-1"> 
+      </ul> 
+      <h3><span id="store-cat-2"></span></h3> 
+      <ul class="store-list" id="store-list-2"> 
+      </ul> 
+      <h3><span id="store-cat-3"></span></h3> 
+      <ul class="store-list" id="store-list-3"> 
+      </ul> 
+      <img src="${root}/images/tvch_shadow.png" id="store-shadow"></div> 
+    <div id="store-footer"></div> 
+  </div> 
+</div>
+
 <div id="ad-layer" style="display: none">
   <img src="${root}/images/ep_panel_on.png" id="ad-panel">
   <p id="ad-title"><span>Featured Channels</span></p>
@@ -675,6 +816,70 @@ var brandinfo = "${brandInfo}";
   </div>
   </div>
 </div>
+
+<div id="yt-layer"> 
+  <div id="yt-holder"> 
+    <div id="yt-header"> 
+      <h2><span>Add My YouTube Favorites</span></h2> 
+      <ul class="navigation"> 
+        <li class="btn-store"><img src="${root}/images/icon_store.png" class="icon-store"><span>Channel Store</span></li> 
+        <li class="btn-home"><img src="${root}/images/icon_home.png" class="icon-home"><span>Return to 9x9 View</span></li> 
+      </ul> 
+    </div> 
+    <div id="yt-container"> 
+        <div id="yt-url"> 
+          <div class="url-input"> 
+            <input name="" type="text" class="url-field" value="Enter YouTube Channel or Playlist URL"> 
+          </div> 
+          <p class="note">* We don't accept URLs for single video</p> 
+        </div> 
+        <div id="yt-chName"> 
+          <div class="url-input yt-input"> 
+            <input name="" type="text" class="url-field" value="Enter Channel Name"> 
+          </div> 
+        </div> 
+        <div id="yt-authorName">         
+          <div class="url-input yt-input"> 
+            <input name="" type="text" class="url-field" value="Enter Author Name"> 
+          </div> 
+        </div> 
+        <div id="yt-lang"> 
+          <ul id="yt-lang-setting"> 
+            <li><span id="yt-program-lang" class="lang-selected">Select program language</span><img src="${root}/images/icon_downarrow.png" class="icon-downarrow"> 
+              <ul class="lang-options"> 
+                <li id="yt-lang-en"><img src="${root}/images/icon_check.png" class="icon-check"><span>English programs</span></li> 
+                <li id="yt-lang-zh"><img src="${root}/images/icon_check.png" class="icon-check"><span>中文節目</span></li> 
+              </ul> 
+            </li> 
+           </ul> 
+        </div> 
+        <div id="yt-description"> 
+          <textarea name="" class="description-field">Enter Channel Description</textarea> 
+        </div> 
+        <div class="cate-selector" id="yt-cate"> 
+          <p>Choose category:</p> 
+          <ul class="cate-list"> 
+            <li><img src="${root}/images/check_off.png" class="check-off"><img src="${root}/images/check_on.png" class="check-on"><span>News</span></li> 
+            <li><img src="${root}/images/check_off.png" class="check-off"><img src="${root}/images/check_on.png" class="check-on"><span>Music</span></li> 
+            <li><img src="${root}/images/check_off.png" class="check-off"><img src="${root}/images/check_on.png" class="check-on"><span>Sports</span></li> 
+            <li><img src="${root}/images/check_off.png" class="check-off"><img src="${root}/images/check_on.png" class="check-on"><span>Movie Trailers</span></li> 
+            <li><img src="${root}/images/check_off.png" class="check-off"><img src="${root}/images/check_on.png" class="check-on"><span>Lifestyle</span></li> 
+            <li><img src="${root}/images/check_off.png" class="check-off"><img src="${root}/images/check_on.png" class="check-on"><span>Food & Wine</span></li> 
+            <li><img src="${root}/images/check_off.png" class="check-off"><img src="${root}/images/check_on.png" class="check-on"><span>Travel</span></li> 
+            <li><img src="${root}/images/check_off.png" class="check-off"><img src="${root}/images/check_on.png" class="check-on"><span>Local Deals</span></li> 
+            <li><img src="${root}/images/check_off.png" class="check-off"><img src="${root}/images/check_on.png" class="check-on"><span>Brands</span></li> 
+            <li><img src="${root}/images/check_off.png" class="check-off"><img src="${root}/images/check_on.png" class="check-on"><span>Others</span></li> 
+          </ul> 
+        </div> 
+        <div id="yt-submission"> 
+          <ul> 
+            <li class="btn" id="btn-add-yt"><span>Add</span></li><li class="btn" id="btn-cancel-yt"><span>Cancel</span></li> 
+          </ul> 
+          <p id="yt-feedback"><img src="${root}/images/loading.gif"><span>Processing...</span></p> 
+        </div> 
+    </div>   
+  </div> 
+</div> 
 
 <div id="signin-layer">
   <div id="signin-holder">
@@ -876,7 +1081,7 @@ var brandinfo = "${brandInfo}";
   <div id="direct-content">
     <img src="${root}/images/logo_about.png" id="direct-logo">
     <h1><span>9x9 is your personal video album</span></h1>
-    <p class="description"><span>All of your favorite videos in one place. Like videos from your podcasts, YouTuve channels, Facebook and Twitter. Plus discover video albums created for your unique lifestyle. You feed all these videos as TV channels into a personalized program guide you create and personalize.</span></p>
+    <p class="description"><span>All of your favorite videos in one place. Like videos from your podcasts, YouTube channels, Facebook and Twitter. Plus discover video albums created for your unique lifestyle. You feed all these videos as TV channels into a personalized program guide you create and personalize.</span></p>
     <p class="btn-blue" id="btn-direct-enter"><span>Watch it Now</span></p>
     <p class="promotion"><span>Personalize your video album and<br>save it to your <strong>Smart Guide</strong></span></p>
     <p class="btn-blue" id="btn-direct-signup"><span>Create Account</span></p>
@@ -997,6 +1202,196 @@ var brandinfo = "${brandInfo}";
 
 <div id="fb-root"></div>
 
+<div id="relaydiv" style="z-index: 1; position: absolute; top: 0px; left: 0px">
+<object id="relay" width=481 height=86>
+<param name=movie value="relay.swf">
+<embed play=false swliveconnect="true" name="relay" 
+src="http://50.17.15.33/relay.swf" quality=high bgcolor=#FFFFFF 
+width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="always" allowScripting="on" wmode="transparent">
+</embed>
+</object>
+</div>
+
 <!--/div-->
+
+<div id="header" style="display: none">
+  <img src="${nroot}/images/bg_header.gif" id="bg-header">
+  <img src="${nroot}/images/beta.png" id="beta">
+  <img src="${nroot}/images/logo.png" id="logo">
+  <p id="slogan"><span>Your Personal Video Album</span></p>  
+</div>
+
+<div id="store" style="background: white; display: none">
+  <div id="store-holder">
+    <h2><span>Channel Store</span></h2>
+    <img src="${nroot}/images/icon_cart_gray.png" id="btn-cart">
+    <p id="cart-bubble">
+      <img src="${nroot}/images/cart_bubble.png">
+      <span>0</span>
+    </p>
+    <div id="preview-area">
+      <p id="btn-flip-preview"><img src="${nroot}/images/btn_flip_L_off.png" id="btn-fp-off"><img src="${nroot}/images/btn_flip_L_on.png" id="btn-fp-on"></p>
+      <p id="preview-index"><span>You are previewing</span><span id="index-ch-title">The Beautiful Universe: Chandra in HD</span><span>in</span><span id="index-catg-title">Music</span></p>
+      <div id="preview-win">
+        <img src="${nroot}/images/bg_preview_win.jpg" id="bg-preview-win">
+        <p id="btn-sound"><img src="${nroot}/images/icon_sound_off.png" id="icon-sound-off"><img src="${nroot}/images/icon_sound_on.png" id="icon-sound-on"></p>
+        <div id="preview-video"></div>
+        <img src="${nroot}/images/preview_ep_panel.png" id="preview-ep-panel">
+        <img src="${nroot}/images/arrow_right_on.png" id="preview-arrow-right">
+        <img src="${nroot}/images/arrow_left_on.png" id="preview-arrow-left">
+        <ul id="preview-ep-list"><li class="on"><img src="${nroot}/images/bg_ep_off.png" class="ep-off"><img src="${nroot}/images/bg_ep_on.png" class="ep-on"><img src="${nroot}/thumb/14.jpeg" class="thumbnail"><p class="duration"><span>10:10</span></p></li><li><img src="${nroot}/images/bg_ep_off.png" class="ep-off"><img src="${nroot}/images/bg_ep_on.png" class="ep-on"><img src="${nroot}/thumb/06.jpg" class="thumbnail"><p class="duration"><span>10:10</span></p></li><li><img src="${nroot}/images/bg_ep_off.png" class="ep-off"><img src="${nroot}/images/bg_ep_on.png" class="ep-on"><img src="${nroot}/thumb/08.jpg" class="thumbnail"><p class="duration"><span>10:10</span></p></li><li><img src="${nroot}/images/bg_ep_off.png" class="ep-off"><img src="${nroot}/images/bg_ep_on.png" class="ep-on"><img src="${nroot}/thumb/04.jpg" class="thumbnail"><p class="duration"><span>10:10</span></p></li><li><img src="${nroot}/images/bg_ep_off.png" class="ep-off"><img src="${nroot}/images/bg_ep_on.png" class="ep-on"><img src="${nroot}/thumb/13.jpg" class="thumbnail"><p class="duration"><span>10:10</span></p></li><li><img src="${nroot}/images/bg_ep_off.png" class="ep-off"><img src="${nroot}/images/bg_ep_on.png" class="ep-on"><img src="${nroot}/thumb/13.jpg" class="thumbnail"><p class="duration"><span>10:10</span></p></li></ul>
+        <p id="preview-ep-meta">
+          <span class="meta-head">Episode:</span>
+          <span class="ep-title">Jay Leno's eclectic car collection</span>
+          <span class="amount">(5/15)</span>
+        </p>
+        <!--<p><span id="preview-meta-head">Episode:</span><span class="preview-ep-title">Jay Leno's eclectic car collection</span> - <span class="amount">5/15</span></p>-->
+      </div>
+      <div id="preview-ch-title">
+        <p class="text-holder"><span>The Beautiful Universe: Chandra in HD</span></p>
+      </div>
+      <p id="btn-detail"><span>More detail</span></p>
+      <img src="${nroot}/images/tag_free.png" id="tag-free">
+      <div id="channel-flipper">
+        <p id="flip-next"><img src="${nroot}/images/arrow_down.png"><span>Next Ch</span></p>
+        <p id="flip-prev"><img src="${nroot}/images/arrow_up.png"><span>Prev Ch</span></p>
+        <p id="flip-ch-index"><span>2 / 20</span></p>
+      </div>
+      <div id="btn-add-ch-L" class="btn-hilite"><img src="${nroot}/images/icon_cart_white.png" class="icon-cart"><p class="btn-text"><span>Add this Channel</span></p></div>
+    </div>    
+    <ul id="tabs">
+      <li id="recommended" class="on"><span>Recommended</span></li>
+      <li id="category"><span>Category</span></li>
+      <li id="yourown"><span>Add your own</span></li>
+    </ul>
+    <div id="channel-pool">
+      <div id="recommended-content" class="tab-content">
+        <ul id="recommended-list">
+        </ul>
+      </div>
+      <div id="category-content" class="tab-content">
+        <ul class="level1-list">
+        </ul>
+      </div>      
+      <div id="yourown-content" class="tab-content">
+        <h3><span>Add YouTube Channels</span></h3>
+        <p id="yt-intro"><span>Enter YouTube Channel or Playlist URL:</span></p>
+        <div id="yt-input">
+          <input name="" type="text" class="textfield" value="http://www.youtube.com/user/">
+        </div>
+        <p id="yt-note"><span>* We don't accept URLs for single video</span></p>
+        <div id="btn-add-yt" class="btn-hilite"><img src="${nroot}/images/icon_cart_white.png" class="icon-cart"><p class="btn-text"><span>Add this Channel</span></p></div>
+      </div>      
+    </div>
+  </div>
+</div>
+
+<div id="guide" style="background: white; display: none">
+  <div id="guide-holder">
+    <h2><span>9x9 Guide</span></h2>
+        <div id="guide-content">
+      <img src="${nroot}/images/bg_player.jpg" id="guide-bg">
+      <p id="btn-guide2store"><span>&lt; Back to Store</span></p>
+      <p id="guide-index"><span class="occupied">13/81</span><span>channels in your 9x9 Guide</span></p>
+      <p id="guide-tip"><span class="head">Tips:</span><br><span>Drag and drop channel icons to arrange channels</span></p>
+      <div id="grid">
+      </div>
+      <div id="channel-info">
+        <p class="head"><span>Current Channel:</span></p>
+        <p class="ch-title"><span>Jazz</span></p>
+        <p class="ch-description"><span>Last installment from my "Making Money from Podcasting" series...</span></p>
+        <p class="ch-epNum"><span>Episode:</span><span class="amount">12</span></p>
+        <p class="ch-updated"><span>Updated:</span><span class="date new">Today</span></p>
+      </div>
+      <img src="${nroot}/images/btn_sync.png" id="btn-guide-sync">
+    </div>
+  </div>
+</div>
+
+<div id="recent-layer" style="display: none">
+  <div id="recent-holder">
+    <h4><span>Recently Watched</span></h4>
+    <img src="${nroot}/images/btn_winclose.png" id="btn-recent-close">
+    <ul id="recent-list"><li class="first"><img src="${nroot}/thumb/01.jpg" class="thumbnail"><p class="ch-title"><span>Top 10 and Top 9 and top 8</span></p></li><li><img src="${nroot}/thumb/01.jpg" class="thumbnail"><p class="ch-title"><span>Top 10</span></p></li><li><img src="${nroot}/thumb/01.jpg" class="thumbnail"><p class="ch-title"><span>Top 10</span></p></li><li><img src="${nroot}/thumb/01.jpg" class="thumbnail"><p class="ch-title"><span>Top 10</span></p></li></ul>
+  </div>
+</div>
+
+<div id="player" style="display: none">
+  <div id="player-holder">
+    <h2><span>9x9 Player</span></h2>
+    <div id="player-content">
+      <p id="btn-flip-play"><img src="${nroot}/images/btn_flip_L_off.png" id="btn-fpl-off"><img src="${nroot}/images/btn_flip_L_on.png" id="btn-fpl-on"></p> 
+      <div id="footer"> </div>
+      <img src="${nroot}/images/bg_player.jpg" id="player-bg">
+      <p id="btn-player2store"><span>&lt; Back to Store</span></p>
+      <p id="player-index"><span>You are watching</span><span class="ch-title">Jazz</span><span>channel</span></p>
+      <div id="player-video"></div>
+      <img src="${nroot}/images/player_ep_panel.png" id="player-ep-panel">
+      <img src="${nroot}/images/arrow_right_on.png" id="player-arrow-right">
+      <img src="${nroot}/images/arrow_left_on.png" id="player-arrow-left">
+      <ul id="player-ep-list"><li class="on"><img src="${nroot}/images/bg_ep_off.png" class="ep-off"><img src="${nroot}/images/bg_ep_on.png" class="ep-on"><img src="${nroot}/thumb/14.jpeg" class="thumbnail"><p class="duration"><span>10:10</span></p></li><li><img src="${nroot}/images/bg_ep_off.png" class="ep-off"><img src="${nroot}/images/bg_ep_on.png" class="ep-on"><img src="${nroot}/thumb/06.jpg" class="thumbnail"><p class="duration"><span>10:10</span></p></li><li><img src="${nroot}/images/bg_ep_off.png" class="ep-off"><img src="${nroot}/images/bg_ep_on.png" class="ep-on"><img src="${nroot}/thumb/08.jpg" class="thumbnail"><p class="duration"><span>10:10</span></p></li><li><img src="${nroot}/images/bg_ep_off.png" class="ep-off"><img src="${nroot}/images/bg_ep_on.png" class="ep-on"><img src="${nroot}/thumb/04.jpg" class="thumbnail"><p class="duration"><span>10:10</span></p></li><li><img src="${nroot}/images/bg_ep_off.png" class="ep-off"><img src="${nroot}/images/bg_ep_on.png" class="ep-on"><img src="${nroot}/thumb/13.jpg" class="thumbnail"><p class="duration"><span>10:10</span></p></li><li><img src="${nroot}/images/bg_ep_off.png" class="ep-off"><img src="${nroot}/images/bg_ep_on.png" class="ep-on"><img src="${nroot}/thumb/16.jpg" class="thumbnail"><p class="duration"><span>10:10</span></p></li><li><img src="${nroot}/images/bg_ep_off.png" class="ep-off"><img src="${nroot}/images/bg_ep_on.png" class="ep-on"><img src="${nroot}/thumb/17.jpg" class="thumbnail"><p class="duration"><span>10:10</span></p></li><li><img src="${nroot}/images/bg_ep_off.png" class="ep-off"><img src="${nroot}/images/bg_ep_on.png" class="ep-on"><img src="${nroot}/thumb/18.jpg" class="thumbnail"><p class="duration"><span>10:10</span></p></li><li><img src="${nroot}/images/bg_ep_off.png" class="ep-off"><img src="${nroot}/images/bg_ep_on.png" class="ep-on"><img src="${nroot}/thumb/19.jpg" class="thumbnail"><p class="duration"><span>10:10</span></p></li></ul>
+      <p id="player-ep-meta">
+        <span class="meta-head">Episode:</span>
+        <span class="ep-title">Jay Leno's eclectic car collection</span>
+        <span class="amount">(5/15)</span>
+      </p>
+      <div id="player-ch-flipper">
+        <p id="play-next"><img src="${nroot}/images/arrow_down.png"><span>Next Ch</span></p>
+        <p id="play-prev"><img src="${nroot}/images/arrow_up.png"><span>Prev Ch</span></p>
+        <p id="play-ch-index"><span>2 / 20</span></p>
+      </div>      
+      <div id="player-info">
+        <div id="ep-description">
+          <p class="head"><span>Episode Description</span></p>
+          <p class="content"><span>Take a look at Selena as she meets fans in Philly and Chicago during her Dream Out Loud K-Mart signing. Dream Out Loud isSelena's clothing line now</span></p>
+        </div>
+        <div id="comment">
+          <p class="head"><span>Curation's Comment</span></p>
+          <p class="content"><span>Take a look at Selena as she meets fans in Philly and Chicago during her Dream Out Loud K-Mart signing. Dream Out Loud isSelena's clothing line now</span></p>
+        </div>
+      </div>
+      <ul id="control-bar">
+        <li id="btn-play"><img src="${nroot}/images/btn_play.png" title="Play"></li>
+        <li id="btn-pause"><img src="${nroot}/images/btn_pause.png" title="Pause"></li>
+        <li class="divider"></li>
+        <li id="play-time"><span>00:52 / 01:32</span></li>
+        <li class="divider"></li>
+        <li id="progress-constrain">
+          <img src="${nroot}/images/btn_knob.png" id="btn-knob">
+          <div id="progress-bar">
+            <p id="loaded"></p>
+            <p id="played"></p>
+          </div>
+        </li>
+        <li class="divider"></li>
+        <li id="btn-volume-down"><img src="${nroot}/images/btn_volume_down.png" title="Volume Down"></li>
+        <li id="volume-constrain">
+          <ul id="volume-bars">
+            <li class="on"></li>
+            <li class="on"></li>
+            <li class="on"></li>
+            <li class="on"></li>
+            <li></li>
+            <li></li>
+            <li></li>
+          </ul>
+        </li>
+        <li id="btn-volume-up"><img src="${nroot}/images/btn_volume_up.png" title="Volume Up"></li>
+        <li class="divider"></li>
+        <li id="btn-rez"><span>360p</span></li>
+        <li class="divider"></li>
+        <li id="btn-sort"><img src="${nroot}/images/btn_sort.png" title="Sort"></li>
+        <li id="btn-share"><img src="${nroot}/images/btn_share.png" title="Share"></li>
+        <li id="btn-sync"><img src="${nroot}/images/btn_sync.png" title="9x9 Sync"></li>
+        <li id="btn-full"><img src="${nroot}/images/btn_full.png" title="Full Screen"></li>
+      </ul>
+    </div>   
+  </div>
+</div>
+
+
+<div id="footer" style="display: none">
+</div>
+
 </body>
 </html>
