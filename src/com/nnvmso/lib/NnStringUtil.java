@@ -22,6 +22,7 @@ public class NnStringUtil {
 	 * @throws UnsupportedEncodingException 
 	 */
 	public static String truncateUTF8(String str, int maxBytes) {
+		if (str == null) { return null; }
 		Charset utf8 = Charset.forName("UTF-8");
 		int totalBytes = str.getBytes(utf8).length;
 		if (totalBytes <= maxBytes) { return str; }
