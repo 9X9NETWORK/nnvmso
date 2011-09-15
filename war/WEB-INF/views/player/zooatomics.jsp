@@ -5,7 +5,7 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9playerV68a"/>
-<c:set var="nroot" value="http://9x9ui.s3.amazonaws.com/9x9playerV73"/>
+<c:set var="nroot" value="http://9x9ui.s3.amazonaws.com/9x9playerV74"/>
 
 <!-- $Revision$ -->
 
@@ -690,39 +690,6 @@ var brandinfo = "${brandInfo}";
       </div> 
     </div> 
   </div> 
-</div> 
-
-<div id="store-layer"> 
-  <div id="store-holder"> 
-    <div id="store-header"> 
-      <h2><span>Channel Store</span></h2> 
-      <ul class="navigation"> 
-        <li class="btn-home"><img src="${root}/images/icon_home.png" class="icon-home"><span>Return to 9x9 View</span></li> 
-      </ul> 
-      <ul id="store-lang-setting"> 
-        <li><span id="store-program-lang" class="lang-selected">English programs</span><img src="${root}/images/icon_downarrow.png" class="icon-downarrow"> 
-          <ul class="lang-options"> 
-            <li id="store-lang-en"><img src="${root}/images/icon_check.png" class="icon-check"><span>English programs</span></li> 
-            <li id="store-lang-zh"><img src="${root}/images/icon_check.png" class="icon-check"><span>中文節目</span></li> 
-          </ul> 
-        </li> 
-      </ul> 
-    </div> 
-    <div id="store-container"> 
-      <img src="${root}/images/arrow_up.png" id="store-arrow-up"> 
-      <img src="${root}/images/arrow_down.png" id="store-arrow-down"> 
-      <h3><span id="store-cat-1"></span></h3> 
-      <ul class="store-list" id="store-list-1"> 
-      </ul> 
-      <h3><span id="store-cat-2"></span></h3> 
-      <ul class="store-list" id="store-list-2"> 
-      </ul> 
-      <h3><span id="store-cat-3"></span></h3> 
-      <ul class="store-list" id="store-list-3"> 
-      </ul> 
-      <img src="${root}/images/tvch_shadow.png" id="store-shadow"></div> 
-    <div id="store-footer"></div> 
-  </div> 
 </div>
 
 <div id="ad-layer" style="display: none">
@@ -1214,14 +1181,35 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
 
 <!--/div-->
 
-<div id="header" style="display: none">
+<div id="header">
   <img src="${nroot}/images/bg_header.gif" id="bg-header">
   <img src="${nroot}/images/beta.png" id="beta">
   <img src="${nroot}/images/logo.png" id="logo">
-  <p id="slogan"><span>Your Personal Video Album</span></p>  
+  <p id="slogan"><span>Your Personal Video Album</span></p>
+  <ul id="nav">
+    <li id="btn-account">
+      <p><span class="head">Hi,</span><span id="user">Guest</span><img src="${nroot}/images/icon_expand.png" class="icon-expand"></p>
+      <ul id="account-dropdown" class="dropdown">
+        <li id="btn-signin"><span>Sign in / Sign up</span></li>
+        <li id="btn-settings"><span>Settings</span></li>
+        <li id="btn-signout"><span>Sign out</span></li>
+      </ul>
+    </li>
+    <li class="divider"></li>
+    <li id="store" class="main"><span>Store</span></li>
+    <li class="divider"></li>
+    <li id="guide" class="main"><span>Guide</span></li>
+    <li class="divider"></li>
+    <li id="player" class="main"><span>Player</span></li>
+    <li class="divider"></li>
+    <li id="curator"><span>Curator</span></li>
+    <li class="divider"></li>
+    <li id="help"><span>Help</span></li>
+  </ul>
 </div>
 
-<div id="store" style="background: white; display: none">
+
+<div id="store-layer" class="stage" style="background: white; display: none">
   <div id="store-holder">
     <h2><span>Channel Store</span></h2>
     <img src="${nroot}/images/icon_cart_gray.png" id="btn-cart">
@@ -1286,7 +1274,7 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
   </div>
 </div>
 
-<div id="guide" style="background: white; display: none">
+<div id="guide-layer" class="stage" style="background: white; display: none">
   <div id="guide-holder">
     <h2><span>9x9 Guide</span></h2>
         <div id="guide-content">
@@ -1303,7 +1291,16 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
         <p class="ch-epNum"><span>Episode:</span><span class="amount">12</span></p>
         <p class="ch-updated"><span>Updated:</span><span class="date new">Today</span></p>
       </div>
-      <img src="${nroot}/images/btn_sync.png" id="btn-guide-sync">
+      
+      <ul id="guide-sync">
+        <li id="btn-guide-sync">
+          <img src="${nroot}/images/btn_sync.png">
+          <ul id="guide-sync-dropdown" class="dropdown">
+            <li class="on"><img src="${nroot}/images/icon_check.png" class="icon-check"><span>Google TV</span></li>
+            <li><img src="${nroot}/images/icon_check.png" class="icon-check"><span>Google TV2</span></li>
+          </ul>
+        </li>
+      </ul>
     </div>
   </div>
 </div>
@@ -1316,16 +1313,15 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
   </div>
 </div>
 
-<div id="player" style="display: none">
+<div id="player-layer" class="stage" style="display: none; background: white">
+  <div id="player-video"></div>
   <div id="player-holder">
     <h2><span>9x9 Player</span></h2>
     <div id="player-content">
       <p id="btn-flip-play"><img src="${nroot}/images/btn_flip_L_off.png" id="btn-fpl-off"><img src="${nroot}/images/btn_flip_L_on.png" id="btn-fpl-on"></p> 
-      <div id="footer"> </div>
       <img src="${nroot}/images/bg_player.jpg" id="player-bg">
-      <p id="btn-player2store"><span>&lt; Back to Store</span></p>
+      <p id="btn-player2store"><span>< Back to Store</span></p>
       <p id="player-index"><span>You are watching</span><span class="ch-title">Jazz</span><span>channel</span></p>
-      <div id="player-video"></div>
       <img src="${nroot}/images/player_ep_panel.png" id="player-ep-panel">
       <img src="${nroot}/images/arrow_right_on.png" id="player-arrow-right">
       <img src="${nroot}/images/arrow_left_on.png" id="player-arrow-left">
@@ -1366,15 +1362,7 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
         <li class="divider"></li>
         <li id="btn-volume-down"><img src="${nroot}/images/btn_volume_down.png" title="Volume Down"></li>
         <li id="volume-constrain">
-          <ul id="volume-bars">
-            <li class="on"></li>
-            <li class="on"></li>
-            <li class="on"></li>
-            <li class="on"></li>
-            <li></li>
-            <li></li>
-            <li></li>
-          </ul>
+          <ul id="volume-bars"><li class="on"></li><li class="on"></li><li class="on"></li><li class="on"></li><li></li><li></li><li></li></ul>
         </li>
         <li id="btn-volume-up"><img src="${nroot}/images/btn_volume_up.png" title="Volume Up"></li>
         <li class="divider"></li>
@@ -1382,13 +1370,18 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
         <li class="divider"></li>
         <li id="btn-sort"><img src="${nroot}/images/btn_sort.png" title="Sort"></li>
         <li id="btn-share"><img src="${nroot}/images/btn_share.png" title="Share"></li>
-        <li id="btn-sync"><img src="${nroot}/images/btn_sync.png" title="9x9 Sync"></li>
+        <li id="btn-sync">
+          <img src="${nroot}/images/btn_sync.png" title="9x9 Sync">
+          <ul id="sync-dropdown" class="dropdown">
+            <li class="on"><img src="${nroot}/images/icon_check.png" class="icon-check"><span>Google TV</span></li>
+            <li><img src="${nroot}/images/icon_check.png" class="icon-check"><span>Google TV2</span></li>
+          </ul>
+        </li>
         <li id="btn-full"><img src="${nroot}/images/btn_full.png" title="Full Screen"></li>
       </ul>
-    </div>   
+    </div>
   </div>
 </div>
-
 
 <div id="footer" style="display: none">
 </div>
