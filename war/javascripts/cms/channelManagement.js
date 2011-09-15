@@ -1137,6 +1137,7 @@ var page$ = {
   },
   initGenericOne: function() {
     $('.create_channel_hint').show();
+    $('.create_channel_button').unbind().click(page$.skeletonCreation.create9x9Channel);
   },
   init: function() {
     var css = '.chPublic { background:url(' + $('#image_ch_public').text() + ') no-repeat; }\n.chUnPublic { background:url(' + $('#image_ch_unpublic').text() + ') no-repeat; }';
