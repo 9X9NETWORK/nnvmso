@@ -98,7 +98,10 @@ var cms = {
   loadScript: function(url, callback) {
     var cache = $.ajaxSettings.cache;
     $.ajaxSettings.cache = true;
-    $.getScript(url, callback);
+    if (typeof (callback) == 'function')
+      $.getScript(url, callback);
+    else
+      $.getScript(url);
     $.ajaxSettings.cache = cache;
   },
   initSetupButton: function() {
@@ -109,13 +112,11 @@ var cms = {
       ajax:    'setup',
       trigger: '#setup',
       onLoad: function() {
-        cms.loadScript('http://connect.facebook.net/en_US/all.js', function() {
-          cms.loadScript('/javascripts/cms/setup.js', function() {
-            pageSetup.init();
-            if (cms.isGeneric()) {
-              pageSetup.initGenericOne();
-            }
-          });
+        cms.loadScript('/javascripts/cms/setup.js', function() {
+          pageSetup.init();
+          if (cms.isGeneric()) {
+            pageSetup.initGenericOne();
+          }
         });
       },
       onHide: function() {
@@ -147,7 +148,12 @@ var cms = {
       cache: false
     });
     
-    cms.loadScript('/javascripts/jquery.jqModal.js', cms.initSetupButton);
+    cms.loadScript('/javascripts/plugins/jquery.getCSS.js', function() {
+      $.getCSS('/stylesheets/jquery.jqModal.css', function() {
+        cms.loadScript('/javascripts/plugins/jquery.jqModal.js', cms.initSetupButton);
+      });
+    });
+    cms.loadScript('/javascripts/plugins/jquery.textTruncate.js');
   }
 };
 

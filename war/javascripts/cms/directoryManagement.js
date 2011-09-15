@@ -417,7 +417,7 @@ var page$ = {
     }
   },
   init: function() {
-    cms.loadScript('/javascripts/jquery.jstree.js', function() {
+    cms.loadScript('/javascripts/plugins/jquery.jstree.js', function() {
       page$.channelAndSetPool.onload = page$.directoryArea.init;
       page$.channelAndSetPool.init();
     });

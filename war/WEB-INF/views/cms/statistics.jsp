@@ -6,11 +6,11 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="stylesheet" type="text/css" href="/stylesheets/cms.css" />
 <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.15/themes/start/jquery-ui.css" />
-<link rel="stylesheet" href="/stylesheets/jquery.jqModal.css" type="text/css"/>
+<link rel="stylesheet" type="text/css" href="/stylesheets/cms.css" />
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.js"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.15/jquery-ui.min.js"></script>
+<script type="text/javascript" src="http://connect.facebook.net/en_US/all.js"></script>
 <script type="text/javascript" src="/javascripts/cms/common.js"></script>
 <script type="text/javascript" src="/javascripts/cms/statistics.js"></script>
 <title><spring:message code="cms.statistics.title"/></title>

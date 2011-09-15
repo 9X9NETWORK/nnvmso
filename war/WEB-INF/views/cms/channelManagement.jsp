@@ -7,12 +7,11 @@
 <head>
 <meta type="text/css" http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <link type="text/css" rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.15/themes/start/jquery-ui.css"/>
-<link type="text/css" rel="stylesheet" href="/stylesheets/jquery.jqModal.css"/>
 <link type="text/css" rel="stylesheet" href="/stylesheets/cms.css"/>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.js"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.15/jquery-ui.min.js"></script>
-<script type="text/javascript" src="/javascripts/jquery.textTruncate.js"></script>
-<script type="text/javascript" src="/javascripts/jquery.progressbar.js"></script>
+<script type="text/javascript" src="http://connect.facebook.net/en_US/all.js"></script>
+<script type="text/javascript" src="/javascripts/plugins/jquery.progressbar.js"></script>
 <script type="text/javascript" src="/javascripts/swfupload/swfupload.js"></script>
 <script type="text/javascript" src="/javascripts/cms/common.js"></script>
 <script type="text/javascript" src="/javascripts/cms/channelManagement.js"></script>
