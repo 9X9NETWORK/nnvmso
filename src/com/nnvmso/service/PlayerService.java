@@ -14,7 +14,6 @@ import com.nnvmso.model.ChannelSet;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoProgram;
-import com.nnvmso.web.PlayerController;
 
 public class PlayerService {
 	

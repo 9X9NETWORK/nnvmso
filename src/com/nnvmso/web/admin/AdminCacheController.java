@@ -17,9 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnNetUtil;
-import com.nnvmso.model.Category;
 import com.nnvmso.model.MsoChannel;
-import com.nnvmso.service.CategoryManager;
 import com.nnvmso.service.MsoChannelManager;
 import com.nnvmso.service.MsoManager;
 import com.nnvmso.service.MsoProgramManager;

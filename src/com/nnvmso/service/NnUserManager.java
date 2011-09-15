@@ -12,7 +12,6 @@ import com.nnvmso.dao.NnUserDao;
 import com.nnvmso.lib.AuthLib;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
-import com.nnvmso.model.MsoProgram;
 import com.nnvmso.model.NnUser;
 
 @Service

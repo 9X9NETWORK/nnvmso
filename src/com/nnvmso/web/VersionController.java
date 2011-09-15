@@ -44,6 +44,7 @@ public class VersionController {
 		return NnNetUtil.textReturn(info);
 	}	
 	
+	@SuppressWarnings("unused")
 	@RequestMapping("facebookTest") // delete after
 	private ResponseEntity<String> facebookTest() throws IOException {
 		
