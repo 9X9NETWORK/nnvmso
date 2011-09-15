@@ -6,7 +6,7 @@
     <div class="setTitle">
       <ul class="setupTab">
         <li id="tabA" class="setupTabItem link_Act"><a href="javascript:"><spring:message code="cms.setup.label.account_sync"/></a></li>
-        <li id="tabB" class="setupTabItem link_Normal"><a href="javascript:"><spring:message code="cms.setup.label.admin_group"/></a></li>
+        <li id="tabB" class="setupTabItem link_Normal" style="display:none"><a href="javascript:"><spring:message code="cms.setup.label.admin_group"/></a></li>
         <li id="tabC" class="setupTabItem link_Normal"><a href="javascript:"><spring:message code="cms.setup.label.change_password"/></a></li>
         <div class="clear"></div>
       </ul>
