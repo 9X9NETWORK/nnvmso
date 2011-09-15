@@ -311,12 +311,13 @@ public class TranscodingServiceController {
 	}
 	
 	@RequestMapping("updateFbToken")
-	public ResponseEntity<String> updateFbToken(@RequestParam(required=false) String access_token) throws IOException {
+	public ResponseEntity<String> updateFbToken(@RequestParam(required=false) String access_token,
+	                                            @RequestParam(required=false) Boolean real) throws IOException {
 		try {
 			if (access_token == null || access_token.length() == 0) {
 				return NnNetUtil.textReturn("not empty");
 			}
-			transcodingService.updateFbToken(access_token);
+			transcodingService.updateFbToken(access_token, (real != null));
 		} catch (Exception e) {
 			transcodingService.handleException(e);
 		}

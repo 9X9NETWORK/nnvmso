@@ -303,14 +303,18 @@ public class TranscodingService {
 		return pro;
 	}
 	
-	public void updateFbToken(String fbToken) {
+	public void updateFbToken(String fbToken, Boolean real) {
 		MsoConfigManager configMngr = new MsoConfigManager();		
-		MsoConfig config = configMngr.findByItem(MsoConfig.FBTOKEN);
+		String item;
+		if (real)
+			item = MsoConfig.REALFBTOKEN;
+		else
+			item = MsoConfig.FBTOKEN;
+		MsoConfig config = configMngr.findByItem(item);
 		if (config == null) { config = new MsoConfig();	}
-		config.setItem(MsoConfig.FBTOKEN);
+		config.setItem(item);
 		config.setValue(fbToken);
 		configMngr.save(config);
-		
 	}
 	
 	public String[] getTranscodingEnv(HttpServletRequest req) {

@@ -73,7 +73,7 @@ public class FacebookLib {
 	public void postToFacebook(FBPost fbPost) throws IOException {
 		
 		MsoConfigManager configMngr = new MsoConfigManager();
-		MsoConfig fbConfig = configMngr.findByItem(MsoConfig.FBTOKEN);
+		MsoConfig fbConfig = configMngr.findByItem(MsoConfig.REALFBTOKEN);
 		String accessToken = fbConfig.getValue();
 		
 		URL url = new URL("https://graph.facebook.com/" + fbPost.getFacebookId() + "/feed");
