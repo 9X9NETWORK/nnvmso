@@ -139,6 +139,7 @@ var brandinfo = "${brandInfo}";
 
   </div>
 
+<!--
 <div id="ep-layer" style="display: none">
   <img src="${root}/images/ep_panel_off.png" id="ep-panel">
   <div id="ep-tip"></div>
@@ -150,6 +151,7 @@ var brandinfo = "${brandInfo}";
     <div id="ep-meta"><p><span class="ch-title" id="ep-layer-ch-title"></span> - <span class="ep-title" id="ep-layer-ep-title"></span> - <span class="age" id="ep-age"></span> - <span class="duration" id="ep-length"></span></p></div>
   </div>
 </div>
+-->
 
 <ul class="set-options"> 
   <li class="on"><img src="${root}/images/icon_check.png" class="icon-check"><span>News</span></li> 
@@ -916,6 +918,7 @@ var brandinfo = "${brandInfo}";
 
 <div id="preload-control-images" style="display: none"></div>
 
+<!--
 <div id="control-layer" style="display: block;">
     <img src="${root}/images/bg_controler.png" id="controler-bg">
     <ul id="control-bar">
@@ -925,7 +928,6 @@ var brandinfo = "${brandInfo}";
         <p id="played"></p>
       </li>
       <li class="divider"></li>
-
       <li id="instruction"><span id="cinstr">Mouse over the control bar to see episodes.</span></li>
       <li id="btn-volume-up" class="cpclick"><img src="${root}/images/btn_volume_up.png" title="Volume Up"></li>
       <li id="volume-constrain" class="on">
@@ -940,7 +942,6 @@ var brandinfo = "${brandInfo}";
         </ul>
       </li>
       <li id="btn-volume-down" class="cpclick"><img src="${root}/images/btn_volume_down.png" title="Volume Down"></li>
-      <!--li id="btn-mute"><img src="${root}/images/btn_mute.png" title="Mute"></li-->
       <li class="divider-r">
       <li id="btn-facebook" class="cpclick"><img src="${root}/images/btn_facebook.png" title="Share to Facebook"></li>
       <li id="btn-sg" class="cpclick"><img src="${root}/images/btn_sg.png" title="Return to Smart Guide "></li>
@@ -953,6 +954,7 @@ var brandinfo = "${brandInfo}";
       <li class="divider-r"></li>
     </ul>
 </div>
+--!>
 
 <div id="delete-layer">
   <div class="delete-holder" id="delete-holder">
@@ -1000,6 +1002,7 @@ var brandinfo = "${brandInfo}";
   </div>
 </div>
 
+<!--
 <div id="ear-left">
   <p id="left-off">
     <span>CH -</span>
@@ -1010,7 +1013,9 @@ var brandinfo = "${brandInfo}";
     <p class="ch"><span>CH -</span></p> 
   </div>
 </div>
+-->
 
+<!--
 <div id="ear-right">
   <p id="right-off">
     <span>CH +</span>
@@ -1021,6 +1026,7 @@ var brandinfo = "${brandInfo}";
     <p class="ch"><span>CH +</span></p> 
   </div>
 </div>
+-->
 
 <div id="epend-layer" style="display: none">
   <div id="go-up">Press <span class="enlarge">&uarr;</span> to go to the IPG</div>
@@ -1209,7 +1215,7 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
 </div>
 
 
-<div id="store-layer" class="stage" style="background: white; display: none">
+<div id="store-layer" class="stage" style="background: #f0f0f0; display: none">
   <div id="store-holder">
     <h2><span>Channel Store</span></h2>
     <img src="${nroot}/images/icon_cart_gray.png" id="btn-cart">
@@ -1249,7 +1255,7 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
     </div>    
     <ul id="tabs">
       <li id="recommended" class="on"><span>Recommended</span></li>
-      <li id="category"><span>Category</span></li>
+      <li id="category"><span>Categories</span></li>
       <li id="yourown"><span>Add your own</span></li>
     </ul>
     <div id="channel-pool">
@@ -1274,7 +1280,7 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
   </div>
 </div>
 
-<div id="guide-layer" class="stage" style="background: white; display: none">
+<div id="guide-layer" class="stage" style="background: #f0f0f0; display: none">
   <div id="guide-holder">
     <h2><span>9x9 Guide</span></h2>
         <div id="guide-content">
@@ -1313,7 +1319,7 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
   </div>
 </div>
 
-<div id="player-layer" class="stage" style="display: none; background: white">
+<div id="player-layer" class="stage" style="display: none; background: #f0f0f0">
   <div id="player-video"></div>
   <div id="player-holder">
     <h2><span>9x9 Player</span></h2>
@@ -1342,7 +1348,7 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
           <p class="content"><span>Take a look at Selena as she meets fans in Philly and Chicago during her Dream Out Loud K-Mart signing. Dream Out Loud isSelena's clothing line now</span></p>
         </div>
         <div id="comment">
-          <p class="head"><span>Curation's Comment</span></p>
+          <p class="head"><span>Curator's Comment</span></p>
           <p class="content"><span>Take a look at Selena as she meets fans in Philly and Chicago during her Dream Out Loud K-Mart signing. Dream Out Loud isSelena's clothing line now</span></p>
         </div>
       </div>
