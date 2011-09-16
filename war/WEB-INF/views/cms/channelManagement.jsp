@@ -602,6 +602,7 @@
   <div class="right_footer"></div>
   <div class="clear"></div>
 </div>
+<%@include file="footer.jsp"%>
 <!-- language tags for javascript -->
 <label class="lang" id="lang_title_create_channel_info"><spring:message code="cms.channel_management.title.create_channel_info"/></label>
 <label class="lang" id="lang_title_edit_channel_info"><spring:message code="cms.channel_management.title.edit_channel_info"/></label>

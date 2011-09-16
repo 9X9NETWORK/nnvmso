@@ -93,6 +93,7 @@
   </div>
   <div class="clear"></div>
 </div>
+<%@include file="footer.jsp"%>
 <label class="lang" id="lang_view_statistics"><spring:message code="cms.promotion_tools.msg.view_statistics"/></label>
 <label class="lang" id="lang_label_channel_set"><spring:message code="cms.promotion_tools.label.channel_set"/></label>
 <label class="lang" id="lang_confirm_goto_setting_page"><spring:message code="cms.warning.goto_setting_page"/></label>

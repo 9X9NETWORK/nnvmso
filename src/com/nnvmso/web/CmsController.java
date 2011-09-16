@@ -89,6 +89,7 @@ public class CmsController {
 				model.addAttribute("mso", mso);
 				model.addAttribute("msoId", mso.getKey().getId());
 				model.addAttribute("msoType", mso.getType());
+				model.addAttribute("msoName", "cms");
 				model.addAttribute("logoutUrl", "/cms/logout");
 				if (cmsTab.equals("channelManagement") || cmsTab.equals("channelSetManagement")) {
 					String policy = AmazonLib.buildS3Policy("9x9tmp", "public-read", "");
@@ -223,11 +224,14 @@ public class CmsController {
 		
 		Mso sessionMso = (Mso)session.getAttribute("mso");
 		if (sessionMso != null && sessionMso.getKey().getId() == mso.getKey().getId()) {
+			
 			model.addAttribute("msoLogo", mso.getLogoUrl());
 			model.addAttribute("mso", mso);
 			model.addAttribute("msoId", mso.getKey().getId());
 			model.addAttribute("msoType", mso.getType());
+			model.addAttribute("msoName", mso.getName());
 			model.addAttribute("logoutUrl", "/" + msoName + "/logout");
+			
 			if (cmsTab.equals("channelManagement") || cmsTab.equals("channelSetManagement")) {
 				String policy = AmazonLib.buildS3Policy("9x9tmp", "public-read", "");
 				model.addAttribute("s3Policy", policy);

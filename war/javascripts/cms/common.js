@@ -126,11 +126,15 @@ var cms = {
     });
   },
   initGenericOne: function() {
+    $('#blog_link').show();
     $('#mso_logo').wrapAll('<a href="/9x9"></a>');
     $('.menuB').removeAttr('href');
     $('<style/>').text('.menuB:hover { background-position: -90px -59px; cursor: default}').appendTo('head');
   },
   init: function() {
+    if (!cms.isGeneric()) {
+      $('#mso_logo').wrapAll('<a href="/' + $('#msoName').val() + '"></a>');
+    }
     $('.header .logout').css('background', 'url(' + $('#image_header_logout').text() + ') no-repeat');
     $('.header .setup').css('background', 'url(' + $('#image_header_setup').text() + ') no-repeat');
     $('.header .sg').css('background', 'url(' + $('#image_header_sg').text() + ') no-repeat');

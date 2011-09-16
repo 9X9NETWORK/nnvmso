@@ -185,6 +185,7 @@
   </div>
   <div class="clear"></div>
 </div>
+<%@include file="footer.jsp"%>
 <label class="lang" id="lang_view_statistics"><spring:message code="cms.statistics.msg.view_statistics"/></label>
 <label class="lang" id="lang_label_channel_set"><spring:message code="cms.statistics.label.channel_set"/></label>
 <label class="lang" id="lang_title_set_statistics"><spring:message code="cms.statistics.title.channel_set_statistics"/></label>
