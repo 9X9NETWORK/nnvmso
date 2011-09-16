@@ -133,22 +133,37 @@ public class AdminMsoController {
 	}
 	
 	@RequestMapping(value = "list", params = {"page", "rows", "sidx", "sord"})
-	public void list(@RequestParam(value = "page") Integer      currentPage,
-	                 @RequestParam(value = "rows") Integer      rowsPerPage,
-	                 @RequestParam(value = "sidx") String       sortIndex,
-	                 @RequestParam(value = "sord") String       sortDirection,
-	                                               OutputStream out) {
+	public void list(@RequestParam(value = "page")   Integer      currentPage,
+	                 @RequestParam(value = "rows")   Integer      rowsPerPage,
+	                 @RequestParam(value = "sidx")   String       sortIndex,
+	                 @RequestParam(value = "sord")   String       sortDirection,
+	                 @RequestParam(required = false) String       searchField,
+	                 @RequestParam(required = false) String       searchOper,
+	                 @RequestParam(required = false) String       searchString,
+	                                                 OutputStream out) {
 		
 		NnUserManager userMngr = new NnUserManager();
 		ObjectMapper mapper = new ObjectMapper();
 		List<Map<String, Object>> dataRows = new ArrayList<Map<String, Object>>();
 		
-		int totalRecords = msoMngr.total();
+		String filter = "";
+		if (searchField != null && searchOper != null && searchString != null && !searchString.isEmpty()) {
+			
+			Map<String, String> opMap = JqgridHelper.getOpMap();
+			if (opMap.containsKey(searchOper)) {
+				filter = searchField + " " + opMap.get(searchOper) + " " + searchString;
+				logger.info("filter: " + filter);
+				sortIndex = "updateDate";
+				sortDirection = "desc";
+			}
+		}
+		
+		int totalRecords = msoMngr.total(filter);
 		int totalPages = (int)Math.ceil((double)totalRecords / rowsPerPage);
 		if (currentPage > totalPages)
 			currentPage = totalPages;
 		
-		List<Mso> results = msoMngr.list(currentPage, rowsPerPage, sortIndex, sortDirection);
+		List<Mso> results = msoMngr.list(currentPage, rowsPerPage, sortIndex, sortDirection, filter);
 		
 		for (Mso mso : results) {
 			

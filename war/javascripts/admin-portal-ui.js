@@ -1518,6 +1518,7 @@ var page$ = {
             index:    'logoUrl',
             width:    150,
             align:    'center',
+            search:   false,
             sortable: true,
             hidden:   true,
             editable: true,
@@ -1535,6 +1536,7 @@ var page$ = {
             index:    'mso',
             width:    80,
             align:    'center',
+            search:   false,
             stype:    'select',
             sortable: false,
             editable: true,
@@ -1548,6 +1550,7 @@ var page$ = {
             index:    'name',
             width:    100,
             align:    'center',
+            search:   false,
             sortable: true,
             editable: true,
             editrules: {
@@ -1563,6 +1566,7 @@ var page$ = {
             index:    'title',
             width:    100,
             align:    'center',
+            search:   false,
             sortable: true,
             editable: true,
             editoptions: {
@@ -1575,6 +1579,7 @@ var page$ = {
             index:    'updateDate',
             width:    140,
             align:    'center',
+            search:   false,
             sortable: true,
             editable: true,
             editoptions: {
@@ -1587,6 +1592,7 @@ var page$ = {
             index:    'createDate',
             width:    140,
             align:    'center',
+            search:   false,
             sortable: true,
             editable: true,
             hidden:   true,
@@ -1603,6 +1609,7 @@ var page$ = {
             index:    'logoClickUrl',
             width:    150,
             align:    'center',
+            search:   false,
             sortable: true,
             hidden:   true,
             editable: true,
@@ -1616,6 +1623,7 @@ var page$ = {
             index:    'jingleUrl',
             width:    150,
             align:    'center',
+            search:   false,
             sortable: true,
             hidden:   true,
             editable: true,
@@ -1629,6 +1637,8 @@ var page$ = {
             index:     'type',
             width:     70,
             align:     'center',
+            search:    true,
+            stype:     'select',
             sortable:  true,
             formatter: 'select',
             editable:  true,
@@ -1636,6 +1646,10 @@ var page$ = {
             editoptions: {
               disabled: true,
               value:    constants.msoType
+            },
+            searchoptions: {
+              sopt:  ['eq'],
+              value: constants.msoType
             }
           },
           {
@@ -1645,6 +1659,7 @@ var page$ = {
             width:     90,
             align:     'center',
             sortable:  true,
+            search:    false,
             formatter: 'select',
             editable:  true,
             edittype:  'select',
@@ -1659,6 +1674,7 @@ var page$ = {
             width:    70,
             align:    'center',
             hidden:   true,
+            search:   false,
             sortable: true,
             editable: true,
             editrules: {
@@ -1673,6 +1689,7 @@ var page$ = {
             index:    'password',
             width:    140,
             align:    'center',
+            search:   false,
             sortable: false,
             editable: true,
             edittype: 'password',
@@ -1691,6 +1708,7 @@ var page$ = {
             index:    'intro',
             width:    150,
             align:    'center',
+            search:   false,
             sortable: true,
             hidden:   true,
             editable: true,
@@ -1708,6 +1726,7 @@ var page$ = {
             index:    'viewers',
             width:    60,
             align:    'center',
+            search:   false,
             sortable: false,
             hidden:   false,
             editable: false
@@ -1776,7 +1795,7 @@ var page$ = {
           edit:   false,
           add:    true,
           del:    false,
-          search: false,
+          search: true,
           view:   false,
           addtitle: 'Create A New MSO'
         },
@@ -2060,7 +2079,8 @@ var page$ = {
             index:     'type',
             width:     70,
             align:     'center',
-            search:    false,
+            search:    true,
+            stype:     'select',
             sortable:  true,
             formatter: 'select',
             editable:  true,
@@ -2068,6 +2088,10 @@ var page$ = {
             editoptions: {
               disabled: true,
               value:    constants.userType
+            },
+            searchoptions: {
+              sopt:  ['eq'],
+              value: constants.userType
             }
           },
           {
