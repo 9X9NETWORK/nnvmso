@@ -5,7 +5,7 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9playerV68a"/>
-<c:set var="nroot" value="http://9x9ui.s3.amazonaws.com/9x9playerV74"/>
+<c:set var="nroot" value="http://9x9ui.s3.amazonaws.com/9x9playerV75"/>
 
 <!-- $Revision$ -->
 
@@ -1372,18 +1372,42 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
         </li>
         <li id="btn-volume-up"><img src="${nroot}/images/btn_volume_up.png" title="Volume Up"></li>
         <li class="divider"></li>
-        <li id="btn-rez"><span>360p</span></li>
-        <li class="divider"></li>
-        <li id="btn-sort"><img src="${nroot}/images/btn_sort.png" title="Sort"></li>
-        <li id="btn-share"><img src="${nroot}/images/btn_share.png" title="Share"></li>
-        <li id="btn-sync">
+        <li id="btn-full" class="right"><img src="${nroot}/images/btn_full.png" title="Full Screen"></li>
+        <li id="btn-sync" class="right">
           <img src="${nroot}/images/btn_sync.png" title="9x9 Sync">
           <ul id="sync-dropdown" class="dropdown">
             <li class="on"><img src="${nroot}/images/icon_check.png" class="icon-check"><span>Google TV</span></li>
             <li><img src="${nroot}/images/icon_check.png" class="icon-check"><span>Google TV2</span></li>
           </ul>
         </li>
-        <li id="btn-full"><img src="${nroot}/images/btn_full.png" title="Full Screen"></li>
+        <li id="btn-share" class="right">
+          <img src="${nroot}/images/btn_share.png" title="Share">
+          <ul id="share-dropdown" class="dropdown">
+            <li class="combo">
+              <span>Channel URL:</span>
+              <p id="share-input"><input type="text" class="textfield" value=""></p>
+            </li>
+            <li><img src="${nroot}/images/icon_mail.png" class="icon-mail"><span>Send by email</span></li>
+            <li><img src="${nroot}/images/icon_fb.png" class="icon-fb"><span>Share to facebook</span></li>
+          </ul>
+        </li>
+        <li id="btn-sort" class="right">
+          <img src="${nroot}/images/btn_sort.png" title="Sort">
+          <ul id="sort-dropdown" class="dropdown">
+            <li class="head"><span>Episodes sort by:</span></li>
+            <li class="on"><img src="${nroot}/images/icon_check.png" class="icon-check"><span>From Newest to Oldest</span></li>
+            <li><img src="${nroot}/images/icon_check.png" class="icon-check"><span>From Left off to Newest</span></li>
+          </ul>
+        </li>
+        <li id="btn-rez" class="right">
+          <span id="selected-rez">360p</span>
+          <ul id="rez-dropdown" class="dropdown">
+            <li><img src="${nroot}/images/icon_check.png" class="icon-check"><span>720p</span></li>
+            <li class="on"><img src="${nroot}/images/icon_check.png" class="icon-check"><span>480p</span></li>
+            <li><img src="${nroot}/images/icon_check.png" class="icon-check"><span>360p</span></li>
+            <li><img src="${nroot}/images/icon_check.png" class="icon-check"><span>240p</span></li>
+          </ul>
+        </li>
       </ul>
     </div>
   </div>
