@@ -5,7 +5,7 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9playerV68a"/>
-<c:set var="nroot" value="http://9x9ui.s3.amazonaws.com/9x9playerV75"/>
+<c:set var="nroot" value="http://9x9ui.s3.amazonaws.com/9x9playerV77"/>
 
 <!-- $Revision$ -->
 
@@ -62,12 +62,6 @@ var brandinfo = "${brandInfo}";
 
 
 <title>9x9.tv</title>
-
-<style type="text/css">
-#slider-wrap{float:left;background-color:lightgrey;width:20px;border:1px solid gray;border-left:none;}
-#slider-vertical{position:relative;height:100%}
-.ui-slider-handle{width:20px;height:10px;margin:0 auto;background-color:darkgray;display:block;position:absolute}
-</style>
 
 </head>
 
@@ -850,69 +844,101 @@ var brandinfo = "${brandInfo}";
   </div> 
 </div> 
 
-<div id="signin-layer">
-  <div id="signin-holder">
-    <div id="btn-winclose"><img src="${root}/images/btn_winclose.png"></div>
-    <ul id="tab-list">
-      <li id="login" class="on"><h2>Returning Users</h2></li>
-      <li id="signup"><h2>New Users</h2></li>
-    </ul>
-    <div id="login-panel" class="input-panel">
-      <ul class="input-list">
-        <li>
-          <span>Email:</span>
-          <p class="signin-input">
-            <input type="text" class="signin-field" id="L-email">
-          </p>
-        </li>
-        <li>
-          <span>Password:</span>
-          <p class="signin-input">
-            <input type="password" class="signin-field" id="L-password">
-          </p>
-        </li>
-        <li><a class="btn" id="btn-login"><span>Log in</span></a></li>
-      </ul>
-    </div>
-    <div id="signup-panel" class="input-panel">
-      <ul class="input-list">
-        <li>
-          <span>Name:</span>
-          <p class="signin-input">
-            <input type="text" class="signin-field" id="S-name">
-          </p>
-        </li>
-        <li>
-          <span>Email:</span>
-          <p class="signin-input">
-            <input type="text" class="signin-field" id="S-email">
-          </p>
-        </li>
-        <li>
-          <span>Password:</span>
-          <p class="signin-input">
-            <input type="password" class="signin-field" id="S-password">
-          </p>
-        </li>
-        <li>
-          <span>Password verify:</span>
-          <p class="signin-input">
-            <input type="password" class="signin-field" id="S-password2">
-          </p>
-        </li>
-        <li><a class="btn" id="btn-signup"><span>Sign up</span></a></li>
-      </ul>
-       
-      <div id="encouragement">
-        <p><span>Sign up to have a personalized Smart Guide, and to curate your own channels from YouTube or Facebook.</span></p>
-        <div id="signup-triger">
-          <p><img src="${root}/images/icon_tip.png" id="triger-icon"><span id="triger-txt">Learn more</span></p>
-          <p id="signup-tip"><span>To curate your own channels from YouTube or Facebook, simply copy and paste your YouTube channel, YouTube playlist or Facebook page URL to the Smart Guide.</span><span class="arrow"></span></p>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+<div id="signin-layer">
+  <div id="signin-holder">
+    <img src="${nroot}/images/btn_winclose.png" id="btn-signin-close">
+    <ul id="signin-tabs">
+      <li id="signin" class="on"><span>Returning Users</span></li>
+      <li id="signup"><span>New Users</span></li>
+    </ul>
+    <div id="signin-panel" class="input-panel">
+      <ul class="input-list">
+        <li>
+          <span>Your 9x9 ID:</span>
+          <p class="signin-input">
+            <input type="text" class="textfield" id="return-email">
+          </p>
+        </li>
+        <li>
+          <span>Password:</span>
+          <p class="signin-input">
+            <input type="password" class="textfield" id="signin-password">
+          </p>
+        </li>
+        <li id="btn-forgot-pw"><span>Forgot your password?</span></li>
+        <li id="keep-signin" class="on"><img src="${nroot}/images/btn_check_on.png" class="btn-check-on"><img src="${nroot}/images/btn_check_off.png" class="btn-check-off"><span>Keep me sign in</span></li>
+        <li><p class="btn" id="btn-signin"><span>Sign in</span></p></li>
+      </ul>
+      <div id="entry-switcher">
+        <p><span>New to 9x9?</span></p>
+        <p><span>Tired of searching for videos? Access thousands of curated channels and create your very own programming guide!</span></p>
+        <p><span>It's free and easy!</span></p>
+        <p class="btn" id="btn-create-account"><span>Create an Account</span></p>
+      </div>
+    </div>
+    <div id="signup-panel" class="input-panel">
+      <ul class="input-list">
+        <li>
+          <span>Email:</span>
+          <p class="signin-input">
+            <input type="text" class="textfield" id="signup-email">
+          </p>
+        </li>
+        <li>
+          <span>Password:</span>
+          <p class="signin-input">
+            <input type="password" class="textfield" id="signup-password">
+          </p>
+          <span class="hint">6-character minimum</span>
+        </li>
+        <li>
+          <span>Retype Password:</span>
+          <p class="signin-input">
+            <input type="password" class="textfield" id="signup-password2">
+          </p>
+        </li>
+        <li>
+          <span>First Name:</span>
+          <p class="signin-input">
+            <input type="text" class="textfield" id="signup-firstname">
+          </p>
+        </li>
+        <li>
+          <span>Last Name:</span>
+          <p class="signin-input">
+            <input type="text" class="textfield" id="signup-lastname">
+          </p>
+        </li>
+      </ul>
+      <ul class="input-list-right">
+        <li>
+          <p><span>Gender:</span></p>
+          <p class="radio-item on"><img src="${nroot}/images/btn_radio_off.png" class="btn-radio-off"><img src="${nroot}/images/btn_radio_on.png" class="btn-radio-on"><span>Male</span></p>
+          <p class="radio-item"><img src="${nroot}/images/btn_radio_off.png" class="btn-radio-off"><img src="${nroot}/images/btn_radio_on.png" class="btn-radio-on"><span>Female</span></p>
+        </li>
+        <li id="birth-input">
+          <span>Birth Year:</span>
+          <p class="signin-input">
+            <input type="text" class="textfield" value="Example: 1985" id="signup-birthyear">
+          </p>
+        </li>
+        <li id="captcha-input">
+          <span>Word Verification:</span>
+          <p class="signin-input">
+            <input type="text" class="textfield" value="Type the characters in the picture below" id="signup-captcha">
+          </p>
+          <p id="captcha"><img src="${nroot}/images/chptcha.gif"></p>
+          <img src="${nroot}/images/btn_recaptcha.png" id="btn-recaptcha" title="Get a new challenge">
+        </li>
+        <li>
+          <p class="term-text"><span>Clicking I accept means that you agree to the <a href="">9x9 service agreement</a> and <a href="">privacy statement</a>. You also agree to receive email from 9x9 with service updates, special offers, and survey invitations. You can unsubscribe at any time.</span></p>
+        </li>
+        <li><p class="btn" id="btn-signup"><span>I Accept</span></p></li>
+      </ul>
+    </div>   
+  </div>
+</div>
+
 
 <div id="browse" style="display: none; z-index: 999"></div>
 
@@ -1223,6 +1249,17 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
       <img src="${nroot}/images/cart_bubble.png">
       <span>0</span>
     </p>
+    <div id="btn-programlang">
+      <p id="selected-programlang"><span>English programs</span><img src="${nroot}/images/icon_expand.png" class="icon-expand"></p>
+      <ul id="programlang-dropdown" class="dropdown">
+        <li class="on"><img src="${nroot}/images/icon_check.png" class="icon-check"><span>English programs</span></li>
+        <li><img src="${nroot}/images/icon_check.png" class="icon-check"><span>中文節目</span></li>
+      </ul>
+    </div>
+    <p id="search-input">
+      <img src="${nroot}/images/icon_search.png" class="icon-search">
+      <input type="text" class="textfield" value="Search" id="search-field">
+    </p>
     <div id="preview-area">
       <p id="btn-flip-preview"><img src="${nroot}/images/btn_flip_L_off.png" id="btn-fp-off"><img src="${nroot}/images/btn_flip_L_on.png" id="btn-fp-on"></p>
       <p id="preview-index"><span>You are previewing</span><span id="index-ch-title">The Beautiful Universe: Chandra in HD</span><span>in</span><span id="index-catg-title">Music</span></p>
@@ -1259,10 +1296,12 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
       <li id="yourown"><span>Add your own</span></li>
     </ul>
     <div id="channel-pool">
+      <div id="recommended-slider" class="slider-wrap"><div class="slider-vertical"></div></div>
       <div id="recommended-content" class="tab-content">
         <ul id="recommended-list">
         </ul>
       </div>
+      <div id="category-slider" class="slider-wrap"><div class="slider-vertical"></div></div>
       <div id="category-content" class="tab-content">
         <ul class="level1-list">
         </ul>
