@@ -805,13 +805,6 @@ public class CmsApiController {
 		MsoManager msoMngr = new MsoManager();
 		Mso nnmso = msoMngr.findNNMso();
 		List<Category> categories = catMngr.findAllByMsoId(nnmso.getKey().getId());
-		if (locale.equals(Locale.TAIWAN)) {
-			for (Category category : categories) {
-				if (category.getChnName() != null && !category.getChnName().isEmpty()) {
-					category.setName(category.getChnName());
-				}
-			}
-		}
 		return categories;
 	}
 	

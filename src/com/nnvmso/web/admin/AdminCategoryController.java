@@ -326,7 +326,6 @@ public class AdminCategoryController {
 			cell.add(category.getKey().getId());
 			cell.add(category.getParentId());
 			cell.add(category.getName());
-			cell.add(category.getChnName());
 			cell.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(category.getUpdateDate()));
 			cell.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(category.getCreateDate()));
 			cell.add(category.isPublic());
@@ -365,7 +364,6 @@ public class AdminCategoryController {
 		if (isPublic == null)
 			isPublic = true;
 		Category category = new Category(name, isPublic, msoId);
-		category.setChnName(chnName);
 		categoryMngr.create(category);
 		return "OK";
 	}
@@ -404,7 +402,6 @@ public class AdminCategoryController {
 		}
 		if (chnName != null) {
 			logger.info("chnName = " + chnName);
-			category.setChnName(chnName);
 		}
 		if (isPublic != null) {
 			logger.info("isPublic = " + isPublic);
