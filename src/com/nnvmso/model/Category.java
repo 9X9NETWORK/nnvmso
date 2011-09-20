@@ -31,24 +31,24 @@ public class Category implements Serializable {
 	@Persistent
 	public static String UNCATEGORIZED = "UNCATEGORIZED";
 	private String name;
-
-	@Persistent
-	private String chnName;
 	
 	@Persistent
 	private boolean isPublic;
 	
 	@Persistent
 	private int channelCount;
+	
+	@Persistent
+	private String lang;
 
 	@Persistent
-	private int chnChannelCount;
+	private short seq;	
 	
 	@Persistent
 	private Date createDate;
 	
 	@Persistent
-	private Date updateDate;
+	private Date updateDate;	
 	
 	public Category(String name, boolean isPublic, long msoId) {
 		this.name = name;
@@ -122,20 +122,20 @@ public class Category implements Serializable {
 		return parentId;
 	}
 
-	public int getChnChannelCount() {
-		return chnChannelCount;
+	public String getLang() {
+		return lang;
 	}
 
-	public void setChnChannelCount(int chnChannelCount) {
-		this.chnChannelCount = chnChannelCount;
+	public void setLang(String lang) {
+		this.lang = lang;
 	}
 
-	public String getChnName() {
-		return chnName;
+	public short getSeq() {
+		return seq;
 	}
 
-	public void setChnName(String chnName) {
-		this.chnName = chnName;
+	public void setSeq(short seq) {
+		this.seq = seq;
 	}
 	
 }

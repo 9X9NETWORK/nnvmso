@@ -84,7 +84,8 @@ public class AdminCacheController {
 		MsoProgramManager programMngr = new MsoProgramManager();
 		String output = "";
 		if (list) {
-			output = programMngr.findCacheByChannel(channel);
+			//output = programMngr.findCacheByChannel(channel);
+			output = "in progress";
 		} else if (delete) {			
 			programMngr.deleteCacheByChannel(channel);
 		} else {

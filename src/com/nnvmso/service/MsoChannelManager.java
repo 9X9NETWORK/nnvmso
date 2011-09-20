@@ -17,6 +17,7 @@ import com.nnvmso.lib.FacebookLib;
 import com.nnvmso.lib.YouTubeLib;
 import com.nnvmso.model.Category;
 import com.nnvmso.model.CategoryChannel;
+import com.nnvmso.model.LangTable;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoIpg;
@@ -33,6 +34,28 @@ public class MsoChannelManager {
 	
 	private MsoChannelDao msoChannelDao = new MsoChannelDao();
 	
+	public void create(MsoChannel channel) {
+		Date now = new Date();
+		if (channel.getSourceUrl() != null) {
+			channel.setSourceUrl(channel.getSourceUrl().trim()); //remove the trailing slash
+			channel.setSourceUrlSearch(channel.getSourceUrl().toLowerCase());
+		}
+		if (channel.getName() != null) {
+			channel.setNameSearch(channel.getName().trim().toLowerCase());
+		}
+		if (channel.getLangCode() == null || channel.getLangCode().length() == 0) {
+			channel.setLangCode(LangTable.LANG_EN);
+		}
+		channel.setCreateDate(now);
+		channel.setUpdateDate(now);
+		msoChannelDao.save(channel);
+
+		//save to cache
+		Cache cache = CacheFactory.get();		
+		String key = this.getCacheKey(channel.getKey().getId());
+		if (cache != null) { cache.put(key, channel); }				
+	}
+	
 	/**
 	 * @@@IMPORTANT 
 	 * setProgramCount will be done automatically in MsoProgramManager when a program is added.
@@ -42,21 +65,7 @@ public class MsoChannelManager {
 	 * sourceURL is not supposed to be duplicated. Duplication check is your responsibility.   
 	 */
 	public void create(MsoChannel channel, List<Category> categories) {
-		Date now = new Date();
-		if (channel.getSourceUrl() != null) {
-			channel.setSourceUrl(channel.getSourceUrl().trim());
-			channel.setSourceUrlSearch(channel.getSourceUrl().toLowerCase());
-		}
-		if (channel.getName() != null) {
-			channel.setNameSearch(channel.getName().trim().toLowerCase());
-		}
-		if (channel.getLangCode() == null || channel.getLangCode().length() == 0) {
-			channel.setLangCode(Mso.LANG_EN);
-		}
-		channel.setCreateDate(now);
-		channel.setUpdateDate(now);
-		msoChannelDao.save(channel);
-		
+		this.create(channel);
 		//create CategoryChannel
 		CategoryChannelManager ccMngr = new CategoryChannelManager();
 		for (Category c : categories) {
@@ -104,6 +113,7 @@ public class MsoChannelManager {
 	 * No deletion so we can keep track of blacklist urls 
 	 */
 	public void delete(MsoChannel channel) {
+		msoChannelDao.delete(channel);
 		//delete categories
 		//delete channel
 		//delete programs
@@ -186,9 +196,14 @@ public class MsoChannelManager {
 		
 	public String verifyUrl(String url) {
 		if (url == null) return null;
-		TranscodingService tranService = new TranscodingService();
 		if (!url.contains("http://") && !url.contains("https://"))
 			return null;
+		if (!url.contains("youtube.com") && !url.contains("facebook.com"))
+			return null;
+		if (url.contains("youtube.com"))
+			url = YouTubeLib.formatCheck(url);
+		
+		/*
 		if (!url.contains("youtube.com")) {
 			if (url.contains("deimos3.apple.com")) { //temp fix for demo
 				return url;
@@ -204,6 +219,7 @@ public class MsoChannelManager {
 		} else {
 			url = YouTubeLib.formatCheck(url);
 		}
+		*/
 		return url;
 	}
 

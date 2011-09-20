@@ -83,7 +83,7 @@ public class CalibrationTask {
 		}
 		
 		category.setChannelCount(engCnt);
-		category.setChnChannelCount(chnCnt);
+		//category.setChnChannelCount(chnCnt);
 		cMngr.save(category);
 		log.info("calibrat category:" + category.getName() + "(" + category.getKey().getId() + ") with " + channels.size() + " channels.");
 		return NnNetUtil.textReturn("OK");

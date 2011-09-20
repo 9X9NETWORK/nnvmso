@@ -172,7 +172,7 @@ public class AdminNnUserController {
 			cell.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(user.getUpdateDate()));
 			cell.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(user.getCreateDate()));
 			cell.add(user.getType());
-			cell.add(user.getAge());
+			cell.add(user.getDob());
 			cell.add(user.getIntro());
 			
 			map.put("id", user.getKey().getId());

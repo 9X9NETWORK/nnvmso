@@ -9,7 +9,6 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,33 +17,41 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
-import com.nnvmso.lib.CookieHelper;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnNetUtil;
-import com.nnvmso.service.EmailService;
 import com.nnvmso.service.InitService;
 
 /**
  * for testing only, works only for small set of data
  * 
  * most of the functions are private, turned it on if you need them.
- */	
+ */
+
+//wipe out data: Category, CategoryChannel, CategoryChannelSet, ChannelSet, ChannelSetChannel
+
+//initChannelsToTask
+//initSetsToTask
+//initCategoriesToTask
+//initSetAndChannelsToTask
+//initCategoryAndSetsToTask
+//initRecommdned
+//initSetImagesToTask
+//initCategoryCount
+//initMso
+
 @Controller
 @RequestMapping("admin/init")
 public class AdminInitController {
 	protected static final Logger log = Logger.getLogger(AdminInitController.class.getName());		
 	
 	private final InitService initService;		
-	private final EmailService emailService;
 	
 	@Autowired
-	public AdminInitController(InitService initService, EmailService emailService) {
+	public AdminInitController(InitService initService) {
 		this.initService = initService;
-		this.emailService = emailService;
 	}		
 	
 	@ExceptionHandler(Exception.class)
@@ -57,6 +64,7 @@ public class AdminInitController {
 		return "error/exception";				
 	}
 		
+	//local machine
 	@RequestMapping(value="groundStart", method=RequestMethod.GET)
 	public String groundStartGet(HttpServletRequest req) {
 		return "admin/groundStart";
@@ -66,12 +74,144 @@ public class AdminInitController {
 	public String groundStartPost(HttpServletRequest req) {
 		String host = NnNetUtil.getUrlRoot(req);
 		if (host.equals("http://localhost:8888")) {
-			initService.setRequest(req);
-			initService.initAll(true, true, false);
+			initService.initAll(false);
 		}
 		return "admin/groundStart";
 	}	
 
+	//gae environment	
+	@RequestMapping("initChannelsToTask")
+	public ResponseEntity<String> initChannelsToTask() {
+		QueueFactory.getDefaultQueue().add(
+			      TaskOptions.Builder.withUrl("/admin/init/initChannels"));			          
+		return NnNetUtil.textReturn("You will receive an email when it is done.");
+	}
+	
+	@RequestMapping("initChannels")
+	public ResponseEntity<String> initChannels(HttpServletRequest req) {
+		initService.setRequest(req);
+		initService.initChannels(true);
+		this.sendEmail("init all the channels done");
+		return NnNetUtil.textReturn("OK");		
+	}
+		
+	@RequestMapping("initSetsToTask")
+	public ResponseEntity<String> initSetsToTask() {
+		QueueFactory.getDefaultQueue().add(
+			      TaskOptions.Builder.withUrl("/admin/init/initSets"));			          
+		return NnNetUtil.textReturn("You will receive an email when it is done.");
+	}
+	
+	@RequestMapping("initSets")
+	public ResponseEntity<String> initSets(HttpServletRequest req) {
+		initService.setRequest(req);
+		initService.initSets();
+		this.sendEmail("init all the sets done");
+		return NnNetUtil.textReturn("OK");		
+	}
+
+	@RequestMapping("initCategoriesToTask")
+	public ResponseEntity<String> initCategoriesToTask() {
+		QueueFactory.getDefaultQueue().add(
+			      TaskOptions.Builder.withUrl("/admin/init/initCategories"));			          
+		return NnNetUtil.textReturn("You will receive an email when it is done.");
+	}
+	
+	@RequestMapping("initCategories")
+	public ResponseEntity<String> initCategories(HttpServletRequest req) {
+		initService.setRequest(req);
+		initService.initCategories();
+		this.sendEmail("init all the categories done");
+		return NnNetUtil.textReturn("OK");		
+	}
+
+	@RequestMapping("initSetAndChannelsToTask")
+	public ResponseEntity<String> initSetAndChannelsToTask() {
+		QueueFactory.getDefaultQueue().add(
+			      TaskOptions.Builder.withUrl("/admin/init/initSetAndChannels"));			          
+		return NnNetUtil.textReturn("You will receive an email when it is done.");
+	}
+	
+	@RequestMapping("initSetAndChannels")
+	public ResponseEntity<String> initSetAndChannels(HttpServletRequest req) {
+		initService.setRequest(req);
+		initService.initSetAndChannels();
+		this.sendEmail("init all the SetsAndChannels done");
+		return NnNetUtil.textReturn("OK");		
+	}
+
+	@RequestMapping("initCategoryAndSetsToTask")
+	public ResponseEntity<String> initCategoryAndSetsToTask() {
+		QueueFactory.getDefaultQueue().add(
+			      TaskOptions.Builder.withUrl("/admin/init/initCategoryAndSets"));			          
+		return NnNetUtil.textReturn("You will receive an email when it is done.");
+	}
+	
+	@RequestMapping("initCategoryAndSets")
+	public ResponseEntity<String> initCategoryAndSets(HttpServletRequest req) {
+		initService.setRequest(req);
+		initService.initCategoryAndSets();
+		this.sendEmail("init all the CategoryAndSets done");
+		return NnNetUtil.textReturn("OK");		
+	}
+
+	@RequestMapping("initRecommdned")
+	public ResponseEntity<String> initRecommended(HttpServletRequest req) {
+		initService.setRequest(req);
+		initService.initRecommended();
+		this.sendEmail("init all the Recommended done");
+		return NnNetUtil.textReturn("OK");		
+	}
+	
+	@RequestMapping("initSetImagesToTask")
+	public ResponseEntity<String> initSetImagesToTask(HttpServletRequest req) {
+		QueueFactory.getDefaultQueue().add(
+			      TaskOptions.Builder.withUrl("/admin/init/initSetImages"));			          
+		return NnNetUtil.textReturn("You will receive an email when it is done.");
+	}	
+
+	@RequestMapping("initSetImages")
+	public ResponseEntity<String> initSetImages(HttpServletRequest req) {
+		initService.setRequest(req);
+		initService.initSetImages();
+		this.sendEmail("init all the initSetImagesToTask done");
+		return NnNetUtil.textReturn("OK");		
+	}
+
+	//temp fix
+	@RequestMapping("initCategoryCount")
+	public ResponseEntity<String> initCategoryCount(HttpServletRequest req) {
+		initService.setRequest(req);
+		initService.initCategoryCount();
+		this.sendEmail("init all the CategoryCount done");
+		return NnNetUtil.textReturn("OK");		
+	}
+
+	//temp fix
+	@RequestMapping("addMsoConfig")
+	public ResponseEntity<String> initMso(HttpServletRequest req) {
+		initService.setRequest(req);
+		initService.addMsoConfig();
+		return NnNetUtil.textReturn("OK");		
+	}
+	
+	//temp fix
+	@RequestMapping("deleteChannelsToTask")
+	public ResponseEntity<String> deleteChannelsToTask() {
+		QueueFactory.getDefaultQueue().add(
+			      TaskOptions.Builder.withUrl("/admin/init/deleteChannels"));			          
+		return NnNetUtil.textReturn("You will receive an email when it is done.");
+	}
+	
+	//temp fix
+	@RequestMapping("deleteChannels")
+	public ResponseEntity<String> deleteChannels(HttpServletRequest req) {
+		initService.setRequest(req);
+		initService.deleteUrls();
+		this.sendEmail("delete all the channels done");
+		return NnNetUtil.textReturn("OK");		
+	}
+	
 	public void sendEmail(String subject) {
 		Properties props = new Properties();
         Session session = Session.getDefaultInstance(props, null);
@@ -86,181 +226,6 @@ public class AdminInitController {
         } catch (Exception e) {
         	NnLogUtil.logException(e);
 		}					
-	}	
-	
-	@SuppressWarnings("unused")
-	@RequestMapping("initMso1Channels")
-	private ResponseEntity<String> initMso1Channels(@RequestParam boolean devel, @RequestParam boolean trans, HttpServletRequest req) {
-		initService.setRequest(req);
-		initService.createMso1DefaultChannels(devel, trans);
-		this.sendEmail("step3 done: create 9x9 channels");
-		return NnNetUtil.textReturn("OK");
-	}
-	
-	@SuppressWarnings("unused")
-	@RequestMapping("initMso2Channels")
-	private ResponseEntity<String> initMso2Channels(@RequestParam boolean devel, @RequestParam boolean trans, HttpServletRequest req) {
-		initService.setRequest(req);
-		initService.createMso2DefaultChannels(devel, trans);
-		this.sendEmail("step4 done: create 5f channels");
-		return NnNetUtil.textReturn("OK");
-	}
-	
-	@SuppressWarnings("unused")
-	@RequestMapping("initMso1Ipg")
-	private ResponseEntity<String> initMso1Ipg(@RequestParam boolean devel, HttpServletRequest req) {
-		initService.setRequest(req);
-		initService.createMso1DefaultIpg(devel);
-		return NnNetUtil.textReturn("OK");
-	}
-		
-	@SuppressWarnings("unused")
-	@RequestMapping("initMso2Ipg")
-	private ResponseEntity<String> initMso2Ipg(@RequestParam boolean devel, HttpServletRequest req) {
-		initService.setRequest(req);
-		initService.createMso2DefaultIpg(devel);
-		this.sendEmail("step5 done: 9x9 and 5f default ipgs");
-		return NnNetUtil.textReturn("OK");
-	}
-	
-	@RequestMapping("initMso3Channels")
-	public ResponseEntity<String> initMso3Channels(@RequestParam boolean devel, @RequestParam boolean trans, HttpServletRequest req) {
-		initService.setRequest(req);
-		initService.createMso3OwnedChannels(devel, trans);
-		this.sendEmail("step6 done: create daai channels");
-		return NnNetUtil.textReturn("OK");
-	}
-	
-	@RequestMapping("initMso3ChannelSet")
-	public ResponseEntity<String> initMso3ChannelSet(@RequestParam boolean devel, HttpServletRequest req) {
-		initService.setRequest(req);
-		initService.createMso3ChannelSet(devel);
-		this.sendEmail("step7 done: daai channel set");
-		return NnNetUtil.textReturn("OK");
-	}
-	
-	@SuppressWarnings("unused")
-	@RequestMapping("initProStep2")
-	private ResponseEntity<String> initProStep2(@RequestParam boolean devel, @RequestParam boolean trans, @RequestParam boolean debug, HttpServletRequest req) {
-		initService.setRequest(req);
-		QueueFactory.getDefaultQueue().add(
-			      TaskOptions.Builder.withUrl("/admin/init/initMsoAndCategories")
-			          .param("debug", String.valueOf(debug)));
-		return NnNetUtil.textReturn("You will receive an email when it is done.");
-	}
-
-	@SuppressWarnings("unused")
-	@RequestMapping("initProStep3")
-	private ResponseEntity<String> initProStep3(@RequestParam boolean devel, @RequestParam boolean trans, @RequestParam boolean debug, HttpServletRequest req) {
-		initService.setRequest(req);
-		QueueFactory.getDefaultQueue().add(
-			      TaskOptions.Builder.withUrl("/admin/init/initMso1Channels")
-			         .param("devel", String.valueOf(devel))
-			         .param("trans", String.valueOf(trans)));
-		return NnNetUtil.textReturn("You will receive an email when it is done.");
-	}
-
-	@SuppressWarnings("unused")
-	@RequestMapping("initProStep4")
-	private ResponseEntity<String> initProStep4(@RequestParam boolean devel, @RequestParam boolean trans, @RequestParam boolean debug, HttpServletRequest req) {
-		initService.setRequest(req);
-		QueueFactory.getDefaultQueue().add(
-			      TaskOptions.Builder.withUrl("/admin/init/initMso2Channels")
-			         .param("devel", String.valueOf(devel))
-			         .param("trans", String.valueOf(trans)));		
-		return NnNetUtil.textReturn("You will receive an email when it is done.\nDo no proceed to step5 until all the channels are ready.");
-	}
-
-	@SuppressWarnings("unused")
-	@RequestMapping("initProStep5")
-	private ResponseEntity<String> initProStep5(@RequestParam boolean devel, @RequestParam boolean trans, @RequestParam boolean debug, HttpServletRequest req) {
-		initService.setRequest(req);
-		QueueFactory.getDefaultQueue().add(
-	      TaskOptions.Builder.withUrl("/admin/init/initMso1Ipg")
-	         .param("devel", String.valueOf(devel)));
-
-		QueueFactory.getDefaultQueue().add(
-	      TaskOptions.Builder.withUrl("/admin/init/initMso2Ipg")
-	         .param("devel", String.valueOf(devel)));		
-		
-		return NnNetUtil.textReturn("You will receive an email when it is done.");
-	}
-	
-	@RequestMapping("initProStep6")
-	public ResponseEntity<String> initProStep6(@RequestParam boolean devel, @RequestParam boolean trans, @RequestParam boolean debug, HttpServletRequest req) {
-		initService.setRequest(req);
-		initService.initializeMso3AndCategories(debug);
-		QueueFactory.getDefaultQueue().add(
-			      TaskOptions.Builder.withUrl("/admin/init/initMso3Channels")
-			         .param("devel", String.valueOf(devel))
-			         .param("trans", String.valueOf(trans)));
-		
-		return NnNetUtil.textReturn("You will receive an email when it is done.\nDo no proceed to step7 until all the channels are ready.");
-	}
-	
-	@RequestMapping("initProStep7")
-	public ResponseEntity<String> initProStep7(@RequestParam boolean devel, @RequestParam boolean trans, @RequestParam boolean debug, HttpServletRequest req) {
-		initService.setRequest(req);
-		QueueFactory.getDefaultQueue().add(
-			      TaskOptions.Builder.withUrl("/admin/init/initMso3ChannelSet")
-			         .param("devel", String.valueOf(devel)));
-		
-		return NnNetUtil.textReturn("You will receive an email when it is done.");
-	}
-	
-	/**
-	 * Example: admin/init/initProTask?devel=0&trans=1&debug=1"	
-	 * @param debug whether to turn on player's debugging information
-	 * @param devel whether to use test data (versus data from PM)
-	 * @param trans whether to submit data to transcoding service. turn off for internal data integretiy testing.
-	 */	
-	@SuppressWarnings("unused")
-	@RequestMapping("initProStep1")
-	private ResponseEntity<String> initProTask(@RequestParam boolean devel, @RequestParam boolean trans, @RequestParam boolean debug, HttpServletRequest req) {
-		initService.setRequest(req);
-		QueueFactory.getDefaultQueue().add(
-			      TaskOptions.Builder.withUrl("/admin/init/deleteAll"));
-		return NnNetUtil.textReturn("You will receive an email when it is done.");
 	}		
-	
-	@SuppressWarnings("unused")
-	@RequestMapping("changeMso")
-	private ResponseEntity<String> changeMso(@RequestParam(value="mso")String mso, HttpServletResponse resp) {
-		CookieHelper.setCookie(resp, CookieHelper.MSO, mso);
-		return NnNetUtil.textReturn("OK");
-	}
-	
-	@SuppressWarnings("unused")
-	@RequestMapping("emailTest")
-	private ResponseEntity<String> emailTest() {
-		emailService.sendEmailToAdmin("email test done", "done");
-		return NnNetUtil.textReturn("OK");
-	}
-		
-	@SuppressWarnings("unused")
-	@RequestMapping("email")
-	private ResponseEntity<String> emailTask() {
-		QueueFactory.getDefaultQueue().add(
-			      TaskOptions.Builder.withUrl("/admin/init/emailTest"));
-		return NnNetUtil.textReturn("You will receive an email when it is done.");
-	}
-
-	@SuppressWarnings("unused")
-	@RequestMapping("deleteAll")
-	private ResponseEntity<String> initialize(HttpServletRequest req) {
-		initService.setRequest(req);
-		initService.deleteAll();
-		this.sendEmail("step1 done: delete all");
-		return NnNetUtil.textReturn("OK");
-	}
- 
-	@SuppressWarnings("unused")
-	@RequestMapping("initMsoAndCategories")
-	private ResponseEntity<String> initMsoAndCategories(HttpServletRequest req, @RequestParam(value="debug")boolean debug) {
-		initService.setRequest(req);
-		initService.initMsoAndCategories(debug);
-		this.sendEmail("step2 done: initiate mso and categories");
-		return NnNetUtil.textReturn("OK");		
-	}
 	
 }

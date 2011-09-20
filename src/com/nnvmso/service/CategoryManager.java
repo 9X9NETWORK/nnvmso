@@ -105,8 +105,12 @@ public class CategoryManager {
 		return categories;
 	}
 	
-	public List<Category> findPlayerCategories(long parentId, long msoId) {
-		return categoryDao.findPlayerCategories(parentId, msoId);
+	public Category findCategory(String categoryName, String subCategoryName) {
+		return categoryDao.findCategory(categoryName, subCategoryName);
+	}
+	
+	public List<Category> findPlayerCategories(long parentId, String lang) {
+		return categoryDao.findPlayerCategories(parentId, lang);
 	}
 	
 	public List<Category> findCategoriesByIdStr(String categoryIds) {
@@ -161,10 +165,12 @@ public class CategoryManager {
 			for (CategoryChannel cc : ccs) {
 				Category c = this.findById(cc.getCategoryId());
 				log.info("count added: category id" + c.getKey().getId() + ";channelId " + channel.getKey().getId() + ";name " + channel.getName());
-				if (channel.getLangCode().equals(Mso.LANG_ZH))
+				/*
+				if (channel.getLang().equals(Mso.LANG_ZH))
 					c.setChnChannelCount(c.getChnChannelCount()+1);
 				else
 					c.setChannelCount(c.getChannelCount() + 1);
+				*/
 				this.save(c);					
 			}
 		}						

@@ -38,7 +38,7 @@ public class NnUser implements Serializable {
 	private String name;	
 	
 	@Persistent
-	private int age;
+	private String dob; //for now it's year 
 	
 	@Persistent
 	private String intro;
@@ -73,6 +73,15 @@ public class NnUser implements Serializable {
 	
 	@Persistent
 	private String facebookToken;
+
+	@Persistent
+	private short gender;
+	
+	@Persistent
+	private String lang;
+	
+	@Persistent
+	private String region;
 	
 	public NnUser(String email, String password, String name, short type) {
 		this.email = email;
@@ -179,14 +188,6 @@ public class NnUser implements Serializable {
 		this.imageUrl = imageUrl;
 	}
 
-	public int getAge() {
-		return age;
-	}
-
-	public void setAge(int age) {
-		this.age = age;
-	}
-
 	public long getMsoId() {
 		return msoId;
 	}
@@ -219,4 +220,37 @@ public class NnUser implements Serializable {
         buffer.append("token: " + token + ";");
         return buffer.toString();		
 	}
+
+	public short getGender() {
+		return gender;
+	}
+
+	public void setGender(short gender) {
+		this.gender = gender;
+	}
+
+	public String getLang() {
+		return lang;
+	}
+
+	public void setLang(String lang) {
+		this.lang = lang;
+	}
+
+	public String getRegion() {
+		return region;
+	}
+
+	public void setRegion(String region) {
+		this.region = region;
+	}
+
+	public String getDob() {
+		return dob;
+	}
+
+	public void setDob(String dob) {
+		this.dob = dob;
+	}
+	
 }

@@ -189,7 +189,11 @@ public class MsoProgramManager {
 			}
 		}
 		//find
-		programs = msoProgramDao.findGoodProgramsByChannelId(channelId);
+		MsoChannelManager channelMngr = new MsoChannelManager();		
+		MsoChannel c = channelMngr.findById(channelId);
+		if (c == null)
+			return null;
+		programs = msoProgramDao.findGoodProgramsByChannelId(c);
 		//store in cache
 		if (cache != null) { this.storeInCache(cache, programs, channelId); }				
 		return programs;
@@ -205,13 +209,16 @@ public class MsoProgramManager {
 				cache.put(this.getCacheKey(p.getKey().getId()), p);
 			}
 		}
+		
         //store a channel's program list, sorted by pubDate
+		/*
 		List<MsoProgram>goodList = msoProgramDao.findGoodProgramsByChannelId(channelId);
 		List<Long> list = new ArrayList<Long>();
 		for (MsoProgram p : goodList) {
 			list.add(p.getKey().getId());
 		}
 		cache.put(this.getCacheProgramListKey(channelId), list);
+		*/
 	}
 	
 	/**
@@ -341,6 +348,7 @@ public class MsoProgramManager {
 		return "channel-programList(" + channelId + ")";		
 	}	
 	
+	/*
 	public String findCacheByChannel(long channelId) {
 		Cache cache = CacheFactory.get();
 		String listStr = "";
@@ -361,6 +369,7 @@ public class MsoProgramManager {
 		}	 		
 		return "program list:\n" + listStr + "\nprogram cached:\n" + programStr; 		
 	}
+	*/
 	
 	public void cacheByChannelId(long channelId) {
 		Cache cache = CacheFactory.get();

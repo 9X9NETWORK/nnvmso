@@ -21,23 +21,25 @@ public class ChannelSetManager {
 	private ChannelSetDao channelSetDao = new ChannelSetDao();
 	
 	public void create(ChannelSet channelSet, List<MsoChannel> channels) {
-		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
-		
+		channelSet.setChannelCount(channels.size());
+		this.create(channelSet);		
+		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();		
 		if (this.findByName(channelSet.getName()) != null) {
 			logger.warning("channelSet already exists, name: " + channelSet.getName());
-			//return;
 		}
-		channelSet.setNameSearch(channelSet.getName().trim().toLowerCase());
-		Date now = new Date();
-		channelSet.setCreateDate(now);
-		channelSet.setUpdateDate(now);
-		channelSet.setChannelCount(channels.size());
-		channelSetDao.save(channelSet);
-		
 		for (MsoChannel channel : channels) {
 			ChannelSetChannel csc = new ChannelSetChannel(channelSet.getKey().getId(), channel.getKey().getId(), channel.getSeq());
 			cscMngr.create(csc);
 		}
+	}
+
+	public void create(ChannelSet channelSet) {
+		channelSet.setNameSearch(channelSet.getName().trim().toLowerCase());
+		Date now = new Date();
+		channelSet.setCreateDate(now);
+		channelSet.setUpdateDate(now);
+		channelSet.setChannelCount(0);
+		channelSetDao.save(channelSet);
 	}
 	
 	public ChannelSet findByBeautifulUrl(String url) {
@@ -67,7 +69,7 @@ public class ChannelSetManager {
 		return channelSet;
 	}
 	
-	private Object findByName(String name) {
+	public ChannelSet findByName(String name) {
 		return channelSetDao.findByNameSearch(name.trim().toLowerCase());
 	}
 	
@@ -91,6 +93,14 @@ public class ChannelSetManager {
 		return channelSetDao.findById(channelSetId);
 	}
 
+	public List<ChannelSet> findAllByLang(String lang) {
+		return channelSetDao.findAllByLang(lang);
+	}
+
+	public List<ChannelSet> findAll() {
+		return channelSetDao.findAll();
+	}
+	
 	public List<ChannelSet> findAllByChannelSetIds(List<Long> channelSetIdList) {
 		List<ChannelSet> results = new ArrayList<ChannelSet>();
 		for (Long channelSetId : channelSetIdList) {

@@ -20,6 +20,21 @@ public class ChannelSetDao extends GenericDao<ChannelSet> {
 		super(ChannelSet.class);
 	}
 
+	public List<ChannelSet> findAll() {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		List<ChannelSet> detached = new ArrayList<ChannelSet>(); 
+		try {
+			Query q = pm.newQuery(ChannelSet.class);
+			q.setOrdering("seq asc");
+			@SuppressWarnings("unchecked")
+			List<ChannelSet> sets = (List<ChannelSet>) q.execute();
+			detached = (List<ChannelSet>)pm.detachCopyAll(sets);
+		} finally {
+			pm.close();
+		}
+		return detached;
+	}	
+	
 	public ChannelSet findById(long id) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();		
 		ChannelSet cs = null;
@@ -50,6 +65,23 @@ public class ChannelSetDao extends GenericDao<ChannelSet> {
 		return detached;
 	}	
 
+	public List<ChannelSet> findAllByLang(String lang) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		List<ChannelSet> detached = new ArrayList<ChannelSet>(); 
+		try {
+			Query q = pm.newQuery(ChannelSet.class);
+			q.setFilter("lang == langParam");
+			q.declareParameters("string langParam");
+			q.setOrdering("seq asc");
+			@SuppressWarnings("unchecked")
+			List<ChannelSet> sets = (List<ChannelSet>) q.execute(lang);
+			detached = (List<ChannelSet>)pm.detachCopyAll(sets);
+		} finally {
+			pm.close();
+		}
+		return detached;
+	}	
+	
 	public List<ChannelSet> findFeaturedSets(String lang) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		List<ChannelSet> detached = new ArrayList<ChannelSet>(); 

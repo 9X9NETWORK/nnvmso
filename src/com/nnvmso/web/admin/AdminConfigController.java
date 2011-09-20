@@ -3,11 +3,14 @@ package com.nnvmso.web.admin;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.sf.jsr107cache.Cache;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.nnvmso.lib.CacheFactory;
 import com.nnvmso.lib.CookieHelper;
 import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.model.Mso;
@@ -20,6 +23,23 @@ import com.nnvmso.service.TranscodingService;
 @RequestMapping("admin/config")
 public class AdminConfigController {
 	
+	@RequestMapping("setRO")
+	public ResponseEntity<String> setRO(@RequestParam(value="delete", required=false)boolean delete, 
+			                            @RequestParam(value="list", required=false)boolean list) {
+		String ro = "ro";
+		Cache cache = CacheFactory.get();
+		if (cache == null)
+			NnNetUtil.textReturn("cache has problem");
+		if (list) {
+			return NnNetUtil.textReturn("ro=" + (String)cache.get(ro));
+		}
+		if (delete)
+			cache.remove(ro); 		
+		if (!list && !delete)
+			cache.put(ro, 1);
+		return NnNetUtil.textReturn("OK");
+	}
+		
 	//check transcoding server setting
 	@RequestMapping("transcodingServer")
 	public ResponseEntity<String> transcodingServer(HttpServletRequest req) {

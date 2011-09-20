@@ -21,6 +21,7 @@ import com.google.appengine.api.datastore.DatastoreTimeoutException;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.model.Category;
+import com.nnvmso.model.LangTable;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoConfig;
@@ -80,7 +81,7 @@ public class TranscodingService {
 		MsoChannelManager channelMngr = new MsoChannelManager();
 		CategoryManager categoryMngr = new CategoryManager();
 		List<Category> categories = new ArrayList<Category>();
-		Category c = categoryMngr.findByName("Entertainment");
+		Category c = categoryMngr.findByName(Category.UNCATEGORIZED);
 		categories.add(c);
 		if (c == null) {
 			mapel.setErrorCode(String.valueOf(NnStatusCode.CATEGORY_ERROR));
@@ -112,7 +113,7 @@ public class TranscodingService {
 		}
 		channel.setContentType(Short.valueOf(mapel.getContentType()));
 		channel.setStatus(MsoChannel.STATUS_SUCCESS);
-		channel.setLangCode(Mso.LANG_ZH_TW);		
+		channel.setLangCode(LangTable.LANG_ZH);		
 		channelMngr.create(channel, categories);
 		mapel.setKey(String.valueOf(channel.getKey().getId()));
 		mapel.setErrorCode(String.valueOf(NnStatusCode.SUCCESS));
@@ -327,7 +328,8 @@ public class TranscodingService {
 			env = "alpha";
 		} else if (url.contains("9x9tvbeta") || url.contains("beta.9x9.tv") || url.contains("beta.5f.tv")){
 			env = "beta";
-		} else if (url.contains("9x9tvdev") || url.contains("dev.9x9.tv") || url.contains("dev.5f.tv")){
+		} else if (url.contains("9x9tvdev") || url.contains("dev.9x9.tv") || url.contains("dev.5f.tv") ||
+				   url.contains("9x9tvpuppy") || url.contains("puppy.9x9.tv")){
 			env = "dev";
 		} else if (url.contains("9x9tvqa") || url.contains("qa.9x9.tv") || url.contains("qa.5f.tv")) {
 			env = "qa";

@@ -59,6 +59,9 @@ public class ChannelSet implements Serializable {
 	
 	@Persistent
 	private String lang;
+
+	@Persistent
+	private short seq;
 	
 	@NotPersistent
 	private int subscriptionCount;
@@ -197,5 +200,13 @@ public class ChannelSet implements Serializable {
 	public void setLang(String lang) {
 		this.lang = lang;
 	}
-		
+
+	public short getSeq() {
+		return seq;
+	}
+
+	public void setSeq(short seq) {
+		this.seq = seq;
+	}
+	
 }

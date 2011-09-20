@@ -27,6 +27,7 @@ import com.google.appengine.api.datastore.DatastoreFailureException;
 import com.google.appengine.api.datastore.DatastoreNeedIndexException;
 import com.google.appengine.api.datastore.DatastoreTimeoutException;
 import com.google.apphosting.api.DeadlineExceededException;
+import com.google.apphosting.api.ApiProxy;
 import com.nnvmso.dao.ShardedCounter;
 import com.nnvmso.lib.CookieHelper;
 import com.nnvmso.lib.NnLogUtil;
@@ -34,7 +35,9 @@ import com.nnvmso.lib.NnStringUtil;
 import com.nnvmso.lib.YouTubeLib;
 import com.nnvmso.model.AreaOwnership;
 import com.nnvmso.model.Category;
+import com.nnvmso.model.CategoryChannelSet;
 import com.nnvmso.model.ChannelSet;
+import com.nnvmso.model.ChannelSetChannel;
 import com.nnvmso.model.Ipg;
 import com.nnvmso.model.LangTable;
 import com.nnvmso.model.Mso;
@@ -78,6 +81,7 @@ public class PlayerApiService {
 		if (id == null && beautifulUrl == null) {
 			return NnStatusMsg.inputMissing(locale);
 		}		
+		if (id.startsWith("s")) id = id.replace("s", ""); 			
 		if (id != null && !Pattern.matches("^\\d*$", id)) {
 			return NnStatusMsg.inputError(locale);
 		}
@@ -93,29 +97,71 @@ public class PlayerApiService {
 			return messageSource.getMessage("nnstatus.set_invalid", new Object[] {NnStatusCode.SET_INVALID} , locale);
 		
 		List<MsoChannel> channels = csMngr.findChannelsById(cs.getKey().getId());
-		System.out.println(channels.size());
+		String[] result = {"", "", ""};
 		//first block: status
-		String output = NnStatusMsg.successStr(locale) + separatorStr;
 		Mso csMso = msoMngr.findById(cs.getMsoId());
-		//2nd block		
-		output = output + assembleKeyValue("name", csMso.getName());
-		output = output + assembleKeyValue("imageUrl", csMso.getLogoUrl()); 
-		output = output + assembleKeyValue("intro", csMso.getIntro());
-		output = output + separatorStr;			
+		//2nd block	 
+		result[0] += assembleKeyValue("name", csMso.getName());
+		result[0] += assembleKeyValue("imageUrl", csMso.getLogoUrl()); 
+		result[0] += assembleKeyValue("intro", csMso.getIntro());
+		 
 		//3rd block: set info
-		output += assembleKeyValue("id", String.valueOf(cs.getKey().getId()));
-		output += assembleKeyValue("name", cs.getName());		
-		output += assembleKeyValue("imageUrl", cs.getImageUrl());
+		result[1] += assembleKeyValue("id", String.valueOf(cs.getKey().getId()));
+		result[1] += assembleKeyValue("name", cs.getName());		
+		result[1] += assembleKeyValue("imageUrl", cs.getImageUrl());
 		
-		//4rd block, channel info
-		String channelLineup = separatorStr;
+		//4rd block, channel info		
 		for (MsoChannel c : channels) {
-			channelLineup = channelLineup + this.composeChannelLineupStr(c, csMso) + "\n";													
-		}
-		output += channelLineup;
-		return output;
+			result[2] += this.composeChannelLineupStr(c, csMso) + "\n";													
+		}		
+		return this.assembleMsgs(NnStatusCode.SUCCESS, result);
 	}	
 		
+	public String setUserProfile(String userToken, String items, String values) {
+		//verify input
+		if (userToken == null || userToken.length() == 0 || userToken.equals("undefined"))
+			return this.assembleMsgs(NnStatusCode.INPUT_MISSING, null);
+		//verify user
+		NnUser user = userMngr.findByToken(userToken);
+		if (user == null) 
+			return this.assembleMsgs(NnStatusCode.USER_INVALID, null);
+		String[] key = items.split(",");
+		String[] value = values.split(",");
+		for (int i=0; i<key.length; i++) {
+			if (key[i].equals("name"))
+				user.setName(value[i]);
+			if (key[i].equals("year"))
+				user.setDob(value[i]);
+			if (key[i].equals("password"))
+				user.setPassword(value[i]);
+			if (key[i].equals("lang"))
+				user.setLang(value[i]);
+			if (key[i].equals("region"))
+				user.setLang(value[i]);			
+		}
+		userMngr.save(user);
+		return this.assembleMsgs(NnStatusCode.SUCCESS, null);
+	}
+
+	public String getUserProfile(String userToken) {
+		//verify input
+		if (userToken == null || userToken.length() == 0 || userToken.equals("undefined"))
+			return this.assembleMsgs(NnStatusCode.INPUT_MISSING, null);
+		//verify user
+		NnUser user = userMngr.findByToken(userToken);
+		if (user == null) 
+			return this.assembleMsgs(NnStatusCode.USER_INVALID, null);
+		String[] result = {""};
+		//2nd block	 
+		result[0] += assembleKeyValue("name", user.getName());
+		result[0] += assembleKeyValue("email", user.getEmail()); 
+		result[0] += assembleKeyValue("gender", String.valueOf(user.getGender()));
+		result[0] += assembleKeyValue("year", String.valueOf(user.getDob()));
+		result[0] += assembleKeyValue("lang", user.getLang());
+		result[0] += assembleKeyValue("region", user.getRegion());
+		return this.assembleMsgs(NnStatusCode.SUCCESS, result);
+	}
+	
 	public String setUserPref(String userToken, String item, String value) {
 		//verify input
 		if (userToken == null || userToken.length() == 0 || userToken.equals("undefined") ||
@@ -124,24 +170,28 @@ public class PlayerApiService {
 		}		
 		//verify user
 		NnUser user = userMngr.findByToken(userToken);
-		if (user == null) {return NnStatusMsg.userInvalid(locale);}
-		
-		//get preference
-		NnUserPrefManager prefMngr = new NnUserPrefManager();
-		NnUserPref pref = prefMngr.findByUserIdAndItem(user.getKey().getId(), item);
-		if (pref != null) {
-			pref.setValue(value);			
-			prefMngr.save(pref);
-		} else {
-			pref = new NnUserPref();
-			pref.setValue(value);
-			pref.setItem(item);			
-			pref.setUserId(user.getKey().getId());
-			prefMngr.create(pref);
+		if (user == null) {return NnStatusMsg.userInvalid(locale);}		
+		if (item.equals("password")) {
+			user.setPassword(value); //pwd check
+			userMngr.save(user);
+		} else {		
+			//get preference
+			NnUserPrefManager prefMngr = new NnUserPrefManager();
+			NnUserPref pref = prefMngr.findByUserIdAndItem(user.getKey().getId(), item);
+			if (pref != null) {
+				pref.setValue(value);			
+				prefMngr.save(pref);
+			} else {
+				pref = new NnUserPref();
+				pref.setValue(value);
+				pref.setItem(item);			
+				pref.setUserId(user.getKey().getId());
+				prefMngr.create(pref);
+			}
 		}
 		return NnStatusMsg.successStr(locale);
-	}	
-	
+	}
+
 	public int addMsoInfoVisitCounter(String msoName) {
 		String counterName = msoName + "BrandInfo";
 		CounterFactory factory = new CounterFactory();
@@ -155,29 +205,37 @@ public class PlayerApiService {
 		if (theMso == null) {return NnStatusMsg.msoInvalid(locale);}
 		int counter = this.addMsoInfoVisitCounter(theMso.getName());
 		MsoConfigManager configMngr = new MsoConfigManager();
-		MsoConfig config = configMngr.findByMsoIdAndItem(theMso.getKey().getId(), MsoConfig.DEBUG);
-		MsoConfig fbConfig = configMngr.findByItem(MsoConfig.FBTOKEN);
-		String debug = "1";
-		if (config != null) { debug = config.getValue(); }
-		
-		String results = NnStatusMsg.successStr(locale) + separatorStr;
-		results = results + this.assembleKeyValue("key", String.valueOf(mso.getKey().getId()));
-		results = results + this.assembleKeyValue("name", mso.getName());
-		results = results + this.assembleKeyValue("title", mso.getTitle());		
-		results = results + this.assembleKeyValue("logoUrl", mso.getLogoUrl());
-		results = results + this.assembleKeyValue("jingleUrl", mso.getJingleUrl());
-		results = results + this.assembleKeyValue("logoClickUrl", mso.getLogoClickUrl());
-		results = results + this.assembleKeyValue("preferredLangCode", mso.getPreferredLangCode());
-		results = results + this.assembleKeyValue("jingleUrl", mso.getJingleUrl());
-		results = results + this.assembleKeyValue("brandInfoCounter", String.valueOf(counter));
-		results = results + this.assembleKeyValue("debug", debug);
-		if (fbConfig!=null)
-			results = results + this.assembleKeyValue(MsoConfig.FBTOKEN, fbConfig.getValue());
-		
-		return results;
+		String[] result = {""};
+		result[0] += this.assembleKeyValue("key", String.valueOf(mso.getKey().getId()));
+		result[0] += this.assembleKeyValue("name", mso.getName());
+		result[0] += this.assembleKeyValue("title", mso.getTitle());		
+		result[0] += this.assembleKeyValue("logoUrl", mso.getLogoUrl());
+		result[0] += this.assembleKeyValue("jingleUrl", mso.getJingleUrl());
+		result[0] += this.assembleKeyValue("logoClickUrl", mso.getLogoClickUrl());
+		result[0] += this.assembleKeyValue("preferredLangCode", mso.getPreferredLangCode());
+		result[0] += this.assembleKeyValue("jingleUrl", mso.getJingleUrl());
+		result[0] += this.assembleKeyValue("brandInfoCounter", String.valueOf(counter));
+
+		List<MsoConfig> list = configMngr.findAllByMsoId(mso.getKey().getId());
+		for (MsoConfig config : list) {
+			if (config.getItem().equals(MsoConfig.DEBUG))
+				result[0] += this.assembleKeyValue(MsoConfig.DEBUG, config.getValue());
+			if (config.getItem().equals(MsoConfig.FBTOKEN))
+				result[0] += this.assembleKeyValue(MsoConfig.FBTOKEN, config.getValue());
+			if (config.getItem().equals(MsoConfig.RO))
+				result[0] += this.assembleKeyValue(MsoConfig.RO, config.getValue());
+			
+		}		
+		return this.assembleMsgs(NnStatusCode.SUCCESS, result);
 	}
 
 	public String handleException (Exception e) {
+		try {
+			
+		} catch (com.google.apphosting.api.ApiProxy.CapabilityDisabledException a) {
+			System.out.println("handle CapabilityDisabledException");
+		}
+		
 		String output = NnStatusMsg.errorStr(locale);
     	if (e.getClass().equals(NumberFormatException.class)) {
 			output = NnStatusCode.INPUT_BAD + "\t" + "INPUT BAD";			
@@ -190,7 +248,7 @@ public class PlayerApiService {
 		} else if (e.getClass().equals(DatastoreNeedIndexException.class)) {
 			output = NnStatusCode.DATABASE_NEED_INDEX + "\t" + "index is still building, fatal.";
 		} else if (e.getClass().equals(DeadlineExceededException.class)) {
-			output = NnStatusCode.GAE_TIMEOUT + "\t" + "GAE timeout";
+			output = NnStatusCode.GAE_TIMEOUT + "\t" + "GAE timeout";		
 		}
 		                               
 		NnLogUtil.logException((Exception) e);
@@ -1075,10 +1133,12 @@ public class PlayerApiService {
 		for (Category c : categories) {
 			String name =  c.getName();
 			int cnt = c.getChannelCount();
+			/*
 			if (lang.equals(Mso.LANG_ZH)) {
 				name = categoryMngr.translate(name);
 				cnt = c.getChnChannelCount();
 			}
+			*/
 			String[] str = {String.valueOf(c.getKey().getId()), name, String.valueOf(cnt)};				
 			output = output + NnStringUtil.getDelimitedStr(str) + "\n";
 		}
@@ -1089,8 +1149,6 @@ public class PlayerApiService {
 	}		 
 	
 	private String composeChannelLineupStr(MsoChannel c, Mso mso) {
-		if (c == null)
-			System.out.println("<<<<<<<<<< null >>>>>>>>>>>");
 		String intro = c.getIntro();
 		if (intro != null) {
 			intro = intro.replaceAll("\n", " ");
@@ -1259,32 +1317,48 @@ public class PlayerApiService {
     }
 	
 	public String findCategoryInfo(String id, String lang) {
-		String[] result = {"", "", ""};
-		if (lang == null)
-			lang = Mso.LANG_EN;
-		
-		CategoryManager categoryMngr = new CategoryManager();
-		if (id == null) {
+		lang = this.langCheck(lang);	
+        if (lang == null)
+            return this.assembleMsgs(NnStatusCode.INPUT_BAD, null);				
+		if (id == null)
 			id = "0";
-		}
+		
+		String[] result = {"", "", ""};
+		CategoryManager categoryMngr = new CategoryManager();		
+		CategoryChannelSetManager ccsMngr = new CategoryChannelSetManager();
+		ChannelSetManager csMngr = new ChannelSetManager();
+		//it's a set, find channel info
 		result[0] = id + "\n";
-		List<Category> categories = categoryMngr.findPlayerCategories(Long.parseLong(id), mso.getKey().getId());
-		if (categories.size() == 0) {
-			MsoChannelManager channelMngr = new MsoChannelManager();
-			List<MsoChannel> channels = channelMngr.findPublicChannelsByCategoryIdAndLang(Long.parseLong(id), lang);
+		if (id.startsWith("s")) {
+			List<MsoChannel> channels = csMngr.findChannelsById(Long.parseLong(id.substring(1, id.length())));			
 			for (MsoChannel c : channels) {
-				result[2] += this.composeChannelLineupStr(c, mso);
+				result[1] += this.composeChannelLineupStr(c, mso) + "\n";
 			}
 			return this.assembleMsgs(NnStatusCode.SUCCESS, result);
 		}
-				
+		
+		List<Category> categories = categoryMngr.findPlayerCategories(Long.parseLong(id), lang);
+		//it's the end of category leaf, find set info
+		if (categories.size() == 0) {
+			List<CategoryChannelSet> list = ccsMngr.findAllByCategoryId(Long.parseLong(id));
+			List<Long> channelSetIdList = new ArrayList<Long>();
+			for (CategoryChannelSet l : list) {
+				channelSetIdList.add(l.getChannelSetId());
+			}
+			List<ChannelSet> csList = csMngr.findAllByChannelSetIds(channelSetIdList);
+			for (ChannelSet cs : csList) {
+				String name =  cs.getName();
+				int cnt = cs.getChannelCount();
+				String[] str = {"s" + String.valueOf(cs.getKey().getId()), name, String.valueOf(cnt)};				
+				result[1] += NnStringUtil.getDelimitedStr(str) + "\n";				
+			}
+			return this.assembleMsgs(NnStatusCode.SUCCESS, result);			
+		}
+
+		//find categories
 		for (Category c : categories) {
 			String name =  c.getName();
 			int cnt = c.getChannelCount();
-			if (lang.equals(Mso.LANG_ZH)) {
-				name = c.getChnName();
-				cnt = c.getChnChannelCount();
-			}
 			String[] str = {String.valueOf(c.getKey().getId()), name, String.valueOf(cnt)};				
 			result[1] += NnStringUtil.getDelimitedStr(str) + "\n";
 		}

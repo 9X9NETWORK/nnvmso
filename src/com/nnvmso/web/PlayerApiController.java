@@ -166,14 +166,46 @@ public class PlayerApiController {
 	 */          
 	@RequestMapping(value="setUserPref")
 	public ResponseEntity<String> setUserPref(@RequestParam(value="user", required=false)String user,
-			                               @RequestParam(value="key", required=false)String key,
-			                               @RequestParam(value="value", required=false)String value,
-			                               HttpServletRequest req) {
+			                                  @RequestParam(value="key", required=false)String key,
+			                                  @RequestParam(value="value", required=false)String value,
+			                                  HttpServletRequest req) {
 		log.info("userPref: key(" + key + ");value(" + value + ")");
 		this.prepService(req);		
 		String output = NnStatusMsg.errorStr(locale);
 		try {
 			output = playerApiService.setUserPref(user, key, value);
+		} catch (Exception e) {
+			output = playerApiService.handleException(e);
+		}
+		log.info(output);
+		return NnNetUtil.textReturn(output);
+	}
+
+	@RequestMapping(value="getUserProfile")
+	public ResponseEntity<String> getUserProfile	(@RequestParam(value="user", required=false)String user,
+			                                     HttpServletRequest req) {
+		this.prepService(req);		
+		String output = NnStatusMsg.errorStr(locale);
+		try {
+			output = playerApiService.getUserProfile(user);
+		} catch (Exception e) {
+			output = playerApiService.handleException(e);
+		}
+		log.info(output);
+		return NnNetUtil.textReturn(output);
+	}
+	
+	@RequestMapping(value="setUserProfile")
+	public ResponseEntity<String> setUserProfile(@RequestParam(value="user", required=false)String user,
+									             @RequestParam(value="key", required=false)String key,
+									             @RequestParam(value="value", required=false)String value,
+			                                     HttpServletRequest req) {
+		
+		log.info("set user profile: key(" + key + ");value(" + value + ")");
+		this.prepService(req);		
+		String output = NnStatusMsg.errorStr(locale);
+		try {
+			output = playerApiService.setUserProfile(user, key, value);
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}

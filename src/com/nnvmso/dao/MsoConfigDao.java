@@ -1,12 +1,15 @@
 package com.nnvmso.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import com.nnvmso.lib.PMF;
+import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoConfig;
+import com.nnvmso.model.MsoProgram;
 
 public class MsoConfigDao {
 	
@@ -60,5 +63,20 @@ public class MsoConfigDao {
 		return config;		
 	}
 	
+	public List<MsoConfig> findByMsoId(long msoId) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		List<MsoConfig> detached = new ArrayList<MsoConfig>();
+		try {
+			Query query = pm.newQuery(MsoConfig.class);
+			query.setFilter("msoId == msoIdParam");		
+			query.declareParameters("long msoIdParam");				
+			@SuppressWarnings("unchecked")
+			List<MsoConfig> results = (List<MsoConfig>) query.execute(msoId);
+			detached = (List<MsoConfig>)pm.detachCopyAll(results);
+		} finally {
+			pm.close();
+		}
+		return detached;		
+	}
 	
 }

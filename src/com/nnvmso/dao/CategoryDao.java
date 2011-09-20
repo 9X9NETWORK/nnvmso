@@ -33,7 +33,8 @@ public class CategoryDao extends GenericDao<Category> {
 	public void delete(Category category) {
 		throw new JDOFatalException();
 	}
-	
+
+	//can be duplicated
 	public Category findByName(String name) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Category detached = null;
@@ -53,16 +54,45 @@ public class CategoryDao extends GenericDao<Category> {
 		return detached;
 	}
 
-	public List<Category> findPlayerCategories(long parentId, long msoId) {
+	public Category findCategory(String categoryName, String subcategoryName) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		List<Category> detached = new ArrayList<Category>();
+		Category detached = null;
 		try {
 			Query query = pm.newQuery(Category.class);
-			query.setFilter("parentId == parentIdParam && msoId == msoIdParam && isPublic == isPublicParam");
-			query.declareParameters("long parentIdParam, long msoIdParam, boolean isPublicParam");			
-			query.setOrdering("name");
+			query.setFilter("name == nameParam");
+			query.declareParameters(Key.class.getName() + " nameParam");
 			@SuppressWarnings("unchecked")
-			List<Category> results = (List<Category>) query.execute(parentId, msoId, true);			
+			List<Category> results = (List<Category>) query.execute(subcategoryName);
+			results = (List<Category>)pm.detachCopyAll(results);
+			if (results.size() == 1) {
+				detached = results.get(0);
+			} else {
+				for (Category c : results) {
+					if (c.getParentId() != 0) {
+						Category parent = this.findById(c.getParentId());
+						if (parent.getName().equals(categoryName))
+							detached = parent;
+					}
+				}				
+			}
+		} finally {
+			pm.close();
+		}
+		return detached;				
+	}
+	
+	//assuming one mso
+	public List<Category> findPlayerCategories(long parentId, String lang) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		List<Category> detached = new ArrayList<Category>();
+		System.out.println("watch parent:" + parentId + ";lang:" + lang);
+		try {
+			Query query = pm.newQuery(Category.class);
+			query.setFilter("lang == langParam && parentId == parentIdParam && isPublic == isPublicParam");
+			query.declareParameters("String langParam, long parentIdParam, boolean isPublicParam");
+			query.setOrdering("seq");
+			@SuppressWarnings("unchecked")
+			List<Category> results = (List<Category>) query.execute(lang, parentId, true);			
 			detached = (List<Category>)pm.detachCopyAll(results);
 		} finally {
 			pm.close();

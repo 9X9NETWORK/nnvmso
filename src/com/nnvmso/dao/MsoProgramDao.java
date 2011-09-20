@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.TreeMap;
 import java.util.logging.Logger;
 
 import javax.jdo.JDOObjectNotFoundException;
@@ -144,17 +145,33 @@ public class MsoProgramDao extends GenericDao<MsoProgram> {
 	/**
 	 * Good: is Public, is STATUS_OK, is TYPE_VIDEO
 	 */
-	public List<MsoProgram> findGoodProgramsByChannelId(long channelId) {
+	public List<MsoProgram> findGoodProgramsByChannelId(MsoChannel c) {
 		List<MsoProgram> detached = new ArrayList<MsoProgram>();
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
 			Query q = pm.newQuery(MsoProgram.class);
 			q.setFilter("channelId == channelIdParam && status == statusParam && type == typeParam");
 			q.declareParameters("long channelIdParam, short statusParam, short typeParam");
-			q.setOrdering("pubDate desc");
+			if (c.getContentType() == MsoChannel.CONTENTTYPE_MAPEL_SOAP) {
+				q.setOrdering("sort asc"); 
+		    } else if (c.getContentType() == MsoChannel.CONTENTTYPE_MAPEL_VARIETY) {
+				q.setOrdering("sort desc");
+			} else {
+				q.setOrdering("pubDate desc");
+			}			
 			@SuppressWarnings("unchecked")
-			List<MsoProgram> programs = (List<MsoProgram>)q.execute(channelId, MsoProgram.STATUS_OK, MsoProgram.TYPE_VIDEO);
+			List<MsoProgram> programs = (List<MsoProgram>)q.execute(c.getKey().getId(), MsoProgram.STATUS_OK, MsoProgram.TYPE_VIDEO);
 			detached = (List<MsoProgram>)pm.detachCopyAll(programs);
+			/*
+			if (c.getContentType() == MsoChannel.CONTENTTYPE_MAPEL_VARIETY) {
+				List<TreeMap> sorting = new ArrayList<MsoProgram>();
+				for (MsoProgram p : programs) {
+					
+				}
+			} else {
+				detached = (List<MsoProgram>)pm.detachCopyAll(programs);
+			}
+			*/
 		} finally {
 			pm.close();
 		}

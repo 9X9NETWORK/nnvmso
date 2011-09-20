@@ -180,7 +180,7 @@ public class MsoChannel implements Serializable {
 	public Date getCreateDate() {
 		return createDate;
 	}
-
+	
 	public String getLangCode() {
 		return langCode;
 	}
