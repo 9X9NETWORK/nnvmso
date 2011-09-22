@@ -5,7 +5,7 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9playerV68a"/>
-<c:set var="nroot" value="http://9x9ui.s3.amazonaws.com/9x9playerV77"/>
+<c:set var="nroot" value="http://9x9ui.s3.amazonaws.com/9x9playerV78"/>
 
 <!-- $Revision$ -->
 
@@ -866,7 +866,7 @@ var brandinfo = "${brandInfo}";
           </p>
         </li>
         <li id="btn-forgot-pw"><span>Forgot your password?</span></li>
-        <li id="keep-signin" class="on"><img src="${nroot}/images/btn_check_on.png" class="btn-check-on"><img src="${nroot}/images/btn_check_off.png" class="btn-check-off"><span>Keep me sign in</span></li>
+        <li id="keep-signin"><p class="btn-check on"><img src="${nroot}/images/btn_check_on.png" class="btn-check-on"><img src="${nroot}/images/btn_check_off.png" class="btn-check-off"><span>Keep me sign in</span></p></li>
         <li><p class="btn" id="btn-signin"><span>Sign in</span></p></li>
       </ul>
       <div id="entry-switcher">
@@ -898,15 +898,9 @@ var brandinfo = "${brandInfo}";
           </p>
         </li>
         <li>
-          <span>First Name:</span>
+          <span>Name:</span>
           <p class="signin-input">
-            <input type="text" class="textfield" id="signup-firstname">
-          </p>
-        </li>
-        <li>
-          <span>Last Name:</span>
-          <p class="signin-input">
-            <input type="text" class="textfield" id="signup-lastname">
+            <input type="text" class="textfield" id="signup-name">
           </p>
         </li>
       </ul>
@@ -1222,7 +1216,7 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
     <li id="btn-account">
       <p><span class="head">Hi,</span><span id="user">Guest</span><img src="${nroot}/images/icon_expand.png" class="icon-expand"></p>
       <ul id="account-dropdown" class="dropdown">
-        <li id="btn-signin"><span>Sign in / Sign up</span></li>
+        <li id="btn-sign"><span>Sign in / Sign up</span></li>
         <li id="btn-settings"><span>Settings</span></li>
         <li id="btn-signout"><span>Sign out</span></li>
       </ul>
@@ -1449,6 +1443,136 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
         </li>
       </ul>
     </div>
+  </div>
+</div>
+
+<div id="settings-layer">
+  <div id="settings-holder">
+    <img src="${nroot}/images/btn_winclose.png" id="btn-settings-close">
+    <ul id="settings-tabs">
+      <li id="general" class="on"><span>General</span></li>
+      <li id="sharing"><span>Sharing</span></li>
+      <li id="preload"><span>Preload</span></li>
+      <li id="resolution"><span>Resolution</span></li>
+    </ul>
+    <div id="general-panel" class="input-panel">
+      <ul class="input-list">
+        <li>
+          <p class="head"><span>Name:</span></p>
+          <p id="reset-name" class="editable"><span>John Smith</span></p>
+          <div id="reset-name-input" class="setting-block">
+            <p class="settings-input"><input type="text" class="textfield" value="John Smith"></p>
+          </div>
+        </li>
+        <li>
+          <p class="head"><span>Email:</span></p>
+          <p id="reset-email" class="fixed"><span>john@9x9.tv</span></p>
+        </li>
+        <li>
+          <p class="head"><span>Password:</span></p>
+          <p id="reset-pw" class="editable"><span>*******</span></p>
+          <div id="reset-pw-input" class="setting-block">
+            <p class="settings-input"><input type="text" class="textfield" value="Enter your old password"></p>
+            <p class="settings-input"><input type="text" class="textfield" value="Enter a new password"></p>
+            <p class="settings-input"><input type="text" class="textfield" value="Re-enter the new password"></p>
+          </div>
+        </li>
+        <li>
+          <p class="head"><span>Gender:</span></p>
+          <p id="reset-gender" class="editable"><span>Male</span></p>
+          <div id="reset-gender-input" class="setting-block">
+            <p class="radio-item on"><img src="${nroot}/images/btn_radio_off.png" class="btn-radio-off"><img src="${nroot}/images/btn_radio_on.png" class="btn-radio-on"><span>Male</span></p>
+            <p class="radio-item"><img src="${nroot}/images/btn_radio_off.png" class="btn-radio-off"><img src="${nroot}/images/btn_radio_on.png" class="btn-radio-on"><span>Female</span></p>
+          </div>
+        </li>
+        <li>
+          <p class="head"><span>Birth Year:</span></p>
+          <p id="reset-birth" class="editable"><span>1980</span></p>
+          <div id="reset-birth-input" class="setting-block">
+            <p class="settings-input"><input type="text" class="textfield" value="1980"></p>
+          </div>
+        </li>
+        <li>
+          <p class="head"><span>Language:</span></p>
+          <div id="btn-language" class="droppable">
+            <p id="selected-language"><span>English</span></p>
+            <ul id="language-dropdown" class="dropdown">
+              <li class="on"><img src="${nroot}/images/icon_check.png" class="icon-check"><span>English</span></li>
+              <li><img src="${nroot}/images/icon_check.png" class="icon-check"><span>中文</span></li>
+            </ul>
+          </div>
+        </li>
+        <li>
+          <p class="head"><span>Region:</span></p>
+          <div id="btn-region" class="droppable">
+            <p id="selected-region"><span>US</span></p>
+            <ul id="region-dropdown" class="dropdown">
+              <li class="on"><img src="${nroot}/images/icon_check.png" class="icon-check"><span>US</span></li>
+              <li><img src="${nroot}/images/icon_check.png" class="icon-check"><span>Taiwan</span></li>
+              <li><img src="${nroot}/images/icon_check.png" class="icon-check"><span>World Wide</span></li>
+            </ul>
+          </div>
+        </li>
+      </ul>
+      <ul class="action-list">
+        <li><p id="btn-general-save" class="btn"><span>Save</span></p></li>
+      </ul>
+    </div>
+    <div id="sharing-panel" class="input-panel">
+      <ul class="input-list">
+        <li>
+          <p class="head"><span>Connect Your 9x9 Account with:</span></p>
+          <p class="btn-check on"><img src="${nroot}/images/btn_check_on.png" class="btn-check-on"><img src="${nroot}/images/btn_check_off.png" class="btn-check-off"><span>Facebook</span></p>  
+          <p id="btn-connect-fb" class="btn"><span>Connect with Facebook</span></p>
+        </li>
+        <li>
+          <p class="head"><span>Auto share on My Facebook Wall when:</span></p>
+          <p class="btn-check on"><img src="${nroot}/images/btn_check_on.png" class="btn-check-on"><img src="${nroot}/images/btn_check_off.png" class="btn-check-off"><span>I add a new channel to my guide</span></p>
+        </li>
+      </ul>
+      <ul class="action-list">
+        <li><p id="btn-sharing-save" class="btn"><span>Save</span></p></li>
+      </ul>
+    </div>
+    <div id="preload-panel" class="input-panel">
+      <ul class="input-list">
+        <li>
+          <p class="head"><span>I want to set 9x9's preloading capacity to:</span></p>
+          <p class="radio-item on"><img src="${nroot}/images/btn_radio_off.png" class="btn-radio-off"><img src="${nroot}/images/btn_radio_on.png" class="btn-radio-on"><span>Off</span><span class="explanation">what is Off</span></p>
+          <p class="radio-item"><img src="${nroot}/images/btn_radio_off.png" class="btn-radio-off"><img src="${nroot}/images/btn_radio_on.png" class="btn-radio-on"><span>Normal</span><span class="explanation">what is Normal</span></p>
+          <p class="radio-item"><img src="${nroot}/images/btn_radio_off.png" class="btn-radio-off"><img src="${nroot}/images/btn_radio_on.png" class="btn-radio-on"><span>Maximum</span><span class="explanation">what is Mazimum</span></p>
+        </li>
+      </ul>
+      <ul class="action-list">
+        <li><p id="btn-preload-save" class="btn"><span>Save</span></p></li>
+      </ul>
+    </div>
+    <div id="resolution-panel" class="input-panel">
+      <ul class="input-list">
+        <li>
+          <p class="head"><span>Set 9x9's default playback resolution at:</span></p>
+          <p class="radio-item on"><img src="${nroot}/images/btn_radio_off.png" class="btn-radio-off"><img src="${nroot}/images/btn_radio_on.png" class="btn-radio-on"><span>1080p</span></p>
+          <p class="radio-item"><img src="${nroot}/images/btn_radio_off.png" class="btn-radio-off"><img src="${nroot}/images/btn_radio_on.png" class="btn-radio-on"><span>720p</span></p>
+          <p class="radio-item"><img src="${nroot}/images/btn_radio_off.png" class="btn-radio-off"><img src="${nroot}/images/btn_radio_on.png" class="btn-radio-on"><span>480p (Default)</span></p>
+          <p class="radio-item"><img src="${nroot}/images/btn_radio_off.png" class="btn-radio-off"><img src="${nroot}/images/btn_radio_on.png" class="btn-radio-on"><span>360p</span></p>
+        </li>
+      </ul>
+      <ul class="action-list">
+        <li><p id="btn-resolution-save" class="btn"><span>Save</span></p></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div id="forgot-layer">
+  <div id="forgot-holder" class="forgot-holder">
+    <p id="forgot-input">
+      <input type="text" class="textfield" value="Please enter your email address">
+    </p>
+    <ul class="action-list">
+      <li><p class="btn disable" id="btn-forgot-retrieve"><span>Retrieve</span></p></li>
+      <li><p class="btn" id="btn-forgot-cancel"><span>Cancel</span></p></li>
+    </ul>
   </div>
 </div>
 
