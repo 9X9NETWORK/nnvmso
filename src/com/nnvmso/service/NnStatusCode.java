@@ -65,10 +65,11 @@ public class NnStatusCode {
 	public static final int GAE_ERROR = 700;
 	public static final int GAE_TIMEOUT = 701;
 	
-	//800 database error
+	//900 database error
 	public static final int DATABASE_ERROR = 900;
 	public static final int DATABASE_TIMEOUT = 901;
 	public static final int DATABASE_NEED_INDEX = 902;
+	public static final int DATABASE_READONLY = 903;
 	
 	
 }

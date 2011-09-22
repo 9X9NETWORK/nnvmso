@@ -81,10 +81,11 @@ public class NnStatusMsg {
 			  case NnStatusCode.DATABASE_ERROR: return messageSource.getMessage("nnstatus.database_error", new Object[] {NnStatusCode.DATABASE_ERROR} , locale);
 			  case NnStatusCode.DATABASE_TIMEOUT: return messageSource.getMessage("nnstatus.database_timeout", new Object[] {NnStatusCode.DATABASE_TIMEOUT} , locale);
 			  case NnStatusCode.DATABASE_NEED_INDEX: return messageSource.getMessage("nnstatus.database_need_index", new Object[] {NnStatusCode.DATABASE_NEED_INDEX} , locale);	
+			  case NnStatusCode.DATABASE_READONLY: return NnStatusCode.DATABASE_READONLY + "\t" + "database_readonly" + "\n";	
 			  default: return messageSource.getMessage("nnstatus.output_no_msg_defined", new Object[] {status} , locale); 
 			}
 		} catch (NoSuchMessageException e) {
-			return messageSource.getMessage("nnstatus.output_no_msg_defined", new Object[] {status} , locale);			
+			return status + "\t" + "no message text defined" + "\n";			
 		}
 	}
 	

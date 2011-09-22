@@ -3,7 +3,10 @@ package com.nnvmso.service;
 import java.util.Date;
 import java.util.List;
 
+import net.sf.jsr107cache.Cache;
+
 import com.nnvmso.dao.MsoConfigDao;
+import com.nnvmso.lib.CacheFactory;
 import com.nnvmso.model.MsoConfig;
 
 public class MsoConfigManager {
@@ -19,6 +22,11 @@ public class MsoConfigManager {
 	
 	public MsoConfig save(MsoConfig config) {
 		config.setUpdateDate(new Date());
+		if (config.getKey().equals(MsoConfig.RO)) {
+			Cache cache = CacheFactory.get();
+			if (cache != null)
+				cache.put(MsoConfig.RO, config.getValue());
+		}			
 		return configDao.save(config);
 	}
 		

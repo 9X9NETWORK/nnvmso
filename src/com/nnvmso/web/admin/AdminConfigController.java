@@ -22,24 +22,7 @@ import com.nnvmso.service.TranscodingService;
 @Controller
 @RequestMapping("admin/config")
 public class AdminConfigController {
-	
-	@RequestMapping("setRO")
-	public ResponseEntity<String> setRO(@RequestParam(value="delete", required=false)boolean delete, 
-			                            @RequestParam(value="list", required=false)boolean list) {
-		String ro = "ro";
-		Cache cache = CacheFactory.get();
-		if (cache == null)
-			NnNetUtil.textReturn("cache has problem");
-		if (list) {
-			return NnNetUtil.textReturn("ro=" + (String)cache.get(ro));
-		}
-		if (delete)
-			cache.remove(ro); 		
-		if (!list && !delete)
-			cache.put(ro, 1);
-		return NnNetUtil.textReturn("OK");
-	}
-		
+			
 	//check transcoding server setting
 	@RequestMapping("transcodingServer")
 	public ResponseEntity<String> transcodingServer(HttpServletRequest req) {

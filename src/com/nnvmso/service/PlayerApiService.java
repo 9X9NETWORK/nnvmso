@@ -18,6 +18,8 @@ import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.sf.jsr107cache.Cache;
+
 import org.springframework.context.MessageSource;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -29,6 +31,7 @@ import com.google.appengine.api.datastore.DatastoreTimeoutException;
 import com.google.apphosting.api.DeadlineExceededException;
 import com.google.apphosting.api.ApiProxy;
 import com.nnvmso.dao.ShardedCounter;
+import com.nnvmso.lib.CacheFactory;
 import com.nnvmso.lib.CookieHelper;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnStringUtil;
@@ -52,6 +55,7 @@ import com.nnvmso.model.NnUserShare;
 import com.nnvmso.model.NnUserWatched;
 import com.nnvmso.model.Subscription;
 import com.nnvmso.model.SubscriptionLog;
+import com.nnvmso.validation.NnUserValidator;
 
 @Service
 public class PlayerApiService {
@@ -116,6 +120,20 @@ public class PlayerApiService {
 		}		
 		return this.assembleMsgs(NnStatusCode.SUCCESS, result);
 	}	
+	
+	public int checkRO() {
+		Cache cache = CacheFactory.get();
+		MsoConfigManager configMngr = new MsoConfigManager();
+		MsoConfig config = configMngr.findByItem(MsoConfig.RO);
+		String cacheRO = "0";
+		if (cache != null) {
+			if ((String)cache.get(MsoConfig.RO) != null)
+				cacheRO = (String)cache.get(MsoConfig.RO);
+		}
+		if (cacheRO.equals("1") || (config != null && config.getValue().equals("1")))			
+			return NnStatusCode.DATABASE_READONLY;
+		return NnStatusCode.SUCCESS;
+	}
 		
 	public String setUserProfile(String userToken, String items, String values) {
 		//verify input
@@ -127,18 +145,41 @@ public class PlayerApiService {
 			return this.assembleMsgs(NnStatusCode.USER_INVALID, null);
 		String[] key = items.split(",");
 		String[] value = values.split(",");
+		String password = "";
+		String oldPassword = "";
+		if (key.length != value.length)
+			return this.assembleMsgs(NnStatusCode.INPUT_ERROR, null);
 		for (int i=0; i<key.length; i++) {
 			if (key[i].equals("name"))
 				user.setName(value[i]);
 			if (key[i].equals("year"))
 				user.setDob(value[i]);
 			if (key[i].equals("password"))
-				user.setPassword(value[i]);
+				password = value[i];				
+			if (key[i].equals("oldPassword"))
+				oldPassword = value[i];				
 			if (key[i].equals("lang"))
 				user.setLang(value[i]);
 			if (key[i].equals("region"))
-				user.setLang(value[i]);			
+				user.setLang(value[i]);
+			if (key[i].equals("gender"))
+				user.setGender(Short.parseShort(value[i]));						
 		}
+		int status = NnUserValidator.validateProfile(user);
+		if (status != NnStatusCode.SUCCESS) {
+			log.info("profile fail");
+			return this.assembleMsgs(status, null);
+		}
+		if (password.length() > 0 && oldPassword.length() > 0) {
+			NnUser authenticated = userMngr.findAuthenticatedUser(user.getEmail(), oldPassword);
+			if (authenticated == null)
+				return this.assembleMsgs(NnStatusCode.USER_LOGIN_FAILED, null);
+			status = NnUserValidator.validatePassword(password);
+			if (status != NnStatusCode.SUCCESS)
+				return this.assembleMsgs(status, null);
+			user.setPassword(password);
+		}
+		
 		userMngr.save(user);
 		return this.assembleMsgs(NnStatusCode.SUCCESS, null);
 	}
@@ -151,11 +192,13 @@ public class PlayerApiService {
 		NnUser user = userMngr.findByToken(userToken);
 		if (user == null) 
 			return this.assembleMsgs(NnStatusCode.USER_INVALID, null);
-		String[] result = {""};
-		//2nd block	 
+		String[] result = {""};	 
 		result[0] += assembleKeyValue("name", user.getName());
-		result[0] += assembleKeyValue("email", user.getEmail()); 
-		result[0] += assembleKeyValue("gender", String.valueOf(user.getGender()));
+		result[0] += assembleKeyValue("email", user.getEmail());
+		String gender = "";
+		if (user.getGender() != 2)
+			gender = String.valueOf(user.getGender());
+		result[0] += assembleKeyValue("gender", gender);
 		result[0] += assembleKeyValue("year", String.valueOf(user.getDob()));
 		result[0] += assembleKeyValue("lang", user.getLang());
 		result[0] += assembleKeyValue("region", user.getRegion());
@@ -203,6 +246,7 @@ public class PlayerApiService {
 	public String findMsoInfo(HttpServletRequest req) {
 		Mso theMso = msoMngr.findMsoViaHttpReq(req);
 		if (theMso == null) {return NnStatusMsg.msoInvalid(locale);}
+
 		int counter = this.addMsoInfoVisitCounter(theMso.getName());
 		MsoConfigManager configMngr = new MsoConfigManager();
 		String[] result = {""};
@@ -217,15 +261,18 @@ public class PlayerApiService {
 		result[0] += this.assembleKeyValue("brandInfoCounter", String.valueOf(counter));
 
 		List<MsoConfig> list = configMngr.findAllByMsoId(mso.getKey().getId());
+		int status = NnStatusCode.SUCCESS;
 		for (MsoConfig config : list) {
 			if (config.getItem().equals(MsoConfig.DEBUG))
 				result[0] += this.assembleKeyValue(MsoConfig.DEBUG, config.getValue());
 			if (config.getItem().equals(MsoConfig.FBTOKEN))
 				result[0] += this.assembleKeyValue(MsoConfig.FBTOKEN, config.getValue());
-			if (config.getItem().equals(MsoConfig.RO))
-				result[0] += this.assembleKeyValue(MsoConfig.RO, config.getValue());
-			
-		}		
+			if (config.getItem().equals(MsoConfig.RO)) {
+				result[0] += this.assembleKeyValue(MsoConfig.FBTOKEN, config.getValue());
+			}			
+		}	
+		if (status == NnStatusCode.DATABASE_READONLY)
+			return this.assembleMsgs(NnStatusCode.DATABASE_READONLY, result);
 		return this.assembleMsgs(NnStatusCode.SUCCESS, result);
 	}
 
@@ -254,7 +301,7 @@ public class PlayerApiService {
 		NnLogUtil.logException((Exception) e);
 		return output;
 	}	
-	
+		
 	public String processPdr(String userToken, String pdr, String session) {
 		//verify input
 		if (userToken == null || userToken.length() == 0 || userToken.equals("undefined")) {
@@ -1299,7 +1346,7 @@ public class PlayerApiService {
 		return output;		
 	}
 
-    private String assembleMsgs(int status, String[] raw) {
+    public String assembleMsgs(int status, String[] raw) {
         String result = NnStatusMsg.getMsg(status, locale);
         String separatorStr = "--\n";
         if (raw != null && raw.length > 0) {
@@ -1332,7 +1379,7 @@ public class PlayerApiService {
 		if (id.startsWith("s")) {
 			List<MsoChannel> channels = csMngr.findChannelsById(Long.parseLong(id.substring(1, id.length())));			
 			for (MsoChannel c : channels) {
-				result[1] += this.composeChannelLineupStr(c, mso) + "\n";
+				result[2] += this.composeChannelLineupStr(c, mso) + "\n";
 			}
 			return this.assembleMsgs(NnStatusCode.SUCCESS, result);
 		}

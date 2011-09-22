@@ -22,6 +22,7 @@ import com.nnvmso.model.Mso;
 import com.nnvmso.model.NnContent;
 import com.nnvmso.service.MsoManager;
 import com.nnvmso.service.NnContentManager;
+import com.nnvmso.service.NnStatusCode;
 import com.nnvmso.service.NnStatusMsg;
 import com.nnvmso.service.PlayerApiService;
 
@@ -127,7 +128,7 @@ public class PlayerApiController {
 		this.playerApiService= playerApiService;
 	}	
 	
-	private void prepService(HttpServletRequest req) {
+	private int prepService(HttpServletRequest req) {
 		/*
 		String userAgent = req.getHeader("user-agent");
 		if ((userAgent.indexOf("CFNetwork") > -1) && (userAgent.indexOf("Darwin") > -1))	 {
@@ -144,7 +145,9 @@ public class PlayerApiController {
 		}
 		playerApiService.setLocale(locale);
 		playerApiService.setMso(mso);
+		int status = playerApiService.checkRO();
 		this.locale = locale;
+		return status;
 	}
 	
 	/**
@@ -170,7 +173,10 @@ public class PlayerApiController {
 			                                  @RequestParam(value="value", required=false)String value,
 			                                  HttpServletRequest req) {
 		log.info("userPref: key(" + key + ");value(" + value + ")");
-		this.prepService(req);		
+		int status = this.prepService(req);
+		if (status != NnStatusCode.SUCCESS)
+			return NnNetUtil.textReturn(playerApiService.assembleMsgs(NnStatusCode.DATABASE_READONLY, null));
+				
 		String output = NnStatusMsg.errorStr(locale);
 		try {
 			output = playerApiService.setUserPref(user, key, value);
@@ -199,10 +205,12 @@ public class PlayerApiController {
 	public ResponseEntity<String> setUserProfile(@RequestParam(value="user", required=false)String user,
 									             @RequestParam(value="key", required=false)String key,
 									             @RequestParam(value="value", required=false)String value,
-			                                     HttpServletRequest req) {
-		
+			                                     HttpServletRequest req) {		
 		log.info("set user profile: key(" + key + ");value(" + value + ")");
-		this.prepService(req);		
+		int status = this.prepService(req);
+		if (status != NnStatusCode.SUCCESS)
+			return NnNetUtil.textReturn(playerApiService.assembleMsgs(NnStatusCode.DATABASE_READONLY, null));
+		
 		String output = NnStatusMsg.errorStr(locale);
 		try {
 			output = playerApiService.setUserProfile(user, key, value);
@@ -295,7 +303,10 @@ public class PlayerApiController {
 	@RequestMapping(value="guestRegister")
 	public ResponseEntity<String> guestRegister(@RequestParam(value="ipg", required = false) String ipg, HttpServletRequest req, HttpServletResponse resp) {
 		log.info("guest register: (ipg)" + ipg);
-		this.prepService(req);
+		int status = this.prepService(req);
+		if (status != NnStatusCode.SUCCESS)
+			return NnNetUtil.textReturn(playerApiService.assembleMsgs(NnStatusCode.DATABASE_READONLY, null));
+
 		String output = NnStatusMsg.errorStr(locale);
 		try {
 			output = playerApiService.createGuest(ipg, req, resp); 
@@ -324,7 +335,10 @@ public class PlayerApiController {
 		String userToken = req.getParameter("user");				
 		log.info("signup: email=" + email + ";name=" + name + ";userToken=" + userToken + ";password=" + password);
 
-		this.prepService(req);
+		int status = this.prepService(req);
+		if (status != NnStatusCode.SUCCESS)
+			return NnNetUtil.textReturn(playerApiService.assembleMsgs(NnStatusCode.DATABASE_READONLY, null));
+
 		String output = NnStatusMsg.errorStr(locale);
 		try {
 			output = playerApiService.createUser(email, password, name, userToken, req, resp);
@@ -417,7 +431,10 @@ public class PlayerApiController {
 			                                @RequestParam(value="pos", required=false) String pos,
 			                                HttpServletRequest req ) {		
 		log.info("subscribe: userToken=" + userToken+ "; channel=" + channelId + "; grid=" + gridId + "; set=" + setId + ";pos=" + pos);
-		this.prepService(req);
+		int status = this.prepService(req);
+		if (status != NnStatusCode.SUCCESS)
+			return NnNetUtil.textReturn(playerApiService.assembleMsgs(NnStatusCode.DATABASE_READONLY, null));
+
 		String output = NnStatusMsg.errorStr(locale);
 		try {
 			output = playerApiService.subscribe(userToken, channelId, setId, gridId, pos);
@@ -456,7 +473,10 @@ public class PlayerApiController {
 			                              @RequestParam(value="landing", required=false) String beautifulUrl,
 			                              HttpServletRequest req ) {
 		log.info("setInfo: id =" + id + ";landing=" + beautifulUrl);
-		this.prepService(req);		
+		int status = this.prepService(req);
+		if (status != NnStatusCode.SUCCESS)
+			return NnNetUtil.textReturn(playerApiService.assembleMsgs(NnStatusCode.DATABASE_READONLY, null));
+		
 		String output = NnStatusMsg.errorStr(locale);
 		try {
 			output = playerApiService.findSetInfo(id, beautifulUrl);
@@ -481,7 +501,10 @@ public class PlayerApiController {
 			                                  @RequestParam(value="pos", required=false) String pos,
 			                                  HttpServletRequest req) {
 		log.info("setInfo: user=" + userToken + ";pos =" + pos);
-		this.prepService(req);		
+		int status = this.prepService(req);
+		if (status != NnStatusCode.SUCCESS)
+			return NnNetUtil.textReturn(playerApiService.assembleMsgs(NnStatusCode.DATABASE_READONLY, null));
+		
 		String output = NnStatusMsg.errorStr(locale);
 		try {
 			output = playerApiService.changeSetInfo(userToken, name, pos);
@@ -514,7 +537,10 @@ public class PlayerApiController {
 								              @RequestParam(value="grid", required=false) String grid,
 								              @RequestParam(value="set", required=false) String setId,
 								              HttpServletRequest req) {			
-		this.prepService(req);
+		int status = this.prepService(req);
+		if (status != NnStatusCode.SUCCESS)
+			return NnNetUtil.textReturn(playerApiService.assembleMsgs(NnStatusCode.DATABASE_READONLY, null));
+
 		log.info("userToken=" + userToken + "; channel=" + channelId + "; set=" + setId + "; seq=" + grid);
 		String output = NnStatusMsg.errorStr(locale);
 		try {
@@ -550,7 +576,10 @@ public class PlayerApiController {
 		String tags = req.getParameter("tag");
 		String lang = req.getParameter("lang");
 
-		this.prepService(req);		
+		int status = this.prepService(req);
+		if (status != NnStatusCode.SUCCESS)
+			return NnNetUtil.textReturn(playerApiService.assembleMsgs(NnStatusCode.DATABASE_READONLY, null));
+		
 		log.info("player input - userToken=" + userToken+ "; url=" + url + ";grid=" + grid + ";categoryId=" + categoryIds);				
 		String output = NnStatusMsg.errorStr(locale);		
 		
@@ -692,7 +721,10 @@ public class PlayerApiController {
 											  @RequestParam(value="grid1", required=false) String grid1,
 											  @RequestParam(value="grid2", required=false) String grid2,
 											  HttpServletRequest req){
-		this.prepService(req);
+		int status = this.prepService(req);
+		if (status != NnStatusCode.SUCCESS)
+			return NnNetUtil.textReturn(playerApiService.assembleMsgs(NnStatusCode.DATABASE_READONLY, null));
+
 		log.info("userToken=" + userToken + ";grid1=" + grid1 + ";grid2=" + grid2);
 		String output = NnStatusMsg.errorStr(locale);
 		try {
@@ -718,7 +750,10 @@ public class PlayerApiController {
 											  @RequestParam(value="channel", required=false) String channelId,
 											  @RequestParam(value="grid", required=false) String grid,
 											  HttpServletRequest req){
-		this.prepService(req);
+		int status = this.prepService(req);
+		if (status != NnStatusCode.SUCCESS)
+			return NnNetUtil.textReturn(playerApiService.assembleMsgs(NnStatusCode.DATABASE_READONLY, null));
+
 		log.info("userToken=" + userToken + ";grid=" + grid);
 		String output = NnStatusMsg.errorStr(locale);
 		try {
@@ -810,7 +845,10 @@ public class PlayerApiController {
 			                              @RequestParam(value="channel", required=false) String channelId, 
 			                              @RequestParam(value="program", required=false) String programId, 
 			                              HttpServletRequest req) {		
-		this.prepService(req);
+		int status = this.prepService(req);
+		if (status != NnStatusCode.SUCCESS)
+			return NnNetUtil.textReturn(playerApiService.assembleMsgs(NnStatusCode.DATABASE_READONLY, null));
+
 		log.info("saveIpg(" + userToken + ")");
 		String output = NnStatusMsg.errorStr(locale);		
 		try {
@@ -836,7 +874,10 @@ public class PlayerApiController {
 			                              @RequestParam(value="set", required=false) String setId,
 			                              @RequestParam(value="program", required=false) String programId, 
 			                              HttpServletRequest req) {		
-		this.prepService(req);
+		int status = this.prepService(req);
+		if (status != NnStatusCode.SUCCESS)
+			return NnNetUtil.textReturn(playerApiService.assembleMsgs(NnStatusCode.DATABASE_READONLY, null));
+
 		log.info("saveShare(" + userToken + ")");
 		String output = NnStatusMsg.errorStr(locale);		
 		try {
@@ -909,7 +950,10 @@ public class PlayerApiController {
 									  @RequestParam(value="session", required=false) String session,
 									  @RequestParam(value="pdr", required=false) String pdr,
 									  HttpServletRequest req) {
-		this.prepService(req);
+		int status = this.prepService(req);
+		if (status != NnStatusCode.SUCCESS)
+			return NnNetUtil.textReturn(playerApiService.assembleMsgs(NnStatusCode.DATABASE_READONLY, null));
+
 		String output = NnStatusMsg.errorStr(locale);
 		log.info("user=" + userToken + ";session=" + session);
 		try {
@@ -930,7 +974,10 @@ public class PlayerApiController {
 	public ResponseEntity<String> programRemove(@RequestParam(value="program", required=false) String programId,
 				                                @RequestParam(value="user", required=false) String userToken,
 				                                HttpServletRequest req) {
-		this.prepService(req);
+		int status = this.prepService(req);
+		if (status != NnStatusCode.SUCCESS)
+			return NnNetUtil.textReturn(playerApiService.assembleMsgs(NnStatusCode.DATABASE_READONLY, null));
+
 		String output = NnStatusMsg.errorStr(locale);
 		log.info("bad program:" + programId + ";reported by user:" + userToken);
 		try {
