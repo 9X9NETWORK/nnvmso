@@ -3,24 +3,71 @@ package com.nnvmso.dao;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import com.google.appengine.api.datastore.DatastoreNeedIndexException;
+import com.google.appengine.api.datastore.DatastoreTimeoutException;
 import com.google.appengine.api.datastore.Key;
 import com.nnvmso.lib.NnStringUtil;
 import com.nnvmso.lib.PMF;
+import com.nnvmso.lib.SearchJanitorUtils;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.NnUser;
 
 public class MsoChannelDao extends GenericDao<MsoChannel> {
 	
-	protected static final Logger logger = Logger.getLogger(MsoDao.class.getName());
+	protected static final Logger log = Logger.getLogger(MsoDao.class.getName());
+	
+	public static final int MAXIMUM_NUMBER_OF_WORDS_TO_SEARCH = 10;		
 	
 	public MsoChannelDao() {
 		super(MsoChannel.class);
+	}
+
+	public static List<MsoChannel> searchChannelEntries(String queryString) {			 			
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		StringBuffer queryBuffer = new StringBuffer();
+
+		queryBuffer.append("SELECT FROM " + MsoChannel.class.getName() + " WHERE ");
+		Set<String> queryTokens = SearchJanitorUtils
+				.getTokensForIndexingOrQuery(queryString,
+						MAXIMUM_NUMBER_OF_WORDS_TO_SEARCH);
+
+		List<String> parametersForSearch = new ArrayList<String>(queryTokens);
+		StringBuffer declareParametersBuffer = new StringBuffer();
+		int parameterCounter = 0;
+		
+		while (parameterCounter < queryTokens.size()) {
+			queryBuffer.append("fts == param" + parameterCounter);
+			declareParametersBuffer.append("String param" + parameterCounter);
+			if (parameterCounter + 1 < queryTokens.size()) {
+				queryBuffer.append(" && ");
+				declareParametersBuffer.append(", ");
+
+			}
+			parameterCounter++;
+		}
+	
+		Query query = pm.newQuery(queryBuffer.toString());
+		query.declareParameters(declareParametersBuffer.toString());
+		List<MsoChannel> result = null;
+		
+		try {
+			result = (List<MsoChannel>) query.executeWithArray(parametersForSearch.toArray());
+		} catch (DatastoreTimeoutException e) {
+			log.severe(e.getMessage());
+			log.severe("datastore timeout at: " + queryString);// + " - timestamp: " + discreteTimestamp);
+		} catch(DatastoreNeedIndexException e) {
+			log.severe(e.getMessage());
+			log.severe("datastore need index exception at: " + queryString);// + " - timestamp: " + discreteTimestamp);
+		}
+
+		return result;
 	}
 	
 	public MsoChannel save(MsoChannel channel) {

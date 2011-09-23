@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import net.sf.jsr107cache.Cache;
@@ -14,6 +15,7 @@ import com.google.appengine.api.datastore.Key;
 import com.nnvmso.dao.MsoChannelDao;
 import com.nnvmso.lib.CacheFactory;
 import com.nnvmso.lib.FacebookLib;
+import com.nnvmso.lib.SearchJanitorUtils;
 import com.nnvmso.lib.YouTubeLib;
 import com.nnvmso.model.Category;
 import com.nnvmso.model.CategoryChannel;
@@ -31,6 +33,7 @@ public class MsoChannelManager {
 	protected static final Logger log = Logger.getLogger(MsoChannelManager.class.getName());
 	
 	public static short MAX_CHANNEL_SIZE = 50;
+	public static final int MAX_NUMBER_OF_WORDS_TO_PUT_IN_INDEX = 200;
 	
 	private MsoChannelDao msoChannelDao = new MsoChannelDao();
 	
@@ -454,5 +457,35 @@ public class MsoChannelManager {
 		List<MsoChannel> channels = msoChannelDao.findAllByIds(channelIdList);
 		return channels;
 	}
-	
+
+	public static void updateFTSStuffForMsoChannel(MsoChannel channel) {			
+		StringBuffer sb = new StringBuffer();		
+		sb.append(channel.getName() + " " + channel.getIntro());			
+		Set<String> new_ftsTokens = SearchJanitorUtils.getTokensForIndexingOrQuery(
+				sb.toString(),
+				MAX_NUMBER_OF_WORDS_TO_PUT_IN_INDEX);				
+		Set<String> ftsTokens = channel.getFts();
+		ftsTokens.clear();
+		for (String token : new_ftsTokens) {
+			ftsTokens.add(token);
+		}		
+	}
+
+	public static Set<String> getFtsTokens(String name, String intro) {			
+		StringBuffer sb = new StringBuffer();		
+		sb.append(name + " " + intro);			
+		Set<String> new_ftsTokens = SearchJanitorUtils.getTokensForIndexingOrQuery(
+				sb.toString(),
+				MAX_NUMBER_OF_WORDS_TO_PUT_IN_INDEX);
+		Set<String> ftsTokens = new HashSet<String>();
+		ftsTokens.clear();
+		for (String token : new_ftsTokens) {
+			ftsTokens.add(token);
+		}
+		return ftsTokens;
+	}
+
+	public static List<MsoChannel> searchChannelEntries(String queryString) {
+		return MsoChannelDao.searchChannelEntries(queryString);		
+	}
 }

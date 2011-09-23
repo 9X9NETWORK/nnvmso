@@ -12,7 +12,7 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 import com.google.appengine.api.datastore.Key;
-import com.nnvmso.service.SearchJanitor;
+import com.nnvmso.service.MsoChannelManager;
 
 /**
  * 9x9 Channel
@@ -134,14 +134,14 @@ public class MsoChannel implements Serializable {
 		this.imageUrl = imageUrl;
 		this.userId = userId;
 		this.fts = new HashSet<String>();
-		SearchJanitor.updateFTSStuffForMsoChannel(this);		
+		MsoChannelManager.updateFTSStuffForMsoChannel(this);		
 	}
 	
 	public MsoChannel(String sourceUrl, long userId) {
 		this.sourceUrl = sourceUrl;
 		this.userId = userId;
 		this.fts = new HashSet<String>();
-		SearchJanitor.updateFTSStuffForMsoChannel(this);		
+		MsoChannelManager.updateFTSStuffForMsoChannel(this);		
 	}
 	
 	public Key getKey() {

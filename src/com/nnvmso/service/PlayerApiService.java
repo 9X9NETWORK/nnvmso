@@ -137,9 +137,8 @@ public class PlayerApiService {
 		return NnStatusCode.SUCCESS;
 	}
 	
-	public String search(String text) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();		
-		List<MsoChannel> searchResults = SearchJanitor.searchChannelEntries(text, pm);
+	public String search(String text) {		
+		List<MsoChannel> searchResults = MsoChannelManager.searchChannelEntries(text);
 		String[] result = {""};
 		for (MsoChannel c : searchResults) {
 			result[0] += this.composeChannelLineupStr(c, mso) + "\n";
