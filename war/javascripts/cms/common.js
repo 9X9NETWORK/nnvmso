@@ -168,7 +168,7 @@ var cms = {
     $('#blog_link').show();
     $('#mso_logo').wrapAll('<a href="/9x9"></a>');
     $('.menuB').removeAttr('href');
-    $('<style/>').text('.menuB:hover { background-position: -90px -59px; cursor: default}').appendTo('head');
+    $('<style> .menuB:hover { background-position: -90px -59px; cursor: default; } </style>').appendTo('head');
   },
   init: function() {
     if (!cms.isGeneric()) {
