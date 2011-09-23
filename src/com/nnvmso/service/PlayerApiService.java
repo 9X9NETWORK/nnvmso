@@ -15,6 +15,7 @@ import java.util.TreeMap;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import javax.jdo.PersistenceManager;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -35,6 +36,7 @@ import com.nnvmso.lib.CacheFactory;
 import com.nnvmso.lib.CookieHelper;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnStringUtil;
+import com.nnvmso.lib.PMF;
 import com.nnvmso.lib.YouTubeLib;
 import com.nnvmso.model.AreaOwnership;
 import com.nnvmso.model.Category;
@@ -134,7 +136,17 @@ public class PlayerApiService {
 			return NnStatusCode.DATABASE_READONLY;
 		return NnStatusCode.SUCCESS;
 	}
-		
+	
+	public String search(String text) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();		
+		List<MsoChannel> searchResults = SearchJanitor.searchChannelEntries(text, pm);
+		String[] result = {""};
+		for (MsoChannel c : searchResults) {
+			result[0] += this.composeChannelLineupStr(c, mso) + "\n";
+		}
+		return this.assembleMsgs(NnStatusCode.SUCCESS, result);
+	}
+	
 	public String setUserProfile(String userToken, String items, String values) {
 		//verify input
 		if (userToken == null || userToken.length() == 0 || userToken.equals("undefined"))
@@ -143,6 +155,8 @@ public class PlayerApiService {
 		NnUser user = userMngr.findByToken(userToken);
 		if (user == null) 
 			return this.assembleMsgs(NnStatusCode.USER_INVALID, null);
+		if (user.getEmail().equals(NnUser.GUEST_EMAIL))
+			return this.assembleMsgs(NnStatusCode.USER_PERMISSION_ERROR, null);
 		String[] key = items.split(",");
 		String[] value = values.split(",");
 		String password = "";

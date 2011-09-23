@@ -10,7 +10,7 @@ import com.google.appengine.tools.mapreduce.AppEngineMapper;
 
 public class MergeAccountMapper extends AppEngineMapper<Key, Entity, NullWritable, NullWritable>{
 
-	protected static final Logger logger = Logger.getLogger(ReCategoryMapper.class.getName());
+	protected static final Logger logger = Logger.getLogger(MergeAccountMapper.class.getName());
 		
 	@Override
 	public void map(Key key, Entity entity, Context context) {

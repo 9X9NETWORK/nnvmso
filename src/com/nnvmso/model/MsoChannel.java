@@ -2,9 +2,17 @@ package com.nnvmso.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
-import javax.jdo.annotations.*;
+import javax.jdo.annotations.IdGeneratorStrategy;
+import javax.jdo.annotations.NotPersistent;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
+
 import com.google.appengine.api.datastore.Key;
+import com.nnvmso.service.SearchJanitor;
 
 /**
  * 9x9 Channel
@@ -117,16 +125,23 @@ public class MsoChannel implements Serializable {
 	@Persistent
 	private String transcodingUpdateDate; //timestamps from transcoding server
 		
+    @Persistent
+    private Set<String> fts;
+	
 	public MsoChannel(String name, String intro, String imageUrl, long userId) {
 		this.name = name;
 		this.intro = intro;
 		this.imageUrl = imageUrl;
 		this.userId = userId;
+		this.fts = new HashSet<String>();
+		SearchJanitor.updateFTSStuffForMsoChannel(this);		
 	}
 	
 	public MsoChannel(String sourceUrl, long userId) {
 		this.sourceUrl = sourceUrl;
 		this.userId = userId;
+		this.fts = new HashSet<String>();
+		SearchJanitor.updateFTSStuffForMsoChannel(this);		
 	}
 	
 	public Key getKey() {
@@ -335,5 +350,13 @@ public class MsoChannel implements Serializable {
 
 	public void setFeatured(boolean featured) {
 		this.featured = featured;
-	}	
+	}
+
+	public Set<String> getFts() {
+		return fts;
+	}
+
+	public void setFts(Set<String> fts) {
+		this.fts = fts;
+	}		
 }

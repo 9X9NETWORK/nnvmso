@@ -33,7 +33,9 @@ public class AddPropertyMapper extends AppEngineMapper<Key, Entity, NullWritable
 			value.setProperty(propertyName, new Date());
 		} else if (type.equals("string")) {
 			value.setProperty(propertyName, propertyValue);
-		} 
+		}  else if (type.equals("open")) {
+			value.setProperty(propertyName, null);
+		}
 		DatastoreMutationPool mutationPool = this.getAppEngineContext(context).getMutationPool();
 		mutationPool.put(value);
 	}

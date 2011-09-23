@@ -1,8 +1,10 @@
 package com.nnvmso.web;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.logging.Logger;
 
+import javax.jdo.PersistenceManager;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -18,13 +20,16 @@ import com.google.appengine.api.datastore.Text;
 import com.nnvmso.lib.CookieHelper;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnNetUtil;
+import com.nnvmso.lib.PMF;
 import com.nnvmso.model.Mso;
+import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.NnContent;
 import com.nnvmso.service.MsoManager;
 import com.nnvmso.service.NnContentManager;
 import com.nnvmso.service.NnStatusCode;
 import com.nnvmso.service.NnStatusMsg;
 import com.nnvmso.service.PlayerApiService;
+import com.nnvmso.service.SearchJanitor;
 
 /**
  * This is API specification for 9x9 Player. Please note although the document is written in JavaDoc form, it is generic Web Service API via HTTP request-response, no Java necessary.
@@ -1080,6 +1085,20 @@ public class PlayerApiController {
 		}
 		return NnNetUtil.textReturn(output);
 	}
+
+	@RequestMapping(value="search")
+	public ResponseEntity<String> search(@RequestParam(value="text", required=false) String text,
+			                             HttpServletRequest req) {
+		this.prepService(req);
+		String output = NnStatusMsg.errorStr(locale);
+		try {
+			output = playerApiService.search(text);
+		} catch (Exception e) {
+			output = playerApiService.handleException(e);
+		}
+		return NnNetUtil.textReturn(output);
+	}
+	
 	
 	/*
 	@RequestMapping(value="test")

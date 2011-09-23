@@ -32,7 +32,11 @@ import com.nnvmso.service.InitService;
 
 //wipe out data: Category, CategoryChannel, CategoryChannelSet, ChannelSet, ChannelSetChannel
 
-//initChannelsToTask
+//change MsoChannel Schema 
+//ChannelStatusMapper (mark all the channels to waiting_approval status)
+//initChannelsToTask (mark selected channel to good status)
+//mapreduce, updateFtsMapper (update channel fts)
+
 //initSetsToTask
 //initCategoriesToTask
 //initSetAndChannelsToTask

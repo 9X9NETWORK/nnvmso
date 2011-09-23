@@ -37,7 +37,7 @@
       <value template="optinonal">String</value>
     </property>
     <property>
-      <name human="Property Type (int, boolean, date, string, long, short)">propertyType</name>
+      <name human="Property Type (int, boolean, date, string, long, short, open)">propertyType</name>
       <value template="optinonal">String</value>
     </property>
   </configuration>  
@@ -171,10 +171,10 @@
     </property>     
   </configuration>
   
-  <configuration name="MsoChannel Lang Mapper">
+  <configuration name="Channel Status Mapper">
     <property>
       <name>mapreduce.map.class</name>      
-      <value>com.nnvmso.task.mapper.MsoChannelLangMapper</value>
+      <value>com.nnvmso.task.mapper.ChannelStatusMapper</value>
     </property>
     <property>
       <name>mapreduce.inputformat.class</name>
@@ -186,10 +186,10 @@
     </property>    
   </configuration>
 
-  <configuration name="ReCategory Mapper">
+  <configuration name="Update Fts Mapper">
     <property>
       <name>mapreduce.map.class</name>      
-      <value>com.nnvmso.task.mapper.ReCategoryMapper</value>
+      <value>com.nnvmso.task.mapper.UpdateFtsMapper</value>
     </property>
     <property>
       <name>mapreduce.inputformat.class</name>
@@ -197,48 +197,9 @@
     </property>    
     <property>
       <name human="Entity Kind to Map Over">mapreduce.mapper.inputformat.datastoreinputformat.entitykind</name>
-      <value template="optional">CategoryChannel</value>      
-    </property>
-    <property>
-      <name human="FoodAndWine">FoodAndWine</name>
-      <value template="optinonal"></value>
-    </property>
-    <property>
-      <name human="HealthAndfitness">HealthAndfitness</name>
-      <value template="optinonal"></value>
-    </property>
-    <property>
-      <name human="Lifestyle">Lifestyle</name>
-      <value template="optinonal"></value>
-    </property>
-    <property>
-      <name human="GayAndlesbian">GayAndlesbian</name>
-      <value template="optinonal"></value>
-    </property>
-    <property>
-      <name human="Sports">Sports</name>
-      <value template="optinonal"></value>
-    </property>
-    <property>
-      <name human="TravelAndLiving">TravelAndLiving</name>
-      <value template="optinonal"></value>
-    </property>
-    <property>
-      <name human="LifestyleAndHobbies">LifestyleAndHobbies</name>
-      <value template="optinonal"></value>
-    </property>
-    <property>
-      <name human="SportsAndOutdoors">SportsAndOutdoors</name>
-      <value template="optinonal"></value>
-    </property>        
-    <property>
-      <name human="Entertainment">Entertainment</name>
-      <value template="optinonal"></value>
-    </property>        
-    <property>
-      <name human="Comedy">Comedy</name>
-      <value template="optinonal"></value>
-    </property>        
-  </configuration>  
+      <value template="optional">MsoChannel</value>      
+    </property>    
+  </configuration>
+
       
 </configurations>

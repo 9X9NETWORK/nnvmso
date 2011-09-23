@@ -34,7 +34,7 @@ public class NnUserValidator {
 	
 	public static int validateProfile(NnUser user) {
 		System.out.println("gender:" + user.getGender());
-		if (user.getGender() > 1 || user.getGender() < 0) {
+		if (user.getGender() > 2 || user.getGender() < 0) {
 			log.info("gender error:" + user.getGender() + ";" + user.getEmail());
 			return NnStatusCode.INPUT_BAD;
 		}

@@ -357,9 +357,12 @@ public class InitService {
 				if (c.getStatus() == MsoChannel.STATUS_WAIT_FOR_APPROVAL) {
 					log.info("mark the channel from waiting to approval to success");
 					c.setStatus(MsoChannel.STATUS_SUCCESS);
+					channelMngr.save(c);
+				} else if (c.getStatus() != MsoChannel.STATUS_SUCCESS){
+					log.info("wanted channel but not success");					
 				}
 			}
-		}		
+		}
 	}
 
 	public String[][] getSetChannels() {
