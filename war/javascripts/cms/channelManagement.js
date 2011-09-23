@@ -22,14 +22,14 @@ var page$ = {
   },
   skeletonCreation: {
     create9x9Channel: function() {
-      $.post('/CMSAPI/createChannelSkeleton', { 'msoId': $('#msoId').val() }, function(channelId) {
+      cms.post('/CMSAPI/createChannelSkeleton', { 'msoId': $('#msoId').val() }, function(channelId) {
         $('<li/>').append('<div class="chShadow channel_info_block_cloned"><div class="chShadowTitle"></div><div class="chImg"></div></div>')
           .prependTo('#channel_list_ul');
         page$.channelDetail.init(channelId, true);
       }, 'json');
     },
     create9x9Program: function(channelId, channelName) {
-      $.post('/CMSAPI/createProgramSkeleton', function(programId) {
+      cms.post('/CMSAPI/createProgramSkeleton', function(programId) {
         if (programId != null)
           page$.programDetail.programCreation(programId, channelId, channelName);
       }, 'json');
@@ -55,7 +55,7 @@ var page$ = {
       });
     },
     init: function(programId, readonly) {
-      $.post('/CMSAPI/programInfo', { 'programId': programId }, function(program) {
+      cms.post('/CMSAPI/programInfo', { 'programId': programId }, function(program) {
         if (readonly) {
           $('#program_list_readonly').hide();
           page$.programDetail.displayProgramReadonly(program);
@@ -63,7 +63,7 @@ var page$ = {
           $('#program_list').hide();
           page$.programDetail.displayProgram(program);
         }
-      });
+      }, 'json');
     },
     initYouTube: function(url, channelId) {
       $.get(url, { 'alt': 'json-in-script' }, function(data) {
@@ -160,7 +160,7 @@ var page$ = {
         if (programDetailBlock.find('.ep_image_updated').val() == 'true') {
           parameters['imageUrl'] = programDetailBlock.find('.ep_image').attr('src');
         }
-        $.post('/CMSAPI/saveProgram', parameters, function(response) {
+        cms.post('/CMSAPI/saveProgram', parameters, function(response) {
           if (response != 'OK') {
             alert($('#lang_warning_error_occurs').text());
           } else {
@@ -263,7 +263,7 @@ var page$ = {
       $('#continue_add_new_program_button').unbind().click(function() {
         page$.skeletonCreation.create9x9Program(channelId, channelName);
       });
-      $.post('/CMSAPI/programInfo', { 'programId': programId }, function(program) {
+      cms.post('/CMSAPI/programInfo', { 'programId': programId }, function(program) {
         var programDetailBlock = $('#program_create_detail_block')
                                    .clone(true)
                                    .removeAttr('id')
@@ -322,13 +322,12 @@ var page$ = {
               var parameters = {
                 'videoIdStr': videoId
               };
-              $.post('/CMSAPI/getYouTubeVideoInfo', parameters, function(info)
-              {
+              cms.post('/CMSAPI/getYouTubeVideoInfo', parameters, function(info) {
                 programDetailBlock.find('.ep_name').val(info.title);
                 programDetailBlock.find('.ep_intro').val(info.description);
                 programDetailBlock.find('.ep_image').attr('src', info.thumbnail);
                 programDetailBlock.find('.ep_image_updated').val('true');
-              });
+              }, 'json');
               */
             }
           }
@@ -360,12 +359,11 @@ var page$ = {
                 if (programDetailBlock.find('.ep_image_updated').val() == 'true') {
                   parameters['imageUrl'] = programDetailBlock.find('.ep_image').attr('src');
                 }
-                $.post('/CMSAPI/saveNewProgram', parameters, function(response) {
+                cms.post('/CMSAPI/saveNewProgram', parameters, function(response) {
                   if (response == 'OK') {
                     alert($('#lang_update_successfully').text());
                     programDetailBlock.removeClass('program_create_detail_block_cloned').parent().hide(); // IE compatible
                     var size = $('.program_create_detail_block_cloned').size();
-                    log('size: ' + size);
                     if ($('.program_create_detail_block_cloned').size() == 0) {
                       page$.programList.init(channelId, false, channelName);
                     }
@@ -487,7 +485,7 @@ var page$ = {
             page$.programList.init(channelId, false, channelName);
           }
         });
-      });
+      }, 'json');
     }
   },
   programList: {
@@ -503,7 +501,7 @@ var page$ = {
     init: function(channelId, readonly, channelName) {
       if (page$.overallLayout.destroyRightSideContent(false) == false) return false;
       
-      $.post('/CMSAPI/programList', { 'channelId': channelId }, function(programs) {
+      cms.post('/CMSAPI/programList', { 'channelId': channelId }, function(programs) {
         $('.create_program_button').unbind().click({ 'channelId': channelId, 'channelName': channelName }, function(event) {
           if (page$.overallLayout.destroyRightSideContent(false) == false) return false;
           page$.skeletonCreation.create9x9Program(event.data.channelId, event.data.channelName);
@@ -525,7 +523,7 @@ var page$ = {
           $('#program_list .right_title div').text(channelName);
           page$.programList.displayProgramList(programs);
         }
-      });
+      }, 'json');
     },
     initYouTube: function(username, channelName, callback, isPlaylist, channelId) {
       if (page$.overallLayout.destroyRightSideContent(false) == false) return false;
@@ -542,7 +540,6 @@ var page$ = {
         'format':      5,
         'v':           2
       };
-      log(requestUrl);
       $.get(requestUrl, parameters, function(data) {
         if (data == null) return;
         var feed = data.feed;
@@ -574,7 +571,6 @@ var page$ = {
         programInfoBlock.find('.addthis_button_expanded').attr('addthis:url', promoteUrl);
         programInfoBlock.find('.program_info_detailbutton').click({ 'entry': entry }, function(event) {
           var youtubeUrl = event.data.entry.link[4].href + '&callback=?';
-          log(youtubeUrl);
           page$.programDetail.initYouTube(youtubeUrl, channelId);
           return false;
         });
@@ -631,13 +627,13 @@ var page$ = {
           var parameters = {
             'programId': event.data.programId
           };
-          $.post('/CMSAPI/removeProgram', parameters, function() {
+          cms.post('/CMSAPI/removeProgram', parameters, function() {
             event.data.programInfoBlock.parent().remove();
           });
           return false;
         });
         programInfoBlock.find('.program_info_publish').click({ 'programId': programId, 'switchObject': switchObject }, function(event) {
-          $.post('/CMSAPI/switchProgramPublicity', { 'programId': event.data.programId }, function(response) {
+          cms.post('/CMSAPI/switchProgramPublicity', { 'programId': event.data.programId }, function(response) {
             if (response) {
               event.data.switchObject.removeClass('chUnPublic').addClass('chPublic');
             } else {
@@ -762,7 +758,7 @@ var page$ = {
         var parameters = {
           'sourceUrl': sourceUrl
         }
-        $.post('/CMSAPI/importChannelByUrl', parameters, function(channel) {
+        cms.post('/CMSAPI/importChannelByUrl', parameters, function(channel) {
           if (channel == null) {
             alert($('#lang_channel_source_is_wrong').text());
             $('#channel_import_detail [name="ch_import_url"]').focus();
@@ -857,7 +853,7 @@ var page$ = {
               var parameters = {
                 'url': channel.sourceUrl
               };
-              $.get('/CMSAPI/getPodcastInfo', parameters, function(feed) {
+              cms.post('/CMSAPI/getPodcastInfo', parameters, function(feed) {
                 $('#channel_import_detail [name="ch_name"]').val(feed.title);
                 $('#channel_import_detail [name="ch_intro"]').val(feed.description);
                 if (typeof feed.thumbnail != 'undefined')
@@ -873,7 +869,7 @@ var page$ = {
               */
             }
           }
-          $.post('/CMSAPI/channelCategory', { 'channelId': channelId }, function(category) {
+          cms.post('/CMSAPI/channelCategory', { 'channelId': channelId }, function(category) {
             if (category != null) {
               $('#channel_import_detail [name="ch_category"]').val(category.key.id);
             }
@@ -909,7 +905,7 @@ var page$ = {
             if (imageUpdated == 'true') {
               parameters['imageUrl'] = imageUrl;
             }
-            $.post('/CMSAPI/addChannelByUrl', parameters, function(response) {
+            cms.post('/CMSAPI/addChannelByUrl', parameters, function(response) {
               if (response != 'OK') {
                 alert($('#lang_warning_error_occurs').text());
               } else {
@@ -935,7 +931,7 @@ var page$ = {
         $('#ch_title').text($('#lang_title_edit_channel_info').text());
       }
       
-      $.post('/CMSAPI/channelInfo', { 'channelId': channelId }, function(channel) {
+      cms.post('/CMSAPI/channelInfo', { 'channelId': channelId }, function(channel) {
         $('#ch_id').val(channel.key.id);
         $('#ch_name').val('').val(channel.name);
         $('#ch_image').attr('src', channel.imageUrl);
@@ -1004,7 +1000,7 @@ var page$ = {
               .text(categories[i].name)
               .appendTo('#channel_detail .sys_directory');
         }
-        $.post('/CMSAPI/channelCategory', { 'channelId': channelId }, function(category) {
+        cms.post('/CMSAPI/channelCategory', { 'channelId': channelId }, function(category) {
           if (category != null) {
             $('#channel_detail .sys_directory').val(category.key.id);
           }
@@ -1034,7 +1030,7 @@ var page$ = {
         if ($('#ch_image_updated').val() == 'true') {
           parameters['imageUrl'] = $('#ch_image').attr('src');
         }
-        $.post('/CMSAPI/saveChannel', parameters, function(response) {
+        cms.post('/CMSAPI/saveChannel', parameters, function(response) {
           if (response != 'OK') {
             alert($('#lang_warning_error_occurs').text());
           }else {
@@ -1056,7 +1052,7 @@ var page$ = {
       page$.channelList.destroy();
       
       // load channels
-      $.post('/CMSAPI/listOwnedChannels', { 'msoId': $('#msoId').val() }, function(channels) {
+      cms.post('/CMSAPI/listOwnedChannels', { 'msoId': $('#msoId').val() }, function(channels) {
         if (channels.length == 0) {
           $('#channel_list_empty').show();
           return;
@@ -1111,14 +1107,14 @@ var page$ = {
               'channelId': event.data.channelId,
               'msoId': $('#msoId').val()
             };
-            $.post('/CMSAPI/removeChannelFromList', parameters, function() {
+            cms.post('/CMSAPI/removeChannelFromList', parameters, function() {
               event.data.channelInfoBlock.parent().remove();
               if (page$.overallLayout.destroyRightSideContent(false) == false) return false;
             });
             return false;
           });
           channelInfoBlock.find('.channel_info_publish').click({ 'channelId': channelId, 'switchObject': switchObject }, function(event) {
-            $.post('/CMSAPI/switchChannelPublicity', { 'channelId': event.data.channelId }, function(response) {
+            cms.post('/CMSAPI/switchChannelPublicity', { 'channelId': event.data.channelId }, function(response) {
               if (response) {
                 event.data.switchObject.css('background', 'url(' + $('#image_ch_public').text() + ') no-repeat');
               } else {
@@ -1179,8 +1175,8 @@ var page$ = {
     $('.create_channel_button').unbind().click(page$.skeletonCreation.create9x9Channel);
   },
   init: function() {
-    var css = '.chPublic { background:url(' + $('#image_ch_public').text() + ') no-repeat; }\n.chUnPublic { background:url(' + $('#image_ch_unpublic').text() + ') no-repeat; }';
-    $('<style/>').text(css).appendTo('head');
+    var css = '<style> .chPublic { background:url(' + $('#image_ch_public').text() + ') no-repeat; }\n.chUnPublic { background:url(' + $('#image_ch_unpublic').text() + ') no-repeat; } </style>';
+    $(css).appendTo('head');
     
     page$.channelList.init();
     $(window).bind('beforeunload', function() {

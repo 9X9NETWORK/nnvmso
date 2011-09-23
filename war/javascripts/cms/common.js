@@ -2,9 +2,13 @@
  * 
  */
 
-var log = function() { };
+var log = function(text) {
+  if (window.console && console.log)
+    console.log(text);
+};
+
 var cms = {
-  debug: true,
+  debug: false,
   isGeneric: function() {
     return ($('#msoType').val() == '4');
   },
@@ -90,6 +94,17 @@ var cms = {
       return 'video/unknown';
     }
   },
+  post: function(url, parameters, callback, format) {
+    if ($.browser.msie && url.charAt(0) == '/') {
+      log('post: ' + url);
+      url = 'http://' + location.host + url; // IE compatible
+    }
+    if (!format) {
+      $.post(url, parameters, callback);
+    } else {
+      $.post(url, parameters, callback, format);
+    }
+  },
   loadJSON: function(url, callback) {
     var cache = $.ajaxSettings.cache;
     $.ajaxSettings.cache = true;
@@ -97,6 +112,24 @@ var cms = {
     $.ajaxSettings.cache = cache;
   },
   loadScript: function(url, callback) {
+    if ($.browser.msie && url.charAt(0) == '/') {
+      log('loadScript: ' + url);
+      return (function(url, callback) {
+        var head   = document.getElementsByTagName("head")[0];
+        var script = document.createElement("script");
+        var done   = false; // Handle Script loading
+        script.src = url;
+        script.onload = script.onreadystatechange = function() { // Attach handlers for all browsers
+          if ( !done && (!this.readyState || this.readyState === "loaded" || this.readyState === "complete") ) {
+            done = true;
+            if (callback) { callback(); }
+            script.onload = script.onreadystatechange = null; // Handle memory leak in IE
+          }
+        };
+        head.appendChild(script);
+        return undefined; // We handle everything using the script element injection
+      })(url, callback);
+    }
     var cache = $.ajaxSettings.cache;
     $.ajaxSettings.cache = true;
     if (typeof (callback) == 'function')
@@ -138,19 +171,23 @@ var cms = {
     $('.header .logout').css('background', 'url(' + $('#image_header_logout').text() + ') no-repeat');
     $('.header .setup').css('background', 'url(' + $('#image_header_setup').text() + ') no-repeat');
     $('.header .sg').css('background', 'url(' + $('#image_header_sg').text() + ') no-repeat');
+    
+    log('browser.msie: ' + $.browser.msie);
+    
     var style =
+      '<style> ' +
       '.menuA, .menuA:hover, .menuA_active, ' +
       '.menuB, .menuB:hover, .menuB_active, ' +
       '.menuC, .menuC:hover, .menuC_active, ' +
       '.menuD, .menuD:hover, .menuD_active, ' +
       '.menuE, .menuE:hover, .menuE_active {' +
-      '  background-image: url(' + $('#image_menu').text() + ');' +
-      '}'
-    $('<style/>').text(style).appendTo('head');
+      '  background-image: url(' + $('#image_menu').text() + '); ' +
+      '} ' +
+      '</style>';
+    var jqStyle = $(style).appendTo('head'); // IE compatible
     
     $.ajaxSetup ({
-      // Disable caching of AJAX responses
-      cache: false
+      cache: false // Disable caching of AJAX responses
     });
     
     cms.loadScript('/javascripts/plugins/jquery.getCSS.js', function() {
@@ -159,10 +196,6 @@ var cms = {
       });
     });
     cms.loadScript('/javascripts/plugins/jquery.textTruncate.js');
-    cms.loadScript('/javascripts/plugins/jquery.log.js', function() {
-      log = $.log;
-      log('logger initialized');
-    });
   }
 };
 
@@ -183,15 +216,15 @@ $(function() {
   
   cms.init();
   
-  if (cms.isGeneric()) {
-    cms.initGenericOne();
-  }
-  
   if (typeof (page$) != 'undefined' && typeof (page$.init) == 'function') {
     page$.init();
     if (cms.isGeneric() && typeof (page$.initGenericOne) == 'function') {
       page$.initGenericOne();
     }
+  }
+  
+  if (cms.isGeneric()) {
+    cms.initGenericOne();
   }
   
 });
