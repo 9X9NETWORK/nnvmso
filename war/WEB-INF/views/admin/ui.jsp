@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.15/themes/ui-darkness/jquery-ui.css" type="text/css" />
 <link rel="stylesheet" href="/stylesheets/ui.jqgrid.css" />
 <link rel="stylesheet" href="/stylesheets/admin-portal-ui.css" />
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.js"></script>
+<script type="text/javascript" src="/javascripts/jquery-1.6.4.fixed.js"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.15/jquery-ui.js"></script>
 <script type="text/javascript" src="/javascripts/grid.locale-en.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.jqGrid.src.js"></script>

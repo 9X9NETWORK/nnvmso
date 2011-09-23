@@ -13,7 +13,7 @@ var page$ = {
     'appendTo': '#directory_list_ul',
     'disabled': false,
     'opacity':  0.5,
-    'helper':   "clone",
+    'helper':   'clone',
     'scroll':   false,
     'revert':   'invalid',
     'zIndex':   2700
@@ -37,7 +37,7 @@ var page$ = {
         var url = '/CMSAPI/createCategoryChannel';
         parameters['channelId'] = objectId;
       }
-      $.post(url, parameters, function(response) {
+      cms.post(url, parameters, function(response) {
         if (response != 'OK') {
           alert($('#lang_warning_error_occurs').text());
           return;
@@ -72,7 +72,7 @@ var page$ = {
   },
   loadCategoryChannelsAndChannelSets: function(categoryId) {
     // load channels
-    $.post('/CMSAPI/listCategoryChannels', { 'categoryId': categoryId }, function(channels) {
+    cms.post('/CMSAPI/listCategoryChannels', { 'categoryId': categoryId }, function(channels) {
       for (var i in channels) {
         var channelId = channels[i].key.id;
         $('#treeview').jstree('create', '#' + categoryId, 'last', {
@@ -92,7 +92,7 @@ var page$ = {
       }
     }, 'json');
     // load channel sets
-    $.post('/CMSAPI/listCategoryChannelSets', { 'categoryId': categoryId }, function(channelSets) {
+    cms.post('/CMSAPI/listCategoryChannelSets', { 'categoryId': categoryId }, function(channelSets) {
       for (var i in channelSets) {
         var channelSetId = channelSets[i].key.id;
         $('#treeview').jstree('create', '#' + categoryId, 'last', {
@@ -155,7 +155,7 @@ var page$ = {
         if (confirm(confirmMessage.replace('{categoryName}', categoryName)) == false) {
           return;
         }
-        $.post('/CMSAPI/removeCategory', { 'categoryId': categoryId }, function(response) {
+        cms.post('/CMSAPI/removeCategory', { 'categoryId': categoryId }, function(response) {
           if (response != 'OK') {
             alert($('#lang_warning_error_occurs').text());
             return;
@@ -175,7 +175,7 @@ var page$ = {
           parentId: $(selected).attr('id'),
           name: name
         };
-        $.post('/CMSAPI/createCategory', parameters, function(categoryId) {
+        cms.post('/CMSAPI/createCategory', parameters, function(categoryId) {
           if (!categoryId.toString().match(/^[0-9]+$/) || categoryId == 0) {
             alert($('#lang_warning_error_occurs').text());
             return;
@@ -188,7 +188,7 @@ var page$ = {
             data: name
           }, function(data) {
           }, false);
-        });
+        }, 'text');
       });
       $('#btn_rename_directory').button().unbind('click').click(function() {
         var selected = $('#treeview').jstree('get_selected');
@@ -198,7 +198,7 @@ var page$ = {
         }
         $('#treeview').jstree('rename');
       });
-      $.post('/CMSAPI/listCategories', { 'msoId': $('#msoId').val() }, function(categories) {
+      cms.post('/CMSAPI/listCategories', { 'msoId': $('#msoId').val() }, function(categories) {
         var root = [];
         for (var i = 0; i < categories.length; i++) {
           if (categories[i].parentId == 0) {
@@ -215,7 +215,7 @@ var page$ = {
               'categoryId': categoryId,
               'name': newName
             };
-            $.post('/CMSAPI/renameCategory', parameter, function(response) {
+            cms.post('/CMSAPI/renameCategory', parameter, function(response) {
               if (response != 'OK')
                 alert($('#lang_warning_error_occurs').text());
             }, 'text');
@@ -232,7 +232,7 @@ var page$ = {
             'categoryId': categoryId,
             'name': name
           };
-          $.post('/CMSAPI/renameCategory', parameter, function(response) {
+          cms.post('/CMSAPI/renameCategory', parameter, function(response) {
             if (response != 'OK')
               alert($('#lang_warning_error_occurs').text());
           }, 'text');
@@ -261,7 +261,7 @@ var page$ = {
           } else {
             return;
           }
-          $.post(url, parameters, function(response) {
+          cms.post(url, parameters, function(response) {
             if (response != 'OK') {
               alert($('#lang_warning_error_occurs').text());
             }
@@ -296,7 +296,7 @@ var page$ = {
                 alert($('#lang_warning_cannot_drag_directory').text());
                 return;
               }
-              $.post(url, parameters, function(response) {
+              cms.post(url, parameters, function(response) {
                 if (response != 'OK') {
                   alert($('#lang_warning_error_occurs').text());
                   return;
@@ -363,7 +363,7 @@ var page$ = {
           },
           'plugins': ['themes', 'html_data', 'types', 'ui', 'crrm', 'dnd']
         });
-      });
+      }, 'json');
     }
   },
   channelAndSetPool: {
@@ -376,7 +376,7 @@ var page$ = {
       });
     },
     init: function() {
-      $.post('/CMSAPI/listOwnedChannelSets', { 'msoId': $('#msoId').val() }, function(channelSets) {
+      cms.post('/CMSAPI/listOwnedChannelSets', { 'msoId': $('#msoId').val() }, function(channelSets) {
         for (var i = 0; i < channelSets.length; i++) {
           var item = $('<li class="ch_normal"/>');
           var img = $('<img/>').attr('src', channelSets[i].imageUrl);
@@ -391,7 +391,7 @@ var page$ = {
             $(this).css('z-index', 1);
           });
         }
-        $.post('/CMSAPI/listOwnedChannels', { 'msoId': $('#msoId').val() }, function(channels) {
+        cms.post('/CMSAPI/listOwnedChannels', { 'msoId': $('#msoId').val() }, function(channels) {
           for (var i = 0; i < channels.length; i++) {
             var item = $('<li class="ch_normal"/>');
             var img = $('<img/>').attr('src', channels[i].imageUrl);
@@ -412,7 +412,7 @@ var page$ = {
           if (page$.channelAndSetPool.onload != null && typeof page$.channelAndSetPool.onload == 'function') {
             page$.channelAndSetPool.onload();
           }
-        });
+        }, 'json');
       }, 'json');
     }
   },

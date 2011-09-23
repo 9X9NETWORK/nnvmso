@@ -8,10 +8,9 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <title><spring:message code="cms.login.title"/></title>
 <link href="/stylesheets/cms.css" rel="stylesheet" type="text/css" />
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.js"></script>
+<script type="text/javascript" src="/javascripts/jquery-1.6.4.fixed.js"></script>
 <script type="text/jabascript">
-$(function()
-{
+$(function() {
   $('a.btnLogin').css('backround', 'url(' + $('#image_btn_login').text() + ')');
   $('a.btnLogin:hover').css('backround', 'url(' + $('#image_btn_login_hover').text() + ')');
 });

@@ -95,10 +95,6 @@ var cms = {
     }
   },
   get: function(url, parameters, callback, format) {
-    if ($.browser.msie && url.charAt(0) == '/') {
-      log('GET: ' + url);
-      url = 'http://' + location.host + url; // IE compatible
-    }
     if (!format) {
       $.get(url, parameters, callback);
     } else {
@@ -106,21 +102,16 @@ var cms = {
     }
   },
   post: function(url, parameters, callback, format) {
-    if ($.browser.msie && url.charAt(0) == '/') {
-      log('POST: ' + url);
-      url = 'http://' + location.host + url; // IE compatible
-    }
-    if (!format) {
-      $.post(url, parameters, callback);
+    if (!callback) {
+      $.post(url, parameters);
     } else {
-      $.post(url, parameters, callback, format);
+      if (!format)
+        $.post(url, parameters, callback);
+      else
+        $.post(url, parameters, callback, format);
     }
   },
   loadJSON: function(url, callback) {
-    if ($.browser.msie && url.charAt(0) == '/') {
-      log('JSON: ' + url);
-      url = 'http://' + location.host + url; // IE compatible
-    }
     var cache = $.ajaxSettings.cache;
     $.ajaxSettings.cache = true;
     $.getJSON(url, callback);
@@ -187,9 +178,6 @@ var cms = {
     $('.header .setup').css('background', 'url(' + $('#image_header_setup').text() + ') no-repeat');
     $('.header .sg').css('background', 'url(' + $('#image_header_sg').text() + ') no-repeat');
     
-    if ($.browser.msie)
-      log('browser: IE');
-    
     var style =
       '<style> ' +
       '.menuA, .menuA:hover, .menuA_active, ' +
@@ -200,7 +188,7 @@ var cms = {
       '  background-image: url(' + $('#image_menu').text() + '); ' +
       '} ' +
       '</style>';
-    var jqStyle = $(style).appendTo('head'); // IE compatible
+    $(style).appendTo('head'); // IE compatible
     
     $.ajaxSetup ({
       cache: false // Disable caching of AJAX responses

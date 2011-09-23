@@ -12,12 +12,12 @@ var page$ = {
             .text(categories[i].name)
             .appendTo('#sys_directory');
         }
-        $.post('/CMSAPI/defaultChannelSetCategory', { 'msoId': $('#msoId').val() }, function(category) {
+        cms.post('/CMSAPI/defaultChannelSetCategory', { 'msoId': $('#msoId').val() }, function(category) {
           if (category != null) {
             $('#sys_directory').val(category.key.id);
           }
         }, 'json');
-        $.post('/CMSAPI/defaultChannelSetInfo', { 'msoId': $('#msoId').val() }, function(channelSet) {
+        cms.post('/CMSAPI/defaultChannelSetInfo', { 'msoId': $('#msoId').val() }, function(channelSet) {
           if (channelSet != null) {
             var url = 'http://' + ((location.host == 'www.9x9.tv') ? '9x9.tv' : location.host) + '/';
             url += ((channelSet.beautifulUrl != null) ? channelSet.beautifulUrl : channelSet.defaultUrl);
@@ -104,7 +104,7 @@ var page$ = {
       });
     },
     init: function() {
-      $.post('/CMSAPI/defaultChannelSetChannels', { 'msoId': $('#msoId').val() }, function(channels) {
+      cms.post('/CMSAPI/defaultChannelSetChannels', { 'msoId': $('#msoId').val() }, function(channels) {
         for (var i = 0; i < channels.length; i++) {
           var seq = channels[i].seq;
           var img = $('<img/>').attr('src', channels[i].imageUrl);
@@ -147,7 +147,7 @@ var page$ = {
       this.numberOfSlides = this.slides.length;
     },
     init: function() {
-      $.post('/CMSAPI/listOwnedChannels', { 'msoId': $('#msoId').val() }, function(channels) {
+      cms.post('/CMSAPI/listOwnedChannels', { 'msoId': $('#msoId').val() }, function(channels) {
         page$.channelPool.populateSlides(channels);
         
         // Remove scrollbar in JS
@@ -171,15 +171,13 @@ var page$ = {
         page$.channelPool.manageControls();
         
         // Create event listeners for .controls clicks
-        $('.control').click(function(event)
-        {
+        $('.control').click(function(event) {
           // Determine new position
           page$.channelPool.currentPosition = ($(event.target).attr('id') == 'rightControl') ? page$.channelPool.currentPosition + 1 : page$.channelPool.currentPosition - 1;
           // Hide / show controls
           page$.channelPool.manageControls();
           // Move slideInner using margin-left
-          $('#slideInner').animate(
-          {
+          $('#slideInner').animate({
             'marginLeft': page$.channelPool.slideWidth * (-page$.channelPool.currentPosition)
           });
         });
@@ -194,7 +192,7 @@ var page$ = {
               'channelSetId': $('#cc_id').val(),
               'seq':          seq
             }
-            $.post('/CMSAPI/removeChannelSetChannel', parameters, function(response) {
+            cms.post('/CMSAPI/removeChannelSetChannel', parameters, function(response) {
               if (response != 'OK') {
                 alert($('#lang_warning_error_occurs').text());
                 page$.channelSetArea.reload();
@@ -209,7 +207,7 @@ var page$ = {
                              .CreateBubblePopup(cms.bubblePopupProperties);
               page$.channelSetArea.channelIds = $.grep(page$.channelSetArea.channelIds, function(value) { return value != channelId });
               dragObj.draggable('disable').html('').removeClass('ch_exist').RemoveBubblePopup();
-            });
+            }, 'text');
           }
         });
       }, 'json');
@@ -260,7 +258,7 @@ var page$ = {
           'from':         from,
           'to':           to
         };
-        $.post('/CMSAPI/changeChannelSetChannel', parameters, function(response) {
+        cms.post('/CMSAPI/changeChannelSetChannel', parameters, function(response) {
           if (response != 'OK') {
             alert($('#lang_warning_error_occurs').text());
             page$.channelSetArea.reload();
@@ -281,7 +279,7 @@ var page$ = {
             cms.bubblePopupProperties['innerHtml'] = $(dragObj).find('span').html();
             $(dragObj).CreateBubblePopup(cms.bubblePopupProperties);
           }
-        });
+        }, 'text');
       } else {
         var channelId = $(ui.draggable).find('input[name="channelId"]').val();
         var parameters = {
@@ -289,7 +287,7 @@ var page$ = {
           'channelId':    channelId,
           'seq':          to
         }
-        $.post('/CMSAPI/addChannelSetChannel', parameters, function(response) {
+        cms.post('/CMSAPI/addChannelSetChannel', parameters, function(response) {
           if (response != 'OK') {
             alert($('#lang_warning_error_occurs').text());
             page$.channelSetArea.reload();
@@ -321,7 +319,7 @@ var page$ = {
             .removeClass('ch_normal')
             .draggable({ disabled: true })
             .RemoveBubblePopup();
-        });
+        }, 'text');
       }
     }
   },
@@ -407,7 +405,7 @@ var page$ = {
     if (imageUpdated == 'true') {
       parameters['imageUrl'] = imageUrl;
     }
-    $.post('/CMSAPI/saveChannelSet', parameters, function(response) {
+    cms.post('/CMSAPI/saveChannelSet', parameters, function(response) {
       if (response != 'OK')
         alert($('#lang_warning_error_occurs').text());
       else
