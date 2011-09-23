@@ -66,7 +66,7 @@ var page$ = {
       });
     },
     initYouTube: function(url, channelId) {
-      $.get(url, { alt: 'json' }, function(data) {
+      $.get(url, { 'alt': 'json-in-script' }, function(data) {
         if (typeof data.entry != 'undefined') {
           $('#program_list').hide();
           page$.programDetail.displayYouTube(data.entry, channelId);
@@ -303,9 +303,10 @@ var page$ = {
             if (inputUrl.indexOf('youtube.com') >= 0) {
               var videoId = inputUrl.match(/\/watch\?v=([^\/&]+)/)[1];
               var parameters = {
-                'alt': 'json'
+                'alt': 'json-in-script',
+                'v':   2
               };
-              $.get('http://gdata.youtube.com/feeds/api/videos/' + videoId, parameters, function(data) {
+              $.get('http://gdata.youtube.com/feeds/api/videos/' + videoId + '?callback=?', parameters, function(data) {
                 programDetailBlock.find('.ep_name').val(data.entry.media$group.media$title.$t);
                 programDetailBlock.find('.ep_intro').val(data.entry.media$group.media$description.$t);
                 programDetailBlock.find('.ep_image').attr('src', data.entry.media$group.media$thumbnail[1].url);
@@ -362,7 +363,9 @@ var page$ = {
                 $.post('/CMSAPI/saveNewProgram', parameters, function(response) {
                   if (response == 'OK') {
                     alert($('#lang_update_successfully').text());
-                    programDetailBlock.parent().remove();
+                    programDetailBlock.removeClass('program_create_detail_block_cloned').parent().hide(); // IE compatible
+                    var size = $('.program_create_detail_block_cloned').size();
+                    log('size: ' + size);
                     if ($('.program_create_detail_block_cloned').size() == 0) {
                       page$.programList.init(channelId, false, channelName);
                     }
@@ -528,17 +531,18 @@ var page$ = {
       if (page$.overallLayout.destroyRightSideContent(false) == false) return false;
       
       if (isPlaylist)
-        var requestUrl = 'http://gdata.youtube.com/feeds/api/playlists/' + username;
+        var requestUrl = 'http://gdata.youtube.com/feeds/api/playlists/' + username + '?callback=?';
       else
-        var requestUrl = 'http://gdata.youtube.com/feeds/api/users/' + username + '/uploads';
+        var requestUrl = 'http://gdata.youtube.com/feeds/api/users/' + username + '/uploads?callback=?';
       var parameters = {
         'orderby':     'published',
         'start-index': 1,
         'max-results': 50,
-        'alt':         'json',
+        'alt':         'json-in-script',
         'format':      5,
         'v':           2
       };
+      log(requestUrl);
       $.get(requestUrl, parameters, function(data) {
         if (data == null) return;
         var feed = data.feed;
@@ -569,7 +573,9 @@ var page$ = {
         var promoteUrl = 'http://' + location.host + '/view?channel=' + channelId + '&episode=' + entry.media$group.yt$videoid.$t;
         programInfoBlock.find('.addthis_button_expanded').attr('addthis:url', promoteUrl);
         programInfoBlock.find('.program_info_detailbutton').click({ 'entry': entry }, function(event) {
-          page$.programDetail.initYouTube(event.data.entry.link[4].href, channelId);
+          var youtubeUrl = event.data.entry.link[4].href + '&callback=?';
+          log(youtubeUrl);
+          page$.programDetail.initYouTube(youtubeUrl, channelId);
           return false;
         });
         var promoteUrlTruncated = promoteUrl;
@@ -827,13 +833,13 @@ var page$ = {
               var requestUrl;
               if (channel.sourceUrl.indexOf('view_play_list') >= 0) {
                 var listId = channel.sourceUrl.match(/\/view_play_list\?p=([^\/]*)/)[1];
-                requestUrl = 'http://gdata.youtube.com/feeds/api/playlists/' + listId;
+                requestUrl = 'http://gdata.youtube.com/feeds/api/playlists/' + listId + '?callback=?';
               } else {
                 var username = channel.sourceUrl.match(/\/user\/([^\/]*)/)[1];
-                requestUrl = 'http://gdata.youtube.com/feeds/api/users/' + username + '/uploads';
+                requestUrl = 'http://gdata.youtube.com/feeds/api/users/' + username + '/uploads?callback=?';
               }
               var parameters = {
-                'alt': 'json',
+                'alt': 'json-in-script',
                 'format': 5,
                 'v': 2
               };
