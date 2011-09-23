@@ -628,10 +628,10 @@ public class CmsApiController {
 	public @ResponseBody String saveChannel(HttpServletRequest req,
 	                                        @RequestParam Long channelId,
 	                                        @RequestParam(required = false) String imageUrl,
-	                                        @RequestParam String name,
-	                                        @RequestParam String intro,
-	                                        @RequestParam String tag,
-	                                        @RequestParam String langCode,
+	                                        @RequestParam(required = false) String name,
+	                                        @RequestParam(required = false) String intro,
+	                                        @RequestParam(required = false) String tag,
+	                                        @RequestParam(required = false) String langCode,
 	                                        @RequestParam Long categoryId) throws NoSuchAlgorithmException {
 		
 		logger.info("channelId = " + channelId);
@@ -650,8 +650,10 @@ public class CmsApiController {
 		if (channel == null)
 			return "Invalid ChannelId";
 		
-		channel.setTags(tag);
-		channel.setLangCode(langCode);
+		if (tag != null)
+			channel.setTags(tag);
+		if (langCode != null)
+			channel.setLangCode(langCode);
 		if (imageUrl != null) {
 			ContentWorkerService workerService = new ContentWorkerService();
 			Long timestamp = System.currentTimeMillis() / 1000L;
@@ -667,8 +669,10 @@ public class CmsApiController {
 			workerService.channelLogoProcess(channelId, imageUrl, prefix, req);
 		}
 		
-		channel.setName(name);
-		channel.setIntro(intro);
+		if (name != null)
+			channel.setName(name);
+		if (intro != null)
+			channel.setIntro(intro);
 		channel.setUpdateDate(new Date());
 		channelMngr.save(channel);
 		

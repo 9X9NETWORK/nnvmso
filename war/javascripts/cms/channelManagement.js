@@ -66,7 +66,7 @@ var page$ = {
       }, 'json');
     },
     initYouTube: function(url, channelId) {
-      $.get(url, { 'alt': 'json-in-script' }, function(data) {
+      cms.get(url, { 'alt': 'json-in-script' }, function(data) {
         if (typeof data.entry != 'undefined') {
           $('#program_list').hide();
           page$.programDetail.displayYouTube(data.entry, channelId);
@@ -306,7 +306,7 @@ var page$ = {
                 'alt': 'json-in-script',
                 'v':   2
               };
-              $.get('http://gdata.youtube.com/feeds/api/videos/' + videoId + '?callback=?', parameters, function(data) {
+              cms.get('http://gdata.youtube.com/feeds/api/videos/' + videoId + '?callback=?', parameters, function(data) {
                 programDetailBlock.find('.ep_name').val(data.entry.media$group.media$title.$t);
                 programDetailBlock.find('.ep_intro').val(data.entry.media$group.media$description.$t);
                 programDetailBlock.find('.ep_image').attr('src', data.entry.media$group.media$thumbnail[1].url);
@@ -540,7 +540,7 @@ var page$ = {
         'format':      5,
         'v':           2
       };
-      $.get(requestUrl, parameters, function(data) {
+      cms.get(requestUrl, parameters, function(data) {
         if (data == null) return;
         var feed = data.feed;
         if (typeof feed.entry != 'undefined') {
@@ -839,7 +839,7 @@ var page$ = {
                 'format': 5,
                 'v': 2
               };
-              $.get(requestUrl, parameters, function(data) {
+              cms.get(requestUrl, parameters, function(data) {
                 if (data == null) return;
                 var feed = data.feed;
                 $('#channel_import_detail [name="ch_name"]').val(feed.title.$t);

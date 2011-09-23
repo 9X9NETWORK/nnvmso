@@ -94,9 +94,20 @@ var cms = {
       return 'video/unknown';
     }
   },
+  get: function(url, parameters, callback, format) {
+    if ($.browser.msie && url.charAt(0) == '/') {
+      log('GET: ' + url);
+      url = 'http://' + location.host + url; // IE compatible
+    }
+    if (!format) {
+      $.get(url, parameters, callback);
+    } else {
+      $.get(url, parameters, callback, format);
+    }
+  },
   post: function(url, parameters, callback, format) {
     if ($.browser.msie && url.charAt(0) == '/') {
-      log('post: ' + url);
+      log('POST: ' + url);
       url = 'http://' + location.host + url; // IE compatible
     }
     if (!format) {
@@ -106,9 +117,13 @@ var cms = {
     }
   },
   loadJSON: function(url, callback) {
+    if ($.browser.msie && url.charAt(0) == '/') {
+      log('JSON: ' + url);
+      url = 'http://' + location.host + url; // IE compatible
+    }
     var cache = $.ajaxSettings.cache;
     $.ajaxSettings.cache = true;
-    $.get(url, callback, 'json');
+    $.getJSON(url, callback);
     $.ajaxSettings.cache = cache;
   },
   loadScript: function(url, callback) {
@@ -172,7 +187,8 @@ var cms = {
     $('.header .setup').css('background', 'url(' + $('#image_header_setup').text() + ') no-repeat');
     $('.header .sg').css('background', 'url(' + $('#image_header_sg').text() + ') no-repeat');
     
-    log('browser.msie: ' + $.browser.msie);
+    if ($.browser.msie)
+      log('browser: IE');
     
     var style =
       '<style> ' +
