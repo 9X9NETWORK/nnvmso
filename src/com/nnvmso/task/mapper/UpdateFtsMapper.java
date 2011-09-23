@@ -10,7 +10,7 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.tools.mapreduce.AppEngineMapper;
 import com.google.appengine.tools.mapreduce.DatastoreMutationPool;
 import com.nnvmso.model.MsoChannel;
-import com.nnvmso.service.SearchJanitor;
+import com.nnvmso.service.MsoChannelManager;
 
 public class UpdateFtsMapper extends AppEngineMapper<Key, Entity, NullWritable, NullWritable>{
 	protected static final Logger log = Logger.getLogger(UpdateFtsMapper.class.getName());
@@ -24,7 +24,7 @@ public class UpdateFtsMapper extends AppEngineMapper<Key, Entity, NullWritable, 
 		short status = Short.parseShort(String.valueOf(dbStatus));
 		if (status == MsoChannel.STATUS_SUCCESS) {
 			log.info("This channel(" + name + ") is updated fts:" + sourceUrl);
-			Set<String> fts = SearchJanitor.getFtsTokens(name, intro);
+			Set<String> fts = MsoChannelManager.getFtsTokens(name, intro);
 			entity.setProperty("fts", fts);		
 			DatastoreMutationPool mutationPool = this.getAppEngineContext(context).getMutationPool();
 			mutationPool.put(entity);

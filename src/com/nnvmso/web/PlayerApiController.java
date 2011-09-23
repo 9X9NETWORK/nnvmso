@@ -29,7 +29,6 @@ import com.nnvmso.service.NnContentManager;
 import com.nnvmso.service.NnStatusCode;
 import com.nnvmso.service.NnStatusMsg;
 import com.nnvmso.service.PlayerApiService;
-import com.nnvmso.service.SearchJanitor;
 
 /**
  * This is API specification for 9x9 Player. Please note although the document is written in JavaDoc form, it is generic Web Service API via HTTP request-response, no Java necessary.
