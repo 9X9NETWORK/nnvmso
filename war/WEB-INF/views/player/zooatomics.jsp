@@ -5,7 +5,7 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9playerV68a"/>
-<c:set var="nroot" value="http://9x9ui.s3.amazonaws.com/9x9playerV78"/>
+<c:set var="nroot" value="http://9x9ui.s3.amazonaws.com/9x9playerV80"/>
 
 <!-- $Revision$ -->
 
@@ -1525,10 +1525,10 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
           <p class="btn-check on"><img src="${nroot}/images/btn_check_on.png" class="btn-check-on"><img src="${nroot}/images/btn_check_off.png" class="btn-check-off"><span>Facebook</span></p>  
           <p id="btn-connect-fb" class="btn"><span>Connect with Facebook</span></p>
         </li>
-        <li>
+        <!--li>
           <p class="head"><span>Auto share on My Facebook Wall when:</span></p>
           <p class="btn-check on"><img src="${nroot}/images/btn_check_on.png" class="btn-check-on"><img src="${nroot}/images/btn_check_off.png" class="btn-check-off"><span>I add a new channel to my guide</span></p>
-        </li>
+        </li-->
       </ul>
       <ul class="action-list">
         <li><p id="btn-sharing-save" class="btn"><span>Save</span></p></li>
@@ -1538,9 +1538,9 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
       <ul class="input-list">
         <li>
           <p class="head"><span>I want to set 9x9's preloading capacity to:</span></p>
-          <p class="radio-item on"><img src="${nroot}/images/btn_radio_off.png" class="btn-radio-off"><img src="${nroot}/images/btn_radio_on.png" class="btn-radio-on"><span>Off</span><span class="explanation">what is Off</span></p>
-          <p class="radio-item"><img src="${nroot}/images/btn_radio_off.png" class="btn-radio-off"><img src="${nroot}/images/btn_radio_on.png" class="btn-radio-on"><span>Normal</span><span class="explanation">what is Normal</span></p>
-          <p class="radio-item"><img src="${nroot}/images/btn_radio_off.png" class="btn-radio-off"><img src="${nroot}/images/btn_radio_on.png" class="btn-radio-on"><span>Maximum</span><span class="explanation">what is Mazimum</span></p>
+          <p class="radio-item" id="preload-off"><img src="${nroot}/images/btn_radio_off.png" class="btn-radio-off"><img src="${nroot}/images/btn_radio_on.png" class="btn-radio-on"><span>Off</span><span class="explanation">what is Off</span></p>
+          <p class="radio-item" id="preload-normal"><img src="${nroot}/images/btn_radio_off.png" class="btn-radio-off"><img src="${nroot}/images/btn_radio_on.png" class="btn-radio-on"><span>Normal</span><span class="explanation">what is Normal</span></p>
+          <p class="radio-item" id="preload-max"><img src="${nroot}/images/btn_radio_off.png" class="btn-radio-off"><img src="${nroot}/images/btn_radio_on.png" class="btn-radio-on"><span>Maximum</span><span class="explanation">what is Mazimum</span></p>
         </li>
       </ul>
       <ul class="action-list">
@@ -1551,10 +1551,11 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
       <ul class="input-list">
         <li>
           <p class="head"><span>Set 9x9's default playback resolution at:</span></p>
-          <p class="radio-item on"><img src="${nroot}/images/btn_radio_off.png" class="btn-radio-off"><img src="${nroot}/images/btn_radio_on.png" class="btn-radio-on"><span>1080p</span></p>
-          <p class="radio-item"><img src="${nroot}/images/btn_radio_off.png" class="btn-radio-off"><img src="${nroot}/images/btn_radio_on.png" class="btn-radio-on"><span>720p</span></p>
-          <p class="radio-item"><img src="${nroot}/images/btn_radio_off.png" class="btn-radio-off"><img src="${nroot}/images/btn_radio_on.png" class="btn-radio-on"><span>480p (Default)</span></p>
-          <p class="radio-item"><img src="${nroot}/images/btn_radio_off.png" class="btn-radio-off"><img src="${nroot}/images/btn_radio_on.png" class="btn-radio-on"><span>360p</span></p>
+          <p class="radio-item" id="rez-hd1080"><img src="${nroot}/images/btn_radio_off.png" class="btn-radio-off"><img src="${nroot}/images/btn_radio_on.png" class="btn-radio-on"><span>1080p</span></p>
+          <p class="radio-item" id="rez-hd720"><img src="${nroot}/images/btn_radio_off.png" class="btn-radio-off"><img src="${nroot}/images/btn_radio_on.png" class="btn-radio-on"><span>720p</span></p>
+          <p class="radio-item" id="rez-large"><img src="${nroot}/images/btn_radio_off.png" class="btn-radio-off"><img src="${nroot}/images/btn_radio_on.png" class="btn-radio-on"><span>large (480px)</span></p>
+          <p class="radio-item" id="rez-medium"><img src="${nroot}/images/btn_radio_off.png" class="btn-radio-off"><img src="${nroot}/images/btn_radio_on.png" class="btn-radio-on"><span>medium (360px)</span></p>
+          <p class="radio-item" id="rez-small"><img src="${nroot}/images/btn_radio_off.png" class="btn-radio-off"><img src="${nroot}/images/btn_radio_on.png" class="btn-radio-on"><span>small (240px)</span></p>
         </li>
       </ul>
       <ul class="action-list">
@@ -1576,7 +1577,23 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
   </div>
 </div>
 
-<div id="footer" style="display: none">
+<div id="footer">
+  <ul id="footer-list">
+    <li id="btn-company"><span>Company</span></li>
+    <li class="divider"></li>
+    <li id="btn-partner"><span>Partner</span></li>
+    <li class="divider"></li>
+    <li id="btn-blog"><span>Blog</span></li>
+    <li class="divider"></li>
+    <li id="btn-sitelang">
+      <p id="selected-sitelang"><span>English site</span><img src="${nroot}/images/icon_expand.png" class="icon-expand"></p>
+      <ul id="sitelang-dropdown" class="dropdown">
+        <li class="on"><img src="${nroot}/images/icon_check.png" class="icon-check"><span>English site</span></li>
+        <li><img src="${nroot}/images/icon_check.png" class="icon-check"><span>\u4e2d\u6587\u7db2\u7ad9</span></li>
+      </ul>
+    </li>
+  </ul>
+  <p id="copyright"><span>&copy; 2011 9x9.tv.  All right reserved</span></p>
 </div>
 
 </body>
