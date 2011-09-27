@@ -481,7 +481,17 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
         </div>
         <p id="yt-note"><span>* We don't accept URLs for single video</span></p>
         <div id="btn-add-yt" class="btn-hilite"><img src="${nroot}/images/icon_cart_white.png" class="icon-cart"><p class="btn-text"><span>Add this Channel</span></p></div>
-      </div>      
+      </div>
+    </div>
+      <div id="search-layer">
+      <img src="${nroot}/images/btn_winclose.png" id="btn-search-close">
+      <h4><span>Search Result</span></h4>
+     <p id="result-head"><span class="amount">200</span><span>results found</span></p>
+      <div id="search-slider" class="slider-wrap"><div class="slider-vertical"></div></div>
+      <div id="search-content">
+        <ul id="search-list">
+        </ul>
+      </div>
     </div>
   </div>
 </div>
