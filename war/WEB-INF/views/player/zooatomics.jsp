@@ -368,14 +368,19 @@ var brandinfo = "${brandInfo}";
 
 <div id="fb-root"></div>
 
-<div id="relaydiv" style="z-index: 1; position: absolute; top: 0px; left: 0px">
+<!--
+<div id="relaydiv" style="z-index: 1; position: absolute; top: 0px; left: 0px; width=500px; height=500px">
 <object id="relay" width=481 height=86>
-<param name=movie value="relay.swf">
+<param name=movie value="relay4.swf">
 <embed play=false swliveconnect="true" name="relay" 
-src="http://50.17.15.33/relay.swf" quality=high bgcolor=#FFFFFF 
+src="http://relay-puppy.9x9.tv/relay4.swf" quality=high bgcolor=#FFFFFF 
 width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="always" allowScripting="on" wmode="transparent">
 </embed>
 </object>
+</div>
+-->
+
+<div id="relaydiv" style="z-index: 1; position: absolute; top: 0px; left: 0px; width=500px; height=500px">
 </div>
 
 <!--/div-->
