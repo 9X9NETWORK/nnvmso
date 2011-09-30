@@ -18,6 +18,7 @@ public class RtnProgramItem {
 	private String thumbnailLarge;
 	private String type;
 	private String sortId;
+	private String subSortId;
 	
 	public String getTitle() {
 		return title;
@@ -96,6 +97,12 @@ public class RtnProgramItem {
 	}
 	public void setSortId(String sortId) {
 		this.sortId = sortId;
+	}	
+	public String getSubSortId() {
+		return subSortId;
+	}
+	public void setSubSortId(String subSortId) {
+		this.subSortId = subSortId;
 	}
 	public String toString() {
         StringBuffer buffer = new StringBuffer();

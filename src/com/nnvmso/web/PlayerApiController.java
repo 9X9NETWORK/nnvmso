@@ -1,10 +1,8 @@
 package com.nnvmso.web;
 
-import java.util.List;
 import java.util.Locale;
 import java.util.logging.Logger;
 
-import javax.jdo.PersistenceManager;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -15,17 +13,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.google.appengine.api.datastore.Blob;
-import com.google.appengine.api.datastore.Text;
 import com.nnvmso.lib.CookieHelper;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnNetUtil;
-import com.nnvmso.lib.PMF;
 import com.nnvmso.model.Mso;
-import com.nnvmso.model.MsoChannel;
-import com.nnvmso.model.NnContent;
 import com.nnvmso.service.MsoManager;
-import com.nnvmso.service.NnContentManager;
 import com.nnvmso.service.NnStatusCode;
 import com.nnvmso.service.NnStatusMsg;
 import com.nnvmso.service.PlayerApiService;
@@ -305,7 +297,7 @@ public class PlayerApiController {
 	 * @return please reference login
 	 */	
 	@RequestMapping(value="guestRegister")
-	public ResponseEntity<String> guestRegister(@RequestParam(value="ipg", required = false) String ipg, HttpServletRequest req, HttpServletResponse resp) {
+	public ResponseEntity<String> guestRegister(@RequestParam(value="ipg", required = false) String ipg, HttpServletRequest req, HttpServletResponse resp) {		
 		log.info("guest register: (ipg)" + ipg);
 		int status = this.prepService(req);
 		if (status != NnStatusCode.SUCCESS)
@@ -313,7 +305,7 @@ public class PlayerApiController {
 
 		String output = NnStatusMsg.errorStr(locale);
 		try {
-			output = playerApiService.createGuest(ipg, req, resp); 
+			output = playerApiService.createGuest(req, resp); 
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}	
@@ -336,7 +328,10 @@ public class PlayerApiController {
 		String email = req.getParameter("email");
 		String password = req.getParameter("password");
 		String name = req.getParameter("name");
-		String userToken = req.getParameter("user");				
+		String userToken = req.getParameter("user");
+		String captcha = req.getParameter("captcha");
+		String text = req.getParameter("text");
+		
 		log.info("signup: email=" + email + ";name=" + name + ";userToken=" + userToken + ";password=" + password);
 
 		int status = this.prepService(req);
@@ -345,7 +340,7 @@ public class PlayerApiController {
 
 		String output = NnStatusMsg.errorStr(locale);
 		try {
-			output = playerApiService.createUser(email, password, name, userToken, req, resp);
+			output = playerApiService.createUser(email, password, name, userToken, captcha, text, req, resp);
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}
@@ -359,7 +354,8 @@ public class PlayerApiController {
 	 * @param user user key identifier 
 	 */		
 	@RequestMapping(value="signout")
-    public ResponseEntity<String> signout(@RequestParam(value="user", required=false) String userKey, HttpServletRequest req, HttpServletResponse resp) {
+    public ResponseEntity<String> signout(@RequestParam(value="user", required=false) String userKey, 
+    		                              HttpServletRequest req, HttpServletResponse resp) {
 		this.prepService(req);
 		String output = NnStatusMsg.errorStr(locale);
 		try {
@@ -991,42 +987,6 @@ public class PlayerApiController {
 		}
 		return NnNetUtil.textReturn(output);
 	}
-
-	/**
-	 * Listing featured sets 
-	 * 
-	 * @param mso name
-	 * @return set id, set name, set image, channel count, subscription count (developing)
-	 */	
-	@RequestMapping(value="listFeaturedSets")
-	public ResponseEntity<String> listFeaturedSets(HttpServletRequest req) {				                                
-		this.prepService(req);
-		String output = NnStatusMsg.errorStr(locale);
-		try {
-			output = playerApiService.findFeaturedSets(Mso.LANG_EN);
-		} catch (Exception e) {
-			output = playerApiService.handleException(e);
-		}
-		return NnNetUtil.textReturn(output);
-	}
-
-	/**
-	 * List featured channels 
-	 * 
-	 * @param mso name
-	 * @return please reference channelLineup
-	 */	
-	@RequestMapping(value="listFeaturedChannels")
-	public ResponseEntity<String> listFeaturedChannels(HttpServletRequest req) {				                                
-		this.prepService(req);
-		String output = NnStatusMsg.errorStr(locale);
-		try {
-			output = playerApiService.findFeaturedChannels();
-		} catch (Exception e) {
-			output = playerApiService.handleException(e);
-		}
-		return NnNetUtil.textReturn(output);
-	}
 	
 	@RequestMapping(value="listRecommended")
 	public ResponseEntity<String> listRecommended(
@@ -1098,25 +1058,61 @@ public class PlayerApiController {
 		return NnNetUtil.textReturn(output);
 	}
 	
-	
-	/*
-	@RequestMapping(value="test")
-	public ResponseEntity<String> test(@RequestParam(value="user", required=false) String userToken,
-									  @RequestParam(value="session", required=false) String session,
-									  @RequestParam(value="pdr", required=false) String pdr,
-									  HttpServletRequest req) {
-		this.prepService(req);
+	@RequestMapping(value="saveSorting")
+	public ResponseEntity<String> saveSorting(@RequestParam(value="user", required=false) String userToken,
+			                                  @RequestParam(value="channel", required=false) String channelId,
+			                                  @RequestParam(value="sorting", required=false) String sorting,
+			                                  HttpServletRequest req) {
+		log.info("user:" + userToken + ";channel:" + channelId + ";sorting:" + sorting);
+		int status = this.prepService(req);
+		if (status != NnStatusCode.SUCCESS)
+			return NnNetUtil.textReturn(playerApiService.assembleMsgs(NnStatusCode.DATABASE_READONLY, null));
+		
 		String output = NnStatusMsg.errorStr(locale);
-		log.info("user=" + userToken + ";session=" + session);
 		try {
-			userToken="8s12689Ns28RN2992sut";
-			pdr = "w \t 7 \t 9\nw \t 10 \t 11\nabw\nw \t 12 \t abcde";
-			output = playerApiService.processPdr(userToken, pdr, session);
+			output = playerApiService.saveSorting(userToken, channelId, sorting);
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}
 		return NnNetUtil.textReturn(output);
 	}
-	*/
+
+	@RequestMapping(value="shareByEmail")
+	public ResponseEntity<String> shareByEmail(
+			@RequestParam(value="user", required=false) String userToken,			                            
+			@RequestParam(value="toEmail", required=false) String toEmail,
+			@RequestParam(value="toName", required=false) String toName,
+			@RequestParam(value="subject", required=false) String subject,
+			@RequestParam(value="content", required=false) String content,
+			@RequestParam(value="captcha", required=false) String captcha,
+			@RequestParam(value="text", required=false) String text,
+			HttpServletRequest req) {
+		log.info("user:" + userToken + ";to whom:" + toEmail + ";content:" + content);
+		this.prepService(req);
+		
+		String output = NnStatusMsg.errorStr(locale);
+		try {
+			output = playerApiService.shareByEmail(userToken, toEmail, toName, subject, content, captcha, text);
+		} catch (Exception e) {
+			output = playerApiService.handleException(e);
+		}
+		return NnNetUtil.textReturn(output);
+	}
+
+	@RequestMapping(value="requestCaptcha")
+	public ResponseEntity<String> requestCaptcha(@RequestParam(value="user", required=false) String token,
+												 @RequestParam(value="action", required=false) String action,
+			                                     HttpServletRequest req) {
+		log.info("user:" + token);
+		this.prepService(req);
+		
+		String output = NnStatusMsg.errorStr(locale);
+		try {
+			output = playerApiService.createCaptcha(token, action);
+		} catch (Exception e) {
+			output = playerApiService.handleException(e);
+		}
+		return NnNetUtil.textReturn(output);
+	}
 	
 }

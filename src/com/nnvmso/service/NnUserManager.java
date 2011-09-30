@@ -22,10 +22,13 @@ public class NnUserManager {
 	private NnUserDao nnUserDao = new NnUserDao();
 	
 	//@@@IMPORTANT email duplication is your responsibility
-	public void create(NnUser user) {
+	public void create(NnUser user, String token) {
 		user.setName(user.getName().replaceAll("\\s", " "));
 		user.setEmail(user.getEmail().toLowerCase());
-		user.setToken(this.generateToken());
+		if (token == null)
+			user.setToken(NnUserManager.generateToken());
+		else 
+			user.setToken(token);
 		Date now = new Date();
 		user.setCreateDate(now);
 		user.setUpdateDate(now);
@@ -50,7 +53,7 @@ public class NnUserManager {
 	 * GAE can only write 5 records a sec, maybe safe enough to do so w/out DB retrieving.
 	 * taking the chance to speed up signin (meaning not to consult DB before creating the account).
 	 */
-	private String generateToken() {
+	public static String generateToken() {
 		String time = String.valueOf(new Date().getTime());
 		String random = RandomStringUtils.randomAlphabetic(10);
 		String result = time + random;

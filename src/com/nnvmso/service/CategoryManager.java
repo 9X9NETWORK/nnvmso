@@ -19,7 +19,6 @@ import com.nnvmso.dao.CategoryDao;
 import com.nnvmso.lib.CacheFactory;
 import com.nnvmso.model.Category;
 import com.nnvmso.model.CategoryChannel;
-import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
 
 @Service

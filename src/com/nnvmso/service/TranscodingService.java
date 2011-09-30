@@ -22,7 +22,6 @@ import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.model.Category;
 import com.nnvmso.model.LangTable;
-import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoConfig;
 import com.nnvmso.model.MsoProgram;
@@ -243,40 +242,35 @@ public class TranscodingService {
 		}
 		program.setStorageId(item.getItemId());	
 		
-		if (item.getMp4() != null) {			
-			program.setMpeg4FileUrl(item.getMp4());
-		}		
-		if (item.getWebm() != null) {
+		if (item.getMp4() != null)			
+			program.setMpeg4FileUrl(item.getMp4());		
+		if (item.getWebm() != null)
 			program.setWebMFileUrl(item.getWebm());
-		}
-		if (item.getOther() != null) {
+		if (item.getOther() != null)
 			program.setOtherFileUrl(item.getOther());
-		}
-		if (item.getAudio() != null) {
+		if (item.getAudio() != null)
 			program.setAudioFileUrl(item.getAudio());			
-		}
-		if (item.getDuration() != null) {
+		if (item.getDuration() != null)
 			program.setDuration(item.getDuration());
-		}
-		if (item.getAudio() != null) {
+		if (item.getSubSortId() != null)
+			program.setSubSeq(item.getSubSortId());
+		if (item.getAudio() != null)
 			program.setType(MsoProgram.TYPE_AUDIO);
-		} else {
+		else
 			program.setType(MsoProgram.TYPE_VIDEO);
-		}
 		if (item.getPubDate() != null) {
 			Date theDate = new Date(Long.parseLong(item.getPubDate())*1000);
 			program.setPubDate(theDate);
 		} else {
 			program.setPubDate(new Date());
-		}
+		}		
 		program.setPublic(true);
 		if (item.getSortId() != null)
 			program.setSeq(item.getSortId());
-		if (isNew) {
+		if (isNew)
 			programMngr.create(channel, program);
-		} else {
+		else
 			programMngr.save(program);
-		}
 		return new PostResponse(String.valueOf(NnStatusCode.SUCCESS), "SUCCESS");
 	}
 

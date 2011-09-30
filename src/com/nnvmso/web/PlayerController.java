@@ -34,6 +34,20 @@ public class PlayerController {
 		return "redirect:9x9";
 	}	
 	
+	@RequestMapping("mini")
+	public String mini(@RequestParam(value="mso",required=false) String mso, HttpServletRequest req, HttpServletResponse resp, Model model) {
+		PlayerService service = new PlayerService();
+		model = service.prepareBrand(model, mso, resp);
+		return "player/mini";
+	}	
+
+	@RequestMapping("tv")
+	public String tv(@RequestParam(value="mso",required=false) String mso, HttpServletRequest req, HttpServletResponse resp, Model model) {
+		PlayerService service = new PlayerService();
+		model = service.prepareBrand(model, mso, resp);
+		return "player/mini";
+	}	
+	
 	/**
 	 * to become a 9x9 player, 1)delete cookie, 2)set fb info 
 	 */	
@@ -42,9 +56,7 @@ public class PlayerController {
 		PlayerService service = new PlayerService();
 		model = service.prepareBrand(model, mso, resp);
 		model = service.prepareSetInfo(model, name, resp);
-
-		//String prefLanguage = req.getHeader("Accept-Language");
-		
+		//String prefLanguage = req.getHeader("Accept-Language");		
 		return "player/zooatomics";
 	}
 
@@ -69,16 +81,7 @@ public class PlayerController {
 	public String support() {
 		return "general/support";
 	}	
-	
-	/*
-	@RequestMapping("daai")
-	public String daai(@RequestParam(value="mso",required=false) String mso, HttpServletRequest req, HttpServletResponse resp, Model model) {
-		PlayerService service = new PlayerService();
-		model = service.prepareBrand(model, mso, resp);		
-		return "player/antelope";
-	}
-	*/
-	
+		
 	/*
 	 * used for dns redirect watch dog 
 	 */

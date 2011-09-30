@@ -95,7 +95,7 @@ public class AdminMsoController {
 		
 		NnUser user = new NnUser(contactEmail, password, name, NnUser.TYPE_3X3);
 		user.setMsoId(mso.getKey().getId());
-		userMngr.create(user);
+		userMngr.create(user, null);
 		
 		ChannelSet channelSet = new ChannelSet(mso.getKey().getId(), name, name, true);
 		channelSet.setDefaultUrl(String.valueOf(mso.getKey().getId()));

@@ -45,10 +45,10 @@ public class NnUserValidator {
 				return NnStatusCode.INPUT_BAD;
 			}
 		}
-		String lang = user.getLang();
-		if (lang != null && lang.length() > 0) {
-			if (lang.equals(LangTable.LANG_EN) && lang.equals(LangTable.LANG_ZH)) {
-				log.info("lang error:" + lang + ";" + user.getEmail());
+		String sphere = user.getSphere();
+		if (sphere != null && sphere.length() > 0) {
+			if (sphere.equals(LangTable.LANG_EN) && sphere.equals(LangTable.LANG_ZH)) {
+				log.info("sphere error:" + sphere + ";" + user.getEmail());
 				return NnStatusCode.INPUT_BAD;
 			}
 		}

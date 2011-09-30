@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appengine-web-app xmlns="http://appengine.google.com/ns/1.0">
-	<application>9x9tvqa</application>
-	<version>58</version>
+	<application>9x9tvpuppy</application>
+	<version>31</version>
 	
 	<!-- Configure java.util.logging -->
 	<system-properties>

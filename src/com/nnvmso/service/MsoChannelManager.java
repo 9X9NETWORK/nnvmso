@@ -104,6 +104,8 @@ public class MsoChannelManager {
 			channel.setNameSearch(channel.getName().trim().toLowerCase());
 		
 		channel.setUpdateDate(new Date());
+		if (channel.getStatus() == MsoChannel.STATUS_SUCCESS)
+			MsoChannelManager.updateFTSStuffForMsoChannel(channel);
 		channel = msoChannelDao.save(channel);
 		//save to cache
 		Cache cache = CacheFactory.get();		
@@ -470,7 +472,7 @@ public class MsoChannelManager {
 			ftsTokens.add(token);
 		}		
 	}
-
+	
 	public static Set<String> getFtsTokens(String name, String intro) {			
 		StringBuffer sb = new StringBuffer();		
 		sb.append(name + " " + intro);			
@@ -487,5 +489,13 @@ public class MsoChannelManager {
 
 	public static List<MsoChannel> searchChannelEntries(String queryString) {
 		return MsoChannelDao.searchChannelEntries(queryString);		
+	}
+	
+	public static short getDefaultSorting(MsoChannel c) {
+		short sorting = MsoChannel.SORT_NEWEST_TO_OLDEST; 
+		if (c.getContentType() == MsoChannel.CONTENTTYPE_MAPLE_SOAP || 
+			c.getContentType() == MsoChannel.CONTENTTYPE_MAPLE_VARIETY)
+			sorting = MsoChannel.SORT_MAPEL;
+		return sorting;
 	}
 }

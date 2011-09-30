@@ -12,6 +12,7 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 import com.google.appengine.api.datastore.Key;
+import com.nnvmso.lib.YouTubeLib;
 import com.nnvmso.service.MsoChannelManager;
 
 /**
@@ -82,8 +83,8 @@ public class MsoChannel implements Serializable {
 	public static final short CONTENTTYPE_FACEBOOK = 5;
 	public static final short CONTENTTYPE_MIXED = 6;
 	public static final short CONTENTTYPE_SLIDE = 7;
-	public static final short CONTENTTYPE_MAPEL_VARIETY = 8;
-	public static final short CONTENTTYPE_MAPEL_SOAP = 9;
+	public static final short CONTENTTYPE_MAPLE_VARIETY = 8;
+	public static final short CONTENTTYPE_MAPLE_SOAP = 9;
 	
 	@Persistent
 	private short status;
@@ -112,7 +113,13 @@ public class MsoChannel implements Serializable {
 		
 	@NotPersistent
 	private int seq; //use with subscription, to specify sequence in IPG. 
-		
+
+	public static final short SORT_NEWEST_TO_OLDEST = 1; //default
+	public static final short SORT_OLDEST_TO_NEWEST = 2;
+	public static final short SORT_MAPEL = 3;
+	@NotPersistent
+	private int sorting;  
+	
 	@NotPersistent
 	private int subscriptionCount;
 	
@@ -165,6 +172,12 @@ public class MsoChannel implements Serializable {
 	}
 
 	public void setIntro(String intro) {
+		if (intro != null) {
+			intro = intro.replaceAll("\n", " ");
+			intro = intro.replaceAll("\t", " ");
+			int introLenth = (intro.length() > 256 ? 256 : intro.length()); 
+			intro = intro.substring(0, introLenth);
+		}
 		this.intro = intro;
 	}
 
@@ -172,6 +185,17 @@ public class MsoChannel implements Serializable {
 		return imageUrl;
 	}
 
+	public String getPlayerPrefImageUrl() {
+		String imageUrl = getImageUrl();
+		if ((getStatus() == MsoChannel.STATUS_ERROR) || 
+		    (getStatus() != MsoChannel.STATUS_WAIT_FOR_APPROVAL &&
+			 getStatus() != MsoChannel.STATUS_SUCCESS && 
+			 getStatus() != MsoChannel.STATUS_PROCESSING)) {	
+			imageUrl = "http://9x9ui.s3.amazonaws.com/9x9playerV65/images/error.png";
+		} 
+		return imageUrl;
+	}
+	
 	public void setImageUrl(String imageUrl) {
 		this.imageUrl = imageUrl;
 	}
@@ -243,6 +267,14 @@ public class MsoChannel implements Serializable {
 	public String getSourceUrl() {
 		return sourceUrl;
 	}
+	
+	public String getPlayerPrefSource() {
+		if (getSourceUrl() != null && getSourceUrl().contains("http://www.youtube.com"))
+			return YouTubeLib.getYouTubeChannelName(getSourceUrl());		
+		if (getContentType() == MsoChannel.CONTENTTYPE_FACEBOOK)
+			return getSourceUrl();
+		return "";
+	}	
 
 	public void setSourceUrl(String sourceUrl) {
 		this.sourceUrl = sourceUrl;
@@ -358,5 +390,14 @@ public class MsoChannel implements Serializable {
 
 	public void setFts(Set<String> fts) {
 		this.fts = fts;
-	}		
+	}
+
+	public int getSorting() {
+		return sorting;
+	}
+
+	public void setSorting(int sorting) {
+		this.sorting = sorting;
+	}
+		
 }

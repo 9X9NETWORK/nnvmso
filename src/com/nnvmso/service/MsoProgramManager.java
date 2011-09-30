@@ -110,9 +110,8 @@ public class MsoProgramManager {
 			NnLogUtil.logException(e);
 		}
 	} 
-
-	public MsoProgram save(MsoProgram program) {
-		
+	
+	public MsoProgram save(MsoProgram program) {		
 		program.setUpdateDate(new Date()); // NOTE: a trying to modify program update time (from admin) will be omitted by this
 		program = msoProgramDao.save(program);
 		Cache cache = CacheFactory.get();

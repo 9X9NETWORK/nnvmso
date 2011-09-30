@@ -12,7 +12,34 @@ import net.sf.jsr107cache.Cache;
 import org.springframework.stereotype.Service;
 
 import com.nnvmso.lib.CacheFactory;
-import com.nnvmso.model.*;
+import com.nnvmso.model.AreaOwnership;
+import com.nnvmso.model.BrandAdmin;
+import com.nnvmso.model.Captcha;
+import com.nnvmso.model.Category;
+import com.nnvmso.model.CategoryChannel;
+import com.nnvmso.model.CategoryChannelSet;
+import com.nnvmso.model.ChannelAutosharing;
+import com.nnvmso.model.ChannelSet;
+import com.nnvmso.model.ChannelSetAutosharing;
+import com.nnvmso.model.ChannelSetChannel;
+import com.nnvmso.model.ContentOwnership;
+import com.nnvmso.model.Ipg;
+import com.nnvmso.model.LangTable;
+import com.nnvmso.model.Mso;
+import com.nnvmso.model.MsoChannel;
+import com.nnvmso.model.MsoConfig;
+import com.nnvmso.model.MsoIpg;
+import com.nnvmso.model.MsoProgram;
+import com.nnvmso.model.NnGuest;
+import com.nnvmso.model.NnUser;
+import com.nnvmso.model.NnUserPref;
+import com.nnvmso.model.NnUserShare;
+import com.nnvmso.model.NnUserWatched;
+import com.nnvmso.model.PdrRaw;
+import com.nnvmso.model.SnsAuth;
+import com.nnvmso.model.Subscription;
+import com.nnvmso.model.SubscriptionLog;
+import com.nnvmso.model.ViewLog;
 
 /**
  * for testing, works only for small set of data
@@ -40,8 +67,62 @@ public class InitService {
 		initCategories();
 		initSetAndChannels();
 		initCategoryAndSets();
+		initMapelPrograms();
 	}
 		
+	 //for local testing only
+	public void initMapelPrograms() {
+		NnUserManager userMngr = new NnUserManager();
+		NnUser user = userMngr.findByEmail(NNEMAIL); 
+		MsoChannelManager channelMngr = new MsoChannelManager();		
+		MsoChannel soap = new MsoChannel("mapel soap", "mapel soap", "", user.getKey().getId());
+		soap.setContentType(MsoChannel.CONTENTTYPE_MAPLE_SOAP);
+		channelMngr.create(soap);
+		MsoChannel variety = new MsoChannel("mapel variety", "mapel variety", "", user.getKey().getId());
+		variety.setContentType(MsoChannel.CONTENTTYPE_MAPLE_VARIETY);
+		channelMngr.create(variety);
+		
+		MsoProgramManager programMngr = new MsoProgramManager();
+		MsoProgram s1 = new MsoProgram("s1", "s1", "", MsoProgram.TYPE_VIDEO);
+		s1.setPublic(true);
+		s1.setSeq("1");
+		programMngr.create(soap, s1);
+		MsoProgram s3 = new MsoProgram("s3", "s3", "", MsoProgram.TYPE_VIDEO);
+		s3.setPublic(true);
+		s3.setSeq("3");
+		programMngr.create(soap, s3);
+		MsoProgram s2 = new MsoProgram("s2", "s2", "", MsoProgram.TYPE_VIDEO);
+		s2.setPublic(true);
+		s2.setSeq("2");
+		programMngr.create(soap, s2);
+		MsoProgram s4 = new MsoProgram("s4", "s4", "", MsoProgram.TYPE_VIDEO);
+		s4.setPublic(true);
+		s4.setSeq("4");
+		programMngr.create(soap, s4);		
+		MsoProgram v11 = new MsoProgram("v11", "v11", "", MsoProgram.TYPE_VIDEO);
+		v11.setPublic(true);
+		v11.setSeq("1");
+		v11.setSubSeq("1");
+		programMngr.create(variety, v11);
+		MsoProgram v13 = new MsoProgram("v13", "v13", "", MsoProgram.TYPE_VIDEO);
+		v13.setPublic(true);
+		v13.setSeq("1");
+		v13.setSubSeq("3");
+		programMngr.create(variety, v13);
+		MsoProgram v2 = new MsoProgram("v2", "v2", "", MsoProgram.TYPE_VIDEO);
+		v2.setPublic(true);
+		v2.setSeq("2");
+		programMngr.create(variety, v2);
+		MsoProgram v3 = new MsoProgram("v3", "v3", "", MsoProgram.TYPE_VIDEO);
+		v3.setPublic(true);
+		v3.setSeq("3");
+		programMngr.create(variety, v3);		
+		MsoProgram v12 = new MsoProgram("v12", "v12", "", MsoProgram.TYPE_VIDEO);
+		v12.setPublic(true);
+		v12.setSeq("1");
+		v12.setSubSeq("2");
+		programMngr.create(variety, v12);
+	}
 	public void deleteAll() {
 		cache = CacheFactory.get();
 		if (cache != null) {
@@ -58,6 +139,9 @@ public class InitService {
 		
 		list = dumper.findAll(Category.class, "createDate");
 		dumper.deleteAll(Category.class, list);
+
+		list = dumper.findAll(Captcha.class, "createDate");
+		dumper.deleteAll(Captcha.class, list);
 		
 		list = dumper.findAll(CategoryChannel.class, "createDate");
 		dumper.deleteAll(CategoryChannel.class, list);
@@ -97,6 +181,9 @@ public class InitService {
 		
 		list = dumper.findAll(MsoProgram.class, "createDate");
 		dumper.deleteAll(MsoProgram.class, list);
+
+		list = dumper.findAll(NnGuest.class, "createDate");
+		dumper.deleteAll(NnGuest.class, list);
 		
 		list = dumper.findAll(NnUser.class, "createDate");
 		dumper.deleteAll(NnUser.class, list);
@@ -153,11 +240,11 @@ public class InitService {
 		NnUserManager userMngr = new NnUserManager();
 		user = new NnUser(NNEMAIL, "9x9mso", "9x9 mso", NnUser.TYPE_NN);  
 		user.setMsoId(mso.getKey().getId());
-		userMngr.create(user);
+		userMngr.create(user, null);
 		//a user for testing
 		NnUser a = new NnUser("a@a.com", "foobie", "a", NnUser.TYPE_NN);
 		a.setMsoId(mso.getKey().getId()); //!!!
-		userMngr.create(a);
+		userMngr.create(a, null);
 		
 		log.info("initializeMso1AndCategories is done");
 	}				

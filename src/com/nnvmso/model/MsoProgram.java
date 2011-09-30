@@ -93,6 +93,10 @@ public class MsoProgram implements Serializable {
 	private String seq; //mainly for mapel, not only for seq, but also its app id
 
 	@Persistent
+	private String subSeq; //mainly for mapel, not only for seq, but also its app id
+	
+	
+	@Persistent
 	private String comment;
 	
 	public MsoProgram(String name, String intro, String imageUrl, short type) {
@@ -278,4 +282,12 @@ public class MsoProgram implements Serializable {
 		this.seq = seq;
 	}
 
+	public String getSubSeq() {
+		return subSeq;
+	}
+
+	public void setSubSeq(String subSeq) {
+		this.subSeq = subSeq;
+	}
+	
 }

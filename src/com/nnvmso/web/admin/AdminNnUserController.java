@@ -112,7 +112,7 @@ public class AdminNnUserController {
 	@RequestMapping("create")
 	public @ResponseBody String create(@RequestParam(value="email")String email, String password, String name) {		
 		NnUser nnUser = new NnUser(email, password, name, NnUser.TYPE_USER);		
-		nnUserMngr.create(nnUser);		
+		nnUserMngr.create(nnUser, null);		
 		return "OK";
 	}
 

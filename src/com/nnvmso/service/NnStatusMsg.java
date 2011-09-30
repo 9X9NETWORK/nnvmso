@@ -52,8 +52,13 @@ public class NnStatusMsg {
 			  case NnStatusCode.INPUT_ERROR: return messageSource.getMessage("nnstatus.input_error", new Object[] {NnStatusCode.INPUT_ERROR} , locale);
 			  case NnStatusCode.INPUT_MISSING: return messageSource.getMessage("nnstatus.input_missing", new Object[] {NnStatusCode.INPUT_MISSING} , locale);
 			  case NnStatusCode.INPUT_BAD: return messageSource.getMessage("nnstatus.input_bad", new Object[] {NnStatusCode.INPUT_BAD} , locale);
+			  case NnStatusCode.CAPTCHA_FAILED: return NnStatusCode.CAPTCHA_FAILED + "\t" + "CAPTCHA_FAILED" + "\n";	
+			  case NnStatusCode.CAPTCHA_TOOMANY_TRIES: return NnStatusCode.CAPTCHA_TOOMANY_TRIES + "\t" + "CAPTCHA_TOOMANY_TRIES" + "\n";
+			  case NnStatusCode.CAPTCHA_EXPIRED: return NnStatusCode.CAPTCHA_EXPIRED + "\t" + "CAPTCHA_EXPIRED" + "\n";
+			  case NnStatusCode.CAPTCHA_INVALID: return NnStatusCode.CAPTCHA_ERROR + "\t" + "CAPTCHA_INVALID" + "\n";
+			  case NnStatusCode.CAPTCHA_ERROR: return NnStatusCode.CAPTCHA_ERROR + "\t" + "CAPTCHA_ERROR" + "\n";
 			  case NnStatusCode.OUTPUT_NO_MSG_DEFINED: return messageSource.getMessage("nnstatus.output_no_msg_defined", new Object[] {NnStatusCode.OUTPUT_NO_MSG_DEFINED} , locale);
-			  case NnStatusCode.USER_ERROR: return messageSource.getMessage("nnstatus.user_error", new Object[] {NnStatusCode.USER_ERROR} , locale);
+			  case NnStatusCode.USER_ERROR: return NnStatusCode.USER_ERROR + "\t" + "user error" + "\n";
 			  case NnStatusCode.USER_LOGIN_FAILED: return messageSource.getMessage("nnstatus.user_login_failed", new Object[] {NnStatusCode.USER_LOGIN_FAILED} , locale);
 			  case NnStatusCode.USER_EMAIL_TAKEN: return messageSource.getMessage("nnstatus.user_email_taken", new Object[] {NnStatusCode.USER_EMAIL_TAKEN} , locale);
 			  case NnStatusCode.USER_INVALID: return messageSource.getMessage("nnstatus.user_invalid", new Object[] {NnStatusCode.USER_INVALID} , locale);
@@ -81,7 +86,8 @@ public class NnStatusMsg {
 			  case NnStatusCode.DATABASE_ERROR: return messageSource.getMessage("nnstatus.database_error", new Object[] {NnStatusCode.DATABASE_ERROR} , locale);
 			  case NnStatusCode.DATABASE_TIMEOUT: return messageSource.getMessage("nnstatus.database_timeout", new Object[] {NnStatusCode.DATABASE_TIMEOUT} , locale);
 			  case NnStatusCode.DATABASE_NEED_INDEX: return messageSource.getMessage("nnstatus.database_need_index", new Object[] {NnStatusCode.DATABASE_NEED_INDEX} , locale);	
-			  case NnStatusCode.DATABASE_READONLY: return NnStatusCode.DATABASE_READONLY + "\t" + "database_readonly" + "\n";	
+			  case NnStatusCode.DATABASE_READONLY: return NnStatusCode.DATABASE_READONLY + "\t" + "database_readonly" + "\n";
+			  case NnStatusCode.API_DEPRECATED: return NnStatusCode.API_DEPRECATED + "\t" + "API_DEPRECATED" + "\n";	
 			  default: return messageSource.getMessage("nnstatus.output_no_msg_defined", new Object[] {status} , locale); 
 			}
 		} catch (NoSuchMessageException e) {

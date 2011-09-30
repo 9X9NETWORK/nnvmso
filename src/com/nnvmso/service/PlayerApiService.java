@@ -4,8 +4,11 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -15,7 +18,6 @@ import java.util.TreeMap;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
-import javax.jdo.PersistenceManager;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -29,20 +31,19 @@ import org.springframework.stereotype.Service;
 import com.google.appengine.api.datastore.DatastoreFailureException;
 import com.google.appengine.api.datastore.DatastoreNeedIndexException;
 import com.google.appengine.api.datastore.DatastoreTimeoutException;
+import com.google.appengine.api.datastore.Key;
 import com.google.apphosting.api.DeadlineExceededException;
-import com.google.apphosting.api.ApiProxy;
 import com.nnvmso.dao.ShardedCounter;
 import com.nnvmso.lib.CacheFactory;
 import com.nnvmso.lib.CookieHelper;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnStringUtil;
-import com.nnvmso.lib.PMF;
 import com.nnvmso.lib.YouTubeLib;
 import com.nnvmso.model.AreaOwnership;
+import com.nnvmso.model.Captcha;
 import com.nnvmso.model.Category;
 import com.nnvmso.model.CategoryChannelSet;
 import com.nnvmso.model.ChannelSet;
-import com.nnvmso.model.ChannelSetChannel;
 import com.nnvmso.model.Ipg;
 import com.nnvmso.model.LangTable;
 import com.nnvmso.model.Mso;
@@ -51,7 +52,10 @@ import com.nnvmso.model.MsoConfig;
 import com.nnvmso.model.MsoIpg;
 import com.nnvmso.model.MsoProgram;
 import com.nnvmso.model.NnContent;
+import com.nnvmso.model.NnEmail;
+import com.nnvmso.model.NnGuest;
 import com.nnvmso.model.NnUser;
+import com.nnvmso.model.NnUserChannelSorting;
 import com.nnvmso.model.NnUserPref;
 import com.nnvmso.model.NnUserShare;
 import com.nnvmso.model.NnUserWatched;
@@ -124,15 +128,9 @@ public class PlayerApiService {
 	}	
 	
 	public int checkRO() {
-		Cache cache = CacheFactory.get();
 		MsoConfigManager configMngr = new MsoConfigManager();
 		MsoConfig config = configMngr.findByItem(MsoConfig.RO);
-		String cacheRO = "0";
-		if (cache != null) {
-			if ((String)cache.get(MsoConfig.RO) != null)
-				cacheRO = (String)cache.get(MsoConfig.RO);
-		}
-		if (cacheRO.equals("1") || (config != null && config.getValue().equals("1")))			
+		if (config != null && config.getValue().equals("1"))			
 			return NnStatusCode.DATABASE_READONLY;
 		return NnStatusCode.SUCCESS;
 	}
@@ -148,7 +146,8 @@ public class PlayerApiService {
 	
 	public String setUserProfile(String userToken, String items, String values) {
 		//verify input
-		if (userToken == null || userToken.length() == 0 || userToken.equals("undefined"))
+		if (userToken == null || userToken.length() == 0 || userToken.equals("undefined") ||
+			items == null || values == null)
 			return this.assembleMsgs(NnStatusCode.INPUT_MISSING, null);
 		//verify user
 		NnUser user = userMngr.findByToken(userToken);
@@ -171,10 +170,10 @@ public class PlayerApiService {
 				password = value[i];				
 			if (key[i].equals("oldPassword"))
 				oldPassword = value[i];				
-			if (key[i].equals("lang"))
-				user.setLang(value[i]);
-			if (key[i].equals("region"))
-				user.setLang(value[i]);
+			if (key[i].equals("sphere"))
+				if ((value[i] == null) || (this.checkLang(value[i]) == null))
+					return this.assembleMsgs(NnStatusCode.INPUT_BAD, null);
+				user.setSphere(value[i]);
 			if (key[i].equals("gender"))
 				user.setGender(Short.parseShort(value[i]));						
 		}
@@ -213,8 +212,7 @@ public class PlayerApiService {
 			gender = String.valueOf(user.getGender());
 		result[0] += assembleKeyValue("gender", gender);
 		result[0] += assembleKeyValue("year", String.valueOf(user.getDob()));
-		result[0] += assembleKeyValue("lang", user.getLang());
-		result[0] += assembleKeyValue("region", user.getRegion());
+		result[0] += assembleKeyValue("sphere", user.getSphere());
 		return this.assembleMsgs(NnStatusCode.SUCCESS, result);
 	}
 	
@@ -248,11 +246,12 @@ public class PlayerApiService {
 		return NnStatusMsg.successStr(locale);
 	}
 
-	public int addMsoInfoVisitCounter(String msoName) {
+	public int addMsoInfoVisitCounter(String msoName, boolean readOnly) {		
 		String counterName = msoName + "BrandInfo";
 		CounterFactory factory = new CounterFactory();
 		ShardedCounter counter = factory.getOrCreateCounter(counterName);
-		counter.increment();			
+		if (!readOnly)
+			counter.increment();			
 		return counter.getCount(); 								
 	}
 	
@@ -260,7 +259,6 @@ public class PlayerApiService {
 		Mso theMso = msoMngr.findMsoViaHttpReq(req);
 		if (theMso == null) {return NnStatusMsg.msoInvalid(locale);}
 
-		int counter = this.addMsoInfoVisitCounter(theMso.getName());
 		MsoConfigManager configMngr = new MsoConfigManager();
 		String[] result = {""};
 		result[0] += this.assembleKeyValue("key", String.valueOf(mso.getKey().getId()));
@@ -271,21 +269,25 @@ public class PlayerApiService {
 		result[0] += this.assembleKeyValue("logoClickUrl", mso.getLogoClickUrl());
 		result[0] += this.assembleKeyValue("preferredLangCode", mso.getPreferredLangCode());
 		result[0] += this.assembleKeyValue("jingleUrl", mso.getJingleUrl());
-		result[0] += this.assembleKeyValue("brandInfoCounter", String.valueOf(counter));
 
 		List<MsoConfig> list = configMngr.findAllByMsoId(mso.getKey().getId());
-		int status = NnStatusCode.SUCCESS;
+		boolean readOnly = false;
 		for (MsoConfig config : list) {
 			if (config.getItem().equals(MsoConfig.DEBUG))
 				result[0] += this.assembleKeyValue(MsoConfig.DEBUG, config.getValue());
 			if (config.getItem().equals(MsoConfig.FBTOKEN))
 				result[0] += this.assembleKeyValue(MsoConfig.FBTOKEN, config.getValue());
 			if (config.getItem().equals(MsoConfig.RO)) {
-				result[0] += this.assembleKeyValue(MsoConfig.FBTOKEN, config.getValue());
+				result[0] += this.assembleKeyValue(MsoConfig.RO, config.getValue());
+				readOnly = Boolean.parseBoolean(config.getValue());
 			}			
 		}	
-		if (status == NnStatusCode.DATABASE_READONLY)
-			return this.assembleMsgs(NnStatusCode.DATABASE_READONLY, result);
+		String locale = this.findLocaleByHttpRequest(req);
+		result[0] += this.assembleKeyValue("locale", locale);
+		int counter = 0;
+		if (!readOnly)
+			counter = this.addMsoInfoVisitCounter(theMso.getName(), readOnly);		
+		result[0] += this.assembleKeyValue("brandInfoCounter", String.valueOf(counter));		
 		return this.assembleMsgs(NnStatusCode.SUCCESS, result);
 	}
 
@@ -470,13 +472,12 @@ public class PlayerApiService {
 		} catch (Exception e) {
 			NnLogUtil.logException(e);
 		}
-        String localeCode = "en";
-		if (country.equals("tw") || country.equals("cn") || country.equals("hk")) {
-			localeCode = "zh";
-		} else if (country.equals("")) {
-			localeCode = "default";
+		log.info("country from query:" + country + ";with ip:" + ip);
+        String locale = "en";
+		if (country.equals("tw")) {
+			locale = "zh";
 		}
-		return NnStatusMsg.successStr(locale) + separatorStr + localeCode;
+		return locale;
 	}
 	 	
 	private String composeChannelByCategoroy(List<MsoChannel> channels) {
@@ -537,35 +538,20 @@ public class PlayerApiService {
 		return result;
 	}	
 		
-	public String createGuest(String ipgId, HttpServletRequest req, HttpServletResponse resp) {
+	public String createGuest(HttpServletRequest req, HttpServletResponse resp) {
 		//verify input
 		if (mso == null) { return NnStatusMsg.errorStr(locale); }
-		IpgManager ipgMngr = new IpgManager();
-		Ipg ipg = null;
-		if (ipgId != null) {
-			ipg = ipgMngr.findById(Long.decode(ipgId));
-			if (ipg == null) 
-				return messageSource.getMessage("nnstatus.ipg_invalid", new Object[] {NnStatusCode.IPG_INVALID} , locale);
-		}		
+		NnGuestManager mngr = new NnGuestManager();
+		NnGuest guest = new NnGuest(NnGuest.TYPE_GUEST);
+		mngr.create(guest);
 		
-		//create guest
-		String password = String.valueOf(("token" + Math.random() + new Date().getTime()).hashCode());
-		NnUser guest = new NnUser(NnUser.GUEST_EMAIL, password, NnUser.GUEST_NAME, NnUser.TYPE_USER, mso.getKey().getId());		
-		userMngr.create(guest);
-		
-		//subscribe default channels
-		if (ipg != null) {
-			SubscriptionManager sMngr = new SubscriptionManager();
-			List<MsoChannel> ipgChannels = ipgMngr.findIpgChannels(ipg);
-			for (MsoChannel c : ipgChannels)
-				sMngr.subscribeChannel(guest.getKey().getId(), c.getKey().getId(), c.getSeq(), c.getType(), mso.getKey().getId());			
-		} else {
-			userMngr.subscibeDefaultChannels(guest);
-		}
-		
+		String output = NnStatusMsg.successStr(locale) + separatorStr;		
+		output = output + assembleKeyValue("token", guest.getToken());
+		output = output + assembleKeyValue("name", NnUser.GUEST_NAME);
+		output = output + assembleKeyValue("lastLogin", "");
+
 		//prepare cookie and output
-		String output = this.prepareUserInfo(guest);	
-		this.setUserCookie(resp, CookieHelper.GUEST, guest.getToken());
+		this.setUserCookie(resp, CookieHelper.USER, guest.getToken());
 		return output;
 	}
 
@@ -575,22 +561,28 @@ public class PlayerApiService {
 	}
 	
 	//Prepare user info, it is used by login, guest register, userTokenVerify
-	public String prepareUserInfo(NnUser user) {		
-		String output = NnStatusMsg.successStr(locale) + separatorStr;		
-		output = output + assembleKeyValue("token", user.getToken());
-		output = output + assembleKeyValue("name", user.getName());
-		output = output + assembleKeyValue("lastLogin", String.valueOf(user.getUpdateDate().getTime()));
-		
-		NnUserPrefManager prefMngr = new NnUserPrefManager();
-		List<NnUserPref> list = prefMngr.findByUserId(user.getKey().getId());		
-		for (NnUserPref pref : list) {
-			output = output + this.assembleKeyValue(pref.getItem(), pref.getValue());
+	public String prepareUserInfo(NnUser user, NnGuest guest) {		
+		String output = NnStatusMsg.successStr(locale) + separatorStr;
+		if (user != null) {
+			output = output + assembleKeyValue("token", user.getToken());
+			output = output + assembleKeyValue("name", user.getName());
+			output = output + assembleKeyValue("lastLogin", String.valueOf(user.getUpdateDate().getTime()));
+			
+			NnUserPrefManager prefMngr = new NnUserPrefManager();
+			List<NnUserPref> list = prefMngr.findByUserId(user.getKey().getId());		
+			for (NnUserPref pref : list) {
+				output = output + this.assembleKeyValue(pref.getItem(), pref.getValue());
+			}
+		} else {		
+			output = output + assembleKeyValue("token", guest.getToken());
+			output = output + assembleKeyValue("name", NnUser.GUEST_NAME);
+			output = output + assembleKeyValue("lastLogin", "");			
 		}
 			
 		return output;
 	}
 	
-    private String langCheck(String lang) {
+    private String checkLang(String lang) {
         if (lang != null && !lang.equals(LangTable.LANG_EN) && !lang.equals(LangTable.LANG_ZH))
             return null;
         if (lang == null)
@@ -603,7 +595,7 @@ public class PlayerApiService {
 		NnContent content = contentMngr.findByItemAndLang(key, lang);		
 		if (content == null)
 			return this.assembleMsgs(NnStatusCode.INPUT_BAD, null);
-        lang = this.langCheck(lang);
+        lang = this.checkLang(lang);
         if (lang == null)
             return this.assembleMsgs(NnStatusCode.INPUT_BAD, null);		
 		String[] result = {content.getContent().getValue()};
@@ -791,83 +783,95 @@ public class PlayerApiService {
 		return output;
 	}
 
-	public String createUser(String email, String password, String name, String userToken, 
+	private int checkCaptcha(NnGuest guest, String fileName, String name) {
+		NnGuestManager guestMngr = new NnGuestManager();
+		if (guest == null)
+			return NnStatusCode.USER_INVALID;
+		if (guest.getCaptchaId() == 0)
+			return NnStatusCode.CAPTCHA_INVALID;
+		Captcha c = new CaptchaManager().findById(guest.getCaptchaId());
+		System.out.println(guest.getGuessTimes() + ";" + NnGuest.GUESS_MAXTIMES);
+		if (guest.getGuessTimes() >= NnGuest.GUESS_MAXTIMES)
+			return NnStatusCode.CAPTCHA_TOOMANY_TRIES;
+		if (!c.getFileName().equals(fileName) || 
+			!c.getName().equals(name)) {
+			guest.setGuessTimes(guest.getGuessTimes()+1);
+			guestMngr.save(guest);
+			return NnStatusCode.CAPTCHA_FAILED;
+		}
+		Date now = new Date();
+		if (now.after(guest.getExpiredAt()))
+			return NnStatusCode.CAPTCHA_FAILED;
+		return NnStatusCode.SUCCESS;
+	}
+	
+	public String createUser(String email, String password, String name, String token,
+				             String captchaFilename, String captchaText,
 			                 HttpServletRequest req, HttpServletResponse resp) {
-		//verify input		
-		if (email == null || password == null || name == null ||
-			email.length() == 0 || password.length() == 0 || name.length() == 0 ||
-			email.equals("undefined")) {
-			return NnStatusMsg.inputMissing(locale);
-		}
-		String regex = "^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$";
-		email = email.trim();
-		name = name.trim();
-		if (!Pattern.matches(regex, email.toLowerCase()) || password.length() < 6) {		
-			return NnStatusMsg.inputError(locale);
-		}
-			
+		System.out.println("token:" + token);
+		int status = NnUserValidator.validate(email, password, name, req);
+		if (status != NnStatusCode.SUCCESS) 
+			return this.assembleMsgs(status, null);					
 		//find mso
 		if (mso == null) { return NnStatusMsg.msoInvalid(locale);}
 		
+		NnGuestManager guestMngr = new NnGuestManager();
+		NnGuest guest = guestMngr.findByToken(token);
+		if (guest == null && captchaFilename != null) {
+			log.info("such guest does not exist, where does this token from");
+			return this.assembleMsgs(NnStatusCode.USER_INVALID, null);
+		}
+		if (guest != null) {
+			status = this.checkCaptcha(guest, captchaFilename, captchaText);
+			if (status != NnStatusCode.SUCCESS) 
+				return this.assembleMsgs(status, null);
+		}
+		/*
+		//captcha verification
+		if (!guest.getCaptcha().getFileName().equals(captcha) || 
+			!guest.getCaptcha().getName().equals(name)) {
+			guest.setGuessTimes(guest.getGuessTimes()+1);
+			guestMngr.save(guest);
+			return this.assembleMsgs(NnStatusCode.INPUT_CAPTCHA_FAILED, null);
+		}
+		if (guest.getGuessTimes() > NnGuest.GUESS_MAXTIMES)
+			return this.assembleMsgs(NnStatusCode.INPUT_CAPTCHA_EXPIRED, null);
+		Date now = new Date();
+		if (now.after(guest.getExpiredAt()))
+			return this.assembleMsgs(NnStatusCode.INPUT_CAPTCHA_FAILED, null);
+		*/
 		//verify email
 		NnUser user = userMngr.findByEmail(email);
 		if (user != null) {
 			log.info("user email taken:" + user.getEmail() + "; mso=" + mso.getName() + ";user token=" + user.getToken());
 			return messageSource.getMessage("nnstatus.user_email_taken", new Object[] {NnStatusCode.USER_EMAIL_TAKEN} , locale);
 		}
-		boolean convertFromGuest = true;
-		//create user
-		if (userToken != null) { user = userMngr.findByToken(userToken);}
-		if (user == null ) {
-			convertFromGuest = false;
-			log.info("User signup userToken NOT FOUND. Token=" + userToken);
-			user = new NnUser(email, password, name, NnUser.TYPE_USER, mso.getKey().getId());
-			log.info("user, based on the input:" + user.toString());
-			userMngr.create(user);
-			userMngr.subscibeDefaultChannels(user);
-		} else {
-			log.info("User signup with guest token=" + userToken + "; email=" + email + "; name=" + name + ";password=" + password);					 		
-			if (user.getEmail().equals(NnUser.GUEST_EMAIL)) {
-				log.info("1st time signup after being a guest");
-				user.setEmail(email);
-				user.setPassword(password);
-				user.setName(name);
-				userMngr.save(user);
-			} else {
-				return messageSource.getMessage("nnstatus.user_token_taken", new Object[] {NnStatusCode.USER_TOKEN_TAKEN} , locale);				
-			}
-		}
-		log.info("user, after user's created" + user.toString());			
-		String output = this.prepareUserInfo(user);
-		if (convertFromGuest) {
-			CookieHelper.deleteCookie(resp, CookieHelper.GUEST);
-		}
+				
+		user = new NnUser(email, password, name, NnUser.TYPE_USER, mso.getKey().getId());
+		userMngr.create(user, token);
+		userMngr.subscibeDefaultChannels(user);							
+		String output = this.prepareUserInfo(user, null);
 		this.setUserCookie(resp, CookieHelper.USER, user.getToken());
 		return output;
 	}
 	
+	//!!! can remove all the user check since going to wipe out all the guest account
 	public String findUserByToken(String token, HttpServletRequest req, HttpServletResponse resp) {
 		if (token == null) {return NnStatusMsg.inputMissing(locale);}
 		
-		NnUser found = userMngr.findByToken(token);
-		/*
-		if (found == null || (found != null && found.getMsoId() != mso.getKey().getId())) {
+		NnGuestManager guestMngr = new NnGuestManager();
+		NnUser user = userMngr.findByToken(token);
+		NnGuest guest = guestMngr.findByToken(token);
+		if (user == null && guest == null) {
 			CookieHelper.deleteCookie(resp, CookieHelper.USER);
-			return NnStatusMsg.userInvalid(locale);
+			return this.assembleMsgs(NnStatusCode.USER_INVALID, null);
 		}
-		*/
-		if (found == null) {
-			CookieHelper.deleteCookie(resp, CookieHelper.USER);
-			return NnStatusMsg.userInvalid(locale);
+		if (user != null) {
+			if (user.getEmail().equals(NnUser.GUEST_EMAIL))
+				return this.assembleMsgs(NnStatusCode.USER_INVALID, null);
+			userMngr.save(user); //change last login time (ie updateTime)
 		}
-		
-		if (found.getEmail().equals(NnUser.GUEST_EMAIL)) {
-			this.setUserCookie(resp, CookieHelper.GUEST, found.getToken());			
-		} else {
-			this.setUserCookie(resp, CookieHelper.USER, found.getToken());
-		}
-		userMngr.save(found); //change last login time (ie updateTime)
-		return this.prepareUserInfo(found);
+		return this.prepareUserInfo(user, guest);
 	}
 	
 	public String findAuthenticatedUser(String email, String password, HttpServletRequest req, HttpServletResponse resp) {		
@@ -878,7 +882,7 @@ public class PlayerApiService {
 		String output = messageSource.getMessage("nnstatus.user_login_failed", new Object[] {NnStatusCode.USER_LOGIN_FAILED} , locale);		
 		NnUser user = userMngr.findAuthenticatedUser(email, password);
 		if (user != null) {
-			output = this.prepareUserInfo(user);
+			output = this.prepareUserInfo(user, null);
 			userMngr.save(user); //change last login time (ie updateTime)
 			this.setUserCookie(resp, CookieHelper.USER, user.getToken());
 		}
@@ -1037,19 +1041,53 @@ public class PlayerApiService {
 	public String findChannelInfo(String userToken, boolean userInfo, 
 			                      String channelIds, boolean setInfo, boolean isRequired) {
 		//verify input
-		if ((userToken == null && userInfo == true) || (userToken == null && channelIds == null) || (userToken == null && setInfo == true)) {
+		if ((userToken == null && userInfo == true) || (userToken == null && channelIds == null) || (userToken == null && setInfo == true))
 			return NnStatusMsg.inputMissing(locale);
-		}		
+
+		List<String> result = new ArrayList<String>();
 		NnUser user = null;
 		if (userToken != null) {
 			//verify user
 			user = userMngr.findByToken(userToken);
-			if (user == null) {return NnStatusMsg.userInvalid(locale);}
+			if (user == null) {
+				NnGuest guest = new NnGuestManager().findByToken(userToken);
+				if (guest == null)
+					return this.assembleMsgs(NnStatusCode.USER_INVALID, null);
+				else
+					return this.assembleMsgs(NnStatusCode.SUCCESS, null);
+			}
 		}
 		
-		String result = NnStatusMsg.successStr(locale) + separatorStr;
 		if (userInfo) {
-			result = this.prepareUserInfo(user) + separatorStr;	}
+			result.add(this.prepareUserInfo(user, null) + separatorStr);	
+		}
+		AreaOwnershipManager areaMngr = new AreaOwnershipManager();
+		NnUserChannelSortingManager sortingMngr = new NnUserChannelSortingManager();
+		List<NnUserChannelSorting> sorts = new ArrayList<NnUserChannelSorting>();
+		HashMap<Long, Short> sortMap = new HashMap<Long, Short>();
+		if (user != null) {
+			List<AreaOwnership> sets = areaMngr.findByUserId(user.getKey().getId());	
+			sorts = sortingMngr.findByUser(user.getKey().getId());
+		    //set info
+			if (setInfo) {
+				String setOutput = "";
+				for (AreaOwnership s : sets) {
+					String[] obj = {
+							String.valueOf(s.getAreaNo()),
+							String.valueOf(s.getSetId()),
+							s.getSetName(),						
+							s.getSetImageUrl(),
+							String.valueOf(s.getType()),
+					};
+					setOutput += NnStringUtil.getDelimitedStr(obj) + "\n";
+				}
+				result.add(setOutput);
+			}
+			for (NnUserChannelSorting s : sorts) {
+				sortMap.put(s.getChannelId(), s.getSort());
+			}		
+			
+		}
 		
 		//find channels
 		List<MsoChannel> channels = new ArrayList<MsoChannel>();
@@ -1063,82 +1101,41 @@ public class PlayerApiService {
 			MsoChannelManager channelMngr = new MsoChannelManager();
 			channelPos = false;
 			String[] chArr = channelIds.split(",");
-			//check format
-			try {
-				if (chArr.length > 1) {
-					List<Long> list = new ArrayList<Long>();
-					for (int i=0; i<chArr.length; i++) { list.add(Long.valueOf(chArr[i]));}
-					channels = channelMngr.findAllByChannelIds(list);
-				} else {
-					MsoChannel channel = channelMngr.findById(Long.parseLong(channelIds));
-					if (channel != null)
-						channels.add(channel);
-				}
-			} catch (NumberFormatException e) {
-				return messageSource.getMessage("nnstatus.channel_invalid", new Object[] {NnStatusCode.CHANNEL_INVALID} , locale);
+			if (chArr.length > 1) {
+				List<Long> list = new ArrayList<Long>();
+				for (int i=0; i<chArr.length; i++) { list.add(Long.valueOf(chArr[i]));}
+				channels = channelMngr.findAllByChannelIds(list);
+			} else {
+				MsoChannel channel = channelMngr.findById(Long.parseLong(channelIds));
+				if (channel != null) channels.add(channel);					
 			}
 		}
-		AreaOwnershipManager areaMngr = new AreaOwnershipManager();
-		List<MsoChannel> setChannels = new ArrayList<MsoChannel>();
-		if (user != null) {
-			List<AreaOwnership> sets = areaMngr.findByUserId(user.getKey().getId());		
-		    //set info
-			if (setInfo) {
-				for (AreaOwnership s : sets) {
-					String[] obj = {
-							String.valueOf(s.getAreaNo()),
-							String.valueOf(s.getSetId()),
-							s.getSetName(),						
-							s.getSetImageUrl(),
-							String.valueOf(s.getType()),
-					};
-					result = result + NnStringUtil.getDelimitedStr(obj);;
-					result = result + "\n";
-				}
-				result = result + separatorStr;					
-			}		
-			
-			//find channels from set
-			ChannelSetManager setMngr = new ChannelSetManager();
-			for (AreaOwnership area : sets) {
-				if (area.getType() == AreaOwnership.TYPE_RO) {
-					List<MsoChannel> list = setMngr.findChannelsById(area.getSetId());
-					for (MsoChannel c : list) {
-						c.setSeq(this.convertSetPosToIPGSeq(c.getSeq(), area.getAreaNo()));
-					}
-					setChannels.addAll(list);				
-				}
-			}
-		}
-		//sort by key
+		if (isRequired && channels.size() == 0)
+			return this.assembleMsgs(NnStatusCode.CHANNEL_INVALID, null);
+		//sort by seq
 		if (channelPos) {
 			TreeMap<Integer, MsoChannel> channelMap = new TreeMap<Integer, MsoChannel>();
 			for (MsoChannel c : channels) {
-				channelMap.put(c.getSeq(), c);
-			}
-			if (user != null) {
-				//overwrite by set channels
-				for (MsoChannel c : setChannels) {
-					channelMap.put(c.getSeq(), c);
-				}
+				channelMap.put(c.getSeq(), c);				
 			}
 			Iterator<Entry<Integer, MsoChannel>> it = channelMap.entrySet().iterator();
+	    	channels.clear();
 		    while (it.hasNext()) {
 		        Map.Entry<Integer, MsoChannel> pairs = (Map.Entry<Integer, MsoChannel>)it.next();
-				result = result + this.composeChannelLineupStr((MsoChannel)pairs.getValue(), mso);
-				result = result + "\n";	       
+		    	channels.add((MsoChannel)pairs.getValue());
 		    }
-		} else {
-			log.info("channelLineup: regardless the pos");
-			if (isRequired && channels.size() == 0) {
-				return messageSource.getMessage("nnstatus.channel_invalid", new Object[] {NnStatusCode.CHANNEL_INVALID} , locale);
-			}
-			for (MsoChannel c : channels) {
-				result = result + this.composeChannelLineupStr(c, mso);
-				result = result + "\n";
-			}
 		}
-		return result;
+		String channelOutput = "";
+		for (MsoChannel c : channels) {
+			if (user != null && sortMap.containsKey(c.getKey().getId()))
+		        c.setSorting(sortMap.get(c.getKey().getId()));
+		    else 
+		    	c.setSorting(MsoChannelManager.getDefaultSorting(c));
+			channelOutput += this.composeChannelLineupStr(c, mso) + "\n";
+		}		
+		result.add(channelOutput);
+		String size[] = new String[result.size()];
+		return this.assembleMsgs(NnStatusCode.SUCCESS, result.toArray(size));
 	}
 	
 	//http://localhost:8888/playerAPI/programInfo?ipg=27852&channel=*
@@ -1158,12 +1155,20 @@ public class PlayerApiService {
 			log.info("ipg program count: " + programs.size());
 		} else if (channelIds.equals("*")) {
 			user = userMngr.findByToken(userToken);
-			if (user == null) { return NnStatusMsg.userInvalid(locale); }
+			if (user == null) {
+				NnGuest guest = new NnGuestManager().findByToken(userToken);
+				if (guest == null)
+					return this.assembleMsgs(NnStatusCode.USER_INVALID, null);
+				else
+					return this.assembleMsgs(NnStatusCode.SUCCESS, null);
+			}
 			programs = programMngr.findSubscribedPrograms(user.getKey().getId());
-		} else if (chArr.length > 1) {
+		} else if (chArr.length > 1) {			
 			List<Long> list = new ArrayList<Long>();
 			for (int i=0; i<chArr.length; i++) { list.add(Long.valueOf(chArr[i]));}
-			programs = programMngr.findGoodProgramsByChannelIds(list);
+			for (Long l : list) {
+				programs.addAll(programMngr.findGoodProgramsByChannelId(l));
+			}
 		} else {
 			programs = programMngr.findGoodProgramsByChannelId(Long.parseLong(channelIds));
 		}		
@@ -1176,7 +1181,7 @@ public class PlayerApiService {
 		String result = NnStatusMsg.successStr(locale) + separatorStr;
 		if (userInfo) {
 			if (user == null && userToken != null) {user = userMngr.findByToken(userToken);}
-			result = this.prepareUserInfo(user) + separatorStr; 
+			result = this.prepareUserInfo(user, null) + separatorStr; 
 		}
 		return result + this.composeProgramInfoStr(programs, config);
 	}
@@ -1210,27 +1215,7 @@ public class PlayerApiService {
 	
 	private String composeChannelLineupStr(MsoChannel c, Mso mso) {
 		String intro = c.getIntro();
-		if (intro != null) {
-			intro = intro.replaceAll("\n", " ");
-			intro = intro.replaceAll("\t", " ");
-			int introLenth = (intro.length() > 256 ? 256 : intro.length()); 
-			intro = intro.substring(0, introLenth);
-		} else {
-			intro = "";
-		}
-		String imageUrl = c.getImageUrl();
-		if (c.getStatus() == MsoChannel.STATUS_ERROR) {
-			imageUrl = "/WEB-INF/../images/error.png";
-		} else if (c.getStatus() == MsoChannel.STATUS_PROCESSING) {
-			if (mso.getPreferredLangCode().equals(Mso.LANG_ZH_TW)) {
-				imageUrl = "/WEB-INF/../images/processing_cn.png";
-			}
-		} else if (c.getStatus() != MsoChannel.STATUS_WAIT_FOR_APPROVAL &&
-				   c.getStatus() != MsoChannel.STATUS_SUCCESS && 
-				   c.getStatus() != MsoChannel.STATUS_PROCESSING) {	
-				imageUrl = "http://9x9ui.s3.amazonaws.com/9x9playerV65/images/error.png";
-		}
-
+		String imageUrl = c.getPlayerPrefImageUrl();	
 		String channelName = "";
 		if (c.getSourceUrl() != null && c.getSourceUrl().contains("http://www.youtube.com"))
 			channelName = YouTubeLib.getYouTubeChannelName(c.getSourceUrl());
@@ -1246,7 +1231,8 @@ public class PlayerApiService {
 					    String.valueOf(c.getStatus()),
 					    String.valueOf(c.getContentType()),
 					    channelName,
-					    this.convertEpochToTime(c.getTranscodingUpdateDate(), c.getUpdateDate())
+					    this.convertEpochToTime(c.getTranscodingUpdateDate(), c.getUpdateDate()),
+					    String.valueOf(c.getSorting()),
 					    };
 		String output = NnStringUtil.getDelimitedStr(ori);
 		return output;
@@ -1377,7 +1363,7 @@ public class PlayerApiService {
     }
 	
 	public String findCategoryInfo(String id, String lang) {
-		lang = this.langCheck(lang);	
+		lang = this.checkLang(lang);	
         if (lang == null)
             return this.assembleMsgs(NnStatusCode.INPUT_BAD, null);				
 		if (id == null)
@@ -1425,6 +1411,88 @@ public class PlayerApiService {
 		return this.assembleMsgs(NnStatusCode.SUCCESS, result);
 	}
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+	private HashMap checkUser(String userToken, boolean guestOK) {
+		HashMap map = new HashMap();    	
+		//verify input
+		if (userToken == null || userToken.length() == 0 || userToken.equals("undefined"))
+			map.put("s", NnStatusCode.INPUT_MISSING);
+		//verify user
+		NnUser user = userMngr.findByToken(userToken);
+		if (user == null) 
+			map.put("s", NnStatusCode.USER_INVALID);
+		if (!guestOK && user.getEmail().equals(NnUser.GUEST_EMAIL) )
+			map.put("s", NnStatusCode.USER_PERMISSION_ERROR);
+		map.put("s", NnStatusCode.SUCCESS);
+		map.put("u", user);
+		return map;
+    }
+	
+	public String saveSorting(String userToken, String channelId, String sort) {
+		@SuppressWarnings("rawtypes")
+		HashMap map = this.checkUser(userToken, false);
+		if ((Integer)map.get("s") != NnStatusCode.SUCCESS) {
+			return this.assembleMsgs((Integer)map.get("s"), null);
+		}
+		NnUser user = (NnUser) map.get("u");
+		NnUserChannelSorting sorting = new NnUserChannelSorting(user.getKey().getId(), 
+				                           Long.parseLong(channelId), Short.parseShort(sort));
+		NnUserChannelSortingManager sortingMngr = new NnUserChannelSortingManager();
+		sortingMngr.save(sorting);		
+		return this.assembleMsgs(NnStatusCode.SUCCESS, null);
+	}
+	
+	public String createCaptcha(String token, String action) {
+		if (token == null || action == null)
+			return this.assembleMsgs(NnStatusCode.INPUT_MISSING, null);
+		CaptchaManager mngr = new CaptchaManager();
+		Captcha c = mngr.getRandom();
+		if (c == null)
+			return this.assembleMsgs(NnStatusCode.CAPTCHA_ERROR, null);
+		short a = Short.valueOf(action);   
+		Calendar cal = Calendar.getInstance();		
+		cal.add(Calendar.MINUTE, 5);		
+		NnGuestManager guestMngr = new NnGuestManager();
+		NnGuest guest = guestMngr.findByToken(token);				
+		if (a == Captcha.ACTION_SIGNUP) {
+			if (guest == null)
+				return this.assembleMsgs(NnStatusCode.USER_INVALID, null);
+		} else if (a == Captcha.ACTION_EMAIL) {
+			if (guest == null) {
+				guest = new NnGuest(NnGuest.TYPE_USER);
+				guest.setToken(token);
+			}
+		}
+		guest.setCaptchaId(c.getKey().getId());
+		guest.setExpiredAt(cal.getTime());
+		guest.setGuessTimes(0);
+		guestMngr.save(guest);		
+		return this.assembleMsgs(NnStatusCode.SUCCESS, new String[] {c.getFileName()});
+	}	
+	
+	public String shareByEmail(String userToken, String toEmail, String toName, 
+			                   String subject, String content, 
+			                   String captcha, String text) {
+		EmailService service = new EmailService();
+		@SuppressWarnings("rawtypes")
+		HashMap map = this.checkUser(userToken, false);
+		if ((Integer)map.get("s") != NnStatusCode.SUCCESS) {
+			return this.assembleMsgs((Integer)map.get("s"), null);
+		}		
+		NnUser user = (NnUser) map.get("u");
+		if (captcha != null) {
+			NnGuestManager guestMngr = new NnGuestManager();
+			NnGuest guest = guestMngr.findByToken(userToken);
+			int status = this.checkCaptcha(guest, captcha, text);
+			if (status != NnStatusCode.SUCCESS)
+				return this.assembleMsgs(status, null);
+			guestMngr.delete(guest);
+		}
+		NnEmail mail = new NnEmail(toEmail, toName, NnEmail.SEND_EMAIL_SHARE, user.getName(), user.getEmail(), subject, content);		
+		service.sendEmail(mail);
+		return this.assembleMsgs(NnStatusCode.SUCCESS, null);
+	}
+	
 	public String findUserWatched(String userToken, String channel, String count) {		
 		String[] result = {"", ""};
 		NnUserWatchedManager watchedMngr = new NnUserWatchedManager();
@@ -1437,17 +1505,12 @@ public class PlayerApiService {
 			if (i > cnt)
 				break;
 			result[0] += w.getChannelId() + "\t" + w.getProgram() + "\n";
-			System.out.println("count i :" + i);
 			MsoChannel c = channelMngr.findById(w.getChannelId());
-			if (c != null) {
-				System.out.println("found one channel" + c.getKey().getId()); 
+			if (c != null) { 
 				channels.add(c);
-			} else {
-				System.out.println("can't find anything");
 			}
 			i++;
 		}
-		System.out.println("channel size:" + channels.size());
 		for (MsoChannel c : channels) {
 			result[1] += this.composeChannelLineupStr(c, mso) + "\n";
 		}

@@ -3,6 +3,7 @@ package com.nnvmso.web.admin;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.Session;
 import javax.mail.Transport;
@@ -67,7 +68,7 @@ public class AdminInitController {
 		}
 		return "error/exception";				
 	}
-		
+
 	//local machine
 	@RequestMapping(value="groundStart", method=RequestMethod.GET)
 	public String groundStartGet(HttpServletRequest req) {
@@ -83,6 +84,12 @@ public class AdminInitController {
 		return "admin/groundStart";
 	}	
 
+	@RequestMapping("file")
+	public ResponseEntity<String> file() {
+		return NnNetUtil.textReturn("You will receive an email when it isdone.");
+	}
+	
+	
 	//gae environment	
 	@RequestMapping("initChannelsToTask")
 	public ResponseEntity<String> initChannelsToTask() {
@@ -216,13 +223,48 @@ public class AdminInitController {
 		return NnNetUtil.textReturn("OK");		
 	}
 	
+	@RequestMapping("testEmail")
+	public ResponseEntity<String> testEmail(HttpServletRequest req) {
+		log.info("test email here");
+		Properties props = new Properties();
+        Session session = Session.getDefaultInstance(props, null);
+        String msgBody = "remove setFrom";
+        try {
+        	Message msg = new MimeMessage(session);
+//        	msg.setFrom(new InternetAddress("gaeadmin@9x9.tv", "yiwen"));
+        	Address addr = new InternetAddress("yiwen@teltel.com", "yiwen"); 
+        	Address addrs[] = {addr};
+        	//msg.addFrom(addrs);
+        	msg.setReplyTo(addrs);
+            msg.addRecipient(Message.RecipientType.TO, new InternetAddress("nncloudtv@gmail.com", "nncloudtv"));            
+        	msg.setHeader("From", "yiwen@teltel.com");
+        	msg.setHeader("From_Alias", "yiwen");
+        	msg.setHeader("Sender", "gaeadmin@9x9.tv");
+        	msg.setHeader("Sender_Alias", "gaeadmin");
+        	msg.setHeader("sender", "gaeadmin@9x9.tv");
+        	msg.setHeader("sender_Alias", "gaeadmin");
+            msg.setSubject("domain test");
+            if (msg.getHeader("sender") != null)
+            	System.out.println("sender:" + msg.getHeader("sender")[0]);
+            if (msg.getHeader("Sender") != null)
+            	System.out.println("Sender:" + msg.getHeader("Sender")[0]);            
+            if (msg.getHeader("from") != null)
+            	System.out.println("from:" + msg.getHeader("from")[0]);
+            msg.setText(msgBody);            
+            Transport.send(msg);
+        } catch (Exception e) {
+        	NnLogUtil.logException(e);
+		}							
+		return NnNetUtil.textReturn("OK");		
+	}	
+	
 	public void sendEmail(String subject) {
 		Properties props = new Properties();
         Session session = Session.getDefaultInstance(props, null);
         String msgBody = "done";
         try {
         	Message msg = new MimeMessage(session);
-            msg.setFrom(new InternetAddress("nncloudtv@gmail.com", "nncloudtv"));
+            msg.setFrom(new InternetAddress("admin@gmail.com", "nncloudtv"));
             msg.addRecipient(Message.RecipientType.TO, new InternetAddress("nncloudtv@gmail.com", "nncloudtv"));                             
             msg.setSubject(subject);
             msg.setText(msgBody);

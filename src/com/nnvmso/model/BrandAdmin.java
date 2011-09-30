@@ -13,9 +13,6 @@ import com.google.appengine.api.datastore.Key;
 @PersistenceCapable(detachable = "true")
 public class BrandAdmin implements Serializable {
 	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	
 	@PrimaryKey
