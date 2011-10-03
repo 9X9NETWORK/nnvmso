@@ -34,7 +34,7 @@ public class PdrRawManager {
 	 */
 	public void processPdr(String pdr, NnUser user, String sessionId) {
 		if (pdr == null) {return;}		
-		
+		log.info("pdr:" + pdr);
 		PdrRawManager pdrMngr = new PdrRawManager();		
 		NnUserWatchedManager watchedMngr = new NnUserWatchedManager();
 		String reg = "w \t (\\d++) \t (\\w++)";		
