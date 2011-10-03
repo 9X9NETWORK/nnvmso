@@ -5,7 +5,7 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9playerV68a"/>
-<c:set var="nroot" value="http://9x9ui.s3.amazonaws.com/9x9playerV80"/>
+<c:set var="nroot" value="http://9x9ui.s3.amazonaws.com/9x9playerV81"/>
 
 <!-- $Revision$ -->
 
@@ -222,7 +222,8 @@ var brandinfo = "${brandInfo}";
     </div>   
   </div>
 </div>
-
+
+
 
 <div id="preload-control-images" style="display: none"></div>
 
@@ -237,10 +238,11 @@ var brandinfo = "${brandInfo}";
   </div>
 </div>
 
+
 <div id="confirm-layer">
-  <div class="confirm-holder" id="confirm-holder" style="z-index: 70">
-    <p id="confirm-text"></p>
-    <a class="btn on" id="btn-cfclose"><span id="close1">Close</span></a>
+  <div id="confirm-holder">
+    <p><span id="confirm-text"></span></p>
+    <p class="btn" id="btn-confirm-close"><span>Close</span></p>
   </div>
 </div>
 
@@ -303,13 +305,20 @@ var brandinfo = "${brandInfo}";
 
 <div id="sg-bubble"><img src="${root}/images/bg_bubble.png"><div id="btn-bubble-del"><img src="${root}/images/btn_delete_off.png" class="off"><img src="${root}/images/btn_delete_on.png" class="on"></div><p><span id="rsbubble">Return to Smart Guide for more interesting content</span></p></div>
 
-<div id="fb-bubble">
-  <div id="fb-holder">
-    <img src="" id="fb-picture">
-    <span id="fb-name"></span>
-    <span id="fb-comment"></span>
-  </div>
-</div>
+<div id="fb-bubble">
+
+  <div id="fb-holder">
+
+    <img src="" id="fb-picture">
+
+    <span id="fb-name"></span>
+
+    <span id="fb-comment"></span>
+
+  </div>
+
+</div>
+
 
 <!--div id="btn-subscribe" style="z-index: 300; display: none"><img src="${root}/images/btn_subscribe_off.png" class="off"><img src="${root}/images/btn_subscribe_on.png" class="on"></div-->
 
@@ -342,7 +351,7 @@ var brandinfo = "${brandInfo}";
 <div id="rename-layer">
   <div class="rename-holder">
     <p id="rename-input">
-      <input type="text" id="rename-field" value="Enter a new title for the set">
+      <input type="text" class="textfield" id="rename-field" value="Enter a new title for the set">
     </p>
     <ul class="action-list">
       <li><a class="btn" id="btn-rename-save"><span>Save</span></a></li>
@@ -352,15 +361,91 @@ var brandinfo = "${brandInfo}";
 </div>
 
 <div id="tribtn-layer">
-  <div class="tribtn-holder">
-    <p>This set has been added to your Smart Guide!</p>
-    <div class="actions">
-      <a class="btn" id="btn-watchSet"><span>Watch this set</span></a>
-      <a class="btn" id="btn-toFset"><span>Look at more featured sets</span></a>
-      <a class="btn" id="btn-toSG"><span>Return to Smart Guide</span></a>
+  <div id="tribtn-holder">
+    <p><span>The channel you follow is added successfully!</span></p>
+    <ul class="action-list">
+      <li><p class="btn" id="btn-watchSet"><span>Watching this Set</span></p></li>
+      <li><p class="btn" id="btn-toFset"><span>Back to Add Featured Sets</span></p></li>
+      <li><p class="btn" id="btn-toSG"><span>Return to Smart Guide</span></p></li>
+    </ul>
+  </div>
+</div>
+
+<div id="company-layer">
+  <div id="company-holder">
+    <img src="${nroot}/images/btn_winclose.png" id="btn-company-close">
+    <ul id="company-tabs">
+      <li id="about" class="on"><span>About Us</span></li>
+      <li id="contact"><span>Contact Us</span></li>
+      <li id="legal"><span>Legal</span></li>
+    </ul>
+    <div id="about-panel" class="input-panel">
+      <div id="about-slider" class="slider-wrap"><div class="slider-vertical"></div></div>
+      <div id="about-content" class="constrain">
+        <div id="about-list">
+          <img src="${nroot}/images/logo_about.png" id="about-logo">
+          <p><span>As today's Internet becomes increasingly dominated by videos, 9x9 offers the ultimate Video Browser that brings order to chaos by making online video discovery and consumption fun and addictive. Organized as a virtually infinitely large video Channel Store and backed by a Cloud-based platform,  9x9 allows online videos such as those found on YouTube to be grouped into TV-like channels which can be easily flipped through, discovered and added to the user's program guide.  Users watch channels subscribed via a browser on a PC, or an app on iPad, iPhone or TV anywhere anytime.  A Visual Directory further aids the users in quickly browsing the Channel Store and picking out their favorite video channels through a simple "Flip and Discover" experience.</span></p>
+          <p><span>Over time, 9x9 will personalize its Video Browser to suit an individual user's lifestyle and grow the ecosystem by working with content creators, curators, media agencies and advertisers to redefine the rules of the unfulfilled half of the Internet to be dominated by videos.</span></p>
+          <p><span>9x9 is headquartered in Santa Clara, California and backed by investors in the US and abroad.  Join us today by visiting our Channel Store and discover a whole new experience of online video discovery, video watching and video sharing.  The more you flip, the better it gets.</span></p>
+        </div>
+      </div>
+    </div>
+    <div id="contact-panel" class="input-panel">
+      <div id="contact-content" class="constrain">
+      </div>
+    </div>
+    <div id="legal-panel" class="input-panel">
+      <div id="legal-content" class="constrain">
+      </div>
     </div>
   </div>
- </div>
+</div>
+
+<div id="help-layer">
+  <div id="help-holder">
+    <img src="${nroot}/images/btn_winclose.png" id="btn-help-close">
+    <ul id="help-tabs">
+      <li id="tutorial" class="on"><span>Tutorial</span></li>
+      <li id="faq"><span>FAQ</span></li>
+    </ul>
+    <div id="tutorial-panel" class="input-panel">
+      <div id="tutorial-content" class="constrain">
+        <div id="tutorial-list">
+          <p id="tutorial-video">
+            <iframe width="100%" height="100%" src="http://www.youtube.com/embed/0DLO2ZO0V4k" frameborder="0" allowfullscreen></iframe>
+          </p>
+          <p id="tutorial-intro"><span class="head">Welcome to 9x9</span><br><span>Wtaching your favorite online videos with 9x9 can be any easier! Simply drag and drop from our Channel Store to your very own 9x9 Gudie</span></p>
+          <p id="btn-tutorial-browse" class="btn-hilite"><span>Browse Now!</span></p>
+        </div>
+      </div>
+    </div>
+    <div id="faq-panel" class="input-panel">
+      <div id="faq-slider" class="slider-wrap"><div class="slider-vertical"></div></div>
+      <div id="faq-content" class="constrain">
+        <div id="faq-list">
+          <p><span>As today's Internet becomes increasingly dominated by videos, 9x9 offers the ultimate Video Browser that brings order to chaos by making online video discovery and consumption fun and addictive. Organized as a virtually infinitely large video Channel Store and backed by a Cloud-based platform,  9x9 allows online videos such as those found on YouTube to be grouped into TV-like channels which can be easily flipped through, discovered and added to the user's program guide.  Users watch channels subscribed via a browser on a PC, or an app on iPad, iPhone or TV anywhere anytime.  A Visual Directory further aids the users in quickly browsing the Channel Store and picking out their favorite video channels through a simple "Flip and Discover" experience.</span></p>
+          <p><span>Over time, 9x9 will personalize its Video Browser to suit an individual user's lifestyle and grow the ecosystem by working with content creators, curators, media agencies and advertisers to redefine the rules of the unfulfilled half of the Internet to be dominated by videos.</span></p>
+          <p><span>9x9 is headquartered in Santa Clara, California and backed by investors in the US and abroad.  Join us today by visiting our Channel Store and discover a whole new experience of online video discovery, video watching and video sharing.  The more you flip, the better it gets.</span></p>
+          <p><span>As today's Internet becomes increasingly dominated by videos, 9x9 offers the ultimate Video Browser that brings order to chaos by making online video discovery and consumption fun and addictive. Organized as a virtually infinitely large video Channel Store and backed by a Cloud-based platform,  9x9 allows online videos such as those found on YouTube to be grouped into TV-like channels which can be easily flipped through, discovered and added to the user's program guide.  Users watch channels subscribed via a browser on a PC, or an app on iPad, iPhone or TV anywhere anytime.  A Visual Directory further aids the users in quickly browsing the Channel Store and picking out their favorite video channels through a simple "Flip and Discover" experience.</span></p>
+          <p><span>Over time, 9x9 will personalize its Video Browser to suit an individual user's lifestyle and grow the ecosystem by working with content creators, curators, media agencies and advertisers to redefine the rules of the unfulfilled half of the Internet to be dominated by videos.</span></p>
+          <p><span>9x9 is headquartered in Santa Clara, California and backed by investors in the US and abroad.  Join us today by visiting our Channel Store and discover a whole new experience of online video discovery, video watching and video sharing.  The more you flip, the better it gets.</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="forgot-layer">
+  <div id="forgot-holder" class="forgot-holder">
+    <p id="forgot-input">
+      <input type="text" class="textfield" value="Please enter your email address">
+    </p>
+    <ul class="action-list">
+      <li><p class="btn disable" id="btn-forgot-retrieve"><span>Retrieve</span></p></li>
+      <li><p class="btn" id="btn-forgot-cancel"><span>Cancel</span></p></li>
+    </ul>
+  </div>
+</div>
 
 <div id="log-layer" style="position: absolute; left: 0; top: 0; height: 100%; width: 100%; background: white; color: black; text-align: left; padding: 20px; overflow: scroll; z-index: 9999; display: none"></div>
 
@@ -415,6 +500,14 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
 
 <div id="store-layer" class="stage" style="background: #f0f0f0; display: none">
   <div id="store-holder">
+    <div id="pool-waiting">
+      <img src="${nroot}/images/loading.gif">
+      <p><span>One moment...</span></p>
+    </div>
+    <div id="preview-waiting">
+      <img src="${nroot}/images/loading.gif">
+      <p><span>One moment...</span></p>
+    </div>
     <h2><span>Channel Store</span></h2>
     <img src="${nroot}/images/icon_cart_gray.png" id="btn-cart">
     <p id="cart-bubble">
@@ -434,27 +527,45 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
     </p>
     <div id="preview-area">
       <p id="btn-flip-preview"><img src="${nroot}/images/btn_flip_L_off.png" id="btn-fp-off"><img src="${nroot}/images/btn_flip_L_on.png" id="btn-fp-on"></p>
-      <p id="preview-index"><span>Previewing channel</span><span id="index-ch-title">The Beautiful Universe: Chandra in HD</span><span>in</span><span id="index-catg-title">Music</span></p>
+      <p id="preview-index"><span>Previewing</span><span id="index-ch-title"></span><span>channel in</span><span id="index-catg-title"></span><span>set</span></p>
       <div id="preview-win">
-        <img src="${nroot}/images/bg_preview_win.jpg" id="bg-preview-win">
-        <p id="btn-sound"><img src="${nroot}/images/icon_sound_off.png" id="icon-sound-off"><img src="${nroot}/images/icon_sound_on.png" id="icon-sound-on"></p>
         <div id="preview-video"></div>
-        <img src="${nroot}/images/preview_ep_panel.png" id="preview-ep-panel">
-        <img src="${nroot}/images/arrow_right_on.png" id="preview-arrow-right">
-        <img src="${nroot}/images/arrow_left_on.png" id="preview-arrow-left">
-        <ul id="preview-ep-list"><li class="on"><img src="${nroot}/images/bg_ep_off.png" class="ep-off"><img src="${nroot}/images/bg_ep_on.png" class="ep-on"><img src="${nroot}/thumb/14.jpeg" class="thumbnail"><p class="duration"><span>10:10</span></p></li><li><img src="${nroot}/images/bg_ep_off.png" class="ep-off"><img src="${nroot}/images/bg_ep_on.png" class="ep-on"><img src="${nroot}/thumb/06.jpg" class="thumbnail"><p class="duration"><span>10:10</span></p></li><li><img src="${nroot}/images/bg_ep_off.png" class="ep-off"><img src="${nroot}/images/bg_ep_on.png" class="ep-on"><img src="${nroot}/thumb/08.jpg" class="thumbnail"><p class="duration"><span>10:10</span></p></li><li><img src="${nroot}/images/bg_ep_off.png" class="ep-off"><img src="${nroot}/images/bg_ep_on.png" class="ep-on"><img src="${nroot}/thumb/04.jpg" class="thumbnail"><p class="duration"><span>10:10</span></p></li><li><img src="${nroot}/images/bg_ep_off.png" class="ep-off"><img src="${nroot}/images/bg_ep_on.png" class="ep-on"><img src="${nroot}/thumb/13.jpg" class="thumbnail"><p class="duration"><span>10:10</span></p></li><li><img src="${nroot}/images/bg_ep_off.png" class="ep-off"><img src="${nroot}/images/bg_ep_on.png" class="ep-on"><img src="${nroot}/thumb/13.jpg" class="thumbnail"><p class="duration"><span>10:10</span></p></li></ul>
         <p id="preview-ep-meta">
           <span class="meta-head">Episode:</span>
-          <span class="ep-title">Jay Leno's eclectic car collection</span>
-          <span class="amount">(5/15)</span>
+          <span class="ep-title"></span>
         </p>
-        <!--<p><span id="preview-meta-head">Episode:</span><span class="preview-ep-title">Jay Leno's eclectic car collection</span> - <span class="amount">5/15</span></p>-->
+        <p id="ep-switcher">
+          <img src="${nroot}/images/icon_ep.png" id="btn-ep">
+          <span id="ep-show">Watch more episodes in this channel</span>
+          <span id="ep-hide">Hide</span>
+        </p>
+        <div id="preview-ep">
+          <img src="${nroot}/images/arrow_right_on.png" id="preview-arrow-right">
+          <img src="${nroot}/images/arrow_left_on.png" id="preview-arrow-left">
+          <ul id="preview-ep-list"></ul>
+        </div>    
       </div>
-      <div id="preview-ch-title">
-        <p class="text-holder"><span>The Beautiful Universe: Chandra in HD</span></p>
+      <p id="channel-price"><img src="${nroot}/images/tag_free.png" id="icon-tag"><span class="free">FREE</span></p>
+      <ul id="preview-controller">
+        <li id="btn-preview-play" class="on"><img src="${nroot}/images/btn_play.png" id="icon-preview-play" title="Play"><img src="${nroot}/images/btn_pause.png" id="icon-preview-pause" title="Pause"></li>
+        <li id="btn-info"><img src="${nroot}/images/btn_info.png" id="icon-info" title="Channel Info"></li>
+        <li id="btn-sound"><img src="${nroot}/images/icon_sound_off.png" id="icon-sound-off" title="Sound Off"><img src="${nroot}/images/icon_sound_on.png" id="icon-sound-on" title="Sound On"></li>
+      </ul>
+      <div id="channel-bubble">
+        <img src="${nroot}/images/bubble_tip.png" id="channel-bubble-tip">
+        <img src="${nroot}/images/bg_bubble.png" class="bg-bubble">
+        <div id="chbubble-slider" class="slider-wrap"><div class="slider-vertical"></div></div>
+        <div id="chbubble-content">
+          <p id="chbubble-list">
+            <span></span>
+          </p>
+        </div>
+        <ul id="chbubble-meta">
+          <li><span>15 episodes</span></li>
+          <li><span>Updated: 09/09/11</span></li>
+          <li><span>Curator: John Smith</span></li>
+        </ul>
       </div>
-      <p id="btn-detail"><span>More detail</span></p>
-      <img src="${nroot}/images/tag_free.png" id="tag-free">
       <div id="channel-flipper">
         <p id="flip-next"><img src="${nroot}/images/arrow_down.png"><span>Next Ch</span></p>
         <p id="flip-prev"><img src="${nroot}/images/arrow_up.png"><span>Prev Ch</span></p>
@@ -464,7 +575,7 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
     </div>    
     <ul id="tabs">
       <li id="recommended" class="on"><span>Recommended</span></li>
-      <li id="category"><span>Categories</span></li>
+      <li id="category"><span>Directory</span></li>
       <li id="yourown"><span>Add your own</span></li>
     </ul>
     <div id="channel-pool">
@@ -498,6 +609,12 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
         </ul>
       </div>
     </div>
+  </div>
+</div>
+
+<div id="hint-layer">
+  <div id="hint-holder">
+    <img src="${nroot}/images/hint_1.png" id="hint-1"><img src="${nroot}/images/hint_2.png" id="hint-2"><img src="${nroot}/images/hint_3.png" id="hint-3">
   </div>
 </div>
 
@@ -777,7 +894,7 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
       <p id="selected-sitelang"><span>English site</span><img src="${nroot}/images/icon_expand.png" class="icon-expand"></p>
       <ul id="sitelang-dropdown" class="dropdown">
         <li class="on"><img src="${nroot}/images/icon_check.png" class="icon-check"><span>English site</span></li>
-        <li><img src="${nroot}/images/icon_check.png" class="icon-check"><span>\u4e2d\u6587\u7db2\u7ad9</span></li>
+        <li><img src="${nroot}/images/icon_check.png" class="icon-check"><span>中文網站</span></li>
       </ul>
     </li>
   </ul>
