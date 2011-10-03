@@ -43,9 +43,6 @@ public class MsoChannelManager {
 			channel.setSourceUrl(channel.getSourceUrl().trim()); //remove the trailing slash
 			channel.setSourceUrlSearch(channel.getSourceUrl().toLowerCase());
 		}
-		if (channel.getName() != null) {
-			channel.setNameSearch(channel.getName().trim().toLowerCase());
-		}
 		if (channel.getLangCode() == null || channel.getLangCode().length() == 0) {
 			channel.setLangCode(LangTable.LANG_EN);
 		}
@@ -73,8 +70,7 @@ public class MsoChannelManager {
 		CategoryChannelManager ccMngr = new CategoryChannelManager();
 		for (Category c : categories) {
 			ccMngr.create(new CategoryChannel(c.getKey().getId(), channel.getKey().getId()));
-		}
-		
+		}		
 		//set category channelCount if necessary
 		CategoryManager categoryMngr = new CategoryManager();
 		if (this.isCounterQualified(channel)) {
@@ -84,7 +80,7 @@ public class MsoChannelManager {
 		//save to cache
 		Cache cache = CacheFactory.get();		
 		String key = this.getCacheKey(channel.getKey().getId());
-		if (cache != null) { cache.put(key, channel); }		
+		if (cache != null) { cache.put(key, channel); }
 	}
 
 	/**
@@ -100,8 +96,6 @@ public class MsoChannelManager {
 			channel.setSourceUrl(channel.getSourceUrl().trim());
 			channel.setSourceUrlSearch(channel.getSourceUrl().toLowerCase());
 		}
-		if (channel.getName() != null)
-			channel.setNameSearch(channel.getName().trim().toLowerCase());
 		
 		channel.setUpdateDate(new Date());
 		if (channel.getStatus() == MsoChannel.STATUS_SUCCESS)

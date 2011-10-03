@@ -8,7 +8,6 @@ import javax.jdo.Query;
 
 import com.nnvmso.lib.PMF;
 import com.nnvmso.model.Captcha;
-import com.nnvmso.service.NnUserManager;
 
 public class CaptchaDao extends GenericDao<Captcha> {
 	protected static final Logger logger = Logger.getLogger(CaptchaDao.class.getName());
@@ -30,16 +29,18 @@ public class CaptchaDao extends GenericDao<Captcha> {
 	public Captcha getRandom() {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Captcha c = null;
-		String random = NnUserManager.generateToken();
+		double random = Math.random();
 		try {
 			Query q = pm.newQuery(Captcha.class);
 			q.setFilter("random > randomParam");
+			q.declareParameters("double randomParam");
 			q.setRange(1, 2);
-			q.declareParameters("String randomParam");
+			q.setOrdering("random");
 			List<Captcha> list = (List<Captcha>) q.execute(random);			
 			if (list.size() == 0) {
 				q.setFilter("random < randomParam");
 				q.setRange(1, 2);
+				q.setOrdering("random");
 				q.declareParameters("String randomParam");
 				list = (List<Captcha>) q.execute(random);
 			}

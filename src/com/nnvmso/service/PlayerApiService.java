@@ -1,8 +1,11 @@
 package com.nnvmso.service;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -23,10 +26,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.sf.jsr107cache.Cache;
 
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.context.MessageSource;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.google.appengine.api.datastore.DatastoreFailureException;
 import com.google.appengine.api.datastore.DatastoreNeedIndexException;
@@ -37,7 +44,9 @@ import com.nnvmso.dao.ShardedCounter;
 import com.nnvmso.lib.CacheFactory;
 import com.nnvmso.lib.CookieHelper;
 import com.nnvmso.lib.NnLogUtil;
+import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.lib.NnStringUtil;
+import com.nnvmso.lib.PiwikLib;
 import com.nnvmso.lib.YouTubeLib;
 import com.nnvmso.model.AreaOwnership;
 import com.nnvmso.model.Captcha;
@@ -110,16 +119,15 @@ public class PlayerApiService {
 		String[] result = {"", "", ""};
 		//first block: status
 		Mso csMso = msoMngr.findById(cs.getMsoId());
-		//2nd block	 
+		//2nd block, set's mso info	 
 		result[0] += assembleKeyValue("name", csMso.getName());
 		result[0] += assembleKeyValue("imageUrl", csMso.getLogoUrl()); 
-		result[0] += assembleKeyValue("intro", csMso.getIntro());
-		 
+		result[0] += assembleKeyValue("intro", csMso.getIntro());		 
 		//3rd block: set info
 		result[1] += assembleKeyValue("id", String.valueOf(cs.getKey().getId()));
 		result[1] += assembleKeyValue("name", cs.getName());		
 		result[1] += assembleKeyValue("imageUrl", cs.getImageUrl());
-		
+		result[1] += assembleKeyValue("piwik", cs.getPiwik());
 		//4rd block, channel info		
 		for (MsoChannel c : channels) {
 			result[2] += this.composeChannelLineupStr(c, csMso) + "\n";													
@@ -176,6 +184,10 @@ public class PlayerApiService {
 				user.setSphere(value[i]);
 			if (key[i].equals("gender"))
 				user.setGender(Short.parseShort(value[i]));						
+			if (key[i].equals("ui-lang"))
+				if ((value[i] == null) || (this.checkLang(value[i]) == null))
+					return this.assembleMsgs(NnStatusCode.INPUT_BAD, null);
+				user.setLang(value[i]);
 		}
 		int status = NnUserValidator.validateProfile(user);
 		if (status != NnStatusCode.SUCCESS) {
@@ -213,6 +225,7 @@ public class PlayerApiService {
 		result[0] += assembleKeyValue("gender", gender);
 		result[0] += assembleKeyValue("year", String.valueOf(user.getDob()));
 		result[0] += assembleKeyValue("sphere", user.getSphere());
+		result[0] += assembleKeyValue("ui-lang", user.getLang());
 		return this.assembleMsgs(NnStatusCode.SUCCESS, result);
 	}
 	
@@ -225,23 +238,18 @@ public class PlayerApiService {
 		//verify user
 		NnUser user = userMngr.findByToken(userToken);
 		if (user == null) {return NnStatusMsg.userInvalid(locale);}		
-		if (item.equals("password")) {
-			user.setPassword(value); //pwd check
-			userMngr.save(user);
-		} else {		
-			//get preference
-			NnUserPrefManager prefMngr = new NnUserPrefManager();
-			NnUserPref pref = prefMngr.findByUserIdAndItem(user.getKey().getId(), item);
-			if (pref != null) {
-				pref.setValue(value);			
-				prefMngr.save(pref);
-			} else {
-				pref = new NnUserPref();
-				pref.setValue(value);
-				pref.setItem(item);			
-				pref.setUserId(user.getKey().getId());
-				prefMngr.create(pref);
-			}
+		//get preference
+		NnUserPrefManager prefMngr = new NnUserPrefManager();
+		NnUserPref pref = prefMngr.findByUserIdAndItem(user.getKey().getId(), item);
+		if (pref != null) {
+			pref.setValue(value);			
+			prefMngr.save(pref);
+		} else {
+			pref = new NnUserPref();
+			pref.setValue(value);
+			pref.setItem(item);			
+			pref.setUserId(user.getKey().getId());
+			prefMngr.create(pref);
 		}
 		return NnStatusMsg.successStr(locale);
 	}
@@ -468,7 +476,10 @@ public class PlayerApiService {
 	        	log.info("findLocaleByHttpRequest() IP service returns error:" + connection.getResponseCode());	        	
 	        }
 	        BufferedReader rd  = new BufferedReader(new InputStreamReader(connection.getInputStream()));;
-	        if (rd.readLine()!=null) {country = rd.readLine().toLowerCase();} //assuming one line	        
+	        String line = rd.readLine(); 
+	        if (line != null) {
+	        	country = line.toLowerCase();
+	        } //assuming one line	        
 		} catch (Exception e) {
 			NnLogUtil.logException(e);
 		}
@@ -567,12 +578,13 @@ public class PlayerApiService {
 			output = output + assembleKeyValue("token", user.getToken());
 			output = output + assembleKeyValue("name", user.getName());
 			output = output + assembleKeyValue("lastLogin", String.valueOf(user.getUpdateDate().getTime()));
-			
+			output += assembleKeyValue("sphere", user.getSphere());
+			output += assembleKeyValue("ui-lang", user.getLang());			
 			NnUserPrefManager prefMngr = new NnUserPrefManager();
 			List<NnUserPref> list = prefMngr.findByUserId(user.getKey().getId());		
 			for (NnUserPref pref : list) {
 				output = output + this.assembleKeyValue(pref.getItem(), pref.getValue());
-			}
+			}			
 		} else {		
 			output = output + assembleKeyValue("token", guest.getToken());
 			output = output + assembleKeyValue("name", NnUser.GUEST_NAME);
@@ -807,11 +819,17 @@ public class PlayerApiService {
 	
 	public String createUser(String email, String password, String name, String token,
 				             String captchaFilename, String captchaText,
+				             String sphere, String lang,
 			                 HttpServletRequest req, HttpServletResponse resp) {
-		System.out.println("token:" + token);
+		
 		int status = NnUserValidator.validate(email, password, name, req);
 		if (status != NnStatusCode.SUCCESS) 
-			return this.assembleMsgs(status, null);					
+			return this.assembleMsgs(status, null);
+		lang = this.checkLang(lang);	
+		sphere = this.checkLang(sphere);
+        if (lang == null || sphere == null)
+            return this.assembleMsgs(NnStatusCode.INPUT_BAD, null);				
+		
 		//find mso
 		if (mso == null) { return NnStatusMsg.msoInvalid(locale);}
 		
@@ -826,20 +844,6 @@ public class PlayerApiService {
 			if (status != NnStatusCode.SUCCESS) 
 				return this.assembleMsgs(status, null);
 		}
-		/*
-		//captcha verification
-		if (!guest.getCaptcha().getFileName().equals(captcha) || 
-			!guest.getCaptcha().getName().equals(name)) {
-			guest.setGuessTimes(guest.getGuessTimes()+1);
-			guestMngr.save(guest);
-			return this.assembleMsgs(NnStatusCode.INPUT_CAPTCHA_FAILED, null);
-		}
-		if (guest.getGuessTimes() > NnGuest.GUESS_MAXTIMES)
-			return this.assembleMsgs(NnStatusCode.INPUT_CAPTCHA_EXPIRED, null);
-		Date now = new Date();
-		if (now.after(guest.getExpiredAt()))
-			return this.assembleMsgs(NnStatusCode.INPUT_CAPTCHA_FAILED, null);
-		*/
 		//verify email
 		NnUser user = userMngr.findByEmail(email);
 		if (user != null) {
@@ -848,6 +852,8 @@ public class PlayerApiService {
 		}
 				
 		user = new NnUser(email, password, name, NnUser.TYPE_USER, mso.getKey().getId());
+		user.setSphere(sphere);
+		user.setLang(lang);
 		userMngr.create(user, token);
 		userMngr.subscibeDefaultChannels(user);							
 		String output = this.prepareUserInfo(user, null);
@@ -1233,6 +1239,7 @@ public class PlayerApiService {
 					    channelName,
 					    this.convertEpochToTime(c.getTranscodingUpdateDate(), c.getUpdateDate()),
 					    String.valueOf(c.getSorting()),
+					    c.getPiwik(),
 					    };
 		String output = NnStringUtil.getDelimitedStr(ori);
 		return output;
@@ -1357,8 +1364,7 @@ public class PlayerApiService {
         }
         if (result.substring(result.length()-3, result.length()).equals(separatorStr)) {
             result = result.substring(0, result.length()-3);
-        }
-                 
+        }                 
         return result;
     }
 	
@@ -1516,4 +1522,13 @@ public class PlayerApiService {
 		}
 		return this.assembleMsgs(NnStatusCode.SUCCESS, result);
 	}
+	
+	public String createPiwikSite(String set, String channel, HttpServletRequest req) {
+		String idsite = PiwikLib.createPiwikSite(Integer.parseInt(set), Integer.parseInt(channel), req);
+		if (idsite == null)
+			return this.assembleMsgs(NnStatusCode.PIWIK_ERROR, null);
+		String[] result = {String.valueOf(idsite)};
+		return this.assembleMsgs(NnStatusCode.SUCCESS, result);
+	}	
+	
 }

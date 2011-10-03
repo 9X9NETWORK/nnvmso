@@ -62,6 +62,9 @@ public class ChannelSet implements Serializable {
 
 	@Persistent
 	private short seq;
+
+	@Persistent
+	private String piwik;
 	
 	@NotPersistent
 	private int subscriptionCount;
@@ -207,6 +210,14 @@ public class ChannelSet implements Serializable {
 
 	public void setSeq(short seq) {
 		this.seq = seq;
+	}
+
+	public String getPiwik() {
+		return piwik;
+	}
+
+	public void setPiwik(String piwik) {
+		this.piwik = piwik;
 	}
 	
 }

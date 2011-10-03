@@ -7,8 +7,6 @@ import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
-import org.apache.commons.lang.RandomStringUtils;
-
 import com.google.appengine.api.datastore.Key;
 
 @PersistenceCapable(detachable="true")
@@ -27,22 +25,28 @@ public class Captcha {
 	private String fileName;
 	
 	@Persistent
-	private String random;
+	private double random;
 	
 	@Persistent
 	private Date createDate;
 	
 	public static short ACTION_SIGNUP = 1;
 	public static short ACTION_EMAIL = 2;
+		
+	@Persistent
+	private boolean toBeExpired;
+	
+	@Persistent
+	private Date lockedDate; //even it's to be expired, but it's still used by someone
 	
 	public Captcha(long batch, String name, String fileName) {
 		this.batch = batch;
 		this.name = name;
 		this.fileName = fileName;
-		String random = RandomStringUtils.randomAlphabetic(10);
-		this.random = random;
+		this.random = Math.random();
 		Date now = new Date();
 		this.createDate = now;
+		this.toBeExpired = false;
 	}
 	
 	public Key getKey() {
@@ -85,12 +89,28 @@ public class Captcha {
 		this.createDate = createDate;
 	}
 
-	public String getRandom() {
+	public double getRandom() {
 		return random;
 	}
 
-	public void setRandom(String random) {
+	public void setRandom(double random) {
 		this.random = random;
+	}
+
+	public boolean isToBeExpired() {
+		return toBeExpired;
+	}
+
+	public void setToBeExpired(boolean toBeExpired) {
+		this.toBeExpired = toBeExpired;
+	}
+
+	public Date getLockedDate() {
+		return lockedDate;
+	}
+
+	public void setLockedDate(Date lockedDate) {
+		this.lockedDate = lockedDate;
 	}
 		
 }

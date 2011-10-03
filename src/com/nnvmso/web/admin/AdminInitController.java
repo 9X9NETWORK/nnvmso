@@ -1,6 +1,11 @@
 package com.nnvmso.web.admin;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.Properties;
+import java.util.Scanner;
 import java.util.logging.Logger;
 
 import javax.mail.Address;
@@ -69,6 +74,32 @@ public class AdminInitController {
 		return "error/exception";				
 	}
 
+	//local machine
+	@RequestMapping(value="read", method=RequestMethod.GET)
+	public String read(HttpServletRequest req) {
+		try {
+			//FileInputStream fis = new FileInputStream("WEB-INF/views/admin/ESets.xlsx");
+			FileInputStream fis = new FileInputStream("WEB-INF/views/admin/text.txt");
+			InputStreamReader in = new InputStreamReader(fis, "UTF-8");
+			Scanner scanner = new Scanner(in);
+			StringBuilder text = new StringBuilder();
+		    try {
+		      while (scanner.hasNextLine()){
+		        text.append(scanner.nextLine() + "\n");
+		      }
+		    }
+		    finally{
+		      scanner.close();
+		    }	
+		    System.out.println("text:" + text);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		return "admin/groundStart";
+	} 	
+	
 	//local machine
 	@RequestMapping(value="groundStart", method=RequestMethod.GET)
 	public String groundStartGet(HttpServletRequest req) {

@@ -45,24 +45,29 @@ public class CaptchaController {
 	
 	@RequestMapping("uploadToTask")
 	public ResponseEntity<String> uploadToTask(
-			@RequestParam(value="file", required=false) String file,	
+			@RequestParam(value="fileGet", required=false) String fileGet,	
 			HttpServletRequest req) {
+		String file = req.getParameter("file");
 		QueueFactory.getDefaultQueue().add(
 			      TaskOptions.Builder.withUrl("/captcha/upload")
-			        .param("file", String.valueOf(file)));		
+			        .method(TaskOptions.Method.POST)
+			        .param("file", String.valueOf(file)));
 		return NnNetUtil.textReturn("queued in the task");
 	}
 	
 	@RequestMapping("upload")
-	public ResponseEntity<String> upload(@RequestParam(value="file", required=false) String file,			
+	public ResponseEntity<String> upload(@RequestParam(value="fileGet", required=false) String fileGet,			
 				                         HttpServletRequest req) {		
 
+		String file = req.getParameter("file");
 		if (file == null)
 			return NnNetUtil.textReturn("data missing");
 		String[] line = file.split("\n");
 		ArrayList<Captcha> list = new ArrayList<Captcha>();
+		int cnt = 0;
 		try {
 			for (String l : line) {
+				cnt ++;
 				String[] data = l.split("\t");
 				long batch = Long.parseLong(data[2].substring(0, 1));
 				Captcha c = new Captcha(batch, data[1], data[2]);
@@ -70,7 +75,7 @@ public class CaptchaController {
 			}
 			log.info("lines processed:" + line.length);
 		} catch (ArrayIndexOutOfBoundsException e) {
-			log.info("data form not expected");
+			log.info("data form not expected, from line:" + cnt);
 		}
 		CaptchaManager mngr = new CaptchaManager();
 		mngr.saveAll(list);

@@ -201,5 +201,57 @@
     </property>    
   </configuration>
 
+  <configuration name="Update Random Mapper">
+    <property>
+      <name>mapreduce.map.class</name>      
+      <value>com.nnvmso.task.mapper.RandomCaptchaMapper</value>
+    </property>
+    <property>
+      <name>mapreduce.inputformat.class</name>
+      <value>com.google.appengine.tools.mapreduce.DatastoreInputFormat</value>
+    </property>    
+    <property>
+      <name human="Entity Kind to Map Over">mapreduce.mapper.inputformat.datastoreinputformat.entitykind</name>
+      <value template="optional">Captcha</value>      
+    </property>    
+  </configuration>
+
+  <configuration name="Piwik Channel Mapper">
+    <property>
+      <name>mapreduce.map.class</name>      
+      <value>com.nnvmso.task.mapper.PiwikChannelMapper</value>
+    </property>
+    <property>
+      <name>mapreduce.inputformat.class</name>
+      <value>com.google.appengine.tools.mapreduce.DatastoreInputFormat</value>
+    </property>    
+    <property>
+      <name human="Entity Kind to Map Over">mapreduce.mapper.inputformat.datastoreinputformat.entitykind</name>
+      <value template="optional">MsoChannel</value>      
+    </property>    
+    <property>
+      <name human="urlRoot">urlRoot</name>
+      <value template="optinonal">String</value>
+    </property>
+  </configuration>
+
+  <configuration name="Piwik Set Mapper">
+    <property>
+      <name>mapreduce.map.class</name>      
+      <value>com.nnvmso.task.mapper.PiwikSetMapper</value>
+    </property>
+    <property>
+      <name>mapreduce.inputformat.class</name>
+      <value>com.google.appengine.tools.mapreduce.DatastoreInputFormat</value>
+    </property>    
+    <property>
+      <name human="Entity Kind to Map Over">mapreduce.mapper.inputformat.datastoreinputformat.entitykind</name>
+      <value template="optional">ChannelSet</value>      
+    </property>    
+    <property>
+      <name human="urlRoot">urlRoot</name>
+      <value template="optinonal">String</value>
+    </property>
+  </configuration>
       
 </configurations>

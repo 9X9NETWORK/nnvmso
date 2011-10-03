@@ -1,5 +1,6 @@
 package com.nnvmso.web;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -7,19 +8,11 @@ import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.google.appengine.tools.mapreduce.ConfigurationXmlUtil;
-import com.google.appengine.tools.mapreduce.DatastoreInputFormat;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.InputFormat;
 import org.apache.hadoop.mapreduce.Mapper;
-import com.nnvmso.task.mapper.DeleteAllMapper;
-
-import java.io.IOException;
-
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.NoSuchMessageException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -28,11 +21,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.google.appengine.api.datastore.DatastoreFailureException;
-import com.google.appengine.api.datastore.DatastoreNeedIndexException;
-import com.google.appengine.api.datastore.DatastoreTimeoutException;
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
+import com.google.appengine.tools.mapreduce.ConfigurationXmlUtil;
+import com.google.appengine.tools.mapreduce.DatastoreInputFormat;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.model.Mso;
@@ -44,6 +36,7 @@ import com.nnvmso.service.MsoProgramManager;
 import com.nnvmso.service.NnStatusCode;
 import com.nnvmso.service.NnStatusMsg;
 import com.nnvmso.service.TranscodingService;
+import com.nnvmso.task.mapper.DeleteAllMapper;
 import com.nnvmso.web.json.transcodingservice.Channel;
 import com.nnvmso.web.json.transcodingservice.ChannelInfo;
 import com.nnvmso.web.json.transcodingservice.MapelChannel;
@@ -189,7 +182,7 @@ public class TranscodingServiceController {
 					cs.add(new Channel(String.valueOf(c.getKey().getId()), 
 							           c.getSourceUrl(), 
 							           c.getTranscodingUpdateDate(), 
-							           String.valueOf(c.getEnforceTranscoding()),
+							           "0",
 							           String.valueOf(c.getSubscriptionCount())));
 				}
 			}

@@ -33,9 +33,6 @@ public class MsoChannel implements Serializable {
 	private String name; 
 	
 	@Persistent
-	private String nameSearch;
-
-	@Persistent
 	private String intro;
 	
 	@Persistent
@@ -49,10 +46,7 @@ public class MsoChannel implements Serializable {
 	
 	@Persistent
 	private short rating;
-	
-	@Persistent
-	private short license;
-	
+		
 	@Persistent
 	private String tags;
 	
@@ -102,12 +96,7 @@ public class MsoChannel implements Serializable {
 	//internal
 	public static final short STATUS_TRANSCODING_DB_ERROR = 1000;
 	public static final short STATUS_NNVMSO_JSON_ERROR = 1001;
-			
-	//enforce transcoding, could be used to assign special formats or bit rates
-	//currently 0 is no, 1 is yes
-	@Persistent
-	private short enforceTranscoding; 
-		
+					
 	@Persistent
 	private String errorReason;
 		
@@ -134,7 +123,10 @@ public class MsoChannel implements Serializable {
 		
     @Persistent
     private Set<String> fts;
-	
+
+    @Persistent
+    private String piwik;
+    
 	public MsoChannel(String name, String intro, String imageUrl, long userId) {
 		this.name = name;
 		this.intro = intro;
@@ -312,14 +304,6 @@ public class MsoChannel implements Serializable {
 		this.rating = rating;
 	}
 
-	public short getLicense() {
-		return license;
-	}
-
-	public void setLicense(short license) {
-		this.license = license;
-	}
-
 	public short getAdvertsing() {
 		return advertsing;
 	}
@@ -336,14 +320,6 @@ public class MsoChannel implements Serializable {
 		this.subscriptionCount = subscriptionCount;
 	}
 
-	public String getNameSearch() {
-		return nameSearch;
-	}
-
-	public void setNameSearch(String nameSearch) {
-		this.nameSearch = nameSearch;
-	}
-
 	public String getSourceUrlSearch() {
 		return sourceUrlSearch;
 	}
@@ -354,14 +330,6 @@ public class MsoChannel implements Serializable {
 
 	public void setTranscodingUpdateDate(String transcodingUpdateDate) {
 		this.transcodingUpdateDate = transcodingUpdateDate;
-	}
-
-	public short getEnforceTranscoding() {
-		return enforceTranscoding;
-	}
-
-	public void setEnforceTranscoding(short enforceTranscoding) {
-		this.enforceTranscoding = enforceTranscoding;
 	}
 
 	public String getTranscodingUpdateDate() {
@@ -399,5 +367,13 @@ public class MsoChannel implements Serializable {
 	public void setSorting(int sorting) {
 		this.sorting = sorting;
 	}
-		
+
+	public String getPiwik() {
+		return piwik;
+	}
+
+	public void setPiwik(String piwik) {
+		this.piwik = piwik;
+	}
+	
 }

@@ -101,8 +101,6 @@ public class TranscodingService {
 			channel = new MsoChannel(mapel.getSourceUrl(), user.getKey().getId());
 		}
 		channel.setImageUrl(mapel.getImage());	
-		if (mapel.getTitle() != null) 
-			channel.setNameSearch(mapel.getTitle().toLowerCase());
 		channel.setName(mapel.getTitle());					
 		if (mapel.getDescription() != null) { 
 			mapel.setDescription(mapel.getDescription().replaceAll("\\s", " "));
@@ -136,8 +134,7 @@ public class TranscodingService {
 		//change status to WAIT_FOR_APPROVAL at the end
 		if (channel.getStatus() == MsoChannel.STATUS_PROCESSING) { 
 			String name = podcast.getTitle();
-			channel.setName(name);
-			if (name != null) { channel.setNameSearch(name.toLowerCase()); };			
+			channel.setName(name);			
 			String intro = podcast.getDescription();
 			if (intro!= null && intro.length() > 500) {
 				intro = intro.substring(0, 499);

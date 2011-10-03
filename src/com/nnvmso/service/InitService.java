@@ -12,6 +12,7 @@ import net.sf.jsr107cache.Cache;
 import org.springframework.stereotype.Service;
 
 import com.nnvmso.lib.CacheFactory;
+import com.nnvmso.lib.PiwikLib;
 import com.nnvmso.model.AreaOwnership;
 import com.nnvmso.model.BrandAdmin;
 import com.nnvmso.model.Captcha;
@@ -430,6 +431,7 @@ public class InitService {
 		String[] urls = this.getChannelUrls();
 		MsoChannelManager channelMngr = new MsoChannelManager();
 		TranscodingService tranService = new TranscodingService();
+		boolean piwik = true;
 		for (String url : urls) {			
 			MsoChannel c = channelMngr.findBySourceUrlSearch(url);
 			if (c == null) {					
@@ -437,8 +439,12 @@ public class InitService {
 				c.setStatus(MsoChannel.STATUS_PROCESSING);
 				c.setContentType(channelMngr.getContentTypeByUrl(url));
 				channelMngr.create(c);
-				if (transcoding)
-					tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);			
+				if (transcoding) {
+					tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
+					channelMngr.save(c);
+				} else {
+					piwik = false; //local testing, no piwik creation
+				}
 			} else {
 				log.info("this channel existed:" + url);
 				if (c.getStatus() == MsoChannel.STATUS_WAIT_FOR_APPROVAL) {
@@ -449,6 +455,12 @@ public class InitService {
 					log.info("wanted channel but not success");					
 				}
 			}
+			if (piwik) {
+				String piwikId = PiwikLib.createPiwikSite(0, c.getKey().getId(), req);
+				c.setPiwik(piwikId);
+				channelMngr.save(c);
+			}
+
 		}
 	}
 
@@ -682,6 +694,9 @@ public class InitService {
 				channelSet.setSeq((short)(i-12));
 			}
 			csMngr.create(channelSet);
+			String piwik = PiwikLib.createPiwikSite(channelSet.getKey().getId(), 0, req);
+			channelSet.setPiwik(piwik);
+			csMngr.save(channelSet);			
 			ownershipMngr.create(new ContentOwnership(), mso, channelSet);
 		}
 	}

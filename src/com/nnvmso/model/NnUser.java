@@ -78,6 +78,9 @@ public class NnUser implements Serializable {
 	private short gender;
 	
 	@Persistent
+	private String lang;
+
+	@Persistent
 	private String sphere;
 	
 	public NnUser(String email, String password, String name, short type) {
@@ -240,6 +243,14 @@ public class NnUser implements Serializable {
 
 	public void setSphere(String sphere) {
 		this.sphere = sphere;
+	}
+
+	public String getLang() {
+		return lang;
+	}
+
+	public void setLang(String lang) {
+		this.lang = lang;
 	}
 	
 }

@@ -15,11 +15,13 @@ public class NnStatusCode {
 	public static final int INPUT_ERROR = 100;
 	public static final int INPUT_MISSING = 101;
 	public static final int INPUT_BAD = 102;
-	public static final int CAPTCHA_FAILED = 103;
-	public static final int CAPTCHA_EXPIRED = 104;
-	public static final int CAPTCHA_TOOMANY_TRIES = 105;
-	public static final int CAPTCHA_INVALID = 106;
-	public static final int CAPTCHA_ERROR = 107;
+	public static final int CAPTCHA_FAILED = 110;
+	public static final int CAPTCHA_EXPIRED = 111;
+	public static final int CAPTCHA_TOOMANY_TRIES = 112;
+	public static final int CAPTCHA_INVALID = 113;
+	public static final int CAPTCHA_ERROR = 114;
+	public static final int PIWIK_INVALID = 120;
+	public static final int PIWIK_ERROR = 121;
 	
 	//150 output error
 	public static final int OUTPUT_NO_MSG_DEFINED = 151;

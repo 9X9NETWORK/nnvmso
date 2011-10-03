@@ -17,6 +17,8 @@ import com.nnvmso.lib.CookieHelper;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.model.Mso;
+import com.nnvmso.model.MsoConfig;
+import com.nnvmso.service.MsoConfigManager;
 import com.nnvmso.service.MsoManager;
 import com.nnvmso.service.NnStatusCode;
 import com.nnvmso.service.NnStatusMsg;
@@ -331,6 +333,8 @@ public class PlayerApiController {
 		String userToken = req.getParameter("user");
 		String captcha = req.getParameter("captcha");
 		String text = req.getParameter("text");
+		String sphere = req.getParameter("sphere");
+		String lang = req.getParameter("lang");
 		
 		log.info("signup: email=" + email + ";name=" + name + ";userToken=" + userToken + ";password=" + password);
 
@@ -340,7 +344,7 @@ public class PlayerApiController {
 
 		String output = NnStatusMsg.errorStr(locale);
 		try {
-			output = playerApiService.createUser(email, password, name, userToken, captcha, text, req, resp);
+			output = playerApiService.createUser(email, password, name, userToken, captcha, text, sphere, lang, req, resp);
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}
@@ -1115,4 +1119,36 @@ public class PlayerApiController {
 		return NnNetUtil.textReturn(output);
 	}
 	
+	@RequestMapping(value="requestTracker")
+	public ResponseEntity<String> requestTracker(@RequestParam(value="set", required=false) String set,
+												 @RequestParam(value="channel", required=false) String channel,
+			                                     HttpServletRequest req) {
+		log.info("set:" + set + ";channel:" + channel);
+		this.prepService(req);		
+		String output = NnStatusMsg.errorStr(locale);
+		try {
+			output = playerApiService.createPiwikSite(set, channel, req);			
+		} catch (Exception e) {
+			output = playerApiService.handleException(e);
+		}
+		return NnNetUtil.textReturn(output);
+	}
+
+	//!!! important, remove after ios testing
+	@RequestMapping("changeConfig")
+	public ResponseEntity<String> changeConfig(@RequestParam(value="msoName",required=false) String msoName,
+			                                   @RequestParam(value="key",required=false) String key,
+			                                   @RequestParam(value="value", required=false) String value ) {
+		MsoManager msoMngr = new MsoManager();
+		MsoConfigManager configMngr = new MsoConfigManager();		
+		
+		Mso mso = msoMngr.findByName(msoName);
+		if (mso == null) { return NnNetUtil.textReturn("mso not found");}
+		MsoConfig config = configMngr.findByMsoIdAndItem(mso.getKey().getId(), key);
+		if (config == null) { config = new MsoConfig();	}
+		config.setItem(key);
+		config.setValue(value);
+		configMngr.save(config);
+		return NnNetUtil.textReturn("OK");
+	}	
 }
