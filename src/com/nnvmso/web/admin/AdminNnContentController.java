@@ -112,11 +112,12 @@ public class AdminNnContentController {
 	public ResponseEntity<String> list() {
 		//find all programs, including the not public ones
 		List<NnContent> list = contentMngr.findAll();
-		String[] title = {"id", "key", "value"};		
+		String[] title = {"id", "key", "lang", "value"};		
 		String output = "";
 		for (NnContent c : list) {
 			String[] ori = {String.valueOf(c.getKey().getId()),
 							c.getItem(),
+							c.getLang(),
 	                        String.valueOf(c.getContent().getValue())};	                        
 			output = output + NnStringUtil.getDelimitedStr(ori) + "\n";			
 		}
