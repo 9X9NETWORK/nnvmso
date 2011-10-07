@@ -122,7 +122,7 @@
         <div id="search_content" class="tab_content">
           <div id="search_area">
             <p><spring:message code="cms.channel_set_management.label.search_keyword"/>:</p>
-            <input name="" type="text" id="search_input"/>
+            <input type="text" id="search_input"/>
             <p id="search_button" class="btnGray"><span><spring:message code="cms.channel_set_management.btn.search"/></span></p>
           </div>
           <div id="search_result">

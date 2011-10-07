@@ -81,6 +81,16 @@ public class CmsApiController {
 	
 	//////////////////// ChannelSet Management ////////////////////
 	
+	@RequestMapping("searchChannel")
+	public @ResponseBody List<MsoChannel> searchChannel(@RequestParam String text) {
+		logger.info("search: " + text);
+		if (text == null || text.length() == 0) {
+			logger.warning("no query string");
+			return new ArrayList();
+		}
+		return MsoChannelManager.searchChannelEntries(text);
+	}
+	
 	@RequestMapping("defaultChannelSetInfo")
 	public @ResponseBody ChannelSet defaultChannelSetInfo(@RequestParam Long msoId) {
 		CmsApiService cmsService = new CmsApiService();
@@ -115,11 +125,24 @@ public class CmsApiController {
 		ChannelSet channelSet = cmsService.getDefaultChannelSet(msoId);
 		if (channelSet == null)
 			return new ArrayList<MsoChannel>();
-		return cmsService.findChannelsByChannelSetId(channelSet.getKey().getId());
+		List<MsoChannel> results = cmsService.findChannelsByChannelSetId(channelSet.getKey().getId());
+		
+		class MsoChannelComparator implements Comparator<MsoChannel> {
+			@Override
+			public int compare(MsoChannel channel1, MsoChannel channel2) {
+				int seq1 = channel1.getSeq();
+				int seq2 = channel2.getSeq();
+				return (seq2 - seq1);
+			}
+		}
+		
+		Collections.sort(results, new MsoChannelComparator());
+		return results;
 	}
 	
 	@RequestMapping("saveChannelSet")
 	public @ResponseBody String saveChannelSet(@RequestParam Long channelSetId,
+	                                           @RequestParam(required = false) String channelIds,
 	                                           @RequestParam(required = false) String imageUrl,
 	                                           @RequestParam String name,
 	                                           @RequestParam String intro,
@@ -175,6 +198,24 @@ public class CmsApiController {
 			ccsMngr.create(ccs);
 			// TODO: dealing with channelCount
 			logger.info("create new CategoryChannelSet channelSetId = " + channelSetId + ", categoryId = " + categoryId);
+		}
+		
+		if (channelIds != null) {
+			ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
+			MsoChannelManager channelMngr = new MsoChannelManager();
+			List<ChannelSetChannel> cscs = cscMngr.findByChannelSetId(channelSetId);
+			for (ChannelSetChannel csc : cscs) {
+				cscMngr.delete(csc);
+			}
+			String[] split = channelIds.split(",");
+			for (int i = 0; i < split.length; i++) {
+				MsoChannel channel = channelMngr.findById(Long.valueOf(split[i]));
+				if (channel == null) {
+					logger.warning("channel id does not exist: " + split[i]);
+					continue;
+				}
+				cscMngr.create(new ChannelSetChannel(channelSetId, channel.getKey().getId(), i));
+			}
 		}
 		
 		return "OK";

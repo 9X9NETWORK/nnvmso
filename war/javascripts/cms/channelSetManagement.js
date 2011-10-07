@@ -3,8 +3,126 @@
  */
  
 var page$ = {
+  objSearchTab: {
+    funcPopulateSearchBox: function(channels) {
+      
+      $('#result_list li').remove(); // clean previous result
+      
+      for(var i = 0; i < channels.length; i++) {
+        var channel = channels[i]
+        
+        var item = $('<li class="ch_normal"/>');
+        var btnPlay = $('<a/>').attr('target', '_player');
+        btnPlay.attr('href', cms.getChannelUrl(channel.key.id));
+        btnPlay.append('<p class="btnPlay"/>');
+        btnPlay.appendTo(item);
+        
+        var btnAdd = $('<p class="btnAdd"/>');
+        btnAdd.click({ 'channel': channel }, function(event) {
+          page$.channelSetArea.insertChannel(event.data.channel);
+        });
+        btnAdd.appendTo(item);
+        
+        $('<input name="channelId" type="hidden"/>').val(channel.key.id.toString());
+        //$('<span/>').html(page$.populateBubbleContent(channel)).hide().appendTo();
+        
+        $('<img/>').attr('src', channel.imageUrl).appendTo(item);
+        $('<p/>').text(channel.name).appendTo(item);
+        $('#result_list').append(item);
+      }
+      
+      // page$.objSearchTab.initBubbles();
+    },
+    initBubbles: function() {
+      //$('#result_list .ch_normal').each(function() {
+      //  cms.bubblePopupProperties['innerHtml'] = $(this).find('span').html();
+      //  $(this).CreateBubblePopup(cms.bubblePopupProperties);
+      //});
+    },
+    init: function() {
+      var tab$ = page$.objSearchTab;
+      
+      $('#search_button').click(function() {
+        var parameters = {
+          'text': $('#search_input').val()
+        };
+        cms.post('/CMSAPI/searchChannel', parameters, function(channels) {
+          tab$.funcPopulateSearchBox(channels);
+        }, 'json');
+      });
+      
+      $('#result_list li').remove();
+    }
+  },
   objChannelSetInfo: {
     init: function() {
+      cms.post('/CMSAPI/defaultChannelSetInfo', { 'msoId': $('#msoId').val() }, function(channelSet) {
+        if (channelSet != null) {
+          var url = 'http://' + ((location.host == 'www.9x9.tv') ? '9x9.tv' : location.host) + '/';
+          url += ((channelSet.beautifulUrl != null) ? channelSet.beautifulUrl : channelSet.defaultUrl);
+          if (channelSet.beautifulUrl != null || channelSet.defaultUrl != null) {
+            $('#channel_set_promote_url').text(url).attr('href', url);
+            $('.addthis_button_expanded').attr('addthis:url', url);
+            cms.initAddthis();
+          }
+          $('#cc_name').val(channelSet.name);
+          $('#cc_tag').val(channelSet.tag);
+          $('#cc_language').val(channelSet.lang);
+          $('#cc_intro').text(channelSet.intro);
+          if (channelSet.imageUrl != null) {
+            $('#cc_image').attr('src', channelSet.imageUrl);
+          }
+          $('#cc_image_updated').val('false');
+          $('#cc_id').val(channelSet.key.id);
+          $('#upload_image').click(function() {
+            $('#upload_image_form').submit(function(event) {
+              alert(event);
+            });
+          });
+          var swfupload_settings = {
+            flash_url:          '/javascripts/swfupload/swfupload.swf',
+            upload_url:         'http://9x9tmp.s3.amazonaws.com/',
+            file_size_limit:    '10240',
+            file_types:         '*.jpg;*.png;*.gif',
+            file_types_description: 'Image Files',
+            file_post_name:     'file',
+            button_placeholder: $('#upload_image').get(0),
+            button_action:       SWFUpload.BUTTON_ACTION.SELECT_FILE,
+            button_image_url:   $('#image_btn_upload').text(),
+            button_width:       '95',
+            button_height:      '32',
+            button_cursor:      SWFUpload.CURSOR.HAND,
+            button_window_mode : SWFUpload.WINDOW_MODE.TRANSPARENT,
+            debug:              false,
+            http_success :      [201],
+            upload_success_handler: function(file, serverData, recievedResponse) {
+              $('#uploading').hide();
+              $('#cc_image').attr('src', 'http://9x9tmp.s3.amazonaws.com/' + 'ch_set_logo_' + channelSet.key.id + '_'+ file.size + file.type);
+              $('#cc_image_updated').val('true');
+            },
+            upload_error_handler: function(file, code, message) {
+              $('#uploading').hide();
+              alert('error: ' + message);
+            },
+            file_queued_handler: function(file) {
+              var post_params =
+                {
+                  "AWSAccessKeyId": $('#s3_id').val(),
+                  "key":            'ch_set_logo_' + channelSet.key.id + '_'+ file.size + file.type,
+                  "acl":            "public-read",
+                  "policy":         $('#s3_policy').val(),
+                  "signature":      $('#s3_signature').val(),
+                  "content-type":   (file.type == '.jpg') ? "image/jpeg" : "image/png",
+                  "success_action_status": "201"
+                };
+              this.setPostParams(post_params);
+              this.startUpload(file.id);
+              $('#uploading').show();
+            }
+          };
+          var swfu = new SWFUpload(swfupload_settings);
+        }
+      }, 'json');
       cms.loadJSON('/CMSAPI/systemCategories', function(categories) {
         for (var i = 0; i < categories.length; i++) {
           $('<option></option>')
@@ -14,114 +132,71 @@ var page$ = {
         }
         cms.post('/CMSAPI/defaultChannelSetCategory', { 'msoId': $('#msoId').val() }, function(category) {
           if (category != null) {
-            $('#sys_directory').val(category.key.id);
-          }
-        }, 'json');
-        cms.post('/CMSAPI/defaultChannelSetInfo', { 'msoId': $('#msoId').val() }, function(channelSet) {
-          if (channelSet != null) {
-            var url = 'http://' + ((location.host == 'www.9x9.tv') ? '9x9.tv' : location.host) + '/';
-            url += ((channelSet.beautifulUrl != null) ? channelSet.beautifulUrl : channelSet.defaultUrl);
-            if (channelSet.beautifulUrl != null || channelSet.defaultUrl != null) {
-              $('#channel_set_promote_url').text(url).attr('href', url);
-              $('.addthis_button_expanded').attr('addthis:url', url);
-              cms.initAddthis();
-            }
-            $('#cc_name').val(channelSet.name);
-            $('#cc_tag').val(channelSet.tag);
-            $('#cc_language').val(channelSet.lang);
-            $('#cc_intro').text(channelSet.intro);
-            if (channelSet.imageUrl != null) {
-              $('#cc_image').attr('src', channelSet.imageUrl);
-            }
-            $('#cc_image_updated').val('false');
-            $('#cc_id').val(channelSet.key.id);
-            $('#upload_image').click(function() {
-              $('#upload_image_form').submit(function(event) {
-                alert(event);
-              });
-            });
-            var swfupload_settings = {
-              flash_url:          '/javascripts/swfupload/swfupload.swf',
-              upload_url:         'http://9x9tmp.s3.amazonaws.com/',
-              file_size_limit:    '10240',
-              file_types:         '*.jpg;*.png;*.gif',
-              file_types_description: 'Image Files',
-              file_post_name:     'file',
-              button_placeholder: $('#upload_image').get(0),
-              button_action:       SWFUpload.BUTTON_ACTION.SELECT_FILE,
-              button_image_url:   $('#image_btn_upload').text(),
-              button_width:       '95',
-              button_height:      '32',
-              button_cursor:      SWFUpload.CURSOR.HAND,
-              button_window_mode : SWFUpload.WINDOW_MODE.TRANSPARENT,
-              debug:              false,
-              http_success :      [201],
-              upload_success_handler: function(file, serverData, recievedResponse) {
-                $('#uploading').hide();
-                $('#cc_image').attr('src', 'http://9x9tmp.s3.amazonaws.com/' + 'ch_set_logo_' + channelSet.key.id + '_'+ file.size + file.type);
-                $('#cc_image_updated').val('true');
-              },
-              upload_error_handler: function(file, code, message) {
-                $('#uploading').hide();
-                alert('error: ' + message);
-              },
-              file_queued_handler: function(file) {
-                var post_params =
-                  {
-                    "AWSAccessKeyId": $('#s3_id').val(),
-                    "key":            'ch_set_logo_' + channelSet.key.id + '_'+ file.size + file.type,
-                    "acl":            "public-read",
-                    "policy":         $('#s3_policy').val(),
-                    "signature":      $('#s3_signature').val(),
-                    "content-type":   (file.type == '.jpg') ? "image/jpeg" : "image/png",
-                    "success_action_status": "201"
-                  };
-                this.setPostParams(post_params);
-                this.startUpload(file.id);
-                $('#uploading').show();
-              }
-            };
-            var swfu = new SWFUpload(swfupload_settings);
+             $('#sys_directory').val(category.key.id);
           }
         }, 'json');
       });
     }
   },
   channelSetArea: {
-    channelIds: [],
     reload: function() {
-      $('.ch_exist').each(function() {
-        $(this).RemoveBubblePopup();
-      });
-      $('.ch_exist').html('').removeClass('ch_exist').draggable({ 'disabled': true });
-      page$.channelSetArea.channelIds = [];
-      page$.channelSetArea.init();
+      //$('.ch_exist').each(function() {
+      //  $(this).RemoveBubblePopup();
+      //});
+      //$('.ch_exist').html('').removeClass('ch_exist').draggable({ 'disabled': true });
+      //page$.channelSetArea.channelIds = [];
+      //page$.channelSetArea.init();
     },
     initBubbles: function() {
-      $('.ch_exist').each(function() {
-        cms.bubblePopupProperties['innerHtml'] = $(this).find('span').html();
-        $(this).CreateBubblePopup(cms.bubblePopupProperties);
+      //$('.ch_exist').each(function() {
+      //  cms.bubblePopupProperties['innerHtml'] = $(this).find('span').html();
+      //  $(this).CreateBubblePopup(cms.bubblePopupProperties);
+      //});
+    },
+    adjustWidth: function() {
+      var size = $('#set_ch_list li').size();
+      $('#set_ch_list').width(size * 112);
+    },
+    insertChannel: function(channel) {
+      var area$ = page$.channelSetArea;
+      var item = $('<li class="ch_normal"/>');
+      
+      var btnRemove = $('<p class="btnRemove"/>');
+      btnRemove.click(function() {
+        $(this).parent().remove();
       });
+      btnRemove.appendTo(item);
+      $('<img/>').attr('src', channel.imageUrl).appendTo(item);
+      $('<p/>').text(channel.name).appendTo(item);
+      $('<input type="hidden" name="channelId"/>').val(channel.key.id).appendTo(item);
+      $('#set_ch_list').append(item);
+      area$.adjustWidth();
     },
     init: function() {
+      var area$ = page$.channelSetArea;
+      $('#set_ch_list .ch_normal').remove();
       cms.post('/CMSAPI/defaultChannelSetChannels', { 'msoId': $('#msoId').val() }, function(channels) {
         for (var i = 0; i < channels.length; i++) {
-          var seq = channels[i].seq;
-          var img = $('<img/>').attr('src', channels[i].imageUrl);
-          var dom = $('#channel_set_area li').get(seq - 1);
-          $(dom).addClass('ch_exist').append(img);
-          $('<input/>').attr('type', 'hidden').attr('name', 'channelId').val(channels[i].key.id).appendTo(dom);
-          $('<span></span>').hide().html(page$.populateBubbleContent(channels[i])).appendTo(dom);
-          page$.channelSetArea.initBubbles();
-          $(dom).draggable(page$.draggableProperties);
-          page$.channelSetArea.channelIds.push(channels[i].key.id.toString());
+          area$.insertChannel(channels[i]);
+          /*
+          var channel = channels[i];
+          var item = $('<li class="ch_normal"/>');
+          
+          var btnRemove = $('<p class="btnRemove"/>');
+          btnRemove.click({ channelId: channel.key.id }, function(event) {
+            alert(event.data.channelId); // Qoo
+          });
+          btnRemove.appendTo(item);
+          $('<img/>').attr('src', channel.imageUrl).appendTo(item);
+          $('<p/>').text(channel.name).appendTo(item);
+          $('#set_ch_list').append(item);
+          area$.adjustWidth();
+          */
         }
-        page$.channelPool.manageControls();
-        $('.ch_none').droppable(page$.droppableProperties);
       }, 'json');
     }
   },
-  channelPool: {
+  channelPool: { // deprecated
     currentPosition: 0,
     slideWidth:      410,
     slides:          null,
@@ -130,9 +205,9 @@ var page$ = {
       for (var i = 0; i < channels.length; i = i + 8) {
         var slide = $('<div class="slide"><ul></ul></div>');
         for (var j = i; j < channels.length && j < i + 8; j++) {
-          var item = $('<li class="ch_normal"></li>');
+          var item = $('<li class="ch_normal"/>');
           var img = $('<img/>').attr('src', channels[j].imageUrl);
-          var p = $('<p class="ch_name"></p>').text(channels[j].name).textTruncate(20, '...');
+          var p = $('<p class="ch_name"/>').text(channels[j].name).textTruncate(20, '...');
           var hidden = $('<input type="hidden" name="channelId"/>').val(channels[j].key.id);
           item.append(img).append(p).append(hidden).appendTo(slide);
           item.draggable(page$.draggableProperties);
@@ -394,8 +469,18 @@ var page$ = {
       alert($('#lang_warning_empty_logo').text());
       return;
     }
+    var items = $('#set_ch_list li').toArray();
+    var channelIds = '';
+    for (var i = 0; i < items.length; i++) {
+      if (channelIds != '')
+        channelIds += ',';
+      var channelId = $(items[i]).find('input[name="channelId"]').val();
+      channelIds += channelId;
+    }
+    log(channelIds);
     var parameters = {
       'channelSetId': $('#cc_id').val(),
+      'channelIds':   channelIds,
       'name':         name,
       'intro':        intro,
       'tag':          tag,
@@ -416,10 +501,11 @@ var page$ = {
     $('.ch_bg').css('background', 'url(' + $('image_bg_album').text() + ') no-repeat;');
     
     page$.objChannelSetInfo.init();
+    page$.objSearchTab.init();
     //page$.channelPool.init();
-    //page$.channelSetArea.init();
+    page$.channelSetArea.init();
     
-    $('#publish_channel_set').click(page$.funcPublishChannelSet);
+    $('#publish_button').click(page$.funcPublishChannelSet);
     
   }
 };

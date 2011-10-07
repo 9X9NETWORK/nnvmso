@@ -44,6 +44,13 @@ var cms = {
     'themeName': 'all-black',
     'themePath': '/images/cms'
   },
+  getChannelUrl: function(channelId, programId) {
+    var url = 'http://' + location.host + '/view?channel=' + channelId;
+    if (programId) {
+      url += '&episode=' + programId;
+    }
+    return url;
+  },
   getContentTypeByFileExtention: function(ext) {
     
     switch(ext) {
