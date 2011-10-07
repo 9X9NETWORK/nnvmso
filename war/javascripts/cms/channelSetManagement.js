@@ -416,8 +416,8 @@ var page$ = {
     $('.ch_bg').css('background', 'url(' + $('image_bg_album').text() + ') no-repeat;');
     
     page$.objChannelSetInfo.init();
-    page$.channelPool.init();
-    page$.channelSetArea.init();
+    //page$.channelPool.init();
+    //page$.channelSetArea.init();
     
     $('#publish_channel_set').click(page$.funcPublishChannelSet);
     

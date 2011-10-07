@@ -9,7 +9,7 @@ var pageSetup = {
   },
   init: function() {
     $('#tabB').hide();
-    $('.setup_context').css('background', 'url(' + $('#image_bg_setup').text() + ') no-repeat;');
+    $('.setup_context').css('background', 'url(' + $('#image_bg_setup').text() + ') no-repeat');
     
     $.post('/CMSAPI/listSnsAuth', { 'msoId': $('#msoId').val() }, function(snsList) {
       for (i in snsList) {

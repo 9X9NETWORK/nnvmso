@@ -94,29 +94,63 @@
   </div>
   <div class="right_content floatL">
     <div class="right_body">
-      <div class="right_title"><spring:message code="cms.channel_set_management.title.edit_channel_set"/></div>
-      <div class="ch_arrange" id="channel_set_area">
-        <div class="ch_bg">
-          <ul>
-            <li class="ch_none"></li>
-            <li class="ch_none"></li>
-            <li class="ch_none"></li>
-            <li class="ch_none"></li>
-            <li class="ch_none"></li>
-            <li class="ch_none"></li>
-            <li class="ch_none"></li>
-            <li class="ch_none"></li>
-            <li class="ch_none"></li>
+      <div class="right_title"><spring:message code="cms.channel_set_management.title.edit_channel_set"/><p id="publish_button" class="btnGray"><span><spring:message code="cms.channel_set_management.btn.pubish"/></span></p></div>
+      <div class="set_ch_arrange">
+        <div id="set_ch_holder">
+          <ul id="set_ch_list" class="connectedSortable">
+            <li class="ch_normal"><p class="btnAdd"></p><p class="btnRemove"></p><p class="btnPlay"></p><img src="http://teltel.co.cc/louis/cms3.1/channelSetManagement_files/ch_logo_85005_11902.jpg"/><p class="chTitle">街舞1</p></li>
+            <li class="ch_normal"><p class="btnAdd"></p><p class="btnRemove"></p><p class="btnPlay"></p><img src="http://teltel.co.cc/louis/cms3.1/channelSetManagement_files/hqdefault.jpg"/><p class="chTitle">街舞2</p></li>
+            <li class="ch_normal"><p class="btnAdd"></p><p class="btnRemove"></p><p class="btnPlay"></p><img src="http://teltel.co.cc/louis/cms3.1/channelSetManagement_files/hqdefault(1).jpg"/><p class="chTitle">街舞3</p></li>
+            <li class="ch_normal"><p class="btnAdd"></p><p class="btnRemove"></p><p class="btnPlay"></p><img src="http://teltel.co.cc/louis/cms3.1/channelSetManagement_files/hqdefault(2).jpg"/><p class="chTitle">街舞4</p></li>
+            <li class="ch_normal"><p class="btnAdd"></p><p class="btnRemove"></p><p class="btnPlay"></p><img src="http://teltel.co.cc/louis/cms3.1/channelSetManagement_files/hqdefault(3).jpg"/><p class="chTitle">街舞5</p></li>
+            <li class="ch_normal"><p class="btnAdd"></p><p class="btnRemove"></p><p class="btnPlay"></p><img src="http://teltel.co.cc/louis/cms3.1/channelSetManagement_files/hqdefault(4).jpg"/><p class="chTitle">街舞6</p></li>
+            <li class="ch_normal"><p class="btnAdd"></p><p class="btnRemove"></p><p class="btnPlay"></p><img src="http://teltel.co.cc/louis/cms3.1/channelSetManagement_files/hqdefault(5).jpg"/><p class="chTitle">街舞7</p></li>
+            <li class="ch_normal"><p class="btnAdd"></p><p class="btnRemove"></p><p class="btnPlay"></p><img src="http://teltel.co.cc/louis/cms3.1/channelSetManagement_files/default(1).jpg"/><p class="chTitle">街舞8</p></li>
+            <li class="ch_normal"><p class="btnAdd"></p><p class="btnRemove"></p><p class="btnPlay"></p><img src="http://teltel.co.cc/louis/cms3.1/channelSetManagement_files/default(2).jpg"/><p class="chTitle">街舞9</p></li>
           </ul>
-          <div class="clear"></div>
         </div>
       </div>
       <div class="ch_pool">
         <p class="ch_sub_title"><spring:message code="cms.channel_set_management.msg.drag_drop_explanation"/></p>
-        <div id="slideshow">
-          <div id="slidesContainer">
+        <ul id="pool_tabs">
+          <li id="category"><spring:message code="cms.channel_set_management.label.category"/></li>
+          <li id="search"><spring:message code="cms.channel_set_management.label.search"/></li>
+          <li id="youtube"><spring:message code="cms.channel_set_management.label.youtube"/></li>
+        </ul>
+        <div id="category_content" class="tab_content">
+        </div>
+        <div id="search_content" class="tab_content">
+          <div id="search_area">
+            <input name="" type="text" id="search_input"/>
+            <p id="search_button" class="btnGray"><span><spring:message code="cms.channel_set_management.btn.search"/></span></p>
           </div>
-          <a href="javascript:" class="btnCreate floatR" id="publish_channel_set"><span><spring:message code="cms.channel_set_management.btn.pubish"/></span></a>
+          <div id="search_result">
+            <ul id="result_list" class="connectedSortable">
+              <li class="ch_normal"><p class="btnAdd"></p><p class="btnRemove"></p><p class="btnPlay"></p><img src="http://teltel.co.cc/louis/cms3.1/channelSetManagement_files/ch_logo_85005_11902.jpg">
+              <p class="chTitle">街舞</p></li>
+              <li class="ch_normal"><p class="btnAdd"></p><p class="btnRemove"></p><p class="btnPlay"></p><img src="http://teltel.co.cc/louis/cms3.1/channelSetManagement_files/hqdefault.jpg">
+              <p class="chTitle">心理學與現代生活 Psychology and Modern Life</p></li>
+              <li class="ch_normal"><p class="btnAdd"></p><p class="btnRemove"></p><p class="btnPlay"></p><img src="http://teltel.co.cc/louis/cms3.1/channelSetManagement_files/hqdefault(1).jpg">
+              <p class="chTitle">心理學與現代生活 Psychology and Modern Life</p></li>
+              <li class="ch_normal"><p class="btnAdd"></p><p class="btnRemove"></p><p class="btnPlay"></p><img src="http://teltel.co.cc/louis/cms3.1/channelSetManagement_files/hqdefault(2).jpg">
+              <p class="chTitle">心理學與現代生活 Psychology and Modern Life</p></li>
+              <li class="ch_normal"><p class="btnAdd"></p><p class="btnRemove"></p><p class="btnRemove"></p><p class="btnPlay"></p><img src="http://teltel.co.cc/louis/cms3.1/channelSetManagement_files/hqdefault(3).jpg">
+              <p class="chTitle">心理學與現代生活 Psychology and Modern Life</p></li>
+              <li class="ch_normal"><p class="btnAdd"></p><p class="btnRemove"></p><p class="btnPlay"></p><img src="http://teltel.co.cc/louis/cms3.1/channelSetManagement_files/hqdefault(4).jpg">
+              <p class="chTitle">心理學與現代生活 Psychology and Modern Life</p></li>
+              <li class="ch_normal"><p class="btnAdd"></p><p class="btnRemove"></p><p class="btnPlay"></p><img src="http://teltel.co.cc/louis/cms3.1/channelSetManagement_files/hqdefault(5).jpg">
+              <p class="chTitle">心理學與現代生活 Psychology and Modern Life</p></li>
+              <li class="ch_normal"><p class="btnAdd"></p><p class="btnRemove"></p><p class="btnPlay"></p><img src="http://teltel.co.cc/louis/cms3.1/channelSetManagement_files/default(1).jpg" />
+              <p class="chTitle">心理學與現代生活 Psychology and Modern Life</p></li>
+              <li class="ch_normal"><p class="btnAdd"></p><p class="btnRemove"></p><p class="btnPlay"></p><img src="http://teltel.co.cc/louis/cms3.1/channelSetManagement_files/default(2).jpg" />
+              <p class="chTitle">心理學與現代生活 Psychology and Modern Life</p></li>
+            </ul>
+          </div>
+        </div>
+        <div id="youtube_content" class="tab_content">
+          <p><spring:message code="cms.channel_set_management.label.youtube_channel_playlist_url"/>:</p>
+          <input name="" type="text" id="youtube_input"/>
+          <p id="youtube_button" class="btnGray"><span><spring:message code="cms.channel_set_management.btn.add"/></span></p>
         </div>
       </div>
     </div>
