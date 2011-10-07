@@ -101,7 +101,7 @@
     <property name="updateDate" direction="desc"/>
   </datastore-index>
   <datastore-index kind="MsoChannel" ancestor="false" source="manual">
-    <property name="nameSearch" direction="asc"/>
+    <property name="name" direction="asc"/>
     <property name="updateDate" direction="desc"/>
   </datastore-index>
   <datastore-index kind="MsoChannel" ancestor="false" source="manual">

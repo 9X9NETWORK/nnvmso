@@ -141,9 +141,11 @@ public class AdminMsoChannelController {
 		           && searchOper.equals("eq")
 		           && (searchField.equals("status") || searchField.equals("contentType") || searchField.equals("isPublic") || searchField.equals("featured") || searchField.equals("sourceUrl") || searchField.equals("name")  || searchField.equals("langCode"))) {
 			
-			if (searchField.equals("sourceUrl") || searchField.equals("name")) {
+			if (searchField.equals("sourceUrl")) {
 				searchString = NnStringUtil.escapedQuote(searchString.toLowerCase());
 				searchField += "Search";
+			} else if (searchField.equals("name")) {
+				searchString = NnStringUtil.escapedQuote(searchString);
 			} else if (searchField.equals("langCode")) {
 				searchString = NnStringUtil.escapedQuote(searchString);
 			}
