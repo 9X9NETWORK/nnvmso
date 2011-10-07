@@ -108,6 +108,9 @@ public class MsoChannel implements Serializable {
 	public static final short SORT_MAPEL = 3;
 	@NotPersistent
 	private int sorting;  
+
+	@NotPersistent
+	private long recentlyWatchedProgram;  
 	
 	@NotPersistent
 	private int subscriptionCount;
@@ -374,6 +377,14 @@ public class MsoChannel implements Serializable {
 
 	public void setPiwik(String piwik) {
 		this.piwik = piwik;
+	}
+
+	public long getRecentlyWatchedProgram() {
+		return recentlyWatchedProgram;
+	}
+
+	public void setRecentlyWatchedProgram(long recentlyWatchedProgram) {
+		this.recentlyWatchedProgram = recentlyWatchedProgram;
 	}
 	
 }

@@ -1,11 +1,20 @@
 package com.nnvmso.web;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Locale;
 import java.util.logging.Logger;
+import java.util.zip.GZIPInputStream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -18,10 +27,14 @@ import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoConfig;
+import com.nnvmso.model.NnUser;
+import com.nnvmso.model.NnUserWatched;
 import com.nnvmso.service.MsoConfigManager;
 import com.nnvmso.service.MsoManager;
 import com.nnvmso.service.NnStatusCode;
 import com.nnvmso.service.NnStatusMsg;
+import com.nnvmso.service.NnUserManager;
+import com.nnvmso.service.NnUserWatchedManager;
 import com.nnvmso.service.PlayerApiService;
 
 /**
@@ -379,9 +392,11 @@ public class PlayerApiController {
 	 * @param token user key 
 	 * @return Will delete the user cookie if token is invalid.<br/>
 	 * 		   Return info please reference login.
+	 * @throws IOException 
 	 */	
 	@RequestMapping(value="userTokenVerify")
-	public ResponseEntity<String> userTokenVerify(@RequestParam(value="token") String token, HttpServletRequest req, HttpServletResponse resp) {
+	//public ResponseEntity<String> userTokenVerify(@RequestParam(value="token") String token, HttpServletRequest req, HttpServletResponse resp) {
+	public void userTokenVerify(@RequestParam(value="token") String token, HttpServletRequest req, HttpServletResponse resp) throws IOException {
 		log.info("userTokenVerify() : userToken=" + token);		
 
 		this.prepService(req);
@@ -392,7 +407,8 @@ public class PlayerApiController {
 			output = playerApiService.handleException(e);
 		}
 		log.info(output);
-		return NnNetUtil.textReturn(output);
+		NnNetUtil.write(resp, output);
+		//return NnNetUtil.textReturn(output);
 	}
 	
 	/**
@@ -441,7 +457,7 @@ public class PlayerApiController {
 
 		String output = NnStatusMsg.errorStr(locale);
 		try {
-			output = playerApiService.subscribe(userToken, channelId, setId, gridId, pos);
+			output = playerApiService.subscribe(userToken, channelId, gridId);
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}
@@ -767,31 +783,7 @@ public class PlayerApiController {
 		}	
 		log.info(output);
 		return NnNetUtil.textReturn(output);		
-	}					
-	
-	/**
-	 * @deprecated
-	 * Get "new" program list. Current "new" definition: the latest 3 shows in a channel.   
-	 * 1. Latest 3 shows users haven't seen 
-	 * 2. Latest 3 shows watched by user, if no unseen show in this channel
-	 * 
-	 * @param user user's unique identifier 
-	 * @return A string of new program list.<br/>
-	 * 	       Each program is \n delimited.<br/>  
-	 *         Example: 1\n2\n3\n
-	 */	
-	@RequestMapping(value="whatsNew") 
-	public ResponseEntity<String> whatsNew(@RequestParam(value="user") String userToken, HttpServletRequest req) {
-		this.prepService(req);		
-		log.info("userToken=" + userToken);		
-		String output = NnStatusMsg.errorStr(locale);		
-		try {
-			output = playerApiService.findNewPrograms(userToken);
-		} catch (Exception e) {
-			output = playerApiService.handleException(e);
-		}
-		return NnNetUtil.textReturn(output);		
-	}	
+	}						
 	
 	/**
 	 * Get program information based on query criteria.
@@ -836,33 +828,6 @@ public class PlayerApiController {
 	}
 	
 	/* ==========  CATEGORY: IPG RELATED ========== */
-	/**
-	 * @deprecated Save User IPG (snapshot). Please use saveShare instead
-	 *
-	 * @param user user's unique identifier
-	 * @param channel channel id
-	 * @param program program id
-	 * @return A unique IPG identifier
-	 */
-	@RequestMapping(value="saveIpg")
-	public ResponseEntity<String> saveIpg(@RequestParam(value="user", required=false) String userToken, 
-			                              @RequestParam(value="channel", required=false) String channelId, 
-			                              @RequestParam(value="program", required=false) String programId, 
-			                              HttpServletRequest req) {		
-		int status = this.prepService(req);
-		if (status != NnStatusCode.SUCCESS)
-			return NnNetUtil.textReturn(playerApiService.assembleMsgs(NnStatusCode.DATABASE_READONLY, null));
-
-		log.info("saveIpg(" + userToken + ")");
-		String output = NnStatusMsg.errorStr(locale);		
-		try {
-			output = playerApiService.saveIpg(userToken, channelId, programId);
-		} catch (Exception e) {
-			output = playerApiService.handleException(e);
-		}
-		return NnNetUtil.textReturn(output);
-	}	
-
 	/**
 	 * Save User Shareing
 	 *
@@ -914,28 +879,6 @@ public class PlayerApiController {
 		return NnNetUtil.textReturn(output);						
 	}
 	
-	/**
-	 * @deprecated Load User IPG (snapshot). Please use saveShare and loadShare instead
-	 *
-	 * @param ipg IPG's unique identifier
-	 * @return  Returns a program to play follows ipg information.
-	 * 	        The program to play returns in the 2nd section, format please reference programInfo format.
-	 *          3rd section is ipg information, format please reference channelLineup.
-	 */
-	@RequestMapping(value="loadIpg")
-	public ResponseEntity<String> loadIpg(@RequestParam(value="ipg") Long ipgId, 
-										  HttpServletRequest req) {		
-		log.info("ipgId:" + ipgId);		
-		this.prepService(req);
-		String output = NnStatusMsg.errorStr(locale);		
-		try {
-			output = playerApiService.loadIpg(ipgId);
-		} catch (Exception e) {
-			output = playerApiService.handleException(e);
-		}
-		return NnNetUtil.textReturn(output);						
-	}
-
 	/**
 	 * Collecting PDR
 	 * 
@@ -1024,11 +967,13 @@ public class PlayerApiController {
 	public ResponseEntity<String> recentlyWatched(@RequestParam(value="user", required=false) String userToken,
 	                                              @RequestParam(value="channel", required=false) String channel,
 										          @RequestParam(value="count", required=false) String count,
+										          @RequestParam(value="channelInfo", required=false) String channelInfo,
 			                                      HttpServletRequest req) {				                                
 		this.prepService(req);
+		boolean isChannelInfo = Boolean.parseBoolean(channelInfo);
 		String output = NnStatusMsg.errorStr(locale);
 		try {
-			output = playerApiService.findUserWatched(userToken, channel, count);
+			output = playerApiService.findUserWatched(userToken, channel, count, isChannelInfo);
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}
@@ -1119,21 +1064,6 @@ public class PlayerApiController {
 		return NnNetUtil.textReturn(output);
 	}
 	
-	@RequestMapping(value="requestTracker")
-	public ResponseEntity<String> requestTracker(@RequestParam(value="set", required=false) String set,
-												 @RequestParam(value="channel", required=false) String channel,
-			                                     HttpServletRequest req) {
-		log.info("set:" + set + ";channel:" + channel);
-		this.prepService(req);		
-		String output = NnStatusMsg.errorStr(locale);
-		try {
-			output = playerApiService.createPiwikSite(set, channel, req);			
-		} catch (Exception e) {
-			output = playerApiService.handleException(e);
-		}
-		return NnNetUtil.textReturn(output);
-	}
-
 	//!!! important, remove after ios testing
 	@RequestMapping("changeConfig")
 	public ResponseEntity<String> changeConfig(@RequestParam(value="msoName",required=false) String msoName,
@@ -1150,5 +1080,45 @@ public class PlayerApiController {
 		config.setValue(value);
 		configMngr.save(config);
 		return NnNetUtil.textReturn("OK");
-	}	
+	}
+	
+	//!!! important, remove after ios testing
+	@RequestMapping("saveUserWatched")
+	public ResponseEntity<String> saveUserWatched(@RequestParam(value="user",required=false) String token,
+			                                      @RequestParam(value="channel",required=false) String channel,
+			                                      @RequestParam(value="program", required=false) String program) {
+		NnUserWatchedManager watchedMngr = new NnUserWatchedManager();
+		NnUserManager userMngr = new NnUserManager();		
+		NnUser user = userMngr.findByToken(token);				
+		NnUserWatched watched = new NnUserWatched(user, Long.parseLong(channel), program);
+		watchedMngr.save(watched);
+		return NnNetUtil.textReturn("OK");
+	}
+	
+	@RequestMapping(value="requestTracker")
+	public ResponseEntity<String> requestTracker(@RequestParam(value="set", required=false) String set,
+												 @RequestParam(value="channel", required=false) String channel,
+			                                     HttpServletRequest req) {
+		log.info("set:" + set + ";channel:" + channel);
+		this.prepService(req);		
+		String output = NnStatusMsg.errorStr(locale);
+		try {
+			output = playerApiService.createPiwikSite(set, channel, req);			
+		} catch (Exception e) {
+			output = playerApiService.handleException(e);
+		}
+		return NnNetUtil.textReturn(output);
+	}
+
+	@RequestMapping(value="write")
+	public void write(HttpServletResponse resp, HttpServletRequest req) throws IOException {
+		NnNetUtil.write(resp, "lalala");
+	}
+
+	@RequestMapping(value="gzip")
+	public void gzip(HttpServletResponse resp, HttpServletRequest req) throws IOException {
+		NnNetUtil.writeGzip(resp, "lalala");
+	}
+		
+	
 }

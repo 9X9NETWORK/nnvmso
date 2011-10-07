@@ -1,14 +1,8 @@
 package com.nnvmso.web.admin;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.util.Properties;
-import java.util.Scanner;
 import java.util.logging.Logger;
 
-import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.Session;
 import javax.mail.Transport;
@@ -23,6 +17,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
@@ -36,14 +31,14 @@ import com.nnvmso.service.InitService;
  * most of the functions are private, turned it on if you need them.
  */
 
-//wipe out data: Category, CategoryChannel, CategoryChannelSet, ChannelSet, ChannelSetChannel
 
+/* first run */
+//wipe out data: Category, CategoryChannel, CategoryChannelSet, ChannelSet, ChannelSetChannel
 //change MsoChannel Schema 
-//ChannelStatusMapper (mark all the channels to waiting_approval status)
 //initChannelsToTask (mark selected channel to good status)
 //mapreduce, updateFtsMapper (update channel fts)
-
-//initSetsToTask
+//initSetsToTask?isEnglish=true&isDevel=false
+//initChannelsToTask
 //initCategoriesToTask
 //initSetAndChannelsToTask
 //initCategoryAndSetsToTask
@@ -51,6 +46,27 @@ import com.nnvmso.service.InitService;
 //initSetImagesToTask
 //initCategoryCount
 //initMso
+
+/* 2nd run */
+//wipe out data: Category, CategoryChannel, CategoryChannelSet, ChannelSet, ChannelSetChannel
+//ChannelStatusMapper (mark all the channels to waiting_approval status)
+
+//initSetsToTask?isEnglish=true&isDevel=false
+//initChannelsToTask?isEnglish=true&isDevel=false
+//initCategoriesToTask?isEnglish=true&isDevel=false
+//initSetAndChannelsToTask?isEnglish=true&isDevel=false
+//initCategoryAndSetsToTask?isEnglish=true&isDevel=false
+//initRecommdned?isEnglish=true
+//initSetImagesToTask?isEnglish=true
+
+//initSetsToTask?isEnglish=false&isDevel=false
+//initChannelsToTask?isEnglish=false&isDevel=false
+//initCategoriesToTask?isEnglish=false&isDevel=false
+//initSetAndChannelsToTask?isEnglish=false&isDevel=false
+//initCategoryAndSetsToTask?isEnglish=false&isDevel=false
+//initRecommdned?isEnglish=false
+//initSetImagesToTask?isEnglish=false
+//initCategoryCountToTask
 
 @Controller
 @RequestMapping("admin/init")
@@ -73,32 +89,6 @@ public class AdminInitController {
 		}
 		return "error/exception";				
 	}
-
-	//local machine
-	@RequestMapping(value="read", method=RequestMethod.GET)
-	public String read(HttpServletRequest req) {
-		try {
-			//FileInputStream fis = new FileInputStream("WEB-INF/views/admin/ESets.xlsx");
-			FileInputStream fis = new FileInputStream("WEB-INF/views/admin/text.txt");
-			InputStreamReader in = new InputStreamReader(fis, "UTF-8");
-			Scanner scanner = new Scanner(in);
-			StringBuilder text = new StringBuilder();
-		    try {
-		      while (scanner.hasNextLine()){
-		        text.append(scanner.nextLine() + "\n");
-		      }
-		    }
-		    finally{
-		      scanner.close();
-		    }	
-		    System.out.println("text:" + text);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-		return "admin/groundStart";
-	} 	
 	
 	//local machine
 	@RequestMapping(value="groundStart", method=RequestMethod.GET)
@@ -110,7 +100,7 @@ public class AdminInitController {
 	public String groundStartPost(HttpServletRequest req) {
 		String host = NnNetUtil.getUrlRoot(req);
 		if (host.equals("http://localhost:8888")) {
-			initService.initAll(false);
+			initService.initAll(true, true);
 		}
 		return "admin/groundStart";
 	}	
@@ -123,85 +113,125 @@ public class AdminInitController {
 	
 	//gae environment	
 	@RequestMapping("initChannelsToTask")
-	public ResponseEntity<String> initChannelsToTask() {
+	public ResponseEntity<String> initChannelsToTask(
+			@RequestParam(value="isDevel",required=false) boolean isDevel) {
 		QueueFactory.getDefaultQueue().add(
-			      TaskOptions.Builder.withUrl("/admin/init/initChannels"));			          
+			      TaskOptions.Builder.withUrl("/admin/init/initChannels")
+			         .param("isDevel", String.valueOf(isDevel))			      			      
+		);			          
 		return NnNetUtil.textReturn("You will receive an email when it is done.");
 	}
 	
 	@RequestMapping("initChannels")
-	public ResponseEntity<String> initChannels(HttpServletRequest req) {
+	public ResponseEntity<String> initChannels(
+			@RequestParam(value="isEnglish",required=false) boolean isEnglish,
+			@RequestParam(value="isDevel",required=false) boolean isDevel,			
+			HttpServletRequest req) {
 		initService.setRequest(req);
-		initService.initChannels(true);
-		this.sendEmail("init all the channels done");
+		initService.initChannels(isEnglish, isDevel);
+		this.sendEmail("init all the channels done", "done");
 		return NnNetUtil.textReturn("OK");		
 	}
 		
 	@RequestMapping("initSetsToTask")
-	public ResponseEntity<String> initSetsToTask() {
+	public ResponseEntity<String> initSetsToTask(
+			@RequestParam(value="isEnglish",required=false) boolean isEnglish,
+			@RequestParam(value="isDevel",required=false) boolean isDevel) {
 		QueueFactory.getDefaultQueue().add(
-			      TaskOptions.Builder.withUrl("/admin/init/initSets"));			          
+			      TaskOptions.Builder.withUrl("/admin/init/initSets")
+			        .param("isEnglish", String.valueOf(isEnglish))   
+			        .param("isDevel", String.valueOf(isDevel))			        
+			      );			          
 		return NnNetUtil.textReturn("You will receive an email when it is done.");
 	}
 	
 	@RequestMapping("initSets")
-	public ResponseEntity<String> initSets(HttpServletRequest req) {
+	public ResponseEntity<String> initSets(
+			@RequestParam(value="isEnglish",required=false) boolean isEnglish,
+			@RequestParam(value="isDevel",required=false) boolean isDevel,
+			HttpServletRequest req) {
 		initService.setRequest(req);
-		initService.initSets();
-		this.sendEmail("init all the sets done");
+		initService.initSets(isEnglish, isDevel);
+		this.sendEmail("init all the sets done", "done");
 		return NnNetUtil.textReturn("OK");		
 	}
 
 	@RequestMapping("initCategoriesToTask")
-	public ResponseEntity<String> initCategoriesToTask() {
+	public ResponseEntity<String> initCategoriesToTask(
+			@RequestParam(value="isEnglish",required=false) boolean isEnglish,
+			@RequestParam(value="isDevel",required=false) boolean isDevel			
+			) {
 		QueueFactory.getDefaultQueue().add(
-			      TaskOptions.Builder.withUrl("/admin/init/initCategories"));			          
+			      TaskOptions.Builder.withUrl("/admin/init/initCategories")
+			        .param("isEnglish", String.valueOf(isEnglish))   
+			        .param("isDevel", String.valueOf(isDevel))			        			      
+			      );			          
 		return NnNetUtil.textReturn("You will receive an email when it is done.");
 	}
 	
 	@RequestMapping("initCategories")
-	public ResponseEntity<String> initCategories(HttpServletRequest req) {
+	public ResponseEntity<String> initCategories(
+			@RequestParam(value="isEnglish",required=false) boolean isEnglish, 
+			HttpServletRequest req) {
 		initService.setRequest(req);
-		initService.initCategories();
-		this.sendEmail("init all the categories done");
+		initService.initCategories(isEnglish);
+		this.sendEmail("init all the categories done", "done");
 		return NnNetUtil.textReturn("OK");		
 	}
 
 	@RequestMapping("initSetAndChannelsToTask")
-	public ResponseEntity<String> initSetAndChannelsToTask() {
+	public ResponseEntity<String> initSetAndChannelsToTask(
+			@RequestParam(value="isEnglish",required=false) boolean isEnglish,
+			@RequestParam(value="isDevel",required=false) boolean isDevel) {									
 		QueueFactory.getDefaultQueue().add(
-			      TaskOptions.Builder.withUrl("/admin/init/initSetAndChannels"));			          
+			      TaskOptions.Builder.withUrl("/admin/init/initSetAndChannels")
+			        .param("isEnglish", String.valueOf(isEnglish))   
+			        .param("isDevel", String.valueOf(isDevel))			        			      			      
+			      );			          
 		return NnNetUtil.textReturn("You will receive an email when it is done.");
 	}
 	
 	@RequestMapping("initSetAndChannels")
-	public ResponseEntity<String> initSetAndChannels(HttpServletRequest req) {
+	public ResponseEntity<String> initSetAndChannels(
+			@RequestParam(value="isEnglish",required=false) boolean isEnglish,
+			@RequestParam(value="isDevel",required=false) boolean isDevel,				
+			HttpServletRequest req) {
 		initService.setRequest(req);
-		initService.initSetAndChannels();
-		this.sendEmail("init all the SetsAndChannels done");
+		initService.initSetAndChannels(isEnglish);
+		this.sendEmail("init all the SetsAndChannels done", "done");
 		return NnNetUtil.textReturn("OK");		
 	}
 
 	@RequestMapping("initCategoryAndSetsToTask")
-	public ResponseEntity<String> initCategoryAndSetsToTask() {
+	public ResponseEntity<String> initCategoryAndSetsToTask(
+			@RequestParam(value="isEnglish",required=false) boolean isEnglish,
+			@RequestParam(value="isDevel",required=false) boolean isDevel) {										
 		QueueFactory.getDefaultQueue().add(
-			      TaskOptions.Builder.withUrl("/admin/init/initCategoryAndSets"));			          
+			      TaskOptions.Builder.withUrl("/admin/init/initCategoryAndSets")
+			        .param("isEnglish", String.valueOf(isEnglish))   
+			        .param("isDevel", String.valueOf(isDevel)));			        			      			      			      
 		return NnNetUtil.textReturn("You will receive an email when it is done.");
 	}
 	
 	@RequestMapping("initCategoryAndSets")
-	public ResponseEntity<String> initCategoryAndSets(HttpServletRequest req) {
+	public ResponseEntity<String> initCategoryAndSets(
+		@RequestParam(value="isEnglish",required=false) boolean isEnglish,
+		@RequestParam(value="isDevel",required=false) boolean isDevel,				
+		HttpServletRequest req) {
 		initService.setRequest(req);
-		initService.initCategoryAndSets();
-		this.sendEmail("init all the CategoryAndSets done");
+		initService.initCategoryAndSets(isEnglish);
+		this.sendEmail("init all the CategoryAndSets done", "done");
 		return NnNetUtil.textReturn("OK");		
 	}
 
 	@RequestMapping("initRecommdned")
-	public ResponseEntity<String> initRecommended(HttpServletRequest req) {
+	public ResponseEntity<String> initRecommended(
+			@RequestParam(value="isEnglish",required=false) boolean isEnglish,
+			@RequestParam(value="isDevel",required=false) boolean isDevel,
+			HttpServletRequest req) {
 		initService.setRequest(req);
-		initService.initRecommended();
-		this.sendEmail("init all the Recommended done");
+		initService.initRecommended(isEnglish);
+		this.sendEmail("init all the Recommended done", "done");
 		return NnNetUtil.textReturn("OK");		
 	}
 	
@@ -216,16 +246,23 @@ public class AdminInitController {
 	public ResponseEntity<String> initSetImages(HttpServletRequest req) {
 		initService.setRequest(req);
 		initService.initSetImages();
-		this.sendEmail("init all the initSetImagesToTask done");
+		this.sendEmail("init all the initSetImagesToTask done", "done");
 		return NnNetUtil.textReturn("OK");		
 	}
 
+	@RequestMapping("initCategoryCountToTask")
+	public ResponseEntity<String> initCategoryCountToTask(HttpServletRequest req) {
+		QueueFactory.getDefaultQueue().add(
+			      TaskOptions.Builder.withUrl("/admin/init/initCategoryCount"));			          
+		return NnNetUtil.textReturn("You will receive an email when it is done.");
+	}	
+	
 	//temp fix
 	@RequestMapping("initCategoryCount")
 	public ResponseEntity<String> initCategoryCount(HttpServletRequest req) {
 		initService.setRequest(req);
 		initService.initCategoryCount();
-		this.sendEmail("init all the CategoryCount done");
+		this.sendEmail("init all the CategoryCount done", "done");
 		return NnNetUtil.textReturn("OK");		
 	}
 
@@ -236,66 +273,30 @@ public class AdminInitController {
 		initService.addMsoConfig();
 		return NnNetUtil.textReturn("OK");		
 	}
-	
+
 	//temp fix
-	@RequestMapping("deleteChannelsToTask")
-	public ResponseEntity<String> deleteChannelsToTask() {
+	@RequestMapping("badChannelReportToTask")
+	public ResponseEntity<String> badChannelReportToTask() {
 		QueueFactory.getDefaultQueue().add(
-			      TaskOptions.Builder.withUrl("/admin/init/deleteChannels"));			          
+			      TaskOptions.Builder.withUrl("/admin/init/badChannelReport"));			          
 		return NnNetUtil.textReturn("You will receive an email when it is done.");
 	}
-	
+
 	//temp fix
-	@RequestMapping("deleteChannels")
-	public ResponseEntity<String> deleteChannels(HttpServletRequest req) {
-		initService.setRequest(req);
-		initService.deleteUrls();
-		this.sendEmail("delete all the channels done");
+	@RequestMapping("badChannelReport")
+	public ResponseEntity<String> badChannelReport() {
+		String report = initService.reportBadChannels();
+		System.out.println(report);
+		this.sendEmail("badChannelReport", report);
 		return NnNetUtil.textReturn("OK");		
-	}
+	}		
 	
-	@RequestMapping("testEmail")
-	public ResponseEntity<String> testEmail(HttpServletRequest req) {
-		log.info("test email here");
+	public void sendEmail(String subject, String msgBody) {
 		Properties props = new Properties();
         Session session = Session.getDefaultInstance(props, null);
-        String msgBody = "remove setFrom";
         try {
         	Message msg = new MimeMessage(session);
-//        	msg.setFrom(new InternetAddress("gaeadmin@9x9.tv", "yiwen"));
-        	Address addr = new InternetAddress("yiwen@teltel.com", "yiwen"); 
-        	Address addrs[] = {addr};
-        	//msg.addFrom(addrs);
-        	msg.setReplyTo(addrs);
-            msg.addRecipient(Message.RecipientType.TO, new InternetAddress("nncloudtv@gmail.com", "nncloudtv"));            
-        	msg.setHeader("From", "yiwen@teltel.com");
-        	msg.setHeader("From_Alias", "yiwen");
-        	msg.setHeader("Sender", "gaeadmin@9x9.tv");
-        	msg.setHeader("Sender_Alias", "gaeadmin");
-        	msg.setHeader("sender", "gaeadmin@9x9.tv");
-        	msg.setHeader("sender_Alias", "gaeadmin");
-            msg.setSubject("domain test");
-            if (msg.getHeader("sender") != null)
-            	System.out.println("sender:" + msg.getHeader("sender")[0]);
-            if (msg.getHeader("Sender") != null)
-            	System.out.println("Sender:" + msg.getHeader("Sender")[0]);            
-            if (msg.getHeader("from") != null)
-            	System.out.println("from:" + msg.getHeader("from")[0]);
-            msg.setText(msgBody);            
-            Transport.send(msg);
-        } catch (Exception e) {
-        	NnLogUtil.logException(e);
-		}							
-		return NnNetUtil.textReturn("OK");		
-	}	
-	
-	public void sendEmail(String subject) {
-		Properties props = new Properties();
-        Session session = Session.getDefaultInstance(props, null);
-        String msgBody = "done";
-        try {
-        	Message msg = new MimeMessage(session);
-            msg.setFrom(new InternetAddress("admin@gmail.com", "nncloudtv"));
+            msg.setFrom(new InternetAddress("nncloudtv@gmail.com", "nncloudtv"));
             msg.addRecipient(Message.RecipientType.TO, new InternetAddress("nncloudtv@gmail.com", "nncloudtv"));                             
             msg.setSubject(subject);
             msg.setText(msgBody);

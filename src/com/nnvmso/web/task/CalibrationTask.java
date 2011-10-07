@@ -30,65 +30,6 @@ import com.nnvmso.service.MsoProgramManager;
 public class CalibrationTask {
 	protected static final Logger log = Logger.getLogger(CalibrationTask.class.getName());
 	
-	//entry, entry, correct category's channelCount, categoryChannelCount -> runCategories -> runCategoryChannels
-	@RequestMapping("categoryChannelCount")
-	public ResponseEntity<String> categoryChannelCount() throws IOException {
-		try {						
-			QueueFactory.getDefaultQueue().add(
-					TaskOptions.Builder.withUrl("/task/calibration/runCategories")
-		    );
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		return NnNetUtil.textReturn("OK");
-	}
-
-	//run through each category, to envoke categorychannel count
-	@RequestMapping(value="runCategories")
-	public ResponseEntity<String> runCategories(HttpServletRequest req) {
-		String output = "";
-		CategoryManager cMngr = new CategoryManager();
-		List<Category> categories = cMngr.findAll();
-		for (Category c : categories) {
-			try {						
-				QueueFactory.getDefaultQueue().add(
-						TaskOptions.Builder.withUrl("/task/calibration/runCategoryChannels")
-						     .param("category", String.valueOf(c.getKey().getId()))
-			    );
-			} catch (Exception e) {
-				e.printStackTrace();
-			}			
-		}
-		return NnNetUtil.textReturn(output);
-	}
-	
-	//update categorychannel count
-	@RequestMapping(value="runCategoryChannels")
-	public ResponseEntity<String> runCategoryChannels(HttpServletRequest req) {
-		int categoryId = Integer.parseInt(req.getParameter("category"));
-		CategoryManager cMngr = new CategoryManager();
-		Category category = cMngr.findById(categoryId);
-		
-		MsoChannelManager channelMngr = new MsoChannelManager();
-		List<MsoChannel> channels = channelMngr.findPublicChannelsByCategoryId(category.getKey().getId());
-
-		int engCnt = 0;
-		int chnCnt = 0;
-		for (MsoChannel c : channels) {
-			if (c.getLangCode() != null && c.getLangCode().equals(Mso.LANG_ZH))
-				chnCnt++;
-			else 
-				engCnt++;
-		}
-		
-		category.setChannelCount(engCnt);
-		//category.setChnChannelCount(chnCnt);
-		cMngr.save(category);
-		log.info("calibrat category:" + category.getName() + "(" + category.getKey().getId() + ") with " + channels.size() + " channels.");
-		return NnNetUtil.textReturn("OK");
-	}	
-
 	//entry, correct channel's programCount: channelCount -> runChannels -> runPrograms
 	@RequestMapping("channelCount")
 	public ResponseEntity<String> channelCount() throws IOException {
@@ -146,8 +87,7 @@ public class CalibrationTask {
 		    );
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
-		
+		}		
 		return NnNetUtil.textReturn("OK");
 	}
 

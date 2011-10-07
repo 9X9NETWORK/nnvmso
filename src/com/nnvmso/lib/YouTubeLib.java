@@ -56,7 +56,7 @@ public class YouTubeLib {
 		String[] invalid = {"index", "videos",
 		                    "entertainment", "music", "news", "movies",
 		                    "comedy", "gaming", "sports", "education",
-		                    "shows",  "trailers", 
+		                    "shows", 
 		                    "store", "channels", "contests_main"};		
 		HashSet<String> dic = new HashSet<String>();
 		for (int i=0; i<invalid.length; i++) {

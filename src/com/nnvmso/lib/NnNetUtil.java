@@ -1,13 +1,23 @@
 package com.nnvmso.lib;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.http.HttpHeaders;
@@ -15,16 +25,50 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
+
 public class NnNetUtil {
 	
 	protected final static Logger log = Logger.getLogger(NnLogUtil.class.getName());
 		
 	public static ResponseEntity<String> textReturn(String output) {
 		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.valueOf("text/plain;charset=utf-8"));
+		headers.setContentType(MediaType.valueOf("text/plain;charset=utf-8"));		
 		return new ResponseEntity<String>(output, headers, HttpStatus.OK);		
 	}	
-	
+
+	public static void write(HttpServletResponse resp, String text) {
+		try {
+			byte[] reply = text.getBytes("UTF-8");
+	        OutputStream os = resp.getOutputStream();
+	        os.write(reply);
+	        os.flush();
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}	
+
+	public static void writeGzip(HttpServletResponse resp, String text) {
+		try {
+			byte[] reply = text.getBytes("UTF-8");
+	        OutputStream os = resp.getOutputStream();
+	        resp.setHeader("Content-Encoding", "gzip");
+	        resp.setHeader("Content-Type", "text/plain;charset=utf-8");
+            GZIPOutputStream gz = new GZIPOutputStream( os );
+            try {
+                gz.write(reply);
+            } finally {                        
+                gz.close();
+            }	        
+	        os.flush();
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}	
+		
 	public static String getUrlRoot(HttpServletRequest req) {
 		String url = req.getRequestURL().toString();
 	    Pattern p = Pattern.compile("(^http://.*?)/(.*)");	    	    
@@ -52,6 +96,39 @@ public class NnNetUtil {
 	        	log.info("response not ok!" + connection.getResponseCode());
 	        }
 	        writer.close();	        
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static boolean isGzipResponse(HttpServletRequest req) {		      
+	      String ae = req.getHeader("accept-encoding");
+	      if (ae != null && ae.indexOf("gzip") != -1) {        
+	        return true;
+	      }
+	      return false;
+	}
+	
+	
+	public static void urlPost(String urlStr) {
+		System.out.println("enter urlpost");
+        URL url;
+		try {
+			url = new URL("http://localhost:8888/playerAPI/gzip");
+	        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+	        connection.setDoOutput(true);
+			connection.setRequestMethod("POST");
+	        if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {	        	
+	        	log.info("response not ok!" + connection.getResponseCode());
+	        }
+	        System.out.println("enter read response");
+	        GZIPInputStream gzipStream = new GZIPInputStream(connection.getInputStream());
+	        Reader decoder = new InputStreamReader(gzipStream, "UTF-8");
+	        BufferedReader rd = new BufferedReader(decoder);	        
+	        String line = rd.readLine();
+	        while (line!=null) {
+	        	System.out.print(line);
+	        }	       
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

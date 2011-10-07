@@ -44,6 +44,10 @@ public class CategoryChannelSetManager {
 		return results;
 	}
 
+	public List<CategoryChannelSet> findAllBySetId(Long setId) {
+		return ccsDao.findAllBySetId(setId);
+	}
+	
 	public List<CategoryChannelSet> findAllByCategoryId(Long categoryId) {
 		return ccsDao.findAllByCategoryId(categoryId);
 	}

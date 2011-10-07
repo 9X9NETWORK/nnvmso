@@ -1,18 +1,32 @@
 package com.nnvmso.service;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 
 import net.sf.jsr107cache.Cache;
 
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.springframework.stereotype.Service;
 
 import com.nnvmso.lib.CacheFactory;
 import com.nnvmso.lib.PiwikLib;
+import com.nnvmso.lib.YouTubeLib;
 import com.nnvmso.model.AreaOwnership;
 import com.nnvmso.model.BrandAdmin;
 import com.nnvmso.model.Captcha;
@@ -60,14 +74,16 @@ public class InitService {
 		this.req = req;
 	}
 	
-	public void initAll(boolean transcoding) {		
+	public void initAll(boolean english, boolean devel) {
 		deleteAll();		
 		initMso();
-		initChannels(transcoding);
-		initSets();
-		initCategories();
-		initSetAndChannels();
-		initCategoryAndSets();
+		initSets(english, devel);
+		initChannels(english, devel);
+		initCategories(english);
+		initSetAndChannels(english);		
+		initCategoryAndSets(english);
+		initRecommended(english);
+		initCategoryCount();
 		initMapelPrograms();
 	}
 		
@@ -212,11 +228,38 @@ public class InitService {
 						
 		list = dumper.findAll(SnsAuth.class, "createDate");
 		dumper.deleteAll(SnsAuth.class, list);
-		
-		
 		log.info("delete all is done");
 	}
-	
+
+	public String reportBadChannels() {
+		ChannelSetManager csMngr = new ChannelSetManager();
+		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
+		List<ChannelSet> sets = csMngr.findAll();
+		HashMap<Long, MsoChannel> map = new HashMap<Long, MsoChannel>();
+		List<ChannelSetChannel> list = new ArrayList<ChannelSetChannel>();
+		for (ChannelSet cs : sets) {
+			list.addAll(cscMngr.findByChannelSetId(cs.getKey().getId()));
+		}
+		List<MsoChannel> channels = new ArrayList<MsoChannel>();
+		for (ChannelSetChannel csc : list) {
+			MsoChannelManager channelMngr = new MsoChannelManager();
+			MsoChannel c = map.get(csc.getChannelId());
+			if (c == null) {
+				c = channelMngr.findById(csc.getChannelId());
+				map.put(csc.getChannelId(), c);
+				channels.add(c);
+			}						
+		}
+		String report = "";
+		for (MsoChannel c : channels) {
+			if (c.getStatus() != MsoChannel.STATUS_SUCCESS) {
+				String output = c.getKey().getId() + "\t" + c.getName() + "\t" + c.getSourceUrl() + "\t" + c.getStatus() + "\t" + c.getErrorReason() + "\n";
+				report += output;
+			}
+		}
+		return report;
+	}
+ 	
 	public void initMso() {
 		MsoManager msoMngr = new MsoManager();
 		mso = new Mso("9x9", "9x9", NNEMAIL, Mso.TYPE_NN);
@@ -249,186 +292,170 @@ public class InitService {
 		
 		log.info("initializeMso1AndCategories is done");
 	}				
-			
-	public void initCategoryAndSets() {
+
+	public void initCategoryAndSets(boolean english) {
 		CategoryChannelSetManager cscMngr = new CategoryChannelSetManager();
-		ArrayList<String[]> list = this.getCategorySets();
 		CategoryManager cMngr = new CategoryManager();
 		ChannelSetManager csMngr = new ChannelSetManager();
-		String[] categories = (String[])list.get(0);
-		String[] subcategories = (String[])list.get(1);
-		String[] sets = (String[])list.get(2);
-		Hashtable<String, ChannelSet> setTable = new Hashtable<String, ChannelSet>();
-		for (int i=0; i<categories.length; i++) {
-			Category c = cMngr.findCategory(categories[i], subcategories[i]);
-			System.out.println("category:" + c.getName());			
-			ChannelSet cs = setTable.get(sets[i]);
-			if (cs == null)
-				cs = csMngr.findByName(sets[i]);
-			CategoryChannelSet csc = new CategoryChannelSet(c.getKey().getId(), cs.getKey().getId());
-			cscMngr.save(csc);
+		List<Category> categories = new ArrayList<Category>();
+		try {
+			InputStream input;
+			if (english)
+				input = new FileInputStream("WEB-INF/views/admin/ESets.xlsx");
+			else
+				input = new FileInputStream("WEB-INF/views/admin/CSets.xlsx");
+			Workbook wb = WorkbookFactory.create(input);
+			Sheet sheet = wb.getSheetAt(2);			
+			Row row = sheet.getRow(0);
+			//get categories
+			for (int i=0; i<row.getLastCellNum(); i++) {
+				Cell cell = row.getCell(i);
+				String name = cell.getStringCellValue();
+				Category c = cMngr.findByName(name);
+				if (c == null) {
+					log.severe("category not found:" + name);
+					return;
+				}
+				categories.add(c);
+				System.out.println(c.getName());
+			}
+		    ArrayList<List<ChannelSet>> channelSets = new ArrayList<List<ChannelSet>>();
+		    int rows = sheet.getPhysicalNumberOfRows();
+			for (int r=1; r<rows; r++) {
+			    row = sheet.getRow(r);
+		    	int col = row.getLastCellNum();
+		    	int seq = 0;
+			    for (int c=0; c<col; c++) {
+			    	Cell cell = row.getCell(c);
+			    	if (cell != null) {
+			    		String setName = cell.getStringCellValue();
+			    		if (setName != null && setName.length() > 0) {
+				    		ChannelSet cs = csMngr.findByName(setName);
+			    			if (cs == null) {
+								log.severe("channel set not found:" + setName + ";r=" + r + ";c=" + c);
+								return;		    				
+			    			}
+			    			List<ChannelSet> list = new ArrayList<ChannelSet>();		    			
+				    		if (seq < channelSets.size()) { 
+				    			list = channelSets.get(seq);
+				    		} else {
+				    			channelSets.add(list);
+				    		}			    						    			
+		    				list.add(cs);
+			    		}
+			    	}
+			    	seq++;
+			    }
+			}
+			System.out.println("category size:" + categories.size());
+			System.out.println("channel set size:" + channelSets.size());
+			for (int i=0; i<categories.size(); i++) {
+				for (int j=0; j<channelSets.get(i).size(); j++) {
+					CategoryChannelSet csc = new CategoryChannelSet(
+							categories.get(i).getKey().getId(), 
+							channelSets.get(i).get(j).getKey().getId());  
+					cscMngr.save(csc);
+				}
+			}			
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (InvalidFormatException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
-	
-	private ArrayList<String[]> getCategorySets() {
-		ArrayList<String[]> list = new ArrayList<String[]>();
-		String[] categories = {
-			"For Him",
-			"For Him",
-			"For Him",
-			"For Her",
-			"For Her",
-			"For Her",
-			"For Her",
-			"For Work",
-			"For Play",
-			"For Play",
-			"For Play",
-			"For Family",
-			"For College",
-			"For College",			
-			"工作誌",
-			"工作誌",
-			"姊妹淘",
-			"玩樂咖",
-			"男人幫",
-			"男人幫",
-			"玩樂咖",
-			"玩樂咖",
-			"姊妹淘",
-			"姊妹淘",
-			"男人幫",
-			"童心園",
-			"姊妹淘"	,		
-		};
+			
+	public void initCategories(boolean english) {
+		int rows = 0;
+		ArrayList<String> list = new ArrayList<String>();
+		try {
+			InputStream input;
+			if (english)
+				input = new FileInputStream("WEB-INF/views/admin/ESets.xlsx");
+			else 
+				input = new FileInputStream("WEB-INF/views/admin/CSets.xlsx");
+			Workbook wb = WorkbookFactory.create(input);
+			Sheet category = wb.getSheetAt(0);
+			rows = category.getPhysicalNumberOfRows();
+			for (int i=1; i<rows; i++) {
+			    Row row = category.getRow(i);
+			    Cell cell = row.getCell(0);
+			    list.add(cell.getStringCellValue());
+			}
+			if (english)
+				list.add(Category.UNCATEGORIZED);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (InvalidFormatException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} 
 		
-		String[] subcategories = {
-				"The 20 Something Professionals", 
-				"The 20 Something Professionals", 
-				"The Family Man",
-				"Glamorous Gal",
-				"Forever Young",
-				"Super Moms",
-				"Change for the Better",
-				"Go Big or Go Home",
-				"Master Gamer",
-				"Friday Night Fever",
-				"Past Time Favorites",
-				"The Family Man",
-				"The 40 Minutes Study Break",
-				"Hiliarious Dude!",
-				"財經新知",
-				"綜合新聞",
-				"美容美體",
-				"科技玩家",
-				"科技玩家",
-				"科技時尚",
-				"科技時尚",
-				"綜藝娛樂",
-				"綜藝娛樂",
-				"流行音樂",
-				"流行音樂",
-				"可愛動物",
-				"可愛動物",
-		};
-		String[] sets = {
-				"Pick Up Your Game",
-				"Second Place is the First Loser",
-				"Family Time",
-				"Waking up Beautiful",
-				"Dance Like No one is Watching",
-				"Family Lovin'",
-				"Revamp Your Lifestyle",
-				"Play Hard, Work Hard",
-				"King of Games",
-				"Dance to These",
-				"When You Have Nothing to Do",
-				"Family Time",
-				"A Break from Studying",
-				"Learning Could Be Fun",
-				"經理人聖經",
-				"華語都會新聞",
-				"美麗自我",
-				"電玩競地",
-				"電玩競地",
-				"陽光潮流幫",
-				"陽光潮流幫",
-				"娛樂懶人包",
-				"娛樂懶人包",
-				"音樂頑童",
-				"音樂頑童",
-				"小小動物園",
-				"小小動物園",
-		};
-		list.add(categories);
-		list.add(subcategories);
-		list.add(sets);
-		return list;
-	}
-	
-	public void initCategories() {		
 		MsoManager msoMngr = new MsoManager();
 		Mso mso = msoMngr.findNNMso();
-		//categories
-		String[] categoryStr = {
-				"For Him", "For Her", "For Work", "For Play", "For Family", 
-				"For College", "For Kids", "Recommended", Category.UNCATEGORIZED,
-				"男人幫", "姊妹淘", "工作誌", "玩樂咖", "居家人", "校園瘋", "童心園", "精選推薦"  
-		};
-		String[][] subStr = new String[16][]; 
-		subStr[0] = new String[] {"The 20 Something Professionals", "The Family Man"}; 			
-		subStr[1] = new String[] {"Glamorous Gal", "Forever Young", "Super Moms", "Change for the Better"};
-		subStr[2] = new String[] {"Go Big or Go Home"};
-		subStr[3] = new String[] {"Master Gamer", "Friday Night Fever", "Past Time Favorites"};
-		subStr[4] = new String[] {"The Family Man"};
-		subStr[5] = new String[] {"The 40 Minutes Study Break", "Hiliarious Dude!"};
-		subStr[6] = new String[] {""};
-		subStr[7] = new String[] {""};
-		subStr[8] = new String[] {"科技時尚", "流行音樂"}; //for him
-		subStr[9] = new String[] {"美容美體", "綜藝娛樂", "流行音樂"}; //for her
-		subStr[10] = new String[] {"財經新知", "綜合新聞"}; //for work
-		subStr[11] = new String[] {"科技玩家", "科技時尚", "綜藝娛樂"}; //for play
-		subStr[12] = new String[] {""};
-		subStr[13] = new String[] {""};
-		subStr[14] = new String[] {"可愛動物"};
-		subStr[15] = new String[] {""};
 		CategoryManager categoryMngr = new CategoryManager();
-		List<Category> categories= new ArrayList<Category>();
-		for (int i=0; i<categoryStr.length; i++) {
-			Category c = new Category(categoryStr[i], true, mso.getKey().getId());
-			c.setLang(LangTable.LANG_EN);
-			if (i > 8)
-				c.setLang(LangTable.LANG_ZH);
+		int i=1;
+		for (String l : list) {
+			Category c = new Category(l, true, mso.getKey().getId());
+			if (english)
+				c.setLang(LangTable.LANG_EN);
+			else
+				c.setLang(LangTable.LANG_ZH);			
 			if (c.getName().equals(Category.UNCATEGORIZED))
 				c.setPublic(false);
-			c.setSeq((short)(i+1));
-			System.out.println("category name:" + c.getName() + ";lang:" + c.getLang());
+			c.setSeq((short)i);
+			c.setSubCategoryCnt(0);
 			categoryMngr.create(c);
-			categories.add(c);			
+			i++;
 		}
-		
-		for (int i=0; i<subStr.length; i++) {	
-			for (int j=0; j<subStr[i].length; j++) {
-				if (subStr[j].length > 0) {
-					if (subStr[i][j].length() > 0) {
-						Category c = new Category(subStr[i][j], true, mso.getKey().getId());
-						c.setLang(LangTable.LANG_EN);
-						if (i > 7)
-							c.setLang(LangTable.LANG_ZH);
-						c.setParentId(categories.get(i).getKey().getId());
-						System.out.println("sub category name:" + c.getName() + ";lang:" + c.getLang() + ";parentId:" + c.getParentId());
-						c.setSeq((short)(j+1));
-						categoryMngr.create(c);
-					}
-				}
-			}
-		}		
-	}
+	}		
 	
-	public void initChannels(boolean transcoding) {
+	public String[] getChannelUrlsFromExcel(boolean english) {
+		InputStream input;
+		Workbook wb;
+		int rows = 0;
+		Set<String> list = new TreeSet<String>(); 
+		try {
+			if (english)
+				input = new FileInputStream("WEB-INF/views/admin/ESets.xlsx");
+			else 
+				input = new FileInputStream("WEB-INF/views/admin/CSets.xlsx");
+			wb = WorkbookFactory.create(input);
+			Sheet sets = wb.getSheetAt(3);			
+			rows = sets.getPhysicalNumberOfRows();						
+			for (int r=1; r<rows; r++) {
+			    Row row = sets.getRow(r);
+			    int col = row.getLastCellNum(); 
+			    for (int c=1; c<col; c+=2) {
+			    	Cell cell = row.getCell(c);
+			    	if (cell != null) {
+			    		String url = cell.getStringCellValue();
+			    		String checkedUrl = YouTubeLib.formatCheck(url);
+			    		if (checkedUrl != null)
+			    			list.add(checkedUrl);
+			    		else
+			    			log.info("url not passed youtube lib check:" + url);
+			    	}
+			    }
+			}
+			log.info("final channel size:" + list.size());
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (InvalidFormatException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}	
+		return list.toArray(new String[0]);
+		//return ;		
+	}
+
+	public void initChannels(boolean english, boolean devel) {
 		NnUserManager userMngr = new NnUserManager();
 		user = userMngr.findByEmail(NNEMAIL);		
-		String[] urls = this.getChannelUrls();
+		String[] urls = this.getChannelUrlsFromExcel(english);
 		MsoChannelManager channelMngr = new MsoChannelManager();
 		TranscodingService tranService = new TranscodingService();
 		boolean piwik = true;
@@ -439,7 +466,7 @@ public class InitService {
 				c.setStatus(MsoChannel.STATUS_PROCESSING);
 				c.setContentType(channelMngr.getContentTypeByUrl(url));
 				channelMngr.create(c);
-				if (transcoding) {
+				if (!devel) {
 					tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
 					channelMngr.save(c);
 				} else {
@@ -451,6 +478,9 @@ public class InitService {
 					log.info("mark the channel from waiting to approval to success");
 					c.setStatus(MsoChannel.STATUS_SUCCESS);
 					channelMngr.save(c);
+				} else if (c.getStatus() == MsoChannel.STATUS_PROCESSING){
+					tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
+					log.info("was in processing mode, going to submit again");
 				} else if (c.getStatus() != MsoChannel.STATUS_SUCCESS){
 					log.info("wanted channel but not success");					
 				}
@@ -463,346 +493,172 @@ public class InitService {
 
 		}
 	}
-
-	public String[][] getSetChannels() {
-		String sets[][] = new String[21][];		
-		sets[0] = new String[] {
-				"http://www.youtube.com/user/simplepickup",
-				"http://www.youtube.com/user/sixpackshortcuts",
-				"http://www.youtube.com/user/stanforduniversity",
-				"http://www.youtube.com/user/mercedesbenztv",
-				"http://www.youtube.com/user/nike",
-				"http://www.youtube.com/user/tedtalksdirector"				
-		};
 		
-		sets[1] = new String[] {
-				"http://www.youtube.com/user/machinima",
-				"http://www.youtube.com/user/teamflightbrothers",
-				"http://www.youtube.com/user/mroperationsports",
-		};		
-		sets[2] = new String[] {
-				"http://www.youtube.com/user/devinanderica",
-				"http://www.youtube.com/user/visitvictoria",
-				"http://www.youtube.com/user/disneyparks",
-		};
-		sets[3] = new String[] {
-				"http://www.youtube.com/user/michellephan",
-				"http://www.youtube.com/user/elletvfashion",
-				"http://www.youtube.com/user/lorealparis",
-		};
-		sets[4] = new String[] {
-				"http://www.youtube.com/user/billboardgoddess",
-				"http://www.youtube.com/user/atlanticvideos",
-				"http://www.youtube.com/user/armadamusic",
-		};
-		sets[5] = new String[] {
-				"http://www.youtube.com/user/devinanderica",
-				"http://www.youtube.com/user/visitvictoria",
-				"http://www.youtube.com/user/disneyparks",
-		};
-		sets[6] = new String[] {
-				"http://www.youtube.com/user/fashiontv",
-				"http://www.youtube.com/user/getmarriedtv",
-				"http://www.youtube.com/user/larrygreenberg",
-		};
-		sets[7] = new String[] {
-				"http://www.youtube.com/user/tedtalksdirector",
-				"http://www.youtube.com/user/tysiphonehelp",
-				"http://www.youtube.com/user/stanfordbusiness",
-				"http://www.youtube.com/user/a3network",
-				"http://www.youtube.com/user/autoexpress",
-		};
-		sets[8] = new String[] {
-				"http://www.youtube.com/user/machinima",
-				"http://www.youtube.com/user/teamflightbrothers",
-				"http://www.youtube.com/user/mroperationsports",
-		};		
-		sets[9] = new String[] {
-				"http://www.youtube.com/user/billboardgoddess",
-				"http://www.youtube.com/user/atlanticvideos",
-				"http://www.youtube.com/user/armadamusic",
-		};
-		sets[10] = new String[] {
-				"http://www.youtube.com/user/collegehumor",
-				"http://www.youtube.com/user/break",
-		};
-		sets[11] = new String[] {
-				"http://www.youtube.com/user/justkiddingfilms",
-				"http://www.youtube.com/user/timothydelaghetto2",
-				"http://www.youtube.com/user/simplepickup",
-				"http://www.youtube.com/user/wongfuproductions",
-		};
-		sets[12] = new String[] {
-				"http://www.youtube.com/user/collegehumor",
-				"http://www.youtube.com/user/break",
-		};				
-		sets[13] = new String[] {
-				"http://www.youtube.com/user/bwnet",
-				"http://www.youtube.com/user/cwgv",
-				"http://www.youtube.com/user/cwtv",
-				"http://www.youtube.com/user/dxmonline",
-				"http://www.youtube.com/user/taiwantrade",				
-		};
-		sets[14] = new String[] {
-				"http://www.youtube.com/user/thechinesenews",
-				"http://www.youtube.com/user/ptstalk",
-				"http://www.youtube.com/user/chinatimes",
-				"http://www.youtube.com/user/tvbs",
-				"http://www.youtube.com/user/rthk",
-				"http://www.youtube.com/user/hkbnnews",				
-		};
-		sets[15] = new String[] {
-				"http://www.youtube.com/user/fashionguide",
-				"http://www.youtube.com/user/sppweb",
-				"http://www.youtube.com/user/beautyqq",
-				"http://www.youtube.com/user/newapplearial",				
-		};
-		sets[16] = new String[] {
-				"http://www.youtube.com/user/efuntv",
-				"http://www.youtube.com/user/gamebasegnc",
-				"http://www.youtube.com/user/bahamutgnn",                                                          
-				"http://www.youtube.com/user/samgnn2",				
-		};
-		sets[17] = new String[] {
-				"http://www.youtube.com/user/sheng98news",
-				"http://www.youtube.com/user/taiwansr",
-				"http://www.youtube.com/user/buycartv",
-				"http://www.youtube.com/user/lioncyber",
-				"http://www.youtube.com/user/tkbang",
-				"http://www.youtube.com/user/udndigital",
-				"http://www.youtube.com/user/dcviewno1",
-				"http://www.youtube.com/user/sogitv",
-				"http://www.youtube.com/user/sppweb",				
-		};
-		sets[18] = new String[] {
-				"http://www.youtube.com/user/sinapremium",
-				"http://www.youtube.com/user/roadshow68xchina",
-				"http://www.youtube.com/user/chinesecivilization2",
-				"http://www.youtube.com/user/twnexttv",
-				"http://www.youtube.com/user/zimeitao",
-				"http://www.youtube.com/user/taiwansugoi2",
-				"http://www.youtube.com/user/gorgeousspace",
-				"http://www.youtube.com/user/yattamovie2",
-				"http://www.youtube.com/user/2cekidhk",				
-		};
-		sets[19] = new String[] {
-				"http://www.youtube.com/user/universalmusichk",
-				"http://www.youtube.com/user/universaltwn",
-				"http://www.youtube.com/user/warnertaiwan",
-				"http://www.youtube.com/user/kpopmv2011v2",
-				"http://www.youtube.com/user/vul3a04snsding",
-				"http://www.youtube.com/user/asiamuseentertainme",
-				"http://www.youtube.com/user/thewalltw",
-				"http://www.youtube.com/user/totororo0202",				
-		};
-		sets[20] = new String[] {
-				"http://www.youtube.com/user/taipeizoo",
-				"http://www.youtube.com/user/mmovies21",
-				"http://www.youtube.com/user/shironekoshiro",
-				"http://www.youtube.com/user/olivinej",				
-		};		
-		return sets;
-	}
-		
-	public void initSetAndChannels() {
-		String[][] sets = this.getSetChannels();
-		Hashtable<String, MsoChannel> table = new Hashtable<String, MsoChannel>();
+	public void initSetAndChannels(boolean english) {
 		MsoChannelManager channelMngr = new MsoChannelManager();
 		ChannelSetManager csMngr = new ChannelSetManager();
 		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();		
-		List<ChannelSet> cs = csMngr.findAll();
-		
-		for (int i=0; i<sets.length; i++) {
-			for (int j=0; j<sets[i].length; j++) {
-				MsoChannel c = table.get(sets[i][j]);
-				if (c == null) {
-					c = channelMngr.findBySourceUrlSearch(sets[i][j]);
-					table.put(sets[i][j], c);
+		InputStream input;
+		Workbook wb;
+		List<ChannelSet> setList = new ArrayList<ChannelSet>();
+		try {
+			if (english)
+				input = new FileInputStream("WEB-INF/views/admin/ESets.xlsx");
+			else
+				input = new FileInputStream("WEB-INF/views/admin/CSets.xlsx");
+			wb = WorkbookFactory.create(input);
+			Sheet sheet = wb.getSheetAt(3);			
+			Row row = sheet.getRow(0);						
+			//get sets from excel
+			System.out.println("last cell num:" + row.getLastCellNum());
+			for (int i=1; i<row.getLastCellNum(); i+=2) {
+				Cell cell = row.getCell(i);
+				if (cell != null) {
+					String name = cell.getStringCellValue();
+					System.out.println("found name:" + i + ";" + name);
+					if (name != null && name.length() > 0) {
+						name = name.trim();
+						ChannelSet cs = csMngr.findByName(name);
+						if (cs != null) {
+							setList.add(cs);
+					    } else {
+					    	log.severe("this set is not in db:" + name);
+					    }
+					}
 				}
-				ChannelSetChannel csc = new ChannelSetChannel(cs.get(i).getKey().getId(), c.getKey().getId(), c.getSeq());				
-				cscMngr.create(csc);
 			}
+			//compare list with database
+			List<ChannelSet> setAll = csMngr.findAll();
+			for (ChannelSet all : setAll) {
+				boolean found = false;
+				for (ChannelSet sl : setList) {
+					if (sl.getName().equals(all.getName())) {
+						found = true;
+						break;
+					}						
+				}
+				if (!found) {
+					System.out.println("not found this:" + all.getName());
+				}
+			}
+			if (setAll.size() != setList.size()) {
+				log.severe("information inconsistent. set all has " + setAll.size() + ";setList here = " + setList.size());
+				return;
+			}
+			//put all the channels into a string table for set, channel lookup
+			int rows = sheet.getPhysicalNumberOfRows();			
+		    ArrayList<List<String>> channelSetList = new ArrayList<List<String>>();
+			for (int r=1; r<rows; r++) {
+			    row = sheet.getRow(r);
+		    	int col = row.getLastCellNum(); 
+		    	int seq = 0;
+			    for (int c=1; c<col; c+=2) {
+			    	Cell cell = row.getCell(c);
+			    	if (cell != null) {
+			    		String url = cell.getStringCellValue();
+			    		String checkedUrl;
+			    		checkedUrl = YouTubeLib.formatCheck(url);			    			
+		    			List<String> list = new ArrayList<String>();		    			
+		    			if (checkedUrl != null) {
+				    		if (seq < channelSetList.size()) { 
+				    			list = channelSetList.get(seq);
+				    		} else {
+				    			channelSetList.add(list);
+				    		}			    						    			
+		    				list.add(checkedUrl);
+		    			}
+			    	}
+			    	seq++;
+			    }
+			}
+			if (channelSetList.size() != setList.size()) {
+				log.severe("set found from db and channel data are not consistent:" + setList.size() + ";" + channelSetList.size());
+				return;
+			}
+			//real work
+			Hashtable<String, MsoChannel> table = new Hashtable<String, MsoChannel>();
+ 			for (int i=0; i<setList.size(); i++) {
+ 				System.out.println(setList.get(i).getName() + channelSetList.get(i));
+ 				for (String url : channelSetList.get(i)) {
+					MsoChannel c = table.get(url);
+ 					if (c == null)
+ 	 					c = channelMngr.findBySourceUrlSearch(url);
+ 					if (c == null) {
+ 						log.severe("channel unfound:" + url);
+ 						return;
+ 					} else { 
+ 						table.put(url, c);
+ 						ChannelSet cs = setList.get(i);
+ 						ChannelSetChannel csc = new ChannelSetChannel(cs.getKey().getId(), c.getKey().getId(), c.getSeq());				
+ 						cscMngr.create(csc);
+ 					} 						
+ 				}
+ 			}			
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (InvalidFormatException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
-	
-	//13 English, 8 Chinese
-	private String[] getSetNames() { 
-		String[] names = {
-				"Pick Up Your Game", 
-				"Second Place is the First Loser",
-				"Family Time", "Waking up Beautiful",
-				"Dance Like No one is Watching",
-				"Family Lovin'",
-				"Revamp Your Lifestyle",
-				"Play Hard, Work Hard",
-				"King of Games",
-				"Dance to These", 
-				"When You Have Nothing to Do",
-				"Family Time",
-				"A Break from Studying",
-				"Learning Could Be Fun",
-				"經理人聖經", "華語都會新聞", "美麗自我", "電玩競地", "陽光潮流幫", 
-				"娛樂懶人包", "音樂頑童", "小小動物園"  	
-			};
-		return names;
+				
+	public List<String> getSetNamesFromExcel(boolean english) {		
+		ArrayList<String> list = new ArrayList<String>();
+		try {
+			InputStream input;
+			if (english)
+				input = new FileInputStream("WEB-INF/views/admin/ESets.xlsx");
+			else 
+				input = new FileInputStream("WEB-INF/views/admin/CSets.xlsx");
+			Workbook wb = WorkbookFactory.create(input);
+			Sheet sets = wb.getSheetAt(1);
+			int rows = sets.getPhysicalNumberOfRows();
+			for (int i=0; i<rows; i++) {
+			    Row row = sets.getRow(i);			    
+			    Cell cellName = row.getCell(0);
+			    Cell cellDesc = row.getCell(1);
+			    if (cellName.getStringCellValue() != null && cellName.getStringCellValue().length() > 0)
+			    	list.add(cellName.getStringCellValue().trim() + ";" + cellDesc.getStringCellValue().trim());
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (InvalidFormatException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return list;
 	}
 	
-	private String[] getSetIntros() {
-		String[] intros = {
-				"Tired of the same routine everyday? If these guys can do you, so can you!",
-				"Stop losing.  Play like a man.",
-				"Be the best dad there is.", 
-				"Tips on how you can walk out of your house in the morning looking like a superstar!", 
-				"Forget about the dancefloor, your living room is all yours.", 
-				"Cute babies, romantic getaways, awesome places, need I say more?", 
-				"Going through life-changing events? Even the smallest changes can make your life amazing",
-				"Make that money, spend that money!",
-				"Stop getting school'd.  Be that player killer.",
-				"Too much work? Dance away your stress to these tunes.",
-				"Tired of thinking? Give your brain a break with these!",
-				"Be the best dad there is.",
-				"Studyig? Pffff! Procrastinating is better.",
-				"Duh Dude! Pranking on people is jokes.",	
-				"都會經理人必備，掌握業界最新資訊與概念。",
-				"推薦您中國大陸、台灣、香港的主流媒體都會新聞，歡迎訂閱",
-				"姐姐妹妹站起來，美麗時尚不求人的秘方，盡在9x9美麗自我頻道網。",
-				"電玩競地提供您第一手的電玩遊戲情報，每天更新。", 
-				"給陽光熱血又潮流的你，受到眾人矚目的必看精選，歡迎訂閱。",  
-				"匯集港中台娛樂頻道，提供您最新的娛樂資訊，每天更新",  
-				"亞洲流行音樂情報站，提供您港中台日韓等地的最新流行音樂資訊",  
-				"小小動物園就在你家，不用出門也可以和可愛動物們玩耍，歡迎訂閱。",  	
-			};
-		return intros;
-	}
-	
-	public void initSets() {
+	public void initSets(boolean english, boolean devel) {
 		MsoManager msoMngr = new MsoManager();
 		Mso mso = msoMngr.findNNMso(); 
-		String[] names = this.getSetNames();
-		String[] intros = this.getSetIntros();
+		List<String> list = this.getSetNamesFromExcel(english);
 		ContentOwnershipManager ownershipMngr = new ContentOwnershipManager();
 		ChannelSetManager csMngr = new ChannelSetManager();
-		for (int i=0; i<names.length; i++) {
-			ChannelSet channelSet = new ChannelSet(mso.getKey().getId(), names[i], intros[i], true);			
+		for (int i=0; i<list.size(); i++) {
+			String[] value = list.get(i).split(";");
+			String name = value[0];
+			String intro = value[1];
+			ChannelSet channelSet = new ChannelSet(mso.getKey().getId(), name, intro, true);			
 			channelSet.setDefaultUrl(String.valueOf(i)); 
 			channelSet.setBeautifulUrl(String.valueOf(i));
-			channelSet.setFeatured(true);
-			channelSet.setLang(LangTable.LANG_EN);
-			channelSet.setSeq((short)(i+1));
-			if (i > 12) {
+			if (english)
+				channelSet.setLang(LangTable.LANG_EN);
+			else 
 				channelSet.setLang(LangTable.LANG_ZH);
-				channelSet.setSeq((short)(i-12));
-			}
 			csMngr.create(channelSet);
-			String piwik = PiwikLib.createPiwikSite(channelSet.getKey().getId(), 0, req);
-			channelSet.setPiwik(piwik);
-			csMngr.save(channelSet);			
+			if (!devel) {
+				String piwik = PiwikLib.createPiwikSite(channelSet.getKey().getId(), 0, req);
+				channelSet.setPiwik(piwik);
+				csMngr.save(channelSet);
+			}
 			ownershipMngr.create(new ContentOwnership(), mso, channelSet);
 		}
+		log.info("set size:" + list.size());
 	}
 	
-	private String[] getChannelUrls() {
-		String[] urls = {
-				"http://www.youtube.com/user/2cekidhk",
-				"http://www.youtube.com/user/a3network",
-				"http://www.youtube.com/user/armadamusic",
-				"http://www.youtube.com/user/asiamuseentertainme",
-				"http://www.youtube.com/user/atlanticvideos",
-				"http://www.youtube.com/user/autoexpress",
-				"http://www.youtube.com/user/bahamutgnn",
-				"http://www.youtube.com/user/beautyqq",
-				"http://www.youtube.com/user/billboardgoddess",
-				"http://www.youtube.com/user/break",
-				"http://www.youtube.com/user/buycartv",
-				"http://www.youtube.com/user/bwnet",				
-				"http://www.youtube.com/user/chinatimes",
-				"http://www.youtube.com/user/chinesecivilization2",
-				"http://www.youtube.com/user/collegehumor",
-				"http://www.youtube.com/user/cwgv",
-				"http://www.youtube.com/user/cwtv",
-				"http://www.youtube.com/user/dcviewno1",
-				"http://www.youtube.com/user/devinanderica",
-				"http://www.youtube.com/user/disneyparks",
-				"http://www.youtube.com/user/dxmonline",
-				"http://www.youtube.com/user/efuntv",
-				"http://www.youtube.com/user/elletvfashion",
-				"http://www.youtube.com/user/fashionguide",
-				"http://www.youtube.com/user/fashiontv",
-				"http://www.youtube.com/user/gamebasegnc",
-				"http://www.youtube.com/user/getmarriedtv",
-				"http://www.youtube.com/user/gorgeousspace",
-				"http://www.youtube.com/user/hkbnnews",
-				"http://www.youtube.com/user/justkiddingfilms",
-				"http://www.youtube.com/user/kpopmv2011v2",
-				"http://www.youtube.com/user/larrygreenberg",
-				"http://www.youtube.com/user/lioncyber",
-				"http://www.youtube.com/user/lorealparis",
-				"http://www.youtube.com/user/machinima",
-				"http://www.youtube.com/user/mercedesbenztv",
-				"http://www.youtube.com/user/michellephan",
-				"http://www.youtube.com/user/mmovies21",
-				"http://www.youtube.com/user/mroperationsports",
-				"http://www.youtube.com/user/newapplearial",
-				"http://www.youtube.com/user/nike",
-				"http://www.youtube.com/user/olivinej",
-				"http://www.youtube.com/user/ptstalk",
-				"http://www.youtube.com/user/roadshow68xchina",
-				"http://www.youtube.com/user/rthk",
-				"http://www.youtube.com/user/samgnn2",
-				"http://www.youtube.com/user/sheng98news",
-				"http://www.youtube.com/user/shironekoshiro",
-				"http://www.youtube.com/user/simplepickup",
-				"http://www.youtube.com/user/sinapremium",
-				"http://www.youtube.com/user/sixpackshortcuts",
-				"http://www.youtube.com/user/sogitv",
-				"http://www.youtube.com/user/sppweb",
-				"http://www.youtube.com/user/stanfordbusiness",
-				"http://www.youtube.com/user/stanforduniversity",
-				"http://www.youtube.com/user/taipeizoo",
-				"http://www.youtube.com/user/taiwansr",
-				"http://www.youtube.com/user/taiwansugoi2",
-				"http://www.youtube.com/user/taiwantrade",
-				"http://www.youtube.com/user/teamflightbrothers",
-				"http://www.youtube.com/user/tedtalksdirector",
-				"http://www.youtube.com/user/thechinesenews",
-				"http://www.youtube.com/user/thewalltw",
-				"http://www.youtube.com/user/timothydelaghetto2",
-				"http://www.youtube.com/user/tkbang",
-				"http://www.youtube.com/user/totororo0202",
-				"http://www.youtube.com/user/tvbs",
-				"http://www.youtube.com/user/twnexttv",
-				"http://www.youtube.com/user/tysiphonehelp",
-				"http://www.youtube.com/user/udndigital",
-				"http://www.youtube.com/user/universalmusichk",
-				"http://www.youtube.com/user/universaltwn",
-				"http://www.youtube.com/user/visitvictoria",
-				"http://www.youtube.com/user/vul3a04snsding",
-				"http://www.youtube.com/user/warnertaiwan",
-				"http://www.youtube.com/user/wongfuproductions",
-				"http://www.youtube.com/user/yattamovie2",
-				"http://www.youtube.com/user/zimeitao"
-		};
-		return urls;
-	}
-
-	public void deleteUrls() {
-		String[] urls = this.getDeleteUrls();
-		MsoChannelManager channelMngr = new MsoChannelManager();
-		MsoProgramManager programMngr = new MsoProgramManager();
-		for (String url : urls) {
-			MsoChannel c = channelMngr.findBySourceUrlSearch(url);
-			if (c != null) {
-				log.info("delete this url:" + url);
-				List<MsoProgram> list = programMngr.findAllByChannelId(c.getKey().getId());
-				for (MsoProgram p : list) {
-					programMngr.delete(p);
-				}
-				channelMngr.delete(c);				
-			}
-		}
-
-	}
-
 	public void initSetImages() {
 		ChannelSetManager csMngr = new ChannelSetManager();
 		List<ChannelSet> list = csMngr.findAll();
@@ -827,47 +683,63 @@ public class InitService {
 	}
 	
 	public void initCategoryCount() {
+		ChannelSetManager csMngr = new ChannelSetManager();
+		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
+		List<ChannelSet> sets = csMngr.findAll();
+		HashMap<Long, Integer> map = new HashMap<Long, Integer>();
+		for (ChannelSet cs : sets) {
+			List<ChannelSetChannel> list = cscMngr.findByChannelSetId(cs.getKey().getId());
+			cs.setChannelCount(list.size());
+			System.out.println("cs name:" + cs.getName() + ";size:" + list.size());
+			csMngr.save(cs);
+			map.put(cs.getKey().getId(), list.size());
+		}						
 		CategoryManager categoryMngr = new CategoryManager();
+		CategoryChannelSetManager ccsMngr = new CategoryChannelSetManager();
 		List<Category> categories= categoryMngr.findAll();
 		for (Category c : categories) {
-			c.setChannelCount(5);
-			categoryMngr.save(c);
+			List<CategoryChannelSet> list = ccsMngr.findAllByCategoryId(c.getKey().getId());
+			int cnt = 0;
+			for (CategoryChannelSet l : list) {		
+				cnt += map.get(l.getChannelSetId());
+			}			
+			c.setChannelCount(cnt);
+			categoryMngr.save(c);			
 		}
 	}
 	
-	public void initRecommended() {
+	public void initRecommended(boolean english) {		
 		ChannelSetManager csMngr = new ChannelSetManager();
-		List<ChannelSet> list = csMngr.findAll();
-		for (int i=0; i<list.size(); i++) {
-			if (i<10)
-				list.get(i).setFeatured(true);
-			if (i>12)
-				list.get(i).setFeatured(true);
-			csMngr.save(list.get(i));
-		}				
-	}
-	
-	private String[] getDeleteUrls() {
-		String[] urls = {
-				"http://www.youtube.com/user/break",
-				"http://www.youtube.com/user/chinesecivilization2",
-				"http://www.youtube.com/user/collegehumor",
-				"http://www.youtube.com/user/hkbnnews",
-				"http://www.youtube.com/user/justkiddingfilms",
-				"http://www.youtube.com/user/kpopmv2011v2",
-				"http://www.youtube.com/user/nike",
-				"http://www.youtube.com/user/roadshow68xchina",
-				"http://www.youtube.com/user/simplepickup",
-				"http://www.youtube.com/user/sinapremium",
-				"http://www.youtube.com/user/sixpackshortcuts",
-				"http://www.youtube.com/user/taipeizoo",
-				"http://www.youtube.com/user/thechinesenews",
-				"http://www.youtube.com/user/timothydelaghetto2",
-				"http://www.youtube.com/user/tkbang",
-				"http://www.youtube.com/user/tvbs",
-				"http://www.youtube.com/user/twnexttv",
-				"http://www.youtube.com/user/universalmusichk",                                                                                  				
-		};
-		return urls;
-	}
+		try {
+			InputStream input; 
+			if (english)
+				input = new FileInputStream("WEB-INF/views/admin/ESets.xlsx");
+			else 
+				input = new FileInputStream("WEB-INF/views/admin/CSets.xlsx");
+			Workbook wb = WorkbookFactory.create(input);
+			Sheet sheet = wb.getSheetAt(4);
+		    int rows = sheet.getPhysicalNumberOfRows();
+			for (int r=0; r<rows; r++) {
+				Row row = sheet.getRow(r); 
+				Cell cell = row.getCell(0);
+				String name = cell.getStringCellValue();
+				if (name != null && name.length() > 0) {
+					ChannelSet cs = csMngr.findByName(name); 
+					if (cs == null) {
+						log.severe("set not found:" + name);
+						return;
+					}
+					cs.setFeatured(true);
+					cs.setSeq((short)(r+1));
+					csMngr.save(cs);
+				}
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (InvalidFormatException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}		
+	}	
 }

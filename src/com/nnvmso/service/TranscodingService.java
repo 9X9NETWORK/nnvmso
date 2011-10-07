@@ -131,23 +131,21 @@ public class TranscodingService {
 			channelMngr.save(channel);
 			return new PostResponse(String.valueOf(NnStatusCode.SUCCESS), "SUCCESS"); 
 		}
-		//change status to WAIT_FOR_APPROVAL at the end
-		if (channel.getStatus() == MsoChannel.STATUS_PROCESSING) { 
-			String name = podcast.getTitle();
-			channel.setName(name);			
-			String intro = podcast.getDescription();
-			if (intro!= null && intro.length() > 500) {
-				intro = intro.substring(0, 499);
-			}
-			if (intro != null) { intro = intro.replaceAll("\\s", " ");}
-			channel.setIntro(intro);
-			channel.setImageUrl(podcast.getImage());
+		String name = podcast.getTitle();
+		channel.setName(name);			
+		String intro = podcast.getDescription();
+		if (intro!= null && intro.length() > 500) {
+			intro = intro.substring(0, 499);
+		}
+		if (intro != null) { intro = intro.replaceAll("\\s", " ");}
+		channel.setIntro(intro);
+		channel.setImageUrl(podcast.getImage());
+		if (channel.getStatus() == MsoChannel.STATUS_PROCESSING) {			
 			channel.setStatus(MsoChannel.STATUS_WAIT_FOR_APPROVAL);
 		}
 		
-		if (podcast.getLastUpdateTime() != null) {
+		if (podcast.getLastUpdateTime() != null)
 			channel.setTranscodingUpdateDate(podcast.getLastUpdateTime());
-		}
 		channel.setPublic(true);
 		channel.setErrorReason("");
 		channelMngr.save(channel);		

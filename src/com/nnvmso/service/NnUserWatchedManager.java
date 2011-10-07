@@ -15,6 +15,11 @@ public class NnUserWatchedManager {
 					
 	public NnUserWatched save(NnUserWatched watched) {
 		Date now = new Date();
+		NnUserWatched existed = this.findByUserIdAndChannelId(watched.getUserId(), watched.getChannelId());
+		if (existed != null) {
+			existed.setProgram(watched.getProgram());
+			watched = existed;
+		}
 		if (watched.getCreateDate() == null) {watched.setCreateDate(now);}
 		watched.setUpdateDate(now);		
 		return watchedDao.save(watched);

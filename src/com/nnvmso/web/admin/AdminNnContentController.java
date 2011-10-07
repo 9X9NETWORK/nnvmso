@@ -3,11 +3,14 @@ package com.nnvmso.web.admin;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -58,6 +61,20 @@ public class AdminNnContentController {
 		return "OK";
 	}
 
+	@RequestMapping(value="form", method=RequestMethod.GET)
+	public String editGet(HttpServletRequest req) {
+		return "admin/static.jsp";
+	}
+
+	@RequestMapping(value="form", method=RequestMethod.POST)
+	public String editPost(
+			@RequestParam String key, 
+            @RequestParam String text,
+            @RequestParam String lang,
+			HttpServletRequest req) {
+		return "admin/static.jsp";
+	}
+	
 	@RequestMapping(value="edit")
 	public @ResponseBody String edit(@RequestParam String key, 
 			                         @RequestParam String text,

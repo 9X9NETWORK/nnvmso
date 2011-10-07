@@ -89,7 +89,7 @@ public class ChannelSetDao extends GenericDao<ChannelSet> {
 			Query q = pm.newQuery(ChannelSet.class);
 			q.setFilter("featured == featuredParam && lang == langParam");
 			q.declareParameters("boolean featuredParam, String langParam");
-			q.setOrdering("createDate asc");
+			q.setOrdering("seq asc");
 			@SuppressWarnings("unchecked")
 			List<ChannelSet> sets = (List<ChannelSet>) q.execute(true, lang);
 			detached = (List<ChannelSet>)pm.detachCopyAll(sets);

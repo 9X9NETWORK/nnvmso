@@ -39,6 +39,9 @@ public class Category implements Serializable {
 	private int channelCount;
 	
 	@Persistent
+	private int subCategoryCnt;
+	
+	@Persistent
 	private String lang;
 
 	@Persistent
@@ -136,6 +139,14 @@ public class Category implements Serializable {
 
 	public void setSeq(short seq) {
 		this.seq = seq;
+	}
+
+	public int getSubCategoryCnt() {
+		return subCategoryCnt;
+	}
+
+	public void setSubCategoryCnt(int subCategoryCnt) {
+		this.subCategoryCnt = subCategoryCnt;
 	}
 	
 }

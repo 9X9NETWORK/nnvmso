@@ -8,6 +8,8 @@ import java.util.logging.Logger;
 import org.springframework.stereotype.Service;
 
 import com.nnvmso.dao.ChannelSetDao;
+import com.nnvmso.model.Category;
+import com.nnvmso.model.CategoryChannelSet;
 import com.nnvmso.model.ChannelSet;
 import com.nnvmso.model.ChannelSetChannel;
 import com.nnvmso.model.Mso;
@@ -31,6 +33,7 @@ public class ChannelSetManager {
 			ChannelSetChannel csc = new ChannelSetChannel(channelSet.getKey().getId(), channel.getKey().getId(), channel.getSeq());
 			cscMngr.create(csc);
 		}
+		this.resetRelatedChannelCnt(channelSet, channels);
 	}
 
 	public void create(ChannelSet channelSet) {
@@ -38,7 +41,6 @@ public class ChannelSetManager {
 		Date now = new Date();
 		channelSet.setCreateDate(now);
 		channelSet.setUpdateDate(now);
-		channelSet.setChannelCount(0);
 		channelSetDao.save(channelSet);
 	}
 	
@@ -58,6 +60,21 @@ public class ChannelSetManager {
 		return channelSetDao.findFeaturedSets(lang);
 	}
 	
+	public void resetRelatedChannelCnt(ChannelSet channelSet, List<MsoChannel> channels) {
+		if (channels == null)
+			channels = this.findChannelsById(channelSet.getKey().getId());
+		CategoryManager categoryMngr = new CategoryManager();
+		CategoryChannelSetManager ccsMngr = new CategoryChannelSetManager();
+		List<CategoryChannelSet> list = ccsMngr.findAllByCategoryId(channelSet.getKey().getId());
+		for (CategoryChannelSet ccs : list) {
+			Category c = categoryMngr.findById(ccs.getCategoryId());
+			if (c != null) {
+				c.setChannelCount(c.getChannelCount() + channels.size());
+				categoryMngr.save(c);
+			}
+		}
+	}
+	
 	public ChannelSet save(ChannelSet channelSet) {	
 		//NOTE check name existence if needed
 		channelSet.setUpdateDate(new Date());
@@ -65,7 +82,7 @@ public class ChannelSetManager {
 		List<MsoChannel> channels = this.findChannelsById(channelSet.getKey().getId());
 		channelSet.setChannelCount(channels.size());
 		channelSetDao.save(channelSet);
-		
+		this.resetRelatedChannelCnt(channelSet, channels);
 		return channelSet;
 	}
 	

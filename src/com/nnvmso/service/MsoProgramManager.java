@@ -147,27 +147,7 @@ public class MsoProgramManager {
 			list.remove(id);	
 		//!!! category channelCount should be taken care of too when the program count is 0 		
 	}
-	
-	public List<MsoProgram> findNew(long userId) {
-		SubscriptionManager subMngr = new SubscriptionManager();
-		ViewLogManager watchedMngr = new ViewLogManager();
-		List<MsoChannel> channels = subMngr.findSubscribedChannels(userId, 0);
-		List<MsoProgram> programs = new ArrayList<MsoProgram>();
-		List<Long> list = new ArrayList<Long>();		
-		for (int i=0; i< channels.size(); i++) {
-			list.add(channels.get(i).getKey().getId());
-		}
-		if (list != null) {
-			List<ViewLog> watchedList = watchedMngr.findAllByUserId(list);
-			Hashtable<Long, HashSet<Long>> watchedTable = new Hashtable<Long, HashSet<Long>>();
-			for (ViewLog w : watchedList) {
-				watchedTable.put(w.getChannelId(), w.getPrograms());
-			}
-			programs = msoProgramDao.findNewProgramsByChannels(channels, watchedTable);
-		}
-		return programs;
-	} 
-		
+			
 	/**	 
 	 * @@@ Cached
 	 */
