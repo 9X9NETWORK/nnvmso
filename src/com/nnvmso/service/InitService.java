@@ -667,8 +667,14 @@ public class InitService {
 			if (channels.size() == 0) { 
 				log.info("no channels in this set" + cs.getName());
 			} else { 
-				cs.setImageUrl(channels.get(0).getImageUrl());
-				csMngr.save(cs);
+				for (int i=0; i<channels.size(); i++) {
+					String imageUrl = channels.get(i).getImageUrl();
+					if (imageUrl != null && imageUrl.length() > 0) {
+						cs.setImageUrl(imageUrl);
+						csMngr.save(cs);
+						i = channels.size();
+					}
+				}
 			}
 		}
 	}

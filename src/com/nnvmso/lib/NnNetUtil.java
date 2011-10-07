@@ -108,30 +108,4 @@ public class NnNetUtil {
 	      }
 	      return false;
 	}
-	
-	
-	public static void urlPost(String urlStr) {
-		System.out.println("enter urlpost");
-        URL url;
-		try {
-			url = new URL("http://localhost:8888/playerAPI/gzip");
-	        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-	        connection.setDoOutput(true);
-			connection.setRequestMethod("POST");
-	        if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {	        	
-	        	log.info("response not ok!" + connection.getResponseCode());
-	        }
-	        System.out.println("enter read response");
-	        GZIPInputStream gzipStream = new GZIPInputStream(connection.getInputStream());
-	        Reader decoder = new InputStreamReader(gzipStream, "UTF-8");
-	        BufferedReader rd = new BufferedReader(decoder);	        
-	        String line = rd.readLine();
-	        while (line!=null) {
-	        	System.out.print(line);
-	        }	       
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
 }

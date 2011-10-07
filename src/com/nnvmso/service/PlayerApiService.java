@@ -1423,7 +1423,15 @@ public class PlayerApiService {
 		return this.assembleMsgs(NnStatusCode.SUCCESS, null);
 	}
 	
-	public String findUserWatched(String userToken, String channel, String count, boolean channelInfo) {		
+	public String findUserWatched(String userToken, String count, boolean channelInfo) {
+		@SuppressWarnings("rawtypes")
+		HashMap map = this.checkUser(userToken, false);
+		if ((Integer)map.get("s") != NnStatusCode.SUCCESS) {
+			return this.assembleMsgs((Integer)map.get("s"), null);
+		}
+		if (count == null) 
+			return this.assembleMsgs(NnStatusCode.INPUT_MISSING, null);		
+
 		String[] result = {"", ""};
 		NnUserWatchedManager watchedMngr = new NnUserWatchedManager();
 		MsoChannelManager channelMngr = new MsoChannelManager();

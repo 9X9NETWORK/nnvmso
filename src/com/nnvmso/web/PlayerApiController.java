@@ -1,20 +1,12 @@
 package com.nnvmso.web;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.Locale;
 import java.util.logging.Logger;
-import java.util.zip.GZIPInputStream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -965,7 +957,6 @@ public class PlayerApiController {
 
 	@RequestMapping(value="recentlyWatched")
 	public ResponseEntity<String> recentlyWatched(@RequestParam(value="user", required=false) String userToken,
-	                                              @RequestParam(value="channel", required=false) String channel,
 										          @RequestParam(value="count", required=false) String count,
 										          @RequestParam(value="channelInfo", required=false) String channelInfo,
 			                                      HttpServletRequest req) {				                                
@@ -973,7 +964,7 @@ public class PlayerApiController {
 		boolean isChannelInfo = Boolean.parseBoolean(channelInfo);
 		String output = NnStatusMsg.errorStr(locale);
 		try {
-			output = playerApiService.findUserWatched(userToken, channel, count, isChannelInfo);
+			output = playerApiService.findUserWatched(userToken, count, isChannelInfo);
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}
