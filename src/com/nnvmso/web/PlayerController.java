@@ -41,6 +41,13 @@ public class PlayerController {
 		return "player/mini";
 	}	
 
+	@RequestMapping("10ft")
+	public String tenft(@RequestParam(value="mso",required=false) String mso, HttpServletRequest req, HttpServletResponse resp, Model model) {
+		PlayerService service = new PlayerService();
+		model = service.prepareBrand(model, mso, resp);
+		return "player/mini";
+	}	
+	
 	@RequestMapping("tv")
 	public String tv(@RequestParam(value="mso",required=false) String mso, HttpServletRequest req, HttpServletResponse resp, Model model) {
 		PlayerService service = new PlayerService();

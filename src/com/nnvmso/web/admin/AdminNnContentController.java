@@ -62,23 +62,37 @@ public class AdminNnContentController {
 	}
 
 	@RequestMapping(value="form", method=RequestMethod.GET)
-	public String editGet(HttpServletRequest req) {
-		return "admin/static.jsp";
+	public String formEdit(HttpServletRequest req) {
+		return "admin/static";
 	}
 
 	@RequestMapping(value="form", method=RequestMethod.POST)
-	public String editPost(
-			@RequestParam String key, 
-            @RequestParam String text,
-            @RequestParam String lang,
-			HttpServletRequest req) {
-		return "admin/static.jsp";
+	public String formPost(HttpServletRequest req) {			
+		String key = req.getParameter("key");
+		String lang = req.getParameter("lang");
+		String text = req.getParameter("text"); 
+		NnContent content = contentMngr.findByItemAndLang(key, lang);
+		if (content == null) {
+			Text txt = new Text(text);
+			content = new NnContent(key, txt, lang);
+		}
+		if (lang == null)
+			lang = LangTable.LANG_EN;
+		if (!lang.equals(LangTable.LANG_EN) && !lang.equals(LangTable.LANG_ZH))
+			lang = LangTable.LANG_EN;	
+		
+		Text txt = new Text(text);
+		content.setContent(txt);
+		content.setLang(lang);
+		contentMngr.save(content);
+		return "redirect:/admin/content/list";
 	}
 	
 	@RequestMapping(value="edit")
 	public @ResponseBody String edit(@RequestParam String key, 
 			                         @RequestParam String text,
-			                         @RequestParam String lang) {
+			                         @RequestParam String lang,
+			                         HttpServletRequest req) {
 		NnContent content = contentMngr.findByItemAndLang(key, lang);
 		if (content == null)
 			return "does not exist";
@@ -108,7 +122,6 @@ public class AdminNnContentController {
 		}
 		String result = NnStringUtil.getDelimitedStr(title) + "\n" + output;
 		return NnNetUtil.textReturn(result);
-	}
-	
+	}	
 	
 }
