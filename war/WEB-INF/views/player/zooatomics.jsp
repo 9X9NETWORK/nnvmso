@@ -5,7 +5,7 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9playerV68a"/>
-<c:set var="nroot" value="http://9x9ui.s3.amazonaws.com/9x9playerV81"/>
+<c:set var="nroot" value="http://9x9ui.s3.amazonaws.com/9x9playerV84"/>
 
 <!-- $Revision$ -->
 
@@ -67,72 +67,16 @@ var brandinfo = "${brandInfo}";
 
 <body id="body" style="overflow: hidden">
 
-<div id="fp1" style="width: 100%; height: 100%; z-index: 1; visibility: visible; position: absolute; left: 0; top: 0; overflow: hidden;">
-  <a href="" style="display:block; width:100%;" id="player1" onClick="noop(this)"></a>
-
-</div>
-
-<div id="fp2" style="width: 100%; height: 100%; z-index: 2; visibility: visible; position: absolute; left: 0; top: 0; overflow: hidden;">
-  <a href="" style="display:block; width:100%;" id="player2" onClick="noop(this)"></a>
-</div>
-
-<div id="yt1" style="width: 100%; height: 100%; z-index: 1; visibility: visible; position: absolute; left: 0; top: 0; overflow: hidden;">
-  <div id="ytapiplayer1">
-  </div>
-</div>
-
-<div id="yt2" style="width: 100%; height: 100%; z-index: 1; visibility: visible; position: absolute; left: 0; top: 0; overflow: hidden;">
-  <div id="ytapiplayer2">
-  </div>
-</div>
-
-<div id="yt3" style="width: 100%; height: 100%; z-index: 1; visibility: visible; position: absolute; left: 0; top: 0; overflow: hidden;">
-  <div id="ytapiplayer3">
-  </div>
-</div>
-
-<div id="ss" style="width: 100%; height: 100%; z-index: 4; visibility: visible; position: absolute; left: 0; top: 0; overflow: hidden; display: none">
-</div>
-
 <div id="blue" style="background: black; width: 100%; height: 100%; display: block; position: absolute; color: white">
 </div>
 
-<!--div id="notblue" style="width: 100%; display: none; position: absolute; top: 0; margin: 0; overflow: hidden"-->
-
-  <div id="all-players" style="display: none; padding: 0; display: none">
-    <div id="v" style="display: block; padding: 0">
-      <video id="vvv" autoplay="false" preload="metadata" loop="false" height="100%" width="100%" volume="0"></video></div>
-
-<div id="jw" style="width: 100%; height: 100%; display: none">
-        <embed name="player1" id="player1"
-            type="application/x-shockwave-flash"
-            pluginspage="http://www.macromedia.com/go/getflashplayer"
-            width="100%" height="100%"
-            bgcolor="#FFFFFF"
-            src="http://9x9ui.s3.amazonaws.com/scripts/player.swf"
-            allowfullscreen="true"
-            allowscriptaccess="always"
-            wmode="transparent"
-            flashvars="fullscreen=true&controlbar=none&mute=false&bufferlength=1&allowscriptaccess=always">
-        </embed>
-</div>
-<!--div id="jw2" style="width: 100%; height: 100%">
-        <embed name="player2" id="player2"
-            type="application/x-shockwave-flash"
-            pluginspage="http://www.macromedia.com/go/getflashplayer"
-            width="100%" height="100%"
-            bgcolor="#FFFFFF"
-            src="http://9x9ui.s3.amazonaws.com/scripts/player.swf"
-            allowfullscreen="true"
-            allowscriptaccess="always"
-            wmode="transparent"
-            flashvars="fullscreen=true&controlbar=none&mute=false&bufferlength=1&allowscriptaccess=always">
-        </embed>
-
-</div-->
-
+<div id="recent-layer" style="display: none">
+  <div id="recent-holder">
+    <h4><span>Recently Watched</span></h4>
+    <img src="${nroot}/images/btn_winclose.png" id="btn-recent-close">
+    <ul id="recent-list"><li class="first"><img src="${nroot}/thumb/01.jpg" class="thumbnail"><p class="ch-title"><span>Top 10 and Top 9 and top 8</span></p></li><li><img src="${nroot}/thumb/01.jpg" class="thumbnail"><p class="ch-title"><span>Top 10</span></p></li><li><img src="${nroot}/thumb/01.jpg" class="thumbnail"><p class="ch-title"><span>Top 10</span></p></li><li><img src="${nroot}/thumb/01.jpg" class="thumbnail"><p class="ch-title"><span>Top 10</span></p></li></ul>
   </div>
-
+</div>
 
 <div id="signin-layer">
   <div id="signin-holder">
@@ -155,8 +99,8 @@ var brandinfo = "${brandInfo}";
             <input type="password" class="textfield" id="signin-password">
           </p>
         </li>
-        <li id="btn-forgot-pw"><span>Forgot your password?</span></li>
-        <li id="keep-signin"><p class="btn-check on"><img src="${nroot}/images/btn_check_on.png" class="btn-check-on"><img src="${nroot}/images/btn_check_off.png" class="btn-check-off"><span>Keep me sign in</span></p></li>
+        <!--li id="btn-forgot-pw"><span>Forgot your password?</span></li-->
+        <!--li id="keep-signin"><p class="btn-check on"><img src="${nroot}/images/btn_check_on.png" class="btn-check-on"><img src="${nroot}/images/btn_check_off.png" class="btn-check-off"><span>Keep me sign in</span></p></li-->
         <li><p class="btn" id="btn-signin"><span>Sign in</span></p></li>
       </ul>
       <div id="entry-switcher">
@@ -349,7 +293,8 @@ var brandinfo = "${brandInfo}";
 </div>
 
 <div id="rename-layer">
-  <div class="rename-holder">
+  <div id="rename-holder">
+    <spam style="color: white"><br>You can change the name of this 3x3 channel set</span>
     <p id="rename-input">
       <input type="text" class="textfield" id="rename-field" value="Enter a new title for the set">
     </p>
@@ -367,6 +312,37 @@ var brandinfo = "${brandInfo}";
       <li><p class="btn" id="btn-watchSet"><span>Watching this Set</span></p></li>
       <li><p class="btn" id="btn-toFset"><span>Back to Add Featured Sets</span></p></li>
       <li><p class="btn" id="btn-toSG"><span>Return to Smart Guide</span></p></li>
+    </ul>
+  </div>
+</div>
+
+<div id="email-layer">
+  <div id="email-holder">
+    <ul class="input-list">
+      <li>
+        <span>To:</span>
+        <p id="email-input">
+          <input type="text" class="textfield" value="Enter email address">
+        </p>
+      </li>
+      <li>
+        <span>Message:</span><span class="hint">(150 characters maximum)</span>
+        <p id="msg-input">
+          <textarea class="textfield">Enter message</textarea> 
+        </p>
+      </li>
+      <li>
+        <span>Word Verification:</span>
+        <p id="email-captcha-input">
+          <input type="text" class="textfield" value="Type the characters in the picture below">
+        </p>
+        <p id="email-captcha"><img></p>
+        <img src="${nroot}/images/btn_recaptcha.png" id="btn-email-recaptcha" title="Get a new challenge">
+      </li>
+    </ul>
+    <ul class="action-list">
+      <li><p class="btn disable" id="btn-email-send"><span>Send</span></p></li>
+      <li><p class="btn" id="btn-email-cancel"><span>Cancel</span></p></li>
     </ul>
   </div>
 </div>
@@ -649,14 +625,6 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
   </div>
 </div>
 
-<div id="recent-layer" style="display: none">
-  <div id="recent-holder">
-    <h4><span>Recently Watched</span></h4>
-    <img src="${nroot}/images/btn_winclose.png" id="btn-recent-close">
-    <ul id="recent-list"><li class="first"><img src="${nroot}/thumb/01.jpg" class="thumbnail"><p class="ch-title"><span>Top 10 and Top 9 and top 8</span></p></li><li><img src="${nroot}/thumb/01.jpg" class="thumbnail"><p class="ch-title"><span>Top 10</span></p></li><li><img src="${nroot}/thumb/01.jpg" class="thumbnail"><p class="ch-title"><span>Top 10</span></p></li><li><img src="${nroot}/thumb/01.jpg" class="thumbnail"><p class="ch-title"><span>Top 10</span></p></li></ul>
-  </div>
-</div>
-
 <div id="player-layer" class="stage" style="display: none; background: #f0f0f0">
   <div id="player-video"></div>
   <div id="player-holder">
@@ -665,36 +633,36 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
       <p id="btn-flip-play"><img src="${nroot}/images/btn_flip_L_off.png" id="btn-fpl-off"><img src="${nroot}/images/btn_flip_L_on.png" id="btn-fpl-on"></p> 
       <img src="${nroot}/images/bg_player.jpg" id="player-bg">
       <p id="btn-player2store"><span>< Back to Store</span></p>
-      <p id="player-index"><span>You are watching</span><span class="ch-title">Jazz</span><span>channel</span></p>
+      <p id="player-index"><span>You are watching</span><span class="ch-title"></span><span>channel</span></p>
       <img src="${nroot}/images/player_ep_panel.png" id="player-ep-panel">
       <img src="${nroot}/images/arrow_right_on.png" id="player-arrow-right">
       <img src="${nroot}/images/arrow_left_on.png" id="player-arrow-left">
-      <ul id="player-ep-list"><li class="on"><img src="${nroot}/images/bg_ep_off.png" class="ep-off"><img src="${nroot}/images/bg_ep_on.png" class="ep-on"><img src="${nroot}/thumb/14.jpeg" class="thumbnail"><p class="duration"><span>10:10</span></p></li><li><img src="${nroot}/images/bg_ep_off.png" class="ep-off"><img src="${nroot}/images/bg_ep_on.png" class="ep-on"><img src="${nroot}/thumb/06.jpg" class="thumbnail"><p class="duration"><span>10:10</span></p></li><li><img src="${nroot}/images/bg_ep_off.png" class="ep-off"><img src="${nroot}/images/bg_ep_on.png" class="ep-on"><img src="${nroot}/thumb/08.jpg" class="thumbnail"><p class="duration"><span>10:10</span></p></li><li><img src="${nroot}/images/bg_ep_off.png" class="ep-off"><img src="${nroot}/images/bg_ep_on.png" class="ep-on"><img src="${nroot}/thumb/04.jpg" class="thumbnail"><p class="duration"><span>10:10</span></p></li><li><img src="${nroot}/images/bg_ep_off.png" class="ep-off"><img src="${nroot}/images/bg_ep_on.png" class="ep-on"><img src="${nroot}/thumb/13.jpg" class="thumbnail"><p class="duration"><span>10:10</span></p></li><li><img src="${nroot}/images/bg_ep_off.png" class="ep-off"><img src="${nroot}/images/bg_ep_on.png" class="ep-on"><img src="${nroot}/thumb/16.jpg" class="thumbnail"><p class="duration"><span>10:10</span></p></li><li><img src="${nroot}/images/bg_ep_off.png" class="ep-off"><img src="${nroot}/images/bg_ep_on.png" class="ep-on"><img src="${nroot}/thumb/17.jpg" class="thumbnail"><p class="duration"><span>10:10</span></p></li><li><img src="${nroot}/images/bg_ep_off.png" class="ep-off"><img src="${nroot}/images/bg_ep_on.png" class="ep-on"><img src="${nroot}/thumb/18.jpg" class="thumbnail"><p class="duration"><span>10:10</span></p></li><li><img src="${nroot}/images/bg_ep_off.png" class="ep-off"><img src="${nroot}/images/bg_ep_on.png" class="ep-on"><img src="${nroot}/thumb/19.jpg" class="thumbnail"><p class="duration"><span>10:10</span></p></li></ul>
+      <ul id="player-ep-list"></ul>
       <p id="player-ep-meta">
         <span class="meta-head">Episode:</span>
-        <span class="ep-title">Jay Leno's eclectic car collection</span>
-        <span class="amount">(5/15)</span>
+        <span class="ep-title"></span>
+        <span class="amount"></span>
       </p>
       <div id="player-ch-flipper">
         <p id="play-next"><img src="${nroot}/images/arrow_down.png"><span>Next Ch</span></p>
         <p id="play-prev"><img src="${nroot}/images/arrow_up.png"><span>Prev Ch</span></p>
-        <p id="play-ch-index"><span>2 / 20</span></p>
+        <p id="play-ch-index"><span></span></p>
       </div>      
       <div id="player-info">
         <div id="ep-description">
           <p class="head"><span>Episode Description</span></p>
-          <p class="content"><span>Take a look at Selena as she meets fans in Philly and Chicago during her Dream Out Loud K-Mart signing. Dream Out Loud isSelena's clothing line now</span></p>
+          <p class="content"><span></span></p>
         </div>
         <div id="comment">
           <p class="head"><span>Curator's Comment</span></p>
-          <p class="content"><span>Take a look at Selena as she meets fans in Philly and Chicago during her Dream Out Loud K-Mart signing. Dream Out Loud isSelena's clothing line now</span></p>
+          <p class="content"><span></span></p>
         </div>
       </div>
       <ul id="control-bar">
         <li id="btn-play"><img src="${nroot}/images/btn_play.png" title="Play"></li>
         <li id="btn-pause"><img src="${nroot}/images/btn_pause.png" title="Pause"></li>
         <li class="divider"></li>
-        <li id="play-time"><span>00:52 / 01:32</span></li>
+        <li id="play-time"><span></span></li>
         <li class="divider"></li>
         <li id="progress-constrain">
           <img src="${nroot}/images/btn_knob.png" id="btn-knob">
@@ -714,8 +682,6 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
         <li id="btn-sync" class="right">
           <img src="${nroot}/images/btn_sync.png" title="9x9 Sync">
           <ul id="sync-dropdown" class="dropdown">
-            <li class="on"><img src="${nroot}/images/icon_check.png" class="icon-check"><span>Google TV</span></li>
-            <li><img src="${nroot}/images/icon_check.png" class="icon-check"><span>Google TV2</span></li>
           </ul>
         </li>
         <li id="btn-share" class="right">
@@ -898,7 +864,7 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
       </ul>
     </li>
   </ul>
-  <p id="copyright"><span>&copy; 2011 9x9.tv.  All right reserved</span></p>
+  <p id="copyright"><span>&copy; 2011 9x9.tv.  All rights reserved</span></p>
 </div>
 
 </body>
