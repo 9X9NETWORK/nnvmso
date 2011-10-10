@@ -33,6 +33,9 @@
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/vertical.slider.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/jquery.mousewheel.min.js"></script>
 
+<style type="text/css">                                                                                                                                                  
+.ui-slider-horizontal .ui-state-default {z-index: 55; width: 1.1875em; height: 1.1875em; background: white url(${nroot}/images/btn_knob.png) no-repeat scroll 50% 50%;}                                                                                                                                            
+</style>                                                                                                                                                                 
 
 <script type="text/javascript">
 var analytz = false;
@@ -359,19 +362,21 @@ var brandinfo = "${brandInfo}";
       <div id="about-slider" class="slider-wrap"><div class="slider-vertical"></div></div>
       <div id="about-content" class="constrain">
         <div id="about-list">
-          <img src="${nroot}/images/logo_about.png" id="about-logo">
-          <p><span>As today's Internet becomes increasingly dominated by videos, 9x9 offers the ultimate Video Browser that brings order to chaos by making online video discovery and consumption fun and addictive. Organized as a virtually infinitely large video Channel Store and backed by a Cloud-based platform,  9x9 allows online videos such as those found on YouTube to be grouped into TV-like channels which can be easily flipped through, discovered and added to the user's program guide.  Users watch channels subscribed via a browser on a PC, or an app on iPad, iPhone or TV anywhere anytime.  A Visual Directory further aids the users in quickly browsing the Channel Store and picking out their favorite video channels through a simple "Flip and Discover" experience.</span></p>
-          <p><span>Over time, 9x9 will personalize its Video Browser to suit an individual user's lifestyle and grow the ecosystem by working with content creators, curators, media agencies and advertisers to redefine the rules of the unfulfilled half of the Internet to be dominated by videos.</span></p>
-          <p><span>9x9 is headquartered in Santa Clara, California and backed by investors in the US and abroad.  Join us today by visiting our Channel Store and discover a whole new experience of online video discovery, video watching and video sharing.  The more you flip, the better it gets.</span></p>
         </div>
       </div>
     </div>
     <div id="contact-panel" class="input-panel">
+      <div id="contact-slider" class="slider-wrap"><div class="slider-vertical"></div></div>
       <div id="contact-content" class="constrain">
+        <div id="contact-list">
+        </div>
       </div>
     </div>
     <div id="legal-panel" class="input-panel">
+      <div id="legal-slider" class="slider-wrap"><div class="slider-vertical"></div></div>
       <div id="legal-content" class="constrain">
+        <div id="legal-list">
+        </div>
       </div>
     </div>
   </div>
@@ -399,12 +404,6 @@ var brandinfo = "${brandInfo}";
       <div id="faq-slider" class="slider-wrap"><div class="slider-vertical"></div></div>
       <div id="faq-content" class="constrain">
         <div id="faq-list">
-          <p><span>As today's Internet becomes increasingly dominated by videos, 9x9 offers the ultimate Video Browser that brings order to chaos by making online video discovery and consumption fun and addictive. Organized as a virtually infinitely large video Channel Store and backed by a Cloud-based platform,  9x9 allows online videos such as those found on YouTube to be grouped into TV-like channels which can be easily flipped through, discovered and added to the user's program guide.  Users watch channels subscribed via a browser on a PC, or an app on iPad, iPhone or TV anywhere anytime.  A Visual Directory further aids the users in quickly browsing the Channel Store and picking out their favorite video channels through a simple "Flip and Discover" experience.</span></p>
-          <p><span>Over time, 9x9 will personalize its Video Browser to suit an individual user's lifestyle and grow the ecosystem by working with content creators, curators, media agencies and advertisers to redefine the rules of the unfulfilled half of the Internet to be dominated by videos.</span></p>
-          <p><span>9x9 is headquartered in Santa Clara, California and backed by investors in the US and abroad.  Join us today by visiting our Channel Store and discover a whole new experience of online video discovery, video watching and video sharing.  The more you flip, the better it gets.</span></p>
-          <p><span>As today's Internet becomes increasingly dominated by videos, 9x9 offers the ultimate Video Browser that brings order to chaos by making online video discovery and consumption fun and addictive. Organized as a virtually infinitely large video Channel Store and backed by a Cloud-based platform,  9x9 allows online videos such as those found on YouTube to be grouped into TV-like channels which can be easily flipped through, discovered and added to the user's program guide.  Users watch channels subscribed via a browser on a PC, or an app on iPad, iPhone or TV anywhere anytime.  A Visual Directory further aids the users in quickly browsing the Channel Store and picking out their favorite video channels through a simple "Flip and Discover" experience.</span></p>
-          <p><span>Over time, 9x9 will personalize its Video Browser to suit an individual user's lifestyle and grow the ecosystem by working with content creators, curators, media agencies and advertisers to redefine the rules of the unfulfilled half of the Internet to be dominated by videos.</span></p>
-          <p><span>9x9 is headquartered in Santa Clara, California and backed by investors in the US and abroad.  Join us today by visiting our Channel Store and discover a whole new experience of online video discovery, video watching and video sharing.  The more you flip, the better it gets.</span></p>
         </div>
       </div>
     </div>
@@ -473,6 +472,14 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
   </ul>
 </div>
 
+<div id="set-bubble">
+  <img src="${nroot}/images/bubble_tip.png" id="set-bubble-tip">
+  <img src="${nroot}/images/bg_bubble.png" class="bg-bubble">
+  <p id="setbubble-content">
+    <span id="setbubble-title"></span>
+    <span id="setbubble-description"></span>
+  </p>
+</div>
 
 <div id="store-layer" class="stage" style="background: #f0f0f0; display: none">
   <div id="store-holder">
@@ -665,7 +672,7 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
         <li id="play-time"><span></span></li>
         <li class="divider"></li>
         <li id="progress-constrain">
-          <img src="${nroot}/images/btn_knob.png" id="btn-knob">
+          <!--img src="${nroot}/images/btn_knob.png" id="btn-knob"-->
           <div id="progress-bar">
             <p id="loaded"></p>
             <p id="played"></p>
@@ -852,9 +859,9 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
   <ul id="footer-list">
     <li id="btn-company"><span>Company</span></li>
     <li class="divider"></li>
-    <li id="btn-partner"><span>Partner</span></li>
-    <li class="divider"></li>
     <li id="btn-blog"><span>Blog</span></li>
+    <li class="divider"></li>
+    <li id="btn-forum"><span>Forum</span></li>
     <li class="divider"></li>
     <li id="btn-sitelang">
       <p id="selected-sitelang"><span>English site</span><img src="${nroot}/images/icon_expand.png" class="icon-expand"></p>
