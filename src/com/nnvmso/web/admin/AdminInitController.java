@@ -23,7 +23,12 @@ import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnNetUtil;
+import com.nnvmso.model.MsoChannel;
+import com.nnvmso.model.NnUser;
 import com.nnvmso.service.InitService;
+import com.nnvmso.service.MsoChannelManager;
+import com.nnvmso.service.NnUserManager;
+import com.nnvmso.service.TranscodingService;
 
 /**
  * for testing only, works only for small set of data
@@ -100,7 +105,7 @@ public class AdminInitController {
 	public String groundStartPost(HttpServletRequest req) {
 		String host = NnNetUtil.getUrlRoot(req);
 		if (host.equals("http://localhost:8888")) {
-			initService.initAll(true, true);
+			initService.initAll(false, true);
 		}
 		return "admin/groundStart";
 	}	
@@ -281,6 +286,27 @@ public class AdminInitController {
 			      TaskOptions.Builder.withUrl("/admin/init/badChannelReport"));			          
 		return NnNetUtil.textReturn("You will receive an email when it is done.");
 	}
+
+	//temp fix
+	@RequestMapping("mapleTest")
+	public ResponseEntity<String> mapleTest(HttpServletRequest req) {
+		NnUserManager userMngr = new NnUserManager();
+		NnUser user = userMngr.findByEmail("mso@9x9.tv");		
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		String url="http://www.maplestage.net/show/台灣演义/";
+		MsoChannel c = channelMngr.findBySourceUrlSearch(url);
+		if (c == null) {					
+			System.out.println("create maple:" + url);
+			c = new MsoChannel(url, user.getKey().getId());
+			c.setStatus(MsoChannel.STATUS_PROCESSING);
+			c.setContentType(channelMngr.getContentTypeByUrl(url));
+			channelMngr.create(c);
+			TranscodingService tranService = new TranscodingService();
+			tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
+			channelMngr.save(c);
+		}
+		return NnNetUtil.textReturn("OK");		
+	}		
 
 	//temp fix
 	@RequestMapping("badChannelReport")

@@ -1,19 +1,14 @@
 package com.nnvmso.lib;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import javax.servlet.http.HttpServletRequest;
@@ -36,16 +31,20 @@ public class NnNetUtil {
 		return new ResponseEntity<String>(output, headers, HttpStatus.OK);		
 	}	
 
-	public static void write(HttpServletResponse resp, String text) {
-		try {
-			byte[] reply = text.getBytes("UTF-8");
-	        OutputStream os = resp.getOutputStream();
-	        os.write(reply);
-	        os.flush();
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+	public static void write(HttpServletRequest req, HttpServletResponse resp, String text) {
+		if (NnNetUtil.isGzipResponse(req)) {
+			NnNetUtil.writeGzip(resp, text);
+		} else {
+			try {
+				byte[] reply = text.getBytes("UTF-8");
+		        OutputStream os = resp.getOutputStream();
+		        os.write(reply);
+		        os.flush();
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}	
 

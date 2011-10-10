@@ -9,6 +9,7 @@ public class RtnChannel {
 	private String key; //channel key
 	private String title;
 	private String description;
+	private String contentType;
 	private String pubDate;
 	private String lastUpdateTime;
 	private String image;
@@ -70,6 +71,12 @@ public class RtnChannel {
 	}
 	public void setLastUpdateTime(String lastUpdateTime) {
 		this.lastUpdateTime = lastUpdateTime;
+	}	
+	public String getContentType() {
+		return contentType;
+	}
+	public void setContentType(String contentType) {
+		this.contentType = contentType;
 	}
 	public String toString() {
         StringBuffer buffer = new StringBuffer();

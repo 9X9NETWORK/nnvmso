@@ -19,8 +19,7 @@ public class ChannelSetChannelDao extends GenericDao<ChannelSetChannel> {
 		super(ChannelSetChannel.class);
 	}
 	
-	public List<ChannelSetChannel> findByChannelSetId(long channelSetId) {
-		
+	public List<ChannelSetChannel> findByChannelSetId(long channelSetId) {		
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		List<ChannelSetChannel> detached = new ArrayList<ChannelSetChannel>();
 		
@@ -37,12 +36,28 @@ public class ChannelSetChannelDao extends GenericDao<ChannelSetChannel> {
 		}
 		return detached;
 	}
-	
-	public ChannelSetChannel findByChannelSetIdAndSeq(long channelSetId, int seq) {
-		
+
+	public ChannelSetChannel findBySetAndChannel(long channelSetId, long channelId) {		
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		ChannelSetChannel result = null;
-		
+		ChannelSetChannel result = null;		
+		try {
+			Query query = pm.newQuery(ChannelSetChannel.class);
+			query.setFilter("channelSetId == channelSetIdParam && channelId == channelId");
+			query.declareParameters("long channelSetIdParam, long channelIdParam");
+			@SuppressWarnings("unchecked")
+			List<ChannelSetChannel> list = (List<ChannelSetChannel>)query.execute(channelSetId, channelId);
+			if (list.size() > 0)
+				result = pm.detachCopy(list.get(0));
+		} catch (JDOObjectNotFoundException e) {
+		} finally {
+			pm.close();
+		}
+		return result;
+	}
+	
+	public ChannelSetChannel findByChannelSetIdAndSeq(long channelSetId, int seq) {		
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		ChannelSetChannel result = null;		
 		try {
 			Query query = pm.newQuery(ChannelSetChannel.class);
 			query.setFilter("channelSetId == channelSetIdParam && seq == seqParam");

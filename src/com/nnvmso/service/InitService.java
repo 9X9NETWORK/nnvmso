@@ -79,12 +79,14 @@ public class InitService {
 		initMso();
 		initSets(english, devel);
 		initChannels(english, devel);
-		initCategories(english);
-		initSetAndChannels(english);		
-		initCategoryAndSets(english);
-		initRecommended(english);
-		initCategoryCount();
-		initMapelPrograms();
+		
+		//initCategories(english);
+		initSetAndChannels(english);
+		
+//		initCategoryAndSets(english);
+//		initRecommended(english);
+//		initCategoryCount();
+//		initMapelPrograms();
 	}
 		
 	 //for local testing only
@@ -425,22 +427,29 @@ public class InitService {
 			wb = WorkbookFactory.create(input);
 			Sheet sets = wb.getSheetAt(3);			
 			rows = sets.getPhysicalNumberOfRows();						
+		    int maple = 0;
 			for (int r=1; r<rows; r++) {
 			    Row row = sets.getRow(r);
-			    int col = row.getLastCellNum(); 
+			    int col = row.getLastCellNum();
 			    for (int c=1; c<col; c+=2) {
 			    	Cell cell = row.getCell(c);
 			    	if (cell != null) {
 			    		String url = cell.getStringCellValue();
-			    		String checkedUrl = YouTubeLib.formatCheck(url);
-			    		if (checkedUrl != null)
-			    			list.add(checkedUrl);
-			    		else
-			    			log.info("url not passed youtube lib check:" + url);
+			    		if (!url.contains("maplestage")) {  
+				    		String checkedUrl = YouTubeLib.formatCheck(url);
+				    		if (checkedUrl != null)
+				    			list.add(checkedUrl);
+				    		else
+				    			log.info("url not passed youtube lib check:" + url);
+			    		} else {
+			    			list.add(url);
+			    			maple++;
+			    		}
 			    	}
 			    }
 			}
 			log.info("final channel size:" + list.size());
+    		System.out.println("mapel channels:" + maple);			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (InvalidFormatException e) {
@@ -490,7 +499,6 @@ public class InitService {
 				c.setPiwik(piwikId);
 				channelMngr.save(c);
 			}
-
 		}
 	}
 		
@@ -515,7 +523,6 @@ public class InitService {
 				Cell cell = row.getCell(i);
 				if (cell != null) {
 					String name = cell.getStringCellValue();
-					System.out.println("found name:" + i + ";" + name);
 					if (name != null && name.length() > 0) {
 						name = name.trim();
 						ChannelSet cs = csMngr.findByName(name);
@@ -556,8 +563,9 @@ public class InitService {
 			    	Cell cell = row.getCell(c);
 			    	if (cell != null) {
 			    		String url = cell.getStringCellValue();
-			    		String checkedUrl;
-			    		checkedUrl = YouTubeLib.formatCheck(url);			    			
+			    		String checkedUrl = url;
+			    		if (!url.contains("maplestage"))
+			    			checkedUrl = YouTubeLib.formatCheck(url);
 		    			List<String> list = new ArrayList<String>();		    			
 		    			if (checkedUrl != null) {
 				    		if (seq < channelSetList.size()) { 
@@ -573,8 +581,10 @@ public class InitService {
 			}
 			if (channelSetList.size() != setList.size()) {
 				log.severe("set found from db and channel data are not consistent:" + setList.size() + ";" + channelSetList.size());
-				return;
+				//return;
 			}
+						
+			
 			//real work
 			Hashtable<String, MsoChannel> table = new Hashtable<String, MsoChannel>();
  			for (int i=0; i<setList.size(); i++) {
@@ -589,8 +599,11 @@ public class InitService {
  					} else { 
  						table.put(url, c);
  						ChannelSet cs = setList.get(i);
- 						ChannelSetChannel csc = new ChannelSetChannel(cs.getKey().getId(), c.getKey().getId(), c.getSeq());				
- 						cscMngr.create(csc);
+ 						ChannelSetChannel csc = cscMngr.findBySetAndChannel(cs.getKey().getId(), c.getKey().getId());
+ 						if (csc == null) {
+ 							csc = new ChannelSetChannel(cs.getKey().getId(), c.getKey().getId(), c.getSeq());				
+ 							cscMngr.create(csc);
+ 						}
  					} 						
  				}
  			}			

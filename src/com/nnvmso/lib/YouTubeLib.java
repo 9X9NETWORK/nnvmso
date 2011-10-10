@@ -97,7 +97,7 @@ public class YouTubeLib {
 				url = null;
 			}
 		}
-		log.info("original url:" + urlStr + ";result=" + url);
+		//log.info("original url:" + urlStr + ";result=" + url);
 		
 		//if (!youTubeCheck(result)) {return null;} //till the function is fixed		
 		return url;		

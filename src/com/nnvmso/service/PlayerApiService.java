@@ -722,7 +722,7 @@ public class PlayerApiService {
 	private int checkCaptcha(NnGuest guest, String fileName, String name) {
 		NnGuestManager guestMngr = new NnGuestManager();
 		if (guest == null)
-			return NnStatusCode.USER_INVALID;
+			return NnStatusCode.CAPTCHA_INVALID;
 		if (guest.getCaptchaId() == 0)
 			return NnStatusCode.CAPTCHA_INVALID;
 		Captcha c = new CaptchaManager().findById(guest.getCaptchaId());
@@ -1239,7 +1239,8 @@ public class PlayerApiService {
 					        url2, 
 					        url3, 
 					        url4, 
-					        String.valueOf(p.getPubDate().getTime())};
+					        String.valueOf(p.getPubDate().getTime()),
+					        p.getComment()};
 			output = output + NnStringUtil.getDelimitedStr(ori);
 			output = output.replaceAll("null", "");
 			output = output + "\n";
@@ -1335,7 +1336,10 @@ public class PlayerApiService {
 		for (Category c : categories) {
 			String name =  c.getName();
 			int cnt = c.getChannelCount();
-			String[] str = {String.valueOf(c.getKey().getId()), name, String.valueOf(cnt), String.valueOf(c.getSubCategoryCnt())};				
+			String[] str = {String.valueOf(c.getKey().getId()), 
+					                       name, 
+					                       String.valueOf(cnt), 
+					                       String.valueOf(c.getSubCategoryCnt())};				
 			result[1] += NnStringUtil.getDelimitedStr(str) + "\n";
 		}
 		return this.assembleMsgs(NnStatusCode.SUCCESS, result);
@@ -1347,12 +1351,20 @@ public class PlayerApiService {
 		//verify input
 		if (userToken == null || userToken.length() == 0 || userToken.equals("undefined"))
 			map.put("s", NnStatusCode.INPUT_MISSING);
+		if (guestOK) {
+			map.put("s", NnStatusCode.SUCCESS);
+			return map;
+		}
 		//verify user
 		NnUser user = userMngr.findByToken(userToken);
-		if (user == null) 
+		if (user == null) {
 			map.put("s", NnStatusCode.USER_INVALID);
-		if (!guestOK && user.getEmail().equals(NnUser.GUEST_EMAIL) )
+			return map;
+		}
+		if (!guestOK && user.getEmail().equals(NnUser.GUEST_EMAIL) ) {
 			map.put("s", NnStatusCode.USER_PERMISSION_ERROR);
+			return map;
+		}
 		map.put("s", NnStatusCode.SUCCESS);
 		map.put("u", user);
 		return map;
@@ -1402,13 +1414,14 @@ public class PlayerApiService {
 	
 	public String shareByEmail(String userToken, String toEmail, String toName, 
 			                   String subject, String content, 
-			                   String captcha, String text) {
-		EmailService service = new EmailService();
+			                   String captcha, String text) {		
 		@SuppressWarnings("rawtypes")
 		HashMap map = this.checkUser(userToken, false);
 		if ((Integer)map.get("s") != NnStatusCode.SUCCESS) {
 			return this.assembleMsgs((Integer)map.get("s"), null);
-		}		
+		}
+		if (captcha == null || text == null || toEmail == null || content == null)
+			return this.assembleMsgs(NnStatusCode.INPUT_MISSING, null);
 		NnUser user = (NnUser) map.get("u");
 		if (captcha != null) {
 			NnGuestManager guestMngr = new NnGuestManager();
@@ -1418,6 +1431,7 @@ public class PlayerApiService {
 				return this.assembleMsgs(status, null);
 			guestMngr.delete(guest);
 		}
+		EmailService service = new EmailService();
 		NnEmail mail = new NnEmail(toEmail, toName, NnEmail.SEND_EMAIL_SHARE, user.getName(), user.getEmail(), subject, content);		
 		service.sendEmail(mail);
 		return this.assembleMsgs(NnStatusCode.SUCCESS, null);

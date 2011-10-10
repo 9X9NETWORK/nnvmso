@@ -18,15 +18,9 @@ import com.nnvmso.lib.CookieHelper;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.model.Mso;
-import com.nnvmso.model.MsoConfig;
-import com.nnvmso.model.NnUser;
-import com.nnvmso.model.NnUserWatched;
-import com.nnvmso.service.MsoConfigManager;
 import com.nnvmso.service.MsoManager;
 import com.nnvmso.service.NnStatusCode;
 import com.nnvmso.service.NnStatusMsg;
-import com.nnvmso.service.NnUserManager;
-import com.nnvmso.service.NnUserWatchedManager;
 import com.nnvmso.service.PlayerApiService;
 
 /**
@@ -163,7 +157,7 @@ public class PlayerApiController {
 	}
 	
 	/**
-	 * Set user preference. Preferences can be retrieved from login, or apis with isUserInfo option. 
+	 * Set user preference. Preferences can be retrieved from login, or APIs with isUserInfo option.  
 	 * 	
 	 * @param user user token
 	 * @param key preference name
@@ -171,10 +165,12 @@ public class PlayerApiController {
 	 * @return status block
 	 */          
 	@RequestMapping(value="setUserPref")
-	public ResponseEntity<String> setUserPref(@RequestParam(value="user", required=false)String user,
-			                                  @RequestParam(value="key", required=false)String key,
-			                                  @RequestParam(value="value", required=false)String value,
-			                                  HttpServletRequest req) {
+	public ResponseEntity<String> setUserPref(
+			@RequestParam(value="user", required=false)String user,
+			@RequestParam(value="key", required=false)String key,
+			@RequestParam(value="value", required=false)String value,
+			HttpServletRequest req,
+			HttpServletResponse resp) {
 		log.info("userPref: key(" + key + ");value(" + value + ")");
 		int status = this.prepService(req);
 		if (status != NnStatusCode.SUCCESS)
@@ -190,9 +186,19 @@ public class PlayerApiController {
 		return NnNetUtil.textReturn(output);
 	}
 
+	/**
+	 * Get user profile information
+	 * 
+	 * @param user user token
+	 * @return <p>Data returns in key and value pair. Key and value is tab separated. Each pair is \n separated.<br/>
+	 *            keys include "name", "email", "gender", "year", "sphere" "ui-lang"<br/></p>"
+	 *         <p>Example<br/>: name John <br/>email john@example.com<br/>ui-lang en                 
+	 */	
 	@RequestMapping(value="getUserProfile")
-	public ResponseEntity<String> getUserProfile	(@RequestParam(value="user", required=false)String user,
-			                                     HttpServletRequest req) {
+	public ResponseEntity<String> getUserProfile(
+			@RequestParam(value="user", required=false)String user,
+			HttpServletRequest req,
+			HttpServletResponse resp) {
 		this.prepService(req);		
 		String output = NnStatusMsg.errorStr(locale);
 		try {
@@ -204,11 +210,28 @@ public class PlayerApiController {
 		return NnNetUtil.textReturn(output);
 	}
 	
+	/**
+	 * Set user profile information
+	 * 
+	 * @param user user token
+	 * @param <p>key keys include "name", "email", "gender", "year", "sphere", "ui-lang", "password", "oldPassword" 
+	 *        <p>Keys are separated by comma.
+	 * @param <p>value value that pairs with keys. values are separated by comma. The sequence of value has to be the same as 
+	 *        the sequence of keys. 
+	 *        <p>Key and value are used in pairs with corresponding sequence. 
+	 *           For example key=name,email,gender&value=john,john@example.com,1
+	 *        <p>password: if password is provided, oldPassword becomes a mandatory field.
+	 *        <p>gender: valid gender value is 1 and 0
+	 *        <p>ui-lang: ui language. Currently valid values are "zh" and "en".
+	 *        <p>sphere: content region. Currently valid values are "zh" and "en".
+	 */
 	@RequestMapping(value="setUserProfile")
-	public ResponseEntity<String> setUserProfile(@RequestParam(value="user", required=false)String user,
-									             @RequestParam(value="key", required=false)String key,
-									             @RequestParam(value="value", required=false)String value,
-			                                     HttpServletRequest req) {		
+	public ResponseEntity<String> setUserProfile(
+			@RequestParam(value="user", required=false)String user,
+			@RequestParam(value="key", required=false)String key,
+			@RequestParam(value="value", required=false)String value,
+			HttpServletRequest req,
+			HttpServletResponse resp) {		
 		log.info("set user profile: key(" + key + ");value(" + value + ")");
 		int status = this.prepService(req);
 		if (status != NnStatusCode.SUCCESS)
@@ -222,16 +245,15 @@ public class PlayerApiController {
 		}
 		log.info(output);
 		return NnNetUtil.textReturn(output);
-	}
+	}	
 	
-	
-	/* ==========  CATEGORY: BRAND RELATED ========== */
 	/**
 	 * Get brand information. 
 	 * 	
-	 * @param mso mso name, optional, server returns default mso 9x9 if omiited
+	 * @param mso mso name, optional, server returns default mso 9x9 if omitted
 	 * @return <p>Data returns in key and value pair. Key and value is tab separated. Each pair is \n separated.<br/> 
-	 * 		   keys include "key", "name", logoUrl", "jingleUrl", "preferredLangCode" "debug"<br/></p>
+	 * 		   keys include "key", "name", logoUrl", "jingleUrl", "preferredLangCode" "debug", "fbtoken", "read-only"<br/></p>
+	 *         <p>debug equals one indicates debug mode is turned on. read-only equals one indicates system is currently in read-only mode.</p>
 	 *         <p>Example: <br/>
 	 *          0	success <br/>
 	 *          --<br/>
@@ -243,10 +265,14 @@ public class PlayerApiController {
 	 *          logoClickUrl	/<br/>
 	 *          preferredLangCode	en<br/>
 	 *          debug	1<br/>
+	 *          locale  en<br/>
 	 *         </p>
 	 */	
 	@RequestMapping(value="brandInfo")
-	public ResponseEntity<String> brandInfo(@RequestParam(value="mso", required=false)String brandName, HttpServletRequest req) {
+	public ResponseEntity<String> brandInfo(
+			@RequestParam(value="mso", required=false)String brandName, 
+			HttpServletRequest req,
+			HttpServletResponse resp) {
 		log.info("brandInfo:" + brandName);
 		this.prepService(req);		
 		String output = NnStatusMsg.errorStr(locale);
@@ -259,7 +285,6 @@ public class PlayerApiController {
 		return NnNetUtil.textReturn(output);
 	}
 
-	/* ==========  CATEGORY: ACCOUNT RELATED ========== */
 	/**
 	 * User login. A "user" cookie will be set.
 	 * 
@@ -297,15 +322,14 @@ public class PlayerApiController {
 	}
 
 	/**
-	 * Register a guest account. A "guest" cookie will be set.
-	 * If ipg is provided, guest is automatically subscribed to all the channels in the ipg. 
+	 * Register a guest account.
 	 * 
-	 * @param ipg ipg identifier, it is optional
 	 * @return please reference login
 	 */	
 	@RequestMapping(value="guestRegister")
-	public ResponseEntity<String> guestRegister(@RequestParam(value="ipg", required = false) String ipg, HttpServletRequest req, HttpServletResponse resp) {		
-		log.info("guest register: (ipg)" + ipg);
+	public ResponseEntity<String> guestRegister(
+			HttpServletRequest req, 
+			HttpServletResponse resp) {		
 		int status = this.prepService(req);
 		if (status != NnStatusCode.SUCCESS)
 			return NnNetUtil.textReturn(playerApiService.assembleMsgs(NnStatusCode.DATABASE_READONLY, null));
@@ -319,7 +343,7 @@ public class PlayerApiController {
 		log.info(output);
 		return NnNetUtil.textReturn(output);
 	} 
-	
+
 	/**
 	 *  User signup.
 	 *  
@@ -363,8 +387,10 @@ public class PlayerApiController {
 	 * @param user user key identifier 
 	 */		
 	@RequestMapping(value="signout")
-    public ResponseEntity<String> signout(@RequestParam(value="user", required=false) String userKey, 
-    		                              HttpServletRequest req, HttpServletResponse resp) {
+    public ResponseEntity<String> signout(
+    		@RequestParam(value="user", required=false) String userKey, 
+    		HttpServletRequest req, 
+    		HttpServletResponse resp) {
 		this.prepService(req);
 		String output = NnStatusMsg.errorStr(locale);
 		try {
@@ -382,13 +408,14 @@ public class PlayerApiController {
 	 * Example: http://host:port/playerAPI/userTokenVerify?token=QQl0l208W2C4F008980F
 	 * 
 	 * @param token user key 
-	 * @return Will delete the user cookie if token is invalid.<br/>
+	 * @return Will delete user cookie if token is invalid.<br/>
 	 * 		   Return info please reference login.
-	 * @throws IOException 
 	 */	
 	@RequestMapping(value="userTokenVerify")
-	//public ResponseEntity<String> userTokenVerify(@RequestParam(value="token") String token, HttpServletRequest req, HttpServletResponse resp) {
-	public void userTokenVerify(@RequestParam(value="token") String token, HttpServletRequest req, HttpServletResponse resp) throws IOException {
+	public void userTokenVerify(
+			@RequestParam(value="token") String token, 
+			HttpServletRequest req, 
+			HttpServletResponse resp) throws IOException {
 		log.info("userTokenVerify() : userToken=" + token);		
 
 		this.prepService(req);
@@ -399,29 +426,10 @@ public class PlayerApiController {
 			output = playerApiService.handleException(e);
 		}
 		log.info(output);
-		NnNetUtil.write(resp, output);
+		NnNetUtil.write(req, resp, output);
 		//return NnNetUtil.textReturn(output);
-	}
-	
-	/**
-	 * @deprecated Get user's language based on ip
-	 * 
-	 * @return Language code, currently either zh or en. <br/>          
-	 */
-	@RequestMapping(value="getLangCode")
-	public ResponseEntity<String> getLangCode(HttpServletRequest req) {
-		this.prepService(req);
-		String output = NnStatusMsg.errorStr(locale);
-		try {
-			output = playerApiService.findLocaleByHttpRequest(req);
-		} catch (Exception e) {
-			output = playerApiService.handleException(e);
-		}
-		log.info(output);
-		return NnNetUtil.textReturn(output);
 	}	
-
-	/* ==========  CATEGORY: CHANNEL SUBSCRIPTION ========== */	
+	
 	/**
 	 * User subscribes a channel on a designated grid location.
 	 * 
@@ -436,12 +444,14 @@ public class PlayerApiController {
 	 *         second block shows channel id, status code and status message
 	 */		
 	@RequestMapping(value="subscribe")
-	public ResponseEntity<String> subscribe(@RequestParam(value="user", required=false) String userToken, 
-			                                @RequestParam(value="channel", required=false) String channelId,
-			                                @RequestParam(value="set", required=false) String setId,
-			                                @RequestParam(value="grid", required=false) String gridId, 
-			                                @RequestParam(value="pos", required=false) String pos,
-			                                HttpServletRequest req ) {		
+	public ResponseEntity<String> subscribe(
+			@RequestParam(value="user", required=false) String userToken, 
+			@RequestParam(value="channel", required=false) String channelId,
+			@RequestParam(value="set", required=false) String setId,
+			@RequestParam(value="grid", required=false) String gridId, 
+			@RequestParam(value="pos", required=false) String pos,
+			HttpServletRequest req,
+			HttpServletResponse resp) {		
 		log.info("subscribe: userToken=" + userToken+ "; channel=" + channelId + "; grid=" + gridId + "; set=" + setId + ";pos=" + pos);
 		int status = this.prepService(req);
 		if (status != NnStatusCode.SUCCESS)
@@ -481,9 +491,11 @@ public class PlayerApiController {
 	 *         2	399	channel2	channel2 http://podcast.daaitv.org/Daai_TV_Podcast/jing_si_yu/jing_si_yu_files/shapeimage_4.png	3	0	0	2	<br/>
 	 */
 	@RequestMapping(value="setInfo")
-	public ResponseEntity<String> setInfo(@RequestParam(value="set", required=false) String id,
-			                              @RequestParam(value="landing", required=false) String beautifulUrl,
-			                              HttpServletRequest req ) {
+	public ResponseEntity<String> setInfo(
+			@RequestParam(value="set", required=false) String id,
+			@RequestParam(value="landing", required=false) String beautifulUrl,
+			HttpServletRequest req,
+			HttpServletResponse resp) {
 		log.info("setInfo: id =" + id + ";landing=" + beautifulUrl);
 		int status = this.prepService(req);
 		if (status != NnStatusCode.SUCCESS)
@@ -500,7 +512,7 @@ public class PlayerApiController {
 	}
 
 	/**
-	 * Change set name. Please note a pre-defined set is not editable.
+	 * Change set name.
 	 * 
 	 * @param user user token
 	 * @param name set name
@@ -508,10 +520,12 @@ public class PlayerApiController {
 	 * @return status
 	*/
 	@RequestMapping(value="setSetInfo")
-	public ResponseEntity<String> setSetInfo (@RequestParam(value="user", required=false) String userToken,
-			                                  @RequestParam(value="name", required=false) String name,
-			                                  @RequestParam(value="pos", required=false) String pos,
-			                                  HttpServletRequest req) {
+	public ResponseEntity<String> setSetInfo (
+			@RequestParam(value="user", required=false) String userToken,
+			@RequestParam(value="name", required=false) String name,
+			@RequestParam(value="pos", required=false) String pos,
+			HttpServletRequest req,
+			HttpServletResponse resp) {
 		log.info("setInfo: user=" + userToken + ";pos =" + pos);
 		int status = this.prepService(req);
 		if (status != NnStatusCode.SUCCESS)
@@ -544,11 +558,13 @@ public class PlayerApiController {
 	 * @return status code and status message
 	 */			
 	@RequestMapping(value="unsubscribe")
-	public ResponseEntity<String> unsubscribe(@RequestParam(value="user", required=false) String userToken, 
-								              @RequestParam(value="channel", required=false) String channelId,
-								              @RequestParam(value="grid", required=false) String grid,
-								              @RequestParam(value="set", required=false) String setId,
-								              HttpServletRequest req) {			
+	public ResponseEntity<String> unsubscribe(
+			@RequestParam(value="user", required=false) String userToken, 
+			@RequestParam(value="channel", required=false) String channelId,
+			@RequestParam(value="grid", required=false) String grid,
+			@RequestParam(value="set", required=false) String setId,
+			HttpServletRequest req,
+			HttpServletResponse resp) {			
 		int status = this.prepService(req);
 		if (status != NnStatusCode.SUCCESS)
 			return NnNetUtil.textReturn(playerApiService.assembleMsgs(NnStatusCode.DATABASE_READONLY, null));
@@ -564,16 +580,15 @@ public class PlayerApiController {
 		return NnNetUtil.textReturn(output);
 	}	
 
-	/* ==========  CATEGORY: CHANNEL CREATE ========== */		
 	/**
 	 * Generate a channel based on a podcast RSS feed or a YouTube URL.
 	 * 
 	 * <p>Only POST operation is supported.</p>
 	 *  
-	 * @param url a podcast RSS feed or a YouTube url
+	 * @param url YouTube url
 	 * @param user user's unique identifier
-	 * @param grid grid location, 0 - 81
-	 * @param category category id
+	 * @param grid grid location, 1 - 81
+	 * @param category category id, not mandatory
 	 * @param langCode language code, en or zh.
 	 * @param tag tag string, separated by comma
 	 * 
@@ -604,8 +619,9 @@ public class PlayerApiController {
 		return NnNetUtil.textReturn(output);		
 	}
 	
-	/* ==========  CATEGORY: BROWSING ========== */
 	/**
+	 * @deprecated
+	 * 
 	 * Browse all the on-air channels by category.
 	 * 
 	 * @param category category id
@@ -624,9 +640,11 @@ public class PlayerApiController {
 	 *         channel episodes last update time: please look up the definition in channelLineup        
 	 */		
 	@RequestMapping(value="channelBrowse")
-	public ResponseEntity<String> channelBrowse(@RequestParam(value="category", required=false) String categoryIds,
-			                                    @RequestParam(value="lang", required=false) String lang,
-			                                    HttpServletRequest req) {
+	public ResponseEntity<String> channelBrowse(
+			@RequestParam(value="category", required=false) String categoryIds,
+			@RequestParam(value="lang", required=false) String lang,
+			HttpServletRequest req,
+			HttpServletResponse resp) {
 		this.prepService(req);
 		log.info(categoryIds);
 		String output = NnStatusMsg.errorStr(locale);
@@ -639,14 +657,18 @@ public class PlayerApiController {
 	}	
 
 	/**
+	 * @Deprecated Please use category instead
+	 *   
 	 * Browse categories.
 	 *  
 	 * @return Categories info. Each category is \n separated.<br/>
 	 *         Category info has category id, category name, channel count.<br/>
 	 */		
 	@RequestMapping(value="categoryBrowse")
-	public ResponseEntity<String> categoryBrowse(@RequestParam(value="lang", required=false) String lang,
-			                                     HttpServletRequest req) {
+	public ResponseEntity<String> categoryBrowse(
+			@RequestParam(value="lang", required=false) String lang,
+			HttpServletRequest req,
+			HttpServletResponse resp) {
 		this.prepService(req);
 		String output = NnStatusMsg.errorStr(locale);		
 		try {
@@ -664,6 +686,7 @@ public class PlayerApiController {
 	 * @param userInfo true or false. Whether to return user information as login. If asked, it will be returned after status code.
 	 * @param channel channel id, optional, can be one or multiple;  example, channel=1 or channel=1,2,3
 	 * @param setInfo true or false. Whether to return set information.  
+	 * @param required true or false. Will return error in status block if the requested channel is not found.
 	 * @return A string of all of the user's subscribed channels' information.
 	 *         <p>
 	 *         First block: status. Second block: set information. This block will show only when setInfo is true. 
@@ -674,10 +697,10 @@ public class PlayerApiController {
 	 *         <p>  
 	 *         Channel info has following fields: <br/>
 	 *         grid position, channel id, channel name, channel description, channel image url, <br/>
-	 *         program count, channel type(integer, see following), channel status(integer, see following), <br/>
-	 *         contentType(integer, see following), source url, <br/>
-	 *         channel/episodes last update time (see note)
-	 *         
+	 *         program count, channel type(integer, see note), channel status(integer, see note), <br/>
+	 *         contentType(integer, see following), source url (see note), <br/>
+	 *         channel/episodes last update time (see note) <br/>
+	 *         channel sorting (see note), piwik id, last watched episode         
 	 *         </blockquote>
 	 *         <p>
 	 *         set type: TYPE_USER = 1; TYPE_READONLY = 2;
@@ -686,9 +709,15 @@ public class PlayerApiController {
 	 *         <br/>
 	 *         status: STATUS_SUCCESS = 0; STATUS_ERROR = 1;
 	 *         <br/> 
-	 *         contentType: SYSTEM_CHANNEL=1; PODCAST=2; YOUTUBE_CHANNEL=3; YOUTUBE_PLAYERLIST=4 FACEBOOK_CHANNEL=5 MIX_CHANNEL=6
+	 *         contentType: SYSTEM_CHANNEL=1; PODCAST=2; 
+	 *                      YOUTUBE_CHANNEL=3; YOUTUBE_PLAYERLIST=4                        
+	 *                      FACEBOOK_CHANNEL=5; 
+	 *                      MIX_CHANNEL=6; SLIDE=7;
+	 *                      MAPLESTAGE_VARIETY=8; MAPLESTAGE_SOAP=9
 	 *         <br/>
 	 *         channel episodes last update time: it does not always accurate on Youtube channels. It will pass channel create date on FB channels.
+	 *         <br/>
+	 *         sorting: NEWEST_TO_OLDEST=1; SORT_OLDEST_TO_NEWEST=2; SORT_MAPEL=3
 	 *         <p> 
 	 *         Example: <br/>
 	 *         0	success<br/>
@@ -699,12 +728,14 @@ public class PlayerApiController {
 	 *         </p>
 	 */		
 	@RequestMapping(value="channelLineup")
-	public ResponseEntity<String> channelLineup(@RequestParam(value="user", required=false) String userToken,
-												@RequestParam(value="userInfo", required=false) String userInfo,
-												@RequestParam(value="channel", required=false) String channelIds,
-												@RequestParam(value="setInfo", required=false) String setInfo,
-												@RequestParam(value="required", required=false) String required,
-											    HttpServletRequest req) {
+	public ResponseEntity<String> channelLineup(
+			@RequestParam(value="user", required=false) String userToken,
+			@RequestParam(value="userInfo", required=false) String userInfo,
+			@RequestParam(value="channel", required=false) String channelIds,
+			@RequestParam(value="setInfo", required=false) String setInfo,
+			@RequestParam(value="required", required=false) String required,
+			HttpServletRequest req,
+			HttpServletResponse resp) {
 		this.prepService(req);
 		log.info("userToken=" + userToken + ";isUserInfo:" + userInfo);	
 		boolean isUserInfo = Boolean.parseBoolean(userInfo);
@@ -729,14 +760,15 @@ public class PlayerApiController {
 	 * @return status code and status message
 	*/
 	@RequestMapping(value="moveChannel")
-	public ResponseEntity<String> moveChannel(@RequestParam(value="user", required=false) String userToken, 
-											  @RequestParam(value="grid1", required=false) String grid1,
-											  @RequestParam(value="grid2", required=false) String grid2,
-											  HttpServletRequest req){
+	public ResponseEntity<String> moveChannel(
+			@RequestParam(value="user", required=false) String userToken, 
+			@RequestParam(value="grid1", required=false) String grid1,
+			@RequestParam(value="grid2", required=false) String grid2,
+			HttpServletRequest req,
+			HttpServletResponse resp){
 		int status = this.prepService(req);
 		if (status != NnStatusCode.SUCCESS)
 			return NnNetUtil.textReturn(playerApiService.assembleMsgs(NnStatusCode.DATABASE_READONLY, null));
-
 		log.info("userToken=" + userToken + ";grid1=" + grid1 + ";grid2=" + grid2);
 		String output = NnStatusMsg.errorStr(locale);
 		try {
@@ -758,10 +790,11 @@ public class PlayerApiController {
 	 * @return status code and status message
 	*/
 	@RequestMapping(value="copyChannel")
-	public ResponseEntity<String> copyChannel(@RequestParam(value="user", required=false) String userToken, 
-											  @RequestParam(value="channel", required=false) String channelId,
-											  @RequestParam(value="grid", required=false) String grid,
-											  HttpServletRequest req){
+	public ResponseEntity<String> copyChannel(
+			@RequestParam(value="user", required=false) String userToken, 
+			@RequestParam(value="channel", required=false) String channelId,
+			@RequestParam(value="grid", required=false) String grid,
+			HttpServletRequest req){
 		int status = this.prepService(req);
 		if (status != NnStatusCode.SUCCESS)
 			return NnNetUtil.textReturn(playerApiService.assembleMsgs(NnStatusCode.DATABASE_READONLY, null));
@@ -799,14 +832,16 @@ public class PlayerApiController {
 	 *            programType, duration, <br/>
 	 *            programThumbnailUrl, programLargeThumbnailUrl, <br/>
 	 *            url1(mpeg4/slideshow), url2(webm), url3(flv more likely), url4(audio), <br/> 
-	 *            publish date timestamp</p>
+	 *            publish date timestamp, curator comment.</p>
 	 */
 	@RequestMapping("programInfo")
-	public ResponseEntity<String> programInfo(@RequestParam(value="channel", required=false) String channelIds,
-									          @RequestParam(value="user", required = false) String userToken,
-									          @RequestParam(value="userInfo", required=false) String userInfo,
-									          @RequestParam(value="ipg", required = false) String ipgId,
-									          HttpServletRequest req) {
+	public ResponseEntity<String> programInfo(
+			@RequestParam(value="channel", required=false) String channelIds,
+			@RequestParam(value="user", required = false) String userToken,
+			@RequestParam(value="userInfo", required=false) String userInfo,
+			@RequestParam(value="ipg", required = false) String ipgId,
+			HttpServletRequest req,
+			HttpServletResponse resp) {
 		this.prepService(req);		
 		log.info("params: channel:" + channelIds + ";user:" + userToken + ";ipg:" + ipgId);
 		String output = NnStatusMsg.errorStr(locale);
@@ -819,7 +854,6 @@ public class PlayerApiController {
 		return NnNetUtil.textReturn(output);
 	}
 	
-	/* ==========  CATEGORY: IPG RELATED ========== */
 	/**
 	 * Save User Shareing
 	 *
@@ -830,11 +864,13 @@ public class PlayerApiController {
 	 * @return A unique sharing identifier
 	 */
 	@RequestMapping(value="saveShare")
-	public ResponseEntity<String> saveShare(@RequestParam(value="user", required=false) String userToken, 
-			                              @RequestParam(value="channel", required=false) String channelId,
-			                              @RequestParam(value="set", required=false) String setId,
-			                              @RequestParam(value="program", required=false) String programId, 
-			                              HttpServletRequest req) {		
+	public ResponseEntity<String> saveShare(
+			@RequestParam(value="user", required=false) String userToken, 
+			@RequestParam(value="channel", required=false) String channelId,
+			@RequestParam(value="set", required=false) String setId,
+			@RequestParam(value="program", required=false) String programId, 
+			HttpServletRequest req,
+			HttpServletResponse resp) {		
 		int status = this.prepService(req);
 		if (status != NnStatusCode.SUCCESS)
 			return NnNetUtil.textReturn(playerApiService.assembleMsgs(NnStatusCode.DATABASE_READONLY, null));
@@ -885,10 +921,12 @@ public class PlayerApiController {
 	 * 		  </p> 
 	 */	
 	@RequestMapping(value="pdr")
-	public ResponseEntity<String> pdr(@RequestParam(value="user", required=false) String userToken,
-									  @RequestParam(value="session", required=false) String session,
-									  @RequestParam(value="pdr", required=false) String pdr,
-									  HttpServletRequest req) {
+	public ResponseEntity<String> pdr(
+			@RequestParam(value="user", required=false) String userToken,
+			@RequestParam(value="session", required=false) String session,
+			@RequestParam(value="pdr", required=false) String pdr,
+			HttpServletRequest req,
+			HttpServletResponse resp) {
 		int status = this.prepService(req);
 		if (status != NnStatusCode.SUCCESS)
 			return NnNetUtil.textReturn(playerApiService.assembleMsgs(NnStatusCode.DATABASE_READONLY, null));
@@ -910,9 +948,11 @@ public class PlayerApiController {
 	 * @param program programId
 	 */	
 	@RequestMapping(value="programRemove")
-	public ResponseEntity<String> programRemove(@RequestParam(value="program", required=false) String programId,
-				                                @RequestParam(value="user", required=false) String userToken,
-				                                HttpServletRequest req) {
+	public ResponseEntity<String> programRemove(
+			@RequestParam(value="program", required=false) String programId,
+			@RequestParam(value="user", required=false) String userToken,
+			HttpServletRequest req,
+			HttpServletResponse resp) {
 		int status = this.prepService(req);
 		if (status != NnStatusCode.SUCCESS)
 			return NnNetUtil.textReturn(playerApiService.assembleMsgs(NnStatusCode.DATABASE_READONLY, null));
@@ -927,10 +967,17 @@ public class PlayerApiController {
 		return NnNetUtil.textReturn(output);
 	}
 	
+	/**
+	 * List recommendation sets 
+	 * 
+	 * @return <p>lines of set info.
+	 *         <p>Set info includes set id, set name, set description, set image, set channel count          
+	 */		
 	@RequestMapping(value="listRecommended")
 	public ResponseEntity<String> listRecommended(
 			@RequestParam(value="lang", required=false) String lang,
-			HttpServletRequest req) {				                                
+			HttpServletRequest req,
+			HttpServletResponse resp) {				                                
 		this.prepService(req);
 		String output = NnStatusMsg.errorStr(locale);
 		try {
@@ -941,10 +988,24 @@ public class PlayerApiController {
 		return NnNetUtil.textReturn(output);
 	}
 
+	/**
+	 * For directory query. Depending on the query level, it returns category, set, or channel info.    
+	 * API returns list of categories until it reaches category leaf.
+	 * API returns set info when it detects the query category is a set.
+	 * API returns channel info when the category is a set
+	 * 
+	 * @param category category id, category id empty indicates top level category query
+	 * @param lang en or zh
+	 * 
+	 * @return <p>lines of set info.
+	 *         <p>Set info includes set id, set name, set description, set image, set channel count          
+	 */
 	@RequestMapping(value="category")
-	public ResponseEntity<String> category(@RequestParam(value="category", required=false) String category,
-										   @RequestParam(value="lang", required=false) String lang,
-			                               HttpServletRequest req) {				                                
+	public ResponseEntity<String> category(
+			@RequestParam(value="category", required=false) String category,
+			@RequestParam(value="lang", required=false) String lang,
+			HttpServletRequest req,
+			HttpServletResponse resp) {				                                
 		this.prepService(req);
 		String output = NnStatusMsg.errorStr(locale);
 		try {
@@ -956,10 +1017,11 @@ public class PlayerApiController {
 	}
 
 	@RequestMapping(value="recentlyWatched")
-	public ResponseEntity<String> recentlyWatched(@RequestParam(value="user", required=false) String userToken,
-										          @RequestParam(value="count", required=false) String count,
-										          @RequestParam(value="channelInfo", required=false) String channelInfo,
-			                                      HttpServletRequest req) {				                                
+	public ResponseEntity<String> recentlyWatched(
+			@RequestParam(value="user", required=false) String userToken,
+			@RequestParam(value="count", required=false) String count,
+			@RequestParam(value="channelInfo", required=false) String channelInfo,
+			HttpServletRequest req) {				                                
 		this.prepService(req);
 		boolean isChannelInfo = Boolean.parseBoolean(channelInfo);
 		String output = NnStatusMsg.errorStr(locale);
@@ -972,9 +1034,11 @@ public class PlayerApiController {
 	}
 
 	@RequestMapping(value="staticContent")
-	public ResponseEntity<String> staticContent(@RequestParam(value="key", required=false) String key,
-			                                    @RequestParam(value="lang", required=false) String lang,
-			                                    HttpServletRequest req) {				                                
+	public ResponseEntity<String> staticContent(
+			@RequestParam(value="key", required=false) String key,
+			@RequestParam(value="lang", required=false) String lang,
+			HttpServletRequest req,
+			HttpServletResponse resp) {				                                
 		this.prepService(req);
 		String output = NnStatusMsg.errorStr(locale);
 		try {
@@ -986,8 +1050,10 @@ public class PlayerApiController {
 	}
 
 	@RequestMapping(value="search")
-	public ResponseEntity<String> search(@RequestParam(value="text", required=false) String text,
-			                             HttpServletRequest req) {
+	public ResponseEntity<String> search(
+			@RequestParam(value="text", required=false) String text,
+			HttpServletRequest req,
+			HttpServletResponse resp) {
 		this.prepService(req);
 		String output = NnStatusMsg.errorStr(locale);
 		try {
@@ -999,10 +1065,12 @@ public class PlayerApiController {
 	}
 	
 	@RequestMapping(value="saveSorting")
-	public ResponseEntity<String> saveSorting(@RequestParam(value="user", required=false) String userToken,
-			                                  @RequestParam(value="channel", required=false) String channelId,
-			                                  @RequestParam(value="sorting", required=false) String sorting,
-			                                  HttpServletRequest req) {
+	public ResponseEntity<String> saveSorting(
+			@RequestParam(value="user", required=false) String userToken,
+			@RequestParam(value="channel", required=false) String channelId,
+			@RequestParam(value="sorting", required=false) String sorting,
+			HttpServletRequest req,
+			HttpServletResponse resp) {
 		log.info("user:" + userToken + ";channel:" + channelId + ";sorting:" + sorting);
 		int status = this.prepService(req);
 		if (status != NnStatusCode.SUCCESS)
@@ -1026,7 +1094,8 @@ public class PlayerApiController {
 			@RequestParam(value="content", required=false) String content,
 			@RequestParam(value="captcha", required=false) String captcha,
 			@RequestParam(value="text", required=false) String text,
-			HttpServletRequest req) {
+			HttpServletRequest req,
+			HttpServletResponse resp) {
 		log.info("user:" + userToken + ";to whom:" + toEmail + ";content:" + content);
 		this.prepService(req);
 		
@@ -1040,9 +1109,11 @@ public class PlayerApiController {
 	}
 
 	@RequestMapping(value="requestCaptcha")
-	public ResponseEntity<String> requestCaptcha(@RequestParam(value="user", required=false) String token,
-												 @RequestParam(value="action", required=false) String action,
-			                                     HttpServletRequest req) {
+	public ResponseEntity<String> requestCaptcha(
+			@RequestParam(value="user", required=false) String token,
+			@RequestParam(value="action", required=false) String action,
+			HttpServletRequest req,
+			HttpServletResponse resp) {
 		log.info("user:" + token);
 		this.prepService(req);
 		
@@ -1055,11 +1126,14 @@ public class PlayerApiController {
 		return NnNetUtil.textReturn(output);
 	}
 	
-	//!!! important, remove after ios testing
+	/*
 	@RequestMapping("changeConfig")
-	public ResponseEntity<String> changeConfig(@RequestParam(value="msoName",required=false) String msoName,
-			                                   @RequestParam(value="key",required=false) String key,
-			                                   @RequestParam(value="value", required=false) String value ) {
+	public ResponseEntity<String> changeConfig(
+			@RequestParam(value="msoName",required=false) String msoName,
+			@RequestParam(value="key",required=false) String key,
+			@RequestParam(value="value", required=false) String value,
+			HttpServletRequest req,
+			HttpServletResponse resp) {
 		MsoManager msoMngr = new MsoManager();
 		MsoConfigManager configMngr = new MsoConfigManager();		
 		
@@ -1101,15 +1175,17 @@ public class PlayerApiController {
 		return NnNetUtil.textReturn(output);
 	}
 
+	//remove
 	@RequestMapping(value="write")
 	public void write(HttpServletResponse resp, HttpServletRequest req) throws IOException {
-		NnNetUtil.write(resp, "lalala");
+		NnNetUtil.write(req, resp, "lalala");
 	}
 
+	//remove
 	@RequestMapping(value="gzip")
 	public void gzip(HttpServletResponse resp, HttpServletRequest req) throws IOException {
 		NnNetUtil.writeGzip(resp, "lalala");
 	}
-		
+	*/
 	
 }

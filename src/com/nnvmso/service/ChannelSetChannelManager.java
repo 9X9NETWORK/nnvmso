@@ -36,6 +36,11 @@ public class ChannelSetChannelManager {
 	public List<ChannelSetChannel> findByChannelSetId(long channelSetId) {
 		return cscDao.findByChannelSetId(channelSetId);
 	}
+
+	public ChannelSetChannel findBySetAndChannel(long channelSetId, long channelId) {
+		return cscDao.findBySetAndChannel(channelSetId, channelId);
+	}
+	
 	
 	//move from seq1 to seq2
 	public boolean moveSeq(long channelSetId, int seq1, int seq2) {

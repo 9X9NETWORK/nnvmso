@@ -107,7 +107,7 @@ public class MsoChannel implements Serializable {
 	public static final short SORT_OLDEST_TO_NEWEST = 2;
 	public static final short SORT_MAPEL = 3;
 	@NotPersistent
-	private int sorting;  
+	private int sorting;
 
 	@NotPersistent
 	private long recentlyWatchedProgram;  

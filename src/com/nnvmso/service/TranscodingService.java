@@ -138,6 +138,9 @@ public class TranscodingService {
 			intro = intro.substring(0, 499);
 		}
 		if (intro != null) { intro = intro.replaceAll("\\s", " ");}
+		if (podcast.getContentType() != null) {
+			channel.setContentType(Short.parseShort(podcast.getContentType()));
+		}		
 		channel.setIntro(intro);
 		channel.setImageUrl(podcast.getImage());
 		if (channel.getStatus() == MsoChannel.STATUS_PROCESSING) {			

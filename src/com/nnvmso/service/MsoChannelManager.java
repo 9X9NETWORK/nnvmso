@@ -190,6 +190,10 @@ public class MsoChannelManager {
 			type = MsoChannel.CONTENTTYPE_YOUTUBE_PLAYLIST;
 		if (url.contains("facebook.com")) 
 			type = MsoChannel.CONTENTTYPE_FACEBOOK;
+		/*
+		if (url.contains("maplestage"))
+			type = MsoChannel.CONTENTTYPE_MAPLE_VARIETY; //or soap
+			*/
 		return type;
 	}		
 		
