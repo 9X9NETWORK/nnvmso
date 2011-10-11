@@ -1101,9 +1101,9 @@ public class PlayerApiController {
 	 * 
 	 * @param user user token
 	 * @param channel channel id
-	 * @param sorting sorting sequence 
+	 * @param sorting sorting sequence. NEWEST_TO_OLDEST = 1, OLDEST_TO_NEWEST=2  
 	 * @return status
-	 */
+	 */		
 	@RequestMapping(value="saveSorting")
 	public ResponseEntity<String> saveSorting(
 			@RequestParam(value="user", required=false) String userToken,
@@ -1191,7 +1191,10 @@ public class PlayerApiController {
 		return NnNetUtil.textReturn("OK");
 	}
 */	
-		
+	
+	/**
+	 * To be ignored
+	 */
 	@RequestMapping("changeConfig")
 	public ResponseEntity<String> changeConfig(
 			@RequestParam(value="msoName",required=false) String msoName,
@@ -1211,7 +1214,11 @@ public class PlayerApiController {
 		configMngr.save(config);
 		return NnNetUtil.textReturn("OK");
 	}
+
 	
+	/**
+	 * To be ignored
+	 */
 	//!!! important, remove after ios testing
 	@RequestMapping("saveUserWatched")
 	public ResponseEntity<String> saveUserWatched(@RequestParam(value="user",required=false) String token,
@@ -1225,6 +1232,9 @@ public class PlayerApiController {
 		return NnNetUtil.textReturn("OK");
 	}
 	
+	/**
+	 * To be ignored
+	 */
 	@RequestMapping(value="requestTracker")
 	public ResponseEntity<String> requestTracker(@RequestParam(value="set", required=false) String set,
 												 @RequestParam(value="channel", required=false) String channel,
