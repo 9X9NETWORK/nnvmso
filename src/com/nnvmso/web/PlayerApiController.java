@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -22,6 +23,7 @@ import com.nnvmso.service.MsoManager;
 import com.nnvmso.service.NnStatusCode;
 import com.nnvmso.service.NnStatusMsg;
 import com.nnvmso.service.PlayerApiService;
+import com.nnvmso.web.json.transcodingservice.PostUrl;
 
 /**
  * This is API specification for 9x9 Player. Please note although the document is written in JavaDoc form, it is generic Web Service API via HTTP request-response, no Java necessary.
@@ -990,15 +992,18 @@ public class PlayerApiController {
 
 	/**
 	 * For directory query. Depending on the query level, it returns category, set, or channel info.    
-	 * API returns list of categories until it reaches category leaf.
-	 * API returns set info when it detects the query category is a set.
-	 * API returns channel info when the category is a set
+	 * API returns list of category info until it reaches category leaf.
+	 * API returns list of set info when the query "category" is a set.
+	 * API returns list channel info when the query "category" is a set.
 	 * 
 	 * @param category category id, category id empty indicates top level category query
 	 * @param lang en or zh
 	 * 
-	 * @return <p>lines of set info.
-	 *         <p>Set info includes set id, set name, set description, set image, set channel count          
+	 * @return <p>Block one, the request category. Block two, category or set info. Block three, channel info.
+	 *            Block can be blank if such info does not exist.       
+	 *         <p>Category info includes id, name, channel count         
+	 *         <p>Set info includes set id, set name, channel count
+	 *         <p>Channel info please refer to channelLineup
 	 */
 	@RequestMapping(value="category")
 	public ResponseEntity<String> category(
@@ -1016,6 +1021,14 @@ public class PlayerApiController {
 		return NnNetUtil.textReturn(output);
 	}
 
+	/**
+	 * User's recently watched channel and its episode
+	 * 
+	 * @param user user token
+	 * @param count number of recently wathced entries
+	 * @param channelInfo true or false
+	 * @return channel id and program id, separated by tab. each entry is separated by \n
+	 */
 	@RequestMapping(value="recentlyWatched")
 	public ResponseEntity<String> recentlyWatched(
 			@RequestParam(value="user", required=false) String userToken,
@@ -1033,6 +1046,13 @@ public class PlayerApiController {
 		return NnNetUtil.textReturn(output);
 	}
 
+	/**
+	 * Static content for help or general section
+	 * 
+	 * @param key key name to retrieve the content
+	 * @param lang en or zh
+	 * @return static content
+	 */
 	@RequestMapping(value="staticContent")
 	public ResponseEntity<String> staticContent(
 			@RequestParam(value="key", required=false) String key,
@@ -1049,6 +1069,12 @@ public class PlayerApiController {
 		return NnNetUtil.textReturn(output);
 	}
 
+	/**
+	 * Search channel name and description
+	 * 
+	 * @param search search text
+	 * @return matched channels, format please reference channelLineup
+	 */
 	@RequestMapping(value="search")
 	public ResponseEntity<String> search(
 			@RequestParam(value="text", required=false) String text,
@@ -1064,6 +1090,14 @@ public class PlayerApiController {
 		return NnNetUtil.textReturn(output);
 	}
 	
+	/**
+	 * Save user's channel sorting sequence
+	 * 
+	 * @param user user token
+	 * @param channel channel id
+	 * @param sorting sorting sequence 
+	 * @return status
+	 */
 	@RequestMapping(value="saveSorting")
 	public ResponseEntity<String> saveSorting(
 			@RequestParam(value="user", required=false) String userToken,
@@ -1085,6 +1119,18 @@ public class PlayerApiController {
 		return NnNetUtil.textReturn(output);
 	}
 
+	/**
+	 * For user's sharing via email function
+	 * 
+	 * @param user
+	 * @param toEmail
+	 * @param toName
+	 * @param subject
+	 * @param content
+	 * @param captcha
+	 * @param text
+	 * @return status
+	 */
 	@RequestMapping(value="shareByEmail")
 	public ResponseEntity<String> shareByEmail(
 			@RequestParam(value="user", required=false) String userToken,			                            
@@ -1108,6 +1154,13 @@ public class PlayerApiController {
 		return NnNetUtil.textReturn(output);
 	}
 
+	/**
+	 * Request captcha for later verification
+	 * 
+	 * @param token
+	 * @param action action 1 is used for signup. action 2 is used for shareByEmail
+	 * @return
+	 */
 	@RequestMapping(value="requestCaptcha")
 	public ResponseEntity<String> requestCaptcha(
 			@RequestParam(value="user", required=false) String token,
@@ -1125,6 +1178,14 @@ public class PlayerApiController {
 		}
 		return NnNetUtil.textReturn(output);
 	}
+/*
+	@RequestMapping("mapleReceive")
+	public ResponseEntity<String> mapleReceive(@RequestBody PostUrl post) {
+		log.info(post.toString());
+		return NnNetUtil.textReturn("OK");
+	}
+*/	
+	
 	
 	/*
 	@RequestMapping("changeConfig")

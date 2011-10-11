@@ -1,7 +1,14 @@
 package com.nnvmso.web.admin;
 
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Properties;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.mail.Message;
 import javax.mail.Session;
@@ -15,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,6 +37,8 @@ import com.nnvmso.service.InitService;
 import com.nnvmso.service.MsoChannelManager;
 import com.nnvmso.service.NnUserManager;
 import com.nnvmso.service.TranscodingService;
+import com.nnvmso.web.json.transcodingservice.PostUrl;
+import com.nnvmso.web.json.transcodingservice.RtnProgram;
 
 /**
  * for testing only, works only for small set of data
@@ -286,17 +296,16 @@ public class AdminInitController {
 			      TaskOptions.Builder.withUrl("/admin/init/badChannelReport"));			          
 		return NnNetUtil.textReturn("You will receive an email when it is done.");
 	}
-
-	//temp fix
+	
 	@RequestMapping("mapleTest")
 	public ResponseEntity<String> mapleTest(HttpServletRequest req) {
 		NnUserManager userMngr = new NnUserManager();
 		NnUser user = userMngr.findByEmail("mso@9x9.tv");		
 		MsoChannelManager channelMngr = new MsoChannelManager();
-		String url="http://www.maplestage.net/show/台灣演义/";
+			
+		String url="http://www.maplestage.net/show/國民女王/";
 		MsoChannel c = channelMngr.findBySourceUrlSearch(url);
 		if (c == null) {					
-			System.out.println("create maple:" + url);
 			c = new MsoChannel(url, user.getKey().getId());
 			c.setStatus(MsoChannel.STATUS_PROCESSING);
 			c.setContentType(channelMngr.getContentTypeByUrl(url));
@@ -305,6 +314,27 @@ public class AdminInitController {
 			tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
 			channelMngr.save(c);
 		}
+		return NnNetUtil.textReturn("OK");		
+	}				
+	
+	//temp fix
+	@RequestMapping("postTest")
+	public ResponseEntity<String> postTest(HttpServletRequest req) {
+		NnUserManager userMngr = new NnUserManager();
+		NnUser user = userMngr.findByEmail("mso@9x9.tv");		
+		MsoChannelManager channelMngr = new MsoChannelManager();
+			
+		String url="http://www.maplestage.net/show/台灣演义/";
+		PostUrl postUrl = new PostUrl();
+		postUrl.setRss(url);	
+		//String transcodingServer = "http://puppy.9x9.tv/admin/init/mapleReceive";
+		String transcodingServer = "http://puppy.9x9.tv/playerAPI/mapleReceive";
+		NnNetUtil.urlPostWithJson(transcodingServer, postUrl);
+//		MsoChannel c = channelMngr.findBySourceUrlSearch(url);
+//		if (c == null) {					
+//			log.info("create maple:" + url);
+//		}
+
 		return NnNetUtil.textReturn("OK");		
 	}		
 

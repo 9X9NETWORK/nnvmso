@@ -30,4 +30,13 @@ public class PostUrl {
 		this.callback = callback;
 	}
 	
+	public String toString() {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("key: " + key + ";");
+        buffer.append("rss: " + rss + ";");
+        buffer.append("callback: " + callback + ";");
+        return buffer.toString();
+    } 
+
+	
 }

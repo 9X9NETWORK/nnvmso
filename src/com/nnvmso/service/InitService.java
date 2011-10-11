@@ -78,11 +78,11 @@ public class InitService {
 		deleteAll();		
 		initMso();
 		initSets(english, devel);
-		initChannels(english, devel);
-		
-		//initCategories(english);
-		initSetAndChannels(english);
-		
+//		initChannels(english, devel);
+//		
+//		initCategories(english);
+//		initSetAndChannels(english);
+//		
 //		initCategoryAndSets(english);
 //		initRecommended(english);
 //		initCategoryCount();
@@ -549,8 +549,8 @@ public class InitService {
 				}
 			}
 			if (setAll.size() != setList.size()) {
-				log.severe("information inconsistent. set all has " + setAll.size() + ";setList here = " + setList.size());
-				return;
+				//log.severe("information inconsistent. set all has " + setAll.size() + ";setList here = " + setList.size());
+				//return;
 			}
 			//put all the channels into a string table for set, channel lookup
 			int rows = sheet.getPhysicalNumberOfRows();			
@@ -595,7 +595,7 @@ public class InitService {
  	 					c = channelMngr.findBySourceUrlSearch(url);
  					if (c == null) {
  						log.severe("channel unfound:" + url);
- 						return;
+ 						//return;
  					} else { 
  						table.put(url, c);
  						ChannelSet cs = setList.get(i);
