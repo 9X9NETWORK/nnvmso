@@ -31,10 +31,12 @@ import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnNetUtil;
+import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.NnUser;
 import com.nnvmso.service.InitService;
 import com.nnvmso.service.MsoChannelManager;
+import com.nnvmso.service.MsoManager;
 import com.nnvmso.service.NnUserManager;
 import com.nnvmso.service.TranscodingService;
 import com.nnvmso.web.json.transcodingservice.PostUrl;
@@ -338,6 +340,18 @@ public class AdminInitController {
 		return NnNetUtil.textReturn("OK");		
 	}		
 
+	//temp fix
+	@RequestMapping("missingUser")
+	public ResponseEntity<String> missingUser() {
+		NnUserManager userMngr = new NnUserManager();
+		NnUser user = new NnUser("mso@9x9.tv", "9x9mso", "9x9 mso", NnUser.TYPE_NN);
+		MsoManager msoMngr = new MsoManager();
+		Mso mso = msoMngr.findNNMso();
+		user.setMsoId(mso.getKey().getId());
+		userMngr.create(user, null);
+		return NnNetUtil.textReturn("OK");		
+	}		
+	
 	//temp fix
 	@RequestMapping("badChannelReport")
 	public ResponseEntity<String> badChannelReport() {

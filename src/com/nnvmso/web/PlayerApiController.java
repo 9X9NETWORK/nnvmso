@@ -19,9 +19,15 @@ import com.nnvmso.lib.CookieHelper;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.model.Mso;
+import com.nnvmso.model.MsoConfig;
+import com.nnvmso.model.NnUser;
+import com.nnvmso.model.NnUserWatched;
+import com.nnvmso.service.MsoConfigManager;
 import com.nnvmso.service.MsoManager;
 import com.nnvmso.service.NnStatusCode;
 import com.nnvmso.service.NnStatusMsg;
+import com.nnvmso.service.NnUserManager;
+import com.nnvmso.service.NnUserWatchedManager;
 import com.nnvmso.service.PlayerApiService;
 import com.nnvmso.web.json.transcodingservice.PostUrl;
 
@@ -624,7 +630,7 @@ public class PlayerApiController {
 	/**
 	 * @deprecated
 	 * 
-	 * Browse all the on-air channels by category.
+	 * Please use category instead. Browse all the on-air channels by category.
 	 * 
 	 * @param category category id
 	 * @return Category info and channels info. <br/>
@@ -659,9 +665,9 @@ public class PlayerApiController {
 	}	
 
 	/**
-	 * @Deprecated Please use category instead
+	 * @deprecated
 	 *   
-	 * Browse categories.
+	 * Please use category instead. Browse categories.
 	 *  
 	 * @return Categories info. Each category is \n separated.<br/>
 	 *         Category info has category id, category name, channel count.<br/>
@@ -682,16 +688,16 @@ public class PlayerApiController {
 	}
 
 	/**
-	 * Get all of a user's subscriptions. 
+	 * Get channel information 
 	 * 
 	 * @param user user's unique identifier
-	 * @param userInfo true or false. Whether to return user information as login. If asked, it will be returned after status code.
+	 * @param userInfo true or false. Whether to return user information as login does. If asked, it will be returned after status code.
 	 * @param channel channel id, optional, can be one or multiple;  example, channel=1 or channel=1,2,3
 	 * @param setInfo true or false. Whether to return set information.  
 	 * @param required true or false. Will return error in status block if the requested channel is not found.
-	 * @return A string of all of the user's subscribed channels' information.
+	 * @return A string of all of requested channel information
 	 *         <p>
-	 *         First block: status. Second block: set information. This block will show only when setInfo is true. 
+	 *         First block: status. Second block: set information. This block shows only if setInfo is set to true. 
 	 *         Third block: channel information. It would be the second block if setInfo is false
 	 *         <p>
 	 *         Set info has following fields: <br/>
@@ -973,7 +979,7 @@ public class PlayerApiController {
 	 * List recommendation sets 
 	 * 
 	 * @return <p>lines of set info.
-	 *         <p>Set info includes set id, set name, set description, set image, set channel count          
+	 *         <p>Set info includes set id, set name, set description, set image, set channel count. Fields are separated by tab.          
 	 */		
 	@RequestMapping(value="listRecommended")
 	public ResponseEntity<String> listRecommended(
@@ -999,7 +1005,7 @@ public class PlayerApiController {
 	 * @param category category id, category id empty indicates top level category query
 	 * @param lang en or zh
 	 * 
-	 * @return <p>Block one, the request category. Block two, category or set info. Block three, channel info.
+	 * @return <p>Block one, the requested category. Block two, category or set info. Block three, channel info.
 	 *            Block can be blank if such info does not exist.       
 	 *         <p>Category info includes id, name, channel count         
 	 *         <p>Set info includes set id, set name, channel count
@@ -1122,13 +1128,13 @@ public class PlayerApiController {
 	/**
 	 * For user's sharing via email function
 	 * 
-	 * @param user
-	 * @param toEmail
-	 * @param toName
-	 * @param subject
-	 * @param content
-	 * @param captcha
-	 * @param text
+	 * @param user user token
+	 * @param toEmail receiver email
+	 * @param toName receiver name 
+	 * @param subject email subject
+	 * @param content email content
+	 * @param captcha captcha
+	 * @param text captcha text
 	 * @return status
 	 */
 	@RequestMapping(value="shareByEmail")
@@ -1157,9 +1163,9 @@ public class PlayerApiController {
 	/**
 	 * Request captcha for later verification
 	 * 
-	 * @param token
+	 * @param user user token 
 	 * @param action action 1 is used for signup. action 2 is used for shareByEmail
-	 * @return
+	 * @return status
 	 */
 	@RequestMapping(value="requestCaptcha")
 	public ResponseEntity<String> requestCaptcha(
@@ -1185,9 +1191,7 @@ public class PlayerApiController {
 		return NnNetUtil.textReturn("OK");
 	}
 */	
-	
-	
-	/*
+		
 	@RequestMapping("changeConfig")
 	public ResponseEntity<String> changeConfig(
 			@RequestParam(value="msoName",required=false) String msoName,
@@ -1236,6 +1240,7 @@ public class PlayerApiController {
 		return NnNetUtil.textReturn(output);
 	}
 
+	/*
 	//remove
 	@RequestMapping(value="write")
 	public void write(HttpServletResponse resp, HttpServletRequest req) throws IOException {
