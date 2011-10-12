@@ -1163,7 +1163,7 @@ public class PlayerApiService {
 		if (c.getContentType() == MsoChannel.CONTENTTYPE_FACEBOOK) 
 			channelName = c.getSourceUrl();
 		String getName = c.getName();
-		if (getName.startsWith("Youtube user:"))
+		if (getName != null && getName.startsWith("Youtube user:"))
 			getName = getName.replaceFirst("Youtube user: ", "");		
 		String[] ori = {Integer.toString(c.getSeq()), 
 					    String.valueOf(c.getKey().getId()),

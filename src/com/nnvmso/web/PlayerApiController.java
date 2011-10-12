@@ -1007,7 +1007,7 @@ public class PlayerApiController {
 	 * 
 	 * @return <p>Block one, the requested category. Block two, category or set info. Block three, channel info.
 	 *            Block can be blank if such info does not exist.       
-	 *         <p>Category info includes id, name, channel count         
+	 *         <p>Category info includes id, name, channel count, sub-category count         
 	 *         <p>Set info includes set id, set name, channel count
 	 *         <p>Channel info please refer to channelLineup
 	 */

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.TreeMap;
 import java.util.logging.Logger;
 
 import javax.jdo.JDOObjectNotFoundException;
@@ -45,9 +44,10 @@ public class MsoProgramDao extends GenericDao<MsoProgram> {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
 			pm.deletePersistent(program);
+		} catch (JDOObjectNotFoundException e) {			
 		} finally {
 			pm.close();
-		}		
+		}
 	}
 			
 	/**
