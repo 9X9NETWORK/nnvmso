@@ -51,6 +51,7 @@ public class Mso implements Serializable {
 	public static final short TYPE_MSO= 2;
 	public static final short TYPE_3X3= 3;
 	public static final short TYPE_TCO = 4; // for Generic CMS
+	public static final short TYPE_ENTERPRISE = 5; // brand, US only
 	
 	@Persistent
 	private String preferredLangCode;

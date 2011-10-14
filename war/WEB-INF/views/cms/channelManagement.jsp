@@ -299,7 +299,7 @@
             </div>
           </li>
         </ul>
-        <a onclick="return false;" href="javascript:" class="addNew" id="continue_add_new_program_button"><spring:message code="cms.channel_management.btn.continue_creating_program"/></a>
+        <a style="display:none" onclick="return false;" href="javascript:" class="addNew" id="continue_add_new_program_button"><spring:message code="cms.channel_management.btn.continue_creating_program"/></a>
       </div>
     </div>
     <!-- upload channel = 9x9 channel s episode list
@@ -610,6 +610,8 @@
 <label class="lang" id="lang_upload_failed"><spring:message code="cms.warning.upload_failed"/></label>
 <label class="lang" id="lang_confirm_removing_program"><spring:message code="cms.warning.confirm_removing_program"/></label>
 <label class="lang" id="lang_channel_source_is_empty"><spring:message code="cms.warning.channel_source_is_empty"/></label>
+<label class="lang" id="lang_program_source_is_empty"><spring:message code="cms.warning.program_source_is_empty"/></label>
+<label class="lang" id="lang_program_source_invalid_format"><spring:message code="cms.warning.program_source_invalid_format"/></label>
 <label class="lang" id="lang_select_category"><spring:message code="cms.channel_management.msg.select_category"/></label>
 <label class="lang" id="lang_confirm_removing_channel"><spring:message code="cms.warning.confirm_removing_channel"/></label>
 <label class="lang" id="lang_warning_empty_name"><spring:message code="cms.warning.empty_name"/></label>

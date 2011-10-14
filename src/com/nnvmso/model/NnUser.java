@@ -68,6 +68,7 @@ public class NnUser implements Serializable {
 	public static short TYPE_USER = 4;
 	public static short TYPE_NN = 5; //default user, must have and only one
 	public static short TYPE_3X3 = 6;
+	public static short TYPE_ENTERPRISE = 7;
 	@Persistent
 	private short type;
 	

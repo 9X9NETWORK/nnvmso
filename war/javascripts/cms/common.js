@@ -9,6 +9,9 @@ var log = function(text) {
 
 var cms = {
   debug: false,
+  isEnterprise: function() {
+    return ($('#msoType').val() == '5');
+  },
   isGeneric: function() {
     return ($('#msoType').val() == '4');
   },
@@ -171,6 +174,10 @@ var cms = {
       }
     });
   },
+  initEnterpriseOne: function() {
+    $('.menuA').removeAttr('href');
+    $('<style> .menuA:hover { background-position: 0px -59px; cursor: default; } </style>').appendTo('head');
+  },
   initGenericOne: function() {
     $('#blog_link').show();
     $('#mso_logo').wrapAll('<a href="/9x9"></a>');
@@ -211,7 +218,6 @@ var cms = {
         cms.loadScript('/javascripts/plugins/jquery.jqModal.js', cms.initSetupButton);
       });
     });
-    cms.loadScript('/javascripts/plugins/jquery.textTruncate.js');
   }
 };
 
@@ -232,15 +238,19 @@ $(function() {
   
   cms.init();
   
+  if (cms.isGeneric()) {
+    cms.initGenericOne();
+  } else if (cms.isEnterprise()) {
+    cms.initEnterpriseOne();
+  }
+  
   if (typeof (page$) != 'undefined' && typeof (page$.init) == 'function') {
     page$.init();
     if (cms.isGeneric() && typeof (page$.initGenericOne) == 'function') {
       page$.initGenericOne();
+    } else if (cms.isEnterprise() && typeof (page$.initEnterpriseOne) == 'function') {
+      page$.initEnterpriseOne();
     }
-  }
-  
-  if (cms.isGeneric()) {
-    cms.initGenericOne();
   }
   
   /* Release 3.1 by Jeff */

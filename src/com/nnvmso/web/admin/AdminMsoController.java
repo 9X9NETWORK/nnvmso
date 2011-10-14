@@ -83,17 +83,22 @@ public class AdminMsoController {
 		if (found != null) {
 			return "Name In Used";
 		}
-		if (type != Mso.TYPE_3X3) {
+		short userType;
+		if (type == Mso.TYPE_3X3) {
+			userType = NnUser.TYPE_3X3;
+		} else if (type == Mso.TYPE_ENTERPRISE) {
+			userType = Mso.TYPE_ENTERPRISE;
+		} else {
 			return "Only Type 3x3 Is Applicable";
 		}
 		
-		Mso mso = new Mso(name, name, contactEmail, Mso.TYPE_3X3);
+		Mso mso = new Mso(name, name, contactEmail, type);
 		mso.setTitle(name);
 		mso.setPreferredLangCode(Mso.LANG_EN);
 		mso.setLogoUrl(logoUrl);
 		msoMngr.create(mso);
 		
-		NnUser user = new NnUser(contactEmail, password, name, NnUser.TYPE_3X3);
+		NnUser user = new NnUser(contactEmail, password, name, userType);
 		user.setMsoId(mso.getKey().getId());
 		userMngr.create(user, null);
 		

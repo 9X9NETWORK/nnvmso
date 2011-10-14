@@ -509,7 +509,7 @@ public class CmsApiController {
 			workerService.channelLogoProcess(channel.getKey().getId(), imageUrl, prefix, req);
 		}
 		channel.setIntro(intro);
-		channel.setStatus(MsoChannel.STATUS_SUCCESS); // default import status
+		// channel.setStatus(MsoChannel.STATUS_SUCCESS); // default import status
 		channelMngr.save(channel);
 		
 		List<CategoryChannel> ccs = cmsApiService.whichCCContainingTheChannel(channel.getKey().getId());
@@ -783,6 +783,7 @@ public class CmsApiController {
 		
 		MsoChannel channel = new MsoChannel("New Channel", "New Channel", "/WEB-INF/../images/processing.png", userMngr.findNNUser().getKey().getId());
 		channel.setPublic(false);
+		channel.setStatus(MsoChannel.STATUS_WAIT_FOR_APPROVAL);
 		channel.setContentType(MsoChannel.CONTENTTYPE_MIXED); // a channel type in podcast does not allow user to add program in it, so change to mixed type
 		channelMngr.create(channel, new ArrayList<Category>());
 		

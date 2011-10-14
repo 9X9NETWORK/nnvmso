@@ -125,8 +125,10 @@ public class CmsController {
 		
 		Mso sessionMso = (Mso)session.getAttribute("mso");
 		if (sessionMso != null && sessionMso.getKey().getId() == mso.getKey().getId()) {
-			
-			return "redirect:/" + msoName + "/channelManagement";
+			if (mso.getType() == Mso.TYPE_ENTERPRISE)
+				return "redirect:/" + msoName + "/channelSetManagement";
+			else
+				return "redirect:/" + msoName + "/channelManagement";
 		} else {
 			Cookie[] cookies = request.getCookies();
 			if (cookies != null) {
@@ -201,7 +203,10 @@ public class CmsController {
 			response.addCookie(new Cookie("cms_login_" + msoName, ""));
 		}
 		
-		return "redirect:/" + msoName + "/channelManagement";
+		if (mso.getType() == Mso.TYPE_ENTERPRISE)
+			return "redirect:/" + msoName + "/channelSetManagement";
+		else
+			return "redirect:/" + msoName + "/channelManagement";
 	}
 	
 	@RequestMapping(value = "{msoName}/logout")

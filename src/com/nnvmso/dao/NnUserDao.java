@@ -53,8 +53,14 @@ public class NnUserDao extends GenericDao<NnUser> {
 					user = results.get(0);
 				} else {
 					results = (List<NnUser>) query.execute(email, msoId, NnUser.TYPE_TBC);
-					if (results.size() > 0)
+					if (results.size() > 0) {
 						user = results.get(0);
+					} else {
+						results = (List<NnUser>) query.execute(email, msoId, NnUser.TYPE_ENTERPRISE);
+						if (results.size() > 0) {
+							user = results.get(0);
+						}
+					}
 				}
 			}
 			if (user != null) {

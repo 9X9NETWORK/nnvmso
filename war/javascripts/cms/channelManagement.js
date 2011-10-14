@@ -5,6 +5,7 @@
 var page$ = {
   overallLayout: {
     destroyRightSideContent: function(cleanup) {
+      /* not to confirm program creation
       if (cleanup == false) {
         if ($('.program_create_detail_block_cloned').size() > 0) {
           if (confirm($('#lang_confirm_leaving_program_creation').text()) == false) {
@@ -12,6 +13,7 @@ var page$ = {
           }
         }
       }
+      */
       // hide right side content
       page$.channelDetail.destroy();
       page$.programDetail.destroy();
@@ -39,14 +41,14 @@ var page$ = {
     swfObjectImage: [],
     swfObjectVideo: [],
     destroy: function() {
-      for (i in page$.programDetail.swfObjectImage) {
-        page$.programDetail.swfObjectImage[i].destroy();
+      for (i in this.swfObjectImage) {
+        this.swfObjectImage[i].destroy();
       }
-      for (i in page$.programDetail.swfObjectVideo) {
-        page$.programDetail.swfObjectVideo[i].destroy();
+      for (i in this.swfObjectVideo) {
+        this.swfObjectVideo[i].destroy();
       }
-      page$.programDetail.swfObjectVideo = [];
-      page$.programDetail.swfObjectImage = [];
+      this.swfObjectVideo = [];
+      this.swfObjectImage = [];
       $('#program_detail').hide();
       $('#program_detail_readonly').hide();
       $('#program_create_detail').hide();
@@ -120,11 +122,10 @@ var page$ = {
         break;
         case 1:
         programDetailBlock.find('.ep_source a').text('YouTube');
-        if (cms.isGeneric()) {
-          programDetailBlock.find('.ep_name').attr('disabled', true);
-          programDetailBlock.find('.ep_intro').attr('disabled', true);
-          programDetailBlock.find('.ep_comment_block').show();
-        }
+        // youtube comment
+        programDetailBlock.find('.ep_name').attr('disabled', true);
+        programDetailBlock.find('.ep_intro').attr('disabled', true);
+        programDetailBlock.find('.ep_comment_block').show();
         break;
         default:
         programDetailBlock.find('.ep_source a').text('Unknown');
@@ -260,7 +261,7 @@ var page$ = {
       $('#program_create_detail .ep_return').unbind().click(function() {
         page$.programList.init(channelId, false, channelName);
       });
-      $('#continue_add_new_program_button').unbind().click(function() {
+      $('#continue_add_new_program_button').unbind().click(function() { // this button is not showing for now
         page$.skeletonCreation.create9x9Program(channelId, channelName);
       });
       cms.post('/CMSAPI/programInfo', { 'programId': programId }, function(program) {
@@ -270,15 +271,16 @@ var page$ = {
                                    .addClass('program_create_detail_block_cloned');
         var programId = program.key.id;
         
+        if (program.imageUrl == '/WEB-INF/../images/processing.png') {
+          program.imageUrl = 'http://www.youtube.com/img/pic_youtubelogo_123x63.gif';
+        }
         programDetailBlock.find('.ep_name').val(program.name).attr('disabled', true);
         programDetailBlock.find('.ep_image').attr('src', program.imageUrl);
         programDetailBlock.find('.ep_image_updated').val('false');
         programDetailBlock.find('.ep_intro').val(program.intro).attr('disabled', true);
         programDetailBlock.find('.ep_upload_button_place').hide();
-        if (program.imageUrl == '/WEB-INF/../images/processing.png') {
-          program.imageUrl = '/images/cms/upload_img.jpg';
-        }
         programDetailBlock.find('.ep_urlbutton, .ep_ytbutton').css('width', 90).click(function() {
+          
           programDetailBlock.find('.ep_name').attr('disabled', true);
           programDetailBlock.find('.ep_intro').attr('disabled', true);
           programDetailBlock.find('.ep_upload_button_place').hide();
@@ -294,14 +296,19 @@ var page$ = {
             programDetailBlock.find('.youtube_hint').show();
         });
         programDetailBlock.find('.ep_url_import').css('width', 60).unbind().click(function() {
+          programDetailBlock.find('.ep_savebutton').unbind().addClass('btnDisable').removeClass('btnSave');
+          programDetailBlock.find('.ep_name').attr('disabled', true);
+          programDetailBlock.find('.ep_intro').attr('disabled', true);
+          programDetailBlock.find('.ep_upload_button_place').hide();
+          programDetailBlock.find('.ep_comment_block').hide();
           if (programDetailBlock.find('.ep_url_input').val().length > 0) {
             var inputUrl = programDetailBlock.find('.ep_url_input').val();
-            programDetailBlock.find('.ep_name').attr('disabled', false);
-            programDetailBlock.find('.ep_intro').attr('disabled', false);
-            programDetailBlock.find('.ep_upload_button_place').show();
-            programDetailBlock.find('.ep_comment_block').hide();
             if (inputUrl.indexOf('youtube.com') >= 0) {
               var videoId = inputUrl.match(/\/watch\?v=([^\/&]+)/)[1];
+              if (!videoId) {
+                alert($('#lang_program_source_invalid_format').text());
+                return false;
+              }
               var parameters = {
                 'alt': 'json-in-script',
                 'v':   2
@@ -311,12 +318,46 @@ var page$ = {
                 programDetailBlock.find('.ep_intro').val(data.entry.media$group.media$description.$t);
                 programDetailBlock.find('.ep_image').attr('src', data.entry.media$group.media$thumbnail[1].url);
                 programDetailBlock.find('.ep_image_updated').val('true');
-                if (cms.isGeneric()) {
-                  programDetailBlock.find('.ep_name').attr('disabled', true);
-                  programDetailBlock.find('.ep_intro').attr('disabled', true);
-                  programDetailBlock.find('.ep_upload_button_place').hide();
-                  programDetailBlock.find('.ep_comment_block').show();
-                }
+                // youtube comment
+                programDetailBlock.find('.ep_name').attr('disabled', true);
+                programDetailBlock.find('.ep_intro').attr('disabled', true);
+                programDetailBlock.find('.ep_upload_button_place').hide();
+                programDetailBlock.find('.ep_comment_block').show();
+                
+                var btnSave = programDetailBlock.find('.ep_savebutton').css('width', 80).removeClass('btnDisable').addClass('btnSave');
+                btnSave.unbind().click(function() {
+                  if (programDetailBlock.find('.ep_name').val() == '') {
+                    alert($('#lang_warning_empty_name').text());
+                    return;
+                  }
+                  if (programDetailBlock.find('.ep_url_input').val() == '') {
+                    alert($('#lang_warning_import_program_source').text());
+                    return;
+                  }
+                  var parameters = {
+                    'channelId': channelId,
+                    'programId': programId,
+                    'sourceUrl': programDetailBlock.find('.ep_url_input').val(),
+                    'name':      programDetailBlock.find('.ep_name').val(),
+                    'intro':     programDetailBlock.find('.ep_intro').val(),
+                    'comment':   programDetailBlock.find('.ep_comment').val()
+                  };
+                  if (programDetailBlock.find('.ep_image_updated').val() == 'true') {
+                    parameters['imageUrl'] = programDetailBlock.find('.ep_image').attr('src');
+                  }
+                  cms.post('/CMSAPI/saveNewProgram', parameters, function(response) {
+                    if (response == 'OK') {
+                      alert($('#lang_update_successfully').text());
+                      programDetailBlock.removeClass('program_create_detail_block_cloned').parent().hide(); // IE compatible
+                      var size = $('.program_create_detail_block_cloned').size();
+                      if ($('.program_create_detail_block_cloned').size() == 0) {
+                        page$.programList.init(channelId, false, channelName);
+                      }
+                    } else {
+                      alert($('#lang_warning_error_occurs').text());
+                    }
+                  }, 'text');
+                });
               }, 'json');
               /* server side approach
               var parameters = {
@@ -329,51 +370,13 @@ var page$ = {
                 programDetailBlock.find('.ep_image_updated').val('true');
               }, 'json');
               */
+            } else {
+              alert($('#lang_program_source_invalid_format').text());
+              return false;
             }
-          }
-          if (programDetailBlock.find('.ep_url_input').val().length > 0
-              && programDetailBlock.find('.ep_name').val().length > 0) {
-            programDetailBlock
-              .find('.ep_savebutton')
-              .css('width', 80)
-              .unbind()
-              .removeClass('btnDisable')
-              .addClass('btnSave')
-              .click(function() {
-                if (programDetailBlock.find('.ep_name').val() == '') {
-                  alert($('#lang_warning_empty_name').text());
-                  return;
-                }
-                if (programDetailBlock.find('.ep_url_input').val() == '') {
-                  alert($('#lang_warning_import_program_source').text());
-                  return;
-                }
-                var parameters = {
-                  'channelId': channelId,
-                  'programId': programId,
-                  'sourceUrl': programDetailBlock.find('.ep_url_input').val(),
-                  'name':      programDetailBlock.find('.ep_name').val(),
-                  'intro':     programDetailBlock.find('.ep_intro').val(),
-                  'comment':   programDetailBlock.find('.ep_comment').val()
-                };
-                if (programDetailBlock.find('.ep_image_updated').val() == 'true') {
-                  parameters['imageUrl'] = programDetailBlock.find('.ep_image').attr('src');
-                }
-                cms.post('/CMSAPI/saveNewProgram', parameters, function(response) {
-                  if (response == 'OK') {
-                    alert($('#lang_update_successfully').text());
-                    programDetailBlock.removeClass('program_create_detail_block_cloned').parent().hide(); // IE compatible
-                    var size = $('.program_create_detail_block_cloned').size();
-                    if ($('.program_create_detail_block_cloned').size() == 0) {
-                      page$.programList.init(channelId, false, channelName);
-                    }
-                  } else {
-                    alert($('#lang_warning_error_occurs').text());
-                  }
-                }, 'text');
-              });
           } else {
-            programDetailBlock.find('.ep_savebutton').unbind().addClass('btnDisable').removeClass('btnSave');
+            alert($('#lang_program_source_is_empty').text());
+            return;
           }
         });
         $('#program_create_detail').show();
@@ -477,7 +480,7 @@ var page$ = {
         var swfObjectImage = new SWFUpload(swfupload_settings);
         page$.programDetail.swfObjectImage.push(swfObjectImage);
         programDetailBlock.find('.ep_cancelbutton').click(function() {
-          if (confirm($('#lang_confirm_cancel').text()) == false) return;
+          // if (confirm($('#lang_confirm_cancel').text()) == false) return;
           swfObjectImage.destroy();
           swfObject.destroy();
           programDetailBlock.parent().remove();
@@ -485,6 +488,9 @@ var page$ = {
             page$.programList.init(channelId, false, channelName);
           }
         });
+        // to hide other than youtube way
+        programDetailBlock.find('.ep_ytbutton').click();
+        programDetailBlock.find('.ep_select_block').hide();
       }, 'json');
     }
   },
@@ -1162,29 +1168,37 @@ var page$ = {
         $('#channel_list').show();
         cms.initAddthis();
       }, 'json');
-      $('.create_channel_button').unbind().click(function() {
-        if (page$.overallLayout.destroyRightSideContent(false) == false) return false;
-        $('#create_9x9_channel_button').unbind().click(page$.skeletonCreation.create9x9Channel);
-        $('.import_button').unbind().click(page$.channelDetail.displayImportDetail);
-        $('#choose_channel_type').show();
-      });
+      if (cms.isGeneric()) {
+        $('.create_channel_button').unbind().click(function() {
+          if (page$.overallLayout.destroyRightSideContent(false) == false) return false;
+          page$.skeletonCreation.create9x9Channel();
+        });
+      } else {
+        $('.create_channel_button').unbind().click(function() {
+          if (page$.overallLayout.destroyRightSideContent(false) == false) return false;
+          $('#create_9x9_channel_button').unbind().click(page$.skeletonCreation.create9x9Channel);
+          $('.import_button').unbind().click(page$.channelDetail.displayImportDetail);
+          $('#choose_channel_type').show();
+        });
+      }
     }
   },
   initGenericOne: function() {
-    $('.create_channel_hint').show();
-    $('.create_channel_button').unbind().click(page$.skeletonCreation.create9x9Channel);
   },
   init: function() {
     var css = '<style> .chPublic { background:url(' + $('#image_ch_public').text() + ') no-repeat; }\n.chUnPublic { background:url(' + $('#image_ch_unpublic').text() + ') no-repeat; } </style>';
     $(css).appendTo('head');
+    $('.create_channel_hint').show();
     
     page$.channelList.init();
+    /* not to confirm program creation
     $(window).bind('beforeunload', function() {
       if ($('.program_create_detail_block_cloned').size() > 0) {
         return $('#lang_confirm_leaving_program_creation').text();
       }
       return;
     });
+    */
   }
 };
 

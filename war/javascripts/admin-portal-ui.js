@@ -25,7 +25,8 @@ var constants = {
     1: 'NN',
     2: 'MSO',
     3: '3X3',
-    4: 'TCO'
+    4: 'TCO',
+    5: 'Enterprise'
   },
   userType: {
     0: 'Unknown',
@@ -34,7 +35,8 @@ var constants = {
     3: 'TCO',
     4: 'User',
     5: 'NN',
-    6: '3x3'
+    6: '3x3',
+    7: 'Enterprise'
   }
 };
 
@@ -1628,7 +1630,7 @@ var page$ = {
             editable:  true,
             edittype:  'select',
             editoptions: {
-              disabled: true,
+              disabled: false,
               value:    constants.msoType
             },
             searchoptions: {
@@ -1770,10 +1772,9 @@ var page$ = {
         }
       },
       init: function() {
-        var grid$ = page$.tabMsoManagement.gridMsoList;
-        grid$.properties.subGrid = true;
-        grid$.properties.subGridRowExpanded = grid$.gridMsoIpgList.init;
-        $('#mso_table').jqGrid(grid$.properties);
+        this.properties.subGrid = true;
+        this.properties.subGridRowExpanded = this.gridMsoIpgList.init;
+        $('#mso_table').jqGrid(this.properties);
         $('#mso_table').jqGrid('navGrid', '#mso_table_toppager',
         {
           edit:   false,
@@ -1819,6 +1820,11 @@ var page$ = {
                 $(this).attr('src', logoUrl);
               }
             });
+            $('#type option', formId).each(function() {
+              if ($(this).val() != '3' && $(this).val() != '5') {
+                $(this).detach();
+              }
+            });
             $('#type', formId).val(3);
             $('#tr_mso', formId).hide();
             $('#tr_updateDate', formId).hide();
@@ -1834,8 +1840,7 @@ var page$ = {
       }
     },
     init: function() {
-      var tab$ = page$.tabMsoManagement;
-      tab$.gridMsoList.init();
+      this.gridMsoList.init();
     }
   },
   tabUserManagement: {
