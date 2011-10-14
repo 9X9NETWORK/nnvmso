@@ -203,6 +203,7 @@ public class MsoProgramManager {
 	/**
 	 * @@@ Cached 
 	 */
+	/*
 	public List<MsoProgram> findGoodProgramsByChannelIds(List<Long>channelIds) {
 		log.info("requested channelIds size:" + channelIds.size());
 		List<MsoProgram> programs = new ArrayList<MsoProgram>();
@@ -245,17 +246,18 @@ public class MsoProgramManager {
 
 		return programs;
 	}
+	*/
 
 	public List<MsoProgram> findSubscribedPrograms(long userId) {
 		SubscriptionManager subService = new SubscriptionManager();			
 		List<MsoChannel> channels = subService.findSubscribedChannels(userId, 0);
 		List<MsoProgram> programs = new ArrayList<MsoProgram>();
-		List<Long> channelIds = new ArrayList<Long>();
+		//List<Long> channelIds = new ArrayList<Long>();
 		for (MsoChannel c : channels) {
-			channelIds.add(c.getKey().getId());
+			programs.addAll(this.findGoodProgramsByChannelId(c.getKey().getId()));
 		}		
-		System.out.println(channelIds.size());
-		programs = this.findGoodProgramsByChannelIds(channelIds);
+		//System.out.println(channelIds.size());
+		//programs = this.findGoodProgramsByChannelIds(channelIds);
 		return programs;
 	}
 	

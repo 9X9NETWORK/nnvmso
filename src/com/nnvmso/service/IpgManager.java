@@ -49,6 +49,7 @@ public class IpgManager {
 		return ipgDao.findByUserId(userId);
 	}
 	
+	/*
 	public List<MsoProgram> findIpgPrograms(Ipg ipg) {
 		Hashtable<Integer,Long> hashTable = ipg.getChannels();
 		MsoProgramManager programMngr = new MsoProgramManager();
@@ -60,6 +61,7 @@ public class IpgManager {
 		}		
 		return programMngr.findGoodProgramsByChannelIds(channelIds);
 	}
+	*/
 		
 	public List<MsoChannel> findIpgChannels(Ipg ipg) {
 		Hashtable<Integer,Long> hash = ipg.getChannels();

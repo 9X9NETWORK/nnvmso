@@ -77,16 +77,14 @@ public class InitService {
 	public void initAll(boolean english, boolean devel) {
 		deleteAll();		
 		initMso();
+		initCategories(english);
 		initSets(english, devel);
-//		initChannels(english, devel);
-//		
-//		initCategories(english);
-//		initSetAndChannels(english);
-//		
-//		initCategoryAndSets(english);
-//		initRecommended(english);
-//		initCategoryCount();
-//		initMapelPrograms();
+		initChannels(english, devel);		
+		initSetAndChannels(english);		
+		initCategoryAndSets(english);
+		initRecommended(english);
+		initCategoryCount();
+		initMapelPrograms();
 	}
 		
 	 //for local testing only
@@ -535,7 +533,10 @@ public class InitService {
 				}
 			}
 			//compare list with database
-			List<ChannelSet> setAll = csMngr.findAll();
+			String lang = "en";
+			if (!english)
+				lang = "zh";
+			List<ChannelSet> setAll = csMngr.findAllByLang(lang);
 			for (ChannelSet all : setAll) {
 				boolean found = false;
 				for (ChannelSet sl : setList) {
@@ -549,7 +550,7 @@ public class InitService {
 				}
 			}
 			if (setAll.size() != setList.size()) {
-				//log.severe("information inconsistent. set all has " + setAll.size() + ";setList here = " + setList.size());
+				log.severe("information inconsistent. set all has " + setAll.size() + ";setList here = " + setList.size());
 				//return;
 			}
 			//put all the channels into a string table for set, channel lookup

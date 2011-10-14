@@ -71,7 +71,7 @@ public class ChannelSetDao extends GenericDao<ChannelSet> {
 		try {
 			Query q = pm.newQuery(ChannelSet.class);
 			q.setFilter("lang == langParam");
-			q.declareParameters("string langParam");
+			q.declareParameters("String langParam");
 			q.setOrdering("seq asc");
 			@SuppressWarnings("unchecked")
 			List<ChannelSet> sets = (List<ChannelSet>) q.execute(lang);

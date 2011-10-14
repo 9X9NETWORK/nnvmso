@@ -1088,13 +1088,7 @@ public class PlayerApiService {
 		String[] chArr = channelIds.split(",");
 		List<MsoProgram> programs = new ArrayList<MsoProgram>();
 		NnUser user = null;
-		if (channelIds.equals("*") && ipgId != null) {
-			IpgManager ipgMngr = new IpgManager();
-			Ipg ipg = ipgMngr.findById(Long.parseLong(ipgId));
-			if (ipg == null) { return messageSource.getMessage("nnstatus.ipg_invalid", new Object[] {NnStatusCode.IPG_INVALID} , locale);}
-			programs = ipgMngr.findIpgPrograms(ipg);
-			log.info("ipg program count: " + programs.size());
-		} else if (channelIds.equals("*")) {
+		if (channelIds.equals("*")) {
 			user = userMngr.findByToken(userToken);
 			if (user == null) {
 				NnGuest guest = new NnGuestManager().findByToken(userToken);
@@ -1165,7 +1159,8 @@ public class PlayerApiService {
 		String getName = c.getName();
 		if (getName != null && getName.startsWith("Youtube user:"))
 			getName = getName.replaceFirst("Youtube user: ", "");		
-		String[] ori = {Integer.toString(c.getSeq()), 
+		String[] ori = {c.getSourceUrl(),
+				        Integer.toString(c.getSeq()), 
 					    String.valueOf(c.getKey().getId()),
 					    getName,
 					    intro,

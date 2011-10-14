@@ -132,7 +132,7 @@ public class TranscodingService {
 			return new PostResponse(String.valueOf(NnStatusCode.SUCCESS), "SUCCESS"); 
 		}
 		String name = podcast.getTitle();
-		channel.setName(name);			
+		channel.setName(name);
 		String intro = podcast.getDescription();
 		if (intro!= null && intro.length() > 500) {
 			intro = intro.substring(0, 499);
@@ -192,6 +192,10 @@ public class TranscodingService {
 		MsoChannelManager channelMngr = new MsoChannelManager();			
 		RtnProgramItem item = rtnProgram.getItems()[0]; //for now there's only one item
 		log.info("updateProgramViaTranscodingService(): " + item.toString());
+		if (rtnProgram.getKey() == null) {
+			log.info("channek key is null");
+			return new PostResponse(String.valueOf(NnStatusCode.CHANNEL_INVALID), "channel invalid");
+		}
 		if (!Pattern.matches("^\\d*$", rtnProgram.getKey())) {
 			return new PostResponse(String.valueOf(NnStatusCode.CHANNEL_INVALID), "channel invalid");
 		}
@@ -200,10 +204,12 @@ public class TranscodingService {
 			return new PostResponse(String.valueOf(NnStatusCode.CHANNEL_INVALID), "channel invalid");
 		}
 		
+		/*
 		if (channel.getProgramCount() >= MsoChannelManager.MAX_CHANNEL_SIZE) {
 			MsoProgram oldest = programMngr.findOldestByChannelId(channel.getKey().getId());
 			programMngr.delete(oldest); 			
 		}
+		*/
 		
 		if (channel.isPublic() != true && channel.getStatus() == MsoChannel.STATUS_SUCCESS) {
 			channel.setPublic(true);

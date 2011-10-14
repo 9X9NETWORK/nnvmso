@@ -374,6 +374,6 @@ public class AdminInitController {
         } catch (Exception e) {
         	NnLogUtil.logException(e);
 		}					
-	}		
+	}
 	
 }

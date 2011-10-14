@@ -122,6 +122,7 @@ public class MsoProgramDao extends GenericDao<MsoProgram> {
 	/**
 	 * Good: reference findGoodProgramsByChannelId  
 	 */
+	/*
 	public List<MsoProgram> findGoodProgramsByChannelIds(List<Long> channelIds) {
 		List<MsoProgram> good = new ArrayList<MsoProgram>();
 		PersistenceManager pm = PMF.get().getPersistenceManager();
@@ -141,6 +142,7 @@ public class MsoProgramDao extends GenericDao<MsoProgram> {
 		}
 		return good;
 	}
+	*/
 		
 	/**
 	 * Good: is Public, is STATUS_OK, is TYPE_VIDEO
@@ -153,13 +155,13 @@ public class MsoProgramDao extends GenericDao<MsoProgram> {
 			q.setFilter("channelId == channelIdParam && status == statusParam && type == typeParam");
 			q.declareParameters("long channelIdParam, short statusParam, short typeParam");
 			if (c.getContentType() == MsoChannel.CONTENTTYPE_MAPLE_SOAP) {
-				System.out.println("sort by content type mapel");
 				q.setOrdering("seq asc"); 
 		    } else if (c.getContentType() == MsoChannel.CONTENTTYPE_MAPLE_VARIETY) {
 				q.setOrdering("seq desc, subSeq asc");
 			} else {
 				q.setOrdering("pubDate desc");
-			}			
+			}
+			q.setRange(0, 50);			
 			@SuppressWarnings("unchecked")
 			List<MsoProgram> programs = (List<MsoProgram>)q.execute(c.getKey().getId(), MsoProgram.STATUS_OK, MsoProgram.TYPE_VIDEO);
 			detached = (List<MsoProgram>)pm.detachCopyAll(programs);
