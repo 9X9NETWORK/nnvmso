@@ -132,7 +132,7 @@ public class CmsApiController {
 			public int compare(MsoChannel channel1, MsoChannel channel2) {
 				int seq1 = channel1.getSeq();
 				int seq2 = channel2.getSeq();
-				return (seq2 - seq1);
+				return (seq1 - seq2);
 			}
 		}
 		
@@ -151,6 +151,7 @@ public class CmsApiController {
 	                                           @RequestParam Long categoryId) {
 		
 		logger.info("channelSetId = " + channelSetId);
+		logger.info("channelIds = " + channelIds);
 		logger.info("imageUrl = " + imageUrl);
 		logger.info("name = " + name);
 		logger.info("intro = " + intro);
@@ -214,7 +215,7 @@ public class CmsApiController {
 					logger.warning("channel id does not exist: " + split[i]);
 					continue;
 				}
-				cscMngr.create(new ChannelSetChannel(channelSetId, channel.getKey().getId(), i));
+				cscMngr.create(new ChannelSetChannel(channelSetId, channel.getKey().getId(), i + 1));
 			}
 		}
 		
@@ -843,19 +844,31 @@ public class CmsApiController {
 	 * List all system categories (mso in TYPE_NN)
 	 */
 	@RequestMapping("systemCategories")
-	public @ResponseBody List<Category> systemCategories(HttpServletRequest request, HttpServletResponse response) {
+	public @ResponseBody List<Category> systemCategories(@RequestParam(required=false) Long parentId,
+	                                                     HttpServletRequest request,
+	                                                     HttpServletResponse response) {
 		Locale locale = request.getLocale();
 		response.addDateHeader("Expires", System.currentTimeMillis() + 3600000);
 		CategoryManager catMngr = new CategoryManager();
 		MsoManager msoMngr = new MsoManager();
 		Mso nnmso = msoMngr.findNNMso();
 		List<Category> categories = catMngr.findAllByMsoId(nnmso.getKey().getId());
-		if (locale.equals(Locale.TAIWAN)) {
-			for (Category category : categories) {
-				category.setName(catMngr.translate(category.getName()));
+		List<Category> results = new ArrayList<Category>();
+		long parentIdValue;
+		if (parentId == null) {
+			parentIdValue = 0;
+		} else {
+			parentIdValue = parentId.longValue();
+		}
+		for (Category category : categories) {
+			if (category.getParentId() == parentIdValue) {
+				if (locale.equals(Locale.TAIWAN)) {
+					category.setName(catMngr.translate(category.getName()));
+				}
+				results.add(category);
 			}
 		}
-		return categories;
+		return results;
 	}
 	
 	@RequestMapping("renameCategory")

@@ -1,8 +1,65 @@
 /**
- * 
+ *
  */
- 
+
 var page$ = {
+  objDirectoryTree: {
+    init: function() {
+      cms.loadJSON('/CMSAPI/systemCategories', function(categories) {
+        var nodes = [ ];
+        for (var i in categories) {
+          var category = categories[i];
+          var node = {
+            'title':    category.name,
+            'key':      category.key.id,
+            'isFolder': true,
+            'isLazy':   true
+          };
+          nodes.push(node);
+        }
+        $('#treeview').dynatree({
+          children: nodes,
+          onActivate: function(node) {
+          },
+          onDblClick: function(node, event) {
+            if (!node.data.isFolder) {
+              cms.post('/CMSAPI/channelInfo', { 'channelId': node.data.key }, function(channel) {
+                page$.channelSetArea.appendChannel(channel);
+              }, 'json');
+            }
+            return false;
+          },
+          onLazyRead: function(node) {
+            if (node.data.isFolder) {
+              cms.post('/CMSAPI/systemCategories', { 'parentId': node.data.key }, function(categories) {
+                for (var i in categories) {
+                  var category = categories[i];
+                  var child = {
+                    'title':    category.name,
+                    'key':      category.key.id,
+                    'isFolder': true,
+                    'isLazy':   true
+                  };
+                  node.addChild(child);
+                }
+                cms.post('/CMSAPI/listCategoryChannels', { 'categoryId': node.data.key }, function(channels) {
+                  for (var i in channels) {
+                    var channel = channels[i];
+                    var child = {
+                      'title':    channel.name,
+                      'key':      channel.key.id
+                    };
+                    node.addChild(child);
+                  }
+                  node.setLazyNodeStatus(DTNodeStatus_Ok);
+                }, 'json');
+              }, 'json');
+            }
+          }
+        });
+      });
+    }
+  },
   objSearchTab: {
     funcPopulateSearchBox: function(channels) {
       
@@ -25,7 +82,7 @@ var page$ = {
         
         var btnAdd = $('<p class="btnAdd"/>');
         btnAdd.click({ 'channel': channel }, function(event) {
-          page$.channelSetArea.insertChannel(event.data.channel);
+          page$.channelSetArea.appendChannel(event.data.channel);
         });
         btnAdd.appendTo(item);
         
@@ -63,6 +120,19 @@ var page$ = {
   },
   objChannelSetInfo: {
     init: function() {
+      cms.loadJSON('/CMSAPI/systemCategories', function(categories) {
+        for (var i = 0; i < categories.length; i++) {
+          $('<option></option>')
+            .attr('value', categories[i].key.id)
+            .text(categories[i].name)
+            .appendTo('#sys_directory');
+        }
+        cms.post('/CMSAPI/defaultChannelSetCategory', { 'msoId': $('#msoId').val() }, function(category) {
+          if (category != null) {
+             $('#sys_directory').val(category.key.id);
+          }
+        }, 'json');
+      });
       cms.post('/CMSAPI/defaultChannelSetInfo', { 'msoId': $('#msoId').val() }, function(channelSet) {
         if (channelSet != null) {
           var url = 'http://' + ((location.host == 'www.9x9.tv') ? '9x9.tv' : location.host) + '/';
@@ -87,24 +157,24 @@ var page$ = {
             });
           });
           var swfupload_settings = {
-            flash_url:          '/javascripts/swfupload/swfupload.swf',
-            upload_url:         'http://9x9tmp.s3.amazonaws.com/',
-            file_size_limit:    '10240',
-            file_types:         '*.jpg;*.png;*.gif',
+            flash_url:              '/javascripts/swfupload/swfupload.swf',
+            upload_url:             'http://9x9tmp.s3.amazonaws.com/',
+            file_size_limit:        '10240',
+            file_types:             '*.jpg;*.png;*.gif',
             file_types_description: 'Image Files',
-            file_post_name:     'file',
-            button_placeholder: $('#upload_image').get(0),
-            button_action:       SWFUpload.BUTTON_ACTION.SELECT_FILE,
-            button_image_url:   $('#image_btn_upload').text(),
-            button_width:       '95',
-            button_height:      '32',
-            button_cursor:      SWFUpload.CURSOR.HAND,
-            button_window_mode : SWFUpload.WINDOW_MODE.TRANSPARENT,
-            debug:              false,
-            http_success :      [201],
+            file_post_name:         'file',
+            button_placeholder:     $('#upload_image').get(0),
+            button_image_url:       $('#image_btn_upload').text(),
+            button_width:           '95',
+            button_height:          '32',
+            button_cursor:          SWFUpload.CURSOR.HAND,
+            button_window_mode:     SWFUpload.WINDOW_MODE.TRANSPARENT,
+            button_action:          SWFUpload.BUTTON_ACTION.SELECT_FILE,
+            debug:                  false,
+            http_success:           [201],
             upload_success_handler: function(file, serverData, recievedResponse) {
               $('#uploading').hide();
-              $('#cc_image').attr('src', 'http://9x9tmp.s3.amazonaws.com/' + 'ch_set_logo_' + channelSet.key.id + '_'+ file.size + file.type);
+              $('#cc_image').attr('src', 'http://9x9tmp.s3.amazonaws.com/ch_set_logo_' + channelSet.key.id + '_' + file.size + file.type);
               $('#cc_image_updated').val('true');
             },
             upload_error_handler: function(file, code, message) {
@@ -112,16 +182,15 @@ var page$ = {
               alert('error: ' + message);
             },
             file_queued_handler: function(file) {
-              var post_params =
-                {
-                  "AWSAccessKeyId": $('#s3_id').val(),
-                  "key":            'ch_set_logo_' + channelSet.key.id + '_'+ file.size + file.type,
-                  "acl":            "public-read",
-                  "policy":         $('#s3_policy').val(),
-                  "signature":      $('#s3_signature').val(),
-                  "content-type":   (file.type == '.jpg') ? "image/jpeg" : "image/png",
-                  "success_action_status": "201"
-                };
+              var post_params = {
+                'AWSAccessKeyId': $('#s3_id').val(),
+                'key':            'ch_set_logo_' + channelSet.key.id + '_' + file.size + file.type,
+                'acl':            'public-read',
+                'policy':         $('#s3_policy').val(),
+                'signature':      $('#s3_signature').val(),
+                'content-type':   (file.type == '.jpg') ? 'image/jpeg' : 'image/png',
+                'success_action_status': '201'
+              };
               this.setPostParams(post_params);
               this.startUpload(file.id);
               $('#uploading').show();
@@ -130,19 +199,6 @@ var page$ = {
           var swfu = new SWFUpload(swfupload_settings);
         }
       }, 'json');
-      cms.loadJSON('/CMSAPI/systemCategories', function(categories) {
-        for (var i = 0; i < categories.length; i++) {
-          $('<option></option>')
-            .attr('value', categories[i].key.id)
-            .text(categories[i].name)
-            .appendTo('#sys_directory');
-        }
-        cms.post('/CMSAPI/defaultChannelSetCategory', { 'msoId': $('#msoId').val() }, function(category) {
-          if (category != null) {
-             $('#sys_directory').val(category.key.id);
-          }
-        }, 'json');
-      });
     }
   },
   channelSetArea: {
@@ -164,8 +220,7 @@ var page$ = {
       var size = $('#set_ch_list li').size();
       $('#set_ch_list').width(size * 112);
     },
-    insertChannel: function(channel) {
-      var area$ = page$.channelSetArea;
+    appendChannel: function(channel) {
       var item = $('<li class="ch_normal"/>');
       
       var btnRemove = $('<p class="btnRemove"/>');
@@ -177,14 +232,14 @@ var page$ = {
       $('<p/>').text(channel.name).appendTo(item);
       $('<input type="hidden" name="channelId"/>').val(channel.key.id).appendTo(item);
       $('#set_ch_list').append(item);
-      area$.adjustWidth();
+      this.adjustWidth();
     },
     init: function() {
       var area$ = page$.channelSetArea;
       $('#set_ch_list .ch_normal').remove();
       cms.post('/CMSAPI/defaultChannelSetChannels', { 'msoId': $('#msoId').val() }, function(channels) {
         for (var i = 0; i < channels.length; i++) {
-          area$.insertChannel(channels[i]);
+          area$.appendChannel(channels[i]);
           /*
           var channel = channels[i];
           var item = $('<li class="ch_normal"/>');
@@ -197,7 +252,7 @@ var page$ = {
           $('<img/>').attr('src', channel.imageUrl).appendTo(item);
           $('<p/>').text(channel.name).appendTo(item);
           $('#set_ch_list').append(item);
-          area$.adjustWidth();
+          this.adjustWidth();
           */
         }
       }, 'json');
@@ -502,6 +557,7 @@ var page$ = {
         alert($('#lang_warning_error_occurs').text());
       else
         alert($('#lang_update_successfully').text());
+      page$.channelSetArea.init();
     }, 'text');
   },
   init: function() {
@@ -511,6 +567,7 @@ var page$ = {
     page$.objSearchTab.init();
     //page$.channelPool.init();
     page$.channelSetArea.init();
+    page$.objDirectoryTree.init();
     
     $('#publish_button').click(page$.funcPublishChannelSet);
     

@@ -765,3 +765,8 @@ padding:10px 10px 0 10px;
   margin: 0;
   position: static;
 }
+
+#treeview {
+  overflow: auto;
+  max-height: 100%;
+}
