@@ -121,7 +121,7 @@
               </ul>
               <div class="clear"></div>
             </li>
-            <li class="createChItem">
+            <li class="createChItem" style="display:none">
               <div class="floatL createBtn"><a href="javascript:" class="btn btnStep1 import_button"><span><spring:message code="cms.channel_management.btn.import_podcast_channel"/></span></a></div>
               <ul class="floatL createAbout">
                 <spring:message code="cms.channel_management.msg.import_podcast_channel_benefit_list"/>
