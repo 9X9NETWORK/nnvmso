@@ -1,6 +1,8 @@
 package com.nnvmso.lib;
 
+import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +13,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.google.gdata.client.youtube.YouTubeService;
+import com.google.gdata.data.youtube.PlaylistEntry;
+import com.google.gdata.data.youtube.PlaylistFeed;
 import com.google.gdata.data.youtube.VideoEntry;
+import com.google.gdata.data.youtube.VideoFeed;
 import com.google.gdata.data.youtube.YouTubeMediaGroup;
 import com.google.gdata.data.media.mediarss.MediaThumbnail;
 
@@ -103,6 +108,79 @@ public class YouTubeLib {
 		return url;		
 	}
 	
+	public static Map<String, String> getYouTubePlaylistEntry(String playlistIdStr) {
+		
+		Map<String, String> results = new HashMap<String, String>();
+		YouTubeService youtubeService = new YouTubeService(YOUTUBE_CLIENT_ID, YOUTUBE_DEVELOPER_KEY);
+		
+		String sourceUrl = "http://gdata.youtube.com/feeds/api/playlists/" + playlistIdStr;
+		try {
+			PlaylistFeed playlistFeed = youtubeService.getFeed(new URL(sourceUrl), PlaylistFeed.class);
+			List<PlaylistEntry> videoEntries = playlistFeed.getEntries();
+			log.info("entry count: " + videoEntries.size());
+			if (videoEntries.size() > 0) {
+				VideoEntry videoEntry = videoEntries.get(0);
+				YouTubeMediaGroup mediaGroup = videoEntry.getMediaGroup();
+				List<MediaThumbnail> thumbnails = mediaGroup.getThumbnails();
+				if (thumbnails.size() > 0) {
+					String thumbnailUrl = thumbnails.get(0).getUrl();
+					results.put("thumbnail", thumbnailUrl);
+					log.info("thumb: " + thumbnailUrl);
+				}
+			}
+			if (playlistFeed.getTitle() != null) {
+				String title = playlistFeed.getTitle().getPlainText();
+				results.put("title", title);
+				log.info("title: " + title);
+			}
+			if (playlistFeed.getSubtitle() != null) {
+				String subTitle = playlistFeed.getSubtitle().getPlainText();
+				results.put("description", subTitle);
+				log.info("description: " + subTitle);
+			}
+		} catch (Exception e) {
+			NnLogUtil.logException(e);
+		}
+		return results;
+	}
+	
+	public static Map<String, String> getYouTubeChannelEntry(String userIdStr) {
+		
+		Map<String, String> results = new HashMap<String, String>();
+		YouTubeService youtubeService = new YouTubeService(YOUTUBE_CLIENT_ID, YOUTUBE_DEVELOPER_KEY);
+		
+		String sourceUrl = "http://gdata.youtube.com/feeds/api/users/" + userIdStr + "/uploads";
+		try {
+			VideoFeed videoFeed = youtubeService.getFeed(new URL(sourceUrl), VideoFeed.class);
+			List<VideoEntry> videoEntries = videoFeed.getEntries();
+			log.info("entry count: " + videoEntries.size());
+			if (videoEntries.size() > 0) {
+				VideoEntry videoEntry = videoEntries.get(0);
+				YouTubeMediaGroup mediaGroup = videoEntry.getMediaGroup();
+				List<MediaThumbnail> thumbnails = mediaGroup.getThumbnails();
+				if (thumbnails.size() > 0) {
+					String thumbnailUrl = thumbnails.get(0).getUrl();
+					results.put("thumbnail", thumbnailUrl);
+					log.info("thumb: " + thumbnailUrl);
+				}
+			}
+			if (videoFeed.getTitle() != null) {
+				String title = videoFeed.getTitle().getPlainText();
+				results.put("title", title);
+				log.info("title: " + title);
+			}
+			if (videoFeed.getSubtitle() != null) {
+				String subTitle = videoFeed.getSubtitle().getPlainText();
+				results.put("description", subTitle);
+				log.info("description: " + subTitle);
+			}
+		} catch (Exception e) {
+			NnLogUtil.logException(e);
+		}
+		
+		return results;
+	}
+	
 	public static Map<String, String> getYouTubeVideoEntry(String videoIdStr) {
 		
 		Map<String, String> results = new HashMap<String, String>();
@@ -125,6 +203,7 @@ public class YouTubeLib {
 				results.put("thumbnail", thumbnailUrl);
 			}
 		} catch (Exception e) {
+			NnLogUtil.logException(e);
 		}
 		return results;
 	}

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -174,6 +175,27 @@ public class MsoChannelManager {
 			channel.setImageUrl("/WEB-INF/../images/processing.png");
 			channel.setName("Processing");
 			channel.setStatus(MsoChannel.STATUS_PROCESSING);
+			if (channel.getContentType() == MsoChannel.CONTENTTYPE_YOUTUBE_CHANNEL) {
+				String url = channel.getSourceUrl();
+				String name = YouTubeLib.getYouTubeChannelName(url);
+				Map<String, String> info = YouTubeLib.getYouTubeChannelEntry(name);
+				if (info.get("title") != null)
+					channel.setName(info.get("title"));
+				if (info.get("description") != null)
+					channel.setIntro(info.get("description"));
+				if (info.get("thumbnail") != null)
+					channel.setImageUrl(info.get("thumbnail"));
+			} else if (channel.getContentType() == MsoChannel.CONTENTTYPE_YOUTUBE_PLAYLIST) {
+				String url = channel.getSourceUrl();
+				String name = YouTubeLib.getYouTubeChannelName(url);
+				Map<String, String> info = YouTubeLib.getYouTubePlaylistEntry(name);
+				if (info.get("title") != null)
+					channel.setName(info.get("title"));
+				if (info.get("description") != null)
+					channel.setIntro(info.get("description"));
+				if (info.get("thumbnail") != null)
+					channel.setImageUrl(info.get("thumbnail"));
+			}
 		}
 		channel.setSourceUrlSearch(sourceUrl.toLowerCase());
 		channel.setUserId(user.getKey().getId());

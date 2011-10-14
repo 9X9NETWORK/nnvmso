@@ -60,6 +60,24 @@ var page$ = {
       });
     }
   },
+  objYouTubeTab: {
+    init: function() {
+      $('#youtube_button').click(function() {
+        var sourceUrl = $('#youtube_input').val();
+        if (sourceUrl == "") {
+          alert($('#lang_channel_source_is_empty').text());
+          return;
+        }
+        cms.post('/CMSAPI/importChannelByUrl', { 'sourceUrl': sourceUrl }, function(channel) {
+          if (channel == null) {
+            alert($('#lang_channel_source_is_wrong').text());
+            return;
+          }
+          page$.channelSetArea.appendChannel(channel);
+        }, 'json');
+      });
+    }
+  },
   objSearchTab: {
     funcPopulateSearchBox: function(channels) {
       
@@ -565,6 +583,7 @@ var page$ = {
     
     page$.objChannelSetInfo.init();
     page$.objSearchTab.init();
+    page$.objYouTubeTab.init();
     //page$.channelPool.init();
     page$.channelSetArea.init();
     page$.objDirectoryTree.init();
