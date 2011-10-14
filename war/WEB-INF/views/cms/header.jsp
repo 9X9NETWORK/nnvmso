@@ -13,4 +13,5 @@
   <label class="lang" id="image_header_logout"><spring:message code="cms.image.header_logout"/></label>
   <label class="lang" id="image_header_setup"><spring:message code="cms.image.header_setup"/></label>
   <label class="lang" id="image_header_sg"><spring:message code="cms.image.header_sg"/></label>
+  <label class="lang" id="warning_please_wait"><spring:message code="cms.warning.please_wait"/></label>
 </div>

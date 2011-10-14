@@ -201,6 +201,11 @@ var cms = {
       cache: false // Disable caching of AJAX responses
     });
     
+    cms.loadScript('/javascripts/plugins/jquery.blockUI.js', function() {
+      $.blockUI.defaults.message = $('#warning_please_wait').html();
+      $(document).ajaxStart($.blockUI).ajaxStop($.unblockUI);
+    });
+    
     cms.loadScript('/javascripts/plugins/jquery.getCSS.js', function() {
       $.getCSS('/stylesheets/jquery.jqModal.css', function() {
         cms.loadScript('/javascripts/plugins/jquery.jqModal.js', cms.initSetupButton);

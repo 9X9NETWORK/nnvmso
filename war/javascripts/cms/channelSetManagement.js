@@ -7,6 +7,12 @@ var page$ = {
     funcPopulateSearchBox: function(channels) {
       
       $('#result_list li').remove(); // clean previous result
+      $('#no_search_result').hide();
+      
+      if (channels.length == 0) {
+        $('#no_search_result').show();
+        return;
+      }
       
       for(var i = 0; i < channels.length; i++) {
         var channel = channels[i]
@@ -52,6 +58,7 @@ var page$ = {
       });
       
       $('#result_list li').remove();
+      $('#no_search_result').hide();
     }
   },
   objChannelSetInfo: {

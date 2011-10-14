@@ -126,6 +126,7 @@
             <p id="search_button" class="btnGray"><span><spring:message code="cms.channel_set_management.btn.search"/></span></p>
           </div>
           <div id="search_result">
+            <div id="no_search_result">Search Not Found</div>
             <ul id="result_list" class="connectedSortable">
               <li class="ch_normal"><p class="btnAdd"></p><p class="btnRemove"></p><p class="btnPlay"></p><img src="http://teltel.co.cc/louis/cms3.1/channelSetManagement_files/ch_logo_85005_11902.jpg">
               <p class="chTitle">街舞</p></li>
