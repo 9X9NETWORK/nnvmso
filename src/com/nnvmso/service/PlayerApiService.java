@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -47,6 +48,7 @@ import com.nnvmso.model.MsoConfig;
 import com.nnvmso.model.MsoIpg;
 import com.nnvmso.model.MsoProgram;
 import com.nnvmso.model.NnContent;
+import com.nnvmso.model.NnDevice;
 import com.nnvmso.model.NnEmail;
 import com.nnvmso.model.NnGuest;
 import com.nnvmso.model.NnUser;
@@ -1155,8 +1157,8 @@ public class PlayerApiService {
 		if (c.getContentType() == MsoChannel.CONTENTTYPE_FACEBOOK) 
 			channelName = c.getSourceUrl();
 		String getName = c.getName();
-		if (getName != null && getName.startsWith("Youtube user:"))
-			getName = getName.replaceFirst("Youtube user: ", "");		
+		if (getName != null && getName.startsWith("YouTube user:"))
+			getName = getName.replaceFirst("YouTube user: ", "");		
 		String[] ori = {//c.getSourceUrl(),
 				        Integer.toString(c.getSeq()), 
 					    String.valueOf(c.getKey().getId()),
@@ -1478,9 +1480,83 @@ public class PlayerApiService {
 		return this.assembleMsgs(NnStatusCode.SUCCESS, result);
 	}
 	
-	public String registerDevice(String token) {
-		return this.assembleMsgs(NnStatusCode.SUCCESS, null);
+	public String deviceRegister(String userToken, HttpServletResponse resp) {
+		long userId = 0;
+		if (userToken != null) {
+			HashMap map = this.checkUser(userToken, false);
+			if ((Integer)map.get("s") != NnStatusCode.SUCCESS) {
+				return this.assembleMsgs((Integer)map.get("s"), null);
+			}
+			NnUser user = (NnUser) map.get("u");
+			userId = user.getKey().getId();
+		}
+		NnDeviceManager deviceMngr = new NnDeviceManager();		
+		NnDevice device = deviceMngr.create(null, userId);
+		String[] result = {device.getToken()};
+		this.setUserCookie(resp, CookieHelper.DEVICE, device.getToken());
+		return this.assembleMsgs(NnStatusCode.SUCCESS, result);
 	}
 	  
+	public String deviceTokenVerify(String token) {
+		if (token == null)
+			return this.assembleMsgs(NnStatusCode.SUCCESS, null);
+		NnDeviceManager deviceMngr = new NnDeviceManager();
+		NnDevice device = deviceMngr.findByToken(token);
+		if (device == null)
+			return this.assembleMsgs(NnStatusCode.DEVICE_INVALID, null);
+		Set<Long> userIds = device.getUserIds();
+		NnUserManager userMngr = new NnUserManager();
+		String[] result = {""};
+		for (Long u : userIds) {
+			NnUser user = userMngr.findById(u);
+			if (user != null)
+				result[0] += user.getToken() + "\t" + user.getName() + "\n";
+		}
+		return this.assembleMsgs(NnStatusCode.SUCCESS, result);
+	}
+
+	public String deviceAddUser(String deviceToken, String userToken) {
+		long userId = 0;
+		if (userToken != null) {
+			HashMap map = this.checkUser(userToken, false);
+			if ((Integer)map.get("s") != NnStatusCode.SUCCESS) {
+				return this.assembleMsgs((Integer)map.get("s"), null);
+			}
+			NnUser user = (NnUser) map.get("u");
+			userId = user.getKey().getId();
+		}
+		if (deviceToken == null)
+			return this.assembleMsgs(NnStatusCode.INPUT_MISSING, null);
+		NnDeviceManager deviceMngr = new NnDeviceManager();
+		NnDevice device = deviceMngr.findByToken(deviceToken);
+		if (device == null)
+			return this.assembleMsgs(NnStatusCode.DEVICE_INVALID, null);
+		Set<Long> list = device.getUserIds();
+		list.add(userId);
+		deviceMngr.save(device);
+		return this.assembleMsgs(NnStatusCode.SUCCESS, null);
+	}
+
+	public String deviceRemoveUser(String deviceToken, String userToken) {
+		long userId = 0;
+		if (userToken != null) {
+			HashMap map = this.checkUser(userToken, false);
+			if ((Integer)map.get("s") != NnStatusCode.SUCCESS) {
+				return this.assembleMsgs((Integer)map.get("s"), null);
+			}
+			NnUser user = (NnUser) map.get("u");
+			userId = user.getKey().getId();
+		}
+		if (deviceToken == null)
+			return this.assembleMsgs(NnStatusCode.INPUT_MISSING, null);
+		NnDeviceManager deviceMngr = new NnDeviceManager();
+		NnDevice device = deviceMngr.findByToken(deviceToken);
+		if (device == null)
+			return this.assembleMsgs(NnStatusCode.DEVICE_INVALID, null);
+		Set<Long> list = device.getUserIds();
+		list.remove(userId);
+		deviceMngr.save(device);
+		return this.assembleMsgs(NnStatusCode.SUCCESS, null);
+	}
 	
 }

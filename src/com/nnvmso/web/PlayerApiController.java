@@ -1185,67 +1185,98 @@ public class PlayerApiController {
 		return NnNetUtil.textReturn(output);
 	}
 	
-	@RequestMapping(value="registerDevice")
-	public ResponseEntity<String> registerDevice(
-			@RequestParam(value="user", required=false) String token,
+	/**
+	 * Register a device. Will set a "device" cookie if registration is successful.
+	 * 
+	 * @param user user token, optional. will bind to device if user token is provided.
+	 * @return device token
+	 */
+	@RequestMapping(value="deviceRegister")
+	public ResponseEntity<String> deviceRegister(
+			@RequestParam(value="user", required=false) String userToken,
 			HttpServletRequest req,
 			HttpServletResponse resp) {
-		log.info("user:" + token);
-		this.prepService(req);		
+		log.info("user:" + userToken);
+		this.prepService(req);
 		String output = NnStatusMsg.errorStr(locale);
 		try {
-			output = playerApiService.registerDevice(token);
+			output = playerApiService.deviceRegister(userToken, resp);
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}
 		return NnNetUtil.textReturn(output);
 	}
 	
+	/**
+	 * Verify device token
+	 *  
+	 * @param device device token
+	 * @return user token and user name if any. multiple entries will be separated by \n
+	 */
 	@RequestMapping(value="deviceTokenVerify")
 	public ResponseEntity<String> deviceTokenVerify(
-			@RequestParam(value="user", required=false) String token,
+			@RequestParam(value="device", required=false) String token,
 			HttpServletRequest req,
 			HttpServletResponse resp) {
 		log.info("user:" + token);
-		this.prepService(req);
-		
+		this.prepService(req);		
 		String output = NnStatusMsg.errorStr(locale);
 		try {
-			//output = playerApiService.deviceTokenVerify(token);
+			output = playerApiService.deviceTokenVerify(token);
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}
 		return NnNetUtil.textReturn(output);
 	}
 		
+	/**
+	 * Bind a user to device
+	 * 
+	 * @param device device token
+	 * @param user user token
+	 * @return status
+	 */
 	@RequestMapping(value="deviceAddUser")
 	public ResponseEntity<String> deviceAddUser(
-			@RequestParam(value="user", required=false) String token,
+			@RequestParam(value="device", required=false) String deviceToken,
+			@RequestParam(value="user", required=false) String userToken,
 			HttpServletRequest req,
 			HttpServletResponse resp) {
-		log.info("user:" + token);
-		this.prepService(req);
+		log.info("user:" + userToken + ";device=" + deviceToken);
+		int status = this.prepService(req);
+		if (status != NnStatusCode.SUCCESS)
+			return NnNetUtil.textReturn(playerApiService.assembleMsgs(NnStatusCode.DATABASE_READONLY, null));
 		
 		String output = NnStatusMsg.errorStr(locale);
 		try {
-			//output = playerApiService.deviceRemoveUser(token);
+			output = playerApiService.deviceAddUser(deviceToken, userToken);
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}
 		return NnNetUtil.textReturn(output);
 	}
-
+	
+	/**
+	 * Unbind a user from the device
+	 * 
+	 * @param device device token
+	 * @param user user token
+	 * @return status
+	 */
 	@RequestMapping(value="deviceRemoveUser")
 	public ResponseEntity<String> deviceRemoveUser(
-			@RequestParam(value="user", required=false) String token,
+			@RequestParam(value="device", required=false) String deviceToken,
+			@RequestParam(value="user", required=false) String userToken,
 			HttpServletRequest req,
 			HttpServletResponse resp) {
-		log.info("user:" + token);
-		this.prepService(req);
+		log.info("user:" + userToken + ";device=" + deviceToken);
+		int status = this.prepService(req);
+		if (status != NnStatusCode.SUCCESS)
+			return NnNetUtil.textReturn(playerApiService.assembleMsgs(NnStatusCode.DATABASE_READONLY, null));
 		
 		String output = NnStatusMsg.errorStr(locale);
 		try {
-			//output = playerApiService.deviceRemoveUser(token);
+			output = playerApiService.deviceRemoveUser(deviceToken, userToken);
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}

@@ -59,6 +59,7 @@ public class NnStatusMsg {
 			  case NnStatusCode.CAPTCHA_ERROR: return NnStatusCode.CAPTCHA_ERROR + "\t" + "CAPTCHA_ERROR" + "\n";
 			  case NnStatusCode.PIWIK_INVALID: return NnStatusCode.PIWIK_INVALID + "\t" + "PIWIK_INVALID" + "\n";
 			  case NnStatusCode.PIWIK_ERROR: return NnStatusCode.PIWIK_ERROR + "\t" + "PIWIK_ERROR" + "\n";
+			  case NnStatusCode.DEVICE_INVALID: return NnStatusCode.DEVICE_INVALID + "\t" + "DEVICE_INVALID" + "\n";
 			  case NnStatusCode.OUTPUT_NO_MSG_DEFINED: return messageSource.getMessage("nnstatus.output_no_msg_defined", new Object[] {NnStatusCode.OUTPUT_NO_MSG_DEFINED} , locale);
 			  case NnStatusCode.USER_ERROR: return NnStatusCode.USER_ERROR + "\t" + "user error" + "\n";
 			  case NnStatusCode.USER_LOGIN_FAILED: return messageSource.getMessage("nnstatus.user_login_failed", new Object[] {NnStatusCode.USER_LOGIN_FAILED} , locale);
