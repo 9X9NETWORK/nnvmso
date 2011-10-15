@@ -40,7 +40,6 @@ import com.nnvmso.model.Captcha;
 import com.nnvmso.model.Category;
 import com.nnvmso.model.CategoryChannelSet;
 import com.nnvmso.model.ChannelSet;
-import com.nnvmso.model.Ipg;
 import com.nnvmso.model.LangTable;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
@@ -56,7 +55,6 @@ import com.nnvmso.model.NnUserPref;
 import com.nnvmso.model.NnUserShare;
 import com.nnvmso.model.NnUserWatched;
 import com.nnvmso.model.Subscription;
-import com.nnvmso.model.SubscriptionLog;
 import com.nnvmso.validation.NnUserValidator;
 
 @Service
@@ -1159,7 +1157,7 @@ public class PlayerApiService {
 		String getName = c.getName();
 		if (getName != null && getName.startsWith("Youtube user:"))
 			getName = getName.replaceFirst("Youtube user: ", "");		
-		String[] ori = {c.getSourceUrl(),
+		String[] ori = {//c.getSourceUrl(),
 				        Integer.toString(c.getSeq()), 
 					    String.valueOf(c.getKey().getId()),
 					    getName,
@@ -1324,7 +1322,7 @@ public class PlayerApiService {
 			for (ChannelSet cs : csList) {
 				String name =  cs.getName();
 				int cnt = cs.getChannelCount();
-				String[] str = {"s" + String.valueOf(cs.getKey().getId()), name, String.valueOf(cnt)};				
+				String[] str = {"s" + String.valueOf(cs.getKey().getId()), name, String.valueOf(cnt), "ch"};				
 				result[1] += NnStringUtil.getDelimitedStr(str) + "\n";				
 			}
 			return this.assembleMsgs(NnStatusCode.SUCCESS, result);			
@@ -1334,10 +1332,13 @@ public class PlayerApiService {
 		for (Category c : categories) {
 			String name =  c.getName();
 			int cnt = c.getChannelCount();
+			String subcategory = "cat";
+			if (c.getSubCategoryCnt() == 0)
+				subcategory = "set";
 			String[] str = {String.valueOf(c.getKey().getId()), 
 					                       name, 
 					                       String.valueOf(cnt), 
-					                       String.valueOf(c.getSubCategoryCnt())};				
+					                       subcategory};				
 			result[1] += NnStringUtil.getDelimitedStr(str) + "\n";
 		}
 		return this.assembleMsgs(NnStatusCode.SUCCESS, result);
@@ -1475,6 +1476,11 @@ public class PlayerApiService {
 			return this.assembleMsgs(NnStatusCode.PIWIK_ERROR, null);
 		String[] result = {String.valueOf(idsite)};
 		return this.assembleMsgs(NnStatusCode.SUCCESS, result);
-	}	
+	}
+	
+	public String registerDevice(String token) {
+		return this.assembleMsgs(NnStatusCode.SUCCESS, null);
+	}
 	  
+	
 }

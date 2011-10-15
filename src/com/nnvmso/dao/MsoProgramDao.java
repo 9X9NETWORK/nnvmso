@@ -161,7 +161,7 @@ public class MsoProgramDao extends GenericDao<MsoProgram> {
 			} else {
 				q.setOrdering("pubDate desc");
 			}
-			q.setRange(0, 50);			
+			//q.setRange(0, 50);			
 			@SuppressWarnings("unchecked")
 			List<MsoProgram> programs = (List<MsoProgram>)q.execute(c.getKey().getId(), MsoProgram.STATUS_OK, MsoProgram.TYPE_VIDEO);
 			detached = (List<MsoProgram>)pm.detachCopyAll(programs);

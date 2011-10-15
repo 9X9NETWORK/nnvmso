@@ -27,6 +27,7 @@ public class ChannelSetChannelDao extends GenericDao<ChannelSetChannel> {
 			Query query = pm.newQuery(ChannelSetChannel.class);
 			query.setFilter("channelSetId == channelSetIdParam");
 			query.declareParameters("long channelSetIdParam");
+			query.setOrdering("seq");
 			@SuppressWarnings("unchecked")
 			List<ChannelSetChannel> list = (List<ChannelSetChannel>)query.execute(channelSetId);
 			detached = (List<ChannelSetChannel>)pm.detachCopyAll(list);

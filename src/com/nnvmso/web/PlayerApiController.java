@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -29,7 +28,6 @@ import com.nnvmso.service.NnStatusMsg;
 import com.nnvmso.service.NnUserManager;
 import com.nnvmso.service.NnUserWatchedManager;
 import com.nnvmso.service.PlayerApiService;
-import com.nnvmso.web.json.transcodingservice.PostUrl;
 
 /**
  * This is API specification for 9x9 Player. Please note although the document is written in JavaDoc form, it is generic Web Service API via HTTP request-response, no Java necessary.
@@ -50,7 +48,7 @@ import com.nnvmso.web.json.transcodingservice.PostUrl;
  * <b>In this document, method name is used as part of the URL</b>, examples:
  * <p>   
  * <blockquote>
- * http://hostname:port/playerAPI/channelBrowse?category=1<br/>
+ * http://hostname:port/playerAPI/category?lang=en<br/>
  * http://hostname:port/playerAPI/brandInfo?mso=9x9<br/>
  * </blockquote>
  * 
@@ -60,15 +58,15 @@ import com.nnvmso.web.json.transcodingservice.PostUrl;
  * <blockquote>
  * Brand information: brandInfo
  * <p>
- * Account related: guestRegister, signup, login, userTokenVerify, signout
+ * Account signup: guestRegister, signup, login, userTokenVerify, signout
  * <p>
- * Category listing: categoryBrowse
+ * Account info: setUserPref, getUserProfile, setUserProfile   
+ * <p>
+ * Directory listing: category, listRecommended
  * <p>
  * Channel and program listing: channelLineup, programInfo
  * <p>
  * IPG action: moveChannel, channelSubmit, subscribe, unsubscribe
- * <p>
- * IPG snapshot: saveIpg, loadIpg
  * <p>
  * Data collection: pdr, programRemove
  * </blockquote>
@@ -89,7 +87,7 @@ import com.nnvmso.web.json.transcodingservice.PostUrl;
  * token	a466D491UaaU245P412a <br/>
  * name	a
  * <p>
- * Example 2: categoryBrowse
+ * Example 2: category
  * <p>
  * 0	success  <br/>
  * -- <br/>
@@ -104,12 +102,13 @@ import com.nnvmso.web.json.transcodingservice.PostUrl;
  * <blockquote>
  * The first step is to call brandInfo to retrieve brand information. It returns brand id, brand logo, and any necessary brand information.
  * <p>
- * The next step depends on the UI requirement. Use categoryBrowse to find category listing based on the brand. 
+ * The next step depends on the UI requirement. Use listRecommended to find recommendation sets. 
  * Or get an account first. Use userTokenVerify if there's an existing user token. 
  * If there's no token at hand, either sign up for user as a guest(guestRegister) or ask user to signup(signup).
  * <p>
- * Channel and program listing(channelLineup and programInfo) would be ready after an account is registered.
+ * To find directory info, trees for category, set, and channel, use category API.
  * <p>
+ * Find individual set information, use setInfo. For channel use channelInfo; programInfo for channel.
  * </blockquote>
  * <p>
  * <b>Guideline</b> 
@@ -165,7 +164,8 @@ public class PlayerApiController {
 	}
 	
 	/**
-	 * Set user preference. Preferences can be retrieved from login, or APIs with isUserInfo option.  
+	 * Set user preference. Preferences can be retrieved from login, or APIs with isUserInfo option.
+	 * Things are not provided in userProfile API should be stored in user preference.  
 	 * 	
 	 * @param user user token
 	 * @param key preference name
@@ -1184,6 +1184,75 @@ public class PlayerApiController {
 		}
 		return NnNetUtil.textReturn(output);
 	}
+	
+	@RequestMapping(value="registerDevice")
+	public ResponseEntity<String> registerDevice(
+			@RequestParam(value="user", required=false) String token,
+			HttpServletRequest req,
+			HttpServletResponse resp) {
+		log.info("user:" + token);
+		this.prepService(req);		
+		String output = NnStatusMsg.errorStr(locale);
+		try {
+			output = playerApiService.registerDevice(token);
+		} catch (Exception e) {
+			output = playerApiService.handleException(e);
+		}
+		return NnNetUtil.textReturn(output);
+	}
+	
+	@RequestMapping(value="deviceTokenVerify")
+	public ResponseEntity<String> deviceTokenVerify(
+			@RequestParam(value="user", required=false) String token,
+			HttpServletRequest req,
+			HttpServletResponse resp) {
+		log.info("user:" + token);
+		this.prepService(req);
+		
+		String output = NnStatusMsg.errorStr(locale);
+		try {
+			//output = playerApiService.deviceTokenVerify(token);
+		} catch (Exception e) {
+			output = playerApiService.handleException(e);
+		}
+		return NnNetUtil.textReturn(output);
+	}
+		
+	@RequestMapping(value="deviceAddUser")
+	public ResponseEntity<String> deviceAddUser(
+			@RequestParam(value="user", required=false) String token,
+			HttpServletRequest req,
+			HttpServletResponse resp) {
+		log.info("user:" + token);
+		this.prepService(req);
+		
+		String output = NnStatusMsg.errorStr(locale);
+		try {
+			//output = playerApiService.deviceRemoveUser(token);
+		} catch (Exception e) {
+			output = playerApiService.handleException(e);
+		}
+		return NnNetUtil.textReturn(output);
+	}
+
+	@RequestMapping(value="deviceRemoveUser")
+	public ResponseEntity<String> deviceRemoveUser(
+			@RequestParam(value="user", required=false) String token,
+			HttpServletRequest req,
+			HttpServletResponse resp) {
+		log.info("user:" + token);
+		this.prepService(req);
+		
+		String output = NnStatusMsg.errorStr(locale);
+		try {
+			//output = playerApiService.deviceRemoveUser(token);
+		} catch (Exception e) {
+			output = playerApiService.handleException(e);
+		}
+		return NnNetUtil.textReturn(output);
+	}
+	
+	
 /*
 	@RequestMapping("mapleReceive")
 	public ResponseEntity<String> mapleReceive(@RequestBody PostUrl post) {

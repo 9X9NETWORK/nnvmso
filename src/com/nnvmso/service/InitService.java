@@ -590,6 +590,7 @@ public class InitService {
 			Hashtable<String, MsoChannel> table = new Hashtable<String, MsoChannel>();
  			for (int i=0; i<setList.size(); i++) {
  				System.out.println(setList.get(i).getName() + channelSetList.get(i));
+ 				int j=1;
  				for (String url : channelSetList.get(i)) {
 					MsoChannel c = table.get(url);
  					if (c == null)
@@ -602,8 +603,9 @@ public class InitService {
  						ChannelSet cs = setList.get(i);
  						ChannelSetChannel csc = cscMngr.findBySetAndChannel(cs.getKey().getId(), c.getKey().getId());
  						if (csc == null) {
- 							csc = new ChannelSetChannel(cs.getKey().getId(), c.getKey().getId(), c.getSeq());				
+ 							csc = new ChannelSetChannel(cs.getKey().getId(), c.getKey().getId(), j);				
  							cscMngr.create(csc);
+ 							j++;
  						}
  					} 						
  				}

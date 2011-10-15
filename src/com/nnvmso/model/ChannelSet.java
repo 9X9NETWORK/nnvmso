@@ -61,7 +61,7 @@ public class ChannelSet implements Serializable {
 	private String lang;
 
 	@Persistent
-	private short seq;
+	private short seq; //it's used for recommendation
 
 	@Persistent
 	private String piwik;

@@ -34,13 +34,6 @@ public class PlayerController {
 		return "redirect:9x9";
 	}	
 	
-	@RequestMapping("mini")
-	public String mini(@RequestParam(value="mso",required=false) String mso, HttpServletRequest req, HttpServletResponse resp, Model model) {
-		PlayerService service = new PlayerService();
-		model = service.prepareBrand(model, mso, resp);
-		return "player/mini";
-	}	
-
 	@RequestMapping("10ft")
 	public String tenft(@RequestParam(value="mso",required=false) String mso, HttpServletRequest req, HttpServletResponse resp, Model model) {
 		PlayerService service = new PlayerService();
