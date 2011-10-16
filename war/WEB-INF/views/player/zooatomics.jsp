@@ -34,7 +34,7 @@
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/jquery.mousewheel.min.js"></script>
 
 <style type="text/css">                                                                                                                                                  
-.ui-slider-horizontal .ui-state-default {z-index: 55; width: 1.1875em; height: 1.1875em; background: white url(${nroot}/images/btn_knob.png) no-repeat scroll 50% 50%;}                                                                                                                                            
+.ui-slider-horizontal .ui-state-default {z-index: 55; width: 1.1875em; height: 1.1875em; background: white url(${nroot}/images/btn_knob.png) 0 0 no-repeat; background-size: 100%; border: none; position: absoulte; top: 0; left: 0; }                                                                                                                                            
 </style>                                                                                                                                                                 
 
 <script type="text/javascript">
@@ -597,7 +597,15 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
 
 <div id="hint-layer">
   <div id="hint-holder">
-    <img src="${nroot}/images/hint_1.png" id="hint-1"><img src="${nroot}/images/hint_2.png" id="hint-2"><img src="${nroot}/images/hint_3.png" id="hint-3">
+    <img src="${nroot}/images/hint_1.png" id="hint-1"><img src="images/hint_2.png" id="hint-2"><img src="${nroot}/images/hint_3.png" id="hint-3">
+  </div>
+  <div id="hint-bubble">
+    <img src="${nroot}/images/bubble_tip_up.png" id="hint-bubble-tip">
+    <img src="${nroot}/images/bg_bubble_up.png" class="bg-bubble">
+    <div id="hint-bubble-content">
+      <p class="head"><span>New to 9x9?</span></p>
+      <p><span>Click <!--span class="link" id="btn-hint2tutorial"-->here<!--/span--> to take a quick tutorial!</span></p>
+    </div>
   </div>
 </div>
 
@@ -783,11 +791,10 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
         <li>
           <p class="head"><span>Region:</span></p>
           <div id="btn-region" class="droppable">
-            <p id="selected-region"><span>US</span></p>
+            <p id="selected-region"><span>English programs</span></p>
             <ul id="region-dropdown" class="dropdown">
-              <li class="on"><img src="${nroot}/images/icon_check.png" class="icon-check"><span>US</span></li>
-              <li><img src="${nroot}/images/icon_check.png" class="icon-check"><span>Taiwan</span></li>
-              <li><img src="${nroot}/images/icon_check.png" class="icon-check"><span>World Wide</span></li>
+              <li><img src="${nroot}/images/icon_check.png" class="icon-check"><span>English programs</span></li>
+              <li><img src="${nroot}/images/icon_check.png" class="icon-check"><span>中文節目</span></li>
             </ul>
           </div>
         </li>
