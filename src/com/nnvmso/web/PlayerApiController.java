@@ -1211,7 +1211,7 @@ public class PlayerApiController {
 	 * Verify device token
 	 *  
 	 * @param device device token
-	 * @return user token and user name if any. multiple entries will be separated by \n
+	 * @return user token, user name, user email if any. multiple entries will be separated by \n
 	 */
 	@RequestMapping(value="deviceTokenVerify")
 	public ResponseEntity<String> deviceTokenVerify(

@@ -1510,7 +1510,7 @@ public class PlayerApiService {
 		for (Long u : userIds) {
 			NnUser user = userMngr.findById(u);
 			if (user != null)
-				result[0] += user.getToken() + "\t" + user.getName() + "\n";
+				result[0] += user.getToken() + "\t" + user.getName() + "\t" + user.getEmail() + "\n";
 		}
 		return this.assembleMsgs(NnStatusCode.SUCCESS, result);
 	}
