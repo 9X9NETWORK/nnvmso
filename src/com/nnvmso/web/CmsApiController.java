@@ -669,6 +669,7 @@ public class CmsApiController {
 	@RequestMapping("saveChannel")
 	public @ResponseBody String saveChannel(HttpServletRequest req,
 	                                        @RequestParam Long channelId,
+	                                        @RequestParam(required = false) Long   msoId,
 	                                        @RequestParam(required = false) String imageUrl,
 	                                        @RequestParam(required = false) String name,
 	                                        @RequestParam(required = false) String intro,
@@ -683,6 +684,7 @@ public class CmsApiController {
 		logger.info("tag = " + tag);
 		logger.info("langCode = " + langCode);
 		logger.info("categoryId = " + categoryId);
+		logger.info("msoId = " + msoId);
 		
 		CmsApiService cmsApiService = new CmsApiService();
 		MsoChannelManager channelMngr = new MsoChannelManager();
@@ -742,6 +744,20 @@ public class CmsApiController {
 			logger.info("create new CategoryChannel channelId = " + channelId + ", categoryId = " + categoryId);
 		}
 		
+		//channel1 ownership
+		if (msoId != null) {
+			MsoManager msoMngr = new MsoManager();
+			Mso mso = msoMngr.findById(msoId);
+			if (mso != null) {
+				ContentOwnershipManager ownershipMngr = new ContentOwnershipManager();
+				if (ownershipMngr.findByMsoIdAndChannelId(msoId, channelId) == null) {
+					logger.info("create ownership");
+					ownershipMngr.create(new ContentOwnership(), mso, channel);
+				}
+			} else {
+				logger.warning("invalid msoId");
+			}
+		}
 		return "OK";
 	}
 	
@@ -771,25 +787,17 @@ public class CmsApiController {
 	}
 	
 	@RequestMapping("createChannelSkeleton")
-	public @ResponseBody Long createChannelSkeleton(Long msoId) {
+	public @ResponseBody Long createChannelSkeleton() {
 		
 		NnUserManager userMngr = new NnUserManager();
 		MsoManager msoMngr = new MsoManager();
 		MsoChannelManager channelMngr = new MsoChannelManager();
-		
-		Mso mso = msoMngr.findById(msoId);
-		if (mso == null)
-			return null;
 		
 		MsoChannel channel = new MsoChannel("New Channel", "New Channel", "/WEB-INF/../images/processing.png", userMngr.findNNUser().getKey().getId());
 		channel.setPublic(false);
 		channel.setStatus(MsoChannel.STATUS_WAIT_FOR_APPROVAL);
 		channel.setContentType(MsoChannel.CONTENTTYPE_MIXED); // a channel type in podcast does not allow user to add program in it, so change to mixed type
 		channelMngr.create(channel, new ArrayList<Category>());
-		
-		//channel1 ownership
-		ContentOwnershipManager ownershipMngr = new ContentOwnershipManager();
-		ownershipMngr.create(new ContentOwnership(), mso, channel);
 		
 		return channel.getKey().getId();
 	}

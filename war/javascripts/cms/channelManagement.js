@@ -24,7 +24,7 @@ var page$ = {
   },
   skeletonCreation: {
     create9x9Channel: function() {
-      cms.post('/CMSAPI/createChannelSkeleton', { 'msoId': $('#msoId').val() }, function(channelId) {
+      cms.post('/CMSAPI/createChannelSkeleton', { }, function(channelId) {
         $('<li/>').append('<div class="chShadow channel_info_block_cloned"><div class="chShadowTitle"></div><div class="chImg"></div></div>')
           .prependTo('#channel_list_ul');
         page$.channelDetail.init(channelId, true);
@@ -933,6 +933,7 @@ var page$ = {
     },
     init: function(channelId, isNew) {
       if (page$.overallLayout.destroyRightSideContent(false) == false) return false;
+      log('is new channel: ' + isNew);
       if (!isNew) {
         $('#ch_title').text($('#lang_title_edit_channel_info').text());
       }
@@ -1013,7 +1014,9 @@ var page$ = {
         }, 'json');
       });
       $('#channel_detail_cancel').unbind().click(function() {
-        page$.channelDetail.init(channelId, isNew);
+        //page$.channelDetail.init(channelId, isNew);
+        if (page$.overallLayout.destroyRightSideContent(false) == false) return false;
+        page$.channelList.init();
       });
       $('#channel_detail_savebutton').css('width', 80).unbind().click(function() {
         if ($('#ch_name').val() == "") {
@@ -1033,6 +1036,9 @@ var page$ = {
           'langCode':   $('#ch_language').val(),
           'categoryId': $('#ch_category').val()
         };
+        if (isNew) {
+          parameters.msoId = $('#msoId').val();
+        }
         if ($('#ch_image_updated').val() == 'true') {
           parameters['imageUrl'] = $('#ch_image').attr('src');
         }
