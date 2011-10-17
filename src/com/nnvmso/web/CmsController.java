@@ -22,8 +22,10 @@ import com.nnvmso.lib.AmazonLib;
 import com.nnvmso.lib.CookieHelper;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.model.Mso;
+import com.nnvmso.model.MsoConfig;
 import com.nnvmso.model.NnUser;
 import com.nnvmso.service.AuthService;
+import com.nnvmso.service.MsoConfigManager;
 import com.nnvmso.service.MsoManager;
 import com.nnvmso.service.NnUserManager;
 import com.nnvmso.service.SessionService;
@@ -33,6 +35,26 @@ public class CmsController {
 	
 	protected static final Logger logger = Logger.getLogger(CmsController.class.getName());
 	private static MessageSource messageSource = new ClassPathXmlApplicationContext("locale.xml");
+	boolean readonly = false;
+	
+	private boolean isReadonlyMode() {
+		MsoConfigManager configMngr = new MsoConfigManager();
+		readonly = configMngr.isInReadonlyMode();
+		logger.info("readonly mode: " + readonly);
+		return readonly;
+	}
+	
+	private Model setAttributes(Model model, Mso mso) {
+		
+		model.addAttribute("msoLogo", mso.getLogoUrl());
+		model.addAttribute("mso", mso);
+		model.addAttribute("msoId", mso.getKey().getId());
+		model.addAttribute("msoType", mso.getType());
+		model.addAttribute("msoName", mso.getName());
+		model.addAttribute("logoutUrl", "/" + mso.getName() + "/logout");
+		
+		return model;
+	}
 	
 	@ExceptionHandler(Exception.class)
 	public String exception(Exception e) {
@@ -82,15 +104,14 @@ public class CmsController {
 					logger.warning("invalid mso type");
 					return "error/404";
 				}
+				if (isReadonlyMode()) {
+					model.addAttribute("msoLogo", mso.getLogoUrl());
+					return "cms/readonly";
+				}
 				if (cmsTab.equals("admin")) {
 					return "redirect:/cms/channelManagement";
 				}
-				model.addAttribute("msoLogo", mso.getLogoUrl());
-				model.addAttribute("mso", mso);
-				model.addAttribute("msoId", mso.getKey().getId());
-				model.addAttribute("msoType", mso.getType());
-				model.addAttribute("msoName", "cms");
-				model.addAttribute("logoutUrl", "/cms/logout");
+				model = setAttributes(model, mso);
 				if (cmsTab.equals("channelManagement") || cmsTab.equals("channelSetManagement")) {
 					String policy = AmazonLib.buildS3Policy("9x9tmp", "public-read", "");
 					model.addAttribute("s3Policy", policy);
@@ -122,6 +143,10 @@ public class CmsController {
 		Mso mso = msoMngr.findByName(msoName);
 		if (mso == null)
 			return "error/404";
+		if (isReadonlyMode()) {
+			model.addAttribute("msoLogo", mso.getLogoUrl());
+			return "cms/readonly";
+		}
 		
 		Mso sessionMso = (Mso)session.getAttribute("mso");
 		if (sessionMso != null && sessionMso.getKey().getId() == mso.getKey().getId()) {
@@ -173,6 +198,10 @@ public class CmsController {
 		if (mso == null)
 			return "error/404";
 		String msoLogo = mso.getLogoUrl();
+		if (isReadonlyMode()) {
+			model.addAttribute("msoLogo", msoLogo);
+			return "cms/readonly";
+		}
 		Mso msoAuth = authService.msoAuthenticate(email, password, mso.getKey().getId());
 		if (msoAuth == null) {
 			logger.info("login failed");
@@ -224,18 +253,18 @@ public class CmsController {
 		
 		MsoManager msoMngr = new MsoManager();
 		Mso mso = msoMngr.findByName(msoName);
-		if (mso == null)
+		if (mso == null) {
 			return "error/404";
+		}
+		if (isReadonlyMode()) {
+			model.addAttribute("msoLogo", mso.getLogoUrl());
+			return "cms/readonly";
+		}
 		
 		Mso sessionMso = (Mso)session.getAttribute("mso");
 		if (sessionMso != null && sessionMso.getKey().getId() == mso.getKey().getId()) {
 			
-			model.addAttribute("msoLogo", mso.getLogoUrl());
-			model.addAttribute("mso", mso);
-			model.addAttribute("msoId", mso.getKey().getId());
-			model.addAttribute("msoType", mso.getType());
-			model.addAttribute("msoName", mso.getName());
-			model.addAttribute("logoutUrl", "/" + msoName + "/logout");
+			model = setAttributes(model, mso);
 			
 			if (cmsTab.equals("channelManagement") || cmsTab.equals("channelSetManagement")) {
 				String policy = AmazonLib.buildS3Policy("9x9tmp", "public-read", "");

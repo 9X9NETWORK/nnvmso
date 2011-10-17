@@ -29,7 +29,16 @@ public class MsoConfigManager {
 		}			
 		return configDao.save(config);
 	}
-		
+	
+	public boolean isInReadonlyMode() {
+		boolean readonly = false;
+		MsoConfig config = configDao.findByItem(MsoConfig.RO);
+		if (config != null && config.getValue().equals("1")) {
+			readonly = true;
+		}
+		return readonly;
+	}
+	
 	public MsoConfig findByMsoIdAndItem(long msoId, String item) {
 		return configDao.findByMsoIdAndItem(msoId, item);
 	}
