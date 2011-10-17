@@ -216,8 +216,8 @@ var brandinfo = "${brandInfo}";
 </div>
 
 <div id="msg-layer" style="display: none">
-  <div class="msg-holder" id="#msg-holder">
-    <p id="msg-text">No episodes in this channel</p>
+  <div id="msg-holder">
+    <p><span id="msg-text"></span></p>
   </div>
 </div>
 
@@ -386,7 +386,7 @@ var brandinfo = "${brandInfo}";
   <div id="help-holder">
     <img src="${nroot}/images/btn_winclose.png" id="btn-help-close">
     <ul id="help-tabs">
-      <li id="tutorial" class="on"><span>Tutorial</span></li>
+      <li id="tutorial" class="on"><span>New User Tutorial</span></li>
       <li id="faq"><span>FAQ</span></li>
     </ul>
     <div id="tutorial-panel" class="input-panel">
@@ -823,9 +823,8 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
       <ul class="input-list">
         <li>
           <p class="head"><span>I want to set 9x9's preloading capacity to:</span></p>
-          <p class="radio-item" id="preload-off"><img src="${nroot}/images/btn_radio_off.png" class="btn-radio-off"><img src="${nroot}/images/btn_radio_on.png" class="btn-radio-on"><span>Off</span><span class="explanation">what is Off</span></p>
-          <p class="radio-item" id="preload-normal"><img src="${nroot}/images/btn_radio_off.png" class="btn-radio-off"><img src="${nroot}/images/btn_radio_on.png" class="btn-radio-on"><span>Normal</span><span class="explanation">what is Normal</span></p>
-          <p class="radio-item" id="preload-max"><img src="${nroot}/images/btn_radio_off.png" class="btn-radio-off"><img src="${nroot}/images/btn_radio_on.png" class="btn-radio-on"><span>Maximum</span><span class="explanation">what is Mazimum</span></p>
+          <p class="radio-item" id="preload-off"><img src="${nroot}/images/btn_radio_off.png" class="btn-radio-off"><img src="${nroot}/images/btn_radio_on.png" class="btn-radio-on"><span>Off</span><span class="explanation">Disable preloading of videos</span></p>
+          <p class="radio-item" id="preload-on"><img src="${nroot}/images/btn_radio_off.png" class="btn-radio-off"><img src="${nroot}/images/btn_radio_on.png" class="btn-radio-on"><span>On</span><span class="explanation">Enable preloading of videos</span></p>
         </li>
       </ul>
       <ul class="action-list">
