@@ -75,16 +75,16 @@ public class InitService {
 	}
 	
 	public void initAll(boolean english, boolean devel) {
-		deleteAll();		
-		initMso();
-		initCategories(english);
-		initSets(english, devel);
+		//deleteAll();		
+		//initMso();
+		//initCategories(english);
+		//initSets(english, devel);
 		initChannels(english, devel);		
-		initSetAndChannels(english);		
-		initCategoryAndSets(english);
-		initRecommended(english);
-		initCategoryCount();
-		initMapelPrograms();
+		//initSetAndChannels(english);		
+		//initCategoryAndSets(english);
+		//initRecommended(english);
+		//initCategoryCount();
+		//initMapelPrograms();
 	}
 		
 	 //for local testing only
@@ -433,15 +433,17 @@ public class InitService {
 			    	Cell cell = row.getCell(c);
 			    	if (cell != null) {
 			    		String url = cell.getStringCellValue();
-			    		if (!url.contains("maplestage")) {  
-				    		String checkedUrl = YouTubeLib.formatCheck(url);
-				    		if (checkedUrl != null)
-				    			list.add(checkedUrl);
-				    		else
-				    			log.info("url not passed youtube lib check:" + url);
-			    		} else {
-			    			list.add(url);
-			    			maple++;
+			    		if (url != null && url.length() > 0) {
+				    		if (!url.contains("maplestage")) {  
+					    		String checkedUrl = YouTubeLib.formatCheck(url);
+					    		if (checkedUrl != null)
+					    			list.add(checkedUrl);
+					    		else
+					    			log.info("url not passed youtube lib check:" + url);
+				    		} else {
+				    			list.add(url);
+				    			maple++;
+				    		}
 			    		}
 			    	}
 			    }
@@ -466,6 +468,7 @@ public class InitService {
 		MsoChannelManager channelMngr = new MsoChannelManager();
 		TranscodingService tranService = new TranscodingService();
 		boolean piwik = true;
+		int zeroProgramCnt = 0;
 		for (String url : urls) {			
 			MsoChannel c = channelMngr.findBySourceUrlSearch(url);
 			if (c == null) {					
@@ -473,14 +476,16 @@ public class InitService {
 				c.setStatus(MsoChannel.STATUS_PROCESSING);
 				c.setContentType(channelMngr.getContentTypeByUrl(url));
 				channelMngr.create(c);
+				ContentOwnershipManager ownershipMngr = new ContentOwnershipManager();
+				ownershipMngr.create(new ContentOwnership(), mso, c);
 				if (!devel) {
 					tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
 					channelMngr.save(c);
 				} else {
 					piwik = false; //local testing, no piwik creation
 				}
-			} else {
-				log.info("this channel existed:" + url);
+			} else {				
+				//log.info("this channel existed:" + url);
 				if (c.getStatus() == MsoChannel.STATUS_WAIT_FOR_APPROVAL) {
 					log.info("mark the channel from waiting to approval to success");
 					c.setStatus(MsoChannel.STATUS_SUCCESS);
@@ -488,6 +493,14 @@ public class InitService {
 				} else if (c.getStatus() == MsoChannel.STATUS_PROCESSING){
 					tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
 					log.info("was in processing mode, going to submit again");
+				} else if (c.getContentType() == MsoChannel.CONTENTTYPE_MAPLE_SOAP && c.getProgramCount() == 0) {
+					zeroProgramCnt++;
+					log.info("maple soap program count is 0; re-send:" + c.getSourceUrlSearch());
+					tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
+				} else if (c.getContentType() == MsoChannel.CONTENTTYPE_MAPLE_VARIETY && c.getProgramCount() == 0) {
+					zeroProgramCnt++;
+					log.info("maple variety program count is 0; re-send:" + c.getSourceUrlSearch());
+					tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
 				} else if (c.getStatus() != MsoChannel.STATUS_SUCCESS){
 					log.info("wanted channel but not success");					
 				}
@@ -498,6 +511,7 @@ public class InitService {
 				channelMngr.save(c);
 			}
 		}
+		log.info("zero program count:" + zeroProgramCnt); 
 	}
 		
 	public void initSetAndChannels(boolean english) {

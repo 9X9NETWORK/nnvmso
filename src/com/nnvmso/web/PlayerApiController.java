@@ -58,17 +58,25 @@ import com.nnvmso.service.PlayerApiService;
  * <blockquote>
  * Brand information: brandInfo
  * <p>
- * Account signup: guestRegister, signup, login, userTokenVerify, signout
+ * Account signup: guestRegister, signup, login, userTokenVerify, signout, requestCaptcha
  * <p>
- * Account info: setUserPref, getUserProfile, setUserProfile   
+ * Account info: setUserPref, getUserProfile, setUserProfile
  * <p>
- * Directory listing: category, listRecommended
+ * Directory listing: category
  * <p>
- * Channel and program listing: channelLineup, programInfo
+ * Set related: listRecommended, setInfo
+ * <p>
+ * Device related: deviceTokenVerify, deviceRegister, deviceAddUser, deviceRemoveUser
+ * <p>
+ * Channel and program: channelLineup, programInfo, recentlyWatched, search 
  * <p>
  * IPG action: moveChannel, channelSubmit, subscribe, unsubscribe
  * <p>
+ * Share: shareByEmail, requestCaptcha
+ * <p>
  * Data collection: pdr, programRemove
+ * <p>
+ * Bulletin: staticContent
  * </blockquote>
  * <p>
  * <b>9x9 Player API always returns a string:</b>
@@ -1031,9 +1039,10 @@ public class PlayerApiController {
 	 * User's recently watched channel and its episode
 	 * 
 	 * @param user user token
-	 * @param count number of recently wathced entries
+	 * @param count number of recently watched entries
 	 * @param channelInfo true or false
-	 * @return channel id and program id, separated by tab. each entry is separated by \n
+	 * @return Fist block: Lines of channel id and program id.<br/>
+	 *         Second block: if channelInfo is set to true, detail channel information will be returned. Please reference channelLineup for format.
 	 */
 	@RequestMapping(value="recentlyWatched")
 	public ResponseEntity<String> recentlyWatched(

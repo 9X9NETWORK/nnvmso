@@ -25,6 +25,7 @@
     <li><a href="/admin/index">Admin Console</a></li>
     <li><a href="#tabs_channel_mngt">Channel Management</a></li>
     <li><a href="#tabs_category_mngt">Category Management</a></li>
+    <li><a href="#tabs_set_mngt">Set Management</a></li>
     <li><a href="#tabs_mso_mngt">MSO Management</a></li>
     <li><a href="#tabs_user_mngt">User Management</a></li>
   </ul>
@@ -38,6 +39,11 @@
   <div id="tabs_category_mngt">
     <p>
       <table id="cat_table"></table>
+    </p>
+  </div>
+  <div id="tabs_set_mngt">
+    <p>
+      <table id="set_table"></table>
     </p>
   </div>
   <div id="tabs_mso_mngt">

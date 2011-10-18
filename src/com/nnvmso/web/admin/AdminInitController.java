@@ -319,6 +319,11 @@ public class AdminInitController {
 		}
 		return NnNetUtil.textReturn("OK");		
 	}				
+
+//	@RequestMapping("mapleTest")
+//	public ResponseEntity<String> mapleTest(HttpServletRequest req) {
+//		
+//	}
 	
 	//temp fix
 	@RequestMapping("postTest")

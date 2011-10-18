@@ -505,8 +505,11 @@ public class MsoChannelManager {
 			ftsTokens.add(token);
 		}
 		return ftsTokens;
+	}   
+	public List<MsoChannel> findNonPodcasts() {
+		return msoChannelDao.findNonPodcasts();		
 	}
-
+	
 	public static List<MsoChannel> searchChannelEntries(String queryString) {
 		return MsoChannelDao.searchChannelEntries(queryString);		
 	}

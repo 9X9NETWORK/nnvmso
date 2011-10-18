@@ -258,10 +258,11 @@ public class TranscodingService {
 			program.setDuration(item.getDuration());
 		if (item.getSubSortId() != null)
 			program.setSubSeq(item.getSubSortId());
-		if (item.getAudio() != null)
-			program.setType(MsoProgram.TYPE_AUDIO);
-		else
-			program.setType(MsoProgram.TYPE_VIDEO);
+//		if (item.getAudio() != null)
+//			program.setType(MsoProgram.TYPE_AUDIO);
+//		else
+		
+		program.setType(MsoProgram.TYPE_VIDEO);
 		if (item.getPubDate() != null) {
 			Date theDate = new Date(Long.parseLong(item.getPubDate())*1000);
 			program.setPubDate(theDate);

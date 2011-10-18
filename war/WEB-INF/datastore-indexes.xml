@@ -78,6 +78,10 @@
       <property name="updateDate" direction="desc"/>
   </datastore-index>
   <datastore-index kind="MsoChannel" ancestor="false" source="manual">
+    <property name="contentType" direction="asc"/>
+    <property name="programCount" direction="asc"/>
+  </datastore-index>    
+  <datastore-index kind="MsoChannel" ancestor="false" source="manual">
     <property name="featured" direction="asc"/>
     <property name="createDate" direction="asc"/>
   </datastore-index>  
@@ -143,10 +147,6 @@
   <datastore-index kind="MsoProgram" ancestor="false" source="manual">
     <property name="channelId" direction="asc"/>
     <property name="pubDate" direction="asc"/>
-  </datastore-index>  
-  <datastore-index kind="MsoProgram" ancestor="false" source="manual">
-    <property name="channelId" direction="asc"/>
-    <property name="pubDate" direction="desc"/>
   </datastore-index>  
   <datastore-index kind="MsoProgram" ancestor="false" source="manual">
     <property name="channelId" direction="asc"/>

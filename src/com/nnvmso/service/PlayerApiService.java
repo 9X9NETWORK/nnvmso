@@ -1071,7 +1071,7 @@ public class PlayerApiService {
 		    else 
 		    	c.setSorting(MsoChannelManager.getDefaultSorting(c));
 			if (user != null && watchedMap.containsKey(c.getKey().getId()))
-				c.setRecentlyWatchedProgram(Long.parseLong(watchedMap.get(c.getKey().getId())));
+				c.setRecentlyWatchedProgram(c.getRecentlyWatchedProgram());
 			channelOutput += this.composeChannelLineupStr(c, mso) + "\n";
 		}		
 		result.add(channelOutput);

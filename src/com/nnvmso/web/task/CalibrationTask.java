@@ -13,11 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
 import com.nnvmso.lib.NnNetUtil;
-import com.nnvmso.model.Category;
-import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoProgram;
-import com.nnvmso.service.CategoryManager;
 import com.nnvmso.service.MsoChannelManager;
 import com.nnvmso.service.MsoProgramManager;
 
@@ -49,7 +46,7 @@ public class CalibrationTask {
 	public ResponseEntity<String> runChannels(HttpServletRequest req) {
 		String output = "";
 		MsoChannelManager channelMngr = new MsoChannelManager();
-		List<MsoChannel> channels = channelMngr.findAll();
+		List<MsoChannel> channels = channelMngr.findNonPodcasts();
 		for (MsoChannel c : channels) {			
 			try {						
 				QueueFactory.getDefaultQueue().add(

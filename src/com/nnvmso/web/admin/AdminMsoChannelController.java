@@ -66,7 +66,7 @@ public class AdminMsoChannelController {
 		String output = "";
 		List<MsoChannel> channels = new ArrayList<MsoChannel>();
 		if (status == null) {
-			channels = channelMngr.findAll();
+			channels = channelMngr.findNonPodcasts();
 			List<MsoChannel> bad = new ArrayList<MsoChannel>();		
 			for (MsoChannel c : channels) {
 				if (c.getName() == null || c.getStatus() != MsoChannel.STATUS_SUCCESS || 
