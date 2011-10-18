@@ -186,6 +186,22 @@
     </property>    
   </configuration>
 
+  <configuration name="Thumbnail Mapper">
+    <property>
+      <name>mapreduce.map.class</name>      
+      <value>com.nnvmso.task.mapper.ThumbnailMapper</value>
+    </property>
+    <property>
+      <name>mapreduce.inputformat.class</name>
+      <value>com.google.appengine.tools.mapreduce.DatastoreInputFormat</value>
+    </property>    
+    <property>
+      <name human="Entity Kind to Map Over">mapreduce.mapper.inputformat.datastoreinputformat.entitykind</name>
+      <value template="optional">MsoChannel</value>      
+    </property>    
+  </configuration>
+
+
   <configuration name="Program Type Mapper">
     <property>
       <name>mapreduce.map.class</name>      
