@@ -87,6 +87,23 @@ public class InitService {
 		//initMapelPrograms();
 	}
 		
+	public void lessMaple() {
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		List<MsoChannel> channels = channelMngr.findNonPodcasts();
+		TranscodingService tranService = new TranscodingService();
+		int cnt = 0;
+		for (MsoChannel c : channels) {
+			if (c.getContentType() == MsoChannel.CONTENTTYPE_MAPLE_SOAP || c.getContentType() == MsoChannel.CONTENTTYPE_MAPLE_VARIETY) {
+				if (c.getProgramCount() < 5) {
+					tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
+					log.info("count < 5 " + c.getSourceUrl());
+					cnt++;
+				}
+			}
+		}
+		log.info("count < 5 records: " + cnt);
+	}
+	
 	 //for local testing only
 	public void initMapelPrograms() {
 		NnUserManager userMngr = new NnUserManager();
@@ -493,13 +510,13 @@ public class InitService {
 				} else if (c.getStatus() == MsoChannel.STATUS_PROCESSING){
 					tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
 					log.info("was in processing mode, going to submit again");
-				} else if (c.getContentType() == MsoChannel.CONTENTTYPE_MAPLE_SOAP && c.getProgramCount() == 0) {
+				} else if (c.getContentType() == MsoChannel.CONTENTTYPE_MAPLE_SOAP && c.getProgramCount() < 5) {
 					zeroProgramCnt++;
-					log.info("maple soap program count is 0; re-send:" + c.getSourceUrlSearch());
+					log.info("maple soap program count < 5; re-send:" + c.getSourceUrlSearch());
 					tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
-				} else if (c.getContentType() == MsoChannel.CONTENTTYPE_MAPLE_VARIETY && c.getProgramCount() == 0) {
+				} else if (c.getContentType() == MsoChannel.CONTENTTYPE_MAPLE_VARIETY && c.getProgramCount() < 5) {
 					zeroProgramCnt++;
-					log.info("maple variety program count is 0; re-send:" + c.getSourceUrlSearch());
+					log.info("maple variety program count < 5; re-send:" + c.getSourceUrlSearch());
 					tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
 				} else if (c.getStatus() != MsoChannel.STATUS_SUCCESS){
 					log.info("wanted channel but not success");					
@@ -511,7 +528,7 @@ public class InitService {
 				channelMngr.save(c);
 			}
 		}
-		log.info("zero program count:" + zeroProgramCnt); 
+		log.info("< 5 program count:" + zeroProgramCnt); 
 	}
 		
 	public void initSetAndChannels(boolean english) {

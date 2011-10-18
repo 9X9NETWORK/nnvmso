@@ -127,8 +127,7 @@ public class AdminInitController {
 	public ResponseEntity<String> file() {
 		return NnNetUtil.textReturn("You will receive an email when it isdone.");
 	}
-	
-	
+
 	//gae environment	
 	@RequestMapping("initChannelsToTask")
 	public ResponseEntity<String> initChannelsToTask(
@@ -345,6 +344,21 @@ public class AdminInitController {
 
 		return NnNetUtil.textReturn("OK");		
 	}		
+
+	@RequestMapping("lessMapleToTask")
+	public ResponseEntity<String> lessMapleToTask(HttpServletRequest req) {
+		QueueFactory.getDefaultQueue().add(
+			      TaskOptions.Builder.withUrl("/admin/init/lessMaple"));			          
+		return NnNetUtil.textReturn("You will receive an email when it is done.");
+	}	
+	
+	@RequestMapping("lessMaple")
+	public ResponseEntity<String> lessMaple(
+			HttpServletRequest req) {
+		initService.setRequest(req);		
+		initService.lessMaple();
+		return NnNetUtil.textReturn("OK");
+	}
 
 	//temp fix
 	@RequestMapping("missingUser")

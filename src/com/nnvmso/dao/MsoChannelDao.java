@@ -213,7 +213,7 @@ public class MsoChannelDao extends GenericDao<MsoChannel> {
 		}
 		return detached;
 	}	
- 
+	
 	public List<MsoChannel> findNonPodcasts() {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		List<MsoChannel> detached = new ArrayList<MsoChannel>(); 

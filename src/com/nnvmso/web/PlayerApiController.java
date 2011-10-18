@@ -64,11 +64,13 @@ import com.nnvmso.service.PlayerApiService;
  * <p>
  * Directory listing: category
  * <p>
- * Set related: listRecommended, setInfo
+ * Set related: listRecommended, setInfo, category
  * <p>
  * Device related: deviceTokenVerify, deviceRegister, deviceAddUser, deviceRemoveUser
  * <p>
- * Channel and program: channelLineup, programInfo, recentlyWatched, search 
+ * Channel: channelLineup, recentlyWatched, search 
+ * <p>
+ * Program: programInfo 
  * <p>
  * IPG action: moveChannel, channelSubmit, subscribe, unsubscribe
  * <p>

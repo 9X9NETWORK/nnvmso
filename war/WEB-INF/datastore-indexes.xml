@@ -153,6 +153,11 @@
     <property name="status" direction="asc"/>
     <property name="type" direction="asc"/>
     <property name="pubDate" direction="desc"/>
+  </datastore-index>    
+  <datastore-index kind="MsoProgram" ancestor="false" source="manual">
+    <property name="channelId" direction="asc"/>
+    <property name="seq" direction="asc"/>
+    <property name="subSeq" direction="asc"/>
   </datastore-index>  
   <datastore-index kind="MsoProgram" ancestor="false" source="manual">
     <property name="channelId" direction="asc"/>
@@ -166,6 +171,13 @@
     <property name="status" direction="asc"/>
     <property name="type" direction="asc"/>
     <property name="seq" direction="asc"/>
+  </datastore-index>  
+  <datastore-index kind="MsoProgram" ancestor="false" source="manual">
+    <property name="channelId" direction="asc"/>
+    <property name="status" direction="asc"/>
+    <property name="type" direction="asc"/>
+    <property name="seq" direction="asc"/>
+    <property name="subSeq" direction="asc"/>
   </datastore-index>  
   <datastore-index kind="NnUser" ancestor="false" source="manual">
     <property name="__key__" direction="desc"/>

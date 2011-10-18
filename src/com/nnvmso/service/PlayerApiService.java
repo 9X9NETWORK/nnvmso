@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -149,14 +150,24 @@ public class PlayerApiService {
 		if (user == null) 
 			return this.assembleMsgs(NnStatusCode.USER_INVALID, null);
 		if (user.getEmail().equals(NnUser.GUEST_EMAIL))
-			return this.assembleMsgs(NnStatusCode.USER_PERMISSION_ERROR, null);
+			return this.assembleMsgs(NnStatusCode.USER_PERMISSION_ERROR, null);		
 		String[] key = items.split(",");
 		String[] value = values.split(",");
 		String password = "";
 		String oldPassword = "";
+		boolean validKey = false;
 		if (key.length != value.length)
 			return this.assembleMsgs(NnStatusCode.INPUT_ERROR, null);
+		
+		String[] invalid = {"name", "year", "password", 
+                "OldPassword", "sphere", "ui-lang", "gender"};		
+		HashSet<String> dic = new HashSet<String>();
+		for (int i=0; i<invalid.length; i++) {
+			dic.add(invalid[i]);
+		}				
 		for (int i=0; i<key.length; i++) {
+			if (!dic.contains(key[i]))
+				return this.assembleMsgs(NnStatusCode.INPUT_ERROR, null);
 			if (key[i].equals("name"))
 				user.setName(value[i]);
 			if (key[i].equals("year"))
@@ -165,16 +176,18 @@ public class PlayerApiService {
 				password = value[i];				
 			if (key[i].equals("oldPassword"))
 				oldPassword = value[i];				
-			if (key[i].equals("sphere"))
+			if (key[i].equals("sphere")) {
 				if ((value[i] == null) || (this.checkLang(value[i]) == null))
 					return this.assembleMsgs(NnStatusCode.INPUT_BAD, null);
 				user.setSphere(value[i]);
+			}
 			if (key[i].equals("gender"))
 				user.setGender(Short.parseShort(value[i]));						
-			if (key[i].equals("ui-lang"))
+			if (key[i].equals("ui-lang")) {
 				if ((value[i] == null) || (this.checkLang(value[i]) == null))
 					return this.assembleMsgs(NnStatusCode.INPUT_BAD, null);
 				user.setLang(value[i]);
+			}
 		}
 		int status = NnUserValidator.validateProfile(user);
 		if (status != NnStatusCode.SUCCESS) {
@@ -802,7 +815,8 @@ public class PlayerApiService {
 				return this.assembleMsgs(NnStatusCode.USER_INVALID, null);
 			userMngr.save(user); //change last login time (ie updateTime)
 		}
-		String[] result = {this.prepareUserInfo(user, guest)};
+		String[] result = {""};
+		result[0] = this.prepareUserInfo(user, guest);
 		return this.assembleMsgs(NnStatusCode.SUCCESS, result);
 	}
 	
@@ -1321,12 +1335,15 @@ public class PlayerApiService {
 				channelSetIdList.add(l.getChannelSetId());
 			}
 			List<ChannelSet> csList = csMngr.findAllByChannelSetIds(channelSetIdList);
+			int setCnt = 0;
 			for (ChannelSet cs : csList) {
 				String name =  cs.getName();
 				int cnt = cs.getChannelCount();
 				String[] str = {"s" + String.valueOf(cs.getKey().getId()), name, String.valueOf(cnt), "ch"};				
-				result[1] += NnStringUtil.getDelimitedStr(str) + "\n";				
+				result[1] += NnStringUtil.getDelimitedStr(str) + "\n";
+				setCnt++;
 			}
+			log.info("category query: " + id + ";count:" + setCnt);
 			return this.assembleMsgs(NnStatusCode.SUCCESS, result);			
 		}
 

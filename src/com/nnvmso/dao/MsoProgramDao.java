@@ -155,7 +155,7 @@ public class MsoProgramDao extends GenericDao<MsoProgram> {
 			q.setFilter("channelId == channelIdParam && status == statusParam && type == typeParam");
 			q.declareParameters("long channelIdParam, short statusParam, short typeParam");
 			if (c.getContentType() == MsoChannel.CONTENTTYPE_MAPLE_SOAP) {
-				q.setOrdering("seq asc"); 
+				q.setOrdering("seq asc, subSeq asc"); 
 		    } else if (c.getContentType() == MsoChannel.CONTENTTYPE_MAPLE_VARIETY) {
 				q.setOrdering("seq desc, subSeq asc");
 			} else {
