@@ -388,6 +388,7 @@ var brandinfo = "${brandInfo}";
     <ul id="help-tabs">
       <li id="tutorial" class="on"><span>New User Tutorial</span></li>
       <li id="faq"><span>FAQ</span></li>
+      <li id="help-sync"><span>9x9 Sync</span></li>
     </ul>
     <div id="tutorial-panel" class="input-panel">
       <div id="tutorial-content" class="constrain">
@@ -404,6 +405,13 @@ var brandinfo = "${brandInfo}";
       <div id="faq-slider" class="slider-wrap"><div class="slider-vertical"></div></div>
       <div id="faq-content" class="constrain">
         <div id="faq-list">
+        </div>
+      </div>
+    </div>
+    <div id="sync-help-panel" class="input-panel">
+      <div id="sync-slider" class="slider-wrap"><div class="slider-vertical"></div></div>
+      <div id="sync-content" class="constrain">
+        <div id="sync-list">
         </div>
       </div>
     </div>
@@ -597,7 +605,7 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
 
 <div id="hint-layer">
   <div id="hint-holder">
-    <img src="${nroot}/images/hint_1.png" id="hint-1"><img src="images/hint_2.png" id="hint-2"><img src="${nroot}/images/hint_3.png" id="hint-3">
+    <img src="${nroot}/images/hint_1.png" id="hint-1"><img src="${nroot}/images/hint_2.png" id="hint-2"><img src="${nroot}/images/hint_3.png" id="hint-3">
   </div>
   <div id="hint-bubble">
     <img src="${nroot}/images/bubble_tip_up.png" id="hint-bubble-tip">
@@ -737,7 +745,7 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
     <img src="${nroot}/images/btn_winclose.png" id="btn-settings-close">
     <ul id="settings-tabs">
       <li id="general" class="on"><span>General</span></li>
-      <li id="sharing"><span>Sharing</span></li>
+      <!--li id="sharing"><span>Sharing</span></li-->
       <li id="preload"><span>Preload</span></li>
       <li id="resolution"><span>Resolution</span></li>
     </ul>
