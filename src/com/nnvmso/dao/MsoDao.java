@@ -12,6 +12,7 @@ import com.google.appengine.api.datastore.Key;
 
 import com.nnvmso.lib.PMF;
 import com.nnvmso.model.Mso;
+import com.nnvmso.model.MsoChannel;
 
 public class MsoDao extends GenericDao<Mso> {
 	
@@ -37,11 +38,12 @@ public class MsoDao extends GenericDao<Mso> {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Mso detached = null; 
 		try {
-			Query query = pm.newQuery(Mso.class);
 			name = name.toLowerCase();
-			query.setFilter("nameSearch == '" + name + "'");
+			Query q = pm.newQuery(Mso.class);
+			q.setFilter("name == nameParam");
+			q.declareParameters("String nameParam");
 			@SuppressWarnings("unchecked")
-			List<Mso> results = (List<Mso>) query.execute(name);
+			List<Mso> results = (List<Mso>) q.execute(name);
 			if (results.size() > 0) {
 				detached = pm.detachCopy(results.get(0));
 			}

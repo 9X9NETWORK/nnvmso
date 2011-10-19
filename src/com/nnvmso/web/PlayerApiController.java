@@ -1293,16 +1293,7 @@ public class PlayerApiController {
 		}
 		return NnNetUtil.textReturn(output);
 	}
-	
-	
-/*
-	@RequestMapping("mapleReceive")
-	public ResponseEntity<String> mapleReceive(@RequestBody PostUrl post) {
-		log.info(post.toString());
-		return NnNetUtil.textReturn("OK");
-	}
-*/	
-	
+			
 	/**
 	 * To be ignored
 	 */
