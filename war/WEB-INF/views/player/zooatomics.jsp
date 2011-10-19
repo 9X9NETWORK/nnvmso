@@ -5,7 +5,7 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9playerV68a"/>
-<c:set var="nroot" value="http://9x9ui.s3.amazonaws.com/9x9playerV84"/>
+<c:set var="nroot" value="http://9x9ui.s3.amazonaws.com/9x9playerV86"/>
 
 <!-- $Revision$ -->
 
@@ -29,7 +29,7 @@
 <script type="text/javascript" charset="utf-8" src="${root}/javascripts/jquery.swfobject.1-1-1.min.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/scripts/flowplayer-3.2.4.min.js"></script>
 
-<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/player13.js"></script>
+<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/player14.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/vertical.slider.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/jquery.mousewheel.min.js"></script>
 
@@ -489,6 +489,11 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
   </p>
 </div>
 
+<p id="flip-bubble">
+  <img src="${nroot}/images/flip-bubble.png">
+  <span></span>
+</p>
+
 <div id="store-layer" class="stage" style="background: #f0f0f0; display: none">
   <div id="store-holder">
     <div id="pool-waiting">
@@ -517,6 +522,8 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
       <input type="text" class="textfield" value="Search" id="search-field">
     </p>
     <div id="preview-area">
+      <ul id="flip-ch-index">
+      </ul>
       <p id="btn-flip-preview"><img src="${nroot}/images/btn_flip_L_off.png" id="btn-fp-off"><img src="${nroot}/images/btn_flip_L_on.png" id="btn-fp-on"></p>
       <p id="preview-index"><span>Previewing</span><span id="index-ch-title"></span><span>channel in</span><span id="index-catg-title"></span><span>set</span></p>
       <div id="preview-win">
@@ -537,35 +544,32 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
         </div>    
       </div>
       <p id="channel-price"><img src="${nroot}/images/tag_free.png" id="icon-tag"><span class="free">FREE</span></p>
-      <ul id="preview-controller">
-        <li id="btn-preview-play" class="on"><img src="${nroot}/images/btn_play.png" id="icon-preview-play" title="Play"><img src="${nroot}/images/btn_pause.png" id="icon-preview-pause" title="Pause"></li>
-        <li id="btn-info"><img src="${nroot}/images/btn_info.png" id="icon-info" title="Channel Info"></li>
-        <li id="btn-sound"><img src="${nroot}/images/icon_sound_off.png" id="icon-sound-off" title="Sound Off"><img src="${nroot}/images/icon_sound_on.png" id="icon-sound-on" title="Sound On"></li>
-      </ul>
-      <div id="channel-bubble">
-        <img src="${nroot}/images/bubble_tip.png" id="channel-bubble-tip">
-        <img src="${nroot}/images/bg_bubble.png" class="bg-bubble">
-        <div id="chbubble-slider" class="slider-wrap"><div class="slider-vertical"></div></div>
-        <div id="chbubble-content">
-          <p id="chbubble-list">
-            <span></span>
-          </p>
-        </div>
-        <ul id="chbubble-meta">
-          <li><span>15 episodes</span></li>
-          <li><span>Updated: 09/09/11</span></li>
-          <li><span>Curator: John Smith</span></li>
+      <p id="control-switch"><img src="${nroot}/images/btn_in.png" id="btn-in"><img src="${nroot}/images/btn_out.png" id="btn-out"></p>
+      <div id="preview-controller">
+        <ul id="control-list">
+          <li id="btn-info"><img src="${nroot}/images/btn_info.png" id="icon-info" title="Channel Info"></li>
+          <li id="btn-preview-play" class="on"><img src="${nroot}/images/btn_play.png" id="icon-preview-play" title="Play"><img src="${nroot}/images/btn_pause.png" id="icon-preview-pause" title="Pause"></li>
+          <li id="btn-sound"><img src="${nroot}/images/icon_sound_off.png" id="icon-sound-off" title="Sound Off"><img src="${nroot}/images/icon_sound_on.png" id="icon-sound-on" title="Sound On"></li>
+          <li id="btn-flip-prev"><img src="${nroot}/images/btn_flipup.png" id="icon-flip-prev" title="Prev Channel"></li>
+          <li id="btn-flip-next"><img src="${nroot}/images/btn_flipdown.png" id="icon-flip-next" title="Next Channel"></li>
         </ul>
       </div>
-      <div id="channel-flipper">
-        <p id="flip-next"><img src="${nroot}/images/arrow_down.png"><span>Next Ch</span></p>
-        <p id="flip-prev"><img src="${nroot}/images/arrow_up.png"><span>Prev Ch</span></p>
-        <p id="flip-ch-index"><span>2 / 20</span></p>
+      <div id="preview-promo">
+        <p><span>The most popular YouTube channel in 9x9 Channel Store now!</span></p>
+      </div>
+      <div id="channel-bubble">
+        <div id="chbubble-slider" class="slider-wrap"><div class="slider-vertical"></div></div>
+        <div id="chbubble-content">
+          <div id="chbubble-list">
+            <p><span></span></p>
+            <p id="chbubble-meta"><span></span><span class="divider">|</span><span></span><br><span></span></p>
+          </div>
+        </div>
       </div>
       <div id="btn-add-ch-L" class="btn-hilite"><img src="${nroot}/images/icon_cart_white.png" class="icon-cart"><p class="btn-text"><span>Add this Channel</span></p></div>
     </div>    
     <ul id="tabs">
-      <li id="recommended" class="on"><span>Recommended</span></li>
+      <li id="recommended" class="on"><span>Recommended sets</span></li>
       <li id="category"><span>Directory</span></li>
       <li id="yourown"><span>Add your own</span></li>
     </ul>
