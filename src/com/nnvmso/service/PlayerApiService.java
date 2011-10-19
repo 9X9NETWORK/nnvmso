@@ -88,7 +88,7 @@ public class PlayerApiService {
 		if (id == null && beautifulUrl == null) {
 			return NnStatusMsg.inputMissing(locale);
 		}		
-		if (id.startsWith("s")) id = id.replace("s", ""); 			
+		if (id != null && id.startsWith("s")) id = id.replace("s", ""); 			
 		if (id != null && !Pattern.matches("^\\d*$", id)) {
 			return NnStatusMsg.inputError(locale);
 		}

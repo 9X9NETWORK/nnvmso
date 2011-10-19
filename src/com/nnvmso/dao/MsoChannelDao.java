@@ -236,7 +236,7 @@ public class MsoChannelDao extends GenericDao<MsoChannel> {
 		try {
 			Query q = pm.newQuery(MsoChannel.class);
 			q.setFilter("contentType == soapParam || contentType == varietyParam");
-			q.declareParameters("short soapParamm, short varietyParam");
+			q.declareParameters("short soapParam, short varietyParam");
 			@SuppressWarnings("unchecked")
 			List<MsoChannel> channels = (List<MsoChannel>) q.execute(MsoChannel.CONTENTTYPE_MAPLE_SOAP, MsoChannel.CONTENTTYPE_MAPLE_VARIETY);
 			detached = (List<MsoChannel>)pm.detachCopyAll(channels);

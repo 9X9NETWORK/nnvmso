@@ -53,13 +53,13 @@ public class PlayerController {
 	 */	
 	@RequestMapping("{name}")
 	public String zooatomics(@RequestParam(value="mso",required=false) String mso, HttpServletRequest req, HttpServletResponse resp, Model model, @PathVariable("name") String name) {
-		PlayerService service = new PlayerService();
+		PlayerService service = new PlayerService();		
 		model = service.prepareBrand(model, mso, resp);
 		model = service.prepareSetInfo(model, name, resp);
 		//String prefLanguage = req.getHeader("Accept-Language");		
 		return "player/zooatomics";
 	}
-
+	
 	@RequestMapping("view")
 	public String view(@RequestParam(value="mso",required=false) String mso, 
 			           HttpServletRequest req, HttpServletResponse resp, Model model, 
