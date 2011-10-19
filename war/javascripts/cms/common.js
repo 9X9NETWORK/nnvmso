@@ -47,6 +47,9 @@ var cms = {
     'themeName': 'all-black',
     'themePath': '/images/cms'
   },
+  escapeHtml: function(text) {
+    return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  },
   getChannelUrl: function(channelId, programId) {
     var url = 'http://' + location.host + '/view?channel=' + channelId;
     if (programId) {
@@ -177,6 +180,8 @@ var cms = {
   initEnterpriseOne: function() {
     $('.menuA').removeAttr('href');
     $('<style> .menuA:hover { background-position: 0px -59px; cursor: default; } </style>').appendTo('head');
+    $('.menuD').removeAttr('href');
+    $('<style> .menuD:hover { background-position: -268px -59px; cursor: default; } </style>').appendTo('head');
   },
   initGenericOne: function() {
     $('#blog_link').show();
@@ -208,11 +213,6 @@ var cms = {
       cache: false // Disable caching of AJAX responses
     });
     
-    cms.loadScript('/javascripts/plugins/jquery.blockUI.js', function() {
-      $.blockUI.defaults.message = $('#warning_please_wait').html();
-      $(document).ajaxStart($.blockUI).ajaxStop($.unblockUI);
-    });
-    
     cms.loadScript('/javascripts/plugins/jquery.getCSS.js', function() {
       $.getCSS('/stylesheets/jquery.jqModal.css', function() {
         cms.loadScript('/javascripts/plugins/jquery.jqModal.js', cms.initSetupButton);
@@ -235,23 +235,31 @@ $(function() {
   if (cms.debug) {
     cms.loadScript('http://www.netgrow.com.au/assets/files/jquery_plugins/jquery.dump.js');
   }
-  
-  cms.init();
-  
-  if (cms.isGeneric()) {
-    cms.initGenericOne();
-  } else if (cms.isEnterprise()) {
-    cms.initEnterpriseOne();
-  }
-  
-  if (typeof (page$) != 'undefined' && typeof (page$.init) == 'function') {
-    page$.init();
-    if (cms.isGeneric() && typeof (page$.initGenericOne) == 'function') {
-      page$.initGenericOne();
-    } else if (cms.isEnterprise() && typeof (page$.initEnterpriseOne) == 'function') {
-      page$.initEnterpriseOne();
+    
+  cms.loadScript('/javascripts/plugins/jquery.blockUI.js', function() {
+    
+    $.blockUI.defaults.message = $('#warning_please_wait').html();
+    $(document).ajaxStart($.blockUI).ajaxStop($.unblockUI);
+    $.blockUI();
+    
+    cms.init();
+    
+    if (cms.isGeneric()) {
+      cms.initGenericOne();
+    } else if (cms.isEnterprise()) {
+      cms.initEnterpriseOne();
     }
-  }
+    
+    if (typeof (page$) != 'undefined' && typeof (page$.init) == 'function') {
+      page$.init();
+      if (cms.isGeneric() && typeof (page$.initGenericOne) == 'function') {
+        page$.initGenericOne();
+      } else if (cms.isEnterprise() && typeof (page$.initEnterpriseOne) == 'function') {
+        page$.initEnterpriseOne();
+      }
+    }
+    
+  });
   
   /* Release 3.1 by Jeff */
   

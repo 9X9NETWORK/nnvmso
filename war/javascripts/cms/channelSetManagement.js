@@ -5,6 +5,17 @@
 var page$ = {
   objDirectoryTree: {
     init: function() {
+      $('.plus-button').live('click', function() {
+        cms.post('/CMSAPI/channelInfo', { 'channelId': $(this).attr('alt') }, function(channel) {
+          if (channel != null)
+            page$.objChannelSetArea.appendChannel(channel);
+        }, 'json');
+        return false;
+      });
+      $('.play-button').live('click', function() {
+        window.open('/view?channel=' + $(this).attr('alt'), '_player');
+        return false;
+      });
       cms.loadJSON('/CMSAPI/systemCategories', function(categories) {
         var nodes = [ ];
         for (var i in categories) {
@@ -18,16 +29,11 @@ var page$ = {
           nodes.push(node);
         }
         $('#treeview').dynatree({
+          noLink: true,
           children: nodes,
           onActivate: function(node) {
           },
           onDblClick: function(node, event) {
-            if (!node.data.isFolder) {
-              cms.post('/CMSAPI/channelInfo', { 'channelId': node.data.key }, function(channel) {
-                page$.objChannelSetArea.appendChannel(channel);
-              }, 'json');
-            }
-            return false;
           },
           onLazyRead: function(node) {
             if (node.data.isFolder) {
@@ -45,9 +51,10 @@ var page$ = {
                 cms.post('/CMSAPI/listCategoryChannels', { 'categoryId': node.data.key }, function(channels) {
                   for (var i in channels) {
                     var channel = channels[i];
+                    var channelId = channel.key.id;
                     var child = {
-                      'title':    channel.name,
-                      'key':      channel.key.id
+                      'title': cms.escapeHtml(channel.name) + ' <img alt="' + channelId + '" class="tiny-button plus-button" src="/images/cms/plus.png"> <img alt="' + channelId + '" class="tiny-button play-button" src="/images/cms/play.png">',
+                      'key':   channel.key.id
                     };
                     node.addChild(child);
                   }
@@ -238,25 +245,28 @@ var page$ = {
       return item;
     },
     appendChannel: function(channel, suppress) {
+      var arrChannelsInSet = $('#set_ch_list li').toArray();
+      for (var i in arrChannelsInSet) {
+        var found = $(arrChannelsInSet[i]);
+        var channelId = found.find('input[name="channelId"]').val();
+        if (channelId == channel.key.id) {
+          //alert($('#lang_warning_channel_is_already_in').text());
+          $('#set_ch_holder').scrollTo(found, 800);
+          found.effect('highlight', { }, 3000);
+          return;
+        }
+      }
       if ($('#set_ch_list li').size() >= 27) {
         alert($('#lang_warning_reached_maximum_amount').text());
         return;
-      }
-      var arrChannelsInSet = $('#set_ch_list li').toArray();
-      for (var i in arrChannelsInSet) {
-        var channelId = $(arrChannelsInSet[i]).find('input[name="channelId"]').val();
-        if (channelId == channel.key.id) {
-          alert($('#lang_warning_channel_is_already_in').text());
-          return;
-        }
       }
       var item = this.composeChannelSetItem(channel);
       $('#set_ch_list').append(item);
       this.adjustWidth();
       if (!suppress) {
-        alert($('#lang_channel_had_been_added').text());
+        //alert($('#lang_channel_had_been_added').text());
         $('#set_ch_holder').scrollTo(item, 800);
-        item.effect('highlight', { }, 2500);
+        item.effect('highlight', { }, 3000);
       }
     },
     init: function() {

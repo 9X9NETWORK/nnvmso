@@ -770,3 +770,7 @@ padding:10px 10px 0 10px;
   overflow: auto;
   max-height: 100%;
 }
+
+.tiny-button {
+  cursor: pointer;
+}
