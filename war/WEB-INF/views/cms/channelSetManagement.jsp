@@ -14,6 +14,7 @@
 <script type="text/javascript" src="http://connect.facebook.net/en_US/all.js"></script>
 <script type="text/javascript" src="/javascripts/plugins/jquery.bubble.js"></script>
 <script type="text/javascript" src="/javascripts/plugins/dynatree/jquery.dynatree.js"></script>
+<script type="text/javascript" src="/javascripts/plugins/jquery.scrollTo-1.4.2.js"></script>
 <script type="text/javascript" src="/javascripts/swfupload/swfupload.js"></script>
 <script type="text/javascript" src="/javascripts/cms/common.js"></script>
 <script type="text/javascript" src="/javascripts/cms/channelSetManagement.js"></script>
@@ -176,6 +177,9 @@
 <label class="lang" id="lang_channel_source_is_wrong"><spring:message code="cms.warning.channel_source_is_wrong"/></label>
 <label class="lang" id="lang_channel_source_is_empty"><spring:message code="cms.warning.channel_source_is_empty"/></label>
 <label class="lang" id="lang_update_successfully"><spring:message code="cms.warning.update_successfully"/></label>
+<label class="lang" id="lang_warning_channel_is_already_in"><spring:message code="cms.warning.channel_is_already_in"/></label>
+<label class="lang" id="lang_warning_reached_maximum_amount"><spring:message code="cms.warning.reached_maximum_amount"/></label>
+<label class="lang" id="lang_channel_had_been_added"><spring:message code="cms.info.channel_has_been_added"/></label>
 <label class="lang" id="image_bg_album"><spring:message code="cms.image.bg_album"/></label>
 <label class="lang" id="image_btn_upload"><spring:message code="cms.image.btn_upload"/></label>
 </body>

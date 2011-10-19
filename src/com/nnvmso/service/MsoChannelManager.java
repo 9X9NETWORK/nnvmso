@@ -178,6 +178,7 @@ public class MsoChannelManager {
 			if (channel.getContentType() == MsoChannel.CONTENTTYPE_YOUTUBE_CHANNEL) {
 				String url = channel.getSourceUrl();
 				String name = YouTubeLib.getYouTubeChannelName(url);
+				log.info("youtube: " + name);
 				Map<String, String> info = YouTubeLib.getYouTubeChannelEntry(name);
 				if (info.get("title") != null)
 					channel.setName(info.get("title"));
@@ -188,6 +189,7 @@ public class MsoChannelManager {
 			} else if (channel.getContentType() == MsoChannel.CONTENTTYPE_YOUTUBE_PLAYLIST) {
 				String url = channel.getSourceUrl();
 				String name = YouTubeLib.getYouTubeChannelName(url);
+				log.info("playlist: " + name);
 				Map<String, String> info = YouTubeLib.getYouTubePlaylistEntry(name);
 				if (info.get("title") != null)
 					channel.setName(info.get("title"));
