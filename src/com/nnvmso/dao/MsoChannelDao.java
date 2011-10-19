@@ -229,7 +229,23 @@ public class MsoChannelDao extends GenericDao<MsoChannel> {
 		}
 		return detached;
 	}	
-	
+
+	public List<MsoChannel> findMaples() {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		List<MsoChannel> detached = new ArrayList<MsoChannel>(); 
+		try {
+			Query q = pm.newQuery(MsoChannel.class);
+			q.setFilter("contentType == soapParam || contentType == varietyParam");
+			q.declareParameters("short soapParamm, short varietyParam");
+			@SuppressWarnings("unchecked")
+			List<MsoChannel> channels = (List<MsoChannel>) q.execute(MsoChannel.CONTENTTYPE_MAPLE_SOAP, MsoChannel.CONTENTTYPE_MAPLE_VARIETY);
+			detached = (List<MsoChannel>)pm.detachCopyAll(channels);
+		} finally {
+			pm.close();
+		}
+		return detached;
+	}	
+		
 	public List<MsoChannel> findFeaturedChannels() {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		List<MsoChannel> detached = new ArrayList<MsoChannel>(); 

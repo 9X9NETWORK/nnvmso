@@ -159,33 +159,21 @@ public class TranscodingServiceController {
 			                                    @RequestParam(value="msoName", required=false)String msoName,
 			                                    HttpServletRequest req) {
 		ChannelInfo info = new ChannelInfo();
+		List<MsoChannel> channels = new ArrayList<MsoChannel>();
+		MsoChannelManager channelMngr = new MsoChannelManager();		
 		try {
-			MsoManager msoMngr = new MsoManager();
-			MsoChannelManager channelMngr = new MsoChannelManager();
-			List<MsoChannel> channels = new ArrayList<MsoChannel>();
-			if (!msoName.equals("*")) {
-				Mso mso = msoMngr.findByName(msoName);
-				if (mso == null) {
-					info.setErrorCode(String.valueOf(NnStatusCode.MSO_INVALID));
-					info.setErrorReason("mso does not exist");				
-					return info;
-				}
-				channels = channelMngr.findMsoDefaultChannels(mso.getKey().getId(), true);
-			} else {
-				channels = channelMngr.findPublicChannels(true);
-			}
+			channels = channelMngr.findMaples();
 			String[] transcodingEnv = transcodingService.getTranscodingEnv(req);		
 			String callbackUrl = transcodingEnv[1];		
 			List<Channel> cs = new ArrayList<Channel>();
 			for (MsoChannel c : channels) {
-				if (c.getContentType() != MsoChannel.CONTENTTYPE_FACEBOOK) {
-					cs.add(new Channel(String.valueOf(c.getKey().getId()), 
-							           c.getSourceUrl(), 
-							           c.getTranscodingUpdateDate(), 
-							           "0",
-							           String.valueOf(c.getSubscriptionCount())));
-				}
+				cs.add(new Channel(String.valueOf(c.getKey().getId()), 
+						           c.getSourceUrl(), 
+						           c.getTranscodingUpdateDate(), 
+						           "0",
+						           String.valueOf(c.getSubscriptionCount())));
 			}
+			log.info("maple channels:" + channels.size());
 			info.setErrorCode(String.valueOf(NnStatusCode.SUCCESS));
 			info.setErrorReason("Success");
 			info.setChannels(cs);

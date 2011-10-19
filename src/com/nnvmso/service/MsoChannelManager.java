@@ -248,6 +248,10 @@ public class MsoChannelManager {
 		return url;
 	}
 
+	public List<MsoChannel> findMaples() {
+		return msoChannelDao.findMaples();
+	}
+	
 	public List<MsoChannel> findMsoDefaultChannels(long msoId, boolean needSubscriptionCnt) {		
 		//find msoIpg
 		MsoIpgManager msoIpgMngr = new MsoIpgManager();

@@ -94,9 +94,9 @@ public class InitService {
 		int cnt = 0;
 		for (MsoChannel c : channels) {
 			if (c.getContentType() == MsoChannel.CONTENTTYPE_MAPLE_SOAP || c.getContentType() == MsoChannel.CONTENTTYPE_MAPLE_VARIETY) {
-				if (c.getProgramCount() < 5) {
+				if (c.getProgramCount() < 51) {
 					tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
-					log.info("count < 5 " + c.getSourceUrl());
+					log.info("count < 51 " + c.getSourceUrl());
 					cnt++;
 				}
 			}
