@@ -76,6 +76,7 @@ public class CalibrationTask {
 	}
 
 	//entry, remove programs more than 50, programsRemoveEntry->programRemoveChannels->programsRemove
+	/*
 	@RequestMapping("programsRemoveEntry")
 	public ResponseEntity<String> programsRemoveEntry() throws IOException {
 		try {						
@@ -87,8 +88,10 @@ public class CalibrationTask {
 		}		
 		return NnNetUtil.textReturn("OK");
 	}
+	*/
 
-	//run through each channel, 
+	//run through each channel,
+	/*
 	@RequestMapping(value="programRemoveChannels")
 	public ResponseEntity<String> programRemoveChannels(HttpServletRequest req) {
 		String output = "";
@@ -107,7 +110,9 @@ public class CalibrationTask {
 		}
 		return NnNetUtil.textReturn(output);
 	}
+	*/
 
+	/*
 	@RequestMapping(value="programsRemove")
 	public ResponseEntity<String> programsRemove(HttpServletRequest req) {
 		int channelId = Integer.parseInt(req.getParameter("channel"));
@@ -121,6 +126,6 @@ public class CalibrationTask {
 		channelMngr.save(channel);
 		return NnNetUtil.textReturn(output);
 	}
-	
+	*/
 	
 }
