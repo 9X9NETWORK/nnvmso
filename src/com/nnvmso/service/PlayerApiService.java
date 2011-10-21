@@ -1165,29 +1165,26 @@ public class PlayerApiService {
 	private String composeChannelLineupStr(MsoChannel c, Mso mso) {
 		String intro = c.getIntro();
 		String imageUrl = c.getPlayerPrefImageUrl();	
-		String channelName = "";
+		String youtubeId = "";
 		if (c.getSourceUrl() != null && c.getSourceUrl().contains("http://www.youtube.com"))
-			channelName = YouTubeLib.getYouTubeChannelName(c.getSourceUrl());
+			youtubeId = YouTubeLib.getYouTubeChannelName(c.getSourceUrl());
 		if (c.getContentType() == MsoChannel.CONTENTTYPE_FACEBOOK) 
-			channelName = c.getSourceUrl();
-		String getName = c.getName();
-		if (getName != null && getName.startsWith("YouTube user:"))
-			getName = getName.replaceFirst("YouTube user: ", "");		
-		String[] ori = {//c.getSourceUrl(),
-				        Integer.toString(c.getSeq()), 
+			youtubeId = c.getSourceUrl();
+		String[] ori = {Integer.toString(c.getSeq()),				         
 					    String.valueOf(c.getKey().getId()),
-					    getName,
+					    c.getName(),
 					    intro,
 					    imageUrl,
 					    String.valueOf(c.getProgramCount()),
 					    String.valueOf(c.getType()),
 					    String.valueOf(c.getStatus()),
 					    String.valueOf(c.getContentType()),
-					    channelName,
+					    youtubeId,
 					    this.convertEpochToTime(c.getTranscodingUpdateDate(), c.getUpdateDate()),
 					    String.valueOf(c.getSorting()),
 					    c.getPiwik(),
 					    String.valueOf(c.getRecentlyWatchedProgram()),
+					    c.getOriName(),
 					    };
 		String output = NnStringUtil.getDelimitedStr(ori);
 		return output;

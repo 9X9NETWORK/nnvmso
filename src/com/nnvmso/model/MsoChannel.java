@@ -31,6 +31,9 @@ public class MsoChannel implements Serializable {
 		
 	@Persistent
 	private String name; 
+
+	@Persistent
+	private String oriName; 
 	
 	@Persistent
 	private String intro;
@@ -190,7 +193,7 @@ public class MsoChannel implements Serializable {
 		} 
 		return imageUrl;
 	}
-	
+		
 	public void setImageUrl(String imageUrl) {
 		this.imageUrl = imageUrl;
 	}
@@ -385,6 +388,14 @@ public class MsoChannel implements Serializable {
 
 	public void setRecentlyWatchedProgram(String recentlyWatchedProgram) {
 		this.recentlyWatchedProgram = recentlyWatchedProgram;
+	}
+
+	public String getOriName() {
+		return oriName;
+	}
+
+	public void setOriName(String oriName) {
+		this.oriName = oriName;
 	}
 	
 }

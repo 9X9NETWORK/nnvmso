@@ -94,10 +94,9 @@ public class MsoProgram implements Serializable {
 
 	@Persistent
 	private String subSeq; //mainly for mapel, not only for seq, but also its app id
-	
-	
+		
 	@Persistent
-	private String comment;
+	private String comment; //curator comment
 	
 	public MsoProgram(String name, String intro, String imageUrl, short type) {
 		this.name = name;

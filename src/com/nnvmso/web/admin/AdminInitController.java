@@ -50,7 +50,7 @@ import com.nnvmso.web.json.transcodingservice.RtnProgram;
 
 
 /* first run */
-//wipe out data: Category, CategoryChannel, CategoryChannelSet, ChannelSet, ChannelSetChannel
+//wipe out data: Category, CategoryChannel, CategoryChannelSet, ChannelSet, ChannelSetChannel, ContentOwnership
 //change MsoChannel Schema 
 //initChannelsToTask (mark selected channel to good status)
 //mapreduce, updateFtsMapper (update channel fts)
@@ -118,7 +118,7 @@ public class AdminInitController {
 	public String groundStartPost(HttpServletRequest req) {
 		String host = NnNetUtil.getUrlRoot(req);
 		if (host.equals("http://localhost:8888")) {
-			initService.initAll(false, true);
+			initService.initAll(true, true);
 		}
 		return "admin/groundStart";
 	}	
@@ -131,9 +131,11 @@ public class AdminInitController {
 	//gae environment	
 	@RequestMapping("initChannelsToTask")
 	public ResponseEntity<String> initChannelsToTask(
+			@RequestParam(value="isEnglish",required=false) boolean isEnglish,
 			@RequestParam(value="isDevel",required=false) boolean isDevel) {
 		QueueFactory.getDefaultQueue().add(
 			      TaskOptions.Builder.withUrl("/admin/init/initChannels")
+			         .param("isEnglish", String.valueOf(isEnglish))
 			         .param("isDevel", String.valueOf(isDevel))			      			      
 		);			          
 		return NnNetUtil.textReturn("You will receive an email when it is done.");

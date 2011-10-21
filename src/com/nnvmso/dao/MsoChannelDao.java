@@ -29,6 +29,7 @@ public class MsoChannelDao extends GenericDao<MsoChannel> {
 		super(MsoChannel.class);
 	}
 
+	@SuppressWarnings("unchecked")
 	public static List<MsoChannel> searchChannelEntries(String queryString) {			 			
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		StringBuffer queryBuffer = new StringBuffer();

@@ -52,15 +52,19 @@ public class PiwikLib {
 		String urlRoot = NnNetUtil.getUrlRoot(req);
 		String site = "";
 		if (urlRoot.contains("demo")) {
-			site = ".demo";
-		} else if (urlRoot.contains("alpha") ||  
-				   urlRoot.contains("localhost") || 
-				   urlRoot.contains("puppy") || 
+			site = "demo.";
+		} else if (urlRoot.contains("localhost") ||
 				   urlRoot.contains("office") ||
 				   urlRoot.contains("beta")){
-			site = ".dev";
-		}
-		String postHost = "http://piwik" + site + ".9x9.tv";
+			return null;
+		} else if (urlRoot.contains("alpha")) {
+			site = "alpha.";
+		} else if (urlRoot.contains("puppy")) {
+			site = "dev.";
+		} else if (urlRoot.contains("qa")) {
+			site = "qa.";
+		}		
+		String postHost = "http://" + site + "piwik.9x9.tv";
 		String contentUrl = urlRoot + "?";
 		String siteName = "";
 		if (channelId != 0) {

@@ -15,7 +15,13 @@ public class PiwikChannelMapper extends AppEngineMapper<Key, Entity, NullWritabl
 	protected static final Logger log = Logger.getLogger(PiwikChannelMapper.class.getName());
 	
 	@Override
-	public void map(Key key, Entity entity, Context context) {	
+	public void map(Key key, Entity entity, Context context) {
+		
+		entity.setProperty("piwik", null);
+		DatastoreMutationPool mutationPool = this.getAppEngineContext(context).getMutationPool();
+		mutationPool.put(entity);
+
+		/*
 		String urlRoot = context.getConfiguration().get("urlRoot");
 		//Key channelKey = (Key) entity.getProperty("key");
 		Key channelKey = entity.getKey();
@@ -32,6 +38,7 @@ public class PiwikChannelMapper extends AppEngineMapper<Key, Entity, NullWritabl
 			String name = (String) entity.getProperty("name");
 			log.info("channel Key is empty:" + name);
 		}
+		*/
 	}
 	
 }

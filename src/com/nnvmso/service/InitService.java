@@ -75,16 +75,18 @@ public class InitService {
 	}
 	
 	public void initAll(boolean english, boolean devel) {
-		//deleteAll();		
-		//initMso();
-		//initCategories(english);
-		//initSets(english, devel);
-		initChannels(english, devel);		
-		//initSetAndChannels(english);		
-		//initCategoryAndSets(english);
-		//initRecommended(english);
-		//initCategoryCount();
-		//initMapelPrograms();
+		deleteAll();		
+		initMso();
+		initCategories(english);
+		initSets(english, devel);
+		
+		initChannels(english, devel);
+		
+		initSetAndChannels(english);		
+		initCategoryAndSets(english);
+		initRecommended(english);
+		initCategoryCount();
+		initMapelPrograms();
 	}
 		
 	public void lessMaple() {
@@ -453,12 +455,18 @@ public class InitService {
 			    		if (url != null && url.length() > 0) {
 				    		if (!url.contains("maplestage")) {  
 					    		String checkedUrl = YouTubeLib.formatCheck(url);
-					    		if (checkedUrl != null)
-					    			list.add(checkedUrl);
-					    		else
+					    		if (checkedUrl != null) {
+					    			Cell nameCell = row.getCell(c-1);
+					    			String name = "";
+					    			if (nameCell != null) {
+					    				name = nameCell.getStringCellValue();
+					    			}
+					    			list.add(checkedUrl + "," + name);
+					    		} else {
 					    			log.info("url not passed youtube lib check:" + url);
+					    		}
 				    		} else {
-				    			list.add(url);
+				    			list.add(url + "," + "");
 				    			maple++;
 				    		}
 			    		}
@@ -481,12 +489,20 @@ public class InitService {
 	public void initChannels(boolean english, boolean devel) {
 		NnUserManager userMngr = new NnUserManager();
 		user = userMngr.findByEmail(NNEMAIL);		
-		String[] urls = this.getChannelUrlsFromExcel(english);
-		MsoChannelManager channelMngr = new MsoChannelManager();
+		String[] entries = this.getChannelUrlsFromExcel(english);
+		MsoManager msoMngr = new MsoManager();
+		Mso mso = msoMngr.findNNMso();
+		MsoChannelManager channelMngr = new MsoChannelManager();		
 		TranscodingService tranService = new TranscodingService();
 		boolean piwik = true;
 		int zeroProgramCnt = 0;
-		for (String url : urls) {			
+		for (String entry : entries) {	
+			String[] data = entry.split(",");
+			System.out.println("entry:" + entry);
+			String url = data[0];
+			String name = null;
+			if (data.length == 2)
+				name = data[1];
 			MsoChannel c = channelMngr.findBySourceUrlSearch(url);
 			if (c == null) {					
 				c = new MsoChannel(url, user.getKey().getId());
@@ -501,32 +517,44 @@ public class InitService {
 				} else {
 					piwik = false; //local testing, no piwik creation
 				}
-			} else {				
+			} else {		
+				if (c.getContentType() == MsoChannel.CONTENTTYPE_YOUTUBE_CHANNEL || 
+					c.getContentType() == MsoChannel.CONTENTTYPE_YOUTUBE_PLAYLIST) {
+					log.info("re-submit youtube channel:" + c.getSourceUrl());
+					if (!devel)
+						tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
+				}				
 				//log.info("this channel existed:" + url);
 				if (c.getStatus() == MsoChannel.STATUS_WAIT_FOR_APPROVAL) {
 					log.info("mark the channel from waiting to approval to success");
 					c.setStatus(MsoChannel.STATUS_SUCCESS);
-					channelMngr.save(c);
 				} else if (c.getStatus() == MsoChannel.STATUS_PROCESSING){
-					tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
+					if (!devel)
+						tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
 					log.info("was in processing mode, going to submit again");
 				} else if (c.getContentType() == MsoChannel.CONTENTTYPE_MAPLE_SOAP && c.getProgramCount() < 5) {
 					zeroProgramCnt++;
 					log.info("maple soap program count < 5; re-send:" + c.getSourceUrlSearch());
-					tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
+					if (!devel)
+						tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
 				} else if (c.getContentType() == MsoChannel.CONTENTTYPE_MAPLE_VARIETY && c.getProgramCount() < 5) {
 					zeroProgramCnt++;
 					log.info("maple variety program count < 5; re-send:" + c.getSourceUrlSearch());
-					tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
+					if (!devel)
+						tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
 				} else if (c.getStatus() != MsoChannel.STATUS_SUCCESS){
 					log.info("wanted channel but not success");					
-				}
+				}				
 			}
 			if (piwik) {
 				String piwikId = PiwikLib.createPiwikSite(0, c.getKey().getId(), req);
 				c.setPiwik(piwikId);
-				channelMngr.save(c);
 			}
+			if (c.getContentType() == MsoChannel.CONTENTTYPE_YOUTUBE_CHANNEL || 
+				c.getContentType() == MsoChannel.CONTENTTYPE_YOUTUBE_PLAYLIST) {
+				c.setName(name);
+			}			
+			channelMngr.save(c);				
 		}
 		log.info("< 5 program count:" + zeroProgramCnt); 
 	}
@@ -615,8 +643,7 @@ public class InitService {
 				log.severe("set found from db and channel data are not consistent:" + setList.size() + ";" + channelSetList.size());
 				//return;
 			}
-						
-			
+
 			//real work
 			Hashtable<String, MsoChannel> table = new Hashtable<String, MsoChannel>();
  			for (int i=0; i<setList.size(); i++) {
@@ -633,6 +660,7 @@ public class InitService {
  						table.put(url, c);
  						ChannelSet cs = setList.get(i);
  						ChannelSetChannel csc = cscMngr.findBySetAndChannel(cs.getKey().getId(), c.getKey().getId());
+ 						//avoid the duplication
  						if (csc == null) {
  							csc = new ChannelSetChannel(cs.getKey().getId(), c.getKey().getId(), j);				
  							cscMngr.create(csc);
@@ -698,6 +726,7 @@ public class InitService {
 			csMngr.create(channelSet);
 			if (!devel) {
 				String piwik = PiwikLib.createPiwikSite(channelSet.getKey().getId(), 0, req);
+				log.info("piwik id:" + piwik);
 				channelSet.setPiwik(piwik);
 				csMngr.save(channelSet);
 			}

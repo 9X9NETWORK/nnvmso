@@ -714,27 +714,37 @@ public class PlayerApiController {
 	 *         position, set id, set name, set image url, set type
 	 *         <p>  
 	 *         Channel info has following fields: <br/>
-	 *         grid position, channel id, channel name, channel description, channel image url, <br/>
-	 *         program count, channel type(integer, see note), channel status(integer, see note), <br/>
-	 *         contentType(integer, see following), source url (see note), <br/>
+	 *         grid position, <br/> 
+	 *         channel id, <br/>
+	 *         channel name, <br/> 
+	 *         channel description, <br/> 
+	 *         channel image url, <br/>
+	 *         program count, <br/> 
+	 *         channel type(integer, see note), <br/> 
+	 *         channel status(integer, see note), <br/>
+	 *         contentType(integer, see note), <br/> 
+	 *         youtube id (for player youtube query), <br/>
 	 *         channel/episodes last update time (see note) <br/>
-	 *         channel sorting (see note), piwik id, last watched episode         
+	 *         channel sorting (see note), <br/> 
+	 *         piwik id, <br/> 
+	 *         last watched episode <br/>
+	 *         youtube real channel name         
 	 *         </blockquote>
 	 *         <p>
 	 *         set type: TYPE_USER = 1; TYPE_READONLY = 2;
-	 *         <br/>
+	 *         <p>
 	 *         channel type: TYPE_GENERAL = 1; TYPE_READONLY = 2;
-	 *         <br/>
+	 *         <p>
 	 *         status: STATUS_SUCCESS = 0; STATUS_ERROR = 1;
-	 *         <br/> 
+	 *         <p> 
 	 *         contentType: SYSTEM_CHANNEL=1; PODCAST=2; 
 	 *                      YOUTUBE_CHANNEL=3; YOUTUBE_PLAYERLIST=4                        
 	 *                      FACEBOOK_CHANNEL=5; 
 	 *                      MIX_CHANNEL=6; SLIDE=7;
-	 *                      MAPLESTAGE_VARIETY=8; MAPLESTAGE_SOAP=9
-	 *         <br/>
+	 *                      MAPLESTAGE_VARIETY=8; MAPLESTAGE_SOAP=9	
+	 *         <p>
 	 *         channel episodes last update time: it does not always accurate on Youtube channels. It will pass channel create date on FB channels.
-	 *         <br/>
+	 *         <p>
 	 *         sorting: NEWEST_TO_OLDEST=1; SORT_OLDEST_TO_NEWEST=2; SORT_MAPEL=3
 	 *         <p> 
 	 *         Example: <br/>
@@ -742,7 +752,7 @@ public class PlayerApiController {
 	 *         --<br/>
 	 *         1239   1   Daai3x3   null<br/>
 	 *         -- <br/>
-	 *         1	1207	Channel1	http://hostname/images/img.jpg	3	1	0	3	http://www.youtube.com/user/android<br/>
+	 *         1	1207	Channel1	http://hostname/images/img.jpg	3	1	0	3	http://www.youtube.com/user/android <br/>
 	 *         </p>
 	 */		
 	@RequestMapping(value="channelLineup")

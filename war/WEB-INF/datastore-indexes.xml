@@ -60,6 +60,9 @@
     <property name="channelSetId" direction="asc"/>
     <property name="seq" direction="asc"/>
   </datastore-index>  
+  <datastore-index kind="ContentOwnership" ancestor="false" source="manual">
+    <property name="__key__" direction="desc"/>
+  </datastore-index>
   <datastore-index kind="Ipg" ancestor="false" source="manual">
     <property name="__key__" direction="desc"/>
   </datastore-index>

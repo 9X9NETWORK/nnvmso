@@ -132,7 +132,12 @@ public class TranscodingService {
 			return new PostResponse(String.valueOf(NnStatusCode.SUCCESS), "SUCCESS"); 
 		}
 		String name = podcast.getTitle();
-		channel.setName(name);
+		if (channel.getContentType() == MsoChannel.CONTENTTYPE_YOUTUBE_CHANNEL || 
+			channel.getContentType() == MsoChannel.CONTENTTYPE_YOUTUBE_PLAYLIST) {			
+			channel.setOriName(name);
+		} else {
+			channel.setName(name);
+		}		
 		String intro = podcast.getDescription();
 		if (intro!= null && intro.length() > 500) {
 			intro = intro.substring(0, 499);

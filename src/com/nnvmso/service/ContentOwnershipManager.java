@@ -48,8 +48,7 @@ public class ContentOwnershipManager {
 		return channelDao.findAllByIds(channelIds);
 	}
 	
-	public void create(ContentOwnership own, Mso mso, MsoChannel channel) {
-		
+	public void create(ContentOwnership own, Mso mso, MsoChannel channel) {			
 		own.setContentType(ContentOwnership.TYPE_CHANNEL);
 		own.setContentId(channel.getKey().getId());
 		own.setMsoId(mso.getKey().getId());
@@ -59,8 +58,7 @@ public class ContentOwnershipManager {
 		ownershipDao.save(own);
 	}
 
-	public void create(ContentOwnership own, Mso mso, ChannelSet channelSet) {
-		
+	public void create(ContentOwnership own, Mso mso, ChannelSet channelSet) {		
 		own.setContentType(ContentOwnership.TYPE_CHANNELSET);
 		own.setContentId(channelSet.getKey().getId());
 		own.setMsoId(mso.getKey().getId());

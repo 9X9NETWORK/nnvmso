@@ -14,7 +14,12 @@ public class PiwikSetMapper extends AppEngineMapper<Key, Entity, NullWritable, N
 	protected static final Logger log = Logger.getLogger(PiwikSetMapper.class.getName());
 	
 	@Override
-	public void map(Key key, Entity entity, Context context) {	
+	public void map(Key key, Entity entity, Context context) {
+		entity.setProperty("piwik", null);
+		DatastoreMutationPool mutationPool = this.getAppEngineContext(context).getMutationPool();
+		mutationPool.put(entity);
+
+		/*
 		String urlRoot = context.getConfiguration().get("urlRoot");
 		Key setKey = entity.getKey();
 		long setId = setKey.getId();
@@ -23,6 +28,7 @@ public class PiwikSetMapper extends AppEngineMapper<Key, Entity, NullWritable, N
 		entity.setProperty("piwik", piwik);
 		DatastoreMutationPool mutationPool = this.getAppEngineContext(context).getMutationPool();
 		mutationPool.put(entity);
+		*/
 	}
 	
 }
