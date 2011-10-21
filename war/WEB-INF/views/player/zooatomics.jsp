@@ -189,11 +189,10 @@ var brandinfo = "${brandInfo}";
   </div>
 </div>
 
-<div id="waiting">
-  <div class="waiting-holder">
-    <img src="${root}/images/loading.gif">
-    <p id="moment1">One moment...</p>
-
+<div id="waiting-layer">
+  <div id="waiting-holder">
+    <img src="{$nroot}/images/loading.gif">
+    <p>One moment...</p>
   </div>
 </div>
 
@@ -377,6 +376,7 @@ var brandinfo = "${brandInfo}";
     </div>
   </div>
 </div>
+
 
 <div id="help-layer">
   <div id="help-holder">
