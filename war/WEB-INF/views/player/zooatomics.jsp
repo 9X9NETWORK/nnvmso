@@ -5,7 +5,7 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9playerV68a"/>
-<c:set var="nroot" value="http://9x9ui.s3.amazonaws.com/9x9playerV86"/>
+<c:set var="nroot" value="http://9x9ui.s3.amazonaws.com/9x9playerV87"/>
 
 <!-- $Revision$ -->
 
@@ -32,11 +32,7 @@
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/player14.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/vertical.slider.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/jquery.mousewheel.min.js"></script>
-
-<style type="text/css">                                                                                                                                                  
-.ui-slider-horizontal .ui-state-default {z-index: 55; width: 1.1875em; height: 1.1875em; background: white url(${nroot}/images/btn_knob.png) 0 0 no-repeat; background-size: 100%; border: none; position: absoulte; top: 0; left: 0; }                                                                                                                                            
-</style>                                                                                                                                                                 
-
+                                                                                                                                     
 <script type="text/javascript">
 var analytz = false;
 var _gaq = _gaq || [];
@@ -489,10 +485,11 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
   </p>
 </div>
 
-<p id="flip-bubble">
+<div id="flip-bubble">
   <img src="${nroot}/images/flip-bubble.png">
-  <span></span>
-</p>
+  <p><span>Ch </span><span id="chOrder">1</span><br><span>of </span><span id="chNum">20</span></p>
+</div>
+
 
 <div id="store-layer" class="stage" style="background: #f0f0f0; display: none">
   <div id="store-holder">
@@ -692,7 +689,7 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
         <li id="play-time"><span></span></li>
         <li class="divider"></li>
         <li id="progress-constrain">
-          <!--img src="${nroot}/images/btn_knob.png" id="btn-knob"-->
+          <!--p id="btn-knob" style="display: none"></p-->
           <div id="progress-bar">
             <p id="loaded"></p>
             <p id="played"></p>
