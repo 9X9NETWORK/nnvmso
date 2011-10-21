@@ -191,7 +191,7 @@ var brandinfo = "${brandInfo}";
 
 <div id="waiting-layer">
   <div id="waiting-holder">
-    <img src="{$nroot}/images/loading.gif">
+    <img src="${nroot}/images/loading.gif">
     <p>One moment...</p>
   </div>
 </div>
