@@ -78,6 +78,7 @@ public class NnStatusMsg {
 			  case NnStatusCode.SUBSCRIPTION_ERROR: return messageSource.getMessage("nnstatus.subscription_error", new Object[] {NnStatusCode.SUBSCRIPTION_ERROR} , locale);
 			  case NnStatusCode.SUBSCRIPTION_DUPLICATE_CHANNEL: return messageSource.getMessage("nnstatus.subscription_duplicate_channel", new Object[] {NnStatusCode.SUBSCRIPTION_DUPLICATE_CHANNEL} , locale);
 			  case NnStatusCode.SUBSCRIPTION_SET_OCCUPIED: return messageSource.getMessage("nnstatus.subscription_set_occupied", new Object[] {NnStatusCode.SUBSCRIPTION_SET_OCCUPIED} , locale);
+			  case NnStatusCode.SUBSCRIPTION_POS_OCCUPIED: return NnStatusCode.SUBSCRIPTION_POS_OCCUPIED + "\t" + "SUBSCRIPTION_POS_OCCUPIED" + "\n";
 			  case NnStatusCode.CATEGORY_ERROR: return messageSource.getMessage("nnstatus.category_error", new Object[] {NnStatusCode.CATEGORY_ERROR} , locale);
 			  case NnStatusCode.CATEGORY_INVALID: return messageSource.getMessage("nnstatus.category_invalid", new Object[] {NnStatusCode.CATEGORY_INVALID} , locale);
 			  case NnStatusCode.IPG_ERROR: return messageSource.getMessage("nnstatus.ipg_error", new Object[] {NnStatusCode.IPG_ERROR} , locale);

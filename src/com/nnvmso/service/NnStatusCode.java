@@ -57,6 +57,7 @@ public class NnStatusCode {
 	public static final int SUBSCRIPTION_SET_OCCUPIED = 352;
 	public static final int SUBSCRIPTION_DUPLICATE_SET = 353;
 	public static final int SUBSCRIPTION_RO_SET = 354;
+	public static final int SUBSCRIPTION_POS_OCCUPIED = 354;
 	
 	//400 category related
 	public static final int CATEGORY_ERROR = 400;

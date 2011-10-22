@@ -724,11 +724,16 @@ public class PlayerApiService {
 		MsoChannel channel = new MsoChannelManager().findById(cId);			
 		if (channel == null || channel.getStatus() == MsoChannel.STATUS_ERROR)
 			return this.assembleMsgs(NnStatusCode.CHANNEL_ERROR, null);
-		boolean status = subMngr.subscribeChannel(user.getKey().getId(), cId, Integer.parseInt(gridId), MsoIpg.TYPE_GENERAL, mso.getKey().getId());
+		
+		short seq = Short.parseShort(gridId);
+		Subscription s = subMngr.findByUserIdAndSeq(user.getKey().getId(), seq);
+		if (s != null)
+			return this.assembleMsgs(NnStatusCode.SUBSCRIPTION_POS_OCCUPIED, null);		
+		boolean status = subMngr.subscribeChannel(user.getKey().getId(), cId, seq, MsoIpg.TYPE_GENERAL, mso.getKey().getId());
 		if (!status) {
 			//the general status shows error even there's only one error
 			return this.assembleMsgs(NnStatusCode.SUBSCRIPTION_DUPLICATE_CHANNEL, null);
-		}				
+		}
 		return this.assembleMsgs(NnStatusCode.SUCCESS, null);
 	}
 

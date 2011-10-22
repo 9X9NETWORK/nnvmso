@@ -232,8 +232,8 @@ public class PlayerApiController {
 	 * Set user profile information
 	 * 
 	 * @param user user token
-	 * @param <p>key keys include "name", "email", "gender", "year", "sphere", "ui-lang", "password", "oldPassword" 
-	 *        <p>Keys are separated by comma.
+	 * @param <p>key keys include "name", "email", "gender", "year", "sphere", "ui-lang", "password", "oldPassword". <br/> 
+	 *               Keys are separated by comma.
 	 * @param <p>value value that pairs with keys. values are separated by comma. The sequence of value has to be the same as 
 	 *        the sequence of keys. 
 	 *        <p>Key and value are used in pairs with corresponding sequence. 

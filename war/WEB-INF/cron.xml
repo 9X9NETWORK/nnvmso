@@ -1,24 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <cronentries>
-  <!-- 
-  <cron>
-    <url>/task/datamining/userCountTask</url>
-    <description>User Daily Report</description>
-    <schedule>every day 03:00</schedule>
-  </cron>
-  <cron>
-    <url>/task/datamining/channelCountTask</url>
-    <description>Channel Count Daily Report</description>
-    <schedule>every day 03:30</schedule>
-  </cron>
-   -->
-  <!-- 
-  <cron>
-    <url>/task/calibration/programsRemoveEntry</url>    
-    <description>Program Remove Calibration</description>
-    <schedule>every day 08:00</schedule>
-  </cron>
-   -->
   <cron>
     <url>/task/calibration/categoryChannelCount</url>    
     <description>Category Channel Count Calibration</description>

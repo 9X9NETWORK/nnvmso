@@ -91,19 +91,12 @@ public class InitService {
 		
 	public void lessMaple() {
 		MsoChannelManager channelMngr = new MsoChannelManager();
-		List<MsoChannel> channels = channelMngr.findNonPodcasts();
+		List<MsoChannel> channels = channelMngr.findMaples();
 		TranscodingService tranService = new TranscodingService();
-		int cnt = 0;
 		for (MsoChannel c : channels) {
-			if (c.getContentType() == MsoChannel.CONTENTTYPE_MAPLE_SOAP || c.getContentType() == MsoChannel.CONTENTTYPE_MAPLE_VARIETY) {
-				if (c.getProgramCount() < 51) {
-					tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
-					log.info("count < 51 " + c.getSourceUrl());
-					cnt++;
-				}
-			}
+			tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
 		}
-		log.info("count < 5 records: " + cnt);
+		log.info("maple channel re-submission: " + channels.size());
 	}
 	
 	 //for local testing only
