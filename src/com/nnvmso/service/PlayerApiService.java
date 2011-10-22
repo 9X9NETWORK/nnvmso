@@ -587,10 +587,10 @@ public class PlayerApiService {
 	}
 	
     private String checkLang(String lang) {
+        if (lang == null || lang.length() == 0)
+            return LangTable.LANG_EN;
         if (lang != null && !lang.equals(LangTable.LANG_EN) && !lang.equals(LangTable.LANG_ZH))
             return null;
-        if (lang == null)
-            return LangTable.LANG_EN;
         return lang;
     }
 	
@@ -1258,8 +1258,9 @@ public class PlayerApiService {
 	}
 		
 	public String findFeaturedSets(String lang) {
-		if (lang == null)
-			lang = Mso.LANG_EN;
+		lang = this.checkLang(lang);	
+        if (lang == null)
+            return this.assembleMsgs(NnStatusCode.INPUT_BAD, null);				
 		ChannelSetManager setMngr = new ChannelSetManager();
 		List<ChannelSet> sets = setMngr.findFeaturedSets(lang);
 		String[] result = {""};

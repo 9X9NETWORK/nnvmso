@@ -65,7 +65,7 @@ import com.nnvmso.web.json.transcodingservice.RtnProgram;
 //initMso
 
 /* 2nd run */
-//wipe out data: Category, CategoryChannel, CategoryChannelSet, ChannelSet, ChannelSetChannel
+//wipe out data: Category, CategoryChannel, CategoryChannelSet, ChannelSet, ChannelSetChannel, ContentOwnership
 //ChannelStatusMapper (mark all the channels to waiting_approval status)
 
 //initSetsToTask?isEnglish=true&isDevel=false
