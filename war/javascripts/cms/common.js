@@ -169,6 +169,8 @@ var cms = {
           pageSetup.init();
           if (cms.isGeneric()) {
             pageSetup.initGenericOne();
+          } else if (cms.isEnterprise()) {
+            pageSetup.initEnterpriseOne();
           }
         });
       },
