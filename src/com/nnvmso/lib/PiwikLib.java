@@ -65,6 +65,9 @@ public class PiwikLib {
 			site = "qa.";
 		}		
 		String postHost = "http://" + site + "piwik.9x9.tv";
+		if (urlRoot.contains("cms")) {
+			postHost = "http://piwik.teltel.com";
+		}
 		String contentUrl = urlRoot + "?";
 		String siteName = "";
 		if (channelId != 0) {
@@ -163,6 +166,9 @@ public class PiwikLib {
 			site = ".dev";
 		}
 		String postHost = "http://piwik" + site + ".9x9.tv";
+		if (urlRoot.contains("cms")) {
+			postHost = "http://piwik.teltel.com";
+		}
 		String contentUrl = urlRoot + "?";
 		String siteName = "";
 		if (channelId != 0) {
