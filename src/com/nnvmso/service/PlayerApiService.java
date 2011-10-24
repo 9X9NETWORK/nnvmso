@@ -897,6 +897,9 @@ public class PlayerApiService {
 		} else {				
 			//create a new channel
 			channel = channelMngr.initChannelSubmittedFromPlayer(url, user);
+			if (channel == null) {
+				return this.assembleMsgs(NnStatusCode.CHANNEL_ERROR, null);
+			}
 			channel.setTags(tags);
 			channel.setLangCode(lang);
 			log.info("User throws a new url:" + url);
@@ -907,7 +910,6 @@ public class PlayerApiService {
 			}
 		}
 		
-		//!!!!!!!!!!!! BROADCAST BRODCAST
 		//subscribe
 		SubscriptionManager subMngr = new SubscriptionManager();
 		boolean success = subMngr.subscribeChannel(user.getKey().getId(), channel.getKey().getId(), Integer.parseInt(grid), MsoIpg.TYPE_GENERAL, mso.getKey().getId());
@@ -1089,8 +1091,9 @@ public class PlayerApiService {
 		        c.setSorting(sortMap.get(c.getKey().getId()));
 		    else 
 		    	c.setSorting(MsoChannelManager.getDefaultSorting(c));
-			if (user != null && watchedMap.containsKey(c.getKey().getId()))
-				c.setRecentlyWatchedProgram(c.getRecentlyWatchedProgram());
+			if (user != null && watchedMap.containsKey(c.getKey().getId())) {
+				c.setRecentlyWatchedProgram(watchedMap.get(c.getKey().getId()));
+			}
 			channelOutput += this.composeChannelLineupStr(c, mso) + "\n";
 		}		
 		result.add(channelOutput);

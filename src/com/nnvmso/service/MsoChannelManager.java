@@ -180,6 +180,8 @@ public class MsoChannelManager {
 				String name = YouTubeLib.getYouTubeChannelName(url);
 				log.info("youtube: " + name);
 				Map<String, String> info = YouTubeLib.getYouTubeChannelEntry(name);
+				if (!info.get("status").equals(String.valueOf(NnStatusCode.SUCCESS)))
+					return null;
 				if (info.get("title") != null)
 					channel.setName(info.get("title"));
 				if (info.get("description") != null)

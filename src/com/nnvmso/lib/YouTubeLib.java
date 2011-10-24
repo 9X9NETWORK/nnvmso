@@ -17,6 +17,7 @@ import com.google.gdata.data.youtube.PlaylistFeed;
 import com.google.gdata.data.youtube.VideoEntry;
 import com.google.gdata.data.youtube.VideoFeed;
 import com.google.gdata.data.youtube.YouTubeMediaGroup;
+import com.nnvmso.service.NnStatusCode;
 
 public class YouTubeLib {
 	
@@ -145,8 +146,8 @@ public class YouTubeLib {
 	public static Map<String, String> getYouTubeChannelEntry(String userIdStr) {
 		
 		Map<String, String> results = new HashMap<String, String>();
-		YouTubeService youtubeService = new YouTubeService(YOUTUBE_CLIENT_ID, YOUTUBE_DEVELOPER_KEY);
-		
+		results.put("status", String.valueOf(NnStatusCode.SUCCESS));
+		YouTubeService youtubeService = new YouTubeService(YOUTUBE_CLIENT_ID, YOUTUBE_DEVELOPER_KEY);		
 		String sourceUrl = "http://gdata.youtube.com/feeds/api/users/" + userIdStr + "/uploads";
 		try {
 			VideoFeed videoFeed = youtubeService.getFeed(new URL(sourceUrl), VideoFeed.class);
@@ -172,10 +173,12 @@ public class YouTubeLib {
 				results.put("description", subTitle);
 				log.info("description: " + subTitle);
 			}
+		} catch (com.google.gdata.util.ServiceForbiddenException e) {
+			results.put("status", String.valueOf(NnStatusCode.CHANNEL_YOUTUBE_NOT_AVAILABLE));
 		} catch (Exception e) {
+			results.put("status", String.valueOf(NnStatusCode.ERROR));
 			NnLogUtil.logException(e);
 		}
-		
 		return results;
 	}
 	

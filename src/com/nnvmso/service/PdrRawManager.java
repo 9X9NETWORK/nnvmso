@@ -43,9 +43,11 @@ public class PdrRawManager {
 		while (m.find()) {			
 			long channelId = Long.parseLong(m.group(1));
 			String program = m.group(2);
-			NnUserWatched watched = new NnUserWatched(user, channelId, program);
-			log.info("user watched channel and program:" + user.getToken() + ";" + channelId + ";" + program);
-			watchedMngr.save(watched);
+			if (channelId != 0 && !program.equals("0")) {
+				NnUserWatched watched = new NnUserWatched(user, channelId, program);
+				log.info("user watched channel and program:" + user.getToken() + ";" + channelId + ";" + program);
+				watchedMngr.save(watched);
+			}
 		}		
 						
 		//log.info("pdr length: " + pdr.length());
