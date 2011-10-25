@@ -1756,6 +1756,7 @@ var page$ = {
             },
             beforeShowForm: function(formId) {
               $('#tr_password').hide();
+              $('#type', formId).attr('disabled', true);
               $('#logoUrl', formId).click(function() {
                 var logoUrl = prompt('Please enter new logo URL', $(this).attr('src'));
                 if (logoUrl != null) {
