@@ -146,8 +146,9 @@ var page$ = {
   objChannelSetInfo: {
     init: function() {
       cms.loadJSON('/CMSAPI/systemCategories', function(categories) {
+        $('#sys_directory').text('');
         for (var i = 0; i < categories.length; i++) {
-          $('<option></option>')
+          $('<option/>')
             .attr('value', categories[i].key.id)
             .text(categories[i].name)
             .appendTo('#sys_directory');
@@ -232,6 +233,7 @@ var page$ = {
       btnRemove.click(function() {
         $(this).parent().remove();
         page$.objChannelSetArea.adjustWidth();
+        page$.dirty = true;
       });
       btnRemove.appendTo(item);
       $('<img/>').attr('src', channel.imageUrl).appendTo(item);
@@ -263,6 +265,7 @@ var page$ = {
         $('#set_ch_holder').scrollTo(item, 800);
         item.effect('highlight', { }, 3000);
       }
+      page$.dirty = true;
     },
     init: function() {
       $('#set_ch_list .ch_normal').remove();
@@ -275,6 +278,15 @@ var page$ = {
         for (var i in channels) {
           area$.appendChannel(channels[i], true);
         }
+        page$.dirty = false;
+        $('#set_ch_list, #result_list').sortable({
+          connectWith: '.connectedSortable',
+          placeholder: 'empty',
+          talerance:   'pointer',
+          update: function() {
+            page$.dirty = true;
+          }
+        }).disableSelection();
       }, 'json');
     }
   },
@@ -359,8 +371,11 @@ var page$ = {
       else
         alert($('#lang_update_successfully').text());
       page$.objChannelSetArea.init();
+      page$.objChannelSetInfo.init();
+      page$.dirty = false;
     }, 'text');
   },
+  dirty: false,
   init: function() {
     $('.ch_bg').css('background', 'url(' + $('image_bg_album').text() + ') no-repeat;');
     
@@ -372,6 +387,26 @@ var page$ = {
     
     $('#publish_button').click(page$.funcPublishChannelSet);
     
+    (function(target) { // select first tab
+      tab="#"+target;
+      $(tab).addClass("on");
+      content="#"+target+"_content";
+      $(content).addClass("on");
+    })('category');
+    
+    $("#pool_tabs li").click(function() {
+      $("#pool_tabs li, .tab_content").removeClass("on");
+      $(this).addClass("on");
+      target = "#"+$(this).attr("id")+"_content";
+      $(target).addClass("on");
+    });
+    
+    $(window).bind('beforeunload', function() {
+      if (page$.dirty) {
+        return $('#lang_warning_channel_has_not_been_saved').text();
+      }
+      return;
+    });
   }
 };
 

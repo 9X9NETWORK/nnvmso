@@ -265,32 +265,6 @@ $(function() {
   
   /* Release 3.1 by Jeff */
   
-  DefaultTab("category");
-  
-  function DefaultTab(target) {
-    tab="#"+target;
-	$(tab).addClass("on");
-	content="#"+target+"_content";
-	$(content).addClass("on");
-  }
-  
-  function SetListWidth() {
-    chNum=$("#set_ch_list li").size();
-    listWidth=112*chNum;
-    $("#set_ch_list").css("width",listWidth); 
-  }
-  
-  $("#set_ch_list, #result_list").sortable({
-    connectWith: ".connectedSortable",
-	placeholder: "empty"
-  }).disableSelection();
-						
-  $("#pool_tabs li").click(function() {
-    $("#pool_tabs li, .tab_content").removeClass("on");
-	$(this).addClass("on");
-	target = "#"+$(this).attr("id")+"_content";
-	$(target).addClass("on");
-  });
   
 });
 

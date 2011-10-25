@@ -207,7 +207,7 @@ public class CmsController {
 			logger.info("login failed");
 			NnUser user = userMngr.findMsoUser(mso);
 			String error;
-			if (user.getEmail().equals(email)) {
+			if (user != null && user.getEmail().equals(email)) {
 				error = messageSource.getMessage("cms.warning.invalid_password", null, locale);
 			} else {
 				error = messageSource.getMessage("cms.warning.invalid_account", null, locale);

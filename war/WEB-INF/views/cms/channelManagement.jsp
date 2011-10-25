@@ -367,7 +367,7 @@
               <p><a target="_player" href="#" class="ep_url">http://www.9x9.tv/share/3958</a></p><br/>
               <label class="floatL"><spring:message code="cms.channel_management.label.create_time"/></label>
               <p class="ep_createdate">2011/04/25 14:30</p><br/>
-              <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.program_logo"/></label>
+              <label class="floatL"><span class="red" style="display:none">＊</span><spring:message code="cms.channel_management.label.program_logo"/></label>
               <div class="uploadImg">
                 <img alt="" src="/images/cms/upload_img.jpg" class="floatL ep_image"/><input type="hidden" class="ep_image_updated" value="fase"/>
                 <div class="floatL imgBtn">

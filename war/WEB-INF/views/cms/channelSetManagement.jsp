@@ -180,6 +180,7 @@
 <label class="lang" id="lang_warning_channel_is_already_in"><spring:message code="cms.warning.channel_is_already_in"/></label>
 <label class="lang" id="lang_warning_reached_maximum_amount"><spring:message code="cms.warning.reached_maximum_amount"/></label>
 <label class="lang" id="lang_channel_had_been_added"><spring:message code="cms.info.channel_has_been_added"/></label>
+<label class="lang" id="lang_warning_channel_has_not_been_saved"><spring:message code="cms.warning.change_has_not_been_saved"/></label>
 <label class="lang" id="image_bg_album"><spring:message code="cms.image.bg_album"/></label>
 <label class="lang" id="image_btn_upload"><spring:message code="cms.image.btn_upload"/></label>
 </body>

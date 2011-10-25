@@ -548,7 +548,7 @@ padding:10px 10px 0 10px;
 
 #set_ch_list li.empty, #result_list .empty { 
   padding: 5px 0 0 2px;
-  width: 0px; 
+  width: 5px; 
   height:83px; 
   background: #e5e5e5;
   -moz-border-radius:5px; 
