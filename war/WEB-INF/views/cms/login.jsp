@@ -9,10 +9,13 @@
 <title><spring:message code="cms.login.title"/></title>
 <link href="/stylesheets/cms.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="/javascripts/jquery-1.6.4.fixed.js"></script>
-<script type="text/jabascript">
+<script type="text/javascript">
 $(function() {
-  $('a.btnLogin').css('backround', 'url(' + $('#image_btn_login').text() + ')');
-  $('a.btnLogin:hover').css('backround', 'url(' + $('#image_btn_login_hover').text() + ')');
+  var style = '<style>'
+            + 'a.btnLogin { background-image: url(' + $('#image_btn_login').text() + '); }'
+            + 'a.btnLogin:hover { background-image: url(' + $('#image_btn_login_hover').text() + '); }'
+            + '</style>';
+  $(style).appendTo('head');
 });
 </script>
 </head>

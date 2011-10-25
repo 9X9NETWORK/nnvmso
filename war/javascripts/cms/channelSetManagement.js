@@ -176,11 +176,6 @@ var page$ = {
           }
           $('#cc_image_updated').val('false');
           $('#cc_id').val(channelSet.key.id);
-          $('#upload_image').click(function() {
-            $('#upload_image_form').submit(function(event) {
-              alert(event);
-            });
-          });
           var swfupload_settings = {
             flash_url:              '/javascripts/swfupload/swfupload.swf',
             upload_url:             'http://9x9tmp.s3.amazonaws.com/',
