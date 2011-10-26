@@ -515,9 +515,7 @@ public class PlayerApiController {
 			HttpServletRequest req,
 			HttpServletResponse resp) {
 		log.info("setInfo: id =" + id + ";landing=" + beautifulUrl);
-		int status = this.prepService(req);
-		if (status != NnStatusCode.SUCCESS)
-			return NnNetUtil.textReturn(playerApiService.assembleMsgs(NnStatusCode.DATABASE_READONLY, null));
+		this.prepService(req);
 		
 		String output = NnStatusMsg.errorStr(locale);
 		try {
