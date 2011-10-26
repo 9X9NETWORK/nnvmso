@@ -1304,8 +1304,15 @@ public class PlayerApiController {
 		return NnNetUtil.textReturn(output);
 	}
 			
-	@RequestMapping(value="pdrReport")
-	public ResponseEntity<String> pdrReport(
+	/**
+	 * 
+	 * @param user user token
+	 * @param session session id, same as pdr session id
+	 * @param comment user's problem description
+	 * @return status
+	 */
+	@RequestMapping(value="userReport")
+	public ResponseEntity<String> userReport(
 			@RequestParam(value="user", required=false) String user,
 			@RequestParam(value="session", required=false) String session,
 			@RequestParam(value="comment", required=false) String comment,

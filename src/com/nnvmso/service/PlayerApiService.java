@@ -326,11 +326,13 @@ public class PlayerApiService {
 	}	
 		
 	public String pdrReport(String userToken, String session, String comment) {
+		if (session == null)
+			return this.assembleMsgs(NnStatusCode.INPUT_MISSING, null);
 		@SuppressWarnings("rawtypes")
 		HashMap map = this.checkUser(userToken, false);
 		if ((Integer)map.get("s") != NnStatusCode.SUCCESS) {
 			return this.assembleMsgs((Integer)map.get("s"), null);
-		}
+		}		
 		NnUserReportManager reportMngr = new NnUserReportManager();
 		NnUser user = (NnUser) map.get("u");
 		reportMngr.create(user, session, comment);
