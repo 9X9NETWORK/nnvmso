@@ -7,6 +7,19 @@
 </ul>
 
 <ul>
+  <li>user report
+    <ul>
+      <li><a href="/admin/pdr/reportList">report listing</a><br/>
+          (option)user=...&since=yyyymmdd
+      </li>
+      <li>pdr list <br/>
+          http://host/admin/pdr/pdrList?user=...&session=...
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<ul>
   <li>Branding
     <ul>
       <li><a href="/admin/mso/list">mso listing</a></li>

@@ -120,6 +120,12 @@ public class MsoChannelManager {
 		//change category channelCount
 		//check cache
 	}
+	
+	public void deletePrograms(MsoChannel channel) {
+		MsoProgramManager programMngr = new MsoProgramManager();
+		List<MsoProgram> programs = programMngr.findAllByChannelId(channel.getKey().getId());
+		programMngr.deleteAll(programs);		
+	}
 
 	public void calculateAndSaveChannelCount(long channelId) {
 		MsoProgramManager programMngr = new MsoProgramManager();

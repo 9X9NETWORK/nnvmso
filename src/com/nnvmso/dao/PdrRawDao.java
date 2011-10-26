@@ -22,6 +22,38 @@ public class PdrRawDao {
 		}
 		return pdr;
 	}
+
+	public List<PdrRaw> findByUser(String token) {
+		List<PdrRaw> detached = new ArrayList<PdrRaw>();
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		try {
+			Query q = pm.newQuery(PdrRaw.class);
+			q.setFilter("userToken == userTokenParam");
+			q.declareParameters("String userTokenParam");
+			@SuppressWarnings("unchecked")
+			List<PdrRaw> results = (List<PdrRaw>)q.execute(token);
+			detached = (List<PdrRaw>)pm.detachCopyAll(results);
+		} finally {
+			pm.close();
+		}
+		return detached;		
+	}
+	
+	public List<PdrRaw> findByUserAndSession(String token, String session) {
+		List<PdrRaw> detached = new ArrayList<PdrRaw>();
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		try {
+			Query q = pm.newQuery(PdrRaw.class);
+			q.setFilter("userToken == userTokenParam && session == sessionParam");
+			q.declareParameters("String userTokenParam, String sessionParam");
+			@SuppressWarnings("unchecked")
+			List<PdrRaw> results = (List<PdrRaw>)q.execute(token, session);
+			detached = (List<PdrRaw>)pm.detachCopyAll(results);
+		} finally {
+			pm.close();
+		}
+		return detached;		
+	}
 	
 	public List<PdrRaw> findByUserId(long userId) {
 		List<PdrRaw> detached = new ArrayList<PdrRaw>();
@@ -36,8 +68,7 @@ public class PdrRawDao {
 		} finally {
 			pm.close();
 		}
-		return detached;
-		
+		return detached;		
 	}
 
 }

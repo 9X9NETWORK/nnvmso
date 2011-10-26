@@ -4,15 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
-import javax.jdo.JDOObjectNotFoundException;
 
 import com.google.appengine.api.datastore.Key;
-
 import com.nnvmso.lib.PMF;
 import com.nnvmso.model.Mso;
-import com.nnvmso.model.MsoChannel;
 
 public class MsoDao extends GenericDao<Mso> {
 	

@@ -127,6 +127,10 @@ public class MsoProgramManager {
 		return program;
 	}
 
+	public void deleteAll(List<MsoProgram> programs) {
+		msoProgramDao.deleteAll(programs);
+	}
+		
 	public void delete(MsoProgram program) {
 		long id = program.getKey().getId();
 		long channelId = program.getChannelId();

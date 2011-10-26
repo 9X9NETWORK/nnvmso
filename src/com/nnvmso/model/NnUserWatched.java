@@ -21,7 +21,7 @@ public class NnUserWatched implements Serializable {
 	private long userId;
 
 	@Persistent
-	private String userToken; //for faster process
+	private String userToken; //for faster process, can be queried by userToken or userId
 	
 	@Persistent
 	private long channelId;

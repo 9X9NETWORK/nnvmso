@@ -33,13 +33,12 @@ public class AdminSetController {
 	}	
     
 	@RequestMapping("create")
-	public ResponseEntity<String> create(@RequestParam(required=false) String msoName, 
-			                             @RequestParam(required=false) String setName,
+	public ResponseEntity<String> create(@RequestParam(required=false) String setName, 			                             
 			                             @RequestParam(required=false) String setDesc,
 			                             @RequestParam(required=false) String channelIds,
 			                             @RequestParam(required=false) String seqs) {
 		//set info
-		Mso mso = new MsoManager().findByName(msoName);
+		Mso mso = new MsoManager().findNNMso();
 		ChannelSetManager channelSetMngr = new ChannelSetManager();
 		ChannelSet channelSet = new ChannelSet(mso.getKey().getId(), setName, setDesc, true);
 		channelSet.setDefaultUrl(setName); 
@@ -51,10 +50,9 @@ public class AdminSetController {
 		List<Long> list = new ArrayList<Long>();
 		for (int i=0; i<chArr.length; i++) { list.add(Long.valueOf(chArr[i]));}
 		List<MsoChannel> channels = channelMngr.findAllByChannelIds(list);
-		System.out.println("channels size found for channel set: " + channels.size());
 		for (int i=0; i<channels.size(); i++) {
 			channels.get(i).setSeq(Short.valueOf(seqArr[i]));
-		}		
+		}
 		channelSetMngr.create(channelSet, channels);						
 		
 		//channelSet ownership
@@ -63,5 +61,6 @@ public class AdminSetController {
 		
 		return NnNetUtil.textReturn("OK");
 	}	
+	
 	
 }

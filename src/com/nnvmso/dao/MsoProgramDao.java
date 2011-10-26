@@ -39,6 +39,17 @@ public class MsoProgramDao extends GenericDao<MsoProgram> {
 		return program;
 	}
 	
+	public void deleteAll(List<MsoProgram> programs) {
+		if (programs == null) return;
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		try {
+			pm.deletePersistentAll(programs);
+		} catch (JDOObjectNotFoundException e) {			
+		} finally {
+			pm.close();
+		}		
+	}
+	
 	public void delete(MsoProgram program) {
 		if (program == null) return;
 		PersistenceManager pm = PMF.get().getPersistenceManager();

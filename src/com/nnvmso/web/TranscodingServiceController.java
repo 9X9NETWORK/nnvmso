@@ -27,11 +27,9 @@ import com.google.appengine.tools.mapreduce.ConfigurationXmlUtil;
 import com.google.appengine.tools.mapreduce.DatastoreInputFormat;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnNetUtil;
-import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoProgram;
 import com.nnvmso.service.MsoChannelManager;
-import com.nnvmso.service.MsoManager;
 import com.nnvmso.service.MsoProgramManager;
 import com.nnvmso.service.NnStatusCode;
 import com.nnvmso.service.NnStatusMsg;
@@ -76,21 +74,7 @@ public class TranscodingServiceController {
 	public String exception(Exception e) {
 		NnLogUtil.logException(e);
 		return "error/blank";
-	}
-	
-	@RequestMapping("test")
-	public @ResponseBody MapelChannel test(HttpServletRequest req) {
-		MapelChannel channel = new MapelChannel();
-		channel.setSourceUrl("http://www.mevio.com/feeds/hdv.xml");
-		channel.setTitle("lala");
-		channel.setDescription("bubu");
-		try {
-			channel = transcodingService.createChannel(channel);
-		} catch (Exception e) {			
-		}
-		return channel;
-	}
-	
+	}		
 	
 	/**
 	 * Transcoding Service update Podcast Program information
@@ -239,6 +223,18 @@ public class TranscodingServiceController {
 		return resp;
 	}
 
+	@RequestMapping("itemDelete")
+	public  @ResponseBody PostResponse itemDelete(@RequestBody RtnChannel podcast) {
+		log.info(podcast.toString());
+		PostResponse resp = new PostResponse(String.valueOf(NnStatusCode.ERROR), NnStatusMsg.errorStr(Locale.ENGLISH));
+		try {
+			resp = transcodingService.deletePrograms(podcast);
+		} catch (Exception e) {
+			resp = transcodingService.handleException(e);
+		}
+		return resp;
+	}
+	
 	/**
 	 * Transcoding service update Podcast Channel Information
 	 * 

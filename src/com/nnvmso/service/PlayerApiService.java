@@ -325,6 +325,18 @@ public class PlayerApiService {
 		return output;
 	}	
 		
+	public String pdrReport(String userToken, String session, String comment) {
+		@SuppressWarnings("rawtypes")
+		HashMap map = this.checkUser(userToken, false);
+		if ((Integer)map.get("s") != NnStatusCode.SUCCESS) {
+			return this.assembleMsgs((Integer)map.get("s"), null);
+		}
+		NnUserReportManager reportMngr = new NnUserReportManager();
+		NnUser user = (NnUser) map.get("u");
+		reportMngr.create(user, session, comment);
+		return this.assembleMsgs(NnStatusCode.SUCCESS, null);
+	}
+	
 	public String processPdr(String userToken, String pdr, String session) {
 		//verify input
 		if (userToken == null || userToken.length() == 0 || userToken.equals("undefined")) {

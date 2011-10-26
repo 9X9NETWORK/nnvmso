@@ -151,11 +151,15 @@ public class TranscodingService {
 		if (channel.getStatus() == MsoChannel.STATUS_PROCESSING) {			
 			channel.setStatus(MsoChannel.STATUS_WAIT_FOR_APPROVAL);
 		}
+		if (channel.getStatus() != MsoChannel.STATUS_PROCESSING && channel.getStatus() != MsoChannel.STATUS_WAIT_FOR_APPROVAL) {
+			channel.setStatus(this.convertStatus(Short.valueOf(podcast.getErrorCode())));
+		}
 		
 		if (podcast.getLastUpdateTime() != null)
 			channel.setTranscodingUpdateDate(podcast.getLastUpdateTime());
 		channel.setPublic(true);
 		channel.setErrorReason("");
+		
 		channelMngr.save(channel);		
 		return new PostResponse(String.valueOf(NnStatusCode.SUCCESS), "SUCCESS");
 	}
@@ -192,6 +196,15 @@ public class TranscodingService {
 		return podcastInfo;
 	}
 
+	public PostResponse deletePrograms(RtnChannel podcast) {
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		MsoChannel channel = channelMngr.findById(Long.parseLong(podcast.getKey()));
+		if (channel == null)
+			return new PostResponse(String.valueOf(NnStatusCode.CHANNEL_INVALID), "CHANNEL_INVALID");		
+		channelMngr.deletePrograms(channel);
+		return new PostResponse(String.valueOf(NnStatusCode.SUCCESS), "SUCCESS");
+	}
+	
 	public PostResponse updateProgram(RtnProgram rtnProgram) {
 		MsoProgramManager programMngr = new MsoProgramManager();
 		MsoChannelManager channelMngr = new MsoChannelManager();			
@@ -209,7 +222,7 @@ public class TranscodingService {
 			return new PostResponse(String.valueOf(NnStatusCode.CHANNEL_INVALID), "channel invalid");
 		}
 		
-		/*
+		/* 
 		if (channel.getProgramCount() >= MsoChannelManager.MAX_CHANNEL_SIZE) {
 			MsoProgram oldest = programMngr.findOldestByChannelId(channel.getKey().getId());
 			programMngr.delete(oldest); 			

@@ -8,6 +8,7 @@ import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.Text;
 
 @PersistenceCapable(detachable="true")
 public class PdrRaw implements Serializable {	
@@ -21,30 +22,25 @@ public class PdrRaw implements Serializable {
 	private long userId;
 	
 	@Persistent
-	private String sessionId;
+	private String session;
 
 	@Persistent
-	private long timeDelta;
+	private String userToken;
 	
 	@Persistent
-	private String verb;
-	public static String VERB_WATCH = "w";
+	private Text detail;
 	
-	@Persistent
-	private String info;
-
 	@Persistent
 	private Date createDate;
 	
 	@Persistent
 	private Date updateDate;
 	
-	public PdrRaw (long userId, String sessionId, long timeDelta, String verb, String info) {
-		this.sessionId = sessionId;
-		this.timeDelta = timeDelta;
-		this.userId = userId;
-		this.verb = verb;
-		this.info = info;
+	public PdrRaw (NnUser user, String session, Text detail) {
+		this.session = session;
+		this.userId = user.getKey().getId();
+		this.userToken = user.getToken();
+		this.detail = detail;
 	}
 	
 	public Key getKey() {
@@ -63,20 +59,12 @@ public class PdrRaw implements Serializable {
 		this.userId = userId;
 	}
 
-	public String getVerb() {
-		return verb;
+	public Text getDetail() {
+		return detail;
 	}
 
-	public void setVerb(String verb) {
-		this.verb = verb;
-	}
-
-	public String getInfo() {
-		return info;
-	}
-
-	public void setInfo(String info) {
-		this.info = info;
+	public void setDetail(Text detail) {
+		this.detail = detail;
 	}
 
 	public Date getCreateDate() {
@@ -95,20 +83,19 @@ public class PdrRaw implements Serializable {
 		this.updateDate = updateDate;
 	}
 
-	public String getSessionId() {
-		return sessionId;
+	public String getSession() {
+		return session;
 	}
 
-	public void setSessionId(String sessionId) {
-		this.sessionId = sessionId;
+	public void setSession(String session) {
+		this.session = session;
 	}
 
-	public long getTimeDelta() {
-		return timeDelta;
+	public String getUserToken() {
+		return userToken;
 	}
 
-	public void setTimeDelta(long timeDelta) {
-		this.timeDelta = timeDelta;
+	public void setUserToken(String userToken) {
+		this.userToken = userToken;
 	}
-		
 }

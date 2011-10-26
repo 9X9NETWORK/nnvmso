@@ -1,10 +1,12 @@
 package com.nnvmso.service;
 
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.appengine.api.datastore.Text;
 import com.nnvmso.dao.PdrRawDao;
 import com.nnvmso.model.NnUser;
 import com.nnvmso.model.NnUserWatched;
@@ -27,6 +29,12 @@ public class PdrRawManager {
 		pdr.setUpdateDate(new Date());
 		return pdrDao.save(pdr);
 	}		
+
+	public List<PdrRaw> findDebuggingInfo(String token, String session) {
+		if (session != null)
+			return pdrDao.findByUser(token);
+		return pdrDao.findByUserAndSession(token, session);
+	}
 	
 	/**
 	 * 	Keep the implementation since the requirement can be changed back again.
@@ -48,38 +56,10 @@ public class PdrRawManager {
 				log.info("user watched channel and program:" + user.getToken() + ";" + channelId + ";" + program);
 				watchedMngr.save(watched);
 			}
-		}		
-						
-		//log.info("pdr length: " + pdr.length());
-		int times = Math.round(pdr.length() / 500) + 1;
-		int start = 0;
-		int end = 499;
-		if (pdr.length() < end) { end = pdr.length();}
-		for (int i=0; i<times; i++) {
-			String detail = pdr.substring(start, end);
-			PdrRaw raw = new PdrRaw(user.getKey().getId(), sessionId, 0, null, detail);			
-			pdrMngr.create(raw);
-			start = start + 500;
-			end = end  + 499;
-			if (pdr.length() < end) { end = pdr.length();}
-		}		
-		
-		/*
-		//if the verb is watch, store the data in viewlog
-		String[] lines = pdr.split("\n");
-		ViewLogManager viewLogMngr = new ViewLogManager();
-		try {			
-			for (String line : lines) {						
-				String[] data = line.split("\t");			
-				String verb = data[1];			
-				if (verb.equals(PdrRaw.VERB_WATCH)) {
-					viewLogMngr.processPdr(line, userId);
-				}
-			}
-		} catch (Exception e) {
-			log.info("exception catpures: " + e.getClass());
 		}
-		*/
+		Text text = new Text(pdr);
+		PdrRaw raw = new PdrRaw(user, sessionId, text);			
+		pdrMngr.create(raw);
 	}
 		
 }

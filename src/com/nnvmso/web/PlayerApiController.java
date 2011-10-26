@@ -1304,6 +1304,28 @@ public class PlayerApiController {
 		return NnNetUtil.textReturn(output);
 	}
 			
+	@RequestMapping(value="pdrReport")
+	public ResponseEntity<String> pdrReport(
+			@RequestParam(value="user", required=false) String user,
+			@RequestParam(value="session", required=false) String session,
+			@RequestParam(value="comment", required=false) String comment,
+			HttpServletRequest req,
+			HttpServletResponse resp) {
+		log.info("user:" + user + ";session=" + session);
+		int status = this.prepService(req);
+		if (status != NnStatusCode.SUCCESS)
+			return NnNetUtil.textReturn(playerApiService.assembleMsgs(NnStatusCode.DATABASE_READONLY, null));
+		
+		String output = NnStatusMsg.errorStr(locale);
+		try {
+			output = playerApiService.pdrReport(user, session, comment);
+		} catch (Exception e) {
+			output = playerApiService.handleException(e);
+		}
+		return NnNetUtil.textReturn(output);
+	}
+		
+	
 	/**
 	 * To be ignored
 	 */
@@ -1343,7 +1365,7 @@ public class PlayerApiController {
 		watchedMngr.save(watched);
 		return NnNetUtil.textReturn("OK");
 	}
-	
+
 	/**
 	 * To be ignored
 	 */
