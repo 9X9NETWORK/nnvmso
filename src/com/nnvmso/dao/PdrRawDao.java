@@ -8,6 +8,8 @@ import javax.jdo.Query;
 
 import com.google.appengine.api.datastore.Key;
 import com.nnvmso.lib.PMF;
+import com.nnvmso.model.NnDevice;
+import com.nnvmso.model.NnUser;
 import com.nnvmso.model.PdrRaw;
 
 public class PdrRawDao {
@@ -39,15 +41,31 @@ public class PdrRawDao {
 		return detached;		
 	}
 	
-	public List<PdrRaw> findByUserAndSession(String token, String session) {
+	@SuppressWarnings("unchecked")
+	public List<PdrRaw> findDebugging(NnUser user, NnDevice device, String session) {
 		List<PdrRaw> detached = new ArrayList<PdrRaw>();
 		PersistenceManager pm = PMF.get().getPersistenceManager();
+		List<PdrRaw> results = new ArrayList<PdrRaw>();
 		try {
 			Query q = pm.newQuery(PdrRaw.class);
-			q.setFilter("userToken == userTokenParam && session == sessionParam");
-			q.declareParameters("String userTokenParam, String sessionParam");
-			@SuppressWarnings("unchecked")
-			List<PdrRaw> results = (List<PdrRaw>)q.execute(token, session);
+			if (user != null && session != null) {
+				q.setFilter("userId == userIdParam && session == sessionParam");
+				q.declareParameters("long userIdParam, String sessionParam");
+				results = (List<PdrRaw>)q.execute(user.getKey().getId(), session);
+			} else if (device != null && session != null) {
+				q.setFilter("deviceToken == deviceIdParam && session == sessionParam");
+				q.declareParameters("long userIdParam, String sessionParam");
+				results = (List<PdrRaw>)q.execute(device.getKey().getId(), session);
+			} else if (user != null) {
+				q.setFilter("userId == userIdParam");
+				q.declareParameters("long userIdParam");
+				results = (List<PdrRaw>)q.execute(user.getKey().getId());				
+			} else if (device != null) {
+				q.setFilter("deviceId == deviceIdParam");
+				q.declareParameters("long deviceIdParam");
+				results = (List<PdrRaw>)q.execute(device.getKey().getId());				
+			}
+			q.setRange(0,199);
 			detached = (List<PdrRaw>)pm.detachCopyAll(results);
 		} finally {
 			pm.close();

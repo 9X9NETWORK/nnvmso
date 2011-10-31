@@ -116,6 +116,18 @@ public class AdminNnUserController {
 		return "OK";
 	}
 
+	@RequestMapping("resetPassword")
+	public ResponseEntity<String> resetPassword(
+			@RequestParam(value="email")String email, 
+			@RequestParam(value="password")String password, HttpServletRequest req, HttpServletResponse resp) {
+		NnUser user = nnUserMngr.findByEmail(email);
+		if (user == null)
+			return NnNetUtil.textReturn("user does not exist");
+		user.setPassword(password);
+		nnUserMngr.resetPassword(user);	
+		return NnNetUtil.textReturn("OK");
+	}
+	
 	@RequestMapping("login")
 	public @ResponseBody String create(@RequestParam(value="email")String email, String password, HttpServletRequest req, HttpServletResponse resp) {
 		return "OK";

@@ -59,6 +59,11 @@ public class Category implements Serializable {
 		this.msoId= msoId;
 	}
 
+	public Category(String name) {
+		this.name = name;
+		this.setPublic(true);
+	}
+	
 	public long getMsoId() {
 		return msoId;
 	}

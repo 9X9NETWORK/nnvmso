@@ -1,14 +1,14 @@
 package com.nnvmso.service;
 
 import java.util.Date;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.springframework.stereotype.Service;
 
 import com.nnvmso.dao.NnDeviceDao;
 import com.nnvmso.model.NnDevice;
+import com.nnvmso.model.NnUser;
 
 @Service
 public class NnDeviceManager {
@@ -20,18 +20,21 @@ public class NnDeviceManager {
 		device.setUpdateDate(new Date());
 		deviceDao.save(device);
 	}
-	public NnDevice create(NnDevice device, long userId) {
+	
+	public NnDevice create(NnDevice device, NnUser user, String type) {
+		if (device != null && user != null) {
+			NnDevice existed = this.findByTokenAndUser(device.getToken(), user); 
+			if (existed != null)
+				return existed;
+		}
+		
 		if (device == null)
 			device = new NnDevice();
 		if (device.getToken() == null)
-			device.setToken(NnUserManager.generateToken());
-		System.out.println("userId:" + userId);
-		
-		if (userId != 0) {
-			Set<Long> users = new TreeSet<Long>();
-			users.add(userId);
-			device.setUserIds(users);
-		}
+			device.setToken(NnUserManager.generateToken());		
+		if (user != null)
+			device.setUserId(user.getKey().getId());
+		device.setType(type);
 		Date now = new Date();
 		if (device.getCreateDate() == null)
 			device.setCreateDate(now);
@@ -40,27 +43,58 @@ public class NnDeviceManager {
 		return device;
 	}
 	
-	public NnDevice findByToken(String token) {
-		return deviceDao.findByToken(token);
+	public NnDevice findByTokenAndUser(String token, NnUser user) {
+		return deviceDao.findByTokenAndUser(token, user.getKey().getId());
+	}
+
+	public NnDevice findDeviceOpenToken(String token) {
+		return deviceDao.findDeviceOpenToken(token);
 	}
 	
-	public NnDevice addUser(String token, long userId) {
-		NnDevice device = this.findByToken(token);
-		if (device == null)
+	public List<NnDevice> findByToken(String token) {
+		return deviceDao.findByToken(token);
+	}
+
+	public List<NnDevice> findByUser(NnUser user) {
+		return deviceDao.findByUser(user.getKey().getId());
+	}
+	
+	public NnDevice addUser(String token, NnUser user) {
+		List<NnDevice> devices = this.findByToken(token);
+		if (devices.size() == 0)
 			return null;
-		Set<Long> users = device.getUserIds();
-		users.add(userId);
+		NnDevice existed = this.findDeviceOpenToken(token);
+		if (existed != null) {
+			System.out.println("enter 2");
+			existed.setUserId(user.getKey().getId());
+			deviceDao.save(existed);
+			return existed;
+		}
+		existed = this.findByTokenAndUser(token, user);
+		if (existed != null) {
+			System.out.println("enter 1");
+			return existed;
+		}		
+		System.out.println("new add user:" + user.getKey().getId());
+		NnDevice device = new NnDevice();
+		device.setToken(devices.get(0).getToken());
+		this.create(device, user, null);
 		deviceDao.save(device);
 		return device;
 	}	
 	
-	public NnDevice removeUser(String token, long userId) {
-		NnDevice device = this.findByToken(token);
-		if (device == null)
-			return null;
-		Set<Long> users = device.getUserIds();
-		users.remove(userId);
-		deviceDao.save(device);
-		return device;		
+	public void delete(NnDevice device) {
+		deviceDao.delete(device);
+	}
+	
+	public boolean removeUser(String token, NnUser user) {
+		List<NnDevice> devices = this.findByToken(token);
+		if (devices.size() == 0)
+			return false;
+		NnDevice existed = this.findByTokenAndUser(token, user);
+		if (existed == null)
+			return false;
+		this.delete(existed);
+		return true;
 	}
 }

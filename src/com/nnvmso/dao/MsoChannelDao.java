@@ -18,6 +18,7 @@ import com.nnvmso.lib.PMF;
 import com.nnvmso.lib.SearchJanitorUtils;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.NnUser;
+import com.nnvmso.model.NnUserReport;
 
 public class MsoChannelDao extends GenericDao<MsoChannel> {
 	
@@ -29,6 +30,24 @@ public class MsoChannelDao extends GenericDao<MsoChannel> {
 		super(MsoChannel.class);
 	}
 
+	public List<MsoChannel> findSince(Date since) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		List<MsoChannel> detached = new ArrayList<MsoChannel>();
+		try {
+			Query query = pm.newQuery(NnUserReport.class);
+			query.setFilter("createDate > createDateParam");
+			query.declareImports("import java.util.Date");
+			query.declareParameters("Date createDateParam");			 
+			 
+			@SuppressWarnings("unchecked")
+			List<MsoChannel> results = (List<MsoChannel>) query.execute(since);
+			detached = (List<MsoChannel>)pm.detachCopyAll(results);
+		} finally {
+			pm.close();
+		}
+		return detached;		
+	}
+	
 	@SuppressWarnings("unchecked")
 	public static List<MsoChannel> searchChannelEntries(String queryString) {			 			
 		PersistenceManager pm = PMF.get().getPersistenceManager();

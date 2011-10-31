@@ -168,8 +168,11 @@ public class PlayerApiService {
 		for (int i=0; i<key.length; i++) {
 			if (!dic.contains(key[i]))
 				return this.assembleMsgs(NnStatusCode.INPUT_ERROR, null);
-			if (key[i].equals("name"))
+			if (key[i].equals("name")) {
+				if (value[i].equals(NnUser.GUEST_NAME))
+					return this.assembleMsgs(NnStatusCode.INPUT_ERROR, null);
 				user.setName(value[i]);
+			}
 			if (key[i].equals("year"))
 				user.setDob(value[i]);
 			if (key[i].equals("password"))
@@ -339,21 +342,35 @@ public class PlayerApiService {
 		return this.assembleMsgs(NnStatusCode.SUCCESS, null);
 	}
 	
-	public String processPdr(String userToken, String pdr, String session) {
-		//verify input
-		if (userToken == null || userToken.length() == 0 || userToken.equals("undefined")) {
-			return NnStatusMsg.inputMissing(locale);
+	public String processPdr(String userToken, String deviceToken, String session, String pdr) {
+		if (userToken == null && deviceToken == null)
+			return this.assembleMsgs(NnStatusCode.INPUT_MISSING, null);
+		if (pdr == null || pdr.length() == 0) this.assembleMsgs(NnStatusCode.INPUT_ERROR, null);	
+		
+		NnUser user = null;
+		if (userToken != null) { 
+			//verify input
+			@SuppressWarnings("rawtypes")
+			HashMap map = this.checkUser(userToken, false);
+			if ((Integer)map.get("s") != NnStatusCode.SUCCESS && deviceToken == null) {
+				return this.assembleMsgs((Integer)map.get("s"), null);
+			}
+			user = (NnUser) map.get("u");
 		}
-		if (pdr == null || pdr.length() == 0) {return NnStatusMsg.successStr(locale);};
-		
-		//verify user
-		NnUser user = userMngr.findByToken(userToken);
-		if (user == null) {return NnStatusMsg.userInvalid(locale);}
-		
+		List<NnDevice> devices = new ArrayList<NnDevice>();
+		NnDevice device = null;
+		if (deviceToken != null) {
+			NnDeviceManager deviceMngr = new NnDeviceManager();
+			devices = deviceMngr.findByToken(deviceToken);
+			if (devices.size() == 0)
+				return this.assembleMsgs(NnStatusCode.DEVICE_INVALID, null);
+			device = devices.get(0);
+		}
+				
 		//pdr process
 		String output = NnStatusMsg.errorStr(locale);
 		PdrRawManager pdrMngr = new PdrRawManager();
-		pdrMngr.processPdr(pdr, user, session);
+		pdrMngr.processPdr(user, device, session, pdr);
 		output = NnStatusMsg.successStr(locale);
 		return output;
 	}
@@ -1357,11 +1374,13 @@ public class PlayerApiService {
 			List<ChannelSet> csList = csMngr.findAllByChannelSetIds(channelSetIdList);
 			int setCnt = 0;
 			for (ChannelSet cs : csList) {
-				String name =  cs.getName();
-				int cnt = cs.getChannelCount();
-				String[] str = {"s" + String.valueOf(cs.getKey().getId()), name, String.valueOf(cnt), "ch"};				
-				result[1] += NnStringUtil.getDelimitedStr(str) + "\n";
-				setCnt++;
+				if (!cs.isPublic()) {
+					String name =  cs.getName();
+					int cnt = cs.getChannelCount();
+					String[] str = {"s" + String.valueOf(cs.getKey().getId()), name, String.valueOf(cnt), "ch"};				
+					result[1] += NnStringUtil.getDelimitedStr(str) + "\n";
+					setCnt++;
+				}
 			}
 			log.info("category query: " + id + ";count:" + setCnt);
 			return this.assembleMsgs(NnStatusCode.SUCCESS, result);			
@@ -1517,18 +1536,17 @@ public class PlayerApiService {
 		return this.assembleMsgs(NnStatusCode.SUCCESS, result);
 	}
 	
-	public String deviceRegister(String userToken, HttpServletResponse resp) {
-		long userId = 0;
+	public String deviceRegister(String userToken, String type, HttpServletResponse resp) {
+		NnUser user = null;
 		if (userToken != null) {
 			HashMap map = this.checkUser(userToken, false);
 			if ((Integer)map.get("s") != NnStatusCode.SUCCESS) {
 				return this.assembleMsgs((Integer)map.get("s"), null);
 			}
-			NnUser user = (NnUser) map.get("u");
-			userId = user.getKey().getId();
+			user = (NnUser) map.get("u");
 		}
 		NnDeviceManager deviceMngr = new NnDeviceManager();		
-		NnDevice device = deviceMngr.create(null, userId);
+		NnDevice device = deviceMngr.create(null, user, type);		
 		String[] result = {device.getToken()};
 		this.setUserCookie(resp, CookieHelper.DEVICE, device.getToken());
 		return this.assembleMsgs(NnStatusCode.SUCCESS, result);
@@ -1538,61 +1556,59 @@ public class PlayerApiService {
 		if (token == null)
 			return this.assembleMsgs(NnStatusCode.SUCCESS, null);
 		NnDeviceManager deviceMngr = new NnDeviceManager();
-		NnDevice device = deviceMngr.findByToken(token);
-		if (device == null)
+		List<NnDevice> devices = deviceMngr.findByToken(token);
+		if (devices.size() == 0)
 			return this.assembleMsgs(NnStatusCode.DEVICE_INVALID, null);
-		Set<Long> userIds = device.getUserIds();
-		NnUserManager userMngr = new NnUserManager();
+		List<NnUser> users = new ArrayList<NnUser>(); 
+		for (NnDevice d : devices) {
+			if (d.getUserId() != 0) {
+				NnUser user = userMngr.findById(d.getUserId());
+				if (user != null)
+					users.add(user);
+				else
+					log.info("bad data in device:" + d.getToken() + ";userId:" + d.getUserId());
+			}	
+		}		
 		String[] result = {""};
-		for (Long u : userIds) {
-			NnUser user = userMngr.findById(u);
-			if (user != null)
-				result[0] += user.getToken() + "\t" + user.getName() + "\t" + user.getEmail() + "\n";
+		for (NnUser u : users) {
+			result[0] += u.getToken() + "\t" + u.getName() + "\t" + u.getEmail() + "\n";
 		}
 		return this.assembleMsgs(NnStatusCode.SUCCESS, result);
 	}
 
 	public String deviceAddUser(String deviceToken, String userToken) {
-		long userId = 0;
+		NnUser user = null;
 		if (userToken != null) {
 			HashMap map = this.checkUser(userToken, false);
 			if ((Integer)map.get("s") != NnStatusCode.SUCCESS) {
 				return this.assembleMsgs((Integer)map.get("s"), null);
 			}
-			NnUser user = (NnUser) map.get("u");
-			userId = user.getKey().getId();
+			user = (NnUser) map.get("u");
 		}
 		if (deviceToken == null)
 			return this.assembleMsgs(NnStatusCode.INPUT_MISSING, null);
 		NnDeviceManager deviceMngr = new NnDeviceManager();
-		NnDevice device = deviceMngr.findByToken(deviceToken);
+		NnDevice device = deviceMngr.addUser(deviceToken, user);
 		if (device == null)
 			return this.assembleMsgs(NnStatusCode.DEVICE_INVALID, null);
-		Set<Long> list = device.getUserIds();
-		list.add(userId);
-		deviceMngr.save(device);
 		return this.assembleMsgs(NnStatusCode.SUCCESS, null);
 	}
 
 	public String deviceRemoveUser(String deviceToken, String userToken) {
-		long userId = 0;
+		NnUser user = null;
 		if (userToken != null) {
 			HashMap map = this.checkUser(userToken, false);
 			if ((Integer)map.get("s") != NnStatusCode.SUCCESS) {
 				return this.assembleMsgs((Integer)map.get("s"), null);
 			}
-			NnUser user = (NnUser) map.get("u");
-			userId = user.getKey().getId();
+			user = (NnUser) map.get("u");
 		}
 		if (deviceToken == null)
 			return this.assembleMsgs(NnStatusCode.INPUT_MISSING, null);
 		NnDeviceManager deviceMngr = new NnDeviceManager();
-		NnDevice device = deviceMngr.findByToken(deviceToken);
-		if (device == null)
+		boolean success = deviceMngr.removeUser(deviceToken, user);
+		if (!success) 
 			return this.assembleMsgs(NnStatusCode.DEVICE_INVALID, null);
-		Set<Long> list = device.getUserIds();
-		list.remove(userId);
-		deviceMngr.save(device);
 		return this.assembleMsgs(NnStatusCode.SUCCESS, null);
 	}
 	

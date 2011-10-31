@@ -118,7 +118,7 @@ public class AdminInitController {
 	public String groundStartPost(HttpServletRequest req) {
 		String host = NnNetUtil.getUrlRoot(req);
 		if (host.equals("http://localhost:8888")) {
-			initService.initAll(true, true);
+			initService.initAll(false, true);
 		}
 		return "admin/groundStart";
 	}	

@@ -20,12 +20,18 @@ public class PdrRaw implements Serializable {
 	
 	@Persistent
 	private long userId;
+
+	@Persistent
+	private long deviceId;
 	
 	@Persistent
 	private String session;
 
 	@Persistent
 	private String userToken;
+
+	@Persistent
+	private String deviceToken;
 	
 	@Persistent
 	private Text detail;
@@ -36,10 +42,16 @@ public class PdrRaw implements Serializable {
 	@Persistent
 	private Date updateDate;
 	
-	public PdrRaw (NnUser user, String session, Text detail) {
+	public PdrRaw (NnUser user, NnDevice device, String session, Text detail) {
 		this.session = session;
-		this.userId = user.getKey().getId();
-		this.userToken = user.getToken();
+		if (user != null) {
+			this.userId = user.getKey().getId();
+			this.userToken = user.getToken();			
+		}
+		if (device != null) {
+			this.deviceId = device.getKey().getId();
+			this.deviceToken = device.getToken();
+		}
 		this.detail = detail;
 	}
 	
@@ -98,4 +110,21 @@ public class PdrRaw implements Serializable {
 	public void setUserToken(String userToken) {
 		this.userToken = userToken;
 	}
+
+	public long getDeviceId() {
+		return deviceId;
+	}
+
+	public void setDeviceId(long deviceId) {
+		this.deviceId = deviceId;
+	}
+
+	public String getDeviceToken() {
+		return deviceToken;
+	}
+
+	public void setDeviceToken(String deviceToken) {
+		this.deviceToken = deviceToken;
+	}
+		
 }

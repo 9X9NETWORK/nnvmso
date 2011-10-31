@@ -2,8 +2,10 @@ package com.nnvmso.web.admin;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +53,7 @@ public class AdminMsoChannelController {
 		NnLogUtil.logException(e);
 		return "error/exception";				
 	}
-
+	
 	@RequestMapping("create")
 	public @ResponseBody String create(
 				@RequestParam(value="url")String url, 
@@ -60,14 +62,28 @@ public class AdminMsoChannelController {
 		return "";
 	}
 
-	//!!! all sorts of risk to listAll
 	@RequestMapping("list")
-	public ResponseEntity<String> list(@RequestParam(value="status", required=false)String status) {
-		String output = "";
+	public ResponseEntity<String> list(
+			@RequestParam(value="status", required=false)String status,
+			@RequestParam(value="since", required=false)String since) {
+		
 		List<MsoChannel> channels = new ArrayList<MsoChannel>();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+		Date sinceDate = null;
+		String output = "";
+		
+		if (since != null) {
+			try {
+				sinceDate = sdf.parse(since);
+			} catch (ParseException e) {
+				return NnNetUtil.textReturn("wrong date format: yyyymmdd");
+			}			
+			channels.addAll(channelMngr.findSince(sinceDate));			
+		}
+		
+		List<MsoChannel> bad = new ArrayList<MsoChannel>();		
 		if (status == null) {
 			channels = channelMngr.findNonPodcasts();
-			List<MsoChannel> bad = new ArrayList<MsoChannel>();		
 			for (MsoChannel c : channels) {
 				if (c.getName() == null || c.getStatus() != MsoChannel.STATUS_SUCCESS || 
 					c.isPublic() != true || c.getProgramCount() < 1 ) {
@@ -81,9 +97,9 @@ public class AdminMsoChannelController {
 			output = output + this.printChannelData(bad);			
 		} else {
 			channels = channelMngr.findAllByStatus(Short.valueOf(status));
-			output = output + this.printChannelData(channels);
 		}
-		 
+		
+		output = output + this.printChannelData(channels);		
 		return NnNetUtil.textReturn(output);
 	}
 	
@@ -114,7 +130,7 @@ public class AdminMsoChannelController {
 	                 @RequestParam(required = false) String       searchField,
 	                 @RequestParam(required = false) String       searchOper,
 	                 @RequestParam(required = false) String       searchString,
-	                                                 OutputStream out) {
+	                 OutputStream out) {
 		
 		SubscriptionLogManager subLogMngr = new SubscriptionLogManager();
 		ObjectMapper mapper = new ObjectMapper();

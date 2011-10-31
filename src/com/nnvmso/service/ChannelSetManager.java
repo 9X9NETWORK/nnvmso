@@ -21,7 +21,7 @@ public class ChannelSetManager {
 	protected static final Logger logger = Logger.getLogger(ChannelSetManager.class.getName());
 	
 	private ChannelSetDao channelSetDao = new ChannelSetDao();
-	
+		
 	public void create(ChannelSet channelSet, List<MsoChannel> channels) {
 		channelSet.setChannelCount(channels.size());
 		this.create(channelSet);		
@@ -73,6 +73,14 @@ public class ChannelSetManager {
 				categoryMngr.save(c);
 			}
 		}
+	}
+	
+	public void delete(ChannelSet cs) {
+		channelSetDao.delete(cs);
+	}
+	
+	public void saveAll(List<ChannelSet> sets) {
+		channelSetDao.saveAll(sets);
 	}
 	
 	public ChannelSet save(ChannelSet channelSet) {	

@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 
 import com.google.appengine.api.datastore.Text;
 import com.nnvmso.dao.PdrRawDao;
+import com.nnvmso.model.NnDevice;
 import com.nnvmso.model.NnUser;
 import com.nnvmso.model.NnUserWatched;
 import com.nnvmso.model.PdrRaw;
@@ -30,19 +31,16 @@ public class PdrRawManager {
 		return pdrDao.save(pdr);
 	}		
 
-	public List<PdrRaw> findDebuggingInfo(String token, String session) {
-		if (session != null)
-			return pdrDao.findByUser(token);
-		return pdrDao.findByUserAndSession(token, session);
+	public List<PdrRaw> findDebugging(NnUser user, NnDevice device, String session) {
+		return pdrDao.findDebugging(user, device, session);
 	}
 	
 	/**
 	 * 	Keep the implementation since the requirement can be changed back again.
 	 *  @@@ IMPORTANT It needs to be done in task if there's viewLog process  
 	 */
-	public void processPdr(String pdr, NnUser user, String sessionId) {
+	public void processPdr(NnUser user, NnDevice device, String sessionId, String pdr) {
 		if (pdr == null) {return;}		
-		//log.info("pdr:" + pdr);
 		PdrRawManager pdrMngr = new PdrRawManager();		
 		NnUserWatchedManager watchedMngr = new NnUserWatchedManager();
 		String reg = "w\t(\\d++)\t(\\w++)";		
@@ -58,7 +56,7 @@ public class PdrRawManager {
 			}
 		}
 		Text text = new Text(pdr);
-		PdrRaw raw = new PdrRaw(user, sessionId, text);			
+		PdrRaw raw = new PdrRaw(user, device, sessionId, text);			
 		pdrMngr.create(raw);
 	}
 		

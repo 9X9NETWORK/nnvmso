@@ -26,6 +26,7 @@ import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoIpg;
 import com.nnvmso.model.MsoProgram;
 import com.nnvmso.model.NnUser;
+import com.nnvmso.model.NnUserReport;
 import com.nnvmso.model.SubscriptionLog;
 
 @Service
@@ -37,6 +38,10 @@ public class MsoChannelManager {
 	public static final int MAX_NUMBER_OF_WORDS_TO_PUT_IN_INDEX = 200;
 	
 	private MsoChannelDao msoChannelDao = new MsoChannelDao();
+
+	public List<MsoChannel> findSince(Date since) {
+		return msoChannelDao.findSince(since);
+	}
 	
 	public void create(MsoChannel channel) {
 		Date now = new Date();

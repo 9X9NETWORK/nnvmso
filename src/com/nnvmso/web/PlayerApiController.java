@@ -413,6 +413,7 @@ public class PlayerApiController {
 		String output = NnStatusMsg.errorStr(locale);
 		try {
 			CookieHelper.deleteCookie(resp, CookieHelper.USER);
+			CookieHelper.deleteCookie(resp, CookieHelper.GUEST);
 			output = NnStatusMsg.successStr(locale);
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
@@ -949,6 +950,7 @@ public class PlayerApiController {
 	@RequestMapping(value="pdr")
 	public ResponseEntity<String> pdr(
 			@RequestParam(value="user", required=false) String userToken,
+			@RequestParam(value="device", required=false) String deviceToken,
 			@RequestParam(value="session", required=false) String session,
 			@RequestParam(value="pdr", required=false) String pdr,
 			HttpServletRequest req,
@@ -956,11 +958,11 @@ public class PlayerApiController {
 		int status = this.prepService(req);
 		if (status != NnStatusCode.SUCCESS)
 			return NnNetUtil.textReturn(playerApiService.assembleMsgs(NnStatusCode.DATABASE_READONLY, null));
-
+		
 		String output = NnStatusMsg.errorStr(locale);
-		log.info("user=" + userToken + ";session=" + session);
+		log.info("user=" + userToken + ";device=" + deviceToken + ";session=" + session);
 		try {
-			output = playerApiService.processPdr(userToken, pdr, session);
+			output = playerApiService.processPdr(userToken, deviceToken, session, pdr);
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}
@@ -1213,13 +1215,17 @@ public class PlayerApiController {
 	@RequestMapping(value="deviceRegister")
 	public ResponseEntity<String> deviceRegister(
 			@RequestParam(value="user", required=false) String userToken,
+			@RequestParam(value="type", required=false) String type,
 			HttpServletRequest req,
 			HttpServletResponse resp) {
 		log.info("user:" + userToken);
-		this.prepService(req);
+		int status = this.prepService(req);
+		if (status != NnStatusCode.SUCCESS)
+			return NnNetUtil.textReturn(playerApiService.assembleMsgs(NnStatusCode.DATABASE_READONLY, null));
+		
 		String output = NnStatusMsg.errorStr(locale);
 		try {
-			output = playerApiService.deviceRegister(userToken, resp);
+			output = playerApiService.deviceRegister(userToken, type, resp);
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}

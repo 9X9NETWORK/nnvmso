@@ -29,18 +29,25 @@ public class NnUserManager {
 			user.setToken(NnUserManager.generateToken());
 		else 
 			user.setToken(token);
+		if (user.getPassword() != null) {
+			user.setSalt(AuthLib.generateSalt());
+			user.setCryptedPassword(AuthLib.encryptPassword(user.getPassword(), user.getSalt()));
+		}		
 		Date now = new Date();
 		user.setCreateDate(now);
 		user.setUpdateDate(now);
 		nnUserDao.save(user);
 	}
 
-	public NnUser save(NnUser user) {
-		if (user.getPassword() != null) {
-			user.setSalt(AuthLib.generateSalt());
-			user.setCryptedPassword(AuthLib.encryptPassword(user.getPassword(), user.getSalt()));
-		}
-		user.setEmail(user.getEmail().toLowerCase());
+	public NnUser resetPassword(NnUser user) {
+		user.setPassword(user.getPassword());
+		user.setSalt(AuthLib.generateSalt());
+		user.setCryptedPassword(AuthLib.encryptPassword(user.getPassword(), user.getSalt()));
+		this.save(user);
+		return user;
+	}
+	
+	public NnUser save(NnUser user) {		
 		user.setUpdateDate(new Date());
 		return nnUserDao.save(user);
 	}

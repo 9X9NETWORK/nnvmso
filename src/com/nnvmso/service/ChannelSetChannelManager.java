@@ -15,6 +15,10 @@ public class ChannelSetChannelManager {
 	protected static final Logger logger = Logger.getLogger(ChannelSetChannelManager.class.getName());
 	
 	ChannelSetChannelDao cscDao = new ChannelSetChannelDao();
+
+	public void saveAll(List<ChannelSetChannel> list) {
+		cscDao.saveAll(list);
+	}
 	
 	public void create(ChannelSetChannel csc) {
 		Date now = new Date();
@@ -25,6 +29,10 @@ public class ChannelSetChannelManager {
 	
 	public void delete(ChannelSetChannel csc) {
 		cscDao.delete(csc);
+	}
+
+	public void deleteAll(List<ChannelSetChannel> list) {
+		cscDao.deleteAll(list);
 	}
 	
 	public ChannelSetChannel save(ChannelSetChannel csc) {

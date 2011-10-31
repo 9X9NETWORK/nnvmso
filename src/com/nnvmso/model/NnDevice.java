@@ -1,7 +1,6 @@
 package com.nnvmso.model;
 
 import java.util.Date;
-import java.util.Set;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.PersistenceCapable;
@@ -16,12 +15,19 @@ public class NnDevice {
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
 	private Key key;
 
+	@Persistent
 	private String token;
 	
-	private Set<Long> userIds;
+	@Persistent
+	private long userId;
+	
+	@Persistent
+	private String type;
 
+	@Persistent
 	private Date createDate;
 	
+	@Persistent
 	private Date updateDate;
 	
 	public Key getKey() {
@@ -40,12 +46,12 @@ public class NnDevice {
 		this.token = token;
 	}
 
-	public Set<Long> getUserIds() {
-		return userIds;
+	public long getUserId() {
+		return userId;
 	}
 
-	public void setUserIds(Set<Long> userIds) {
-		this.userIds = userIds;
+	public void setUserId(long userId) {
+		this.userId = userId;
 	}
 
 	public Date getCreateDate() {
@@ -62,6 +68,14 @@ public class NnDevice {
 
 	public void setUpdateDate(Date updateDate) {
 		this.updateDate = updateDate;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
 	}
 	
 }

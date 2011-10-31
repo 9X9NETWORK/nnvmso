@@ -1,21 +1,18 @@
 package com.nnvmso.web.admin;
 
-import com.google.appengine.api.users.UserService;
-import com.google.appengine.api.users.UserServiceFactory;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.lang.Math;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -24,19 +21,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import org.codehaus.jackson.map.ObjectMapper;
-
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
 import com.nnvmso.lib.JqgridHelper;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.lib.NnStringUtil;
 import com.nnvmso.model.Category;
 import com.nnvmso.model.CategoryChannel;
-import com.nnvmso.model.Mso;
+import com.nnvmso.model.ChannelSet;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.SubscriptionLog;
 import com.nnvmso.service.CategoryChannelManager;
+import com.nnvmso.service.CategoryChannelSetManager;
 import com.nnvmso.service.CategoryManager;
+import com.nnvmso.service.ChannelSetManager;
 import com.nnvmso.service.MsoChannelManager;
 import com.nnvmso.service.MsoManager;
 import com.nnvmso.service.SubscriptionLogManager;
@@ -61,116 +60,8 @@ public class AdminCategoryController {
 		NnLogUtil.logException(e);
 		return "error/exception";				
 	}
+		
 	
-	@RequestMapping(value="uncategorized")
-	public ResponseEntity<String> uncategorized() {
-		CategoryManager cMngr = new CategoryManager();
-		MsoManager msoMngr = new MsoManager();
-		Mso mso = msoMngr.findByName("9x9");
-		Category c = new Category(Category.UNCATEGORIZED, true, mso.getKey().getId());
-		c.setPublic(false);		
-		cMngr.create(c);
-		return NnNetUtil.textReturn("OK");
-	}
-	
-	@RequestMapping(value="newStuff")
-	public ResponseEntity<String> newStuff() {
-		CategoryManager cMngr = new CategoryManager();
-		List<Category> categories = cMngr.findAll();
-		boolean needNewCategories = true;
-		int cnt = 0;
-		String list[] = new String[10];
-		for (Category c : categories) {			
-			if (c.getName().equals("Activism")) {
-				c.setName("Society & Organizations");
-				cnt++;
-				cMngr.save(c);
-			} else if (c.getName().equals("How to")) {			
-				c.setName("Education & How to");
-				cnt++;
-				cMngr.save(c);
-			} else if (c.getName().equals("Religion")) {			
-				c.setName("Religion & Spirituality");
-				cnt++;
-				cMngr.save(c);
-			} else if (c.getName().equals("Finance")) {
-				c.setName("Finance & Management");
-				cnt++;
-				cMngr.save(c);
-			} else if (c.getName().equals("Travel")) {
-				c.setName("Travel & Living");
-				cnt++;
-				cMngr.save(c);
-			} else if (c.getName().equals("Pets & animals")) {
-				c.setName("Nature & Animals");
-				cnt++;
-				cMngr.save(c);
-			} else if (c.getName().equals("Automotive")) {
-				c.setName("Lifestyle & Hobbies");
-				cnt++;
-				cMngr.save(c);
-			} else if (c.getName().equals("Outdoor")) {
-				c.setName("Sports & Outdoors");
-				cnt++;
-				cMngr.save(c);
-			} else if (c.getName().equals("Arts & Creative")) {
-				needNewCategories = false;
-			} else if (c.getName().equals("Others")) {
-				needNewCategories = false;
-			} else if (c.getName().equals("Gay & lesbian")) {
-				c.setPublic(false);
-				cMngr.save(c);
-			} else if (c.getName().equals("Comedy")) {
-				c.setPublic(false);
-				cMngr.save(c);
-			} else if (c.getName().equals("Food & Wine")) {
-				c.setPublic(false);
-				cMngr.save(c);
-			} else if (c.getName().equals("Health & Fitness")) {
-				c.setPublic(false);
-				cMngr.save(c);
-			} else if (c.getName().equals("Lifestyle")) {
-				c.setPublic(false);
-				cMngr.save(c);
-			} else if (c.getName().equals("Sports")) {
-				c.setPublic(false);
-				cMngr.save(c);
-			}
-			if (c.getName().equals("Comedy")) {
-				list[0] = "Comedy:" + c.getKey().getId();
-			} else if (c.getName().equals("Entertainment")) {
-				list[1] = "Entertainment:" + c.getKey().getId();
-			} else if (c.getName().equals("Food & wine")) {
-				list[2] = "Food & Wine:" + c.getKey().getId();
-			} else if (c.getName().equals("Gay & lesbian")) {
-				list[3] = "Gay & Lesbian:" + c.getKey().getId();
-			} else if (c.getName().equals("Health & fitness")) {
-				list[4] = "Health & Fitness:" + c.getKey().getId();
-			} else if (c.getName().equals("Lifestyle")) {
-				list[5] = "Lifestyle:" + c.getKey().getId();
-			} else if (c.getName().equals("Lifestyle & Hobbies")) {
-				list[6] = "Lifestyle & Hobbies:" + c.getKey().getId();
-			} else if (c.getName().equals("Sports")) {
-				list[7] = "Sports:" + c.getKey().getId();
-			} else if (c.getName().equals("Sports & Outdoors")) {
-				list[8] = "Sports & Outdoors:" + c.getKey().getId();
-			} else if (c.getName().equals("Travel & Living")) {
-				list[9] = "Travel & Living:" + c.getKey().getId();
-			}
-		}
-		MsoManager msoMngr = new MsoManager();
-		Mso mso = msoMngr.findByName("9x9");
-		if (needNewCategories) {
-			cMngr.create(new Category("Arts & Creative", true, mso.getKey().getId()));
-			cMngr.create(new Category("Others", true, mso.getKey().getId()));
-			cnt = cnt + 2;
-		}
-		String output = "category changes:" + cnt + "\n\n";
-		for (int i=0;i<10;i++) {
-			output = output + list[i] + "\n";
-		}
-		return NnNetUtil.textReturn(output);
-	}
 	
 	//list every channel under a category
 	@RequestMapping(value="channelList")
@@ -343,38 +234,36 @@ public class AdminCategoryController {
 		}
 	}
 	
-	@RequestMapping("create")
-	public @ResponseBody String create(@RequestParam(required=true)  String  name,
-	                                   @RequestParam(required=false) Boolean isPublic,
-	                                   @RequestParam(required=true)  Long    msoId) {
-		
-		logger.info("admin = " + userService.getCurrentUser().getEmail());
-		
-		logger.info("msoId = " + msoId);
-		logger.info("name = " + name);
-		MsoManager msoMngr = new MsoManager();
-		Mso mso = msoMngr.findById(msoId);
-		if (mso == null) {
-			String error = "Invalid msoId";
-			logger.warning(error);
-			return error;
-		}
-		if (isPublic == null)
-			isPublic = true;
-		Category category = new Category(name, isPublic, msoId);
+	@RequestMapping("create") 	
+	public @ResponseBody String create(@RequestParam(required=true) String name,
+									   @RequestParam(required=true) short seq,
+									   @RequestParam(required=true) String lang,
+	                                   @RequestParam(required=true) String setIds) {		
+		Category category = new Category(name);
+		category.setLang(lang);
+		category.setSeq(seq);		
+		CategoryChannelSetManager cscMngr = new CategoryChannelSetManager();
+		CategoryManager cMngr = new CategoryManager();
+		ChannelSetManager csMngr = new ChannelSetManager();
+	    List<ChannelSet> sets = new ArrayList<ChannelSet>();
+	    String[] ids = setIds.split(",");
+	    for (String id : ids) {
+	    	ChannelSet s = csMngr.findById(Long.parseLong(id));
+	    	sets.add(s);
+	    }
 		categoryMngr.create(category);
 		return "OK";
 	}
 	
-	@RequestMapping("modify")
-	public @ResponseBody String modify(@RequestParam(required=true)  Long    id,
-	                                   @RequestParam(required=false) String  name,
-	                                   @RequestParam(required=false) Boolean isPublic,
-	                                   @RequestParam(required=false) Long    msoId,
-	                                   @RequestParam(required=false) Integer channelCount) {
+	@RequestMapping("edit")
+	public @ResponseBody String edit(
+			@RequestParam(required=true)  Long    id,
+			@RequestParam(required=false) String  name,
+	        @RequestParam(required=false) Boolean isPublic,
+	        @RequestParam(required=false) Long    msoId,
+	        @RequestParam(required=false) Integer channelCount) {
 		
-		logger.info("admin = " + userService.getCurrentUser().getEmail());
-		
+		logger.info("admin = " + userService.getCurrentUser().getEmail());		
 		logger.info("categoryId = " + id);
 		Category category = categoryMngr.findById(id);
 		if (category == null) {
