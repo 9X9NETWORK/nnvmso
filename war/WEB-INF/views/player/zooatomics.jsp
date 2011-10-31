@@ -5,7 +5,7 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9playerV68a"/>
-<c:set var="nroot" value="http://9x9ui.s3.amazonaws.com/9x9playerV87"/>
+<c:set var="nroot" value="http://9x9ui.s3.amazonaws.com/9x9playerV88"/>
 
 <!-- $Revision$ -->
 
@@ -29,7 +29,7 @@
 <script type="text/javascript" charset="utf-8" src="${root}/javascripts/jquery.swfobject.1-1-1.min.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/scripts/flowplayer-3.2.4.min.js"></script>
 
-<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/player14.js"></script>
+<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/player16.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/vertical.slider.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/jquery.mousewheel.min.js"></script>
                                                                                                                                      
@@ -233,48 +233,9 @@ var brandinfo = "${brandInfo}";
   </div>
 </div>
 
-<div id="about-layer">
-  <div class="about-holder" id="about-holder">
-    <p><span id="about1">9x9 is a cloud based video platform which allows internet content to be discovered and enjoyed through a Smart Guide on Smart TV, Smart Phone and Tablet Devices.</span></p>
-    <p><span id="about2">Discover the magic of the Smart Guide, a 9x9 grid which can be personalized and populated with up to 81 channels to satisfy your everyday online video appetite.</span></p>
-    <p><span id="about3">Watch your favorite podcasts, YouTube channels and other episodic content on 9x9 just like watching TV.</span></p>
-    <p><span id="about4">9x9 is based in Santa Clara, California, USA.  We are a bunch of geeks passionate about revolutionizing online video discovery through a human powered network.</span></p>
-    <p><span id="about5">Our investors include venture capitalists, private investors and corporate investors including D-Link.  Contact us at <a href="mailto:feedback@9x9Cloud.tv">feedback@9x9Cloud.tv</a>.</span></p>
-    <div id="btn-closeAbout"><img src="${root}/images/btn_winclose.png"></div>
-    <img src="${root}/images/logo_about.png" id="about-logo">
-  </div>
-</div>
-
 <div id="sg-bubble"><img src="${root}/images/bg_bubble.png"><div id="btn-bubble-del"><img src="${root}/images/btn_delete_off.png" class="off"><img src="${root}/images/btn_delete_on.png" class="on"></div><p><span id="rsbubble">Return to Smart Guide for more interesting content</span></p></div>
 
-<div id="fb-bubble">
-
-  <div id="fb-holder">
-
-    <img src="" id="fb-picture">
-
-    <span id="fb-name"></span>
-
-    <span id="fb-comment"></span>
-
-  </div>
-
-</div>
-
-
 <!--div id="btn-subscribe" style="z-index: 300; display: none"><img src="${root}/images/btn_subscribe_off.png" class="off"><img src="${root}/images/btn_subscribe_on.png" class="on"></div-->
-
-<div id="toast">
-  <img src="${root}/images/bg_toast.gif" id="bg-toast">
-  <div id="toast-close">
-    <img src="${root}/images/btn_delete_off.png" id="toast-close-off">
-    <img src="${root}/images/btn_delete_on.png" id="toast-close-on">
-  </div>
-  <p id="toast-txt"><span>Follow this channel?</span></p>
-  <div id="btn-holder">
-    <p id="btn-yes" class="btn-blue"><span>Yes</span></p>
-  </div>
-</div>
 
 <div id="opening" style="display: block; z-index: 999">
   <div class="opening-holder" id="splash"></div>
@@ -292,13 +253,13 @@ var brandinfo = "${brandInfo}";
 
 <div id="rename-layer">
   <div id="rename-holder">
-    <spam style="color: white"><br>You can change the name of this 3x3 channel set</span>
+    <p class="instruction"><span>You can change the name of this 3x3 channel set</span></p>
     <p id="rename-input">
       <input type="text" class="textfield" id="rename-field" value="Enter a new title for the set">
     </p>
     <ul class="action-list">
-      <li><a class="btn" id="btn-rename-save"><span>Save</span></a></li>
-      <li><a class="btn" id="btn-rename-cancel"><span>Cancel</span></a></li>
+      <li><p class="btn disable" id="btn-rename-save"><span>Save</span></p></li>
+      <li><p class="btn" id="btn-rename-cancel"><span>Cancel</span></p></li>
     </ul>
   </div>
 </div>
@@ -384,7 +345,8 @@ var brandinfo = "${brandInfo}";
     <ul id="help-tabs">
       <li id="tutorial" class="on"><span>New User Tutorial</span></li>
       <li id="faq"><span>FAQ</span></li>
-      <li id="help-sync"><span>9x9 Sync</span></li>
+      <li id="sync"><span>Diagnostics</span></li>
+      <li id="report"><span>Report Problems</span></li>
     </ul>
     <div id="tutorial-panel" class="input-panel">
       <div id="tutorial-content" class="constrain">
@@ -404,11 +366,19 @@ var brandinfo = "${brandInfo}";
         </div>
       </div>
     </div>
-    <div id="sync-help-panel" class="input-panel">
+    <div id="sync-panel" class="input-panel">
       <div id="sync-slider" class="slider-wrap"><div class="slider-vertical"></div></div>
       <div id="sync-content" class="constrain">
         <div id="sync-list">
         </div>
+      </div>
+    </div>
+    <div id="report-panel" class="input-panel">
+      <div id="report-content" class="constrain">
+        <p id="problem-input">
+          <textarea class="textfield">Enter your problem</textarea> 
+        </p>
+        <p id="btn-report" class="btn"><span>Submit</span></p>
       </div>
     </div>
   </div>
