@@ -29,7 +29,7 @@
 <script type="text/javascript" charset="utf-8" src="${root}/javascripts/jquery.swfobject.1-1-1.min.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/scripts/flowplayer-3.2.4.min.js"></script>
 
-<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/player16.js"></script>
+<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/player17.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/vertical.slider.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/jquery.mousewheel.min.js"></script>
                                                                                                                                      
@@ -266,7 +266,7 @@ var brandinfo = "${brandInfo}";
 
 <div id="tribtn-layer">
   <div id="tribtn-holder">
-    <p><span>The channel you follow is added successfully!</span></p>
+    <p><span id="addsucc">The channel you follow is added successfully!</span></p>
     <ul class="action-list">
       <li><p class="btn" id="btn-watchSet"><span>Watching this Set</span></p></li>
       <li><p class="btn" id="btn-toFset"><span>Back to Add Featured Sets</span></p></li>
