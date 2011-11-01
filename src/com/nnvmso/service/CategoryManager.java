@@ -187,6 +187,10 @@ public class CategoryManager {
 		return categoryDao.list(page, limit, sidx, sord, filter);
 	}
 	
+	public void delete(Category c) {
+		categoryDao.delete(c);
+	}
+	
 	public int total() {
 		return categoryDao.total();
 	}
@@ -245,8 +249,8 @@ public class CategoryManager {
 
 	public Category findById(long id) {
 		return categoryDao.findById(id);
-	}
-			
+	}	
+	
 	private String getCacheKey(long msoId) {
 		return "mso(" + msoId + ")category(all)";
 	}

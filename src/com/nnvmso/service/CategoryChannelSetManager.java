@@ -29,6 +29,14 @@ public class CategoryChannelSetManager {
 		ccs.setUpdateDate(now);
 		ccsDao.save(ccs);
 	}
+
+	public void saveAll(List<CategoryChannelSet> list) {
+		ccsDao.saveAll(list);
+	}
+
+	public void deleteAll(List<CategoryChannelSet> list) {
+		ccsDao.deleteAll(list);
+	}
 	
 	public void delete(CategoryChannelSet ccs) {
 		ccsDao.delete(ccs);

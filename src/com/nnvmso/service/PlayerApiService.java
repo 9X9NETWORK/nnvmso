@@ -1374,7 +1374,7 @@ public class PlayerApiService {
 			List<ChannelSet> csList = csMngr.findAllByChannelSetIds(channelSetIdList);
 			int setCnt = 0;
 			for (ChannelSet cs : csList) {
-				if (!cs.isPublic()) {
+				if (cs.isPublic()) {
 					String name =  cs.getName();
 					int cnt = cs.getChannelCount();
 					String[] str = {"s" + String.valueOf(cs.getKey().getId()), name, String.valueOf(cnt), "ch"};				
