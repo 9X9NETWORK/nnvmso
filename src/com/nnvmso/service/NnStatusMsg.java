@@ -67,6 +67,7 @@ public class NnStatusMsg {
 			  case NnStatusCode.USER_INVALID: return messageSource.getMessage("nnstatus.user_invalid", new Object[] {NnStatusCode.USER_INVALID} , locale);
 			  case NnStatusCode.USER_TOKEN_TAKEN: return messageSource.getMessage("nnstatus.user_token_taken", new Object[] {NnStatusCode.USER_TOKEN_TAKEN} , locale);
 			  case NnStatusCode.USER_PERMISSION_ERROR: return messageSource.getMessage("nnstatus.user_permission_error", new Object[] {NnStatusCode.USER_PERMISSION_ERROR} , locale);
+			  case NnStatusCode.ACCOUNT_INVALID: return NnStatusCode.ACCOUNT_INVALID + "\t" + "ACCOUNT_INVALID" + "\n";
 			  case NnStatusCode.MSO_ERROR: return messageSource.getMessage("nnstatus.mso_error", new Object[] {NnStatusCode.MSO_ERROR} , locale);
 			  case NnStatusCode.MSO_INVALID: return messageSource.getMessage("nnstatus.mso_invalid", new Object[] {NnStatusCode.MSO_INVALID} , locale);
 			  case NnStatusCode.CHANNEL_ERROR: return messageSource.getMessage("nnstatus.channel_error", new Object[] {NnStatusCode.CHANNEL_ERROR} , locale);
