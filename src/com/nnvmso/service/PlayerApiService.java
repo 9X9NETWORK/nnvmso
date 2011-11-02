@@ -345,16 +345,13 @@ public class PlayerApiService {
 	public String processPdr(String userToken, String deviceToken, String session, String pdr) {
 		if (userToken == null && deviceToken == null)
 			return this.assembleMsgs(NnStatusCode.INPUT_MISSING, null);
-		if (pdr == null || pdr.length() == 0) this.assembleMsgs(NnStatusCode.INPUT_ERROR, null);	
+		if (pdr == null || pdr.length() == 0) return this.assembleMsgs(NnStatusCode.INPUT_ERROR, null);	
 		
 		NnUser user = null;
 		if (userToken != null) { 
 			//verify input
 			@SuppressWarnings("rawtypes")
 			HashMap map = this.checkUser(userToken, false);
-			if ((Integer)map.get("s") != NnStatusCode.SUCCESS && deviceToken == null) {
-				return this.assembleMsgs((Integer)map.get("s"), null);
-			}
 			user = (NnUser) map.get("u");
 		}
 		List<NnDevice> devices = new ArrayList<NnDevice>();
@@ -362,11 +359,12 @@ public class PlayerApiService {
 		if (deviceToken != null) {
 			NnDeviceManager deviceMngr = new NnDeviceManager();
 			devices = deviceMngr.findByToken(deviceToken);
-			if (devices.size() == 0)
-				return this.assembleMsgs(NnStatusCode.DEVICE_INVALID, null);
-			device = devices.get(0);
+			if (devices.size() > 0)
+				device = devices.get(0);
 		}
-				
+		if (device == null && user == null)
+			return this.assembleMsgs(NnStatusCode.ACCOUNT_INVALID, null);
+		
 		//pdr process
 		String output = NnStatusMsg.errorStr(locale);
 		PdrRawManager pdrMngr = new PdrRawManager();
