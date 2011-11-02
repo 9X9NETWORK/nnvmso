@@ -4,9 +4,9 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9miniV4"/>
+<c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9miniV5"/>
 
-<link rel="stylesheet" href="http://9x9ui.s3.amazonaws.com/9x9miniV4/stylesheets/main.css" />
+<link rel="stylesheet" href="${root}/stylesheets/main.css" />
 
 
 <!-- $Revision: 1726 $ -->
