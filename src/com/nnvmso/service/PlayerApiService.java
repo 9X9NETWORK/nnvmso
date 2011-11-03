@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -342,7 +341,10 @@ public class PlayerApiService {
 		return this.assembleMsgs(NnStatusCode.SUCCESS, null);
 	}
 	
-	public String processPdr(String userToken, String deviceToken, String session, String pdr) {
+	public String processPdr(
+			String userToken, String deviceToken, 
+			String session, String pdr,
+			HttpServletRequest req) {
 		if (userToken == null && deviceToken == null)
 			return this.assembleMsgs(NnStatusCode.INPUT_MISSING, null);
 		if (pdr == null || pdr.length() == 0) return this.assembleMsgs(NnStatusCode.INPUT_ERROR, null);	
@@ -368,7 +370,8 @@ public class PlayerApiService {
 		//pdr process
 		String output = NnStatusMsg.errorStr(locale);
 		PdrRawManager pdrMngr = new PdrRawManager();
-		pdrMngr.processPdr(user, device, session, pdr);
+		String ip = req.getRemoteAddr();
+		pdrMngr.processPdr(user, device, session, pdr, ip);
 		output = NnStatusMsg.successStr(locale);
 		return output;
 	}

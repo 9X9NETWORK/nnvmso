@@ -6,6 +6,8 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.servlet.http.HttpServletRequest;
+
 import com.google.appengine.api.datastore.Text;
 import com.nnvmso.dao.PdrRawDao;
 import com.nnvmso.model.NnDevice;
@@ -39,7 +41,7 @@ public class PdrRawManager {
 	 * 	Keep the implementation since the requirement can be changed back again.
 	 *  @@@ IMPORTANT It needs to be done in task if there's viewLog process  
 	 */
-	public void processPdr(NnUser user, NnDevice device, String sessionId, String pdr) {
+	public void processPdr(NnUser user, NnDevice device, String sessionId, String pdr, String ip) {
 		if (pdr == null) {return;}		
 		PdrRawManager pdrMngr = new PdrRawManager();		
 		NnUserWatchedManager watchedMngr = new NnUserWatchedManager();
@@ -57,6 +59,7 @@ public class PdrRawManager {
 		}
 		Text text = new Text(pdr);
 		PdrRaw raw = new PdrRaw(user, device, sessionId, text);			
+		raw.setIp(ip);
 		pdrMngr.create(raw);
 	}
 		

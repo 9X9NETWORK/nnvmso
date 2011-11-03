@@ -962,7 +962,7 @@ public class PlayerApiController {
 		String output = NnStatusMsg.errorStr(locale);
 		log.info("user=" + userToken + ";device=" + deviceToken + ";session=" + session);
 		try {
-			output = playerApiService.processPdr(userToken, deviceToken, session, pdr);
+			output = playerApiService.processPdr(userToken, deviceToken, session, pdr, req);
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}

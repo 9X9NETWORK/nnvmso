@@ -28,6 +28,9 @@ public class PdrRaw implements Serializable {
 	private String session;
 
 	@Persistent
+	private String ip;
+	
+	@Persistent
 	private String userToken;
 
 	@Persistent
@@ -126,5 +129,13 @@ public class PdrRaw implements Serializable {
 	public void setDeviceToken(String deviceToken) {
 		this.deviceToken = deviceToken;
 	}
-		
+
+	public String getIp() {
+		return ip;
+	}
+
+	public void setIp(String ip) {
+		this.ip = ip;
+	}
+	
 }
