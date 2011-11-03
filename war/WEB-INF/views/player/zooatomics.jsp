@@ -351,11 +351,6 @@ var brandinfo = "${brandInfo}";
     <div id="tutorial-panel" class="input-panel">
       <div id="tutorial-content" class="constrain">
         <div id="tutorial-list">
-          <p id="tutorial-video">
-            <iframe width="100%" height="100%" src="http://www.youtube.com/embed/0DLO2ZO0V4k" frameborder="0" allowfullscreen></iframe>
-          </p>
-          <p id="tutorial-intro"><span class="head">Welcome to 9x9</span><br><span>Wtaching your favorite online videos with 9x9 can be any easier! Simply drag and drop from our Channel Store to your very own 9x9 Gudie</span></p>
-          <p id="btn-tutorial-browse" class="btn-hilite"><span>Browse Now!</span></p>
         </div>
       </div>
     </div>
