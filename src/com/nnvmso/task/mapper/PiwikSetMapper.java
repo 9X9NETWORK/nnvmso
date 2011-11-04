@@ -8,7 +8,6 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.tools.mapreduce.AppEngineMapper;
 import com.google.appengine.tools.mapreduce.DatastoreMutationPool;
-import com.nnvmso.lib.PiwikLib;
 
 public class PiwikSetMapper extends AppEngineMapper<Key, Entity, NullWritable, NullWritable>{
 	protected static final Logger log = Logger.getLogger(PiwikSetMapper.class.getName());

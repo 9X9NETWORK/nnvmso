@@ -33,8 +33,10 @@ public class PdrRawManager {
 		return pdrDao.save(pdr);
 	}		
 
-	public List<PdrRaw> findDebugging(NnUser user, NnDevice device, String session) {
-		return pdrDao.findDebugging(user, device, session);
+	public List<PdrRaw> findDebugging(
+			NnUser user, NnDevice device, String session,
+			String ip, Date since) {
+		return pdrDao.findDebugging(user, device, session, ip, since);
 	}
 	
 	/**

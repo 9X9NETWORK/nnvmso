@@ -29,6 +29,7 @@ import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.lib.NnStringUtil;
 import com.nnvmso.model.Category;
 import com.nnvmso.model.CategoryChannel;
+import com.nnvmso.model.CategoryChannelSet;
 import com.nnvmso.model.ChannelSet;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.SubscriptionLog;
@@ -37,7 +38,6 @@ import com.nnvmso.service.CategoryChannelSetManager;
 import com.nnvmso.service.CategoryManager;
 import com.nnvmso.service.ChannelSetManager;
 import com.nnvmso.service.MsoChannelManager;
-import com.nnvmso.service.MsoManager;
 import com.nnvmso.service.SubscriptionLogManager;
 
 @Controller
@@ -61,8 +61,6 @@ public class AdminCategoryController {
 		return "error/exception";				
 	}
 		
-	
-	
 	//list every channel under a category
 	@RequestMapping(value="channelList")
 	public ResponseEntity<String> channelList(@RequestParam("category")long id) {		
@@ -177,6 +175,8 @@ public class AdminCategoryController {
 		String output = NnStringUtil.getDelimitedStr(title) + "\n" + result;
 		return NnNetUtil.textReturn(output);
 	}
+
+	
 	
 	@RequestMapping(value = "list", params = {"page", "rows", "sidx", "sord"})
 	public void list(@RequestParam(value = "page")   Integer      currentPage,
@@ -236,52 +236,49 @@ public class AdminCategoryController {
 	
 	@RequestMapping("create") 	
 	public @ResponseBody String create(@RequestParam(required=true) String name,
-									   @RequestParam(required=true) short seq,
 									   @RequestParam(required=true) String lang,
 	                                   @RequestParam(required=true) String setIds) {		
 		Category category = new Category(name);
-		category.setLang(lang);
-		category.setSeq(seq);		
-		CategoryChannelSetManager cscMngr = new CategoryChannelSetManager();
-		CategoryManager cMngr = new CategoryManager();
+		category.setLang(lang);		
+		category.setPublic(true);
 		ChannelSetManager csMngr = new ChannelSetManager();
-	    List<ChannelSet> sets = new ArrayList<ChannelSet>();
+		CategoryChannelSetManager ccsMngr = new CategoryChannelSetManager();
+	    List<CategoryChannelSet> list = new ArrayList<CategoryChannelSet>();
 	    String[] ids = setIds.split(",");
-	    for (String id : ids) {
-	    	ChannelSet s = csMngr.findById(Long.parseLong(id));
-	    	sets.add(s);
+		categoryMngr.create(category);		
+	    for (int i=0; i<ids.length; i++) {
+	    	ChannelSet cs = csMngr.findById(Long.parseLong(ids[i]));
+	    	CategoryChannelSet csc = new CategoryChannelSet(category.getKey().getId(), cs.getKey().getId());	    	
+	    	list.add(csc);
 	    }
-		categoryMngr.create(category);
+	    ccsMngr.saveAll(list);
 		return "OK";
 	}
-	
+
+	@RequestMapping("delete")
+	public @ResponseBody String delete(
+			@RequestParam(required=true)  Long    id) {
+		Category category = categoryMngr.findById(id);
+		CategoryChannelSetManager ccsMngr = new CategoryChannelSetManager();
+		List<CategoryChannelSet> oldList = ccsMngr.findAllByCategoryId(id);
+		ccsMngr.deleteAll(oldList);		
+		categoryMngr.delete(category);
+		return "OK";
+	}
+
 	@RequestMapping("edit")
 	public @ResponseBody String edit(
 			@RequestParam(required=true)  Long    id,
-			@RequestParam(required=false) String  name,
+			@RequestParam(required=false) String  name,			
 	        @RequestParam(required=false) Boolean isPublic,
-	        @RequestParam(required=false) Long    msoId,
-	        @RequestParam(required=false) Integer channelCount) {
-		
+	        @RequestParam(required=false) String setIds) {		
 		logger.info("admin = " + userService.getCurrentUser().getEmail());		
-		logger.info("categoryId = " + id);
 		Category category = categoryMngr.findById(id);
 		if (category == null) {
 			String error = "Category Not Found";
 			logger.warning(error);
 			return error;
-		}
-		
-		if (msoId != null) {
-			MsoManager msoMngr = new MsoManager();
-			logger.info("msoId = " + msoId);
-			if (msoMngr.findById(msoId) == null) {
-				String error = "Invalid msoId";
-				logger.warning(error);
-				return error;
-			}
-			category.setMsoId(msoId);
-		}
+		}		
 		if (name != null) {
 			logger.info("name = " + name);
 			category.setName(name);
@@ -290,11 +287,21 @@ public class AdminCategoryController {
 			logger.info("isPublic = " + isPublic);
 			category.setPublic(isPublic);
 		}
-		if (channelCount != null) {
-			logger.info("channelCount = " + channelCount);
-			category.setChannelCount(channelCount);
+		if (setIds != null) {
+			ChannelSetManager csMngr = new ChannelSetManager();
+			CategoryChannelSetManager ccsMngr = new CategoryChannelSetManager();
+			List<CategoryChannelSet> oldList = ccsMngr.findAllByCategoryId(id);
+			ccsMngr.deleteAll(oldList);
+		    List<CategoryChannelSet> list = new ArrayList<CategoryChannelSet>();
+		    String[] ids = setIds.split(",");
+			categoryMngr.create(category);		
+		    for (int i=0; i<ids.length; i++) {
+		    	ChannelSet cs = csMngr.findById(Long.parseLong(ids[i]));
+		    	CategoryChannelSet csc = new CategoryChannelSet(category.getKey().getId(), cs.getKey().getId());	    	
+		    	list.add(csc);
+		    }
+		    ccsMngr.saveAll(list);			
 		}
-		
 		categoryMngr.save(category);
 		return "OK";
 	}

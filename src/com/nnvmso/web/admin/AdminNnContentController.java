@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.google.appengine.api.datastore.Text;
 import com.google.appengine.api.users.UserService;
@@ -22,6 +23,7 @@ import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.lib.NnStringUtil;
 import com.nnvmso.model.LangTable;
 import com.nnvmso.model.NnContent;
+import com.nnvmso.model.NnUserReport;
 import com.nnvmso.service.NnContentManager;
 
 @Controller
@@ -45,32 +47,25 @@ public class AdminNnContentController {
 		return "error/exception";				
 	}	
 	
-	@RequestMapping(value="create")
-	public @ResponseBody String create(@RequestParam String key, 
-			                           @RequestParam String text,
-			                           @RequestParam String lang) {
-		logger.info("admin = " + userService.getCurrentUser().getEmail());
-		if (lang == null)
-			lang = LangTable.LANG_EN;
-		if (!lang.equals(LangTable.LANG_EN) && !lang.equals(LangTable.LANG_ZH))
-			return "lang error";
-		
-		Text txt = new Text(text); 
-		NnContent content = new NnContent(key, txt, lang);
-		contentMngr.create(content);
-		return "OK";
-	}
-
 	@RequestMapping(value="form", method=RequestMethod.GET)
-	public String formEdit(HttpServletRequest req) {
-		return "admin/static";
+	public ModelAndView formEdit(
+			@RequestParam(value="id", required=false)String id,
+			HttpServletRequest req) {	
+		ModelAndView mv = new ModelAndView("admin/static");
+		if (id != null) {
+			NnContent content = contentMngr.findById(Long.parseLong(id));
+			mv.addObject("key", content.getItem());
+			mv.addObject("lang", content.getLang());
+			mv.addObject("text", content.getContent().getValue());
+		}
+		return mv;
 	}
 
 	@RequestMapping(value="form", method=RequestMethod.POST)
 	public String formPost(HttpServletRequest req) {			
 		String key = req.getParameter("key");
 		String lang = req.getParameter("lang");
-		String text = req.getParameter("text"); 
+		String text = req.getParameter("text");
 		NnContent content = contentMngr.findByItemAndLang(key, lang);
 		if (content == null) {
 			Text txt = new Text(text);
@@ -87,42 +82,18 @@ public class AdminNnContentController {
 		contentMngr.save(content);
 		return "redirect:/admin/content/list";
 	}
-	
-	@RequestMapping(value="edit")
-	public @ResponseBody String edit(@RequestParam String key, 
-			                         @RequestParam String text,
-			                         @RequestParam String lang,
-			                         HttpServletRequest req) {
-		NnContent content = contentMngr.findByItemAndLang(key, lang);
-		if (content == null)
-			return "does not exist";
-		if (lang == null)
-			lang = LangTable.LANG_EN;
-		if (!lang.equals(LangTable.LANG_EN) && !lang.equals(LangTable.LANG_ZH))
-			return "lang error";
 		
-		Text txt = new Text(text);
-		content.setContent(txt);
-		content.setLang(lang);
-		contentMngr.save(content);
-		return "OK";
-	}
-	
 	@RequestMapping("list")
 	public ResponseEntity<String> list() {
 		//find all programs, including the not public ones
-		List<NnContent> list = contentMngr.findAll();
-		String[] title = {"id", "key", "lang", "value"};		
-		String output = "";
+		List<NnContent> list = contentMngr.findAll();				
+		String output = "<p><INPUT TYPE='button' onClick=\"parent.location='form'\" value='create'></p>";
 		for (NnContent c : list) {
-			String[] ori = {String.valueOf(c.getKey().getId()),
-							c.getItem(),
-							c.getLang(),
-	                        String.valueOf(c.getContent().getValue())};	                        
-			output = output + NnStringUtil.getDelimitedStr(ori) + "\n";			
+			output += "<p>" + "<a href='form?id=" + c.getKey().getId() + "'>" +
+			          c.getKey().getId() + "<a>\t" + c.getItem() + "\t" +
+			          c.getLang() + "</p>";
 		}
-		String result = NnStringUtil.getDelimitedStr(title) + "\n" + output;
-		return NnNetUtil.textReturn(result);
+		return NnNetUtil.htmlReturn(output);
 	}	
 	
 }

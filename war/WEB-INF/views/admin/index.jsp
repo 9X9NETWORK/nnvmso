@@ -7,13 +7,22 @@
 </ul>
 
 <ul>
-  <li>user report
+  <li>static content edit
     <ul>
-      <li><a href="/admin/pdr/reportList">report listing</a><br/>
+      <li><a href="/admin/content/list">static content</a><br/>         
+      </li>
+	</ul>
+  </li>	
+</ul>
+
+<ul>
+  <li>user report (also reference document)
+    <ul>
+      <li><a href="/pdr/reportList">report listing</a><br/>
           (option)user=...&since=yyyymmdd
       </li>
       <li>pdr list <br/>
-          http://host/admin/pdr/pdrList?user=...&session=...
+          http://host/pdr/pdrList?user=...&session=...
       </li>
     </ul>
   </li>

@@ -1,6 +1,7 @@
 package com.nnvmso.dao;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.jdo.PersistenceManager;
@@ -42,7 +43,9 @@ public class PdrRawDao {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<PdrRaw> findDebugging(NnUser user, NnDevice device, String session) {
+	public List<PdrRaw> findDebugging(
+			NnUser user, NnDevice device, String session,
+			String ip, Date since) {
 		List<PdrRaw> detached = new ArrayList<PdrRaw>();
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		List<PdrRaw> results = new ArrayList<PdrRaw>();
@@ -64,6 +67,11 @@ public class PdrRawDao {
 				q.setFilter("deviceId == deviceIdParam");
 				q.declareParameters("long deviceIdParam");
 				results = (List<PdrRaw>)q.execute(device.getKey().getId());				
+			} else if (ip != null) {
+				q.declareImports("import java.util.Date");
+				q.setFilter("ip == ipParam && createDate > createDateParam");
+				q.declareParameters("String ipParam, Date createDateParam");
+				results = (List<PdrRaw>)q.execute(ip, since);
 			}
 			q.setRange(0,199);
 			detached = (List<PdrRaw>)pm.detachCopyAll(results);

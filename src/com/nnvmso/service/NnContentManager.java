@@ -38,6 +38,10 @@ public class NnContentManager {
 		return nnContentDao.findByItemAndLang(item, lang);
 	}
 
+	public NnContent findById(long id) {
+		return nnContentDao.findById(id);
+	}
+	
 	public List<NnContent> findAll() {		
 		return nnContentDao.findAll();
 	}

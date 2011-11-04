@@ -497,6 +497,9 @@ public class InitService {
 			if (data.length == 2)
 				name = data[1];
 			MsoChannel c = channelMngr.findBySourceUrlSearch(url);
+			if (url.equals("http://www.maplestage.net/drama/記得,我們有約/")) {
+				System.out.println("========= enter this channel");
+			}
 			if (c == null) {					
 				c = new MsoChannel(url, user.getKey().getId());
 				c.setStatus(MsoChannel.STATUS_PROCESSING);
@@ -513,9 +516,16 @@ public class InitService {
 			} else {		
 				if (c.getContentType() == MsoChannel.CONTENTTYPE_YOUTUBE_CHANNEL || 
 					c.getContentType() == MsoChannel.CONTENTTYPE_YOUTUBE_PLAYLIST) {
+					if (c.getOriName() == null) {
+						log.info("re-submit youtube channel:" + c.getSourceUrl());
+						if (!devel)
+							tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);						
+					}
+					/*
 					log.info("re-submit youtube channel:" + c.getSourceUrl());
 					if (!devel)
 						tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
+					*/
 				}				
 				//log.info("this channel existed:" + url);
 				if (c.getStatus() == MsoChannel.STATUS_WAIT_FOR_APPROVAL) {

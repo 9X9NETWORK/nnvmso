@@ -33,8 +33,8 @@ public class NnNetUtil {
 
 	public static ResponseEntity<String> htmlReturn(String output) {
 		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.valueOf("text/html;charset=utf-8"));		
-		return new ResponseEntity<String>(output, headers, HttpStatus.OK);		
+		headers.setContentType(MediaType.valueOf("text/html;charset=utf-8"));			                                                    
+		return new ResponseEntity<String>(output, headers, HttpStatus.OK);
 	}	
 	
 	public static void write(HttpServletRequest req, HttpServletResponse resp, String text) {

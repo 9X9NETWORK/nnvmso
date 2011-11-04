@@ -118,12 +118,12 @@ public class NnUserDao extends GenericDao<NnUser> {
 		return user;				
 	}
 
-	public List<NnUser> findNoneGuests() {
+	public List<NnUser> findGuests() {
 		List<NnUser> detached = new ArrayList<NnUser>();
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
 			Query query = pm.newQuery(NnUser.class);
-			query.setFilter("email != emailParam");
+			query.setFilter("email == emailParam");
 			query.declareParameters("String emailParam");		
 			@SuppressWarnings("unchecked")
 			List<NnUser> results = (List<NnUser>) query.execute(NnUser.GUEST_EMAIL);

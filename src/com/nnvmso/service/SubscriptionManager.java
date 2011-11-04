@@ -135,6 +135,10 @@ public class SubscriptionManager {
 	public void deleteAll(List<Subscription> list) {
 		subDao.deleteAll(list);
 	}
+
+	public void saveAll(List<Subscription> list) {
+		subDao.saveAll(list);
+	}
 	
 	public int total() {
 		return subDao.total();

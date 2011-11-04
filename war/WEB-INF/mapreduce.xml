@@ -152,10 +152,10 @@
     </property>
   </configuration>  
   
-  <configuration name="MergeAccount Mapper">
+  <configuration name="DeleteGuest Mapper">
     <property>
       <name>mapreduce.map.class</name>      
-      <value>com.nnvmso.task.mapper.MergeAccountMapper</value>
+      <value>com.nnvmso.task.mapper.DeleteGuestMapper</value>
     </property>
     <property>
       <name>mapreduce.inputformat.class</name>
@@ -165,11 +165,37 @@
       <name human="Entity Kind to Map Over">mapreduce.mapper.inputformat.datastoreinputformat.entitykind</name>
       <value template="optional">NnUser</value>      
     </property>   
-    <property>
-      <name human="msoId">msoId</name>
-      <value template="optinonal">8001</value>
-    </property>     
   </configuration>
+
+  <configuration name="DeleteSubscription Mapper">
+    <property>
+      <name>mapreduce.map.class</name>      
+      <value>com.nnvmso.task.mapper.DeleteSubscriptionMapper</value>
+    </property>
+    <property>
+      <name>mapreduce.inputformat.class</name>
+      <value>com.google.appengine.tools.mapreduce.DatastoreInputFormat</value>
+    </property>    
+    <property>
+      <name human="Entity Kind to Map Over">mapreduce.mapper.inputformat.datastoreinputformat.entitykind</name>
+      <value template="optional">Subscription</value>      
+    </property>   
+  </configuration>
+
+  <configuration name="MarkSubType Mapper">
+    <property>
+      <name>mapreduce.map.class</name>      
+      <value>com.nnvmso.task.mapper.MarkSubTypeMapper</value>
+    </property>
+    <property>
+      <name>mapreduce.inputformat.class</name>
+      <value>com.google.appengine.tools.mapreduce.DatastoreInputFormat</value>
+    </property>    
+    <property>
+      <name human="Entity Kind to Map Over">mapreduce.mapper.inputformat.datastoreinputformat.entitykind</name>
+      <value template="optional">Subscription</value>      
+    </property>   
+  </configuration> 
   
   <configuration name="Channel Status Mapper">
     <property>

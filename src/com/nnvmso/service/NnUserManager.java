@@ -129,10 +129,14 @@ public class NnUserManager {
 		return nnUserDao.findByEmailAndMsoId(email.toLowerCase(), mso.getKey().getId());
 	}
 
-	public List<NnUser> findNoneGuests() {
-		return nnUserDao.findNoneGuests();
+	public List<NnUser> findGuests() {
+		return nnUserDao.findGuests();
 	}
 
+	public List<NnUser> findAll() {
+		return nnUserDao.findAll();
+	}
+	
 	public NnUser findByEmail(String email) {
 		return nnUserDao.findByEmail(email.toLowerCase());
 	}	
