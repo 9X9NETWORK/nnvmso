@@ -21,6 +21,10 @@
 
 <link rel="image_src" href="${fbImg}" />
 
+<meta property="og:title" content="${fbName}"/>
+<meta property="og:image" content="${fbImg}"/>
+<meta property="og:description" content="${fbDescription}"/>
+
 <link rel="stylesheet" href="${nroot}/stylesheets/main.css" />
 <!--link rel="stylesheet" href="${root}/stylesheets/main.css" /-->
 <link rel="stylesheet" href="http://9x9ui.s3.amazonaws.com/contest/contest.css" />

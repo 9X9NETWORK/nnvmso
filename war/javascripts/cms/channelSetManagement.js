@@ -165,7 +165,7 @@ var page$ = {
           url += ((channelSet.beautifulUrl != null) ? channelSet.beautifulUrl : channelSet.defaultUrl);
           if (channelSet.beautifulUrl != null || channelSet.defaultUrl != null) {
             $('#channel_set_promote_url').text(url).attr('href', url);
-            $('.addthis_button_expanded').attr('addthis:url', url);
+            $('.addthis_button_expanded').attr('addthis:url', url + '?_=' + new Date().getTime());
             cms.initAddthis();
             $('#plusone').attr('href', url);
             //cms.initPlusone();
