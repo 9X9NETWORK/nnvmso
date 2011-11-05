@@ -871,10 +871,11 @@ public class CmsApiController {
 		}
 		for (Category category : categories) {
 			if (category.getParentId() == parentIdValue) {
-				if (locale.equals(Locale.TAIWAN)) {
-					category.setName(catMngr.translate(category.getName()));
+				if ((locale.equals(Locale.TAIWAN) && category.getLang() != null && category.getLang().compareTo(Mso.LANG_ZH_TW) == 0) ||
+				    (!locale.equals(Locale.TAIWAN) && category.getLang() != null && category.getLang().compareTo(Mso.LANG_EN) == 0)) {
+					
+					results.add(category);
 				}
-				results.add(category);
 			}
 		}
 		return results;

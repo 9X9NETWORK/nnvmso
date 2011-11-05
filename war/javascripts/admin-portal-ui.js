@@ -541,11 +541,11 @@ var page$ = {
             edittype:  'select',
             editoptions: {
               disabled: false,
-              value:    "en:en;zh:zh;zh-TW:zh-TW"
+              value:    "en:en;zh:zh;zh-tw:zh-tw"
             },
             searchoptions: {
               sopt:  ['eq'],
-              value: "en:en;zh:zh;zh-TW:zh-TW"
+              value: "en:en;zh:zh;zh-tw:zh-tw"
             }
           },
           {
@@ -1028,11 +1028,11 @@ var page$ = {
               edittype:  'select',
               editoptions: {
                 disabled: false,
-                value:    "en:en;zh:zh;zh-TW:zh-TW"
+                value:    "en:en;zh:zh;zh-tw:zh-tw"
               },
               searchoptions: {
                 sopt:  ['eq'],
-                value: "en:en;zh:zh;zh-TW:zh-TW"
+                value: "en:en;zh:zh;zh-tw:zh-tw"
               }
             },
             {
@@ -1218,6 +1218,27 @@ var page$ = {
             },
             editrules: {
               edithidden: true
+            }
+          },
+          {
+            label:     'Language',
+            name:      'lang',
+            index:     'lang',
+            width:     70,
+            align:     'center',
+            search:    true,
+            stype:     'select',
+            sortable:  true,
+            formatter: 'select',
+            editable:  true,
+            edittype:  'select',
+            editoptions: {
+              disabled: false,
+              value:    "en:en;zh:zh;zh-tw:zh-tw"
+            },
+            searchoptions: {
+              sopt:  ['eq'],
+              value: "en:en;zh:zh;zh-tw:zh-tw"
             }
           },
           {

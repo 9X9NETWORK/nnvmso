@@ -219,6 +219,7 @@ public class AdminCategoryController {
 			cell.add(category.getName());
 			cell.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(category.getUpdateDate()));
 			cell.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(category.getCreateDate()));
+			cell.add(category.getLang());
 			cell.add(category.isPublic());
 			cell.add(category.getChannelCount());
 			
@@ -271,7 +272,9 @@ public class AdminCategoryController {
 			@RequestParam(required=true)  Long    id,
 			@RequestParam(required=false) String  name,			
 	        @RequestParam(required=false) Boolean isPublic,
+	        @RequestParam(required=false) String  lang,
 	        @RequestParam(required=false) String setIds) {		
+		
 		logger.info("admin = " + userService.getCurrentUser().getEmail());		
 		Category category = categoryMngr.findById(id);
 		if (category == null) {
@@ -302,6 +305,11 @@ public class AdminCategoryController {
 		    }
 		    ccsMngr.saveAll(list);			
 		}
+		if (lang != null) {
+			logger.info("lang = " + lang);
+			category.setLang(lang);
+		}
+		
 		categoryMngr.save(category);
 		return "OK";
 	}
