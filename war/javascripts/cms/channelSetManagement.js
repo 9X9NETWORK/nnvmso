@@ -167,6 +167,8 @@ var page$ = {
             $('#channel_set_promote_url').text(url).attr('href', url);
             $('.addthis_button_expanded').attr('addthis:url', url);
             cms.initAddthis();
+            $('#plusone').attr('href', url);
+            //cms.initPlusone();
           }
           $('#cc_name').val(channelSet.name);
           $('#cc_tag').val(channelSet.tag);

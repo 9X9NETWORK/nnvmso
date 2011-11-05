@@ -199,10 +199,13 @@ public class YouTubeLib {
 			results.put("description", description);
 			
 			List<MediaThumbnail> thumbnails = mediaGroup.getThumbnails();
-			if (thumbnails.size() > 0) {
+			if (thumbnails.size() > 1) {
+				String thumbnailUrl = thumbnails.get(1).getUrl();
+				results.put("thumbnail", thumbnailUrl);
+			} else if (thumbnails.size() > 0) {
 				String thumbnailUrl = thumbnails.get(0).getUrl();
 				results.put("thumbnail", thumbnailUrl);
-			}
+            }
 		} catch (Exception e) {
 			NnLogUtil.logException(e);
 		}

@@ -56,6 +56,7 @@
           <div class="floatL">
             <a class="floatL" href="javascript:" id="channel_set_promote_url" target="_player"></a>
             <a class="floatL icon addthis_button_expanded"></a>
+            <span class="floatL icon"><g:plusone id="plusone" size="small" count="false"></g:plusone></span>
           </div>
           <div class="clear"></div><br/>
           <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_set_management.label.name"/></label>

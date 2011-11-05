@@ -15,6 +15,12 @@ var cms = {
   isGeneric: function() {
     return ($('#msoType').val() == '4');
   },
+  initPlusone: function(callback) {
+    if (callback)
+      cms.loadScript('https://apis.google.com/js/plusone.js', callback);
+    else
+      cms.loadScript('https://apis.google.com/js/plusone.js');
+  },
   initAddthis: function() {
     window.addthis = null;
     cms.loadScript('http://s7.addthis.com/js/250/addthis_widget.js', function() {
@@ -227,7 +233,14 @@ var addthis_config = {
   'data_use_cookies':     false,
   'data_use_flash':       false,
   'data_track_clickback': false,
-  'services_expanded':    'email,facebook,twitter,tumblr,sinaweibo,funp',
+  'services_expanded':    'email,facebook,twitter,tumblr,sinaweibo,funp,plusone.google.com',
+  'services_custom': [
+    {
+      name: "Google+",
+      url:  "https://plusone.google.com/_/+1/confirm?hl=en&url={{URL}}",
+      icon: "/images/cms/google-plus.png"
+    }
+  ],
   'pubid':                'ra-4dcccc98718a5dbe'
 };
 
@@ -262,9 +275,6 @@ $(function() {
     }
     
   });
-  
-  /* Release 3.1 by Jeff */
-  
   
 });
 

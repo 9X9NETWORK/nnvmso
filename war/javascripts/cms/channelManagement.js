@@ -1105,6 +1105,7 @@ var page$ = {
           // add this
           var promoteUrl = 'http://' + location.host + '/view?channel=' + channelId;
           channelInfoBlock.find('.addthis_button_expanded').attr('addthis:url', promoteUrl);
+          channelInfoBlock.find('.plusone').attr('href', promoteUrl);;
           var switchObject = channelInfoBlock.find('.channel_info_publish');
           if (channels[i]['public']) {
             switchObject.removeClass('chUnPublic').addClass('chPublic');
@@ -1173,6 +1174,7 @@ var page$ = {
         }
         $('#channel_list').show();
         cms.initAddthis();
+        //cms.initPlusone();
       }, 'json');
       if (cms.isGeneric()) {
         $('.create_channel_button').unbind().click(function() {

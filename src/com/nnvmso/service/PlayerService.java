@@ -2,6 +2,8 @@ package com.nnvmso.service;
 
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -60,10 +62,34 @@ public class PlayerService {
 			MsoProgramManager programMngr = new MsoProgramManager();
 			MsoProgram program = programMngr.findById(Long.valueOf(pid));
 			if (program != null) {
-				logger.info("episode found = " + pid);
-				model.addAttribute("fbName", NnStringUtil.htmlSafeChars(program.getName()));
-				model.addAttribute("fbDescription", NnStringUtil.htmlSafeChars(program.getIntro()));
-				model.addAttribute("fbImg", NnStringUtil.htmlSafeChars(program.getImageUrl()));
+				if (program.getContentType() == MsoProgram.CONTENTTYPE_YOUTUBE) {
+					String regex = "/watch\\?v=(\\w+)";
+					Pattern pattern = Pattern.compile(regex);
+					Matcher matcher = pattern.matcher(program.getOtherFileUrl());
+					if (matcher.find()) {
+						String videoId = matcher.group(1);
+						logger.info("youtube found = " + videoId);
+						Map<String, String> entry = YouTubeLib.getYouTubeVideoEntry(videoId);
+						model.addAttribute("fbName", NnStringUtil.htmlSafeChars(entry.get("title")));
+						model.addAttribute("fbDescription", NnStringUtil.htmlSafeChars(entry.get("description")));
+						model.addAttribute("fbImg", NnStringUtil.htmlSafeChars(entry.get("thumbnail")));
+					} else {
+						model.addAttribute("fbName", NnStringUtil.htmlSafeChars(program.getName()));
+						model.addAttribute("fbDescription", NnStringUtil.htmlSafeChars(program.getIntro()));
+						if (program.getImageLargeUrl() != null)
+							model.addAttribute("fbImg", NnStringUtil.htmlSafeChars(program.getImageLargeUrl()));
+						else
+							model.addAttribute("fbImg", NnStringUtil.htmlSafeChars(program.getImageUrl()));
+					}
+				} else {
+					logger.info("episode found = " + pid);
+					model.addAttribute("fbName", NnStringUtil.htmlSafeChars(program.getName()));
+					model.addAttribute("fbDescription", NnStringUtil.htmlSafeChars(program.getIntro()));
+					if (program.getImageLargeUrl() != null)
+						model.addAttribute("fbImg", NnStringUtil.htmlSafeChars(program.getImageLargeUrl()));
+					else
+						model.addAttribute("fbImg", NnStringUtil.htmlSafeChars(program.getImageUrl()));
+				}
 			}
 		} else {
 			Map<String, String> entry = YouTubeLib.getYouTubeVideoEntry(pid);

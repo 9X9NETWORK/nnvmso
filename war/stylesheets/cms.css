@@ -280,10 +280,12 @@ a.btnCreate span{ line-height:30px; display:block;}
 .chFocusImg , .epInfoImg , .chUnFocusImg{ width:85px; height:70px; border:1px solid #CCC; margin:5px 0 0 5px; *margin:3px 0 0 3px; float:left;}
 a.btnDel{ background:url(/images/cms/btnClose.png) no-repeat; width:24px; height:23px; display:block; position:relative; top:-28px; left:375px;}
 a.btnDel:hover { background:url(/images/cms/btnCloseHover.png) no-repeat;}
-.chInfo p { color:#343434; padding-top:2px; width:220px;}
+.chInfo p { color:#343434; padding-top:2px; width:230px;}
 .epInfo { color:#343434; padding-top:2px; width:350px; }
 .chInfo a , .epInfo , .chInfo p { font-size:0.85em; }
+/*
 .chInfo a { margin-right:3px; }
+*/
 .chFocusTitle div, .chUnFocusTitle div { max-height:30px; overflow:hidden; }
 
 .btnStep1{ width: 170px;}

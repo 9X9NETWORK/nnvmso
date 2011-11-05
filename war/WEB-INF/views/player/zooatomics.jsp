@@ -1,4 +1,5 @@
 ﻿<!DOCTYPE html>
+<html itemscope itemtype="http://schema.org/">
 <head>
 <meta charset="UTF-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -8,6 +9,11 @@
 <c:set var="nroot" value="http://9x9ui.s3.amazonaws.com/9x9playerV88"/>
 
 <!-- $Revision$ -->
+
+<!-- Google+ Sharing meta data -->
+<meta itemprop="name" content="${fbName}">
+<meta itemprop="description" content="${fbDescription}">
+<meta itemprop="image" content="${fbImg}"><!-- Google+ requires thumbnail size at least 125px -->
 
 <!-- FB Sharing meta data -->
 <meta name="title" content="${fbName}" />

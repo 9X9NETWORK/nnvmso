@@ -84,7 +84,8 @@
                 <div class="chUnFocusImg channel_info_image"></div>
                 <div class="floatL chInfo">
                   <a href="#" target="_player" class="floatL channel_info_promoteurl">http://www.9x9.tv/channel/3958</a>
-                  <a class="addthis_button_expanded"></a>
+                  <a class="floatL icon addthis_button_expanded"></a>
+                  <a class="floatL icon"><g:plusone class="plusone" size="small" count="false"></g:plusone></a>
                   <a href="#" class="iconStatistics" title="觀看數據"></a>
                   <div class="clear"></div>
                   <div class="floatL">
