@@ -1309,8 +1309,10 @@ public class PlayerApiController {
 	}
 			
 	/**
+	 * For users to report problem. Either user or device needs to be provided.
 	 * 
 	 * @param user user token
+	 * @param device device token
 	 * @param session session id, same as pdr session id
 	 * @param comment user's problem description
 	 * @return status
