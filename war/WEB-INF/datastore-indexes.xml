@@ -185,9 +185,16 @@
   <datastore-index kind="NnUser" ancestor="false" source="manual">
     <property name="__key__" direction="desc"/>
   </datastore-index>
+  <datastore-index kind="NnUserReport" ancestor="false" source="manual">
+    <property name="__key__" direction="desc"/>
+  </datastore-index>
   <datastore-index kind="PdrRaw" ancestor="false" source="manual">
     <property name="__key__" direction="desc"/>
   </datastore-index>        
+  <datastore-index kind="PdrRaw" ancestor="false" source="manual">
+    <property name="ip" direction="asc"/>
+    <property name="createDate" direction="asc"/>
+  </datastore-index>  
   <datastore-index kind="Subscription" ancestor="false" source="manual">
     <property name="__key__" direction="desc"/>
   </datastore-index>

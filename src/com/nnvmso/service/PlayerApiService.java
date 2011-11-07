@@ -130,7 +130,9 @@ public class PlayerApiService {
 		return NnStatusCode.SUCCESS;
 	}
 	
-	public String search(String text) {		
+	public String search(String text) {
+		if (text == null || text.length() == 0)
+			return this.assembleMsgs(NnStatusCode.SUCCESS, null);
 		List<MsoChannel> searchResults = MsoChannelManager.searchChannelEntries(text);
 		String[] result = {""};
 		for (MsoChannel c : searchResults) {
@@ -327,17 +329,32 @@ public class PlayerApiService {
 		return output;
 	}	
 		
-	public String pdrReport(String userToken, String session, String comment) {
+	public String pdrReport(String userToken, String deviceToken, String session, String comment) {
 		if (session == null)
 			return this.assembleMsgs(NnStatusCode.INPUT_MISSING, null);
-		@SuppressWarnings("rawtypes")
-		HashMap map = this.checkUser(userToken, false);
-		if ((Integer)map.get("s") != NnStatusCode.SUCCESS) {
-			return this.assembleMsgs((Integer)map.get("s"), null);
-		}		
+		if (userToken == null && deviceToken == null)
+			return this.assembleMsgs(NnStatusCode.INPUT_MISSING, null);
+		
+		NnUser user = null;
+		if (userToken != null) { 
+			//verify input
+			@SuppressWarnings("rawtypes")
+			HashMap map = this.checkUser(userToken, false);
+			user = (NnUser) map.get("u");
+		}
+		List<NnDevice> devices = new ArrayList<NnDevice>();
+		NnDevice device = null;
+		if (deviceToken != null) {
+			NnDeviceManager deviceMngr = new NnDeviceManager();
+			devices = deviceMngr.findByToken(deviceToken);
+			if (devices.size() > 0)
+				device = devices.get(0);
+		}
+		if (device == null && user == null)
+			return this.assembleMsgs(NnStatusCode.ACCOUNT_INVALID, null);
+		
 		NnUserReportManager reportMngr = new NnUserReportManager();
-		NnUser user = (NnUser) map.get("u");
-		reportMngr.create(user, session, comment);
+		reportMngr.create(user, device, session, comment);
 		return this.assembleMsgs(NnStatusCode.SUCCESS, null);
 	}
 	

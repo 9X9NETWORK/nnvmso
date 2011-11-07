@@ -21,6 +21,12 @@ public class NnUserReport {
 	
 	@Persistent
 	private String userToken;
+
+	@Persistent
+	private long deviceId;
+	
+	@Persistent
+	private String deviceToken;
 	
 	@Persistent
 	private String comment;
@@ -32,9 +38,15 @@ public class NnUserReport {
 	private Date createDate;
 
 	public NnUserReport() {}
-	public NnUserReport(NnUser user, String session, String comment) {
-		this.userId = user.getKey().getId();
-		this.userToken = user.getToken();
+	public NnUserReport(NnUser user, NnDevice device, String session, String comment) {
+		if (user != null) {
+			this.userId = user.getKey().getId();
+			this.userToken = user.getToken();
+		}
+		if (device != null) {
+			this.deviceId = device.getKey().getId();
+			this.deviceToken = device.getToken();
+		}
 		this.session = session;
 		this.comment = comment;
 	}
@@ -74,5 +86,17 @@ public class NnUserReport {
 	}
 	public void setUserToken(String userToken) {
 		this.userToken = userToken;
-	}			
+	}
+	public long getDeviceId() {
+		return deviceId;
+	}
+	public void setDeviceId(long deviceId) {
+		this.deviceId = deviceId;
+	}
+	public String getDeviceToken() {
+		return deviceToken;
+	}
+	public void setDeviceToken(String deviceToken) {
+		this.deviceToken = deviceToken;
+	}	
 }

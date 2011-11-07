@@ -1318,6 +1318,7 @@ public class PlayerApiController {
 	@RequestMapping(value="userReport")
 	public ResponseEntity<String> userReport(
 			@RequestParam(value="user", required=false) String user,
+			@RequestParam(value="device", required=false) String device,
 			@RequestParam(value="session", required=false) String session,
 			@RequestParam(value="comment", required=false) String comment,
 			HttpServletRequest req,
@@ -1329,7 +1330,7 @@ public class PlayerApiController {
 		
 		String output = NnStatusMsg.errorStr(locale);
 		try {
-			output = playerApiService.pdrReport(user, session, comment);
+			output = playerApiService.pdrReport(user, device, session, comment);
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}

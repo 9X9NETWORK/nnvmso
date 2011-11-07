@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.nnvmso.dao.NnUserReportDao;
+import com.nnvmso.model.NnDevice;
 import com.nnvmso.model.NnUser;
 import com.nnvmso.model.NnUserReport;
 
@@ -13,8 +14,8 @@ public class NnUserReportManager {
 	
 	private NnUserReportDao reportDao = new NnUserReportDao();
 	
-	public void create(NnUser user, String session, String comment) {
-		NnUserReport report = new NnUserReport(user, session, comment);
+	public void create(NnUser user, NnDevice device, String session, String comment) {
+		NnUserReport report = new NnUserReport(user, device, session, comment);
 		report.setCreateDate(new Date());
 		reportDao.save(report);
 	}

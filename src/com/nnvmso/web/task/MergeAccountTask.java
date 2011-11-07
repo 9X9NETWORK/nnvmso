@@ -3,8 +3,14 @@ package com.nnvmso.web.task;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Logger;
 
+import javax.mail.Message;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.http.ResponseEntity;
@@ -14,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
+import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.NnUser;
@@ -30,7 +37,7 @@ public class MergeAccountTask {
 	
 	//entry
 	@RequestMapping("markSub")
-	public ResponseEntity<String> removeGuest(@RequestParam("start")int start) 
+	public ResponseEntity<String> markSub(@RequestParam("start")int start) 
 			throws IOException {
 		try {						
 			QueueFactory.getDefaultQueue().add(
@@ -54,10 +61,10 @@ public class MergeAccountTask {
 		SubscriptionManager subMngr = new SubscriptionManager();
 		List<NnUser> users = userMngr.findAll();
 		log.info("user total:" + users.size());
-		int end = start + 400;
+		int end = start + 200;
 		if (end > users.size()) 
 			end = users.size();
-		for (int i=start; i<start+400; i++) {	
+		for (int i=start; i<end; i++) {	
 			List<Subscription> list = new ArrayList<Subscription>();
 			list = subMngr.findAllByUser(users.get(i).getKey().getId());
 			for (Subscription s : list) {
@@ -65,15 +72,17 @@ public class MergeAccountTask {
 			}
 			subMngr.saveAll(list);
 		}
+		this.sendEmail("runMarkSub", "done");
 		return NnNetUtil.textReturn(output);
 	}
 
 	//entry
 	@RequestMapping("removeSub")
-	public ResponseEntity<String> removeSub() throws IOException {
+	public ResponseEntity<String> removeSub(@RequestParam("start")int start) throws IOException {
 		try {						
 			QueueFactory.getDefaultQueue().add(
 					TaskOptions.Builder.withUrl("/task/account/runRemoveSub")
+					  .param("start", String.valueOf(start))
 		    );
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -83,25 +92,48 @@ public class MergeAccountTask {
 	}
 
 	@RequestMapping(value="runRemoveSub")
-	public ResponseEntity<String> runRemoveSub(HttpServletRequest req) {
+	public ResponseEntity<String> runRemoveSub(
+			@RequestParam("start")int start,
+			HttpServletRequest req) {
 		String output = "";
 		NnUserManager userMngr = new NnUserManager();
 		MsoChannelManager channelMngr = new MsoChannelManager();
 		SubscriptionManager subMngr = new SubscriptionManager();
 		List<NnUser> users = userMngr.findAll();
-		for (NnUser user : users) {
-			List<Subscription> list = subMngr.findAllByUser(user.getKey().getId());
+		log.info("user total:" + users.size());
+		int end = start + 200;
+		if (end > users.size()) 
+			end = users.size();
+		for (int i=start; i<end; i++) {	
+			List<Subscription> list = subMngr.findAllByUser(users.get(i).getKey().getId());
 			List<Subscription> deleted = new ArrayList<Subscription>();
 			for (Subscription s : list) {
 				MsoChannel c = channelMngr.findById(s.getChannelId());
-				if (c.getContentType() == MsoChannel.CONTENTTYPE_SYSTEM || c.getContentType() == MsoChannel.CONTENTTYPE_PODCAST) {
+				if (c == null)
+					deleted.add(s); 
+				if (c != null && (c.getContentType() == MsoChannel.CONTENTTYPE_SYSTEM || c.getContentType() == MsoChannel.CONTENTTYPE_PODCAST)) {
 					deleted.add(s);
 				}
 			}			
 			subMngr.deleteAll(deleted);
 		}
+		this.sendEmail("runRemoveSub", "done");
 		return NnNetUtil.textReturn(output);
 	}
 	
+	public void sendEmail(String subject, String msgBody) {
+		Properties props = new Properties();
+        Session session = Session.getDefaultInstance(props, null);
+        try {
+        	Message msg = new MimeMessage(session);
+            msg.setFrom(new InternetAddress("nncloudtv@gmail.com", "nncloudtv"));
+            msg.addRecipient(Message.RecipientType.TO, new InternetAddress("nncloudtv@gmail.com", "nncloudtv"));                             
+            msg.setSubject(subject);
+            msg.setText(msgBody);
+            Transport.send(msg);
+        } catch (Exception e) {
+        	NnLogUtil.logException(e);
+		}					
+	}
 
 }
