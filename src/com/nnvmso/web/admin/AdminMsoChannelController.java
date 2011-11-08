@@ -29,6 +29,7 @@ import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.lib.NnStringUtil;
 import com.nnvmso.lib.PiwikLib;
+import com.nnvmso.lib.YouTubeLib;
 import com.nnvmso.model.Category;
 import com.nnvmso.model.CategoryChannel;
 import com.nnvmso.model.ContentOwnership;
@@ -62,7 +63,52 @@ public class AdminMsoChannelController {
 	public String exception(Exception e) {
 		NnLogUtil.logException(e);
 		return "error/exception";				
-	}
+	}	
+	
+	@RequestMapping("tmpList")
+	public ResponseEntity<String> tmpList(
+				HttpServletRequest req) {
+		String[] urls = {
+				"http://www.youtube.com/user/TEDtalksDirector",
+				"http://www.youtube.com/user/AtGoogleTalks",
+				"http://www.youtube.com/user/ReutersVideo",
+				"http://www.youtube.com/user/AssociatedPress",
+				"http://www.youtube.com/user/JimmyKimmelLive",
+				"http://www.youtube.com/user/journeymanpictures",
+				"http://www.youtube.com/user/NASAtelevision",
+				"http://www.youtube.com/user/NewYorkerDotCom",
+				"http://www.youtube.com/user/ComputerHistory",
+				"http://www.youtube.com/user/animalplanetTV",                                              
+				"http://www.youtube.com/user/NBA",
+				"http://www.youtube.com/user/bigthink",
+				"http://www.youtube.com/user/ResearchChannel",
+				"http://www.youtube.com/user/boyceavenue",
+				"http://www.youtube.com/user/growingyourgreens",
+				"http://www.youtube.com/user/ThirteenWNET",
+				"http://www.youtube.com/user/Autoexpress",
+				"http://www.youtube.com/user/PulitzerCenter",
+				"http://www.youtube.com/user/richarddawkinsdotnet",
+				"http://www.youtube.com/user/FunnyorDie",
+				"http://www.youtube.com/reelzchannel",
+				"http://www.youtube.com/user/realannoyingorange",
+				"http://www.youtube.com/user/FoodNetworkTV",
+				"http://www.youtube.com/user/japanesepod101",
+				"http://www.youtube.com/user/NationalGeographic",
+				"http://www.youtube.com/user/CorridorDigital",
+				"http://www.youtube.com/user/trendhuntertv"				
+		};
+		List<MsoChannel> channels = new ArrayList<MsoChannel>();
+		for (String url : urls) {
+			String checkedUrl = YouTubeLib.formatCheck(url);
+			MsoChannel c = channelMngr.findBySourceUrlSearch(checkedUrl);
+			channels.add(c);
+		}
+		String output = "";
+		for (MsoChannel c : channels) {
+			output += c.getKey().getId() + "\t" + c.getSourceUrl() + "\n";
+		}
+		return NnNetUtil.textReturn(output);
+	}	
 	
 	@RequestMapping("create")
 	public @ResponseBody String create(

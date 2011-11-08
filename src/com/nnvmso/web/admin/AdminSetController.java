@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.nnvmso.lib.NnNetUtil;
+import com.nnvmso.lib.YouTubeLib;
 import com.nnvmso.model.Category;
 import com.nnvmso.model.CategoryChannelSet;
 import com.nnvmso.model.ChannelSet;
@@ -148,6 +149,85 @@ public class AdminSetController {
 		List<MsoChannel> channels = channelMngr.findAllByChannelIds(list);
 		for (int i=0; i<channels.size(); i++) {
 			channels.get(i).setSeq(Short.valueOf(seqArr[i]));
+		}
+		channelSet.setLang(lang);
+		channelSetMngr.create(channelSet, channels);						
+		
+		//channelSet ownership
+		ContentOwnershipManager ownershipMngr = new ContentOwnershipManager();
+		ownershipMngr.create(new ContentOwnership(), mso, channelSet);
+		
+		//category and set
+		String[] categoryArr = categoryIds.split(",");
+		CategoryChannelSetManager cscMngr = new CategoryChannelSetManager();
+		CategoryManager cMngr = new CategoryManager();
+		List<Category> categories = new ArrayList<Category>();
+		for (int i=0; i<categoryArr.length; i++) {
+			Category c = cMngr.findById(Long.parseLong(categoryArr[i]));
+			categories.add(c);
+		}
+		for (Category c : categories) {
+			CategoryChannelSet csc = new CategoryChannelSet(c.getKey().getId(), channelSet.getKey().getId());			
+			cscMngr.save(csc);		
+		}
+		return NnNetUtil.textReturn("OK");
+	}	
+
+	@RequestMapping("createTest")
+	public ResponseEntity<String> createTest(@RequestParam(required=false) String name, 			                             
+			                             @RequestParam(required=false) String desc,
+			                             @RequestParam(required=false) String channelIds,
+			                             @RequestParam(required=false) String seqs,
+			                             @RequestParam(required=false) String lang,
+			                             @RequestParam(required=false) String categoryIds) {
+		//set info
+		name="Most Popular this Week";
+		desc = "All your favorites in one place!";
+		
+		Mso mso = new MsoManager().findNNMso();
+		ChannelSetManager channelSetMngr = new ChannelSetManager();
+		ChannelSet channelSet = new ChannelSet(mso.getKey().getId(), name, desc, true);
+		channelSet.setDefaultUrl(name); 
+		channelSet.setBeautifulUrl(name);
+		//related channels
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		String[] urls = {
+				"http://www.youtube.com/user/TEDtalksDirector",
+				"http://www.youtube.com/user/AtGoogleTalks",
+				"http://www.youtube.com/user/ReutersVideo",
+				"http://www.youtube.com/user/AssociatedPress",
+				"http://www.youtube.com/user/JimmyKimmelLive",
+				"http://www.youtube.com/user/journeymanpictures",
+				"http://www.youtube.com/user/NASAtelevision",
+				"http://www.youtube.com/user/NewYorkerDotCom",
+				"http://www.youtube.com/user/ComputerHistory",
+				"http://www.youtube.com/user/animalplanetTV",                                              
+				"http://www.youtube.com/user/NBA",
+				"http://www.youtube.com/user/bigthink",
+				"http://www.youtube.com/user/ResearchChannel",
+				"http://www.youtube.com/user/boyceavenue",
+				"http://www.youtube.com/user/growingyourgreens",
+				"http://www.youtube.com/user/ThirteenWNET",
+				"http://www.youtube.com/user/Autoexpress",
+				"http://www.youtube.com/user/PulitzerCenter",
+				"http://www.youtube.com/user/richarddawkinsdotnet",
+				"http://www.youtube.com/user/FunnyorDie",
+				"http://www.youtube.com/reelzchannel",
+				"http://www.youtube.com/user/realannoyingorange",
+				"http://www.youtube.com/user/FoodNetworkTV",
+				"http://www.youtube.com/user/japanesepod101",
+				"http://www.youtube.com/user/NationalGeographic",
+				"http://www.youtube.com/user/CorridorDigital",
+				"http://www.youtube.com/user/trendhuntertv"				
+		};
+		List<MsoChannel> channels = new ArrayList<MsoChannel>();
+		int j=1;
+		for (String url : urls) {
+			String checkedUrl = YouTubeLib.formatCheck(url);
+			MsoChannel c = channelMngr.findBySourceUrlSearch(checkedUrl);
+			c.setSeq(j);
+			channels.add(c);
+			j++;
 		}
 		channelSet.setLang(lang);
 		channelSetMngr.create(channelSet, channels);						

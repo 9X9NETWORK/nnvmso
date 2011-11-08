@@ -155,7 +155,7 @@ public class PdrController {
 		String output = "";
 		for (NnUserReport r : list) {
 			output += "<p>" + r.getUserToken() + "&nbsp;&nbsp;&nbsp;" + 
-			"<a href='pdrList?user=" + r.getUserToken() + "&session=" + r.getSession() + "'>" +   
+			"<a href='listPdr?user=" + r.getUserToken() + "&session=" + r.getSession() + "'>" +   
 			r.getSession() + "</a><br/>" + r.getComment() + "</p>";
 		}
 		return NnNetUtil.htmlReturn(output);

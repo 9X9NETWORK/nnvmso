@@ -47,12 +47,23 @@ public class MsoChannelManager {
 		return msoChannelDao.findSince(since);
 	}
 	
-	public void create(String url, String name, boolean devel, HttpServletRequest req) {
+	public boolean create(String url, String name, boolean devel, HttpServletRequest req) {
 		NnUserManager userMngr = new NnUserManager();
 		NnUser user = userMngr.findByEmail(Mso.NNEMAIL);		
 		MsoManager msoMngr = new MsoManager();
 		Mso mso = msoMngr.findNNMso();		
 		boolean piwik = true;
+		
+		if (!url.contains("maplestage")) {  
+    		String checkedUrl = YouTubeLib.formatCheck(url);
+    		if (checkedUrl == null) {
+    			log.info("bad url:" + url);
+    			return false;
+    		} else {
+    			url = checkedUrl;
+    		}
+    	}
+		
 		MsoChannel c = this.findBySourceUrlSearch(url);
 		TranscodingService tranService = new TranscodingService();
 		if (c == null) {					
@@ -103,6 +114,7 @@ public class MsoChannelManager {
 		}
 		c.setName(name);		
 		this.save(c);
+		return true;
 	}
 	
 	public void create(MsoChannel channel) {
