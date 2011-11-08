@@ -58,10 +58,6 @@ public class PdrController {
 		return NnNetUtil.textReturn(pservice.assembleMsgs(NnStatusCode.SUCCESS, result));		
 	}	
 	
-	@RequestMapping("test")
-	public ResponseEntity<String> test() {
-		return NnNetUtil.textReturn("what's going on");
-	}
 	/**
 	 * List PDR based on device OR user OR device + session OR user + session OR ip + since
 	 * 

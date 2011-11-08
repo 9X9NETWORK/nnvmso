@@ -12,12 +12,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.nnvmso.lib.NnNetUtil;
+import com.nnvmso.model.Category;
+import com.nnvmso.model.CategoryChannelSet;
 import com.nnvmso.model.ChannelSet;
 import com.nnvmso.model.ChannelSetChannel;
 import com.nnvmso.model.ContentOwnership;
 import com.nnvmso.model.LangTable;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
+import com.nnvmso.service.CategoryChannelSetManager;
+import com.nnvmso.service.CategoryManager;
 import com.nnvmso.service.ChannelSetChannelManager;
 import com.nnvmso.service.ChannelSetManager;
 import com.nnvmso.service.ContentOwnershipManager;
@@ -72,9 +76,9 @@ public class AdminSetController {
 		list.addAll(channelSetMngr.findFeaturedSets(LangTable.LANG_ZH));
 		String output = "";
 		for (ChannelSet cs : list) {
-			output += cs.getKey().getId() + "\t" + cs.getName();
+			output += cs.getKey().getId() + "\t" + cs.getName() + "\n";
 		}
-		return NnNetUtil.textReturn("OK");
+		return NnNetUtil.textReturn(output);
 	}
 
 	@RequestMapping("delete")
@@ -126,7 +130,9 @@ public class AdminSetController {
 	public ResponseEntity<String> create(@RequestParam(required=false) String name, 			                             
 			                             @RequestParam(required=false) String desc,
 			                             @RequestParam(required=false) String channelIds,
-			                             @RequestParam(required=false) String seqs) {
+			                             @RequestParam(required=false) String seqs,
+			                             @RequestParam(required=false) String lang,
+			                             @RequestParam(required=false) String categoryIds) {
 		//set info
 		Mso mso = new MsoManager().findNNMso();
 		ChannelSetManager channelSetMngr = new ChannelSetManager();
@@ -143,12 +149,26 @@ public class AdminSetController {
 		for (int i=0; i<channels.size(); i++) {
 			channels.get(i).setSeq(Short.valueOf(seqArr[i]));
 		}
+		channelSet.setLang(lang);
 		channelSetMngr.create(channelSet, channels);						
 		
 		//channelSet ownership
 		ContentOwnershipManager ownershipMngr = new ContentOwnershipManager();
 		ownershipMngr.create(new ContentOwnership(), mso, channelSet);
 		
+		//category and set
+		String[] categoryArr = categoryIds.split(",");
+		CategoryChannelSetManager cscMngr = new CategoryChannelSetManager();
+		CategoryManager cMngr = new CategoryManager();
+		List<Category> categories = new ArrayList<Category>();
+		for (int i=0; i<categoryArr.length; i++) {
+			Category c = cMngr.findById(Long.parseLong(categoryArr[i]));
+			categories.add(c);
+		}
+		for (Category c : categories) {
+			CategoryChannelSet csc = new CategoryChannelSet(c.getKey().getId(), channelSet.getKey().getId());			
+			cscMngr.save(csc);		
+		}
 		return NnNetUtil.textReturn("OK");
 	}	
 	

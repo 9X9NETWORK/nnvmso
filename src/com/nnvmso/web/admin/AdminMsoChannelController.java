@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -26,13 +28,21 @@ import com.nnvmso.lib.JqgridHelper;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.lib.NnStringUtil;
+import com.nnvmso.lib.PiwikLib;
 import com.nnvmso.model.Category;
 import com.nnvmso.model.CategoryChannel;
+import com.nnvmso.model.ContentOwnership;
+import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
+import com.nnvmso.model.NnUser;
 import com.nnvmso.service.CategoryChannelManager;
 import com.nnvmso.service.CategoryManager;
+import com.nnvmso.service.ContentOwnershipManager;
 import com.nnvmso.service.MsoChannelManager;
+import com.nnvmso.service.MsoManager;
+import com.nnvmso.service.NnUserManager;
 import com.nnvmso.service.SubscriptionLogManager;
+import com.nnvmso.service.TranscodingService;
 
 @Controller
 @RequestMapping("admin/channel")
@@ -56,11 +66,13 @@ public class AdminMsoChannelController {
 	
 	@RequestMapping("create")
 	public @ResponseBody String create(
-				@RequestParam(value="url")String url, 
-				@RequestParam(value="categories")String categoryIds, 
-				@RequestParam(value="userEmail")String email ) {				
-		return "";
-	}
+				HttpServletRequest req,
+			    @RequestParam(value="url")String url,
+				@RequestParam(value="name") String name,
+				@RequestParam(value="devel",required=false) boolean devel) {				 			
+		channelMngr.create(url, name, devel, req);
+		return "OK";
+	}	
 
 	@RequestMapping("list")
 	public ResponseEntity<String> list(

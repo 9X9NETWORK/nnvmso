@@ -44,6 +44,7 @@ public class Mso implements Serializable {
 	
 	@Persistent
 	private String contactEmail;
+	public static String NNEMAIL = "mso@9x9.tv";
 	
 	@Persistent
 	private short type;

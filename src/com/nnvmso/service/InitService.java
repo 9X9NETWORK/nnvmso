@@ -68,7 +68,7 @@ public class InitService {
 
 	private Mso mso;
 	private NnUser user;
-	private static String NNEMAIL = "mso@9x9.tv";	
+	private static String NNEMAIL = "mso@9x9.tv";
 
 	public void setRequest(HttpServletRequest req) {
 		this.req = req;
@@ -497,9 +497,6 @@ public class InitService {
 			if (data.length == 2)
 				name = data[1];
 			MsoChannel c = channelMngr.findBySourceUrlSearch(url);
-			if (url.equals("http://www.maplestage.net/drama/記得,我們有約/")) {
-				System.out.println("========= enter this channel");
-			}
 			if (c == null) {					
 				c = new MsoChannel(url, user.getKey().getId());
 				c.setStatus(MsoChannel.STATUS_PROCESSING);

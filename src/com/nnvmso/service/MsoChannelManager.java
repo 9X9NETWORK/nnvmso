@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import javax.servlet.http.HttpServletRequest;
+
 import net.sf.jsr107cache.Cache;
 
 import org.springframework.stereotype.Service;
@@ -16,10 +18,12 @@ import com.google.appengine.api.datastore.Key;
 import com.nnvmso.dao.MsoChannelDao;
 import com.nnvmso.lib.CacheFactory;
 import com.nnvmso.lib.FacebookLib;
+import com.nnvmso.lib.PiwikLib;
 import com.nnvmso.lib.SearchJanitorUtils;
 import com.nnvmso.lib.YouTubeLib;
 import com.nnvmso.model.Category;
 import com.nnvmso.model.CategoryChannel;
+import com.nnvmso.model.ContentOwnership;
 import com.nnvmso.model.LangTable;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
@@ -41,6 +45,64 @@ public class MsoChannelManager {
 
 	public List<MsoChannel> findSince(Date since) {
 		return msoChannelDao.findSince(since);
+	}
+	
+	public void create(String url, String name, boolean devel, HttpServletRequest req) {
+		NnUserManager userMngr = new NnUserManager();
+		NnUser user = userMngr.findByEmail(Mso.NNEMAIL);		
+		MsoManager msoMngr = new MsoManager();
+		Mso mso = msoMngr.findNNMso();		
+		boolean piwik = true;
+		MsoChannel c = this.findBySourceUrlSearch(url);
+		TranscodingService tranService = new TranscodingService();
+		if (c == null) {					
+			c = new MsoChannel(url, user.getKey().getId());
+			c.setStatus(MsoChannel.STATUS_PROCESSING);
+			c.setContentType(this.getContentTypeByUrl(url));
+			this.create(c);
+			ContentOwnershipManager ownershipMngr = new ContentOwnershipManager();
+			ownershipMngr.create(new ContentOwnership(), mso, c);
+			if (!devel) {
+				tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
+				this.save(c);
+			} else {
+				piwik = false; //local testing, no piwik creation
+			}
+		} else {		
+			if (c.getContentType() == MsoChannel.CONTENTTYPE_YOUTUBE_CHANNEL || 
+				c.getContentType() == MsoChannel.CONTENTTYPE_YOUTUBE_PLAYLIST) {
+				if (c.getOriName() == null) {
+					log.info("re-submit youtube channel:" + c.getSourceUrl());
+					if (!devel)
+						tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);						
+				}
+			}				
+			//log.info("this channel existed:" + url);
+			if (c.getStatus() == MsoChannel.STATUS_WAIT_FOR_APPROVAL) {
+				log.info("mark the channel from waiting to approval to success");
+				c.setStatus(MsoChannel.STATUS_SUCCESS);
+			} else if (c.getStatus() == MsoChannel.STATUS_PROCESSING){
+				if (!devel)
+					tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
+				log.info("was in processing mode, going to submit again");
+			} else if (c.getContentType() == MsoChannel.CONTENTTYPE_MAPLE_SOAP && c.getProgramCount() < 5) {
+				log.info("maple soap program count < 5; re-send:" + c.getSourceUrlSearch());
+				if (!devel)
+					tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
+			} else if (c.getContentType() == MsoChannel.CONTENTTYPE_MAPLE_VARIETY && c.getProgramCount() < 5) {
+				log.info("maple variety program count < 5; re-send:" + c.getSourceUrlSearch());
+				if (!devel)
+					tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
+			} else if (c.getStatus() != MsoChannel.STATUS_SUCCESS){
+				log.info("wanted channel but not success");					
+			}				
+		}
+		if (piwik) {
+			String piwikId = PiwikLib.createPiwikSite(0, c.getKey().getId(), req);
+			c.setPiwik(piwikId);
+		}
+		c.setName(name);		
+		this.save(c);
 	}
 	
 	public void create(MsoChannel channel) {
