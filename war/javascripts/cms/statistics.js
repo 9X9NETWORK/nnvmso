@@ -17,55 +17,48 @@ var page$ = {
       $('.stastics_empty').hide();
       $('.stastics_iframe').hide();
     },
-    initChannel: function(channelId, channelName, statistics) {
+    initChannel: function(channel, statistics) {
       page$.statisticsReport.destroy();
-      $('.right_title > div').text(channelName);
+      $('.right_title > div').text(channel.name);
       
-      var channel_url = piwik_get_site_url(channelId);
-      var params = {
-        method: 'SitesManager.getSitesIdFromSiteUrl',
-        url:    channel_url
-      };
-      piwik_call_api(params, function(sites) {
-        if (sites.length == 0) {
-          $('.stastics_empty').show();
-        } else {
-          var site = sites[0].idsite;
-          log('site: ' + site);
-          var params = {
-            module:      'Widgetize',
-            action:      'iframe',
-            idSite:      site,
-            period:      'day',
-            date:        'today',
-            disableLink: 1
-          };
-          switch (statistics) {
-          case 'visits_summary':
-            params.moduleToWidgetize = 'VisitsSummary';
-            params.actionToWidgetize = 'index';
-            break;
-          case 'visitor_countries':
-            params.moduleToWidgetize = 'UserCountryMap';
-            params.actionToWidgetize = 'worldMap';
-            break;
-          case 'pages':
-            params.moduleToWidgetize = 'Actions';
-            params.actionToWidgetize = 'getPageTitles';
-            break;
-          case 'live':
-            params.moduleToWidgetize = 'Live';
-            params.actionToWidgetize = 'widget';
-            break;
-          default:
-            log('unknown statistics!');
-            return;
-          }
-          var widget_url = piwik_get_widget_url(params);
-          log('widget url: ' + widget_url);
-          $('.stastics_iframe').attr('src', widget_url).show();
+      if (channel.piwik == null) {
+        $('.stastics_empty').show();
+      } else {
+        var site = channel.piwik;
+        log('site: ' + site);
+        var params = {
+          module:      'Widgetize',
+          action:      'iframe',
+          idSite:      site,
+          period:      'day',
+          date:        'today',
+          disableLink: 1
+        };
+        switch (statistics) {
+        case 'visits_summary':
+          params.moduleToWidgetize = 'VisitsSummary';
+          params.actionToWidgetize = 'index';
+          break;
+        case 'visitor_countries':
+          params.moduleToWidgetize = 'UserCountryMap';
+          params.actionToWidgetize = 'worldMap';
+          break;
+        case 'pages':
+          params.moduleToWidgetize = 'Actions';
+          params.actionToWidgetize = 'getPageTitles';
+          break;
+        case 'live':
+          params.moduleToWidgetize = 'Live';
+          params.actionToWidgetize = 'widget';
+          break;
+        default:
+          log('unknown statistics!');
+          return;
         }
-      });
+        var widget_url = piwik_get_widget_url(params);
+        log('widget url: ' + widget_url);
+        $('.stastics_iframe').attr('src', widget_url).show();
+      }
       
       /*
       cms.get('/CMSAPI/channelStatisticsInfo?channelId=' + channelId, function(report) {
@@ -107,7 +100,7 @@ var page$ = {
   channelAndChannelSetList: {
     init: function() {
       // load channels
-      cms.loadJSON('/CMSAPI/listOwnedChannels?msoId=' + $('#msoId').val(), function(channels) {
+      cms.loadJSON('/CMSAPI/defaultChannelSetChannels?msoId=' + $('#msoId').val(), function(channels) {
         for (i in channels) {
           var channelInfoBlock = $('#channel_info_block').clone(true).removeAttr('id').addClass('channel_info_block_cloned');
           var channelId = channels[i].key.id;
@@ -153,7 +146,7 @@ var page$ = {
           channelInfoBlock.find('.channel_info_promoteurl').text(promoteUrl).attr('href', promoteUrl);
           $('<li></li>').append(channelInfoBlock).appendTo('#channel_list_ul');
           // channel info block click event
-          channelInfoBlock.click({ 'channelId': channelId, 'channelName': channels[i].name}, function(event) {
+          channelInfoBlock.click({ 'channel': channels[i] }, function(event) {
             $('.channel_info_block').removeClass('chFocus').addClass('chUnFocus');
             $('.channel_info_title').removeClass('chFocusTitle').addClass('chUnFocusTitle');
             $('.channel_info_image').removeClass('chFocusImg').addClass('chUnFocusImg');
@@ -163,7 +156,7 @@ var page$ = {
             
             // load autosharing info
             var statistics = $('.channel_info_statistics', this).val();
-            page$.statisticsReport.initChannel(event.data.channelId, event.data.channelName, statistics);
+            page$.statisticsReport.initChannel(event.data.channel, statistics);
           });
         }
         cms.initAddthis();
