@@ -329,10 +329,16 @@ public class TranscodingService {
 		else
 			item = MsoConfig.FBTOKEN;
 		MsoConfig config = configMngr.findByItem(item);
-		if (config == null) { config = new MsoConfig();	}
-		config.setItem(item);
-		config.setValue(fbToken);
-		configMngr.save(config);
+		if (config == null) {
+			config = new MsoConfig();
+			config.setItem(item);
+			config.setValue(fbToken);
+			configMngr.create(config);
+		} else {
+			config.setItem(item);
+			config.setValue(fbToken);
+			configMngr.save(config);
+		}
 	}
 	
 	public String[] getTranscodingEnv(HttpServletRequest req) {
