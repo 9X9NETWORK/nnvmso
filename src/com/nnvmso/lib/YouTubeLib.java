@@ -1,6 +1,8 @@
 package com.nnvmso.lib;
 
+import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,9 +16,11 @@ import com.google.gdata.client.youtube.YouTubeService;
 import com.google.gdata.data.media.mediarss.MediaThumbnail;
 import com.google.gdata.data.youtube.PlaylistEntry;
 import com.google.gdata.data.youtube.PlaylistFeed;
+import com.google.gdata.data.youtube.UserProfileEntry;
 import com.google.gdata.data.youtube.VideoEntry;
 import com.google.gdata.data.youtube.VideoFeed;
 import com.google.gdata.data.youtube.YouTubeMediaGroup;
+import com.google.gdata.util.ServiceException;
 import com.nnvmso.service.NnStatusCode;
 
 public class YouTubeLib {
@@ -149,29 +153,38 @@ public class YouTubeLib {
 		results.put("status", String.valueOf(NnStatusCode.SUCCESS));
 		YouTubeService youtubeService = new YouTubeService(YOUTUBE_CLIENT_ID, YOUTUBE_DEVELOPER_KEY);		
 		String sourceUrl = "http://gdata.youtube.com/feeds/api/users/" + userIdStr + "/uploads";
+		String profileUrl = "http://gdata.youtube.com/feeds/api/users/" + userIdStr;
+		
 		try {
+			UserProfileEntry profileEntry = youtubeService.getEntry(new URL(profileUrl), UserProfileEntry.class);
 			VideoFeed videoFeed = youtubeService.getFeed(new URL(sourceUrl), VideoFeed.class);
 			List<VideoEntry> videoEntries = videoFeed.getEntries();
 			log.info("entry count: " + videoEntries.size());
+			if (profileEntry.getThumbnail() != null) {
+				String thumbnailUrl = profileEntry.getThumbnail().getUrl();
+				results.put("thumbnail", thumbnailUrl);
+				log.info("thumb: " + thumbnailUrl);
+			}
 			if (videoEntries.size() > 0) {
 				VideoEntry videoEntry = videoEntries.get(0);
 				YouTubeMediaGroup mediaGroup = videoEntry.getMediaGroup();
 				List<MediaThumbnail> thumbnails = mediaGroup.getThumbnails();
-				if (thumbnails.size() > 0) {
+				if (thumbnails.size() > 0 && (results.get("thumbnail") == null || results.get("thumbnail").contains("no_videos_140"))) {
 					String thumbnailUrl = thumbnails.get(0).getUrl();
 					results.put("thumbnail", thumbnailUrl);
 					log.info("thumb: " + thumbnailUrl);
 				}
 			}
+			if (profileEntry.getAboutMe() != null) {
+				String content = profileEntry.getAboutMe();
+				NnStringUtil.truncateUTF8(content);
+				results.put("description", content);
+				log.info("description: " + content);
+			}
 			if (videoFeed.getTitle() != null) {
 				String title = videoFeed.getTitle().getPlainText();
 				results.put("title", title);
 				log.info("title: " + title);
-			}
-			if (videoFeed.getSubtitle() != null) {
-				String subTitle = videoFeed.getSubtitle().getPlainText();
-				results.put("description", subTitle);
-				log.info("description: " + subTitle);
 			}
 		} catch (com.google.gdata.util.ServiceForbiddenException e) {
 			results.put("status", String.valueOf(NnStatusCode.CHANNEL_YOUTUBE_NOT_AVAILABLE));
