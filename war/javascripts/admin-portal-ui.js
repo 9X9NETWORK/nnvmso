@@ -6,7 +6,10 @@ var constants = {
     3: 'YouTube Channel',
     4: 'YouTube Playlist',
     5: 'Facebook',
-    6: '9x9'
+    6: '9x9',
+    7: 'Slide',
+    8: 'Maple Variety',
+    9: 'Maple Soap'
   },
   channelStatus: {
     0:    'Success',
