@@ -9,6 +9,9 @@ var log = function(text) {
 
 var cms = {
   debug: false,
+  isNN: function() {
+    return ($('#msoType').val() == '1');
+  },
   isEnterprise: function() {
     return ($('#msoType').val() == '5');
   },
@@ -191,6 +194,10 @@ var cms = {
     $('.menuD').removeAttr('href');
     $('<style> .menuD:hover { background-position: -268px -59px; cursor: default; } </style>').appendTo('head');
   },
+  initNNOne: function() {
+    $('.menuC').attr('href', 'directoryManagement');
+    $('<style> .menuC:hover { background-position: -179px 0px; cursor: default; } </style>').appendTo('head');
+  },
   initGenericOne: function() {
     $('#blog_link').show();
     $('#mso_logo').wrapAll('<a href="/9x9"></a>');
@@ -216,6 +223,9 @@ var cms = {
       '} ' +
       '</style>';
     $(style).appendTo('head'); // IE compatible
+    
+    $('.menuC').removeAttr('href');
+    $('<style> .menuC:hover { background-position: -179px -59px; cursor: default; } </style>').appendTo('head');
     
     $.ajaxSetup ({
       cache: false // Disable caching of AJAX responses
@@ -250,7 +260,6 @@ $(function() {
   if (cms.debug) {
     cms.loadScript('http://www.netgrow.com.au/assets/files/jquery_plugins/jquery.dump.js');
   }
-    
   cms.loadScript('/javascripts/plugins/jquery.blockUI.js', function() {
     
     $.blockUI.defaults.message = $('#warning_please_wait').html();
@@ -263,6 +272,8 @@ $(function() {
       cms.initGenericOne();
     } else if (cms.isEnterprise()) {
       cms.initEnterpriseOne();
+    } else if (cms.isNN()) {
+      cms.initNNOne();
     }
     
     if (typeof (page$) != 'undefined' && typeof (page$.init) == 'function') {

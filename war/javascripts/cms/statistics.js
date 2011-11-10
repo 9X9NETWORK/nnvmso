@@ -60,47 +60,18 @@ var page$ = {
         $('.stastics_iframe').attr('src', widget_url).show();
       }
       
-      /*
-      cms.get('/CMSAPI/channelStatisticsInfo?channelId=' + channelId, function(report) {
-        $('#ch_subscription_count').text(report.subscriptionCount);
-      }, 'json');
-      */
-      //$('#stasticTabA').click();
       $('#channel_statistics').show();
-      //page$.statisticsReport.initProgram(channelId);
-    },
-    initProgram: function(channelId) {
-      $('#ep_selector').html('');
-      $('<option/>').val('0').text($('#lang_label_please_select_program').text()).appendTo('#ep_selector');
-      cms.get('/CMSAPI/programList?channelId=' + channelId, { }, function(programs) {
-        for (i in programs) {
-          var name = programs[i].name;
-          if (name.length > 20) {
-            name = name.substr(0, 20) + '...';
-          }
-          var option = $('<option/>').val(programs[i].key.id).text(name).appendTo('#ep_selector');
-          $('#ep_selector').unbind().change(function(event) {
-            var programId = $(this).val();
-            cms.get('/CMSAPI/programStatisticsInfo?programId=' + programId, function(report) {
-              $('#ep_share_count').text(report.shareCount);
-            }, 'json')
-          });
-        }
-      }, 'json');
-    },
-    initChannelSet: function(channelSetId, channelSetName) {
-      page$.statisticsReport.destroy();
-      $('.right_title > div').text(channelSetName + ' - ' + $('#lang_title_set_statistics').text());
-      cms.get('/CMSAPI/channelSetStatisticsInfo?channelSetId=' + channelSetId, { }, function(report) {
-        $('#set_subscription_count').text(report.subscriptionCount);
-      }, 'json');
-      $('#channel_set_statistics').show();
     }
   },
   channelAndChannelSetList: {
     init: function() {
       // load channels
-      cms.loadJSON('/CMSAPI/defaultChannelSetChannels?msoId=' + $('#msoId').val(), function(channels) {
+      if (cms.isEnterprise()) {
+        var method = 'defaultChannelSetChannels';
+      } else {
+        var method = 'listOwnedChannels';
+      }
+      cms.loadJSON('/CMSAPI/' + method + '?msoId=' + $('#msoId').val(), function(channels) {
         for (i in channels) {
           var channelInfoBlock = $('#channel_info_block').clone(true).removeAttr('id').addClass('channel_info_block_cloned');
           var channelId = channels[i].key.id;
@@ -127,6 +98,15 @@ var page$ = {
             break;
             case 6:
             contentType = '9x9';
+            break;
+            case 7:
+            contentType = 'Slide';
+            break;
+            case 8:
+            contentType = 'Maple Variety';
+            break;
+            case 9:
+            contentType = 'Maple Soap';
             break;
             default:
           }
@@ -160,10 +140,8 @@ var page$ = {
           });
         }
         cms.initAddthis();
-        //$('#channel_list').show();
       });
       // load channel sets
-      /*
       cms.loadJSON('/CMSAPI/listOwnedChannelSets?msoId=' + $('#msoId').val(), function(channelSets) {
         for (i in channelSets) {
           var channelSetInfoBlock = $('#channel_info_block').clone(true).removeAttr('id').addClass('channel_info_block_cloned');
@@ -189,7 +167,7 @@ var page$ = {
           channelSetInfoBlock.find('.channel_info_promoteurl').text(promoteUrl).attr('href', promoteUrl);
           $('<li></li>').append(channelSetInfoBlock).appendTo('#channel_set_list_ul');
           // channel info block click event
-          channelSetInfoBlock.click({ 'channelSetId': channelSetId, 'channelSetName': channelSets[i].name}, function(event) {
+          channelSetInfoBlock.click({ 'channelSet': channelSets[i] }, function(event) {
             $('.channel_info_block').removeClass('chFocus').addClass('chUnFocus');
             $('.channel_info_title').removeClass('chFocusTitle').addClass('chUnFocusTitle');
             $('.channel_info_image').removeClass('chFocusImg').addClass('chUnFocusImg');
@@ -197,13 +175,13 @@ var page$ = {
             $('.channel_info_title', this).removeClass('chUnFocusTitle').addClass('chFocusTitle');
             $('.channel_info_image', this).removeClass('chUnFocusImg').addClass('chFocusImg');
             
-            page$.statisticsReport.initChannelSet(event.data.channelSetId, event.data.channelSetName);
+            var statistics = $('.channel_info_statistics', this).val();
+            page$.statisticsReport.initChannel(event.data.channelSet, statistics);
             
           });
         }
         $('#channel_set_list_ul').append('<div class="clear"/>');
       });
-      */
     }
   },
   init: function() {

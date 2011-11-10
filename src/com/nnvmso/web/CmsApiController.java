@@ -29,6 +29,7 @@ import com.google.appengine.api.taskqueue.TaskOptions;
 import com.nnvmso.lib.FacebookLib;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnStringUtil;
+import com.nnvmso.lib.PiwikLib;
 import com.nnvmso.lib.YouTubeLib;
 import com.nnvmso.model.Category;
 import com.nnvmso.model.CategoryChannel;
@@ -141,7 +142,8 @@ public class CmsApiController {
 	}
 	
 	@RequestMapping("saveChannelSet")
-	public @ResponseBody String saveChannelSet(@RequestParam Long channelSetId,
+	public @ResponseBody String saveChannelSet(HttpServletRequest req,
+	                                           @RequestParam Long channelSetId,
 	                                           @RequestParam(required = false) String channelIds,
 	                                           @RequestParam(required = false) String imageUrl,
 	                                           @RequestParam String name,
@@ -218,7 +220,8 @@ public class CmsApiController {
 				cscMngr.create(new ChannelSetChannel(channelSetId, channel.getKey().getId(), i + 1));
 			}
 		}
-		
+		// piwik
+		PiwikLib.createPiwikSite(channelSetId, 0, req);
 		return "OK";
 	}
 	
@@ -758,6 +761,8 @@ public class CmsApiController {
 				logger.warning("invalid msoId");
 			}
 		}
+		// piwik
+		PiwikLib.createPiwikSite(0, channelId, req);
 		return "OK";
 	}
 	

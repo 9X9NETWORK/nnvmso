@@ -22,17 +22,18 @@
     <ul class="menu">
       <li><a href="channelManagement" class="menuA"></a></li>
       <li><a href="channelSetManagement" class="menuB"></a></li>
-      <li><a href="javascript:" class="menuC"></a></li>
+      <li><a href="directoryManagement" class="menuC"></a></li>
       <li><a href="promotionTools" class="menuD"></a></li>
       <li><a href="statistics" class="menuE_active"></a></li>
     </ul>
     <label class="lang" id="image_menu"><spring:message code="cms.image.menu"/></label>
     <div class="clear"></div>
     <div class="left_body">
-      <div class="left_title"><spring:message code="cms.statistics.title.channel_list"/></div>
-      <div class="createChList2">
-        <div class="left_title" style="display:none"><spring:message code="cms.statistics.title.channel_set_list"/></div>
-        <ul class="chList" id="channel_set_list_ul" style="display:none"></ul>
+      <div class="createChList2" style="height: 548px">
+        <div class="left_title"><spring:message code="cms.statistics.title.channel_set_list"/></div>
+        <ul class="chList" id="channel_set_list_ul"></ul>
+        <div class="clear"></div>
+        <div class="left_title"><spring:message code="cms.statistics.title.channel_list"/></div>
         <ul class="chList" id="channel_list_ul">
           <li style="display:none">
             <div class="chUnFocus channel_info_block" id="channel_info_block">

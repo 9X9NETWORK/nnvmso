@@ -51,7 +51,7 @@ var page$ = {
     var label_channel_set = $('#lang_label_channel_set').text();
     var label_update_time = $('#lang_label_update_time').text();
     var span = $('<span></span>');
-    var h2 = $('<h2 class="popTitle"></h2>').text('[' + label_channel_set + ']' + channelSet.name).textTruncate(20, '...').appendTo(span);
+    var h2 = $('<h2 class="popTitle"></h2>').text('[' + label_channel_set + ']' + channelSet.name).appendTo(span);
     
     var innerHtml = span.html();
     innerHtml += '<br/>' + label_update_time + ' : ' + cms.formatDate(channelSet.updateDate);
@@ -62,7 +62,7 @@ var page$ = {
     var label_program_count = $('#lang_label_program_count').text();
     var label_update_time = $('#lang_label_update_time').text();
     var span = $('<span></span>');
-    var h2 = $('<h2 class="popTitle"></h2>').text(channel.name).textTruncate(20, '...').appendTo(span);
+    var h2 = $('<h2 class="popTitle"></h2>').text(channel.name).appendTo(span);
     
     var innerHtml = span.html();
     innerHtml += '<br/>' + label_program_count + ' : ' + channel.programCount;
@@ -380,7 +380,7 @@ var page$ = {
         for (var i = 0; i < channelSets.length; i++) {
           var item = $('<li class="ch_normal"/>');
           var img = $('<img/>').attr('src', channelSets[i].imageUrl);
-          var p = $('<p class="ch_name"></p>').text(channelSets[i].name).textTruncate(20, '...');
+          var p = $('<p class="ch_name"></p>').text(channelSets[i].name);
           var type = $('<input type="hidden" name="type"/>').val('channelSet');
           var hidden = $('<input type="hidden" name="id"/>').val(channelSets[i].key.id);
           item.append(img).append(p).append(type).append(hidden).appendTo('#directory_list_ul');
@@ -392,10 +392,10 @@ var page$ = {
           });
         }
         cms.post('/CMSAPI/listOwnedChannels', { 'msoId': $('#msoId').val() }, function(channels) {
-          for (var i = 0; i < channels.length; i++) {
+          for (var i = 0; i < channels.length && channels[i].name != null; i++) {
             var item = $('<li class="ch_normal"/>');
             var img = $('<img/>').attr('src', channels[i].imageUrl);
-            var p = $('<p class="ch_name"></p>').text(channels[i].name).textTruncate(20, '...');
+            var p = $('<p class="ch_name"></p>').text(channels[i].name);
             var type = $('<input type="hidden" name="type"/>').val('channel');
             var hidden = $('<input type="hidden" name="id"/>').val(channels[i].key.id);
             item.append(img).append(p).append(type).append(hidden).appendTo('#directory_list_ul');

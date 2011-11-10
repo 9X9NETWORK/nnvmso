@@ -255,7 +255,7 @@ var page$ = {
           return;
         }
       }
-      if ($('#set_ch_list li').size() >= 27) {
+      if ($('#set_ch_list li').size() >= 27 && !suppress) {
         alert($('#lang_warning_reached_maximum_amount').text());
         return;
       }
@@ -266,8 +266,8 @@ var page$ = {
         //alert($('#lang_channel_had_been_added').text());
         $('#set_ch_holder').scrollTo(item, 800);
         item.effect('highlight', { }, 3000);
+        page$.dirty = true;
       }
-      page$.dirty = true;
     },
     init: function() {
       $('#set_ch_list .ch_normal').remove();

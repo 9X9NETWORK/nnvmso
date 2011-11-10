@@ -27,7 +27,7 @@
     <ul>
       <li><a href="channelManagement" class="menuA"></a></li>
       <li><a href="javascript:" class="menuB_active"></a></li>
-      <li><a _href="javascript://directoryManagement" class="menuC"></a></li>
+      <li><a href="directoryManagement" class="menuC"></a></li>
       <li><a href="promotionTools" class="menuD"></a></li>
       <li><a href="statistics" class="menuE"></a></li>
     </ul>

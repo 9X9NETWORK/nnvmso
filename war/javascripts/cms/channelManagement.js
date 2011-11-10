@@ -1174,7 +1174,6 @@ var page$ = {
         }
         $('#channel_list').show();
         cms.initAddthis();
-        //cms.initPlusone();
       }, 'json');
       if (cms.isGeneric()) {
         $('.create_channel_button').unbind().click(function() {
