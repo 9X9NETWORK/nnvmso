@@ -496,8 +496,10 @@ public class CmsApiController {
 		MsoChannel channel = channelMngr.findBySourceUrlSearch(sourceUrl);
 		ContentOwnershipManager ownershipMngr = new ContentOwnershipManager();
 		MsoManager msoMngr = new MsoManager();
-		Mso mso = msoMngr.findById(msoId);
 		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
+		ChannelSetManager csMngr = new ChannelSetManager();
+		
+		Mso mso = msoMngr.findById(msoId);
 		
 		if (channel == null)
 			return "Invalid Source Url";
@@ -525,6 +527,10 @@ public class CmsApiController {
 		// channel.setStatus(MsoChannel.STATUS_SUCCESS); // default import status
 		channelMngr.save(channel);
 		
+		ChannelSet channelSet = csMngr.findById(channelSetId);
+		if (channelSet == null)
+			return "Invalid channelSetId";
+		
 		// NOTE: channel can only in one system Channel Set
 		List<ChannelSetChannel> removable = new ArrayList<ChannelSetChannel>();
 		List<ChannelSetChannel> sysCSCs = cmsApiService.whichSystemCSCContainingThisChannel(channel.getKey().getId());
@@ -542,6 +548,7 @@ public class CmsApiController {
 			// create a new ChannelSetChannel
 			cscMngr.appendChannel(channelSetId, channel);
 			logger.info("create new ChannelSetChannel channelId = " + channel.getKey().getId() + ", channelSetId = " + channelSetId);
+			//csMngr.save(channelSet);
 		}
 		
 		// create ownership
@@ -698,6 +705,7 @@ public class CmsApiController {
 		MsoChannelManager channelMngr = new MsoChannelManager();
 		MsoChannel channel = channelMngr.findById(channelId);
 		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
+		ChannelSetManager csMngr = new ChannelSetManager();
 		
 		if (channel == null)
 			return "Invalid ChannelId";
@@ -728,6 +736,10 @@ public class CmsApiController {
 		channel.setUpdateDate(new Date());
 		channelMngr.save(channel);
 		
+		ChannelSet channelSet = csMngr.findById(channelSetId);
+		if (channelSet == null)
+			return "Invalid channelSetId";
+		
 		// NOTE: channel can only in one system Channel Set
 		List<ChannelSetChannel> removable = new ArrayList<ChannelSetChannel>();
 		List<ChannelSetChannel> sysCSCs = cmsApiService.whichSystemCSCContainingThisChannel(channel.getKey().getId());
@@ -745,6 +757,7 @@ public class CmsApiController {
 			// create a new ChannelSetChannel
 			cscMngr.appendChannel(channelSetId, channel);
 			logger.info("create new ChannelSetChannel channelId = " + channel.getKey().getId() + ", channelSetId = " + channelSetId);
+			//csMngr.save(channelSet); // update channelCount
 		}
 		
 		//channel1 ownership

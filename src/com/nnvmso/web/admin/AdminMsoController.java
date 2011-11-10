@@ -105,6 +105,7 @@ public class AdminMsoController {
 		ChannelSet channelSet = new ChannelSet(mso.getKey().getId(), name, name, true);
 		channelSet.setDefaultUrl(String.valueOf(mso.getKey().getId()));
 		channelSet.setBeautifulUrl(name);
+		channelSet.setPublic(false); // to prevent set to appear to directory
 		setMngr.create(channelSet, new ArrayList<MsoChannel>());
 		
 		//channelSet ownership

@@ -166,13 +166,13 @@ var page$ = {
             .text(categories[i].name)
             .attr('title', icon)
             .appendTo('#sys_directory');
-          cms.post('/CMSAPI/defaultChannelSetCategory', { 'msoId': $('#msoId').val() }, function(category) {
-            if (category != null) {
-            	$('#sys_directory').val(category.key.id);
-            }
-            $('#sys_directory').msDropDown();
-          }, 'json');
         }
+        cms.post('/CMSAPI/defaultChannelSetCategory', { 'msoId': $('#msoId').val() }, function(category) {
+          if (category != null) {
+            $('#sys_directory').val(category.key.id);
+          }
+          $('#sys_directory').msDropDown();
+        }, 'json');
       });
       cms.post('/CMSAPI/defaultChannelSetInfo', { 'msoId': $('#msoId').val() }, function(channelSet) {
         if (channelSet != null) {
@@ -367,6 +367,10 @@ var page$ = {
         channelIds += ',';
       var channelId = $(items[i]).find('input[name="channelId"]').val();
       channelIds += channelId;
+    }
+    if (channelIds == '') {
+      alert($('#lang_warning_set_is_empty').text());
+      return;
     }
     log(channelIds);
     var parameters = {
