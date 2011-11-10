@@ -68,10 +68,9 @@ var page$ = {
       });
       
       /*
-      $.get('/CMSAPI/channelStatisticsInfo?channelId=' + channelId, function(report)
-      {
+      cms.get('/CMSAPI/channelStatisticsInfo?channelId=' + channelId, function(report) {
         $('#ch_subscription_count').text(report.subscriptionCount);
-      });
+      }, 'json');
       */
       //$('#stasticTabA').click();
       $('#channel_statistics').show();
@@ -80,7 +79,7 @@ var page$ = {
     initProgram: function(channelId) {
       $('#ep_selector').html('');
       $('<option/>').val('0').text($('#lang_label_please_select_program').text()).appendTo('#ep_selector');
-      $.get('/CMSAPI/programList?channelId=' + channelId, function(programs) {
+      cms.get('/CMSAPI/programList?channelId=' + channelId, { }, function(programs) {
         for (i in programs) {
           var name = programs[i].name;
           if (name.length > 20) {
@@ -89,26 +88,26 @@ var page$ = {
           var option = $('<option/>').val(programs[i].key.id).text(name).appendTo('#ep_selector');
           $('#ep_selector').unbind().change(function(event) {
             var programId = $(this).val();
-            $.get('/CMSAPI/programStatisticsInfo?programId=' + programId, function(report) {
+            cms.get('/CMSAPI/programStatisticsInfo?programId=' + programId, function(report) {
               $('#ep_share_count').text(report.shareCount);
-            })
+            }, 'json')
           });
         }
-      });
+      }, 'json');
     },
     initChannelSet: function(channelSetId, channelSetName) {
       page$.statisticsReport.destroy();
       $('.right_title > div').text(channelSetName + ' - ' + $('#lang_title_set_statistics').text());
-      $.get('/CMSAPI/channelSetStatisticsInfo?channelSetId=' + channelSetId, function(report) {
+      cms.get('/CMSAPI/channelSetStatisticsInfo?channelSetId=' + channelSetId, { }, function(report) {
         $('#set_subscription_count').text(report.subscriptionCount);
-      });
+      }, 'json');
       $('#channel_set_statistics').show();
     }
   },
   channelAndChannelSetList: {
     init: function() {
       // load channels
-      $.getJSON('/CMSAPI/listOwnedChannels?msoId=' + $('#msoId').val(), function(channels) {
+      cms.loadJSON('/CMSAPI/listOwnedChannels?msoId=' + $('#msoId').val(), function(channels) {
         for (i in channels) {
           var channelInfoBlock = $('#channel_info_block').clone(true).removeAttr('id').addClass('channel_info_block_cloned');
           var channelId = channels[i].key.id;
@@ -172,7 +171,7 @@ var page$ = {
       });
       // load channel sets
       /*
-      $.getJSON('/CMSAPI/listOwnedChannelSets?msoId=' + $('#msoId').val(), function(channelSets) {
+      cms.loadJSON('/CMSAPI/listOwnedChannelSets?msoId=' + $('#msoId').val(), function(channelSets) {
         for (i in channelSets) {
           var channelSetInfoBlock = $('#channel_info_block').clone(true).removeAttr('id').addClass('channel_info_block_cloned');
           var channelSetId = channelSets[i].key.id;
@@ -215,8 +214,8 @@ var page$ = {
     }
   },
   init: function() {
-    var css = '.chPublic { background:url(' + $('#image_ch_public').text() + ') no-repeat; }\n.chUnPublic { background:url(' + $('#image_ch_unpublic').text() + ') no-repeat; }';
-    $('<style/>').text(css).appendTo('head');
+    var css = '<style> .chPublic { background:url(' + $('#image_ch_public').text() + ') no-repeat; }\n.chUnPublic { background:url(' + $('#image_ch_unpublic').text() + ') no-repeat; } </style>';
+    $(css).appendTo('head');
     
     /*
     $('#stasticTabA').click(function() {
