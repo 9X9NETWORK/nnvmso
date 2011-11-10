@@ -86,7 +86,7 @@ public class CmsApiController {
 		logger.info("search: " + text);
 		if (text == null || text.length() == 0) {
 			logger.warning("no query string");
-			return new ArrayList();
+			return new ArrayList<MsoChannel>();
 		}
 		return MsoChannelManager.searchChannelEntries(text);
 	}
@@ -871,7 +871,7 @@ public class CmsApiController {
 		}
 		for (Category category : categories) {
 			if (category.getParentId() == parentIdValue) {
-				if ((locale.equals(Locale.TAIWAN) && category.getLang() != null && category.getLang().compareTo(Mso.LANG_ZH_TW) == 0) ||
+				if ((locale.equals(Locale.TAIWAN) && category.getLang() != null && category.getLang().compareTo(Mso.LANG_ZH) == 0) ||
 				    (!locale.equals(Locale.TAIWAN) && category.getLang() != null && category.getLang().compareTo(Mso.LANG_EN) == 0)) {
 					
 					results.add(category);
