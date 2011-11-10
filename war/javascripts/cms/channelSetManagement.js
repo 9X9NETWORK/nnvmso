@@ -21,45 +21,54 @@ var page$ = {
         for (var i in categories) {
           var category = categories[i];
           var node = {
-            'title':    category.name,
+            'title':    '&nbsp;' + category.name,
             'key':      category.key.id,
             'isFolder': true,
-            'isLazy':   true
+            'isLazy':   true,
+            'type':     'category'
           };
+          if (category.lang == 'en') {
+        	  node.icon = 'en.gif';
+          } else {
+        	  node.icon = 'ch.gif';
+          }
           nodes.push(node);
         }
         $('#treeview').dynatree({
           noLink: true,
           children: nodes,
-          onActivate: function(node) {
-          },
-          onDblClick: function(node, event) {
-          },
           onLazyRead: function(node) {
-            if (node.data.isFolder) {
-              cms.post('/CMSAPI/systemCategories', { 'parentId': node.data.key }, function(categories) {
-                for (var i in categories) {
-                  var category = categories[i];
+            if (node.data.isFolder && node.data.type == 'category') {
+              cms.post('/CMSAPI/listCategoryChannelSets', { 'categoryId': node.data.key }, function(channelSets) {
+                for (var i in channelSets) {
+                  var channelSet = channelSets[i];
+                  var channelSetId = channelSet.key.id;
                   var child = {
-                    'title':    category.name,
-                    'key':      category.key.id,
+                    'title': '&nbsp;' + cms.escapeHtml(channelSet.name),
+                    'key':   channelSetId,
                     'isFolder': true,
-                    'isLazy':   true
+                    'isLazy':   true,
+                    'type':     'set'
                   };
                   node.addChild(child);
                 }
-                cms.post('/CMSAPI/listCategoryChannels', { 'categoryId': node.data.key }, function(channels) {
-                  for (var i in channels) {
-                    var channel = channels[i];
-                    var channelId = channel.key.id;
-                    var child = {
-                      'title': cms.escapeHtml(channel.name) + ' <img alt="' + channelId + '" class="tiny-button plus-button" src="/images/cms/plus.png"> <img alt="' + channelId + '" class="tiny-button play-button" src="/images/cms/play.png">',
-                      'key':   channel.key.id
-                    };
-                    node.addChild(child);
-                  }
-                  node.setLazyNodeStatus(DTNodeStatus_Ok);
-                }, 'json');
+                node.setLazyNodeStatus(DTNodeStatus_Ok);
+              }, 'json');
+            } else if (node.data.isFolder && node.data.type == 'set') {
+              cms.post('/CMSAPI/defaultChannelSetChannels', { 'channelSetId': node.data.key }, function(channels) {
+                for (var i in channels) {
+                  var channel = channels[i];
+                  var channelId = channel.key.id;
+                  var child = {
+                    'title': cms.escapeHtml(channel.name) + ' <img alt="' + channelId + '" class="tiny-button plus-button" src="/images/cms/plus.png"> <img alt="' + channelId + '" class="tiny-button play-button" src="/images/cms/play.png">',
+                    'key':   channelId,
+                    'isFolder': false,
+                    'isLazy':   false,
+                    'type':     'channel'
+                  };
+                  node.addChild(child);
+                }
+                node.setLazyNodeStatus(DTNodeStatus_Ok);
               }, 'json');
             }
           }
@@ -146,18 +155,24 @@ var page$ = {
   objChannelSetInfo: {
     init: function() {
       cms.loadJSON('/CMSAPI/systemCategories', function(categories) {
-        $('#sys_directory').text('');
+        $('#sys_directory option[value!="0"]').remove();
         for (var i = 0; i < categories.length; i++) {
+          var icon = '/javascripts/plugins/dynatree/skin/ch.gif';
+          if (categories[i].lang == 'en') {
+            icon = '/javascripts/plugins/dynatree/skin/en.gif';
+          }
           $('<option/>')
             .attr('value', categories[i].key.id)
             .text(categories[i].name)
+            .attr('title', icon)
             .appendTo('#sys_directory');
+          cms.post('/CMSAPI/defaultChannelSetCategory', { 'msoId': $('#msoId').val() }, function(category) {
+            if (category != null) {
+            	$('#sys_directory').val(category.key.id);
+            }
+            $('#sys_directory').msDropDown();
+          }, 'json');
         }
-        cms.post('/CMSAPI/defaultChannelSetCategory', { 'msoId': $('#msoId').val() }, function(category) {
-          if (category != null) {
-             $('#sys_directory').val(category.key.id);
-          }
-        }, 'json');
       });
       cms.post('/CMSAPI/defaultChannelSetInfo', { 'msoId': $('#msoId').val() }, function(channelSet) {
         if (channelSet != null) {
@@ -168,7 +183,6 @@ var page$ = {
             $('.addthis_button_expanded').attr('addthis:url', url + '?_=' + new Date().getTime());
             cms.initAddthis();
             $('#plusone').attr('href', url);
-            //cms.initPlusone();
           }
           $('#cc_name').val(channelSet.name);
           $('#cc_tag').val(channelSet.tag);

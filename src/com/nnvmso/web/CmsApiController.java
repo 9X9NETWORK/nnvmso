@@ -10,7 +10,6 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -121,9 +120,15 @@ public class CmsApiController {
 	 * List all channel in mso default channel set
 	 */
 	@RequestMapping("defaultChannelSetChannels")
-	public @ResponseBody List<MsoChannel> defaultChannelSetChannels(@RequestParam Long msoId) {
+	public @ResponseBody List<MsoChannel> defaultChannelSetChannels(@RequestParam(required=false) Long msoId, @RequestParam(required=false) Long channelSetId) {
 		CmsApiService cmsService = new CmsApiService();
-		ChannelSet channelSet = cmsService.getDefaultChannelSet(msoId);
+		ChannelSetManager setMngr = new ChannelSetManager();
+		ChannelSet channelSet = null;
+		if (msoId != null) {
+			channelSet = cmsService.getDefaultChannelSet(msoId);
+		} else if (channelSetId != null) {
+			channelSet = setMngr.findById(channelSetId);
+		}
 		if (channelSet == null)
 			return new ArrayList<MsoChannel>();
 		List<MsoChannel> results = cmsService.findChannelsByChannelSetId(channelSet.getKey().getId());
@@ -795,7 +800,6 @@ public class CmsApiController {
 	public @ResponseBody Long createChannelSkeleton() {
 		
 		NnUserManager userMngr = new NnUserManager();
-		MsoManager msoMngr = new MsoManager();
 		MsoChannelManager channelMngr = new MsoChannelManager();
 		
 		MsoChannel channel = new MsoChannel("New Channel", "New Channel", "/WEB-INF/../images/processing.png", userMngr.findNNUser().getKey().getId());
@@ -859,9 +863,9 @@ public class CmsApiController {
 	 */
 	@RequestMapping("systemCategories")
 	public @ResponseBody List<Category> systemCategories(@RequestParam(required=false) Long parentId,
+	                                                      @RequestParam(required=false) String lang,
 	                                                     HttpServletRequest request,
 	                                                     HttpServletResponse response) {
-		Locale locale = request.getLocale();
 		response.addDateHeader("Expires", System.currentTimeMillis() + 3600000);
 		CategoryManager catMngr = new CategoryManager();
 		MsoManager msoMngr = new MsoManager();
@@ -876,13 +880,28 @@ public class CmsApiController {
 		}
 		for (Category category : categories) {
 			if (category.getParentId() == parentIdValue) {
-				if ((locale.equals(Locale.TAIWAN) && category.getLang() != null && category.getLang().compareTo(Mso.LANG_ZH) == 0) ||
-				    (!locale.equals(Locale.TAIWAN) && category.getLang() != null && category.getLang().compareTo(Mso.LANG_EN) == 0)) {
-					
+				if (lang == null)
+					results.add(category);
+				else if (lang != null && lang.equalsIgnoreCase(category.getLang())) {
 					results.add(category);
 				}
 			}
 		}
+		class CategoryComparator implements Comparator<Category> {
+			@Override
+			public int compare(Category category1, Category category2) {
+				int seq1 = category1.getSeq();
+				if (category1.getLang() != null && category1.getLang().equalsIgnoreCase("en")) {
+					seq1 -= 100;
+				}
+				int seq2 = category2.getSeq();
+				if (category2.getLang() != null && category2.getLang().equalsIgnoreCase("en")) {
+					seq2 -= 100;
+				}
+				return (seq1 - seq2);
+			}
+		}
+		Collections.sort(results, new CategoryComparator());
 		return results;
 	}
 	
