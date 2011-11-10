@@ -458,7 +458,7 @@ var language_tw =
   pva: '個人專屬影音集合',
   moresets: '更多頻道套餐',
   addset: '新增此頻套餐',
-  follow: '關注這些頻道',
+  follow: '訂閱此頻道網',
   followhint: '點擊即可收到該頻道最新劇集',
   curchan: '當前頻道',
   featchan: '精選頻道',
@@ -472,16 +472,21 @@ var language_tw =
   setnum: '套餐 %d',
   cannotshare: '此服務暫不提供',
   alreadysmart: 'You are already in the Smart Guide',
-  deleteset: 'Do you want to delete this set?',
+  deleteset: '您要刪除這個"頻道網"嗎? ',
   liveedit: 'Cannot edit a live set',
   followthis: 'Follow This Channel',
-  emptyset: 'There is no set here',
+  emptyset: '沒有任何"頻道網"。',
   fromown: '從個人專屬',
   from9x9: '從9x9',
   featuredsets: '特色頻道網',
   featuredchannels: '特色頻道',
   nochan: 'Channel does not exist',
-  organize: 'Organize your favorite %1 channels into a personalized program guide!'
+  organize: '請將您最喜愛的 %1 頻道放入個人節目表',
+  chnowplaying: '目前正播放頻道',
+  watch9x9: '您正在觀看 %1',
+  congrats: '訂閱成功',
+  setsuccess: '恭禧， 您已完成訂閱 <span id="success-data"></span> 頻道網於個人Smart Guide中，您也可以在此繼續訂閱喜歡的頻道。',
+  noplace3x3: '沒有足夠空間儲存這個頻道網，請保留9個頻道空間。'
   };
 
 var translations = language_en;
@@ -605,6 +610,10 @@ function set_language (lang)
   $("#fChannels span").html (translations ['featuredchannels']);
   $("#chDir span").html (translations ['chandir']);
   $("#chDir-input h2").html (translations ['chandir']);
+  $("#branding-holder .wording span").html (translations ['chnowplaying']);
+  $("#success-holder .greeting span").html (translations ['congrats']);
+  $("#success-holder p:nth-child(2)").html (translations ['setsuccess']);
+  $("#success-goto span").html (translations ['returnsmart']);
 
   $("#login h2").html (translations ['returningusers']);
   $("#signup h2").html (translations ['newusers']);
@@ -1094,7 +1103,7 @@ function after_fetch_channels_inner (ipg_flag)
     // xyz
     shared_but_is_now_logged_in = false; 
     af_thumbing = thumbing;
-    ask_question ("Congratuations! You have followed this channel successfully.", 
+    ask_question ("Congratulations! You have followed this channel successfully.", 
            "Watch now", "Smart Guide", "af_watch_now()", "switch_to_ipg()", 2);
     }
   else if (ipg_flag || custom_but_is_now_logged_in)
@@ -1417,7 +1426,7 @@ function custom_url (path)
       $("#set-title span").html (landing_pages [path]['name']);
       $("#branding-logo").attr ('src', landing_pages [path]['logo']);
       $("#logo-tzuchi").attr ('src', landing_pages [path]['logo']);
-      $(".announcing span").html ("Watch " + landing_pages [path]['shortname'] + " on");
+      $(".announcing span").html (translations ['watch9x9'].replace ('%1', landing_pages [path]['shortname']));
       $("#branding-msg span").html ('<b>' + landing_pages [path]['motto'] + '</b>');
       $("#date span").html ("Friday April 15, 2011");
       if (!channels_in_landing_loaded (zoom_page))
@@ -3902,7 +3911,7 @@ function follow_these (set_id)
 
   if (empties.length == 0)
     {
-    notice_ok (thumbing, "No place for a new 3x3!", "");
+    notice_ok (thumbing, translations ['noplace3x3'], "");
     return;
     }
 
@@ -3945,10 +3954,17 @@ function follow_these (set_id)
         }
       else
         {
+        // if (is_landing_page)
+        //   $("#success-data").html (n_channels + ' ' + landing_pages [zoom_page]['shortname']);
+        // else
+        //   $("#success-data").html (n_channels);
+        // Lawrence says to just leave the number off. Hopefully works in all cases
         if (is_landing_page)
-          $("#success-data").html (n_channels + ' ' + landing_pages [zoom_page]['shortname']);
+          $("#success-data").html (landing_pages [zoom_page]['shortname']);
+        else if (set_id in set_pool)
+          $("#success-data").html (set_pool [set_id]['name']);
         else
-          $("#success-data").html (n_channels);
+          $("#success-data").html ("");
         $("#success-goto").unbind();
         $("#success-goto").click (follow_these_ok);
         $("#success-layer").show();
