@@ -29,28 +29,33 @@
     <label class="lang" id="image_menu"><spring:message code="cms.image.menu"/></label>
     <div class="clear"></div>
     <div class="left_body">
+      <div class="left_title"><spring:message code="cms.statistics.title.channel_list"/></div>
       <div class="createChList2">
-        <div class="left_title"><spring:message code="cms.statistics.title.channel_set_list"/></div>
-        <ul class="chList" id="channel_set_list_ul">
-        </ul>
-        <div class="left_title"><spring:message code="cms.statistics.title.channel_list"/></div>
+        <div class="left_title" style="display:none"><spring:message code="cms.statistics.title.channel_set_list"/></div>
+        <ul class="chList" id="channel_set_list_ul" style="display:none"></ul>
         <ul class="chList" id="channel_list_ul">
           <li style="display:none">
             <div class="chUnFocus channel_info_block" id="channel_info_block">
               <div class="chUnFocusTitle channel_info_title"><div>Title Title Title</div></div>
               <div class="chUnFocusImg channel_info_image"></div>
               <div class="floatL chInfo">
-                <a href="#" target="_player" class="floatL channel_info_promoteurl">http://www.9x9.tv/channel/3958</a>
-                <a class="floatL icon addthis_button_expanded"></a>
+                <a style="display:none" href="#" target="_player" class="floatL channel_info_promoteurl">http://www.9x9.tv/channel/3958</a>
+                <a style="display:none" class="floatL icon addthis_button_expanded"></a>
                 <a href="javascript:" class="iconStatistics" title=""></a>
                 <div class="clear"></div>
                 <div class="floatL">
                   <p class="channel_info_contenttype"><spring:message code="cms.channel_management.label.channel_type"/> : <span>9x9</span></p>
-                  <p class="channel_info_programcount"><spring:message code="cms.channel_management.label.program_count"/> : <span>0</span></p>
+                  <p style="display:none" class="channel_info_programcount"><spring:message code="cms.channel_management.label.program_count"/> : <span>0</span></p>
                   <p class="channel_info_subscribers"><spring:message code="cms.channel_management.label.subscribers"/> : <span>0</span></p>
                   <p class="channel_info_updatedate"><spring:message code="cms.channel_management.label.update_time"/> : <span>2011/04/15 14:45</span></p>
+                  <select class="channel_info_statistics">
+                    <option value="visits_summary">Visits Summary</option>
+                    <option value="visitor_countries">Visitor Countries</option>
+                    <option value="pages">Pages</option>
+                    <option value="live">Live!</option>
+                  </select>
                 </div>
-                <ul class="floatL">
+                <ul style="display:none" class="floatL">
                   <li><a class="chUnPublic channel_info_publish"></a></li>
                 </ul>
               </div>
@@ -102,21 +107,23 @@
         </table>
       </div>
       <div class="ch_stastics" id="channel_statistics" style="display:none"><!--channel stastics-->
-        <div class="right_title"><div>Title Title Title</div></div>
-        <div class="stasticTab">
+        <div class="right_title" style="display:none"><div>Title Title Title</div></div>
+        <div class="stasticTab" style="display:none">
           <ul>
-            <li id="stasticTabA" class="tab_focus"><a href="javascript:""><spring:message code="cms.statistics.label.channel_statistics"/></a></li>
-            <li id="stasticTabB" class="tab_unfocus"><a href="javascript:"><spring:message code="cms.statistics.label.program_statistics"/></a></li>
+            <li id="stasticTabA" class="tab_focus"><a _href="javascript:"><spring:message code="cms.statistics.label.channel_statistics"/></a></li>
+            <li style="display:none" id="stasticTabB" class="tab_unfocus"><a href="javascript:"><spring:message code="cms.statistics.label.program_statistics"/></a></li>
             <div class="clear"></div>
           </ul>
         </div>
         <div class="ch_stastics" id="ch_stastics">
-          <div class="stastics_title">
-            <div><spring:message code="cms.statistics.msg.effective_watch"/></div>
+          <div class="stastics_title" style="display:none">
+            <div style="display:none"><spring:message code="cms.statistics.msg.effective_watch"/></div>
             <div class="datePick"><spring:message code="cms.statistics.label.please_select_time_range"/>&nbsp;<input type="text"/></div>
             <div class="clear"></div>
           </div>
-          <div class="stastics_chart">
+          <iframe class="stastics_iframe" scrolling="no" frameborder="0" marginheight="0" marginwidth="0" style="display:none"></iframe>
+          <div class="stastics_empty" style="display:none"><spring:message code="cms.statistics.label.no_report"/></div>
+          <div class="stastics_chart" style="display:none">
             <select name="">
               <option><spring:message code="cms.statistics.label.accumulated_watch_times"/></option>
               <option><spring:message code="cms.statistics.label.average_watch_times_each"/></option>
@@ -126,7 +133,7 @@
             </select>
             <img alt="" src="/images/cms/img_stastics.png"/>
           </div>
-          <table border="0" cellpadding="0" cellspacing="0" class="stastics_list">
+          <table border="0" cellpadding="0" cellspacing="0" class="stastics_list" style="display:none">
             <tr>
               <td>1,057,201</td>
               <td><a href="javascript:"><spring:message code="cms.statistics.label.accumulated_watch_times"/></a></td>

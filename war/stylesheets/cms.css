@@ -74,7 +74,6 @@ body{ background:url(/images/cms/bg.jpg) top left repeat-x #dfe2e4; padding:0; m
   display:block;
 }
 .menuE:hover, .menuE_active {
-/*
   background: url(/images/cms/menu.png) no-repeat -357px 0;
   width:      95px;
   height:     55px;
@@ -95,7 +94,7 @@ body{ background:url(/images/cms/bg.jpg) top left repeat-x #dfe2e4; padding:0; m
 .left_body{ height:556px; padding:0 7px 0 10px;}
 .left_footer{ background:url(/images/cms/left_content_footer.jpg) no-repeat; width:452px; height:19px;}
 .right_content{ background:url(/images/cms/right_content_header.jpg) no-repeat top center; padding-top:11px; width:538px;}
-.right_body{height:600px; background:url(/images/cms/right_content.jpg) repeat-y; padding:0 30px 0 18px;}
+.right_body{height:600px; background:url(/images/cms/right_content.jpg) repeat-y; padding:0 10px 0 10px;}
 .right_footer{ background:url(/images/cms/right_content_footer.jpg) no-repeat; height:19px; width:538px;}
 p.hint_title{ text-align:right; color:#2e2e2e; font-size:0.8em; padding-right:20px;}
 .left_title , .right_title{ color:#fff; font-size:1.2em;}
@@ -381,6 +380,7 @@ a.addNew{ padding:10px 0 0 0; display:block; font-size:0.9em;}
 .epItem a.btnDel , .epItemFocus a.btnDel{background:url(/images/cms/btnClose.png) no-repeat; width:24px; height:23px; display:block; position:relative; top:-28px; left:420px;}
 .chList li , .epList li{ padding-bottom:5px;}
 .chList { padding-top:5px; }
+.chList select { margin: 3px 0 0 5px; }
 
 .directory_ch { width:450px; }
 .directory_ch li { float:left; margin:5px 3px 3px 5px; padding:5px 0 0 5px; }
@@ -468,6 +468,8 @@ a.btnClose:hover { background:url(/images/cms/btnCloseHover.png) no-repeat; }
 }
 
 .stastics_title { border-bottom:1px dashed #ddd; padding:20px 0px 10px 0px; font-size:1em; color:#313131; }
+.stastics_empty { padding:20px 0px 10px 0px; font-size:1em; color:#313131; }
+.stastics_iframe { margin-top: 5px; width: 500px; height: 600px; }
 .datePick { padding:10px 0 5px 0; float:right; }
 .datePick input { margin-right: 5px; }
 .datePick a { padding:0 0 0 5px; }

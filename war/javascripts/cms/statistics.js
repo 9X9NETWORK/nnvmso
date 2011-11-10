@@ -14,17 +14,68 @@ var page$ = {
     destroy: function() {
       $('#channel_statistics').hide();
       $('#channel_set_statistics').hide();
+      $('.stastics_empty').hide();
+      $('.stastics_iframe').hide();
     },
-    initChannel: function(channelId, channelName) {
+    initChannel: function(channelId, channelName, statistics) {
       page$.statisticsReport.destroy();
       $('.right_title > div').text(channelName);
+      
+      var channel_url = piwik_get_site_url(channelId);
+      var params = {
+        method: 'SitesManager.getSitesIdFromSiteUrl',
+        url:    channel_url
+      };
+      piwik_call_api(params, function(sites) {
+        if (sites.length == 0) {
+          $('.stastics_empty').show();
+        } else {
+          var site = sites[0].idsite;
+          log('site: ' + site);
+          var params = {
+            module:      'Widgetize',
+            action:      'iframe',
+            idSite:      site,
+            period:      'day',
+            date:        'today',
+            disableLink: 1
+          };
+          switch (statistics) {
+          case 'visits_summary':
+            params.moduleToWidgetize = 'VisitsSummary';
+            params.actionToWidgetize = 'index';
+            break;
+          case 'visitor_countries':
+            params.moduleToWidgetize = 'UserCountryMap';
+            params.actionToWidgetize = 'worldMap';
+            break;
+          case 'pages':
+            params.moduleToWidgetize = 'Actions';
+            params.actionToWidgetize = 'getPageTitles';
+            break;
+          case 'live':
+            params.moduleToWidgetize = 'Live';
+            params.actionToWidgetize = 'widget';
+            break;
+          default:
+            log('unknown statistics!');
+            return;
+          }
+          var widget_url = piwik_get_widget_url(params);
+          log('widget url: ' + widget_url);
+          $('.stastics_iframe').attr('src', widget_url).show();
+        }
+      });
+      
+      /*
       $.get('/CMSAPI/channelStatisticsInfo?channelId=' + channelId, function(report)
       {
         $('#ch_subscription_count').text(report.subscriptionCount);
       });
-      $('#stasticTabA').click();
+      */
+      //$('#stasticTabA').click();
       $('#channel_statistics').show();
-      page$.statisticsReport.initProgram(channelId);
+      //page$.statisticsReport.initProgram(channelId);
     },
     initProgram: function(channelId) {
       $('#ep_selector').html('');
@@ -92,9 +143,8 @@ var page$ = {
           channelInfoBlock.find('.channel_info_subscribers span').text(channels[i].subscriptionCount);
           channelInfoBlock.find('.channel_info_updatedate span').text(cms.formatDate(channels[i].updateDate));
           // add this
-          var promoteUrl = 'http://' + location.host + '/channel/' + channelId;
+          var promoteUrl = 'http://' + location.host + '/view?channel=' + channelId;
           channelInfoBlock.find('.addthis_button_expanded').attr('addthis:url', promoteUrl);
-          cms.initAddthis();
           var switchObject = channelInfoBlock.find('.channel_info_publish');
           if (channels[i]['public']) {
             switchObject.removeClass('chUnPublic').addClass('chPublic');
@@ -113,12 +163,15 @@ var page$ = {
             $('.channel_info_image', this).removeClass('chUnFocusImg').addClass('chFocusImg');
             
             // load autosharing info
-            page$.statisticsReport.initChannel(event.data.channelId, event.data.channelName);
+            var statistics = $('.channel_info_statistics', this).val();
+            page$.statisticsReport.initChannel(event.data.channelId, event.data.channelName, statistics);
           });
         }
+        cms.initAddthis();
         //$('#channel_list').show();
       });
       // load channel sets
+      /*
       $.getJSON('/CMSAPI/listOwnedChannelSets?msoId=' + $('#msoId').val(), function(channelSets) {
         for (i in channelSets) {
           var channelSetInfoBlock = $('#channel_info_block').clone(true).removeAttr('id').addClass('channel_info_block_cloned');
@@ -158,28 +211,32 @@ var page$ = {
         }
         $('#channel_set_list_ul').append('<div class="clear"/>');
       });
+      */
     }
   },
   init: function() {
     var css = '.chPublic { background:url(' + $('#image_ch_public').text() + ') no-repeat; }\n.chUnPublic { background:url(' + $('#image_ch_unpublic').text() + ') no-repeat; }';
     $('<style/>').text(css).appendTo('head');
     
-    $('#stasticTabA').click(function()
-    {
+    /*
+    $('#stasticTabA').click(function() {
       $('#ch_stastics').show();
       $('#ep_stastics').hide();
       $('#stasticTabA').addClass('tab_focus').removeClass('tab_unfocus');
       $('#stasticTabB').addClass('tab_unfocus').removeClass('tab_focus');
     });
-    $('#stasticTabB').click(function()
-    {
+    $('#stasticTabB').click(function() {
       $('#ch_stastics').hide();
       $('#ep_stastics').show();
       $('#stasticTabB').addClass('tab_focus').removeClass('tab_unfocus');
       $('#stasticTabA').addClass('tab_unfocus').removeClass('tab_focus');
     });
+    */
+    
+    cms.loadScript('/javascripts/piwik-analytics.js');
+    
     page$.channelAndChannelSetList.init();
-    $('.datePick input').datepicker(page$.datepicker_properties);
+    //$('.datePick input').datepicker(page$.datepicker_properties);
   }
 };
 
