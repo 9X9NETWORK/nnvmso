@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9miniV5"/>
+<c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9miniV7"/>
 
 <link rel="stylesheet" href="${root}/stylesheets/main.css" />
 
@@ -20,7 +20,7 @@
 <script type="text/javascript" charset="utf-8" src="${root}/javascripts/jquery.swfobject.1-1-1.min.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/scripts/flowplayer-3.2.4.min.js"></script>
 
-<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/mini4.js"></script>
+<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/mini5.js"></script>
 
 </head>
 <body>
@@ -28,12 +28,6 @@
 <div id="bg-layer"></div>
 
 <div id="video" style="position: absolute; z-Index: 2; height: 100%; width: 100%; background-color: black">
-</div>
-
-<div id="sync-layer">
-  <div id="sync-holder">
-    <p>Ready to Sync</p>
-  </div>
 </div>
 
 <div id="sync-layer">
@@ -86,6 +80,20 @@
         <p id="ch-set"><span>Channel set: <br>Da Ai March Golden Selection Set</span></p>
       </div>
   </div>
+</div>
+
+<div id="volume-layer" style="display: none">
+  <p id="volume-up"><img src="${root}/images/btn_volume_up.png" title="Volume Up"></p>
+  <ul id="volume-bars">
+    <li></li>
+    <li></li>
+    <li></li>
+    <li class="on"></li>
+    <li class="on"></li>
+    <li class="on"></li>
+    <li class="on"></li>
+  </ul>
+  <p id="volume-down"><img src="${root}/images/btn_volume_down.png" title="Volume Down"></p>
 </div>
 
 <div id="player-layer">
