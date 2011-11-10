@@ -342,13 +342,18 @@ public class CmsApiController {
 	 * List all channel sets owned by mso
 	 */
 	@RequestMapping("listOwnedChannelSets")
-	public @ResponseBody List<ChannelSet> listOwnedChannelSets(@RequestParam Long msoId) {
+	public @ResponseBody List<ChannelSet> listOwnedChannelSets(@RequestParam(required=false) Long msoId) {
 		
 		ContentOwnershipManager ownershipMngr = new ContentOwnershipManager();
 		List<ChannelSet> results = new ArrayList<ChannelSet>();
 		
+		if (msoId == null) {
+			MsoManager msoMngr = new MsoManager();
+			Mso nn = msoMngr.findNNMso();
+			logger.info("system channel sets");
+			msoId = nn.getKey().getId();
+		}
 		logger.info("msoId = " + msoId);
-		
 		results = ownershipMngr.findOwnedChannelSetsByMsoId(msoId);
 		for (ChannelSet channelSet : results) {
 			AreaOwnershipManager areaMngr = new AreaOwnershipManager();
@@ -474,7 +479,7 @@ public class CmsApiController {
 	                                            @RequestParam String intro,
 	                                            @RequestParam String tag,
 	                                            @RequestParam String langCode,
-	                                            @RequestParam Long categoryId,
+	                                            @RequestParam Long channelSetId,
 	                                            @RequestParam Long msoId) throws NoSuchAlgorithmException {
 		
 		logger.info("sourceUrl = " + sourceUrl);
@@ -483,16 +488,16 @@ public class CmsApiController {
 		logger.info("intro = " + intro);
 		logger.info("tag = " + tag);
 		logger.info("langCode = " + langCode);
-		logger.info("categoryId = " + categoryId);
+		logger.info("categoryId = " + channelSetId);
 		logger.info("msoId = " + msoId);
 		
 		CmsApiService cmsApiService = new CmsApiService();
 		MsoChannelManager channelMngr = new MsoChannelManager();
 		MsoChannel channel = channelMngr.findBySourceUrlSearch(sourceUrl);
-		CategoryChannelManager ccMngr = new CategoryChannelManager();
 		ContentOwnershipManager ownershipMngr = new ContentOwnershipManager();
 		MsoManager msoMngr = new MsoManager();
 		Mso mso = msoMngr.findById(msoId);
+		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
 		
 		if (channel == null)
 			return "Invalid Source Url";
@@ -520,28 +525,23 @@ public class CmsApiController {
 		// channel.setStatus(MsoChannel.STATUS_SUCCESS); // default import status
 		channelMngr.save(channel);
 		
-		List<CategoryChannel> ccs = cmsApiService.whichCCContainingTheChannel(channel.getKey().getId());
-		List<CategoryChannel> removable = new ArrayList<CategoryChannel>();
-		
-		// NOTE: channel can only in one system category
-		for (CategoryChannel cc : ccs) {
-			if (cc.getCategoryId() != categoryId) {
-				removable.add(cc);
+		// NOTE: channel can only in one system Channel Set
+		List<ChannelSetChannel> removable = new ArrayList<ChannelSetChannel>();
+		List<ChannelSetChannel> sysCSCs = cmsApiService.whichSystemCSCContainingThisChannel(channel.getKey().getId());
+		for (ChannelSetChannel csc : sysCSCs) {
+			if (csc.getChannelSetId() != channelSetId) {
+				removable.add(csc);
 			}
 		}
-		for (CategoryChannel cc : removable) {
-			ccs.remove(cc);
-			ccMngr.delete(cc);
+		for (ChannelSetChannel csc : removable) {
+			sysCSCs.remove(csc);
+			cscMngr.delete(csc);
 		}
-		
-		logger.info("ccs size = " + ccs.size());
-		
-		if (ccs.isEmpty()) {
-			// create a new CategoryChannelSet
-			CategoryChannel cc = new CategoryChannel(categoryId, channel.getKey().getId());
-			ccMngr.create(cc);
-			// TODO: dealing with channelCount
-			logger.info("create new CategoryChannel channelId = " + channel.getKey().getId() + ", categoryId = " + categoryId);
+		logger.info("sysCSCs size = " + sysCSCs.size());
+		if (sysCSCs.isEmpty()) {
+			// create a new ChannelSetChannel
+			cscMngr.appendChannel(channelSetId, channel);
+			logger.info("create new ChannelSetChannel channelId = " + channel.getKey().getId() + ", channelSetId = " + channelSetId);
 		}
 		
 		// create ownership
@@ -683,7 +683,7 @@ public class CmsApiController {
 	                                        @RequestParam(required = false) String intro,
 	                                        @RequestParam(required = false) String tag,
 	                                        @RequestParam(required = false) String langCode,
-	                                        @RequestParam Long categoryId) throws NoSuchAlgorithmException {
+	                                        @RequestParam Long channelSetId) throws NoSuchAlgorithmException {
 		
 		logger.info("channelId = " + channelId);
 		logger.info("imageUrl = " + imageUrl);
@@ -691,13 +691,13 @@ public class CmsApiController {
 		logger.info("intro = " + intro);
 		logger.info("tag = " + tag);
 		logger.info("langCode = " + langCode);
-		logger.info("categoryId = " + categoryId);
+		logger.info("categoryId = " + channelSetId);
 		logger.info("msoId = " + msoId);
 		
 		CmsApiService cmsApiService = new CmsApiService();
 		MsoChannelManager channelMngr = new MsoChannelManager();
 		MsoChannel channel = channelMngr.findById(channelId);
-		CategoryChannelManager ccMngr = new CategoryChannelManager();
+		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
 		
 		if (channel == null)
 			return "Invalid ChannelId";
@@ -728,28 +728,23 @@ public class CmsApiController {
 		channel.setUpdateDate(new Date());
 		channelMngr.save(channel);
 		
-		List<CategoryChannel> ccs = cmsApiService.whichCCContainingTheChannel(channelId);
-		List<CategoryChannel> removable = new ArrayList<CategoryChannel>();
-		
-		// NOTE: channel can only in one system category
-		for (CategoryChannel cc : ccs) {
-			if (cc.getCategoryId() != categoryId) {
-				removable.add(cc);
+		// NOTE: channel can only in one system Channel Set
+		List<ChannelSetChannel> removable = new ArrayList<ChannelSetChannel>();
+		List<ChannelSetChannel> sysCSCs = cmsApiService.whichSystemCSCContainingThisChannel(channel.getKey().getId());
+		for (ChannelSetChannel csc : sysCSCs) {
+			if (csc.getChannelSetId() != channelSetId) {
+				removable.add(csc);
 			}
 		}
-		for (CategoryChannel cc : removable) {
-			ccs.remove(cc);
-			ccMngr.delete(cc);
+		for (ChannelSetChannel csc : removable) {
+			sysCSCs.remove(csc);
+			cscMngr.delete(csc);
 		}
-		
-		logger.info("ccs size = " + ccs.size());
-		
-		if (ccs.isEmpty()) {
-			// create a new CategoryChannelSet
-			CategoryChannel cc = new CategoryChannel(categoryId, channelId);
-			ccMngr.create(cc);
-			// TODO: dealing with channelCount
-			logger.info("create new CategoryChannel channelId = " + channelId + ", categoryId = " + categoryId);
+		logger.info("sysCSCs size = " + sysCSCs.size());
+		if (sysCSCs.isEmpty()) {
+			// create a new ChannelSetChannel
+			cscMngr.appendChannel(channelSetId, channel);
+			logger.info("create new ChannelSetChannel channelId = " + channel.getKey().getId() + ", channelSetId = " + channelSetId);
 		}
 		
 		//channel1 ownership
@@ -769,6 +764,18 @@ public class CmsApiController {
 		// piwik
 		PiwikLib.createPiwikSite(0, channelId, req);
 		return "OK";
+	}
+	
+	@RequestMapping("channelSystemChannelSet")
+	public @ResponseBody ChannelSet channelSystemChannelSet(@RequestParam Long channelId) {
+		CmsApiService cmsService = new CmsApiService();
+		if (channelId == null)
+			return null;
+		List<ChannelSet> channelSetList = cmsService.whichSystemChannelSetsContainingThisChannel(channelId);
+		if (channelSetList.size() > 0)
+			return channelSetList.get(0);
+		else
+			return null;
 	}
 	
 	@RequestMapping("channelCategory")

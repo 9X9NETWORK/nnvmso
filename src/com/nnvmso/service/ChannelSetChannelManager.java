@@ -81,5 +81,20 @@ public class ChannelSetChannelManager {
 			this.delete(csc);
 	}
 	
+	public List<ChannelSetChannel> findAllByChannelId(long channelId) {
+		return cscDao.findAllByChannelId(channelId);
+	}
 	
+	public void appendChannel(long channelSetId, MsoChannel channel) {
+		ChannelSetChannel csc = cscDao.findBySetAndChannel(channelSetId, channel.getKey().getId());
+		if (csc != null)
+			return;
+		for (int i = 1; i < 1000; i++) {
+			if (cscDao.findByChannelSetIdAndSeq(channelSetId, i) == null) {
+				csc = new ChannelSetChannel(channelSetId, channel.getKey().getId(), i);
+				this.create(csc);
+				break;
+			}
+		}
+	}
 }

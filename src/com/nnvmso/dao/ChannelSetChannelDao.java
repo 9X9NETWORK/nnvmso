@@ -73,4 +73,22 @@ public class ChannelSetChannelDao extends GenericDao<ChannelSetChannel> {
 		}
 		return result;
 	}
+	
+	public List<ChannelSetChannel> findAllByChannelId(long channelId) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		List<ChannelSetChannel> detached = new ArrayList<ChannelSetChannel>();
+		
+		try {
+			Query query = pm.newQuery(ChannelSetChannel.class);
+			query.setFilter("channelId == channelIdParam");
+			query.declareParameters("long channelIdParam");
+			@SuppressWarnings("unchecked")
+			List<ChannelSetChannel> list = (List<ChannelSetChannel>)query.execute(channelId);
+			detached = (List<ChannelSetChannel>)pm.detachCopyAll(list);
+		} catch (JDOObjectNotFoundException e) {
+		} finally {
+			pm.close();
+		}
+		return detached;
+	}
 }

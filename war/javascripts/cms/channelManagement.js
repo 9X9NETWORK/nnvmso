@@ -534,10 +534,9 @@ var page$ = {
     initYouTube: function(username, channelName, callback, isPlaylist, channelId) {
       if (page$.overallLayout.destroyRightSideContent(false) == false) return false;
       
+      var requestUrl = 'http://gdata.youtube.com/feeds/api/users/' + username + '/uploads?callback=?';
       if (isPlaylist)
-        var requestUrl = 'http://gdata.youtube.com/feeds/api/playlists/' + username + '?callback=?';
-      else
-        var requestUrl = 'http://gdata.youtube.com/feeds/api/users/' + username + '/uploads?callback=?';
+        requestUrl = 'http://gdata.youtube.com/feeds/api/playlists/' + username + '?callback=?';
       var parameters = {
         'orderby':     'published',
         'start-index': 1,
@@ -744,14 +743,19 @@ var page$ = {
     displayImportDetail: function() {
       if (page$.overallLayout.destroyRightSideContent(false) == false) return false;
       
-      cms.loadJSON('/CMSAPI/systemCategories', function(categories) {
+      cms.loadJSON('/CMSAPI/listOwnedChannelSets', function(channelSets) {
         $('#channel_import_detail .sys_directory').html('<option value="0">' + $('#lang_select_category').text() + '</option>');
-        for (i in categories) {
-          $('<option></option>')
-              .attr('value', categories[i].key.id)
-              .text(categories[i].name)
-              .appendTo('#channel_import_detail .sys_directory');
+        for (i in channelSets) {
+          $('<option/>')
+            .attr('value', channelSets[i].key.id)
+            .text(channelSets[i].name)
+            .appendTo('#channel_import_detail .sys_directory');
         }
+        cms.post('/CMSAPI/channelSystemChannelSet', { 'channelId': channelId }, function(channelSet) {
+          if (channelSet != null) {
+            $('#channel_import_detail [name="ch_category"]').val(channelSet.key.id);
+          }
+        }, 'json');
       });
       
       $('#channel_import_detail [name="ch_import_button"]').unbind().click(function() {
@@ -875,11 +879,6 @@ var page$ = {
               */
             }
           }
-          cms.post('/CMSAPI/channelCategory', { 'channelId': channelId }, function(category) {
-            if (category != null) {
-              $('#channel_import_detail [name="ch_category"]').val(category.key.id);
-            }
-          }, 'json');
           $('#channel_import_detail [name="ch_savebutton"]').removeClass('btnDisable').addClass('btnCreate');
           $('#channel_import_detail [name="ch_savebutton"]').unbind().click(function() {
             var name = $('#channel_import_detail [name="ch_name"]').val();
@@ -901,10 +900,9 @@ var page$ = {
             var parameters = {
               'name':       name,
               'intro':      intro,
-              //'imageUrl':   imageUrl,
-              'categoryId': category,
+              'channelSetId': category, // set set set
               'tag':        tag,
-              'langCode':    langCode,
+              'langCode':   langCode,
               'msoId':      $('#msoId').val(),
               'sourceUrl':  sourceUrl
             };
@@ -998,23 +996,22 @@ var page$ = {
         page$.channelDetail.swfObject = new SWFUpload(swfupload_settings);
         $('#channel_detail').show();
       }, 'json');
-      cms.loadJSON('/CMSAPI/systemCategories', function(categories) {
+      cms.loadJSON('/CMSAPI/listOwnedChannelSets', function(channelSets) { // set set set
         var select_category = $('#lang_select_category').text();
         $('#channel_detail .sys_directory').html('<option value="0">' + select_category + '</option>');
-        for (i in categories) {
-          $('<option></option>')
-              .attr('value', categories[i].key.id)
-              .text(categories[i].name)
-              .appendTo('#channel_detail .sys_directory');
+        for (i in channelSets) {
+          $('<option/>')
+            .attr('value', channelSets[i].key.id)
+            .text(channelSets[i].name)
+            .appendTo('#channel_detail .sys_directory');
         }
-        cms.post('/CMSAPI/channelCategory', { 'channelId': channelId }, function(category) {
-          if (category != null) {
-            $('#channel_detail .sys_directory').val(category.key.id);
+        cms.post('/CMSAPI/channelSystemChannelSet', { 'channelId': channelId }, function(channelSet) {
+          if (channelSet != null) {
+            $('#channel_detail .sys_directory').val(channelSet.key.id);
           }
         }, 'json');
       });
       $('#channel_detail_cancel').unbind().click(function() {
-        //page$.channelDetail.init(channelId, isNew);
         if (page$.overallLayout.destroyRightSideContent(false) == false) return false;
         page$.channelList.init();
       });
@@ -1029,12 +1026,11 @@ var page$ = {
         }
         var parameters = {
           'channelId':  $('#ch_id').val(),
-          //'imageUrl':   $('#ch_image').attr('src'),
           'name':       $('#ch_name').val(),
           'intro':      $('#ch_intro').val(),
           'tag':        $('#ch_tag').val(),
           'langCode':   $('#ch_language').val(),
-          'categoryId': $('#ch_category').val()
+          'channelSetId': $('#ch_category').val() // set set set
         };
         if (isNew) {
           parameters.msoId = $('#msoId').val();
@@ -1045,7 +1041,7 @@ var page$ = {
         cms.post('/CMSAPI/saveChannel', parameters, function(response) {
           if (response != 'OK') {
             alert($('#lang_warning_error_occurs').text());
-          }else {
+          } else {
             alert($('#lang_update_successfully').text());
             page$.channelList.init();
           }

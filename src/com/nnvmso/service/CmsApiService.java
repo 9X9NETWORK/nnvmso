@@ -10,6 +10,7 @@ import com.nnvmso.model.Category;
 import com.nnvmso.model.CategoryChannel;
 import com.nnvmso.model.CategoryChannelSet;
 import com.nnvmso.model.ChannelSet;
+import com.nnvmso.model.ChannelSetChannel;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
 
@@ -82,5 +83,37 @@ public class CmsApiService {
 		}
 		
 		return ccMngr.findByChannelIdAndCategoryIds(channelId, categoryIds);
+	}
+	
+	public List<ChannelSet> whichSystemChannelSetsContainingThisChannel(
+			Long channelId) {
+		ChannelSetManager setMngr = new ChannelSetManager();
+		List<ChannelSetChannel> cscs = this.whichSystemCSCContainingThisChannel(channelId);
+		List<Long> channelSetIds = new ArrayList<Long>();
+		for (ChannelSetChannel csc : cscs) {
+			channelSetIds.add(csc.getChannelSetId());
+		}
+		return setMngr.findAllByChannelSetIds(channelSetIds);
+	}
+	
+	public List<ChannelSetChannel> whichSystemCSCContainingThisChannel(long channelId) {
+		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
+		MsoManager msoMngr = new MsoManager();
+		ContentOwnershipManager ownershipMngr = new ContentOwnershipManager();
+		List<ChannelSetChannel> results = new ArrayList<ChannelSetChannel>();
+		
+		List<ChannelSetChannel> cscs = cscMngr.findAllByChannelId(channelId);
+		List<ChannelSet> systemChannelSets = ownershipMngr.findOwnedChannelSetsByMsoId(msoMngr.findNNMso().getKey().getId());
+		List<Long> systemChannelSetIds = new ArrayList<Long>();
+		for (ChannelSet set : systemChannelSets) {
+			systemChannelSetIds.add(set.getKey().getId());
+		}
+		for (ChannelSetChannel csc : cscs) {
+			if (systemChannelSetIds.contains(csc.getChannelSetId())) {
+				results.add(csc);
+			}
+		}
+		
+		return results;
 	}
 }
