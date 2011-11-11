@@ -356,8 +356,13 @@ public class CmsApiController {
 		logger.info("msoId = " + msoId);
 		results = ownershipMngr.findOwnedChannelSetsByMsoId(msoId);
 		for (ChannelSet channelSet : results) {
+			CmsApiService cmsService = new CmsApiService();
 			AreaOwnershipManager areaMngr = new AreaOwnershipManager();
 			channelSet.setSubscriptionCount(areaMngr.findTotalCountBySetId(channelSet.getKey().getId()));
+			List<Category> sysCategories = cmsService.whichSystemCategoriesContainingTheChannelSet(channelSet.getKey().getId());
+			if (sysCategories.size() > 0) {
+				channelSet.setLang(sysCategories.get(0).getLang());
+			}
 		}
 		return results;
 	}

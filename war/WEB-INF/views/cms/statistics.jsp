@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.15/themes/start/jquery-ui.css" />
@@ -111,7 +110,7 @@
         <div class="right_title" style="display:none"><div>Title Title Title</div></div>
         <div class="stasticTab" style="display:none">
           <ul>
-            <li id="stasticTabA" class="tab_focus"><a _href="javascript:"><spring:message code="cms.statistics.label.channel_statistics"/></a></li>
+            <li id="stasticTabA" class="tab_focus"><a href="javascript:"><spring:message code="cms.statistics.label.channel_statistics"/></a></li>
             <li style="display:none" id="stasticTabB" class="tab_unfocus"><a href="javascript:"><spring:message code="cms.statistics.label.program_statistics"/></a></li>
             <div class="clear"></div>
           </ul>
@@ -191,9 +190,9 @@
     </div>
     <div class="right_footer"></div>
   </div>
+  <%@include file="footer.jsp"%>
   <div class="clear"></div>
 </div>
-<%@include file="footer.jsp"%>
 <label class="lang" id="lang_view_statistics"><spring:message code="cms.statistics.msg.view_statistics"/></label>
 <label class="lang" id="lang_label_channel_set"><spring:message code="cms.statistics.label.channel_set"/></label>
 <label class="lang" id="lang_title_set_statistics"><spring:message code="cms.statistics.title.channel_set_statistics"/></label>

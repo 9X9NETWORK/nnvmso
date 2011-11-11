@@ -55,7 +55,7 @@
     <div class="clear"></div>
   </div>
 </div>
-<div style="clear:both"/>
+<div style="clear:both"></div>
 <%@include file="footer.jsp"%>
 <!-- language tags for javascript -->
 <label class="lang" id="lang_label_program_count"><spring:message code="cms.directory_management.label.program_count"/></label>
