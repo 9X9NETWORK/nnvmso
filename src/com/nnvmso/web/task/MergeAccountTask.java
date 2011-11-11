@@ -35,6 +35,8 @@ public class MergeAccountTask {
 	
 	protected static final Logger log = Logger.getLogger(MergeAccountTask.class.getName());
 	
+	
+	
 	//entry
 	@RequestMapping("markSub")
 	public ResponseEntity<String> markSub(@RequestParam("start")int start) 
@@ -63,13 +65,17 @@ public class MergeAccountTask {
 		int end = start + 200;
 		if (end > users.size()) 
 			end = users.size();
-		for (int i=start; i<end; i++) {	
-			List<Subscription> list = new ArrayList<Subscription>();
-			list = subMngr.findAllByUser(users.get(i).getKey().getId());
-			for (Subscription s : list) {
-				s.setType((short)10);
+		try {
+			for (int i=start; i<end; i++) {	
+				List<Subscription> list = new ArrayList<Subscription>();
+				list = subMngr.findAllByUser(users.get(i).getKey().getId());
+				for (Subscription s : list) {
+					s.setType((short)10);
+				}
+				subMngr.saveAll(list);
 			}
-			subMngr.saveAll(list);
+		} catch (Exception e) {
+			return NnNetUtil.textReturn("exception happens");
 		}
 		this.sendEmail("runMarkSub", "done");
 		return NnNetUtil.textReturn(output);
@@ -90,6 +96,18 @@ public class MergeAccountTask {
 		return NnNetUtil.textReturn("OK");
 	}
 
+	//entry
+	@RequestMapping("userList")
+	public ResponseEntity<String> userList(
+			@RequestParam("page")int page,
+			@RequestParam("limit")int limit
+			) { 			
+		NnUserManager userMngr = new NnUserManager();				
+		List<NnUser> users = userMngr.list(page, limit, null, null);		
+		String output = "user total:" + users.size();		
+		return NnNetUtil.textReturn(output);
+	}
+	
 	@RequestMapping(value="runRemoveSub")
 	public ResponseEntity<String> runRemoveSub(
 			@RequestParam("start")int start,
