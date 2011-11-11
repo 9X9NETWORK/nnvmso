@@ -329,11 +329,13 @@ public class PlayerApiService {
 		return output;
 	}	
 		
-	public String pdrReport(String userToken, String deviceToken, String session, String comment) {
+	public String userReport(String userToken, String deviceToken, String session, String comment) {
 		if (session == null)
 			return this.assembleMsgs(NnStatusCode.INPUT_MISSING, null);
 		if (userToken == null && deviceToken == null)
 			return this.assembleMsgs(NnStatusCode.INPUT_MISSING, null);
+		if (comment.length() > 500)
+			return this.assembleMsgs(NnStatusCode.INPUT_BAD, null);
 		
 		NnUser user = null;
 		if (userToken != null) { 

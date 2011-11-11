@@ -69,33 +69,13 @@ public class AdminMsoChannelController {
 	public ResponseEntity<String> tmpList(
 				HttpServletRequest req) {
 		String[] urls = {
-				"http://www.youtube.com/user/TEDtalksDirector",
-				"http://www.youtube.com/user/AtGoogleTalks",
-				"http://www.youtube.com/user/ReutersVideo",
-				"http://www.youtube.com/user/AssociatedPress",
-				"http://www.youtube.com/user/JimmyKimmelLive",
-				"http://www.youtube.com/user/journeymanpictures",
-				"http://www.youtube.com/user/NASAtelevision",
-				"http://www.youtube.com/user/NewYorkerDotCom",
-				"http://www.youtube.com/user/ComputerHistory",
-				"http://www.youtube.com/user/animalplanetTV",                                              
-				"http://www.youtube.com/user/NBA",
-				"http://www.youtube.com/user/bigthink",
-				"http://www.youtube.com/user/ResearchChannel",
-				"http://www.youtube.com/user/boyceavenue",
-				"http://www.youtube.com/user/growingyourgreens",
-				"http://www.youtube.com/user/ThirteenWNET",
-				"http://www.youtube.com/user/Autoexpress",
-				"http://www.youtube.com/user/PulitzerCenter",
-				"http://www.youtube.com/user/richarddawkinsdotnet",
-				"http://www.youtube.com/user/FunnyorDie",
-				"http://www.youtube.com/reelzchannel",
-				"http://www.youtube.com/user/realannoyingorange",
-				"http://www.youtube.com/user/FoodNetworkTV",
-				"http://www.youtube.com/user/japanesepod101",
-				"http://www.youtube.com/user/NationalGeographic",
-				"http://www.youtube.com/user/CorridorDigital",
-				"http://www.youtube.com/user/trendhuntertv"				
+				"http://www.youtube.com/user/Yamashita916",
+				"http://www.youtube.com/user/DianaAmazing",
+				"http://www.youtube.com/user/tbwtv",
+				"http://www.youtube.com/user/TVHS109",
+				"http://www.youtube.com/user/ntdchinese",
+				"http://www.youtube.com/user/ChinaTimes",
+				"http://www.youtube.com/user/TheChineseNews",				
 		};
 		List<MsoChannel> channels = new ArrayList<MsoChannel>();
 		for (String url : urls) {
@@ -110,12 +90,41 @@ public class AdminMsoChannelController {
 		return NnNetUtil.textReturn(output);
 	}	
 	
+	@RequestMapping("createBatch")
+	public @ResponseBody String createBatch(
+				HttpServletRequest req,
+				@RequestParam(value="devel",required=false) boolean devel) {
+		String lang = "Zh";
+		String[] urls = {
+				"http://www.youtube.com/user/Yamashita916",
+				"http://www.youtube.com/user/DianaAmazing",
+				"http://www.youtube.com/user/tbwtv",
+				"http://www.youtube.com/user/TVHS109",
+				"http://www.youtube.com/user/ntdchinese",
+				"http://www.youtube.com/user/ChinaTimes",
+				"http://www.youtube.com/user/TheChineseNews",				
+		};
+		String[] names= {
+				"老中地方新聞",
+				"丁丁電視",
+				"世界電視",
+				"TVHS",
+				"大唐人電視",
+				"中時電子報",
+				"CCTV News",				
+		};
+		for (int i=0; i<urls.length; i++) {
+			channelMngr.create(urls[i], names[i], devel, req);
+		}
+		return "OK";
+	}		
+	
 	@RequestMapping("create")
 	public @ResponseBody String create(
 				HttpServletRequest req,
 			    @RequestParam(value="url")String url,
 				@RequestParam(value="name") String name,
-				@RequestParam(value="devel",required=false) boolean devel) {				 			
+				@RequestParam(value="devel",required=false) boolean devel) {
 		channelMngr.create(url, name, devel, req);
 		return "OK";
 	}	
@@ -141,7 +150,7 @@ public class AdminMsoChannelController {
 		
 		List<MsoChannel> bad = new ArrayList<MsoChannel>();		
 		if (status == null) {
-			channels = channelMngr.findNonPodcasts();
+			channels = channelMngr.findAll();
 			for (MsoChannel c : channels) {
 				if (c.getName() == null || c.getStatus() != MsoChannel.STATUS_SUCCESS || 
 					c.isPublic() != true || c.getProgramCount() < 1 ) {

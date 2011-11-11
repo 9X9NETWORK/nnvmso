@@ -479,6 +479,29 @@ public class InitService {
 		//return ;		
 	}
 
+	public void initYoutubeOriName(boolean english, boolean devel) {
+		String[] entries = this.getChannelUrlsFromExcel(english);
+		TranscodingService tranService = new TranscodingService();
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		for (String entry : entries) {
+			String[] data = entry.split(",");
+			String url = data[0];
+			MsoChannel c = channelMngr.findBySourceUrlSearch(url);
+			if (c == null) {
+				log.info("something wrong:" + url);
+			} else {
+				if (c.getContentType() == MsoChannel.CONTENTTYPE_YOUTUBE_CHANNEL || 
+					c.getContentType() == MsoChannel.CONTENTTYPE_YOUTUBE_PLAYLIST) {
+					if (c.getOriName() == null) {
+						log.info("re-submit youtube channel:" + c.getSourceUrl());
+						if (!devel)
+							tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);						
+					}
+				}
+			}			
+		}
+	}
+	
 	public void initChannels(boolean english, boolean devel) {
 		NnUserManager userMngr = new NnUserManager();
 		user = userMngr.findByEmail(NNEMAIL);		
@@ -491,15 +514,14 @@ public class InitService {
 		int zeroProgramCnt = 0;
 		for (String entry : entries) {	
 			String[] data = entry.split(",");
-			System.out.println("entry:" + entry);
 			String url = data[0];
 			String name = null;
 			if (data.length == 2)
 				name = data[1];
 			MsoChannel c = channelMngr.findBySourceUrlSearch(url);
-			if (c == null) {					
+			if (c == null) {
 				c = new MsoChannel(url, user.getKey().getId());
-				c.setStatus(MsoChannel.STATUS_PROCESSING);
+				c.setStatus(MsoChannel.STATUS_PROCESSING);	
 				c.setContentType(channelMngr.getContentTypeByUrl(url));
 				channelMngr.create(c);
 				ContentOwnershipManager ownershipMngr = new ContentOwnershipManager();
@@ -510,21 +532,17 @@ public class InitService {
 				} else {
 					piwik = false; //local testing, no piwik creation
 				}
-			} else {		
+			} else {
 				if (c.getContentType() == MsoChannel.CONTENTTYPE_YOUTUBE_CHANNEL || 
 					c.getContentType() == MsoChannel.CONTENTTYPE_YOUTUBE_PLAYLIST) {
 					if (c.getOriName() == null) {
+						/*
 						log.info("re-submit youtube channel:" + c.getSourceUrl());
 						if (!devel)
-							tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);						
+							tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
+						*/						
 					}
-					/*
-					log.info("re-submit youtube channel:" + c.getSourceUrl());
-					if (!devel)
-						tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
-					*/
 				}				
-				//log.info("this channel existed:" + url);
 				if (c.getStatus() == MsoChannel.STATUS_WAIT_FOR_APPROVAL) {
 					log.info("mark the channel from waiting to approval to success");
 					c.setStatus(MsoChannel.STATUS_SUCCESS);
@@ -553,7 +571,7 @@ public class InitService {
 			if (c.getContentType() == MsoChannel.CONTENTTYPE_YOUTUBE_CHANNEL || 
 				c.getContentType() == MsoChannel.CONTENTTYPE_YOUTUBE_PLAYLIST) {
 				c.setName(name);
-			}			
+			}
 			channelMngr.save(c);				
 		}
 		log.info("< 5 program count:" + zeroProgramCnt); 

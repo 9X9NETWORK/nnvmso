@@ -234,15 +234,15 @@ public class MsoChannelDao extends GenericDao<MsoChannel> {
 		return detached;
 	}	
 	
-	public List<MsoChannel> findNonPodcasts() {
+	public List<MsoChannel> findChannelsByType(short type) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		List<MsoChannel> detached = new ArrayList<MsoChannel>(); 
 		try {
 			Query q = pm.newQuery(MsoChannel.class);
-			q.setFilter("contentType != contentTypeParam");
+			q.setFilter("contentType == contentTypeParam");
 			q.declareParameters("short contentTypeParam");
 			@SuppressWarnings("unchecked")
-			List<MsoChannel> channels = (List<MsoChannel>) q.execute(MsoChannel.CONTENTTYPE_PODCAST);
+			List<MsoChannel> channels = (List<MsoChannel>) q.execute(type);
 			detached = (List<MsoChannel>)pm.detachCopyAll(channels);
 		} finally {
 			pm.close();

@@ -1332,7 +1332,7 @@ public class PlayerApiController {
 		
 		String output = NnStatusMsg.errorStr(locale);
 		try {
-			output = playerApiService.pdrReport(user, device, session, comment);
+			output = playerApiService.userReport(user, device, session, comment);
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}

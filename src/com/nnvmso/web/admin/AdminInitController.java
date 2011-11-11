@@ -151,7 +151,31 @@ public class AdminInitController {
 		this.sendEmail("init all the channels done", "done");
 		return NnNetUtil.textReturn("OK");		
 	}
-		
+
+	@RequestMapping("initYoutubeOriNameToTask")
+	public ResponseEntity<String> initYoutubeOriNameToTask(
+			@RequestParam(value="isEnglish",required=false) boolean isEnglish,
+			@RequestParam(value="isDevel",required=false) boolean isDevel) {
+		QueueFactory.getDefaultQueue().add(
+			      TaskOptions.Builder.withUrl("/admin/init/initYoutubeOriName")
+			         .param("isEnglish", String.valueOf(isEnglish))
+			         .param("isDevel", String.valueOf(isDevel))			      			      
+		);			          
+		return NnNetUtil.textReturn("You will receive an email when it is done.");
+	}
+	
+	@RequestMapping("initYoutubeOriName")
+	public ResponseEntity<String> initYoutubeOriName(
+			@RequestParam(value="isEnglish",required=false) boolean isEnglish,
+			@RequestParam(value="isDevel",required=false) boolean isDevel,			
+			HttpServletRequest req) {
+		initService.setRequest(req);
+		initService.initYoutubeOriName(isEnglish, isDevel);
+		this.sendEmail("initYoutubeOriName done", "done");
+		return NnNetUtil.textReturn("OK");		
+	}
+	
+	
 	@RequestMapping("initSetsToTask")
 	public ResponseEntity<String> initSetsToTask(
 			@RequestParam(value="isEnglish",required=false) boolean isEnglish,

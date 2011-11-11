@@ -39,8 +39,54 @@ public class AdminSetController {
 	@Autowired
 	public AdminSetController(ChannelSetManager setMngr) {
 		this.setMngr = setMngr;		
-	}	
-    
+	}
+	
+	@RequestMapping("createBatch")
+	public ResponseEntity<String> createBatch() {
+		String name="灣區新聞";
+		String lang="zh";
+		String desc="多元灣區新聞網帶給您最新資訊";
+		String cname="推薦頻道";
+		
+		String[] urls = {
+				"http://www.youtube.com/user/Yamashita916",
+				"http://www.youtube.com/user/DianaAmazing",
+				"http://www.youtube.com/user/tbwtv",
+				"http://www.youtube.com/user/TVHS109",
+				"http://www.youtube.com/user/ntdchinese",
+				"http://www.youtube.com/user/ChinaTimes",
+				"http://www.youtube.com/user/TheChineseNews",				
+		};
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		List<MsoChannel> channels = new ArrayList<MsoChannel>();
+		for (int i=0; i<urls.length; i++) {
+			String checkedUrl = YouTubeLib.formatCheck(urls[i]);
+			MsoChannel c = channelMngr.findBySourceUrlSearch(checkedUrl);
+			c.setSeq(i+1);
+			channels.add(c);
+		}
+		String output = "";
+		for (MsoChannel c : channels) {
+			output += c.getKey().getId() + "\t" + c.getSourceUrl() + "\n";
+		}			
+		Mso mso = new MsoManager().findNNMso();
+		ChannelSetManager channelSetMngr = new ChannelSetManager();
+		ChannelSet channelSet = new ChannelSet(mso.getKey().getId(), name, desc, true);
+		channelSet.setDefaultUrl(name); 
+		channelSet.setBeautifulUrl(name);
+		//related channels
+		channelSet.setLang(lang);
+		channelSetMngr.create(channelSet, channels);						
+		
+		//category and set		
+		CategoryChannelSetManager cscMngr = new CategoryChannelSetManager();
+		CategoryManager cMngr = new CategoryManager();
+		Category c = cMngr.findByName(cname);
+		CategoryChannelSet csc = new CategoryChannelSet(c.getKey().getId(), channelSet.getKey().getId());
+		cscMngr.save(csc);		
+		return NnNetUtil.textReturn("OK");
+	}
+
 	@RequestMapping("recommendedChange")
 	public ResponseEntity<String> recommended(
 			@RequestParam(required=false) String lang,

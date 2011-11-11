@@ -50,13 +50,15 @@ public class PdrRawManager {
 		String reg = "w\t(\\d++)\t(\\w++)";		
 		Pattern pattern = Pattern.compile(reg);
 		Matcher m = pattern.matcher(pdr);
-		while (m.find()) {			
-			long channelId = Long.parseLong(m.group(1));
-			String program = m.group(2);
-			if (channelId != 0 && !program.equals("0")) {
-				NnUserWatched watched = new NnUserWatched(user, channelId, program);
-				log.info("user watched channel and program:" + user.getToken() + ";" + channelId + ";" + program);
-				watchedMngr.save(watched);
+		if (user != null) {
+			while (m.find()) {			
+				long channelId = Long.parseLong(m.group(1));
+				String program = m.group(2);
+				if (channelId != 0 && !program.equals("0")) {
+					NnUserWatched watched = new NnUserWatched(user, channelId, program);
+					log.info("user watched channel and program:" + user.getToken() + ";" + channelId + ";" + program);
+					watchedMngr.save(watched);
+				}
 			}
 		}
 		Text text = new Text(pdr);

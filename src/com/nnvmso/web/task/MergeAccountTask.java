@@ -42,8 +42,7 @@ public class MergeAccountTask {
 		try {						
 			QueueFactory.getDefaultQueue().add(
 					TaskOptions.Builder.withUrl("/task/account/runMarkSub")
-			         .param("start", String.valueOf(start))
-					
+			         .param("start", String.valueOf(start))					
 		    );
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -28,6 +28,7 @@ public class CalibrationTask {
 	protected static final Logger log = Logger.getLogger(CalibrationTask.class.getName());
 	
 	//entry, correct channel's programCount: channelCount -> runChannels -> runPrograms
+	/*
 	@RequestMapping("channelCount")
 	public ResponseEntity<String> channelCount() throws IOException {
 		try {						
@@ -40,8 +41,10 @@ public class CalibrationTask {
 		
 		return NnNetUtil.textReturn("OK");
 	}
+	*/
 
-	//run through each channel, 
+	//run through each channel,
+	/*
 	@RequestMapping(value="runChannels")
 	public ResponseEntity<String> runChannels(HttpServletRequest req) {
 		String output = "";
@@ -59,6 +62,7 @@ public class CalibrationTask {
 		}
 		return NnNetUtil.textReturn(output);
 	}
+	*/
 
 	@RequestMapping(value="runPrograms")
 	public ResponseEntity<String> runPrograms(HttpServletRequest req) {
