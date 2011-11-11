@@ -1,14 +1,35 @@
 /* piwik analytics */
 
-var piwik_api_url     = 'http://piwik.teltel.com/index.php';
-var piwik_js_url      = 'http://piwik.teltel.com/piwik.js';
-var piwik_tracker_url = 'http://piwik.teltel.com/piwik.php';
+var piwik_api_url     = piwik_host() + 'index.php';
+var piwik_js_url      = piwik_host() + 'piwik.js';
+var piwik_tracker_url = piwik_host() + 'piwik.php';
 var piwik_auth_token  = '23ed70e585b18033d7150f917232d1f4';
 
 var piwik_is_loaded     = false;
 var piwik_tracker       = null;
 var piwik_tracking_site = null;
 var piwik_is_engaging   = false; // mutex
+
+function piwik_host()
+  {
+  var host = (document.location.protocol == 'https:') ? "https://" : "http://";
+
+  if (location.host == 'puppy.9x9.tv')
+    host += 'dev.piwik.9x9.tv';
+  else if (location.host == 'alpha.9x9.tv')
+    host += 'alpha.piwik.9x9.tv';
+  else if (location.host == 'qa.9x9.tv')
+    host += 'qa.piwik.9x9.tv';
+  else if (location.host == 'demo.9x9.tv')
+    host += 'demo.piwik.9x9.tv';
+  else if (location.host == 'www.9x9.tv' || location.host == '9x9.tv')
+    host += 'piwik.9x9.tv';
+  else if (location.host == 'cms.9x9.tv')
+    host += 'piwik.teltel.com';
+
+  host += '/';
+  return host;
+  }
 
 function piwik_initialize()
   {
