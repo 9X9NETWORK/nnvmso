@@ -43,6 +43,7 @@ var page$ = {
                 for (var i in channelSets) {
                   var channelSet = channelSets[i];
                   var channelSetId = channelSet.key.id;
+                  if (channelSet.name == null) continue;
                   var child = {
                     'title': '&nbsp;' + cms.escapeHtml(channelSet.name),
                     'key':   channelSetId,
@@ -59,6 +60,7 @@ var page$ = {
                 for (var i in channels) {
                   var channel = channels[i];
                   var channelId = channel.key.id;
+                  if (channel.name == null) continue;
                   var child = {
                     'title': cms.escapeHtml(channel.name) + ' <img alt="' + channelId + '" class="tiny-button plus-button" src="/images/cms/plus.png"> <img alt="' + channelId + '" class="tiny-button play-button" src="/images/cms/play.png">',
                     'key':   channelId,

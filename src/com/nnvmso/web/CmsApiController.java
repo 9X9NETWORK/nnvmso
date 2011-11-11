@@ -132,7 +132,7 @@ public class CmsApiController {
 		if (channelSet == null)
 			return new ArrayList<MsoChannel>();
 		List<MsoChannel> results = cmsService.findChannelsByChannelSetId(channelSet.getKey().getId());
-		
+		/*
 		class MsoChannelComparator implements Comparator<MsoChannel> {
 			@Override
 			public int compare(MsoChannel channel1, MsoChannel channel2) {
@@ -143,6 +143,7 @@ public class CmsApiController {
 		}
 		
 		Collections.sort(results, new MsoChannelComparator());
+		*/
 		return results;
 	}
 	
