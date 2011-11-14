@@ -726,14 +726,14 @@ var page$ = {
         page$.channelDetail.swfObject = null;
       }
       $('#channel_detail .right_title').text($('#lang_title_create_channel_info').text());
-      $('#channel_detail #ch_language').val('zh-TW');
+      $('#channel_detail #ch_language').val('zh');
       $('#channel_detail').hide();
       $('#channel_import_detail').hide();
       $('#channel_import_detail [name="ch_import_url"]').val('');
       $('#channel_import_detail [name="ch_name"]').val('').attr('disabled', true);
       $('#channel_import_detail [name="ch_intro"]').val('').attr('disabled', true);
       $('#channel_import_detail [name="ch_tag"]').val('').attr('disabled', true);
-      $('#channel_import_detail [name="ch_language"]').val('zh-TW').attr('disabled', true);
+      $('#channel_import_detail [name="ch_language"]').val('zh').attr('disabled', true);
       $('#channel_import_detail [name="ch_category"]').attr('disabled', true);
       $('#channel_import_detail [name="ch_savebutton"]').removeClass('btnCreate').addClass('btnDisable');
       $('#channel_import_detail [name="ch_image"]').attr('src', '/images/cms/upload_img.jpg');
@@ -765,7 +765,7 @@ var page$ = {
           $('#channel_import_detail [name="ch_name"]').val('').attr('disabled', false);
           $('#channel_import_detail [name="ch_intro"]').val('').attr('disabled', false);
           $('#channel_import_detail [name="ch_tag"]').val('').attr('disabled', false);
-          $('#channel_import_detail [name="ch_language"]').val('zh-TW').attr('disabled', false);
+          $('#channel_import_detail [name="ch_language"]').val('zh').attr('disabled', false);
           $('#channel_import_detail [name="ch_category"]').attr('disabled', false);
           $('#channel_import_detail [name="upload_button_place"]').html('').append($('<span/>').attr('name', 'ch_upload_image'));
           if (page$.channelDetail.swfObject != null) {

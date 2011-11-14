@@ -85,7 +85,7 @@
           <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.language"/></label>
           <div class="floatL">
             <select id="cc_language" class="language">
-              <option value="zh-TW">中文</option>
+              <option value="zh">中文</option>
               <option value="en">English</option>
             </select>
           </div>
