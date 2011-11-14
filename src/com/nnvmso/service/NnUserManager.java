@@ -98,6 +98,14 @@ public class NnUserManager {
 					return user;
 				}
 			}
+		} else if (mso.getType() == Mso.TYPE_ENTERPRISE) {
+			List<NnUser> users = nnUserDao.findByType(NnUser.TYPE_ENTERPRISE);
+			for (NnUser user : users) {
+				if (user.getMsoId() == mso.getKey().getId()) {
+					log.info("found TYPE_ENTERPRISE");
+					return user;
+				}
+			}
 		} else if (mso.getType() == Mso.TYPE_TCO) {
 			List<NnUser> users = nnUserDao.findByTypeAndMsoId(NnUser.TYPE_TCO, mso.getKey().getId());
 			if (users.size() > 0)

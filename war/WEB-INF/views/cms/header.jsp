@@ -5,7 +5,7 @@
   <div class="floatL" id="mso_logo"><img alt="" src="${msoLogo}"/></div>
   <div id="setup_page" class="jqmWindow"></div>
   <div class="floatR">
-    <p><spring:message code="cms.header.welcome"/> <span><c:out value="${mso.contactEmail}"/></span></p>
+    <p><spring:message code="cms.header.welcome"/> <span>${mso.contactEmail}</span></p>
     <a href="/9x9" class="sg" style="display:none"></a>
     <a href="javascript:" class="setup" id="setup"></a>
     <a href="${logoutUrl}" class="logout"></a>

@@ -36,7 +36,7 @@ $(function() {
           <a href="javascript:$('#login_form').submit();" class="btnLogin" id="submit_button"></a>
           <br/><br/>
           <label class="floatL">&nbsp;</label>
-          <span class="error"><c:out value="${error}"/></span>
+          <span class="error">${error}</span>
         </fieldset>
       </form>
     </div>

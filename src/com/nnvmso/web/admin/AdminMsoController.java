@@ -87,7 +87,7 @@ public class AdminMsoController {
 		if (type == Mso.TYPE_3X3) {
 			userType = NnUser.TYPE_3X3;
 		} else if (type == Mso.TYPE_ENTERPRISE) {
-			userType = Mso.TYPE_ENTERPRISE;
+			userType = NnUser.TYPE_ENTERPRISE;
 		} else {
 			return "Only Type 3x3 Is Applicable";
 		}

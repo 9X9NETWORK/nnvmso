@@ -1331,6 +1331,7 @@ public class CmsApiController {
 		switch (mso.getType()) {
 		case Mso.TYPE_NN:
 		case Mso.TYPE_3X3:
+		case Mso.TYPE_ENTERPRISE:
 		case Mso.TYPE_MSO:
 		case Mso.TYPE_TCO:
 			user = userMngr.findMsoUser(mso);
@@ -1339,7 +1340,7 @@ public class CmsApiController {
 		if (user == null)
 			return "Invalid msoType";
 		user.setPassword(newPassword);
-		userMngr.save(user);
+		userMngr.resetPassword(user);
 		
 		return "OK";
 	}

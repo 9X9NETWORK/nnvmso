@@ -51,7 +51,11 @@ public class CmsController {
 		model.addAttribute("msoId", mso.getKey().getId());
 		model.addAttribute("msoType", mso.getType());
 		model.addAttribute("msoName", mso.getName());
-		model.addAttribute("logoutUrl", "/" + mso.getName() + "/logout");
+		if (mso.getType() == Mso.TYPE_TCO) {
+			model.addAttribute("logoutUrl", "/cms/logout");
+		} else {
+			model.addAttribute("logoutUrl", "/" + mso.getName() + "/logout");
+		}
 		
 		return model;
 	}

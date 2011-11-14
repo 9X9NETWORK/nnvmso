@@ -36,10 +36,14 @@ var page$ = {
               'channelSetId': channelSetId,
               'type': 1
             };
-            if ($(this).attr('checked') == 'checked') {
-              cms.post('/CMSAPI/createChannelSetAutosharing', parameters);
+            if ($(this).is(':checked')) {
+              cms.post('/CMSAPI/createChannelSetAutosharing', parameters, function() {
+                alert($('#lang_update_successfully').text());
+              });
             } else {
-              cms.post('/CMSAPI/removeChannelSetAutosharing', parameters);
+              cms.post('/CMSAPI/removeChannelSetAutosharing', parameters, function() {
+                alert($('#lang_update_successfully').text());
+              });
             }
           });
         }
@@ -50,10 +54,14 @@ var page$ = {
               'channelSetId': channelSetId,
               'type': 2
             };
-            if ($(this).attr('checked') == 'checked') {
-              cms.post('/CMSAPI/createChannelSetAutosharing', parameters);
+            if ($(this).is(':checked')) {
+              cms.post('/CMSAPI/createChannelSetAutosharing', parameters, function() {
+                alert($('#lang_update_successfully').text());
+              });
             } else {
-              cms.post('/CMSAPI/removeChannelSetAutosharing', parameters);
+              cms.post('/CMSAPI/removeChannelSetAutosharing', parameters, function() {
+                alert($('#lang_update_successfully').text());
+              });
             }
           });
         }
@@ -64,10 +72,14 @@ var page$ = {
               'channelSetId': channelSetId,
               'type': 3
             };
-            if ($(this).attr('checked') == 'checked') {
-              cms.post('/CMSAPI/createChannelSetAutosharing', parameters);
+            if ($(this).is(':checked')) {
+              cms.post('/CMSAPI/createChannelSetAutosharing', parameters, function() {
+                alert($('#lang_update_successfully').text());
+              });
             } else {
-              cms.post('/CMSAPI/removeChannelSetAutosharing', parameters);
+              cms.post('/CMSAPI/removeChannelSetAutosharing', parameters, function() {
+                alert($('#lang_update_successfully').text());
+              });
             }
           });
         }
@@ -78,10 +90,14 @@ var page$ = {
               'channelSetId': channelSetId,
               'type': 3
             };
-            if ($(this).attr('checked') == 'checked') {
-              cms.post('/CMSAPI/createChannelSetAutosharing', parameters);
+            if ($(this).is(':checked')) {
+              cms.post('/CMSAPI/createChannelSetAutosharing', parameters, function() {
+                alert($('#lang_update_successfully').text());
+              });
             } else {
-              cms.post('/CMSAPI/removeChannelSetAutosharing', parameters);
+              cms.post('/CMSAPI/removeChannelSetAutosharing', parameters, function() {
+                alert($('#lang_update_successfully').text());
+              });
             }
           });
         }
@@ -121,10 +137,14 @@ var page$ = {
               'channelId': channelId,
               'type': 1
             };
-            if ($(this).attr('checked') == 'checked') {
-              cms.post('/CMSAPI/createChannelAutosharing', parameters);
+            if ($(this).is(':checked')) {
+              cms.post('/CMSAPI/createChannelAutosharing', parameters, function() {
+                alert($('#lang_update_successfully').text());
+              });
             } else {
-              cms.post('/CMSAPI/removeChannelAutosharing', parameters);
+              cms.post('/CMSAPI/removeChannelAutosharing', parameters, function() {
+                alert($('#lang_update_successfully').text());
+              });
             }
           });
         }
@@ -135,10 +155,14 @@ var page$ = {
               'channelId': channelId,
               'type': 2
             };
-            if ($(this).attr('checked') == 'checked') {
-              cms.post('/CMSAPI/createChannelAutosharing', parameters);
+            if ($(this).is(':checked')) {
+              cms.post('/CMSAPI/createChannelAutosharing', parameters, function() {
+                alert($('#lang_update_successfully').text());
+              });
             } else {
-              cms.post('/CMSAPI/removeChannelAutosharing', parameters);
+              cms.post('/CMSAPI/removeChannelAutosharing', parameters, function() {
+                alert($('#lang_update_successfully').text());
+              });
             }
           });
         }
@@ -149,10 +173,14 @@ var page$ = {
               'channelId': channelId,
               'type': 3
             };
-            if ($(this).attr('checked') == 'checked') {
-              cms.post('/CMSAPI/createChannelAutosharing', parameters);
+            if ($(this).is(':checked')) {
+              cms.post('/CMSAPI/createChannelAutosharing', parameters, function() {
+                alert($('#lang_update_successfully').text());
+              });
             } else {
-              cms.post('/CMSAPI/removeChannelAutosharing', parameters);
+              cms.post('/CMSAPI/removeChannelAutosharing', parameters, function() {
+                alert($('#lang_update_successfully').text());
+              });
             }
           });
         }
@@ -163,10 +191,14 @@ var page$ = {
               'channelId': channelId,
               'type': 3
             };
-            if ($(this).attr('checked') == 'checked') {
-              cms.post('/CMSAPI/createChannelAutosharing', parameters);
+            if ($(this).is(':checked')) {
+              cms.post('/CMSAPI/createChannelAutosharing', parameters, function() {
+                alert($('#lang_update_successfully').text());
+              });
             } else {
-              cms.post('/CMSAPI/removeChannelAutosharing', parameters);
+              cms.post('/CMSAPI/removeChannelAutosharing', parameters, function() {
+                alert($('#lang_update_successfully').text());
+              });
             }
           });
         }
