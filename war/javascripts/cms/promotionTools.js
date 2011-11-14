@@ -214,7 +214,7 @@ var page$ = {
           channelInfoBlock.find('.channel_info_updatedate span').text(cms.formatDate(channels[i].updateDate));
           // add this
           var promoteUrl = 'http://' + location.host + '/view?channel=' + channelId;
-          channelInfoBlock.find('.addthis_button_expanded').attr('addthis:url', promoteUrl);
+          channelInfoBlock.find('.addthis_button_expanded').attr('addthis:url', promoteUrl + '&_=' + channels[i].updateDate);
           var switchObject = channelInfoBlock.find('.channel_info_publish');
           if (channels[i]['public']) {
             switchObject.removeClass('chUnPublic').addClass('chPublic');
