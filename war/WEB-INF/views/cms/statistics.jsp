@@ -29,7 +29,7 @@
     <div class="clear"></div>
     <div class="left_body">
       <div class="createChList2" style="height: 548px">
-        <div class="left_title"><spring:message code="cms.statistics.title.channel_set_list"/></div>
+        <div class="left_title" id="channel_set_title"><spring:message code="cms.statistics.title.channel_set_list"/></div>
         <ul class="chList" id="channel_set_list_ul"></ul>
         <div class="clear"></div>
         <div class="left_title"><spring:message code="cms.statistics.title.channel_list"/></div>

@@ -184,6 +184,9 @@ var page$ = {
       });
     }
   },
+  initGenericOne: function() {
+    $('#channel_set_title').hide();
+  },
   init: function() {
     var css = '<style> .chPublic { background:url(' + $('#image_ch_public').text() + ') no-repeat; }\n.chUnPublic { background:url(' + $('#image_ch_unpublic').text() + ') no-repeat; } </style>';
     $(css).appendTo('head');
