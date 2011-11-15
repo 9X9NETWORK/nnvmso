@@ -440,30 +440,32 @@ public class InitService {
 		    int maple = 0;
 			for (int r=1; r<rows; r++) {
 			    Row row = sets.getRow(r);
-			    int col = row.getLastCellNum();
-			    for (int c=1; c<col; c+=2) {
-			    	Cell cell = row.getCell(c);
-			    	if (cell != null) {
-			    		String url = cell.getStringCellValue();
-			    		if (url != null && url.length() > 0) {
-				    		if (!url.contains("maplestage")) {  
-					    		String checkedUrl = YouTubeLib.formatCheck(url);
-					    		if (checkedUrl != null) {
-					    			Cell nameCell = row.getCell(c-1);
-					    			String name = "";
-					    			if (nameCell != null) {
-					    				name = nameCell.getStringCellValue();
-					    			}
-					    			list.add(checkedUrl + "," + name);
+			    if (row != null) {
+				    int col = row.getLastCellNum();
+				    for (int c=1; c<col; c+=2) {
+				    	Cell cell = row.getCell(c);
+				    	if (cell != null) {
+				    		String url = cell.getStringCellValue();
+				    		if (url != null && url.length() > 0) {
+					    		if (!url.contains("maplestage")) {  
+						    		String checkedUrl = YouTubeLib.formatCheck(url);
+						    		if (checkedUrl != null) {
+						    			Cell nameCell = row.getCell(c-1);
+						    			String name = "";
+						    			if (nameCell != null) {
+						    				name = nameCell.getStringCellValue();
+						    			}
+						    			list.add(checkedUrl + "," + name);
+						    		} else {
+						    			log.info("url not passed youtube lib check:" + url);
+						    		}
 					    		} else {
-					    			log.info("url not passed youtube lib check:" + url);
+					    			list.add(url + "," + "");
+					    			maple++;
 					    		}
-				    		} else {
-				    			list.add(url + "," + "");
-				    			maple++;
 				    		}
-			    		}
-			    	}
+				    	}
+				    }
 			    }
 			}
 			log.info("final channel size:" + list.size());
@@ -536,11 +538,11 @@ public class InitService {
 				if (c.getContentType() == MsoChannel.CONTENTTYPE_YOUTUBE_CHANNEL || 
 					c.getContentType() == MsoChannel.CONTENTTYPE_YOUTUBE_PLAYLIST) {
 					if (c.getOriName() == null) {
-						/*
+						
 						log.info("re-submit youtube channel:" + c.getSourceUrl());
 						if (!devel)
 							tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
-						*/						
+												
 					}
 				}				
 				if (c.getStatus() == MsoChannel.STATUS_WAIT_FOR_APPROVAL) {
@@ -635,26 +637,28 @@ public class InitService {
 		    ArrayList<List<String>> channelSetList = new ArrayList<List<String>>();
 			for (int r=1; r<rows; r++) {
 			    row = sheet.getRow(r);
-		    	int col = row.getLastCellNum(); 
-		    	int seq = 0;
-			    for (int c=1; c<col; c+=2) {
-			    	Cell cell = row.getCell(c);
-			    	if (cell != null) {
-			    		String url = cell.getStringCellValue();
-			    		String checkedUrl = url;
-			    		if (!url.contains("maplestage"))
-			    			checkedUrl = YouTubeLib.formatCheck(url);
-		    			List<String> list = new ArrayList<String>();		    			
-		    			if (checkedUrl != null) {
-				    		if (seq < channelSetList.size()) { 
-				    			list = channelSetList.get(seq);
-				    		} else {
-				    			channelSetList.add(list);
-				    		}			    						    			
-		    				list.add(checkedUrl);
-		    			}
-			    	}
-			    	seq++;
+			    if (row != null) {
+			    	int col = row.getLastCellNum(); 
+			    	int seq = 0;
+				    for (int c=1; c<col; c+=2) {
+				    	Cell cell = row.getCell(c);
+				    	if (cell != null) {
+				    		String url = cell.getStringCellValue();
+				    		String checkedUrl = url;
+				    		if (!url.contains("maplestage"))
+				    			checkedUrl = YouTubeLib.formatCheck(url);
+			    			List<String> list = new ArrayList<String>();		    			
+			    			if (checkedUrl != null) {
+					    		if (seq < channelSetList.size()) { 
+					    			list = channelSetList.get(seq);
+					    		} else {
+					    			channelSetList.add(list);
+					    		}			    						    			
+			    				list.add(checkedUrl);
+			    			}
+				    	}
+				    	seq++;
+				    }
 			    }
 			}
 			if (channelSetList.size() != setList.size()) {

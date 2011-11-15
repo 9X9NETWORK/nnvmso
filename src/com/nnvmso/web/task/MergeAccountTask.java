@@ -33,9 +33,7 @@ import com.nnvmso.service.SubscriptionManager;
 @RequestMapping("task/account")
 public class MergeAccountTask {
 	
-	protected static final Logger log = Logger.getLogger(MergeAccountTask.class.getName());
-	
-	
+	protected static final Logger log = Logger.getLogger(MergeAccountTask.class.getName());		
 	
 	//entry
 	@RequestMapping("markSub")
@@ -108,6 +106,7 @@ public class MergeAccountTask {
 		return NnNetUtil.textReturn(output);
 	}
 	
+	//remove podcast subscription
 	@RequestMapping(value="runRemoveSub")
 	public ResponseEntity<String> runRemoveSub(
 			@RequestParam("start")int start,
@@ -116,7 +115,7 @@ public class MergeAccountTask {
 		NnUserManager userMngr = new NnUserManager();
 		MsoChannelManager channelMngr = new MsoChannelManager();
 		SubscriptionManager subMngr = new SubscriptionManager();
-		List<NnUser> users = userMngr.findAll();
+		List<NnUser> users = userMngr.findUsers();
 		log.info("user total:" + users.size());
 		int end = start + 200;
 		if (end > users.size()) 
@@ -134,7 +133,52 @@ public class MergeAccountTask {
 			}			
 			subMngr.deleteAll(deleted);
 		}
-		this.sendEmail("runRemoveSub", "done");
+		this.sendEmail("runRemoveSub" + start, "done");
+		return NnNetUtil.textReturn(output);
+	}
+
+	//entry
+	@RequestMapping("removeSubBad")
+	public ResponseEntity<String> removeSubBad(@RequestParam("start")int start) throws IOException {
+		try {						
+			QueueFactory.getDefaultQueue().add(
+					TaskOptions.Builder.withUrl("/task/account/runRemoveSubBad")
+					  .param("start", String.valueOf(start))
+		    );
+		} catch (Exception e) {
+			e.printStackTrace();
+		}		
+		return NnNetUtil.textReturn("OK");
+	}
+	
+	//remove podcast subscription
+	@RequestMapping(value="runRemoveSubBad")
+	public ResponseEntity<String> runRemoveSubBad(
+			@RequestParam("start")int start,
+			HttpServletRequest req) {
+		String output = "";
+		NnUserManager userMngr = new NnUserManager();
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		SubscriptionManager subMngr = new SubscriptionManager();
+		List<NnUser> users = userMngr.findUsers();
+		log.info("user total:" + users.size());
+		int end = start + 200;
+		if (end > users.size()) 
+			end = users.size();
+		for (int i=start; i<end; i++) {	
+			List<Subscription> list = subMngr.findAllByUser(users.get(i).getKey().getId());
+			List<Subscription> deleted = new ArrayList<Subscription>();
+			for (Subscription s : list) {
+				MsoChannel c = channelMngr.findById(s.getChannelId());
+				if (c == null)
+					deleted.add(s); 
+				if (c != null && (c.getStatus() == MsoChannel.STATUS_INVALID_FORMAT || c.getStatus() == MsoChannel.STATUS_NO_VALID_EPISODE)) {					
+					deleted.add(s);
+				}
+			}			
+			subMngr.deleteAll(deleted);
+		}
+		this.sendEmail("runRemoveSubBad" + start, "done");
 		return NnNetUtil.textReturn(output);
 	}
 	

@@ -40,6 +40,19 @@ public class AdminSetController {
 	public AdminSetController(ChannelSetManager setMngr) {
 		this.setMngr = setMngr;		
 	}
+
+	@RequestMapping("deleteMso")
+	public ResponseEntity<String> deleteMso(@RequestParam(required=false) long id) {					
+		ChannelSetManager csMngr = new ChannelSetManager();
+		List<ChannelSet> sets = csMngr.findMsoSets(id);
+		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
+		for (ChannelSet cs : sets) {
+			List<ChannelSetChannel> list = cscMngr.findByChannelSetId(cs.getKey().getId());
+			cscMngr.deleteAll(list);
+			csMngr.delete(cs);		
+		}
+		return NnNetUtil.textReturn("OK");
+	}
 	
 	@RequestMapping("createBatch")
 	public ResponseEntity<String> createBatch() {

@@ -56,6 +56,10 @@ public class ChannelSetManager {
 		return channelSetDao.findFeaturedSetsByMso(mso);
 	}
 
+	public List<ChannelSet> findMsoSets(long id) {
+		return channelSetDao.findMsoSets(id);
+	}
+	
 	public List<ChannelSet> findFeaturedSets(String lang) {
 		return channelSetDao.findFeaturedSets(lang);
 	}

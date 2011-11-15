@@ -137,8 +137,8 @@ public class NnUserManager {
 		return nnUserDao.findByEmailAndMsoId(email.toLowerCase(), mso.getKey().getId());
 	}
 
-	public List<NnUser> findGuests() {
-		return nnUserDao.findGuests();
+	public List<NnUser> findUsers() {
+		return nnUserDao.findUsers();
 	}
 
 	public List<NnUser> findAll() {

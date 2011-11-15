@@ -48,6 +48,23 @@ public class ChannelSetDao extends GenericDao<ChannelSet> {
 		return cs;
 	}
 
+	public List<ChannelSet> findMsoSets(long id) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		List<ChannelSet> detached = new ArrayList<ChannelSet>(); 
+		try {
+			Query q = pm.newQuery(ChannelSet.class);
+			q.setFilter("msoId == msoIdParam");
+			q.declareParameters("long msoIdParam");
+			q.setOrdering("createDate asc");
+			@SuppressWarnings("unchecked")
+			List<ChannelSet> sets = (List<ChannelSet>) q.execute(id);
+			detached = (List<ChannelSet>)pm.detachCopyAll(sets);
+		} finally {
+			pm.close();
+		}
+		return detached;
+	}	
+	
 	public List<ChannelSet> findFeaturedSetsByMso(Mso mso) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		List<ChannelSet> detached = new ArrayList<ChannelSet>(); 
