@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 import net.sf.jsr107cache.Cache;
@@ -16,6 +17,8 @@ import net.sf.jsr107cache.Cache;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.springframework.context.MessageSource;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Service;
 
 import com.google.appengine.api.datastore.Key;
@@ -25,6 +28,7 @@ import com.nnvmso.dao.MsoProgramDao;
 import com.nnvmso.lib.CacheFactory;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.model.ChannelAutosharing;
+import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoProgram;
 import com.nnvmso.model.SnsAuth;
@@ -35,6 +39,7 @@ import com.nnvmso.web.json.transcodingservice.FBPost;
 public class MsoProgramManager {
 	
 	protected static final Logger log = Logger.getLogger(MsoProgramManager.class.getName());
+	private static MessageSource messageSource = new ClassPathXmlApplicationContext("locale.xml");
 	
 	private MsoProgramDao msoProgramDao = new MsoProgramDao();
 	
@@ -87,12 +92,18 @@ public class MsoProgramManager {
 		log.info("autosharing count = " + channelAutosharings.size());
 		try {
 			FBPost fbPost = new FBPost(program.getName(), program.getIntro(), program.getImageUrl());
+			MsoManager msoMngr = new MsoManager();
 			InetAddress local = InetAddress.getLocalHost();
 			String url = "http://" + local.getHostName() + "/view?channel=" + channel.getKey().getId() + "&episode=" + program.getKey().getId();
 			fbPost.setLink(url);
-			fbPost.setCaption("9x9.tv");
 			for (ChannelAutosharing autosharing : channelAutosharings) {
 				SnsAuth snsAuth = snsMngr.findFacebookAuthByMsoId(autosharing.getMsoId());
+				Mso mso = msoMngr.findById(autosharing.getMsoId());
+				if (mso.getPreferredLangCode() != null && mso.getPreferredLangCode().equals("en")) {
+					fbPost.setCaption(messageSource.getMessage("cms.autosharing.episode_added", null, Locale.ENGLISH));
+				} else {
+					fbPost.setCaption(messageSource.getMessage("cms.autosharing.episode_added", null, Locale.TRADITIONAL_CHINESE));
+				}
 				if (snsAuth != null && snsAuth.isEnabled()) {
 					fbPost.setFacebookId(snsAuth.getToken());
 					QueueFactory.getDefaultQueue().add(TaskOptions.Builder
