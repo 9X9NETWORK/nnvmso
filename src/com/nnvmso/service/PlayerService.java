@@ -63,7 +63,7 @@ public class PlayerService {
 			MsoProgram program = programMngr.findById(Long.valueOf(pid));
 			if (program != null) {
 				if (program.getContentType() == MsoProgram.CONTENTTYPE_YOUTUBE) {
-					String regex = "/watch\\?v=(\\w+)";
+					String regex = "/watch\\?v=([^\\/&]+)";
 					Pattern pattern = Pattern.compile(regex);
 					Matcher matcher = pattern.matcher(program.getOtherFileUrl());
 					if (matcher.find()) {

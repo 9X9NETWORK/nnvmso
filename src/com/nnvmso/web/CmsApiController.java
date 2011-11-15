@@ -533,6 +533,12 @@ public class CmsApiController {
 		// channel.setStatus(MsoChannel.STATUS_SUCCESS); // default import status
 		channelMngr.save(channel);
 		
+		// submit to transcoding server again
+		if (channel.getKey() != null && channel.getContentType() != MsoChannel.CONTENTTYPE_FACEBOOK) { //!!!
+			TranscodingService tranService = new TranscodingService();
+			tranService.submitToTranscodingService(channel.getKey().getId(), sourceUrl, req);
+		}
+		
 		ChannelSet channelSet = csMngr.findById(channelSetId);
 		if (channelSet == null)
 			return "Invalid channelSetId";
