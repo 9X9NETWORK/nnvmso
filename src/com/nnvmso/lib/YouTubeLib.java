@@ -114,6 +114,7 @@ public class YouTubeLib {
 	public static Map<String, String> getYouTubePlaylistEntry(String playlistIdStr) {
 		
 		Map<String, String> results = new HashMap<String, String>();
+		results.put("status", String.valueOf(NnStatusCode.SUCCESS));
 		YouTubeService youtubeService = new YouTubeService(YOUTUBE_CLIENT_ID, YOUTUBE_DEVELOPER_KEY);
 		
 		String sourceUrl = "http://gdata.youtube.com/feeds/api/playlists/" + playlistIdStr;
@@ -141,7 +142,14 @@ public class YouTubeLib {
 				results.put("description", subTitle);
 				log.info("description: " + subTitle);
 			}
+		} catch (com.google.gdata.util.ResourceNotFoundException e) {
+			results.put("status", String.valueOf(NnStatusCode.CHANNEL_YOUTUBE_NOT_AVAILABLE));
+			log.info("ResourceNotFoundException");
+		} catch (com.google.gdata.util.ServiceForbiddenException e) {
+			results.put("status", String.valueOf(NnStatusCode.CHANNEL_YOUTUBE_NOT_AVAILABLE));
+			log.info("ServiceForbiddenException");
 		} catch (Exception e) {
+			results.put("status", String.valueOf(NnStatusCode.ERROR));
 			NnLogUtil.logException(e);
 		}
 		return results;
@@ -186,8 +194,12 @@ public class YouTubeLib {
 				results.put("title", title);
 				log.info("title: " + title);
 			}
+		} catch (com.google.gdata.util.ResourceNotFoundException e) {
+			results.put("status", String.valueOf(NnStatusCode.CHANNEL_YOUTUBE_NOT_AVAILABLE));
+			log.info("ResourceNotFoundException");
 		} catch (com.google.gdata.util.ServiceForbiddenException e) {
 			results.put("status", String.valueOf(NnStatusCode.CHANNEL_YOUTUBE_NOT_AVAILABLE));
+			log.info("ServiceForbiddenException");
 		} catch (Exception e) {
 			results.put("status", String.valueOf(NnStatusCode.ERROR));
 			NnLogUtil.logException(e);

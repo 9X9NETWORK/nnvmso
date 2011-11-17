@@ -264,7 +264,7 @@ var page$ = {
         var found = $(arrChannelsInSet[i]);
         var channelId = found.find('input[name="channelId"]').val();
         if (channelId == channel.key.id) {
-          //alert($('#lang_warning_channel_is_already_in').text());
+          alert($('#lang_warning_channel_is_already_in').text());
           $('#set_ch_holder').scrollTo(found, 800);
           found.effect('highlight', { }, 3000);
           return;
@@ -277,6 +277,16 @@ var page$ = {
       var item = this.composeChannelSetItem(channel);
       $('#set_ch_list').append(item);
       this.adjustWidth();
+      if ($('#set_ch_list li').size() == 1) {
+        $('#set_ch_list, #result_list').sortable({
+          connectWith: '.connectedSortable',
+          placeholder: 'empty',
+          talerance:   'pointer',
+          update: function() {
+            page$.dirty = true;
+          }
+        }).disableSelection();
+      }
       if (!suppress) {
         //alert($('#lang_channel_had_been_added').text());
         $('#set_ch_holder').scrollTo(item, 800);
@@ -296,14 +306,6 @@ var page$ = {
           area$.appendChannel(channels[i], true);
         }
         page$.dirty = false;
-        $('#set_ch_list, #result_list').sortable({
-          connectWith: '.connectedSortable',
-          placeholder: 'empty',
-          talerance:   'pointer',
-          update: function() {
-            page$.dirty = true;
-          }
-        }).disableSelection();
       }, 'json');
     }
   },

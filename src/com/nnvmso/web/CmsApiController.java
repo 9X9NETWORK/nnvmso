@@ -458,15 +458,20 @@ public class CmsApiController {
 		
 		sourceUrl = sourceUrl.trim();
 		logger.info("import " + sourceUrl);
+		sourceUrl = channelMngr.verifyUrl(sourceUrl);
+		if (sourceUrl == null) {
+			logger.warning("invalid source url");
+			return null;
+		}
+		logger.info("normalized " + sourceUrl);
 		MsoChannel channel = channelMngr.findBySourceUrlSearch(sourceUrl);
 		if (channel == null) {
-			sourceUrl = channelMngr.verifyUrl(sourceUrl);
-			if (sourceUrl == null) {
+			logger.info("new source url");
+			channel = channelMngr.initChannelSubmittedFromPlayer(sourceUrl, userMngr.findNNUser()); //!!!
+			if (channel == null) {
 				logger.warning("invalid source url");
 				return null;
 			}
-			logger.info("new source url");
-			channel = channelMngr.initChannelSubmittedFromPlayer(sourceUrl, userMngr.findNNUser()); //!!!
 			channelMngr.create(channel, new ArrayList<Category>());
 			if (channel.getKey() != null && channel.getContentType() != MsoChannel.CONTENTTYPE_FACEBOOK) { //!!!
 				TranscodingService tranService = new TranscodingService();
