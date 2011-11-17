@@ -24,6 +24,7 @@ import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoConfig;
 import com.nnvmso.model.NnUser;
+import com.nnvmso.model.LangTable;
 import com.nnvmso.service.AuthService;
 import com.nnvmso.service.MsoConfigManager;
 import com.nnvmso.service.MsoManager;
@@ -89,12 +90,16 @@ public class CmsController {
 			}
 			if (user.getType() == NnUser.TYPE_USER) {
 				// generate TCO account
-				Mso mso = new Mso(user.getName(), user.getIntro(), user.getEmail(), Mso.TYPE_TCO);
-				mso.setTitle("TCO");
-				mso.setPreferredLangCode(Mso.LANG_EN);
+				Mso mso = new Mso(user.getEmail(), user.getIntro(), user.getEmail(), Mso.TYPE_TCO);
+				mso.setTitle(user.getName());
+				mso.setPreferredLangCode(LangTable.LANG_ZH);
 				mso.setLogoUrl("/images/logo_9x9.png");
 				msoMngr.create(mso);
-				logger.info("create a tco");
+				if (mso.getKey() == null) {
+					logger.info("failed to migrate to TCO");
+					return "error/404";
+				}
+				logger.info("migrate user to TCO");
 				user.setMsoId(mso.getKey().getId());
 				user.setType(NnUser.TYPE_TCO);
 				userMngr.save(user);
