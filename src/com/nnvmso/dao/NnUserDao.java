@@ -34,6 +34,40 @@ public class NnUserDao extends GenericDao<NnUser> {
 		return user;
 	}
 	
+	@Override
+	public int total(String filter) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		int result = 0;
+		try {
+			Query query = pm.newQuery(NnUser.class);
+			if (filter != null && filter != "")
+				query.setFilter(filter);
+			query.setRange(0, 9999); // GAE limitation
+			@SuppressWarnings("unchecked")
+			int total = ((List<NnUser>)query.execute()).size();
+			result = total;
+		} finally {
+			pm.close();
+		}
+		return result;
+	}
+
+	@Override
+	public int total() {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		int result = 0;
+		try {
+			Query query = pm.newQuery(NnUser.class);
+			query.setRange(0, 9999); // GAE limitation
+			@SuppressWarnings("unchecked")
+			int total = ((List<NnUser>)query.execute()).size();
+			result = total;
+		} finally {
+			pm.close();
+		}
+		return result;
+	}
+
 	// return MSO only
 	@SuppressWarnings("unchecked")
 	public NnUser findAuthenticatedMsoUser(String email, String password, long msoId) {
