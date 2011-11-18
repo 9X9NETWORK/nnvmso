@@ -39,7 +39,7 @@ var page$ = {
           children: nodes,
           onLazyRead: function(node) {
             if (node.data.isFolder && node.data.type == 'category') {
-              cms.post('/CMSAPI/listCategoryChannelSets', { 'categoryId': node.data.key }, function(channelSets) {
+              cms.post('/CMSAPI/listCategoryChannelSets', { 'categoryId': node.data.key, 'isPublic': true }, function(channelSets) {
                 for (var i in channelSets) {
                   var channelSet = channelSets[i];
                   var channelSetId = channelSet.key.id;

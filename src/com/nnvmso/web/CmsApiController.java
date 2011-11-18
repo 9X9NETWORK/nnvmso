@@ -870,7 +870,7 @@ public class CmsApiController {
 	}
 	
 	@RequestMapping("listCategoryChannelSets")
-	public @ResponseBody List<ChannelSet> listCategoryChannelSets(@RequestParam Long categoryId) {
+	public @ResponseBody List<ChannelSet> listCategoryChannelSets(@RequestParam Long categoryId, @RequestParam(required=false) Boolean isPublic) {
 		CategoryChannelSetManager cscMngr = new CategoryChannelSetManager();
 		ChannelSetManager channelSetMngr = new ChannelSetManager();
 		
@@ -879,7 +879,11 @@ public class CmsApiController {
 		for (CategoryChannelSet ccs : ccss) {
 			channelSetIdList.add(ccs.getChannelSetId());
 		}
-		return channelSetMngr.findAllByChannelSetIds(channelSetIdList);
+		if (isPublic != null && isPublic) {
+			return channelSetMngr.findAllPublicByChannelSetIds(channelSetIdList);
+		} else {
+			return channelSetMngr.findAllByChannelSetIds(channelSetIdList);
+		}
 	}
 	
 	/**

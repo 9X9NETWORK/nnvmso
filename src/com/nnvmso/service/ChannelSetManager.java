@@ -139,4 +139,17 @@ public class ChannelSetManager {
 		return results;
 	}
 	
+	public List<ChannelSet> findAllPublicByChannelSetIds(
+			List<Long> channelSetIdList) {
+		
+		List<ChannelSet> results = new ArrayList<ChannelSet>();
+		List<ChannelSet> candidates = this.findAllByChannelSetIds(channelSetIdList);
+		for (ChannelSet set : candidates) {
+			if (set.isPublic()) {
+				results.add(set);
+			}
+		}
+		return results;
+	}
+	
 }
