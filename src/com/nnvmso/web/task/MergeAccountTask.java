@@ -75,7 +75,7 @@ public class MergeAccountTask {
 		} catch (Exception e) {
 			return NnNetUtil.textReturn("exception happens");
 		}
-		this.sendEmail("runMarkSub", "done");
+		this.sendEmail("runMarkSub " + start, "done");
 		return NnNetUtil.textReturn(output);
 	}
 
@@ -105,6 +105,15 @@ public class MergeAccountTask {
 		String output = "user total:" + users.size();		
 		return NnNetUtil.textReturn(output);
 	}
+
+	@RequestMapping("userAll")
+	public ResponseEntity<String> userAll() { 			
+		NnUserManager userMngr = new NnUserManager();				
+		List<NnUser> users = userMngr.findUsers();	
+		String output = "user total:" + users.size();		
+		return NnNetUtil.textReturn(output);
+	}
+	
 	
 	//remove podcast subscription
 	@RequestMapping(value="runRemoveSub")

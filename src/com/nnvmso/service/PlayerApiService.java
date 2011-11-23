@@ -31,6 +31,7 @@ import com.google.appengine.api.datastore.DatastoreNeedIndexException;
 import com.google.appengine.api.datastore.DatastoreTimeoutException;
 import com.google.apphosting.api.DeadlineExceededException;
 import com.nnvmso.dao.ShardedCounter;
+import com.nnvmso.lib.AuthLib;
 import com.nnvmso.lib.CookieHelper;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnStringUtil;
@@ -160,11 +161,11 @@ public class PlayerApiService {
 		if (key.length != value.length)
 			return this.assembleMsgs(NnStatusCode.INPUT_ERROR, null);
 		
-		String[] invalid = {"name", "year", "password", 
-                "OldPassword", "sphere", "ui-lang", "gender"};		
+		String[] valid = {"name", "year", "password", 
+                "oldPassword", "sphere", "ui-lang", "gender"};		
 		HashSet<String> dic = new HashSet<String>();
-		for (int i=0; i<invalid.length; i++) {
-			dic.add(invalid[i]);
+		for (int i=0; i<valid.length; i++) {
+			dic.add(valid[i]);
 		}				
 		for (int i=0; i<key.length; i++) {
 			if (!dic.contains(key[i]))
@@ -206,6 +207,8 @@ public class PlayerApiService {
 			if (status != NnStatusCode.SUCCESS)
 				return this.assembleMsgs(status, null);
 			user.setPassword(password);
+			user.setSalt(AuthLib.generateSalt());
+			user.setCryptedPassword(AuthLib.encryptPassword(user.getPassword(), user.getSalt()));			
 		}
 		
 		userMngr.save(user);
@@ -813,6 +816,7 @@ public class PlayerApiService {
 	public String createUser(String email, String password, String name, String token,
 				             String captchaFilename, String captchaText,
 				             String sphere, String lang,
+				             String year,
 			                 HttpServletRequest req, HttpServletResponse resp) {		
 		int status = NnUserValidator.validate(email, password, name, req);
 		if (status != NnStatusCode.SUCCESS) 
@@ -847,7 +851,8 @@ public class PlayerApiService {
 
 		user = new NnUser(email, password, name, NnUser.TYPE_USER, mso.getKey().getId());
 		user.setSphere(sphere);
-		user.setLang(lang);
+		user.setLang(lang);		
+		user.setDob(year);
 		userMngr.create(user, token);
 		userMngr.subscibeDefaultChannels(user);							
 		String[] result = {this.prepareUserInfo(user, null)};		

@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 
 import org.codehaus.jackson.map.ObjectMapper;
+import org.mortbay.log.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -89,6 +90,23 @@ public class AdminMsoChannelController {
 		}
 		return NnNetUtil.textReturn(output);
 	}	
+
+	@RequestMapping("createPiwik")
+	public @ResponseBody String createPiwik(
+				HttpServletRequest req,
+				@RequestParam(value="id",required=false) long id) {
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		MsoChannel c = channelMngr.findById(id);
+		if (c != null) {
+			if (c.getPiwik() == null) {
+				String piwikId = PiwikLib.createPiwikSite(0, c.getKey().getId(), req);
+				logger.info("piwikId:" + piwikId);
+				c.setPiwik(piwikId);
+				channelMngr.save(c);					
+			}			
+		}
+		return "OK";
+	}
 	
 	@RequestMapping("createBatch")
 	public @ResponseBody String createBatch(
@@ -96,22 +114,26 @@ public class AdminMsoChannelController {
 				@RequestParam(value="devel",required=false) boolean devel) {
 		String lang = "Zh";
 		String[] urls = {
-				"http://www.youtube.com/user/Yamashita916",
-				"http://www.youtube.com/user/DianaAmazing",
-				"http://www.youtube.com/user/tbwtv",
-				"http://www.youtube.com/user/TVHS109",
-				"http://www.youtube.com/user/ntdchinese",
-				"http://www.youtube.com/user/ChinaTimes",
-				"http://www.youtube.com/user/TheChineseNews",				
+				"http://www.youtube.com/user/achun5",
+				"http://www.youtube.com/user/luckyboommini",
+				"http://www.youtube.com/user/wondergirls",
+				"http://www.youtube.com/user/beyonceVEVO",
+				"http://www.youtube.com/user/linkinparktv",
+				"http://www.youtube.com/user/ladygagavevo",
+				"http://www.youtube.com/user/KatyPerryVEVO",
+				"http://www.youtube.com/user/CAguileraVevo",
+				"http://www.youtube.com/user/RihannaVevo",
 		};
 		String[] names= {
-				"老中地方新聞",
-				"丁丁電視",
-				"世界電視",
-				"TVHS",
-				"大唐人電視",
-				"中時電子報",
-				"CCTV News",				
+				"蘇打綠官方頻道",
+				"蔡黃汝(豆花妹)官方YouTube頻道",
+				"Wonder Girls                                                                            ",
+				"Beyonce VEVO",
+				"The Official Linkin Park YouTube Channel",                                         
+				"Lady Gaga Vevo",
+				"Katy Perry VEVO",
+				"Christina Aguilera Vevo",
+				"Rihanna Vevo",
 		};
 		for (int i=0; i<urls.length; i++) {
 			channelMngr.create(urls[i], names[i], devel, req);

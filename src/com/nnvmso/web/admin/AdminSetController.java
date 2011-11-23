@@ -53,6 +53,43 @@ public class AdminSetController {
 		}
 		return NnNetUtil.textReturn("OK");
 	}
+
+	@RequestMapping("changeSet")
+	public ResponseEntity<String> changeSet() {
+		String[] urls = {
+				"http://www.youtube.com/user/achun5",
+				"http://www.youtube.com/user/luckyboommini",
+				"http://www.youtube.com/user/wondergirls",
+				"http://www.youtube.com/user/beyonceVEVO",
+				"http://www.youtube.com/user/linkinparktv",
+				"http://www.youtube.com/user/ladygagavevo",
+				"http://www.youtube.com/user/KatyPerryVEVO",
+				"http://www.youtube.com/user/CAguileraVevo",
+				"http://www.youtube.com/user/RihannaVevo",
+		};
+		ChannelSetManager setMngr = new ChannelSetManager();
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
+		ChannelSet set = setMngr.findByName("本周主打星");
+		if (set != null) {
+			List<ChannelSetChannel> list = cscMngr.findByChannelSetId(set.getKey().getId());
+			cscMngr.deleteAll(list);
+			List<MsoChannel> channels = new ArrayList<MsoChannel>();
+			for (int i=0; i<urls.length; i++) {
+				String checkedUrl = YouTubeLib.formatCheck(urls[i]);
+				MsoChannel c = channelMngr.findBySourceUrlSearch(checkedUrl);
+				channels.add(c);
+			}
+			int i=1;
+			for (MsoChannel c : channels) {			
+				ChannelSetChannel csc = new ChannelSetChannel(set.getKey().getId(), c.getKey().getId(), i);
+				i++;
+				cscMngr.save(csc);
+			}
+		}
+		return NnNetUtil.textReturn("OK");
+		
+	}
 	
 	@RequestMapping("createBatch")
 	public ResponseEntity<String> createBatch() {

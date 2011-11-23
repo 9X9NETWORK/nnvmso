@@ -3,14 +3,11 @@ package com.nnvmso.web.admin;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.jsr107cache.Cache;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.nnvmso.lib.CacheFactory;
 import com.nnvmso.lib.CookieHelper;
 import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.model.Mso;
@@ -34,6 +31,33 @@ public class AdminConfigController {
 		
 		String output = "transcoding server: " + transcodingServer + "\n";
 		output = output + "callback server: " + callbackUrl;
+		
+		return NnNetUtil.textReturn(output);
+	}
+
+	@RequestMapping("piwikServer")
+	public ResponseEntity<String> piwikServer(HttpServletRequest req) {
+		String urlRoot = NnNetUtil.getUrlRoot(req);
+		String site = "";
+		if (urlRoot.contains("demo")) {
+			site = "demo.";
+		} else if (urlRoot.contains("localhost") ||
+				   urlRoot.contains("office") ||
+				   urlRoot.contains("beta")){
+			return null;
+		} else if (urlRoot.contains("alpha")) {
+			site = "alpha.";
+		} else if (urlRoot.contains("puppy")) {
+			site = "dev.";
+		} else if (urlRoot.contains("qa")) {
+			site = "qa.";
+		}		
+		String postHost = "http://" + site + "piwik.9x9.tv";
+		if (urlRoot.contains("cms")) {
+			postHost = "http://piwik.teltel.com";
+		}
+		
+		String output = "piwik server: " + postHost + "\n";
 		
 		return NnNetUtil.textReturn(output);
 	}

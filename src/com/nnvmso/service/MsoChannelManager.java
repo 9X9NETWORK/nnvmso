@@ -582,7 +582,10 @@ public class MsoChannelManager {
 				sb.toString(),
 				MAX_NUMBER_OF_WORDS_TO_PUT_IN_INDEX);				
 		Set<String> ftsTokens = channel.getFts();
-		ftsTokens.clear();
+		if (ftsTokens != null)
+			ftsTokens.clear();
+		else
+			ftsTokens = new HashSet<String>();
 		for (String token : new_ftsTokens) {
 			ftsTokens.add(token);
 		}		

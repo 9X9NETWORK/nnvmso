@@ -65,7 +65,8 @@ import com.nnvmso.web.json.transcodingservice.RtnProgram;
 //initMso
 
 /* 2nd run */
-//wipe out data: Category, CategoryChannel, CategoryChannelSet, ChannelSet, ChannelSetChannel, ContentOwnership
+//wipe out data: Category, CategoryChannelSet, (ChannelSet, ChannelSetChannel, ContentOwnership)
+//admin/set/deleteMso?id=8001
 //ChannelStatusMapper (mark all the channels to waiting_approval status)
 
 //initSetsToTask?isEnglish=true&isDevel=false
@@ -371,18 +372,20 @@ public class AdminInitController {
 		return NnNetUtil.textReturn("OK");		
 	}		
 
-	@RequestMapping("lessMapleToTask")
-	public ResponseEntity<String> lessMapleToTask(HttpServletRequest req) {
+	@RequestMapping("mapleNamesToTask")
+	public ResponseEntity<String> mapleNamesToTask(HttpServletRequest req) {
 		QueueFactory.getDefaultQueue().add(
-			      TaskOptions.Builder.withUrl("/admin/init/lessMaple"));			          
+			      TaskOptions.Builder.withUrl("/admin/init/mapleNames"));			          
 		return NnNetUtil.textReturn("You will receive an email when it is done.");
 	}	
 	
-	@RequestMapping("lessMaple")
-	public ResponseEntity<String> lessMaple(
+	@RequestMapping("mapleNames")
+	public ResponseEntity<String> mapleNames(
 			HttpServletRequest req) {
 		initService.setRequest(req);		
-		initService.lessMaple();
+		//initService.excelTest(false);
+		initService.mapleNames(false, false);
+		this.sendEmail("mapleNames", "done");
 		return NnNetUtil.textReturn("OK");
 	}
 
@@ -420,6 +423,52 @@ public class AdminInitController {
         } catch (Exception e) {
         	NnLogUtil.logException(e);
 		}					
+	}
+
+	@RequestMapping("initPiwikSetToTask")
+	public ResponseEntity<String> initPiwikSetToTask(
+			@RequestParam(value="isEnglish",required=false) boolean isEnglish,
+			@RequestParam(value="isDevel",required=false) boolean isDevel) {
+		QueueFactory.getDefaultQueue().add(
+			      TaskOptions.Builder.withUrl("/admin/init/initPiwikSet")
+			         .param("isEnglish", String.valueOf(isEnglish))
+			         .param("isDevel", String.valueOf(isDevel))			      			      
+		);			          
+		return NnNetUtil.textReturn("You will receive an email when it is done.");
+	}
+	
+	@RequestMapping("initPiwikSet")
+	public ResponseEntity<String> initPiwikSet(
+			@RequestParam(value="isEnglish",required=false) boolean isEnglish,
+			@RequestParam(value="isDevel",required=false) boolean isDevel,			
+			HttpServletRequest req) {
+		initService.setRequest(req);
+		initService.initPiwikSet(isEnglish, isDevel);
+		this.sendEmail("init all the channels done", "done");
+		return NnNetUtil.textReturn("OK");		
+	}
+
+	@RequestMapping("initChannelPiwikToTask")
+	public ResponseEntity<String> initChannelPiwikToTask(
+			@RequestParam(value="isEnglish",required=false) boolean isEnglish,
+			@RequestParam(value="isDevel",required=false) boolean isDevel) {
+		QueueFactory.getDefaultQueue().add(
+			      TaskOptions.Builder.withUrl("/admin/init/initChannelPiwik")
+			         .param("isEnglish", String.valueOf(isEnglish))
+			         .param("isDevel", String.valueOf(isDevel))			      			      
+		);			          
+		return NnNetUtil.textReturn("You will receive an email when it is done.");
+	}
+	
+	@RequestMapping("initChannelPiwik")
+	public ResponseEntity<String> initChannelPiwik(
+			@RequestParam(value="isEnglish",required=false) boolean isEnglish,
+			@RequestParam(value="isDevel",required=false) boolean isDevel,			
+			HttpServletRequest req) {
+		initService.setRequest(req);
+		initService.initChannelPiwik(isEnglish, isDevel);
+		this.sendEmail("init all the channels piwik done", "done");
+		return NnNetUtil.textReturn("OK");		
 	}
 	
 }

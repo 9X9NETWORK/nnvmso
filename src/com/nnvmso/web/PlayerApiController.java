@@ -37,7 +37,7 @@ import com.nnvmso.service.PlayerApiService;
  * <p>
  * Player Request: <br/>
  * http://qa.9x9.tv/playerAPI/brandInfo?mso=9x9
- * <p>
+ * <p>k
  * Service response:  <br/>
  * 0	success<br/>
  * --<br/>
@@ -370,6 +370,8 @@ public class PlayerApiController {
 	 *  @param email email
 	 *  @param password password
 	 *  @param name display name
+	 *  @param sphere content region, en or zh
+	 *  @param lang user preferred language, en or zh
 	 *  @return please reference login
 	 */	
 	@RequestMapping(value="signup")
@@ -381,6 +383,7 @@ public class PlayerApiController {
 		String captcha = req.getParameter("captcha");
 		String text = req.getParameter("text");
 		String sphere = req.getParameter("sphere");
+		String year = req.getParameter("year");
 		String lang = req.getParameter("lang");
 		
 		log.info("signup: email=" + email + ";name=" + name + ";userToken=" + userToken + ";password=" + password);
@@ -391,7 +394,7 @@ public class PlayerApiController {
 
 		String output = NnStatusMsg.errorStr(locale);
 		try {
-			output = playerApiService.createUser(email, password, name, userToken, captcha, text, sphere, lang, req, resp);
+			output = playerApiService.createUser(email, password, name, userToken, captcha, text, sphere, lang, year, req, resp);
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}

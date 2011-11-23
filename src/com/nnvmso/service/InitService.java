@@ -89,14 +89,26 @@ public class InitService {
 		initMapelPrograms();
 	}
 		
-	public void lessMaple() {
+	public void mapleNames(boolean english, boolean devel) {
 		MsoChannelManager channelMngr = new MsoChannelManager();
-		List<MsoChannel> channels = channelMngr.findMaples();
-		TranscodingService tranService = new TranscodingService();
-		for (MsoChannel c : channels) {
-			tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
+		String[] entries = this.getChannelUrlsFromExcel(english);
+		int cnt = 0;
+		for (String entry : entries) {	
+			String[] data = entry.split(",");
+			String url = data[0];
+			String name = null;
+			if (data.length == 2)
+				name = data[1];
+			MsoChannel c = channelMngr.findBySourceUrlSearch(url);
+			if (c != null) {
+				if (c.getName() == null) {
+					c.setName(name);
+					channelMngr.save(c);					
+					cnt++;
+				}
+			}
 		}
-		log.info("maple channel re-submission: " + channels.size());
+		log.info("channel modified:" + cnt);
 	}
 	
 	 //for local testing only
@@ -460,7 +472,12 @@ public class InitService {
 						    			log.info("url not passed youtube lib check:" + url);
 						    		}
 					    		} else {
-					    			list.add(url + "," + "");
+					    			Cell nameCell = row.getCell(c-1);
+					    			String name = "";
+					    			if (nameCell != null) {
+					    				name = nameCell.getStringCellValue();
+					    			}					    			
+					    			list.add(url + "," + name);
 					    			maple++;
 					    		}
 				    		}
@@ -518,11 +535,14 @@ public class InitService {
 			String[] data = entry.split(",");
 			String url = data[0];
 			String name = null;
-			if (data.length == 2)
+			if (data.length == 2) {
 				name = data[1];
+				System.out.println("name:" + name);
+			}
 			MsoChannel c = channelMngr.findBySourceUrlSearch(url);
 			if (c == null) {
 				c = new MsoChannel(url, user.getKey().getId());
+				c.setName(name);
 				c.setStatus(MsoChannel.STATUS_PROCESSING);	
 				c.setContentType(channelMngr.getContentTypeByUrl(url));
 				channelMngr.create(c);
@@ -537,13 +557,13 @@ public class InitService {
 			} else {
 				if (c.getContentType() == MsoChannel.CONTENTTYPE_YOUTUBE_CHANNEL || 
 					c.getContentType() == MsoChannel.CONTENTTYPE_YOUTUBE_PLAYLIST) {
-					if (c.getOriName() == null) {
-						
+					/*
+					if (c.getOriName() == null) {						
 						log.info("re-submit youtube channel:" + c.getSourceUrl());
 						if (!devel)
-							tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
-												
+							tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);												
 					}
+					*/
 				}				
 				if (c.getStatus() == MsoChannel.STATUS_WAIT_FOR_APPROVAL) {
 					log.info("mark the channel from waiting to approval to success");
@@ -564,16 +584,17 @@ public class InitService {
 						tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
 				} else if (c.getStatus() != MsoChannel.STATUS_SUCCESS){
 					log.info("wanted channel but not success");					
-				}				
+				}
+				if (c.getPiwik() != null)
+					piwik = false;
+				if (c.getPiwik() == null && devel)
+					piwik = false;
 			}
 			if (piwik) {
 				String piwikId = PiwikLib.createPiwikSite(0, c.getKey().getId(), req);
 				c.setPiwik(piwikId);
 			}
-			if (c.getContentType() == MsoChannel.CONTENTTYPE_YOUTUBE_CHANNEL || 
-				c.getContentType() == MsoChannel.CONTENTTYPE_YOUTUBE_PLAYLIST) {
-				c.setName(name);
-			}
+			c.setName(name);
 			channelMngr.save(c);				
 		}
 		log.info("< 5 program count:" + zeroProgramCnt); 
@@ -715,8 +736,10 @@ public class InitService {
 			    Row row = sets.getRow(i);			    
 			    Cell cellName = row.getCell(0);
 			    Cell cellDesc = row.getCell(1);
-			    if (cellName.getStringCellValue() != null && cellName.getStringCellValue().length() > 0)
-			    	list.add(cellName.getStringCellValue().trim() + ";" + cellDesc.getStringCellValue().trim());
+			    if (cellName != null) {
+				    if (cellName.getStringCellValue() != null && cellName.getStringCellValue().length() > 0)
+				    	list.add(cellName.getStringCellValue().trim() + ";" + cellDesc.getStringCellValue().trim());
+			    }
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -845,5 +868,68 @@ public class InitService {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}		
-	}	
+	}
+	
+	public void initPiwikSet(boolean english, boolean devel) {
+		ChannelSetManager csMngr = new ChannelSetManager();
+		List<ChannelSet> sets = csMngr.findAll();
+		int cnt = 0;
+		for (ChannelSet cs : sets) {
+			if (cs.getPiwik() == null) {
+				String piwikId = PiwikLib.createPiwikSite(cs.getKey().getId(), 0, req);
+				cs.setPiwik(piwikId);
+				csMngr.save(cs);
+				cnt++;
+			}
+		}
+		log.info("init piwik set count = " + cnt);
+	}
+	
+	public void initChannelPiwik(boolean english, boolean devel) {
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		String[] entries = this.getChannelUrlsFromExcel(english);
+		int cnt = 0;
+		for (String entry : entries) {	
+			String[] data = entry.split(",");
+			String url = data[0];
+			MsoChannel c = channelMngr.findBySourceUrlSearch(url);
+			if (c != null) {
+				if (c.getPiwik() == null) {
+					String piwikId = PiwikLib.createPiwikSite(0, c.getKey().getId(), req);
+					c.setPiwik(piwikId);
+					channelMngr.save(c);					
+					cnt++;
+				}
+			}
+		}
+		log.info("init piwik channel count = " + cnt);
+	}
+	
+	public String[] excelTest(boolean english) {
+		InputStream input;
+		Workbook wb;
+		Set<String> list = new TreeSet<String>(); 
+		try {
+			if (english)
+				input = new FileInputStream("WEB-INF/views/admin/ESets.xlsx");
+			else 
+				input = new FileInputStream("WEB-INF/views/admin/CSets.xlsx");
+			wb = WorkbookFactory.create(input);
+			Sheet sets = wb.getSheetAt(3);			
+			Row row = sets.getRow(2);
+			Cell cell = row.getCell(8);
+			Cell cell1 = row.getCell(9);
+    		System.out.println("name=" + cell.getStringCellValue());
+    		System.out.println("url=" + cell1.getStringCellValue());			    		
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (InvalidFormatException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}	
+		return list.toArray(new String[0]);
+		//return ;		
+	}
+	
 }
