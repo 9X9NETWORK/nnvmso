@@ -139,6 +139,7 @@ public class YouTubeLib {
 			}
 			if (playlistFeed.getSubtitle() != null) {
 				String subTitle = playlistFeed.getSubtitle().getPlainText();
+				subTitle = NnStringUtil.truncateUTF8(subTitle);
 				results.put("description", subTitle);
 				log.info("description: " + subTitle);
 			}
@@ -148,6 +149,9 @@ public class YouTubeLib {
 		} catch (com.google.gdata.util.ServiceForbiddenException e) {
 			results.put("status", String.valueOf(NnStatusCode.CHANNEL_YOUTUBE_NOT_AVAILABLE));
 			log.info("ServiceForbiddenException");
+		} catch (IOException e) {
+			results.put("status", String.valueOf(NnStatusCode.ERROR));
+			NnLogUtil.logException(e);
 		} catch (Exception e) {
 			results.put("status", String.valueOf(NnStatusCode.ERROR));
 			NnLogUtil.logException(e);
@@ -185,7 +189,7 @@ public class YouTubeLib {
 			}
 			if (profileEntry.getAboutMe() != null) {
 				String content = profileEntry.getAboutMe();
-				NnStringUtil.truncateUTF8(content);
+				content = NnStringUtil.truncateUTF8(content);
 				results.put("description", content);
 				log.info("description: " + content);
 			}
@@ -200,6 +204,9 @@ public class YouTubeLib {
 		} catch (com.google.gdata.util.ServiceForbiddenException e) {
 			results.put("status", String.valueOf(NnStatusCode.CHANNEL_YOUTUBE_NOT_AVAILABLE));
 			log.info("ServiceForbiddenException");
+		} catch (IOException e) {
+			results.put("status", String.valueOf(NnStatusCode.ERROR));
+			NnLogUtil.logException(e);
 		} catch (Exception e) {
 			results.put("status", String.valueOf(NnStatusCode.ERROR));
 			NnLogUtil.logException(e);
