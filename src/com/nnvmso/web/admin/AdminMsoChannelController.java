@@ -328,7 +328,7 @@ public class AdminMsoChannelController {
 			cell.add(channel.getContentType());
 			cell.add(channel.getLangCode());
 			cell.add(channel.isPublic());
-			cell.add(channel.isFeatured());
+			cell.add(channel.getPiwik());
 			cell.add(channel.getProgramCount());
 			cell.add(subLogMngr.findTotalCountByChannelId(channel.getKey().getId()));
 			cell.add(channel.getIntro());

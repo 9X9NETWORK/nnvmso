@@ -575,26 +575,15 @@ var page$ = {
             }
           },
           {
-            label:     'Featured',
-            name:      'featured',
-            index:     'featured',
+            label:     'Piwik',
+            name:      'piwik',
+            index:     'piwik',
             width:     70,
             align:     'center',
-            search:    true,
-            stype:     'select',
             sortable:  true,
-            formatter: 'checkbox',
             editable:  true,
-            edittype:  'checkbox',
             editoptions: {
-              value: 'true:false'
-            },
-            searchoptions: {
-              sopt:  ['eq'],
-              value: {
-                'true':  'true',
-                'false': 'false'
-              }
+              disabled: true
             }
           },
           {
