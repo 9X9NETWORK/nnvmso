@@ -1228,6 +1228,8 @@ public class PlayerApiService {
 	
 	private String composeChannelLineupStr(MsoChannel c, Mso mso) {
 		String intro = c.getIntro();
+		if (intro != null)
+			intro = intro.replaceAll("\n", " ").replaceAll("\t", " ");
 		String imageUrl = c.getPlayerPrefImageUrl();	
 		String youtubeId = "";
 		if (c.getSourceUrl() != null && c.getSourceUrl().contains("http://www.youtube.com"))

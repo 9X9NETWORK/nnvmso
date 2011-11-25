@@ -139,7 +139,7 @@ public class YouTubeLib {
 			}
 			if (playlistFeed.getSubtitle() != null) {
 				String subTitle = playlistFeed.getSubtitle().getPlainText();
-				subTitle = NnStringUtil.truncateUTF8(subTitle);
+				subTitle = NnStringUtil.truncateUTF8(subTitle).replaceAll("\t", " ").replaceAll("\n", " ");
 				results.put("description", subTitle);
 				log.info("description: " + subTitle);
 			}
@@ -189,7 +189,7 @@ public class YouTubeLib {
 			}
 			if (profileEntry.getAboutMe() != null) {
 				String content = profileEntry.getAboutMe();
-				content = NnStringUtil.truncateUTF8(content);
+				content = NnStringUtil.truncateUTF8(content).replaceAll("\t", " ").replaceAll("\n", " ");
 				results.put("description", content);
 				log.info("description: " + content);
 			}
