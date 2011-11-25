@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.jdo.JDOUserException;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.mortbay.log.Log;
@@ -236,6 +237,7 @@ public class AdminMsoChannelController {
 			currentPage = 1;
 			results = new ArrayList<MsoChannel>();
 			if (searchString.matches("^[0-9]+$")) {
+				
 				MsoChannel found = channelMngr.findById(Long.parseLong(searchString));
 				if (found != null) {
 					totalRecords++;
@@ -244,25 +246,66 @@ public class AdminMsoChannelController {
 			}
 		} else if (searchField != null && searchOper != null && searchString != null
 		           && searchOper.equals("eq")
-		           && (searchField.equals("status") || searchField.equals("contentType") || searchField.equals("isPublic") || searchField.equals("featured") || searchField.equals("sourceUrl") || searchField.equals("name")  || searchField.equals("langCode"))) {
+		           && (searchField.equals("status") || searchField.equals("contentType") || searchField.equals("isPublic") || searchField.equals("featured") || searchField.equals("sourceUrl") || searchField.equals("langCode"))) {
 			
 			if (searchField.equals("sourceUrl")) {
 				searchString = NnStringUtil.escapedQuote(searchString.toLowerCase());
 				searchField += "Search";
-			} else if (searchField.equals("name")) {
-				searchString = NnStringUtil.escapedQuote(searchString);
-			} else if (searchField.equals("langCode")) {
+			}  else if (searchField.equals("langCode")) {
 				searchString = NnStringUtil.escapedQuote(searchString);
 			}
 			
 			String filter = searchField + " == " + searchString;
 			logger.info("filter = " + filter);
+
 			totalRecords = channelMngr.total(filter);
 			totalPages = (int)Math.ceil((double)totalRecords / rowsPerPage);
 			if (currentPage > totalPages)
 				currentPage = totalPages;
 			results = channelMngr.list(currentPage, rowsPerPage, "updateDate", "desc", filter);
-		} else {
+		}else if (searchField != null && searchOper != null && searchString != null
+		           && searchOper.equals("eq")
+		           && searchField.equals("name")){
+			//use fuzzy search for "name"
+			
+			results = new ArrayList<MsoChannel>();
+			List<MsoChannel> totalResults = new ArrayList<MsoChannel>();
+			try{
+				totalResults = MsoChannelManager.searchChannelEntries(searchString);
+				totalRecords = totalResults.size();
+				totalPages = (int)Math.ceil((double)totalRecords / rowsPerPage);
+				
+				if(totalPages==0)
+				{
+					currentPage = 1;
+					totalPages = 1;
+				}
+				else if(currentPage > totalPages)
+					currentPage = totalPages;
+				
+				if(totalRecords>0)
+				{
+					for(int i=(currentPage-1)*rowsPerPage;i<currentPage*rowsPerPage;i++)
+					{
+						if(i<totalRecords)
+						{
+							results.add(totalResults.get(i));
+						}
+					}
+				}
+			}
+			catch(JDOUserException e)
+			{
+				//handle illegal input from user, return an empty page, see more at "MsoChannelManager.searchChannelEntries".
+				logger.warning("illegal input from user");
+				logger.warning(e.getMessage());
+
+				totalRecords = 0;
+				totalPages = 1;
+				currentPage = 1;
+			}
+		}else {
+		
 			totalRecords = channelMngr.total();
 			totalPages = (int)Math.ceil((double)totalRecords / rowsPerPage);
 			if (currentPage > totalPages)
