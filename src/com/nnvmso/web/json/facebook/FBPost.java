@@ -1,4 +1,4 @@
-package com.nnvmso.web.json.transcodingservice;
+package com.nnvmso.web.json.facebook;
 
 public class FBPost {
 	private String message;

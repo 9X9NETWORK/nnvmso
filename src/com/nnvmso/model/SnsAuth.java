@@ -2,13 +2,17 @@ package com.nnvmso.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
+import javax.jdo.annotations.NotPersistent;
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;
 import javax.jdo.annotations.PrimaryKey;
 
 import com.google.appengine.api.datastore.Key;
+import com.nnvmso.web.json.facebook.FacebookPage;
 
 @PersistenceCapable(detachable = "true")
 public class SnsAuth implements Serializable {
@@ -43,6 +47,9 @@ public class SnsAuth implements Serializable {
 	
 	@Persistent
 	private Date createDate;
+	
+	@NotPersistent
+	private List<FacebookPage> pages;
 	
 	public SnsAuth(long msoId, short type, String token) {
 		this.msoId = msoId;
@@ -104,5 +111,13 @@ public class SnsAuth implements Serializable {
 
 	public boolean isEnabled() {
 		return enabled;
+	}
+
+	public List<FacebookPage> getPages() {
+		return pages;
+	}
+
+	public void setPages(List<FacebookPage> pages) {
+		this.pages = pages;
 	}
 }

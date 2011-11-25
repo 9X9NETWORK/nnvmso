@@ -107,7 +107,7 @@ var page$ = {
     },
     initChannel: function(channelId, channelName) {
       $('.sns_checkbox').attr('checked', false);
-      $('.facebook_select option[value!=""]').remove();
+      $('.facebook_select').val(0);
       // load auto-sharing info
       var parameters = {
         'channelId': channelId,
@@ -118,22 +118,11 @@ var page$ = {
           var autosharing = autosharings[i];
           switch(autosharing.type) {
             case 1:
-            /*
-            if (autosharing.parameter != null && autosharing.parameter != "") {
-              var splitted = autosharing.parameter.split(':', 2);
-              if (splitted[0] != null && splitted[1] != null && splitted[0] != "" && splitted[1] != "") {
-                var api = 'https://graph.facebook.com/' + splitted[0] + '?callback=?';
-                var parameters = {
-                  'access_token': splitted[1]
-                };
-                cms.get(api, parameters, function(response) {
-                  log('can_post: ' + response.can_post);
-                  $('<option/>').val(autosharing.parameter).text(response.name).attr('selected', true).appendTo('.facebook_select');
-                }, 'json');
-              }
-            }
-            */
             $('input[name="sns_facebook"]').attr('checked', true);
+            var target = autosharing.target;
+            if (typeof target != 'undefined' && target != null && page$.facebookPages[target]) {
+              $('.facebook_select').val(target);
+            }
             break;
             case 2:
             $('input[name="sns_twitter"]').attr('checked', true);
@@ -148,20 +137,52 @@ var page$ = {
           }
         }
         if ($('input[name="sns_facebook"]').attr('disabled') != 'disabled') {
+          $('.facebook_select').unbind('change').change(function() {
+            var parameters = {
+              'msoId': $('#msoId').val(),
+              'channelId': channelId,
+              'type': 1
+            };
+            var fb_page_id = $('.facebook_select').val();
+            if (fb_page_id != null && fb_page_id != 0 && page$.facebookPages[fb_page_id]) {
+              parameters['target'] = fb_page_id;
+              parameters['secrete'] = page$.facebookPages[fb_page_id].access_token;
+            }
+            if ($('input[name="sns_facebook"]').is(':checked') == false) {
+              return;
+            }
+            cms.post('/CMSAPI/createChannelAutosharing', parameters, function(response) {
+              if (response == 'OK')
+                alert($('#lang_update_successfully').text());
+              else
+                alert($('#lang_warning_error_occurs').text());
+            }, 'text');
+          });
           $('input[name="sns_facebook"]').unbind('change').change(function() {
             var parameters = {
               'msoId': $('#msoId').val(),
               'channelId': channelId,
               'type': 1
             };
-            if ($(this).is(':checked')) {
-              cms.post('/CMSAPI/createChannelAutosharing', parameters, function() {
-                alert($('#lang_update_successfully').text());
-              });
+            var fb_page_id = $('.facebook_select').val();
+            if (fb_page_id != null && fb_page_id != 0 && page$.facebookPages[fb_page_id]) {
+              parameters['target'] = fb_page_id;
+              parameters['secrete'] = page$.facebookPages[fb_page_id].access_token;
+            }
+            if ($('input[name="sns_facebook"]').is(':checked')) {
+              cms.post('/CMSAPI/createChannelAutosharing', parameters, function(response) {
+                if (response == 'OK')
+                  alert($('#lang_update_successfully').text());
+                else
+                  alert($('#lang_warning_error_occurs').text());
+              }, 'text');
             } else {
-              cms.post('/CMSAPI/removeChannelAutosharing', parameters, function() {
-                alert($('#lang_update_successfully').text());
-              });
+              cms.post('/CMSAPI/removeChannelAutosharing', parameters, function(response) {
+                if (response == 'OK')
+                  alert($('#lang_update_successfully').text());
+                else
+                  alert($('#lang_warning_error_occurs').text());
+              }, 'text');
             }
           });
         }
@@ -337,6 +358,7 @@ var page$ = {
       */
     }
   },
+  facebookPages: { },
   init: function(){
     var css = '<style> .chPublic { background:url(' + $('#image_ch_public').text() + ') no-repeat; }\n.chUnPublic { background:url(' + $('#image_ch_unpublic').text() + ') no-repeat; } </style>';
     $(css).appendTo('head');
@@ -357,9 +379,20 @@ var page$ = {
     });
     cms.post('/CMSAPI/listSnsAuth?msoId=' + $('#msoId').val(), function(snsAuths) {
       for (i in snsAuths) {
+        var sns = snsAuths[i];
         switch (snsAuths[i].type) {
           case 1:
           $('input[name="sns_facebook"]').attr('disabled', false).parent().unbind('click').css('color', 'black');
+          $('.facebook_label').css('color', 'black');
+          if (typeof sns.pages != 'undefined' && sns.pages != null && sns.pages.length > 0) {
+            log('pages count: ' + sns.pages.length);
+            for (i in sns.pages) {
+              var page = sns.pages[i];
+              $('<option/>').val(page.id).text(page.name).appendTo('.facebook_select');
+              page$.facebookPages[page.id] = page;
+            }
+            $('.facebook_select').attr('disabled', false);
+          }
           break;
           case 2:
           $('input[name="sns_twitter"]').attr('disabled', false).parent().unbind('click').css('color', 'black');

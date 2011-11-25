@@ -33,7 +33,7 @@ import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoProgram;
 import com.nnvmso.model.SnsAuth;
 import com.nnvmso.model.ViewLog;
-import com.nnvmso.web.json.transcodingservice.FBPost;
+import com.nnvmso.web.json.facebook.FBPost;
 
 @Service
 public class MsoProgramManager {

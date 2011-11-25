@@ -32,6 +32,9 @@ public class ChannelAutosharing implements Serializable {
 	private short type;
 	
 	@Persistent
+	private String target;
+	
+	@Persistent
 	private String parameter;
 	
 	@Persistent
@@ -90,4 +93,12 @@ public class ChannelAutosharing implements Serializable {
 	public String getParameter() {
 		return parameter;
 	}
+
+	public String getTarget() {
+	    return target;
+    }
+
+	public void setTarget(String target) {
+	    this.target = target;
+    }
 }

@@ -14,7 +14,7 @@ import com.google.appengine.api.taskqueue.TaskOptions;
 import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.service.MsoChannelManager;
-import com.nnvmso.web.json.transcodingservice.FBPost;
+import com.nnvmso.web.json.facebook.FBPost;
 
 @Controller
 @RequestMapping("version")

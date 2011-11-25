@@ -62,7 +62,7 @@ import com.nnvmso.service.NnUserManager;
 import com.nnvmso.service.SnsAuthManager;
 import com.nnvmso.service.SubscriptionLogManager;
 import com.nnvmso.service.TranscodingService;
-import com.nnvmso.web.json.transcodingservice.FBPost;
+import com.nnvmso.web.json.facebook.FBPost;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.SyndFeedInput;
@@ -1230,7 +1230,13 @@ public class CmsApiController {
 	public @ResponseBody List<SnsAuth> listSnsAuth(@RequestParam Long msoId) {
 		logger.info("msoId = " + msoId);
 		SnsAuthManager snsMngr = new SnsAuthManager();
-		return snsMngr.findAllByMsoId(msoId);
+		List<SnsAuth> list = snsMngr.findAllByMsoId(msoId);
+		for (SnsAuth sns : list) {
+			if (sns.getType() == SnsAuth.TYPE_FACEBOOK) {
+				FacebookLib.populatePageList(sns);
+			}
+		}
+		return list;
 	}
 	
 	@RequestMapping("listChannelAutosharing")
@@ -1250,23 +1256,34 @@ public class CmsApiController {
 	}
 	
 	@RequestMapping("createChannelAutosharing")
-	public @ResponseBody void createChannelAutosharing(@RequestParam Long msoId,
+	public @ResponseBody String createChannelAutosharing(@RequestParam Long msoId,
 	                                                   @RequestParam Long channelId,
-	                                                   @RequestParam(required=false) String parameter, 
+	                                                   @RequestParam(required=false) String parameter,
+	                                                   @RequestParam(required=false) String target,
 	                                                   @RequestParam Short type) {
 		logger.info("msoId = " + msoId);
 		logger.info("channelId = " + channelId);
 		logger.info("type = " + type);
 		logger.info("parameter = " + parameter);
+		logger.info("target = " + target);
 		
 		AutosharingService shareService = new AutosharingService();
-		if (shareService.findChannelAutosharing(msoId, channelId, type) == null) {
-			ChannelAutosharing autosharing = new ChannelAutosharing(msoId, channelId, type);
+		ChannelAutosharing autosharing = shareService.findChannelAutosharing(msoId, channelId, type);
+		if (autosharing == null) {
+			autosharing = new ChannelAutosharing(msoId, channelId, type);
 			if (parameter != null) {
 				autosharing.setParameter(parameter);
 			}
+			if (target != null) {
+				autosharing.setTarget(target);
+			}
 			shareService.create(autosharing);
+		} else {
+			autosharing.setParameter(parameter);
+			autosharing.setTarget(target);
+			shareService.save(autosharing);
 		}
+		return "OK";
 	}
 	
 	@RequestMapping("createChannelSetAutosharing")
@@ -1284,7 +1301,7 @@ public class CmsApiController {
 	}
 	
 	@RequestMapping("removeChannelAutosharing")
-	public @ResponseBody void removeChannelAutosharing(@RequestParam Long msoId,
+	public @ResponseBody String removeChannelAutosharing(@RequestParam Long msoId,
 	                                                   @RequestParam Long channelId,
 	                                                   @RequestParam Short type) {
 		logger.info("msoId = " + msoId);
@@ -1296,6 +1313,7 @@ public class CmsApiController {
 		if (autosharing != null) {
 			shareService.delete(autosharing);
 		}
+		return "OK";
 	}
 	
 	@RequestMapping("removeChannelSetAutosharing")

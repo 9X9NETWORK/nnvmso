@@ -77,10 +77,10 @@
         </div>
         <br/>
         <label class="pro_check">
-          <input type="checkbox" class="sns_checkbox" name="sns_facebook" disabled="disabled"/>&nbsp; <span style="color:grey"><spring:message code="cms.promotion_tools.label.facebook"/></span>
+          <input type="checkbox" class="sns_checkbox" name="sns_facebook" disabled="disabled"/>&nbsp; <span style="color:grey" class="facebook_label"><spring:message code="cms.promotion_tools.label.facebook"/></span>
         </label>
         <select class="facebook_select" disabled="disabled">
-          <option value=""><spring:message code="cms.promotion_tools.label.my_profile_page"/></option>
+          <option value="0"><spring:message code="cms.promotion_tools.label.my_profile_page"/></option>
         </select>
         <br/>
         <label class="pro_check" style="display:none"><input type="checkbox" class="sns_checkbox" name="sns_twitter" disabled="disabled"/>&nbsp; <spring:message code="cms.promotion_tools.label.twitter"/></label>
@@ -101,6 +101,7 @@
 <label class="lang" id="lang_label_channel_set"><spring:message code="cms.promotion_tools.label.channel_set"/></label>
 <label class="lang" id="lang_confirm_goto_setting_page"><spring:message code="cms.warning.goto_setting_page"/></label>
 <label class="lang" id="lang_update_successfully"><spring:message code="cms.warning.update_successfully"/></label>
+<label class="lang" id="lang_warning_error_occurs"><spring:message code="cms.warning.error_occurs"/></label>
 <label class="lang" id="image_ch_public"><spring:message code="cms.image.ch_public"/></label>
 <label class="lang" id="image_ch_unpublic"><spring:message code="cms.image.ch_unpublic"/></label>
 </body>

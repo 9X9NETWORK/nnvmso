@@ -37,6 +37,10 @@ public class AutosharingService {
 		return channelAutosharingDao.findChannelAutosharing(msoId, channelId, type);
 	}
 	
+	public void save(ChannelAutosharing autosharing) {
+		channelAutosharingDao.save(autosharing);
+	}
+	
 	public void create(ChannelAutosharing autosharing) {
 		autosharing.setCreateDate(new Date());
 		channelAutosharingDao.save(autosharing);
