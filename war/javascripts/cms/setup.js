@@ -12,6 +12,42 @@ var pageSetup = {
     $('.setupContent').hide();
     $('#setPs').show();
   },
+  showConnect: function() {
+    $('#facebook_connect').show();
+    $('#facebook_disconnect').hide();
+    $('#fb_field').hide();
+  },
+  showDisconnect: function(enabled) {
+    $('#facebook_connect').hide();
+    $('#facebook_disconnect').show();
+    $('#fb_switch').unbind();
+    if (enabled) {
+      $('#fb_switch').text($('#lang_button_disable_autosharing').text()).click(function() {
+        $.post('/CMSAPI/setSnsAuth', { 'msoId': $('#msoId').val(), 'enabled': false, 'type': 1 }, function(response) {
+          if (response != "OK") {
+            log('response: ' + response);
+            alert($('#lang_warning_error_occurs').text());
+            return;
+          }
+          alert($('#lang_update_successfully').text());
+          pageSetup.showDisconnect(false);
+        }, 'text');
+      });
+    } else {
+      $('#fb_switch').text($('#lang_button_enable_autosharing').text()).click(function() {
+        $.post('/CMSAPI/setSnsAuth', { 'msoId': $('#msoId').val(), 'enabled': true, 'type': 1 }, function(response) {
+          if (response != "OK") {
+            log('response: ' + response);
+            alert($('#lang_warning_error_occurs').text());
+            return;
+          }
+          alert($('#lang_update_successfully').text());
+          pageSetup.showDisconnect(true);
+        }, 'text');
+      });
+    }
+    $('#fb_field').show();
+  },
   init: function() {
     $('#tabB').hide();
     $('.setup_context').css('background', 'url(' + $('#image_bg_setup').text() + ') no-repeat');
@@ -20,8 +56,7 @@ var pageSetup = {
       for (i in snsList) {
         var sns = snsList[i];
         if (sns.type == 1) {
-          $('#facebook_connect').hide();
-          $('#facebook_disconnect').show();
+          pageSetup.showDisconnect(sns.enabled);
         }
       }
     });
@@ -47,54 +82,37 @@ var pageSetup = {
       }
     });
     
-    FB.init({
-      appId  : '110847978946712',
-      status : true, // check login status
-      cookie : true, // enable cookies to allow the server to access the session
-      xfbml  : true  // parse XFBML
-    });
-    
-    $('#facebook_connect').unbind().click(function() {
-      FB.login(function(response) {
-        /**
-         * response = {
-         *   status: 'connected',
-         *   session: {
-         *     access_token: '...',
-         *     expires:      '...',
-         *     secret:       '...',
-         *     session_key:  '...',
-         *     sig:          '...',
-         *     uid:          '...'
-         *   },
-         *   perms: 'read_stream'
-         * }
-         *
-         * - OR -
-         *
-         * response = {
-         *   status:  'notConnected',
-         *   session: null,
-         *   perms:   null
-         * }
-         */
-        if (response.status == 'connected') {
+    cms.loadFacebook(function() {
+      $('#facebook_connect').unbind().click(function() {
+        FB.login(function(response) {
+          if (response.status != 'connected' || response.authResponse == null) {
+            log('not connected');
+            return;
+          }
+          var token = response.authResponse.userID;
+          var secrete = response.authResponse.accessToken;
+          log('userID: ' + token);
+          log('accessToken: ' + secrete);
+          if (token == null || secrete == null || token == "" || secrete == "") {
+            alert($('#lang_warning_error_occurs').text());
+            return;
+          }
           var parameters = {
-            'msoId': $('#msoId').val(),
-            'type':  1,
-            'token': response.session.uid
+            'msoId':  $('#msoId').val(),
+            'type':   1,
+            'token':  token,
+            'secrete': secrete
           };
-          $.post('/CMSAPI/createSnsAuth', parameters, function(response)
-          {
+          $.post('/CMSAPI/createSnsAuth', parameters, function(response) {
             if (response != "OK") {
+              log('response: ' + response);
               alert($('#lang_warning_error_occurs').text());
               return;
             }
-            $('#facebook_connect').hide();
-            $('#facebook_disconnect').show();
-          });
-        }
-      }, { perms: pageSetup.sFacebookPermissions });
+            pageSetup.showDisconnect(true);
+          }, 'text');
+        }, { 'scope': pageSetup.sFacebookPermissions });
+      });
     });
     
     $('#facebook_disconnect').unbind().click(function() {
@@ -108,8 +126,7 @@ var pageSetup = {
             alert($('#lang_warning_error_occurs').text());
             return;
           }
-          $('#facebook_connect').show();
-          $('#facebook_disconnect').hide();
+          pageSetup.showConnect();
         });
       }
     });

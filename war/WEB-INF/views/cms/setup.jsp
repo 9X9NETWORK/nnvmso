@@ -13,12 +13,14 @@
     </div>
     <div id="syncAcc" class="syncAcc setupContent">
       <spring:message code="cms.setup.msg.account_synchronization_explanation"/>
-      <div id="fb-root"></div>
       <ul>
         <li class="syncFb">
           <span><spring:message code="cms.setup.label.facebook"/></span>&nbsp;&nbsp;
-          <a style="display:inline" href="javascript:" id="facebook_connect"><spring:message code="cms.setup.button.account_connect"/></a>
-          <a style="display:none" href="javascript:" id="facebook_disconnect"><spring:message code="cms.setup.button.account_disconnect"/></a><!-- &nbsp; | &nbsp;<a href="#"><spring:message code="cms.setup.button.disable_autosharing"/> </a> -->
+          <span><a style="display:inline" href="javascript:" id="facebook_connect"><spring:message code="cms.setup.button.account_connect"/></a></span>
+          <span id="fb_field" style="display:none;width:300px">
+            <a style="display:none" href="javascript:" id="facebook_disconnect"><spring:message code="cms.setup.button.account_disconnect"/></a>
+            &nbsp;&nbsp;|&nbsp;&nbsp;<a href="javascript:" id="fb_switch"></a>
+          </span>
           <a href="javascript:" class="syncInfo"></a>
           <div class="sync_hint" id="fb_hint">
             <spring:message code="cms.setup.msg.fb_sync_hint"/>
@@ -118,6 +120,8 @@
     </div>
   </div>
 </div>
+<label class="lang" id="lang_button_disable_autosharing"><spring:message code="cms.setup.button.disable_autosharing"/></label>
+<label class="lang" id="lang_button_enable_autosharing"><spring:message code="cms.setup.button.enable_autosharing"/></label>
 <label class="lang" id="lang_warning_not_9x9_user"><spring:message code="cms.warning.not_9x9_user"/></label>
 <label class="lang" id="lang_warning_remove_admin_member"><spring:message code="cms.warning.remove_admin_member"/></label>
 <label class="lang" id="image_bg_setup"><spring:message code="cms.image.bg_setup"/></label>

@@ -12,7 +12,6 @@
 <link type="text/css" rel="stylesheet" href="/javascripts/plugins/msdropdown/dd.css"/>
 <script type="text/javascript" src="/javascripts/jquery-1.6.4.fixed.js"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.15/jquery-ui.min.js"></script>
-<script type="text/javascript" src="http://connect.facebook.net/en_US/all.js"></script>
 <script type="text/javascript" src="/javascripts/plugins/jquery.bubble.js"></script>
 <script type="text/javascript" src="/javascripts/plugins/dynatree/jquery.dynatree.js"></script>
 <script type="text/javascript" src="/javascripts/plugins/msdropdown/jquery.dd.js"></script>

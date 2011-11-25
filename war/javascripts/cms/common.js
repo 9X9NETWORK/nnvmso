@@ -9,6 +9,26 @@ var log = function(text) {
 
 var cms = {
   debug: false,
+  isFacebookLoaded: false,
+  loadFacebook: function(callback) {
+    if (this.isFacebookLoaded) {
+      return (typeof callback == 'function') ? callback() : null;
+    }
+    cms.isFacebookLoaded = true;
+    $('<div id="fb-root"></div>').appendTo('body');
+    window.fbAsyncInit = function() {
+      FB.init({
+        appId:     '110847978946712',
+        status:     true, // check login status
+        cookie:     true, // enable cookies to allow the server to access the session
+        xfbml:      true, // parse XFBML
+        oauth:      true, // enable OAth 2.0
+        channelURL: 'http://' + location.host + '/facebook.html'
+      });
+      return (typeof callback == 'function') ? callback() : null;
+    };
+    cms.loadScript('http://connect.beta.facebook.net/en_US/all.js');
+  },
   isNN: function() {
     return ($('#msoType').val() == '1');
   },

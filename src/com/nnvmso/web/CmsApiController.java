@@ -1177,9 +1177,23 @@ public class CmsApiController {
 	
 	//////////////////// Promotion Tools ////////////////////
 	
+	@RequestMapping("setSnsAuth")
+	public @ResponseBody String setSnsAuth(@RequestParam Long msoId,
+	                                        @RequestParam Short type,
+	                                        @RequestParam Boolean enabled) {
+		SnsAuthManager snsMngr = new SnsAuthManager();
+		SnsAuth snsAuth = snsMngr.findMsoIdAndType(msoId, type);
+		if (snsAuth != null) {
+			snsAuth.setEnabled(enabled);
+			snsMngr.save(snsAuth);
+			return "OK";
+		} else {
+			return "NotFound";
+		}
+	}
 	@RequestMapping("removeSnsAuth")
 	public @ResponseBody String removeSnsAuth(@RequestParam Long msoId,
-	                                          @RequestParam Short type) {
+	                                           @RequestParam Short type) {
 		SnsAuthManager snsMngr = new SnsAuthManager();
 		SnsAuth snsAuth = snsMngr.findMsoIdAndType(msoId, type);
 		if (snsAuth != null) {
@@ -1190,9 +1204,9 @@ public class CmsApiController {
 	
 	@RequestMapping("createSnsAuth")
 	public @ResponseBody String createSnsAuth(@RequestParam Long msoId,
-	                                          @RequestParam Short type,
-	                                          @RequestParam String token,
-	                                          @RequestParam(required=false) String secrete) {
+	                                           @RequestParam Short type,
+	                                           @RequestParam String token,
+	                                           @RequestParam(required=false) String secrete) {
 		
 		SnsAuthManager snsMngr = new SnsAuthManager();
 		SnsAuth snsAuth = snsMngr.findMsoIdAndType(msoId, type);
@@ -1200,11 +1214,13 @@ public class CmsApiController {
 			snsAuth = new SnsAuth(msoId, type, token);
 			if (secrete != null)
 				snsAuth.setSecrete(secrete);
+			snsAuth.setEnabled(true);
 			snsMngr.create(snsAuth);
 		} else {
 			snsAuth.setToken(token);
 			if (secrete != null)
 				snsAuth.setSecrete(secrete);
+			snsAuth.setEnabled(true);
 			snsMngr.save(snsAuth);
 		}
 		return "OK";
@@ -1236,14 +1252,20 @@ public class CmsApiController {
 	@RequestMapping("createChannelAutosharing")
 	public @ResponseBody void createChannelAutosharing(@RequestParam Long msoId,
 	                                                   @RequestParam Long channelId,
+	                                                   @RequestParam(required=false) String parameter, 
 	                                                   @RequestParam Short type) {
 		logger.info("msoId = " + msoId);
 		logger.info("channelId = " + channelId);
 		logger.info("type = " + type);
+		logger.info("parameter = " + parameter);
 		
 		AutosharingService shareService = new AutosharingService();
 		if (shareService.findChannelAutosharing(msoId, channelId, type) == null) {
-			shareService.create(new ChannelAutosharing(msoId, channelId, type));
+			ChannelAutosharing autosharing = new ChannelAutosharing(msoId, channelId, type);
+			if (parameter != null) {
+				autosharing.setParameter(parameter);
+			}
+			shareService.create(autosharing);
 		}
 	}
 	

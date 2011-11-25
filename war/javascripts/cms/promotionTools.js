@@ -5,12 +5,12 @@
 var page$ = {
   autosharingSettings: {
     initChannelSet: function(channelSetId, channelSetName) {
-      $('.sns_checkbox').attr('checked', false)
-      // load autosharing info
+      $('.sns_checkbox').attr('checked', false);
+      // load auto-sharing info
       var parameters = {
         'channelSetId': channelSetId,
         'msoId': $('#msoId').val()
-      }
+      };
       cms.post('/CMSAPI/listChannelSetAutosharing', parameters, function(autosharings) {
         for (i in autosharings) {
           switch(autosharings[i].type) {
@@ -106,16 +106,33 @@ var page$ = {
       }, 'json');
     },
     initChannel: function(channelId, channelName) {
-      $('.sns_checkbox').attr('checked', false)
-      // load autosharing info
+      $('.sns_checkbox').attr('checked', false);
+      $('.facebook_select option[value!=""]').remove();
+      // load auto-sharing info
       var parameters = {
         'channelId': channelId,
         'msoId': $('#msoId').val()
-      }
+      };
       cms.post('/CMSAPI/listChannelAutosharing', parameters, function(autosharings) {
         for (i in autosharings) {
-          switch(autosharings[i].type) {
+          var autosharing = autosharings[i];
+          switch(autosharing.type) {
             case 1:
+            /*
+            if (autosharing.parameter != null && autosharing.parameter != "") {
+              var splitted = autosharing.parameter.split(':', 2);
+              if (splitted[0] != null && splitted[1] != null && splitted[0] != "" && splitted[1] != "") {
+                var api = 'https://graph.facebook.com/' + splitted[0] + '?callback=?';
+                var parameters = {
+                  'access_token': splitted[1]
+                };
+                cms.get(api, parameters, function(response) {
+                  log('can_post: ' + response.can_post);
+                  $('<option/>').val(autosharing.parameter).text(response.name).attr('selected', true).appendTo('.facebook_select');
+                }, 'json');
+              }
+            }
+            */
             $('input[name="sns_facebook"]').attr('checked', true);
             break;
             case 2:
@@ -268,7 +285,7 @@ var page$ = {
             $('.channel_info_title', this).removeClass('chUnFocusTitle').addClass('chFocusTitle');
             $('.channel_info_image', this).removeClass('chUnFocusImg').addClass('chFocusImg');
             
-            // load autosharing info
+            // load auto-sharing info
             page$.autosharingSettings.initChannel(event.data.channelId, event.data.channelName);
           });
         }
