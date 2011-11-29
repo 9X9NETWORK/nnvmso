@@ -35,21 +35,17 @@ var page$ = {
           disableLink: 1
         };
         switch (statistics) {
-        case 'visits_summary':
+        case 'overview_with_graph':
           params.moduleToWidgetize = 'VisitsSummary';
           params.actionToWidgetize = 'index';
           break;
-        case 'visitor_countries':
-          params.moduleToWidgetize = 'UserCountryMap';
-          params.actionToWidgetize = 'worldMap';
+        case 'pages_per_visit':
+          params.moduleToWidgetize = 'VisitorInterest';
+          params.actionToWidgetize = 'getNumberOfVisitsPerPage';
           break;
-        case 'pages':
-          params.moduleToWidgetize = 'Actions';
-          params.actionToWidgetize = 'getPageTitles';
-          break;
-        case 'live':
-          params.moduleToWidgetize = 'Live';
-          params.actionToWidgetize = 'widget';
+        case 'length_of_visits':
+          params.moduleToWidgetize = 'VisitorInterest';
+          params.actionToWidgetize = 'getNumberOfVisitsPerVisitDuration';
           break;
         default:
           log('unknown statistics!');
@@ -134,7 +130,7 @@ var page$ = {
             $('.channel_info_title', this).removeClass('chUnFocusTitle').addClass('chFocusTitle');
             $('.channel_info_image', this).removeClass('chUnFocusImg').addClass('chFocusImg');
             
-            // load autosharing info
+            // load auto-sharing info
             var statistics = $('.channel_info_statistics', this).val();
             page$.statisticsReport.initChannel(event.data.channel, statistics);
           });
@@ -191,25 +187,9 @@ var page$ = {
     var css = '<style> .chPublic { background:url(' + $('#image_ch_public').text() + ') no-repeat; }\n.chUnPublic { background:url(' + $('#image_ch_unpublic').text() + ') no-repeat; } </style>';
     $(css).appendTo('head');
     
-    /*
-    $('#stasticTabA').click(function() {
-      $('#ch_stastics').show();
-      $('#ep_stastics').hide();
-      $('#stasticTabA').addClass('tab_focus').removeClass('tab_unfocus');
-      $('#stasticTabB').addClass('tab_unfocus').removeClass('tab_focus');
+    cms.loadScript('/javascripts/piwik-analytics.js', function() {
+      page$.channelAndChannelSetList.init();
     });
-    $('#stasticTabB').click(function() {
-      $('#ch_stastics').hide();
-      $('#ep_stastics').show();
-      $('#stasticTabB').addClass('tab_focus').removeClass('tab_unfocus');
-      $('#stasticTabA').addClass('tab_unfocus').removeClass('tab_focus');
-    });
-    */
-    
-    cms.loadScript('/javascripts/piwik-analytics.js');
-    
-    page$.channelAndChannelSetList.init();
-    //$('.datePick input').datepicker(page$.datepicker_properties);
   }
 };
 

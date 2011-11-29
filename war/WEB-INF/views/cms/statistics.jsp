@@ -48,10 +48,9 @@
                   <p class="channel_info_subscribers"><spring:message code="cms.channel_management.label.subscribers"/> : <span>0</span></p>
                   <p class="channel_info_updatedate"><spring:message code="cms.channel_management.label.update_time"/> : <span>2011/04/15 14:45</span></p>
                   <select class="channel_info_statistics">
-                    <option value="visits_summary">Visits Summary</option>
-                    <option value="visitor_countries">Visitor Countries</option>
-                    <option value="pages">Pages</option>
-                    <option value="live">Live!</option>
+                    <option value="overview_with_graph">Overview</option>
+                    <option value="pages_per_visit">Views per visit</option>
+                    <option value="length_of_visits">Visit duration</option>
                   </select>
                 </div>
                 <ul style="display:none" class="floatL">
