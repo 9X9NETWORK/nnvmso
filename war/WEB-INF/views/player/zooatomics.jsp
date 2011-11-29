@@ -6,7 +6,7 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9playerV68a"/>
-<c:set var="nroot" value="http://9x9ui.s3.amazonaws.com/9x9playerV88"/>
+<c:set var="nroot" value="http://9x9ui.s3.amazonaws.com/9x9playerV92"/>
 
 <!-- $Revision$ -->
 
@@ -39,8 +39,8 @@
 <script type="text/javascript" charset="utf-8" src="${root}/javascripts/jquery.swfobject.1-1-1.min.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/scripts/flowplayer-3.2.4.min.js"></script>
 
-<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/player17.js"></script>
-<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/vertical.slider.js"></script>
+<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/player18.js"></script>
+<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/vertical.slider.V2.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/jquery.mousewheel.min.js"></script>
                                                                                                                                      
 <script type="text/javascript">
@@ -79,6 +79,8 @@ var brandinfo = "${brandInfo}";
 <div id="blue" style="background: black; width: 100%; height: 100%; display: block; position: absolute; color: white">
 </div>
 
+<div id="bg-layer"><img src="${nroot}/images/bg_body.png"></div>
+
 <div id="recent-layer" style="display: none">
   <div id="recent-holder">
     <h4><span>Recently Watched</span></h4>
@@ -89,7 +91,7 @@ var brandinfo = "${brandInfo}";
 
 <div id="signin-layer">
   <div id="signin-holder">
-    <img src="${nroot}/images/btn_winclose.png" id="btn-signin-close">
+    <p id="btn-signin-close"><img src="${nroot}/images/btn_delete_off.png" class="off"><img src="${nroot}/images/btn_delete_on.png" class="on"></p>
     <ul id="signin-tabs">
       <li id="signin" class="on"><span>Returning Users</span></li>
       <li id="signup"><span>New Users</span></li>
@@ -318,7 +320,7 @@ var brandinfo = "${brandInfo}";
 
 <div id="company-layer">
   <div id="company-holder">
-    <img src="${nroot}/images/btn_winclose.png" id="btn-company-close">
+    <p id="btn-company-close"><img src="${nroot}/images/btn_delete_off.png" class="off"><img src="${nroot}/images/btn_delete_on.png" class="on"></p>
     <ul id="company-tabs">
       <li id="about" class="on"><span>About Us</span></li>
       <li id="contact"><span>Contact Us</span></li>
@@ -351,7 +353,7 @@ var brandinfo = "${brandInfo}";
 
 <div id="help-layer">
   <div id="help-holder">
-    <img src="${nroot}/images/btn_winclose.png" id="btn-help-close">
+    <p id="btn-help-close"><img src="${nroot}/images/btn_delete_off.png" class="off"><img src="${nroot}/images/btn_delete_on.png" class="on"></p>
     <ul id="help-tabs">
       <li id="tutorial" class="on"><span>New User Tutorial</span></li>
       <li id="faq"><span>FAQ</span></li>
@@ -364,14 +366,14 @@ var brandinfo = "${brandInfo}";
         </div>
       </div>
     </div>
-    <div id="faq-panel" class="input-panel">
+    <div id="faq-panel" class="input-panel accordion">
       <div id="faq-slider" class="slider-wrap"><div class="slider-vertical"></div></div>
       <div id="faq-content" class="constrain">
         <div id="faq-list">
         </div>
       </div>
     </div>
-    <div id="sync-panel" class="input-panel">
+    <div id="sync-panel" class="input-panel accordion">
       <div id="sync-slider" class="slider-wrap"><div class="slider-vertical"></div></div>
       <div id="sync-content" class="constrain">
         <div id="sync-list">
@@ -426,9 +428,8 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
 
 <div id="header">
   <img src="${nroot}/images/bg_header.gif" id="bg-header">
-  <img src="${nroot}/images/beta.png" id="beta">
   <img src="${nroot}/images/logo.png" id="logo">
-  <p id="slogan"><span>Your Personal Video Album</span></p>
+  <p id="slogan"><span>Your Personal Channel Browser</span></p>
   <ul id="nav">
     <li id="btn-account">
       <p><span class="head">Hi,</span><span id="user">Guest</span><img src="${nroot}/images/icon_expand.png" class="icon-expand"></p>
@@ -466,7 +467,7 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
 </div>
 
 
-<div id="store-layer" class="stage" style="background: #f0f0f0; display: none">
+<div id="store-layer" class="stage" style="display: none; background: #f0f0f0">
   <div id="store-holder">
     <div id="pool-waiting">
       <img src="${nroot}/images/loading.gif">
@@ -483,10 +484,10 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
       <span>0</span>
     </p>
     <div id="btn-programlang">
-      <p id="selected-programlang"><span>English programs</span><img src="${nroot}/images/icon_expand.png" class="icon-expand"></p>
+      <p id="selected-programlang"><span>English Channels</span><img src="${nroot}/images/icon_expand.png" class="icon-expand"></p>
       <ul id="programlang-dropdown" class="dropdown">
-        <li class="on"><img src="${nroot}/images/icon_check.png" class="icon-check"><span>English programs</span></li>
-        <li><img src="${nroot}/images/icon_check.png" class="icon-check"><span>中文節目</span></li>
+        <li class="on"><img src="${nroot}/images/icon_check.png" class="icon-check"><span>English Channels</span></li>
+        <li><img src="${nroot}/images/icon_check.png" class="icon-check"><span>中文頻道</span></li>
       </ul>
     </div>
     <p id="search-input">
@@ -513,7 +514,8 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
           <img src="${nroot}/images/arrow_right_on.png" id="preview-arrow-right">
           <img src="${nroot}/images/arrow_left_on.png" id="preview-arrow-left">
           <ul id="preview-ep-list"></ul>
-        </div>    
+        </div>   
+        <div id="btn-sound"><img src="${nroot}/images/icon_sound_off.png" id="icon-sound-off" title="Turn Sound On"><img src="${nroot}/images/icon_sound_on.png" id="icon-sound-on" title="Turn Sound Off"></div>
       </div>
       <p id="channel-price"><img src="${nroot}/images/tag_free.png" id="icon-tag"><span class="free">FREE</span></p>
       <p id="control-switch"><img src="${nroot}/images/btn_in.png" id="btn-in"><img src="${nroot}/images/btn_out.png" id="btn-out"></p>
@@ -521,13 +523,12 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
         <ul id="control-list">
           <li id="btn-info"><img src="${nroot}/images/btn_info.png" id="icon-info" title="Channel Info"></li>
           <li id="btn-preview-play" class="on"><img src="${nroot}/images/btn_play.png" id="icon-preview-play" title="Play"><img src="${nroot}/images/btn_pause.png" id="icon-preview-pause" title="Pause"></li>
-          <li id="btn-sound"><img src="${nroot}/images/icon_sound_off.png" id="icon-sound-off" title="Sound Off"><img src="${nroot}/images/icon_sound_on.png" id="icon-sound-on" title="Sound On"></li>
           <li id="btn-flip-prev"><img src="${nroot}/images/btn_flipup.png" id="icon-flip-prev" title="Prev Channel"></li>
           <li id="btn-flip-next"><img src="${nroot}/images/btn_flipdown.png" id="icon-flip-next" title="Next Channel"></li>
         </ul>
       </div>
       <div id="preview-promo">
-        <p><span>The most popular YouTube channel in 9x9 Channel Store now!</span></p>
+        <p><span>Flip through the channels and add your favorites to your Guide</span></p>
       </div>
       <div id="channel-bubble">
         <div id="chbubble-slider" class="slider-wrap"><div class="slider-vertical"></div></div>
@@ -567,9 +568,9 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
       </div>
     </div>
       <div id="search-layer">
-      <img src="${nroot}/images/btn_winclose.png" id="btn-search-close">
+      <p id="btn-search-close"><img src="${nroot}/images/btn_delete_off.png" class="off"><img src="${nroot}/images/btn_delete_on.png" class="on"></p>
       <h4><span>Search Result</span></h4>
-     <p id="result-head"><span class="amount">200</span><span>results found</span></p>
+     <p id="result-head"></p>
       <div id="search-slider" class="slider-wrap"><div class="slider-vertical"></div></div>
       <div id="search-content">
         <ul id="search-list">
@@ -593,7 +594,7 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
   </div>
 </div>
 
-<div id="guide-layer" class="stage" style="background: #f0f0f0; display: none">
+<div id="guide-layer" class="stage" style="display: none; background: #f0f0f0">
   <div id="guide-holder">
     <h2><span>9x9 Guide</span></h2>
         <div id="guide-content">
@@ -626,16 +627,71 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
 
 <div id="player-layer" class="stage" style="display: none; background: #f0f0f0">
   <div id="player-video"></div>
+  <ul id="control-bar">
+    <li id="btn-play"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/btn_play.png" title="Play"></li>
+    <li id="btn-pause"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/btn_pause.png" title="Pause"></li>
+    <li class="divider"></li>
+    <li id="play-time"><span></span></li>
+    <li class="divider"></li>
+    <li id="progress-constrain">
+      <!--p id="btn-knob" style="display: none"></p-->
+      <div id="progress-bar">
+        <p id="loaded"></p>
+        <p id="played"></p>
+      </div>
+    </li>
+    <li class="divider"></li>
+    <li id="btn-volume-down"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/btn_volume_down.png" title="Volume Down"></li>
+    <li id="volume-constrain">
+      <ul id="volume-bars"><li class="on"></li><li class="on"></li><li class="on"></li><li class="on"></li><li></li><li></li><li></li></ul>
+    </li>
+    <li id="btn-volume-up"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/btn_volume_up.png" title="Volume Up"></li>
+    <li class="divider"></li>
+    <li id="btn-full" class="right"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/btn_full.png" title="Full Screen"></li>
+    <li id="btn-sync" class="right">
+      <img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/btn_sync.png" title="9x9 Sync">
+      <ul id="sync-dropdown" class="dropdown">
+      </ul>
+    </li>
+    <li id="btn-share" class="right">
+      <img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/btn_share.png" title="Share">
+      <ul id="share-dropdown" class="dropdown">
+        <li class="combo">
+          <span>Channel URL:</span>
+          <p id="share-input"><input type="text" class="textfield" value=""></p>
+        </li>
+        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/icon_mail.png" class="icon-mail"><span>Send by email</span></li>
+        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/icon_fb.png" class="icon-fb"><span>Share to facebook</span></li>
+      </ul>
+    </li>
+    <li id="btn-sort" class="right">
+      <img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/btn_sort.png" title="Sort">
+      <ul id="sort-dropdown" class="dropdown">
+        <li class="head"><span>Episodes sort by:</span></li>
+        <li class="on"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/icon_check.png" class="icon-check"><span>From Newest to Oldest</span></li>
+        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/icon_check.png" class="icon-check"><span>From Left off to Newest</span></li>
+      </ul>
+    </li>
+    <li id="btn-rez" class="right">
+      <span id="selected-rez">360p</span>
+      <ul id="rez-dropdown" class="dropdown">
+        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/icon_check.png" class="icon-check"><span>720p</span></li>
+        <li class="on"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/icon_check.png" class="icon-check"><span>480p</span></li>
+        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/icon_check.png" class="icon-check"><span>360p</span></li>
+        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/icon_check.png" class="icon-check"><span>240p</span></li>
+      </ul>
+    </li>
+  </ul>
   <div id="player-holder">
     <h2><span>9x9 Player</span></h2>
     <div id="player-content">
-      <p id="btn-flip-play"><img src="${nroot}/images/btn_flip_L_off.png" id="btn-fpl-off"><img src="${nroot}/images/btn_flip_L_on.png" id="btn-fpl-on"></p> 
-      <img src="${nroot}/images/bg_player.jpg" id="player-bg">
+      <p id="btn-flip-play"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/btn_flip_L_off.png" id="btn-fpl-off"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/btn_flip_L_on.png" id="btn-fpl-on"></p> 
+      <img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/bg_player.jpg" id="player-bg">
       <p id="btn-player2store"><span>< Back to Store</span></p>
       <p id="player-index"><span>You are watching</span><span class="ch-title"></span><span>channel</span></p>
-      <img src="${nroot}/images/player_ep_panel.png" id="player-ep-panel">
-      <img src="${nroot}/images/arrow_right_on.png" id="player-arrow-right">
-      <img src="${nroot}/images/arrow_left_on.png" id="player-arrow-left">
+      <img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/player_ep_panel.png" id="player-ep-panel">
+      <img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/arrow_right_on.png" id="player-arrow-right">
+      <img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/arrow_left_on.png" id="player-arrow-left">
       <ul id="player-ep-list"></ul>
       <p id="player-ep-meta">
         <span class="meta-head">Episode:</span>
@@ -643,8 +699,8 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
         <span class="amount"></span>
       </p>
       <div id="player-ch-flipper">
-        <p id="play-next"><img src="${nroot}/images/arrow_down.png"><span>Next Ch</span></p>
-        <p id="play-prev"><img src="${nroot}/images/arrow_up.png"><span>Prev Ch</span></p>
+        <p id="play-next"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/arrow_down.png"><span>Next Ch</span></p>
+        <p id="play-prev"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/arrow_up.png"><span>Prev Ch</span></p>
         <p id="play-ch-index"><span></span></p>
       </div>      
       <div id="player-info">
@@ -657,68 +713,15 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
           <p class="content"><span></span></p>
         </div>
       </div>
-      <ul id="control-bar">
-        <li id="btn-play"><img src="${nroot}/images/btn_play.png" title="Play"></li>
-        <li id="btn-pause"><img src="${nroot}/images/btn_pause.png" title="Pause"></li>
-        <li class="divider"></li>
-        <li id="play-time"><span></span></li>
-        <li class="divider"></li>
-        <li id="progress-constrain">
-          <!--p id="btn-knob" style="display: none"></p-->
-          <div id="progress-bar">
-            <p id="loaded"></p>
-            <p id="played"></p>
-          </div>
-        </li>
-        <li class="divider"></li>
-        <li id="btn-volume-down"><img src="${nroot}/images/btn_volume_down.png" title="Volume Down"></li>
-        <li id="volume-constrain">
-          <ul id="volume-bars"><li class="on"></li><li class="on"></li><li class="on"></li><li class="on"></li><li></li><li></li><li></li></ul>
-        </li>
-        <li id="btn-volume-up"><img src="${nroot}/images/btn_volume_up.png" title="Volume Up"></li>
-        <li class="divider"></li>
-        <li id="btn-full" class="right"><img src="${nroot}/images/btn_full.png" title="Full Screen"></li>
-        <li id="btn-sync" class="right">
-          <img src="${nroot}/images/btn_sync.png" title="9x9 Sync">
-          <ul id="sync-dropdown" class="dropdown">
-          </ul>
-        </li>
-        <li id="btn-share" class="right">
-          <img src="${nroot}/images/btn_share.png" title="Share">
-          <ul id="share-dropdown" class="dropdown">
-            <li class="combo">
-              <span>Channel URL:</span>
-              <p id="share-input"><input type="text" class="textfield" value=""></p>
-            </li>
-            <li><img src="${nroot}/images/icon_mail.png" class="icon-mail"><span>Send by email</span></li>
-            <li><img src="${nroot}/images/icon_fb.png" class="icon-fb"><span>Share to facebook</span></li>
-          </ul>
-        </li>
-        <li id="btn-sort" class="right">
-          <img src="${nroot}/images/btn_sort.png" title="Sort">
-          <ul id="sort-dropdown" class="dropdown">
-            <li class="head"><span>Episodes sort by:</span></li>
-            <li class="on"><img src="${nroot}/images/icon_check.png" class="icon-check"><span>From Newest to Oldest</span></li>
-            <li><img src="${nroot}/images/icon_check.png" class="icon-check"><span>From Left off to Newest</span></li>
-          </ul>
-        </li>
-        <li id="btn-rez" class="right">
-          <span id="selected-rez">360p</span>
-          <ul id="rez-dropdown" class="dropdown">
-            <li><img src="${nroot}/images/icon_check.png" class="icon-check"><span>720p</span></li>
-            <li class="on"><img src="${nroot}/images/icon_check.png" class="icon-check"><span>480p</span></li>
-            <li><img src="${nroot}/images/icon_check.png" class="icon-check"><span>360p</span></li>
-            <li><img src="${nroot}/images/icon_check.png" class="icon-check"><span>240p</span></li>
-          </ul>
-        </li>
-      </ul>
     </div>
   </div>
 </div>
 
+
+
 <div id="settings-layer">
   <div id="settings-holder">
-    <img src="${nroot}/images/btn_winclose.png" id="btn-settings-close">
+    <p id="btn-settings-close"><img src="${nroot}/images/btn_delete_off.png" class="off"><img src="${nroot}/images/btn_delete_on.png" class="on"></p>
     <ul id="settings-tabs">
       <li id="general" class="on"><span>General</span></li>
       <!--li id="sharing"><span>Sharing</span></li-->
@@ -775,10 +778,10 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
         <li>
           <p class="head"><span>Region:</span></p>
           <div id="btn-region" class="droppable">
-            <p id="selected-region"><span>English programs</span></p>
+            <p id="selected-region"><span>English Channels</span></p>
             <ul id="region-dropdown" class="dropdown">
-              <li><img src="${nroot}/images/icon_check.png" class="icon-check"><span>English programs</span></li>
-              <li><img src="${nroot}/images/icon_check.png" class="icon-check"><span>中文節目</span></li>
+              <li><img src="${nroot}/images/icon_check.png" class="icon-check"><span>English Channels</span></li>
+              <li><img src="${nroot}/images/icon_check.png" class="icon-check"><span>中文頻道</span></li>
             </ul>
           </div>
         </li>

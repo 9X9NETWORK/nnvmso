@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9miniV7"/>
+<c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9miniV9"/>
 
 <link rel="stylesheet" href="${root}/stylesheets/main.css" />
 
@@ -20,7 +20,7 @@
 <script type="text/javascript" charset="utf-8" src="${root}/javascripts/jquery.swfobject.1-1-1.min.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/scripts/flowplayer-3.2.4.min.js"></script>
 
-<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/mini5.js"></script>
+<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/mini6.js"></script>
 
 </head>
 <body>
@@ -32,9 +32,9 @@
 
 <div id="sync-layer">
   <div id="sync-holder">
-    <p><span>Please initiate default account binding.<br>The name of this device name is:</span></p>
+    <p><span>Please initiate account binding.<br>The name of this device is:</span></p>
     <p><span class="device-name"></span></p>
-    <p><span class="note">Need help? Please visit 9x9.tv</span></p>
+    <p><span class="note">Need help? Please visit 9x9.tv or email feedback@9x9.tv</span></p>
   </div>
 </div>
 
@@ -50,11 +50,33 @@
   </div>
 </div>
 
+<div id="yesno-layer">
+  <div id="yesno-holder">
+    <p id="question"><span>Are you sure you want to remove</span><span id="removee"></span><span>from the user list?</span></p>
+    <ul class="action-list">
+      <li><p class="btn" id="btn-yesno-yes"><span>Yes</span></p></li>
+      <li><p class="btn" id="btn-yesno-no"><span>No</span></p></li>
+    </ul>
+  </div>
+</div>
+
+<div id="player-layer">
+  <div id="osd-layer">
+    <div id="osd-holder">
+      <p id="ch-info"><span class="head">Channel: </span><span id="ch-title"></span></p>
+      <p id="ep-info"><span class="head">Episode: </span><span id="ep-title"></span><span class="dash"> &#8212; </span><span id="ep-age"></span></p>
+      <p id="key-hints"><img src="${root}/images/key_hints.png"></p>
+    </div>
+  </div>
+  <div id="player-holder">
+    <div id="video-layer"></div>
+  </div>
+</div>
+
 <div id="sg-layer">
   <div id="sg-header">
-    <img src="${root}/images/beta.png" id="beta">
     <img src="${root}/images/logo.png" id="logo">
-    <p id="slogan"><span>Your Personal Video Album</span></p>
+    <p id="slogan"><span>Your Personal Channel Browser</span></p>
     <p id="device">
       <span>Device:</span>
       <span id="device-name">Not connected</span>
@@ -94,20 +116,6 @@
     <li class="on"></li>
   </ul>
   <p id="volume-down"><img src="${root}/images/btn_volume_down.png" title="Volume Down"></p>
-</div>
-
-<div id="player-layer">
-  <div id="osd-layer">
-    <p id="ch-title"><span class="head">Channel: </span><span>Channel Title</span></p>
-    <p id="ep-title"><span class="head">Episode: </span><span>Episode Title</span></p>
-  </div>
-  <div id="player-holder">
-    <div id="video-layer"></div>
-    <p id="arrow-left"><img src="${root}/images/arrow_left.png"><span>Prev<br>Episode</span></p>
-    <p id="arrow-right"><img src="${root}/images/arrow_right.png"><span>Next<br>Episode</span></p>
-    <p id="arrow-up"><img src="${root}/images/arrow_up.png"><span>Prev Ch</span></p>
-    <p id="arrow-down"><img src="${root}/images/arrow_down.png"><span>Next Ch</span></p>
-  </div>
 </div>
 
 <div id="relaydiv" style="z-index: 1; position: absolute; top: 0px; left: 0px">
