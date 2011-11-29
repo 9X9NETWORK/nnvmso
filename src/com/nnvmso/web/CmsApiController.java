@@ -144,6 +144,10 @@ public class CmsApiController {
 		
 		Collections.sort(results, new MsoChannelComparator());
 		*/
+		SubscriptionLogManager subLogMngr = new SubscriptionLogManager();
+		for (MsoChannel channel : results) {
+			channel.setSubscriptionCount(subLogMngr.findTotalCountByChannelId(channel.getKey().getId()));
+		}
 		return results;
 	}
 	
@@ -332,8 +336,8 @@ public class CmsApiController {
 		
 		results = ownershipMngr.findOwnedChannelsByMsoId(msoId);
 		Collections.sort(results, new MsoChannelComparator());
+		SubscriptionLogManager subLogMngr = new SubscriptionLogManager();
 		for (MsoChannel channel : results) {
-			SubscriptionLogManager subLogMngr = new SubscriptionLogManager();
 			channel.setSubscriptionCount(subLogMngr.findTotalCountByChannelId(channel.getKey().getId()));
 		}
 		return results;
