@@ -424,7 +424,7 @@ form a { font-size:0.8em; }
 a.btnClose { background:url(/images/cms/btnClose.png) no-repeat; width:24px; height:23px; display:block; position:relative; top:35px; left:555px; }
 a.btnClose:hover { background:url(/images/cms/btnCloseHover.png) no-repeat; }
 
-.setupTab li { float:left; width:100px; height:30px; text-align:center; line-height:30px; }
+.setupTab li { float:left; width:150px; height:30px; text-align:center; line-height:30px; }
 .setupTab a:link, .setupTab a:active, .setupTab a:visited { font-size:0.9em; color:#03C; text-decoration:none; display:block; }
 .setupTab a:hover { text-decoration:underline; }
 
