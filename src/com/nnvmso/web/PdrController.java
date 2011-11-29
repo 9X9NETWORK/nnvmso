@@ -112,7 +112,8 @@ public class PdrController {
 			String token = r.getDeviceToken();
 			if (token == null)
 				r.getUserToken();
-			result[0] += token + "\t" + r.getSession() + "\n" + r.getDetail().getValue() + "\n\n";
+			result[0] += token + "\t" + r.getSession() + "\t" + r.getIp() + "\n" +  
+			             r.getDetail().getValue() + "\n\n";
 		}
 		return NnNetUtil.textReturn(pservice.assembleMsgs(NnStatusCode.SUCCESS, result));		
 	}
@@ -153,10 +154,17 @@ public class PdrController {
 			list = reportMngr.findByUserSince(user, sinceDate);
 		}
 		String output = "";
+		String email = "guest";
+		NnUserManager mngr = new NnUserManager();
+		String nbsp = "&nbsp;&nbsp;&nbsp;";
 		for (NnUserReport r : list) {
-			output += "<p>" + r.getUserToken() + "&nbsp;&nbsp;&nbsp;" + 
-			"<a href='listPdr?user=" + r.getUserToken() + "&session=" + r.getSession() + "'>" +   
-			r.getSession() + "</a><br/>" + r.getComment() + "</p>";
+			NnUser found = mngr.findByToken(r.getUserToken());
+			if (found != null)
+				email = found.getEmail();
+			output += "<p>" +   
+			"<a href='listPdr?user=" + r.getUserToken() + "&session=" + r.getSession() + "'>" + r.getSession() + "</a>" +						 
+			r.getUserToken() + nbsp + email + nbsp + r.getCreateDate() +
+			"<br/>" + r.getComment() + "</p>";
 		}
 		return NnNetUtil.htmlReturn(output);
 	}
