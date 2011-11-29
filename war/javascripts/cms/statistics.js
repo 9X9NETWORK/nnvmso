@@ -150,6 +150,7 @@ var page$ = {
           channelSetInfoBlock.find('.channel_info_programcount span').text('N/A');
           channelSetInfoBlock.find('.channel_info_subscribers span').text(channelSets[i].subscriptionCount);
           channelSetInfoBlock.find('.channel_info_updatedate span').text(cms.formatDate(channelSets[i].updateDate));
+          channelSetInfoBlock.find('.channel_info_subscribers').hide();
           // add this
           var promoteUrl = 'http://' + location.host + '/';
           promoteUrl += ((channelSets[i].beautifulUrl != null) ? channelSets[i].beautifulUrl : channelSets[i].defaultUrl);
