@@ -62,10 +62,9 @@ var page$ = {
   channelAndChannelSetList: {
     init: function() {
       // load channels
+      var method = 'listOwnedChannels';
       if (cms.isEnterprise()) {
-        var method = 'defaultChannelSetChannels';
-      } else {
-        var method = 'listOwnedChannels';
+        method = 'defaultChannelSetChannels';
       }
       cms.loadJSON('/CMSAPI/' + method + '?msoId=' + $('#msoId').val(), function(channels) {
         for (i in channels) {
@@ -141,7 +140,6 @@ var page$ = {
       cms.loadJSON('/CMSAPI/listOwnedChannelSets?msoId=' + $('#msoId').val(), function(channelSets) {
         for (i in channelSets) {
           var channelSetInfoBlock = $('#channel_info_block').clone(true).removeAttr('id').addClass('channel_info_block_cloned');
-          var channelSetId = channelSets[i].key.id;
           
           channelSetInfoBlock.find('.iconStatistics').attr('title', $('#lang_view_statistics').text());
           channelSetInfoBlock.find('.channel_info_title div').text(channelSets[i].name);
