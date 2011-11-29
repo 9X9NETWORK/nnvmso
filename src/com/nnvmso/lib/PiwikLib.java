@@ -63,7 +63,7 @@ public class PiwikLib {
 			site = "dev.";
 		} else if (urlRoot.contains("qa")) {
 			site = "qa.";
-		} else {
+		} else if (!urlRoot.contains("9x9.tv")) {
 			site = "_garbage_";
 		}
 		String postHost = "http://" + site + "piwik.9x9.tv";
@@ -166,7 +166,7 @@ public class PiwikLib {
 				   urlRoot.contains("office") ||
 				   urlRoot.contains("beta")){
 			site = ".dev";
-		} else {
+		} else if (!urlRoot.contains("9x9.tv")) {
 			site = "_garbage_";
 		}
 		String postHost = "http://piwik" + site + ".9x9.tv";
