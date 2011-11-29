@@ -81,11 +81,14 @@ public class FacebookLib {
 		return fbInfo;
 	}
 	
-	public void postToFacebook(FBPost fbPost) throws IOException {
+	public static void postToFacebook(FBPost fbPost) throws IOException {
 		
 		MsoConfigManager configMngr = new MsoConfigManager();
 		MsoConfig fbConfig = configMngr.findByItem(MsoConfig.REALFBTOKEN);
 		String accessToken = fbConfig.getValue();
+		if (fbPost.getAccessToken() != null) {
+			accessToken = fbPost.getAccessToken();
+		}
 		
 		URL url = new URL("https://graph.facebook.com/" + fbPost.getFacebookId() + "/feed");
 		String post =
@@ -95,7 +98,7 @@ public class FacebookLib {
 			"&link=" + URLEncoder.encode(fbPost.getLink(), "US-ASCII")+
 			"&caption=" + URLEncoder.encode(fbPost.getCaption(), "UTF-8") +
 			"&description=" + URLEncoder.encode(fbPost.getDescription(), "UTF-8");
-		if (fbPost.getMessage() != null) {
+		if (fbPost.getMessage() != null && !fbPost.getMessage().isEmpty()) {
 			post += "&message=" + URLEncoder.encode(fbPost.getMessage(), "UTF-8");
 		}
 		log.info(post);

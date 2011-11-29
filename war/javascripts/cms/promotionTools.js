@@ -146,7 +146,7 @@ var page$ = {
             var fb_page_id = $('.facebook_select').val();
             if (fb_page_id != null && fb_page_id != 0 && page$.facebookPages[fb_page_id]) {
               parameters['target'] = fb_page_id;
-              parameters['secrete'] = page$.facebookPages[fb_page_id].access_token;
+              parameters['parameter'] = page$.facebookPages[fb_page_id].access_token;
             }
             if ($('input[name="sns_facebook"]').is(':checked') == false) {
               return;
@@ -167,7 +167,7 @@ var page$ = {
             var fb_page_id = $('.facebook_select').val();
             if (fb_page_id != null && fb_page_id != 0 && page$.facebookPages[fb_page_id]) {
               parameters['target'] = fb_page_id;
-              parameters['secrete'] = page$.facebookPages[fb_page_id].access_token;
+              parameters['parameter'] = page$.facebookPages[fb_page_id].access_token;
             }
             if ($('input[name="sns_facebook"]').is(':checked')) {
               cms.post('/CMSAPI/createChannelAutosharing', parameters, function(response) {

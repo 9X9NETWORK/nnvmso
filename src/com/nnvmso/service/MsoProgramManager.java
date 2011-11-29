@@ -96,6 +96,9 @@ public class MsoProgramManager {
 			InetAddress local = InetAddress.getLocalHost();
 			String url = "http://" + local.getHostName() + "/view?channel=" + channel.getKey().getId() + "&episode=" + program.getKey().getId();
 			fbPost.setLink(url);
+			if (program.getComment() != null) {
+				fbPost.setMessage(program.getComment());
+			}
 			for (ChannelAutosharing autosharing : channelAutosharings) {
 				SnsAuth snsAuth = snsMngr.findFacebookAuthByMsoId(autosharing.getMsoId());
 				Mso mso = msoMngr.findById(autosharing.getMsoId());
@@ -105,7 +108,13 @@ public class MsoProgramManager {
 					fbPost.setCaption(messageSource.getMessage("cms.autosharing.episode_added", null, Locale.TRADITIONAL_CHINESE));
 				}
 				if (snsAuth != null && snsAuth.isEnabled()) {
-					fbPost.setFacebookId(snsAuth.getToken());
+					if (autosharing.getTarget() != null && autosharing.getParameter() != null) {
+						fbPost.setFacebookId(autosharing.getTarget());
+						fbPost.setAccessToken(autosharing.getParameter());
+					} else {
+						fbPost.setFacebookId(snsAuth.getToken());
+						fbPost.setAccessToken(snsAuth.getSecrete());
+					}
 					QueueFactory.getDefaultQueue().add(TaskOptions.Builder
                             .withUrl("/CMSAPI/postToFacebook")
                             .payload(new ObjectMapper().writeValueAsBytes(fbPost), "application/json"));

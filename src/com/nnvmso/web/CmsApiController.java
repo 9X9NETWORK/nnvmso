@@ -1333,11 +1333,10 @@ public class CmsApiController {
 	
 	@RequestMapping("postToFacebook")
 	public @ResponseBody void postToFacebook(@RequestBody FBPost fbPost, HttpServletRequest req) {
-		FacebookLib fbLib = new FacebookLib();
 		try {
 			fbPost.setLink(fbPost.getLink().replaceFirst("localhost", req.getServerName()));
 			logger.info(fbPost.toString());
-			fbLib.postToFacebook(fbPost);
+			FacebookLib.postToFacebook(fbPost);
 		} catch (IOException e) {
 			exception(e);
 		}
