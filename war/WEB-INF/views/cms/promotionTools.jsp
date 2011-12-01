@@ -62,6 +62,13 @@
   </div>
   <div class="right_content floatL">
     <div class="right_body">
+      <div id="no_promotion" style="display:none">
+        <div class="right_title"><div>Title Title Title</div></div>
+        <div class="promote_title"><spring:message code="cms.promotion_tools.msg.no_autosharing_provided"/></div>
+        <label>
+          <input type="checkbox" class="sns_checkbox" disabled="disabled"/>&nbsp; <span style="color:grey" class="facebook_label"><spring:message code="cms.promotion_tools.label.facebook"/></span>
+        </label>
+      </div>
       <div id="promotion_content" style="display:none">
         <div class="right_title"><div>Title Title Title</div></div>
         <div class="promote_title">

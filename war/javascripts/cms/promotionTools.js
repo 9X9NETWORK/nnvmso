@@ -105,7 +105,13 @@ var page$ = {
         $('#promotion_content').show();
       }, 'json');
     },
-    initChannel: function(channelId, channelName) {
+    initChannel: function(channel) {
+      var channelId = channel.key.id;
+      $('.right_title > div').text(channel.name);
+      if (channel.contentType != 6) {
+        $('#no_promotion').show();
+        return;
+      }
       $('.sns_checkbox').attr('checked', false);
       $('.facebook_select').val(0);
       // load auto-sharing info
@@ -240,7 +246,6 @@ var page$ = {
             }
           });
         }
-        $('.right_title > div').text(channelName);
         $('#promotion_content').show();
       }, 'json');
     }
@@ -298,16 +303,21 @@ var page$ = {
           channelInfoBlock.find('.channel_info_promoteurl').text(promoteUrlTruncated).attr('href', promoteUrl);
           $('<li></li>').append(channelInfoBlock).appendTo('#channel_list_ul');
           // channel info block click event
-          channelInfoBlock.click({ 'channelId': channelId, 'channelName': channels[i].name}, function(event) {
+          channelInfoBlock.click({ 'channel': channels[i] }, function(event) {
+            
+            var channel = event.data.channel;
+            
             $('.channel_info_block').removeClass('chFocus').addClass('chUnFocus');
             $('.channel_info_title').removeClass('chFocusTitle').addClass('chUnFocusTitle');
             $('.channel_info_image').removeClass('chFocusImg').addClass('chUnFocusImg');
             $(this).removeClass('chUnFocus').addClass('chFocus');
             $('.channel_info_title', this).removeClass('chUnFocusTitle').addClass('chFocusTitle');
             $('.channel_info_image', this).removeClass('chUnFocusImg').addClass('chFocusImg');
+            $('#promotion_content').hide();
+            $('#no_promotion').hide();
             
             // load auto-sharing info
-            page$.autosharingSettings.initChannel(event.data.channelId, event.data.channelName);
+            page$.autosharingSettings.initChannel(channel);
           });
         }
         //$('#channel_list').show();
@@ -360,8 +370,6 @@ var page$ = {
   },
   facebookPages: { },
   init: function(){
-    var css = '<style> .chPublic { background:url(' + $('#image_ch_public').text() + ') no-repeat; }\n.chUnPublic { background:url(' + $('#image_ch_unpublic').text() + ') no-repeat; } </style>';
-    $(css).appendTo('head');
     
     $('.pro_check').click(function() {
       var confirmMessage = $('#lang_confirm_goto_setting_page').text();
