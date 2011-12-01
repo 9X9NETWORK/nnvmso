@@ -16,7 +16,7 @@
       <ul>
         <li class="syncFb">
           <span><spring:message code="cms.setup.label.facebook"/></span>&nbsp;&nbsp;
-          <span><a style="display:inline" href="javascript:" id="facebook_connect"><spring:message code="cms.setup.button.account_connect"/></a></span>
+          <span><a style="display:block;width:120px" href="javascript:" id="facebook_connect"><spring:message code="cms.setup.button.account_connect"/></a></span>
           <span id="fb_field" style="display:none;width:300px">
             <a style="display:none" href="javascript:" id="facebook_disconnect"><spring:message code="cms.setup.button.account_disconnect"/></a>
             &nbsp;&nbsp;|&nbsp;&nbsp;<a href="javascript:" id="fb_switch"></a>

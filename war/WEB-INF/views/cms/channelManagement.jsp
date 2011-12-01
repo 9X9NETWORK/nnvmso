@@ -21,11 +21,11 @@
 <div class="content">
   <div class="left_content floatL">
     <ul class="menu">
-      <li><a href="javascript:" class="menuA_active"></a></li>
-      <li><a href="channelSetManagement" class="menuB"></a></li>
-      <li><a href="directoryManagement" class="menuC"></a></li>
-      <li><a href="promotionTools" class="menuD"></a></li>
-      <li><a href="statistics" class="menuE"></a></li>
+      <li><a class="menuA_active"></a></li>
+      <li><a class="menuB"></a></li>
+      <li><a class="menuC"></a></li>
+      <li><a class="menuD"></a></li>
+      <li><a class="menuE"></a></li>
     </ul>
     <label class="lang" id="image_menu"><spring:message code="cms.image.menu"/></label>
     <div class="clear"></div>

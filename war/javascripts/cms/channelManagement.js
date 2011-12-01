@@ -92,7 +92,7 @@ var page$ = {
         page$.programDetail.destroy();
         $('#program_list_readonly').show();
       });
-      var dom = programDetailBlock.find('.ep_source').text('YouTube').attr('href', entry.link[0].href);
+      programDetailBlock.find('.ep_source').text('YouTube').attr('href', entry.link[0].href);
       $('#program_list_readonly').hide();
       $('#program_detail_readonly').show();
     },
@@ -252,7 +252,7 @@ var page$ = {
         break;
         default:
       }
-      var dom = programDetailBlock.find('.ep_source').text(sourceName).attr('href', source);
+      programDetailBlock.find('.ep_source').text(sourceName).attr('href', source);
       $('#program_list_readonly').hide();
       $('#program_detail_readonly').show();
     },
@@ -753,14 +753,13 @@ var page$ = {
         var sourceUrl = $('#channel_import_detail [name="ch_import_url"]').val();
         var parameters = {
           'sourceUrl': sourceUrl
-        }
+        };
         cms.post('/CMSAPI/importChannelByUrl', parameters, function(channel) {
           if (channel == null) {
             alert($('#lang_channel_source_is_wrong').text());
             $('#channel_import_detail [name="ch_import_url"]').focus();
             return;
           }
-          var channelId = channel.key.id;
           $('#channel_import_detail [name="ch_import_url"]').val(channel.sourceUrl);
           $('#channel_import_detail [name="ch_name"]').val('').attr('disabled', false);
           $('#channel_import_detail [name="ch_intro"]').val('').attr('disabled', false);
@@ -1158,15 +1157,20 @@ var page$ = {
             $('.channel_info_title', infoBlock).removeClass('chUnFocusTitle').addClass('chFocusTitle');
             $('.channel_info_image', infoBlock).removeClass('chUnFocusImg').addClass('chFocusImg');
             var channel = event.data.channel;
+            var readonly = true;
             if (channel.contentType == 6)
-              var readonly = false;
-            else
-              var readonly = true;
+              readonly = false;
             if (channel.contentType == 3 || channel.contentType == 4) {
+              var username = null;
               if (channel.contentType == 3)
-                var username = channel.sourceUrl.match(/\/user\/([^\/]*)/)[1];
-              else
-                var username = channel.sourceUrl.match(/\/view_play_list\?p=([^&]*)/)[1];
+                username = channel.sourceUrl.match(/\/user\/([^\/]*)/)[1];
+              else if (channel.contentType == 4)
+                username = channel.sourceUrl.match(/\/view_play_list\?p=([^&]*)/)[1];
+              if (username == null) {
+                alert($('#lang_warning_error_occurs').text());
+                return;
+              }
+              log('fetch: ' + username);
               page$.programList.initYouTube(username, channel.name, function(programCount) {
                 $('.channel_info_programcount span', infoBlock).text(programCount);
               }, (channel.contentType == 4), channel.key.id);
@@ -1196,8 +1200,6 @@ var page$ = {
   initGenericOne: function() {
   },
   init: function() {
-    var css = '<style> .chPublic { background:url(' + $('#image_ch_public').text() + ') no-repeat; }\n.chUnPublic { background:url(' + $('#image_ch_unpublic').text() + ') no-repeat; } </style>';
-    $(css).appendTo('head');
     $('.create_channel_hint').show();
     
     page$.channelList.init();

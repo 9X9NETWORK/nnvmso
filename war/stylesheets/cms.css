@@ -9,7 +9,12 @@ ul,li{ list-style:none;}
 a img { border:none}
 a{ outline:none;}
 
-body{ background:url(/images/cms/bg.jpg) top left repeat-x #dfe2e4; padding:0; margin:0 auto; min-width:1000px; }
+body {
+	background: url(/images/cms/bg.jpg) top left repeat-x #dfe2e4;
+	padding: 0;
+    margin: 0 auto;
+    min-width:1000px;
+}
 
 .floatL{ float:left}
 .floatR{ float:right;}
@@ -18,69 +23,81 @@ body{ background:url(/images/cms/bg.jpg) top left repeat-x #dfe2e4; padding:0; m
 .header{ height:80px; padding:10px 0 0 10px; width:990px; margin:0 auto;}
 .header .floatR a{padding-right:10px;}
 .header p{ color:#FFF; float:left; line-height:30px; padding-right:30px; font-size:1.1em}
-.header .setup{ background:url(/images/cms/header_setup.png) no-repeat; width:38px; height:56px; display:block; float:left}
-.header .logout{ background:url(/images/cms/header_logout.png) no-repeat; width:38px; height:56px; display:block; float:left}
+.header .setup {
+    background: url(/images/cms/header_setup-shrinked.png) no-repeat;
+    width:      38px;
+    height:     56px;
+    display:    block;
+    float:      left;
+}
+.header .logout {
+    background: url(/images/cms/header_logout-shrinked.png) no-repeat;
+    width:      38px;
+    height:     56px;
+    display:    block;
+    float:      left;
+}
 .header .sg{ background:url(/images/cms/icon_sg.png) no-repeat; width:38px; height:56px; display:block; float:left}
 .header img{ height: 65px; }
 
-.menuA:hover, .menuA_active {
-  background: url(/images/cms/menu.png) no-repeat 0 0;
-  width:      90px;
+/*.menuA:hover,*/ .menuA_active {
+  background: url(/images/cms/menu-shrinked.png) no-repeat 0 0;
+  width:      114px;
   height:     55px;
   display:    block;
 }
 .menuA {
-  background: url(/images/cms/menu.png) no-repeat 0 -59px;
-  width:90px;
-  height:55px;
-  display:block;
+  background: url(/images/cms/menu-shrinked.png) no-repeat 0px -59px;
+  width:      114px;
+  height:     55px;
+  display:    block;
 }
-.menuB:hover, .menuB_active {
-  background: url(/images/cms/menu.png) no-repeat -90px 0;
-  width:      89px;
+/*.menuB:hover,*/ .menuB_active {
+  background: url(/images/cms/menu-shrinked.png) no-repeat -114px 0;
+  width:      112px;
   height:     55px;
   display:    block;
 }
 .menuB {
-  background: url(/images/cms/menu.png) no-repeat -90px -59px;
-  width:      89px;
+  background: url(/images/cms/menu-shrinked.png) no-repeat -114px -59px;
+  width:      112px;
   height:     55px;
   display:    block;
 }
-.menuC:hover, .menuC_active {
-  background: url(/images/cms/menu.png) no-repeat -179px 0;
-  width:      89px;
+/*.menuC:hover,*/ .menuC_active {
+  background: url(/images/cms/menu-shrinked.png) no-repeat -226px 0px;
+  width:      0px;
   height:     55px;
   display:    block;
 }
 .menuC {
-  background: url(/images/cms/menu.png) no-repeat -179px -59px;
-  width:      89px;
+  background: url(/images/cms/menu-shrinked.png) no-repeat 0px -59px;
+  width:      0px;
   height:     55px;
   display:    block;
 }
-.menuD:hover, .menuD_active {
-  background: url(/images/cms/menu.png) no-repeat -268px 0;
-  width:      89px;
+/*.menuD:hover,*/ .menuD_active {
+  background: url(/images/cms/menu-shrinked.png) no-repeat -226px 0px;
+  width:      112px;
   height:     55px;
   display:    block;
 }
 .menuD {
-  background: url(/images/cms/menu.png) no-repeat -268px -59px;
-  width:89px;
-  height:55px;
-  display:block;
+  background: url(/images/cms/menu-shrinked.png) no-repeat -226px -59px;
+  width:      112px;
+  height:     55px;
+  display:    block;
 }
-.menuE:hover, .menuE_active {
-  background: url(/images/cms/menu.png) no-repeat -357px 0;
-  width:      95px;
+/*.menuE:hover,*/ .menuE_active {
+  background: url(/images/cms/menu-shrinked.png) no-repeat -338px 0px;
+  width:      114px;
   height:     55px;
   display:    block;
 */
 }
 .menuE {
-  background: url(/images/cms/menu.png) no-repeat -357px -59px;
-  width:      95px;
+  background: url(/images/cms/menu-shrinked.png) no-repeat -338px -59px;
+  width:      114px;
   height:     55px;
   display:    block;
 }
@@ -272,7 +289,10 @@ a.btnCreate span{ line-height:30px; display:block;}
 .chUnFocus:hover { background:#fefce3; border:1px solid #ffd885;}
 
 .chFocus{ border:1px solid #ffce3a; width:415px; height:135px; cursor:pointer;}
-.chInfo , .epInfo{ padding:5px 0 5px 10px;}
+.chInfo , .epInfo {
+	padding: 5px 0 5px 10px;
+	width: 310px;
+}
 .chFocusTitle{ width:405px; background:#fff89a; height:30px; color:#5f4800; line-height:30px; padding-left:10px; font-size:1.1em;}
 .chFocusImg , .epInfoImg , .chUnFocusImg{ width:85px; height:70px; border:1px solid #CCC; margin:5px 0 0 5px; *margin:3px 0 0 3px; float:left;}
 a.btnDel{ background:url(/images/cms/btnClose.png) no-repeat; width:24px; height:23px; display:block; position:relative; top:-28px; left:375px;}

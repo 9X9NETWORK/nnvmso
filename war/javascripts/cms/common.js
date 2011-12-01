@@ -38,6 +38,9 @@ var cms = {
   isGeneric: function() {
     return ($('#msoType').val() == '4');
   },
+  is3x3: function() {
+    return ($('#msoType').val() == '3');
+  },
   initPlusone: function(callback) {
     if (callback)
       cms.loadScript('https://apis.google.com/js/plusone.js', callback);
@@ -208,44 +211,76 @@ var cms = {
       }
     });
   },
+  enableChannelManagement: function() {
+    $('.menuA').attr('href', 'channelManagement');
+    $('<style> .menuA:hover { background-position: 0px 0px; } </style>').appendTo('head');
+    log('channel management enabled');
+  },
+  enableChannelSetManagement: function() {
+    $('.menuB').attr('href', 'channelSetManagement');
+    $('<style> .menuB:hover { background-position: -114px 0px; } </style>').appendTo('head');
+    log('set management enabled');
+  },
+  enableDirectoryManagement: function() {
+    $('.menuC').attr('href', 'directoryManagement');
+    $('<style> .menuC:hover { background-position: -226px 0px; } </style>').appendTo('head');
+    log('directory management enabled');
+  },
+  enablePromotionTools: function() {
+    $('.menuD').attr('href', 'promotionTools');
+    $('<style> .menuD:hover { background-position: -226px 0px; } </style>').appendTo('head');
+    log('promotion tools enabled');
+  },
+  enableStatistics: function() {
+    $('.menuE').attr('href', 'statistics');
+    $('<style> .menuE:hover { background-position: -338px 0px; } </style>').appendTo('head');
+    log('statistics enabled');
+  },
+  init3x3One: function() {
+    $('#mso_logo').wrapAll('<a href="/' + $('#msoName').val() + '"></a>');
+    this.enableChannelManagement();
+    this.enableChannelSetManagement();
+    this.enablePromotionTools();
+    this.enableStatistics();
+  },
   initEnterpriseOne: function() {
-    $('.menuA').removeAttr('href');
-    $('<style> .menuA:hover { background-position: 0px -59px; cursor: default; } </style>').appendTo('head');
-    $('.menuD').removeAttr('href');
-    $('<style> .menuD:hover { background-position: -268px -59px; cursor: default; } </style>').appendTo('head');
+    $('#mso_logo').wrapAll('<a href="/' + $('#msoName').val() + '"></a>');
+    this.enableChannelSetManagement();
+    this.enableStatistics();
   },
   initNNOne: function() {
-    $('.menuC').attr('href', 'directoryManagement');
-    $('<style> .menuC:hover { background-position: -179px 0px; cursor: default; } </style>').appendTo('head');
+    $('#mso_logo').wrapAll('<a href="/9x9"></a>');
+    this.enableChannelManagement();
+    this.enableChannelSetManagement();
+    this.enableDirectoryManagement();
+    this.enablePromotionTools();
+    this.enableStatistics();
   },
   initGenericOne: function() {
     $('#blog_link').show();
     $('#mso_logo').wrapAll('<a href="/9x9"></a>');
-    $('.menuB').removeAttr('href');
-    $('<style> .menuB:hover { background-position: -90px -59px; cursor: default; } </style>').appendTo('head');
+    this.enableChannelManagement();
+    this.enablePromotionTools();
+    this.enableStatistics();
   },
   init: function() {
-    if (!cms.isGeneric()) {
-      $('#mso_logo').wrapAll('<a href="/' + $('#msoName').val() + '"></a>');
-    }
     $('.header .logout').css('background', 'url(' + $('#image_header_logout').text() + ') no-repeat');
     $('.header .setup').css('background', 'url(' + $('#image_header_setup').text() + ') no-repeat');
     $('.header .sg').css('background', 'url(' + $('#image_header_sg').text() + ') no-repeat');
     
-    var style =
-      '<style> ' +
-      '.menuA, .menuA:hover, .menuA_active, ' +
-      '.menuB, .menuB:hover, .menuB_active, ' +
-      '.menuC, .menuC:hover, .menuC_active, ' +
-      '.menuD, .menuD:hover, .menuD_active, ' +
-      '.menuE, .menuE:hover, .menuE_active {' +
+    var style = '<style> ' +
+      '.menuA, /*.menuA:hover,*/ .menuA_active, ' +
+      '.menuB, /*.menuB:hover,*/ .menuB_active, ' +
+      '.menuC, /*.menuC:hover,*/ .menuC_active, ' +
+      '.menuD, /*.menuD:hover,*/ .menuD_active, ' +
+      '.menuE, /*.menuE:hover,*/ .menuE_active {' +
       '  background-image: url(' + $('#image_menu').text() + '); ' +
       '} ' +
       '</style>';
     $(style).appendTo('head'); // IE compatible
     
-    $('.menuC').removeAttr('href');
-    $('<style> .menuC:hover { background-position: -179px -59px; cursor: default; } </style>').appendTo('head');
+    var css = '<style> .chPublic { background:url(' + $('#image_ch_public').text() + ') no-repeat; }\n.chUnPublic { background:url(' + $('#image_ch_unpublic').text() + ') no-repeat; } </style>';
+    $(css).appendTo('head');
     
     $.ajaxSetup ({
       cache: false // Disable caching of AJAX responses
@@ -294,6 +329,8 @@ $(function() {
       cms.initEnterpriseOne();
     } else if (cms.isNN()) {
       cms.initNNOne();
+    } else if (cms.is3x3()) {
+      cms.init3x3One();
     }
     
     if (typeof (page$) != 'undefined' && typeof (page$.init) == 'function') {
@@ -302,6 +339,10 @@ $(function() {
         page$.initGenericOne();
       } else if (cms.isEnterprise() && typeof (page$.initEnterpriseOne) == 'function') {
         page$.initEnterpriseOne();
+      } else if (cms.isNN() && typeof (page$.initNNOne) == 'function') {
+        page$.initNNOne();
+      } else if (cms.is3x3() && typeof (page$.init3x3One) == 'function') {
+        page$.init3x3One();
       }
     }
     

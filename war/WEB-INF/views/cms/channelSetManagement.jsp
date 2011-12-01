@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:f="http://java.sun.com/jsf/core" xmlns:h="http://java.sun.com/jsf/html">
+<html xmlns:f="http://java.sun.com/jsf/core" xmlns:h="http://java.sun.com/jsf/html">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <link type="text/css" rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.15/themes/start/jquery-ui.css"/>
@@ -26,11 +26,11 @@
 <div class="content">
   <div class="left_content floatL">
     <ul>
-      <li><a href="channelManagement" class="menuA"></a></li>
-      <li><a href="javascript:" class="menuB_active"></a></li>
-      <li><a href="directoryManagement" class="menuC"></a></li>
-      <li><a href="promotionTools" class="menuD"></a></li>
-      <li><a href="statistics" class="menuE"></a></li>
+      <li><a class="menuA"></a></li>
+      <li><a class="menuB_active"></a></li>
+      <li><a class="menuC"></a></li>
+      <li><a class="menuD"></a></li>
+      <li><a class="menuE"></a></li>
     </ul>
     <label class="lang" id="image_menu"><spring:message code="cms.image.menu"/></label>
     <div class="clear"></div>
