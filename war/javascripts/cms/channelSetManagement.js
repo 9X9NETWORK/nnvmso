@@ -108,7 +108,7 @@ var page$ = {
       }
       
       for(var i = 0; i < channels.length; i++) {
-        var channel = channels[i]
+        var channel = channels[i];
         
         var item = $('<li class="ch_normal"/>');
         var btnPlay = $('<a/>').attr('target', '_player');

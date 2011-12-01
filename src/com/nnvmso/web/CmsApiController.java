@@ -347,7 +347,9 @@ public class CmsApiController {
 	 * List all channel sets owned by mso
 	 */
 	@RequestMapping("listOwnedChannelSets")
-	public @ResponseBody List<ChannelSet> listOwnedChannelSets(@RequestParam(required=false) Long msoId) {
+	public @ResponseBody List<ChannelSet> listOwnedChannelSets(
+			@RequestParam(required=false) Long msoId,
+			@RequestParam(required=false) String sortby) {
 		
 		ContentOwnershipManager ownershipMngr = new ContentOwnershipManager();
 		List<ChannelSet> results = new ArrayList<ChannelSet>();
@@ -369,6 +371,21 @@ public class CmsApiController {
 				channelSet.setLang(sysCategories.get(0).getLang());
 			}
 		}
+		class ChannelSetComparator implements Comparator<ChannelSet> {  // yes, I know, its a little dirty
+			@Override
+			public int compare(ChannelSet set1, ChannelSet set2) {
+				String lang1 = set1.getLang();
+				String lang2 = set2.getLang();
+				if (lang1.equalsIgnoreCase(lang2))
+					return 0;
+				if (lang1.equalsIgnoreCase("en"))
+					return -1;
+				else
+					return 1;
+			}
+		}
+		if (sortby != null && sortby.equalsIgnoreCase("lang"))
+			Collections.sort(results, new ChannelSetComparator());
 		return results;
 	}
 	

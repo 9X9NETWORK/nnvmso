@@ -905,7 +905,7 @@ var page$ = {
             }, 'text');
           });
         }, 'json');
-        cms.loadJSON('/CMSAPI/listOwnedChannelSets', function(channelSets) {
+        cms.loadJSON('/CMSAPI/listOwnedChannelSets?sortby=lang', function(channelSets) {
           $('#channel_import_detail .sys_directory option').remove();
           $('#channel_import_detail .sys_directory').html('<option value="0">' + $('#lang_select_category').text() + '</option>');
           for (i in channelSets) {
@@ -997,7 +997,7 @@ var page$ = {
         page$.channelDetail.swfObject = new SWFUpload(swfupload_settings);
         $('#channel_detail').show();
       }, 'json');
-      cms.loadJSON('/CMSAPI/listOwnedChannelSets', function(channelSets) { // set set set
+      cms.loadJSON('/CMSAPI/listOwnedChannelSets?sortby=lang', function(channelSets) { // set set set
         var select_category = $('#lang_select_category').text();
         $('#channel_detail .sys_directory').html('<option value="0">' + select_category + '</option>');
         for (i in channelSets) {
