@@ -17,13 +17,15 @@ var cms = {
     cms.isFacebookLoaded = true;
     $('<div id="fb-root"></div>').appendTo('body');
     window.fbAsyncInit = function() {
+      var fb_xd_file = 'http://' + location.host + '/channel.html';
+      log('fb cross domain file: ' + fb_xd_file);
       FB.init({
         appId:     '110847978946712',
         status:     true, // check login status
         cookie:     true, // enable cookies to allow the server to access the session
         xfbml:      true, // parse XFBML
         oauth:      true, // enable OAth 2.0
-        channelURL: 'http://' + location.host + '/facebook.html'
+        channelUrl: fb_xd_file
       });
       return (typeof callback == 'function') ? callback() : null;
     };
