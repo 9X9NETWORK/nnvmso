@@ -93,19 +93,20 @@ public class AdminSetController {
 	
 	@RequestMapping("createBatch")
 	public ResponseEntity<String> createBatch() {
-		String name="灣區新聞";
+		String name="Good TV 好消息";
 		String lang="zh";
-		String desc="多元灣區新聞網帶給您最新資訊";
-		String cname="推薦頻道";
+		String desc="Good TV";
+		String cname="非營利組織";
 		
 		String[] urls = {
-				"http://www.youtube.com/user/Yamashita916",
-				"http://www.youtube.com/user/DianaAmazing",
-				"http://www.youtube.com/user/tbwtv",
-				"http://www.youtube.com/user/TVHS109",
-				"http://www.youtube.com/user/ntdchinese",
-				"http://www.youtube.com/user/ChinaTimes",
-				"http://www.youtube.com/user/TheChineseNews",				
+				"http://www.youtube.com/user/goodtv#grid/user/FBE16B28C166951F",
+				"http://www.youtube.com/user/goodtv#grid/user/A95700BA527EA728",
+				"http://www.youtube.com/user/goodtv#grid/user/E9CF038F35D6EEBC",
+				"http://www.youtube.com/user/goodtv#grid/user/6B8141F28B843D88",
+				"http://www.youtube.com/user/goodtv#grid/user/4554E7A23F1530BF",
+				"http://www.youtube.com/user/goodtv#grid/user/CF53AFA4B1499986",
+				"http://www.youtube.com/user/goodtv#grid/user/F23F18DCC8C8A819",
+				"http://www.youtube.com/user/goodtv#grid/user/0F10FA0EAD8B0875",
 		};
 		MsoChannelManager channelMngr = new MsoChannelManager();
 		List<MsoChannel> channels = new ArrayList<MsoChannel>();
@@ -118,7 +119,7 @@ public class AdminSetController {
 		String output = "";
 		for (MsoChannel c : channels) {
 			output += c.getKey().getId() + "\t" + c.getSourceUrl() + "\n";
-		}			
+		}
 		Mso mso = new MsoManager().findNNMso();
 		ChannelSetManager channelSetMngr = new ChannelSetManager();
 		ChannelSet channelSet = new ChannelSet(mso.getKey().getId(), name, desc, true);

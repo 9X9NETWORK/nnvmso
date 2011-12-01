@@ -56,6 +56,7 @@ public class MsoChannelManager {
 		
 		if (!url.contains("maplestage")) {  
     		String checkedUrl = YouTubeLib.formatCheck(url);
+    		System.out.println("checkedUrl:" + checkedUrl);
     		if (checkedUrl == null) {
     			log.info("bad url:" + url);
     			return false;

@@ -537,7 +537,6 @@ public class InitService {
 			String name = null;
 			if (data.length == 2) {
 				name = data[1];
-				System.out.println("name:" + name);
 			}
 			MsoChannel c = channelMngr.findBySourceUrlSearch(url);
 			if (c == null) {
@@ -557,13 +556,11 @@ public class InitService {
 			} else {
 				if (c.getContentType() == MsoChannel.CONTENTTYPE_YOUTUBE_CHANNEL || 
 					c.getContentType() == MsoChannel.CONTENTTYPE_YOUTUBE_PLAYLIST) {
-					/*
 					if (c.getOriName() == null) {						
 						log.info("re-submit youtube channel:" + c.getSourceUrl());
 						if (!devel)
 							tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);												
 					}
-					*/
 				}				
 				if (c.getStatus() == MsoChannel.STATUS_WAIT_FOR_APPROVAL) {
 					log.info("mark the channel from waiting to approval to success");
@@ -901,6 +898,22 @@ public class InitService {
 					cnt++;
 				}
 			}
+		}
+		log.info("init piwik channel count = " + cnt);
+	}
+
+	public void initNnChannelsPiwik(boolean english, boolean devel) {
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		List<MsoChannel> channels = channelMngr.findChannelsByType(MsoChannel.CONTENTTYPE_MIXED);
+		int cnt = 0;
+		for (MsoChannel c : channels) {
+			if (c.getPiwik() == null) {
+				String piwikId = PiwikLib.createPiwikSite(0, c.getKey().getId(), req);
+				c.setPiwik(piwikId);
+				channelMngr.save(c);					
+				cnt++;
+			}
+			
 		}
 		log.info("init piwik channel count = " + cnt);
 	}

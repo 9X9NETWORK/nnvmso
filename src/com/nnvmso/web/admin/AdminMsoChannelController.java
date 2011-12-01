@@ -71,7 +71,7 @@ public class AdminMsoChannelController {
 	public ResponseEntity<String> tmpList(
 				HttpServletRequest req) {
 		String[] urls = {
-				"http://www.youtube.com/user/Yamashita916",
+				"http://www.youtube.com/user/goodtv/user/FBE16B28C166951F",
 				"http://www.youtube.com/user/DianaAmazing",
 				"http://www.youtube.com/user/tbwtv",
 				"http://www.youtube.com/user/TVHS109",
@@ -113,28 +113,25 @@ public class AdminMsoChannelController {
 	public @ResponseBody String createBatch(
 				HttpServletRequest req,
 				@RequestParam(value="devel",required=false) boolean devel) {
-		String lang = "Zh";
 		String[] urls = {
-				"http://www.youtube.com/user/achun5",
-				"http://www.youtube.com/user/luckyboommini",
-				"http://www.youtube.com/user/wondergirls",
-				"http://www.youtube.com/user/beyonceVEVO",
-				"http://www.youtube.com/user/linkinparktv",
-				"http://www.youtube.com/user/ladygagavevo",
-				"http://www.youtube.com/user/KatyPerryVEVO",
-				"http://www.youtube.com/user/CAguileraVevo",
-				"http://www.youtube.com/user/RihannaVevo",
+				"http://www.youtube.com/user/goodtv#grid/user/FBE16B28C166951F",
+				"http://www.youtube.com/user/goodtv#grid/user/A95700BA527EA728",
+				"http://www.youtube.com/user/goodtv#grid/user/E9CF038F35D6EEBC",
+				"http://www.youtube.com/user/goodtv#grid/user/6B8141F28B843D88",
+				"http://www.youtube.com/user/goodtv#grid/user/4554E7A23F1530BF",
+				"http://www.youtube.com/user/goodtv#grid/user/CF53AFA4B1499986",
+				"http://www.youtube.com/user/goodtv#grid/user/F23F18DCC8C8A819",
+				"http://www.youtube.com/user/goodtv#grid/user/0F10FA0EAD8B0875",
 		};
 		String[] names= {
-				"蘇打綠官方頻道",
-				"蔡黃汝(豆花妹)官方YouTube頻道",
-				"Wonder Girls                                                                            ",
-				"Beyonce VEVO",
-				"The Official Linkin Park YouTube Channel",                                         
-				"Lady Gaga Vevo",
-				"Katy Perry VEVO",
-				"Christina Aguilera Vevo",
-				"Rihanna Vevo",
+				"真情部落格",
+				"幸福來敲門",
+				"心靈樂飛揚",
+				"劉三講古",
+				"我們EYE旅行",
+				"健康新煮流",
+				"禱告大軍",
+				"空中主日學~神學與教會歷史~聖潔的國度-五經",
 		};
 		for (int i=0; i<urls.length; i++) {
 			channelMngr.create(urls[i], names[i], devel, req);

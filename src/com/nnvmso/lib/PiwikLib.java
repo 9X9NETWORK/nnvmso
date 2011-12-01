@@ -74,10 +74,10 @@ public class PiwikLib {
 		String siteName = "";
 		if (channelId != 0) {
 			contentUrl += "ch=" + channelId;
-			siteName = String.valueOf(channelId);
+			siteName = "ch" + String.valueOf(channelId);
 		} else if (setId != 0) {
 			contentUrl += "set=" + setId;
-			siteName = String.valueOf(setId);
+			siteName = "set" + String.valueOf(setId);
 		}
 				
 		String urlStr = postHost + "/index.php?";
@@ -90,7 +90,7 @@ public class PiwikLib {
 		urlStr += "&siteName=" + siteName;
 		
 		//urlStr = "http://piwik.teltel.com/index.php?jsoncallback=jsonp1316424512664&method=SitesManager.getSitesIdFromSiteUrl&url=http%3A%2F%2Fcms.9x9.tv%2F9x9&module=API&format=JSON&token_auth=23ed70e585b18033d7150f917232d1f4";
-		System.out.println("url:" + urlStr);			
+		System.out.println("url:" + urlStr);
 		//HTTP GET
 		URL url;
         String idsite = "";
@@ -177,10 +177,10 @@ public class PiwikLib {
 		String siteName = "";
 		if (channelId != 0) {
 			contentUrl += "ch=" + channelId;
-			siteName = String.valueOf(channelId);
+			siteName = "ch" + String.valueOf(channelId);
 		} else if (setId != 0) {
 			contentUrl += "set=" + setId;
-			siteName = String.valueOf(setId);
+			siteName = "set" + String.valueOf(setId);
 		}
 				
 		String urlStr = postHost + "/index.php?";

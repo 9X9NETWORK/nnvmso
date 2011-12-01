@@ -31,6 +31,7 @@ import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnNetUtil;
+import com.nnvmso.lib.PiwikLib;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.NnUser;
@@ -468,6 +469,43 @@ public class AdminInitController {
 		initService.setRequest(req);
 		initService.initChannelPiwik(isEnglish, isDevel);
 		this.sendEmail("init all the channels piwik done", "done");
+		return NnNetUtil.textReturn("OK");		
+	}
+
+	@RequestMapping("testPiwik")
+	public ResponseEntity<String> testPiwik(
+			@RequestParam(value="id",required=false) long id,			
+			HttpServletRequest req) {
+		MsoChannelManager mngr = new MsoChannelManager();
+		MsoChannel c = mngr.findById(id);
+		if (c != null) {
+			String piwikId = PiwikLib.createPiwikSite(0, id, req);
+			c.setPiwik(piwikId);
+			mngr.save(c);
+		}
+		return NnNetUtil.textReturn("OK");		
+	}
+
+	@RequestMapping("initNnChannelsPiwikToTask")
+	public ResponseEntity<String> initNNSetsPiwikToTask(
+			@RequestParam(value="isEnglish",required=false) boolean isEnglish,
+			@RequestParam(value="isDevel",required=false) boolean isDevel) {
+		QueueFactory.getDefaultQueue().add(
+			      TaskOptions.Builder.withUrl("/admin/init/initNnChannelsPiwik")
+			         .param("isEnglish", String.valueOf(isEnglish))
+			         .param("isDevel", String.valueOf(isDevel))			      			      
+		);			          
+		return NnNetUtil.textReturn("You will receive an email when it is done.");
+	}
+	
+	@RequestMapping("initNnChannelsPiwik")
+	public ResponseEntity<String> initNnChannelsPiwik(
+			@RequestParam(value="isEnglish",required=false) boolean isEnglish,
+			@RequestParam(value="isDevel",required=false) boolean isDevel,			
+			HttpServletRequest req) {
+		initService.setRequest(req);
+		initService.initNnChannelsPiwik(isEnglish, isDevel);
+		this.sendEmail("init all the 9x9 channels piwik done", "done");
 		return NnNetUtil.textReturn("OK");		
 	}
 	
