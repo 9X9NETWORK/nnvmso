@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.nnvmso.dao.SubscriptionLogDao;
+import com.nnvmso.model.Mso;
 import com.nnvmso.model.SubscriptionLog;
 
 public class SubscriptionLogManager {
@@ -33,7 +34,12 @@ public class SubscriptionLogManager {
 	}
 	
 	public int findTotalCountByChannelId(long channelId) {
-		return subDao.findTotalCountByChannelId(channelId);
+		
+		MsoManager msoMngr = new MsoManager();
+		Mso nn = msoMngr.findNNMso();
+		long nnId = nn.getKey().getId();
+		
+		return subDao.findCountByChannelIdAndMsoId(channelId, nnId);
 	}
 	
 	public SubscriptionLog findByChannelId(long channelId) {

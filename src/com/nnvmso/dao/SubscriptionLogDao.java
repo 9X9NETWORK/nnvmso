@@ -112,6 +112,25 @@ public class SubscriptionLogDao {
 			pm.close();
 		}
 		return s;		
+	}
+	
+	public int findCountByChannelIdAndMsoId(long channelId, long msoId) {
+		
+		int totalCount = 0;
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		try {
+			Query q = pm.newQuery(SubscriptionLog.class);
+			q.setFilter("channelId == channelIdParam && msoId == msoIdParam");
+			q.declareParameters("long channelIdParam, long msoIdParam");
+			@SuppressWarnings("unchecked")
+			List<SubscriptionLog> subs = (List<SubscriptionLog>)q.execute(channelId, msoId);
+			for (SubscriptionLog s : subs)
+				totalCount += s.getCount();
+		} finally {
+			pm.close();
+		}
+		logger.info("subscriptionCount(" + channelId + ", " + msoId + ") = " + totalCount);
+		return totalCount;
 	}		
 	
 }
