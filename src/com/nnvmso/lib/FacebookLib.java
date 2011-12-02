@@ -85,7 +85,10 @@ public class FacebookLib {
 		
 		MsoConfigManager configMngr = new MsoConfigManager();
 		MsoConfig fbConfig = configMngr.findByItem(MsoConfig.REALFBTOKEN);
-		String accessToken = fbConfig.getValue();
+		String accessToken = null;
+		if (fbConfig != null) {
+			accessToken = fbConfig.getValue();
+		}
 		if (fbPost.getAccessToken() != null) {
 			accessToken = fbPost.getAccessToken();
 		}

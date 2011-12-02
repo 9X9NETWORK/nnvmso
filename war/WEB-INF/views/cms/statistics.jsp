@@ -38,8 +38,8 @@
               <div class="chUnFocusTitle channel_info_title"><div>Title Title Title</div></div>
               <div class="chUnFocusImg channel_info_image"></div>
               <div class="floatL chInfo">
-                <a style="display:none" href="#" target="_player" class="floatL channel_info_promoteurl">http://www.9x9.tv/channel/3958</a>
-                <a style="display:none" class="floatL icon addthis_button_expanded"></a>
+                <a href="#" target="_player" class="floatL channel_info_promoteurl">http://www.9x9.tv/channel/3958</a>
+                <a class="floatL icon addthis_button_expanded"></a>
                 <a href="javascript:" class="iconStatistics" title=""></a>
                 <div class="clear"></div>
                 <div class="floatL">
