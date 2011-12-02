@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,8 +19,28 @@ import com.nnvmso.service.MsoChannelManager;
 public class PiwikLib {
 
 	protected static final Logger log = Logger.getLogger(PiwikLib.class.getName());
-
+	
+	private static Boolean isNoPiwik() {
+		Properties properties = new Properties();
+		Boolean result = true;
+		try {
+			properties.load(MsoChannelManager.class.getClassLoader().getResourceAsStream("transcoding.properties"));
+			String noPiwik = properties.getProperty("nopiwik");
+			if (noPiwik.equalsIgnoreCase("0")) {
+				result = false;
+			}
+		} catch (IOException e) {
+			NnLogUtil.logException(e);
+		}
+		
+		return result;
+	}
+	
 	public static String createPiwikSite(long setId, long channelId, HttpServletRequest req) {
+		if (isNoPiwik()) {
+			log.info("no piwik");
+			return null;
+		}
 		if (setId == 0 && channelId == 0)
 			return null;
 		ChannelSetManager setMngr = new ChannelSetManager();
@@ -127,6 +148,10 @@ public class PiwikLib {
 	
 	//urlRoot example, "http://qa.9x9.tv"
 	public static String createPiwikSite(long setId, long channelId, String urlRoot) {
+		if (isNoPiwik()) {
+			log.info("no piwik");
+			return null;
+		}
 		log.info("setID:" + setId + ";urlRoot:" + urlRoot);
 		if (setId == 0 && channelId == 0)
 			return null;
