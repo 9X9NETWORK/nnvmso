@@ -84,4 +84,25 @@ public class ContentOwnershipDao extends GenericDao<ContentOwnership> {
 		
 		return ownership;
 	}
+	
+	public List<ContentOwnership> findAllByChannelId(long channelId) {
+		
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		List<ContentOwnership> detached = new ArrayList<ContentOwnership>();
+		
+		try {
+			Query query = pm.newQuery(ContentOwnership.class);
+			query.setFilter("contentId == contentIdParam && contentType == contentTypeParam");
+			query.declareParameters("long contentIdParam, long contentTypeParam");
+			@SuppressWarnings("unchecked")
+			List<ContentOwnership> list = (List<ContentOwnership>)query.execute(channelId, ContentOwnership.TYPE_CHANNEL);
+			if (list.size() > 0)
+				detached = (List<ContentOwnership>)pm.detachCopyAll(list);
+		} catch (JDOObjectNotFoundException e) {
+		} finally {
+			pm.close();
+		}
+		
+		return detached;
+	}
 }

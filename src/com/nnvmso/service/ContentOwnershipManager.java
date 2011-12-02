@@ -102,4 +102,8 @@ public class ContentOwnershipManager {
 		ownershipDao.delete(ownership);
 	}
 	
+	public List<ContentOwnership> findAllByChannelId(long channelId) {
+		return ownershipDao.findAllByChannelId(channelId);
+	}
+	
 }
