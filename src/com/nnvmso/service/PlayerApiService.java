@@ -1387,7 +1387,8 @@ public class PlayerApiService {
 			ChannelSet cs = csMngr.findById(csId);
 			if (cs != null) {
 				result[0] = "id" + "\t" + id + "\n";
-				result[0] += "piwik" + "\t" + cs.getPiwik();
+				result[0] += "piwik" + "\t" + cs.getPiwik() + "\n";
+				System.out.println(result[0]);
 			}
 			List<MsoChannel> channels = csMngr.findChannelsById(csId);			
 			for (MsoChannel c : channels) {
