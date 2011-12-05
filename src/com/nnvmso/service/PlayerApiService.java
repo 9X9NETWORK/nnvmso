@@ -1383,7 +1383,13 @@ public class PlayerApiService {
 		//it's a set, find channel info
 		result[0] = id + "\n";
 		if (id.startsWith("s")) {
-			List<MsoChannel> channels = csMngr.findChannelsById(Long.parseLong(id.substring(1, id.length())));			
+			long csId = Long.parseLong(id.substring(1, id.length()));
+			ChannelSet cs = csMngr.findById(csId);
+			if (cs != null) {
+				result[0] = "id" + "\t" + id + "\n";
+				result[0] += "piwik" + "\t" + cs.getPiwik();
+			}
+			List<MsoChannel> channels = csMngr.findChannelsById(csId);			
 			for (MsoChannel c : channels) {
 				result[2] += this.composeChannelLineupStr(c, mso) + "\n";
 			}
