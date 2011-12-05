@@ -4702,7 +4702,7 @@ var xmlJsonClass = {
 					break;
 				case 'checkbox':
 					var cbv = (options.colModel.editoptions) ? options.colModel.editoptions.value.split(":") : ["Yes","No"];
-					ret = $('input',cellval).attr("checked") ? cbv[0] : cbv[1];
+					ret = $('input',cellval)[0].checked ? cbv[0] : cbv[1];
 					break;
 				case 'select' :
 					ret = $.unformat.select(cellval,options,pos,cnt);
@@ -6511,7 +6511,7 @@ $.jgrid.extend({
 					} else {
 					switch ($(this).get(0).type) {
 						case "checkbox":
-							if($(this).attr("checked")) {
+							if($(this)[0].checked) {
 								postdata[this.name]= $(this).val();
 							}else {
 								var ofv = $(this).attr("offval");
@@ -8249,7 +8249,7 @@ $.jgrid.extend({
 							if(cm.editoptions ) {
 								cbv = cm.editoptions.value.split(":");
 							}
-							tmp[nm]=  $("input",this).attr("checked") ? cbv[0] : cbv[1]; 
+							tmp[nm]=  $("input",this)[0].checked ? cbv[0] : cbv[1]; 
 							break;
 						case 'text':
 						case 'password':
@@ -8579,7 +8579,7 @@ $.jgrid.extend({
 						if(cm.editoptions){
 							cbv = cm.editoptions.value.split(":");
 						}
-						v = $("#"+iRow+"_"+nmjq,$t.rows[iRow]).attr("checked") ? cbv[0] : cbv[1];
+						v = $("#"+iRow+"_"+nmjq,$t.rows[iRow])[0].checked ? cbv[0] : cbv[1];
 						v2=v;
 						break;
 					case "password":
