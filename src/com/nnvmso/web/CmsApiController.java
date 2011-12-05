@@ -1216,9 +1216,15 @@ public class CmsApiController {
 	public @ResponseBody String removeSnsAuth(@RequestParam Long msoId,
 	                                           @RequestParam Short type) {
 		SnsAuthManager snsMngr = new SnsAuthManager();
+		AutosharingService shareService = new AutosharingService();
+		
 		SnsAuth snsAuth = snsMngr.findMsoIdAndType(msoId, type);
 		if (snsAuth != null) {
 			snsMngr.delete(snsAuth);
+		}
+		List<ChannelAutosharing> autoshareList = shareService.findAllChannelsByMsoId(msoId);
+		for (ChannelAutosharing autoshare : autoshareList) {
+			shareService.delete(autoshare);
 		}
 		return "OK";
 	}

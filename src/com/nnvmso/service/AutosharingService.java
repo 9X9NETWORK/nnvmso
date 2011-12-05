@@ -77,4 +77,8 @@ public class AutosharingService {
 		return channelAutosharingDao.findAllByChannelIdAndType(channelId, type);
 		
 	}
+
+	public List<ChannelAutosharing> findAllChannelsByMsoId(long msoId) {
+		return channelAutosharingDao.findAllChannelsByMsoId(msoId);
+	}
 }
