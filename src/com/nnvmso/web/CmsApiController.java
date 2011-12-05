@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -148,6 +149,54 @@ public class CmsApiController {
 		for (MsoChannel channel : results) {
 			channel.setSubscriptionCount(subLogMngr.findTotalCountByChannelId(channel.getKey().getId()));
 		}
+		return results;
+	}
+	
+	@RequestMapping("listOwnedAndDefaultSetChannels")
+	public @ResponseBody List<MsoChannel> listOwnedAndDefaultSetChannels(@RequestParam Long msoId) {
+		
+		SubscriptionLogManager subLogMngr = new SubscriptionLogManager();
+		ContentOwnershipManager ownershipMngr = new ContentOwnershipManager();
+		List<MsoChannel> results = new ArrayList<MsoChannel>();
+		CmsApiService cmsService = new CmsApiService();
+		
+		logger.info("msoId = " + msoId);
+		
+		class MsoChannelComparator implements Comparator<MsoChannel> {  // yes, I know, its a little dirty
+			@Override
+			public int compare(MsoChannel channel1, MsoChannel channel2) {
+				Date date1 = channel1.getUpdateDate();
+				Date date2 = channel2.getUpdateDate();
+				return date2.compareTo(date1);
+			}
+		}
+		
+		results = ownershipMngr.findOwnedChannelsByMsoId(msoId);
+		Collections.sort(results, new MsoChannelComparator());
+		
+		ChannelSet channelSet = cmsService.getDefaultChannelSet(msoId);
+		if (channelSet == null) {
+			for (MsoChannel channel : results) {
+				channel.setSubscriptionCount(subLogMngr.findTotalCountByChannelId(channel.getKey().getId()));
+			}
+			return results;
+		}
+		
+		HashSet<Long> set = new HashSet<Long>();
+		for (MsoChannel channel : results) {
+			set.add(channel.getKey().getId());
+		}
+		
+		List<MsoChannel> results2 = cmsService.findChannelsByChannelSetId(channelSet.getKey().getId());
+		for (MsoChannel channel : results2) {
+			Long channelId = channel.getKey().getId();
+			if (!set.contains(channelId)) {
+				set.add(channelId);
+				channel.setSubscriptionCount(subLogMngr.findTotalCountByChannelId(channelId));
+				results.add(channel);
+			}
+		}
+		
 		return results;
 	}
 	

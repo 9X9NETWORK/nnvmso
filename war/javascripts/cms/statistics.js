@@ -62,11 +62,7 @@ var page$ = {
   channelAndChannelSetList: {
     init: function() {
       // load channels
-      var method = 'listOwnedChannels';
-      if (cms.isEnterprise()) {
-        method = 'defaultChannelSetChannels';
-      }
-      cms.loadJSON('/CMSAPI/' + method + '?msoId=' + $('#msoId').val(), function(channels) {
+      cms.loadJSON('/CMSAPI/listOwnedAndDefaultSetChannels?msoId=' + $('#msoId').val(), function(channels) {
         for (i in channels) {
           var channelInfoBlock = $('#channel_info_block').clone(true).removeAttr('id').addClass('channel_info_block_cloned');
           var channelId = channels[i].key.id;
@@ -111,7 +107,7 @@ var page$ = {
           channelInfoBlock.find('.channel_info_updatedate span').text(cms.formatDate(channels[i].updateDate));
           // add this
           var promoteUrl = 'http://' + location.host + '/view?channel=' + channelId;
-          channelInfoBlock.find('.addthis_button_expanded').attr('addthis:url', promoteUrl);
+          channelInfoBlock.find('.addthis_button_expanded').attr('addthis:url', promoteUrl + '&_=' + channels[i].updateDate);
           var switchObject = channelInfoBlock.find('.channel_info_publish');
           if (channels[i]['public']) {
             switchObject.removeClass('chUnPublic').addClass('chPublic');
@@ -152,7 +148,7 @@ var page$ = {
           // add this
           var promoteUrl = 'http://' + location.host + '/';
           promoteUrl += ((channelSets[i].beautifulUrl != null) ? channelSets[i].beautifulUrl : channelSets[i].defaultUrl);
-          channelSetInfoBlock.find('.channel_info_addthis').attr('href', 'http://api.addthis.com/oexchange/0.8/offer?url=' + encodeURIComponent(promoteUrl));
+          channelSetInfoBlock.find('.addthis_button_expanded').attr('addthis:url', promoteUrl + '?_=' + channelSets[i].updateDate);
           var switchObject = channelSetInfoBlock.find('.channel_info_publish');
           if (channelSets[i]['public']) {
             switchObject.removeClass('chUnPublic').addClass('chPublic');
@@ -175,6 +171,7 @@ var page$ = {
             
           });
         }
+        cms.initAddthis();
         $('#channel_set_list_ul').append('<div class="clear"/>');
       });
     }
