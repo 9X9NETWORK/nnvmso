@@ -20,7 +20,7 @@
 <script type="text/javascript" charset="utf-8" src="${root}/javascripts/jquery.swfobject.1-1-1.min.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/scripts/flowplayer-3.2.4.min.js"></script>
 
-<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/mini6.js"></script>
+<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/mini7.js"></script>
 
 </head>
 <body>
@@ -119,6 +119,44 @@
 </div>
 
 <div id="relaydiv" style="z-index: 1; position: absolute; top: 0px; left: 0px">
+</div>
+
+<div id="help-layer">
+  <div id="help-holder">
+    <p id="btn-help-close"><img src="${root}/images/btn_delete_off.png" class="off"><img src="${root}/images/btn_delete_on.png" class="on"></p>
+    <ul id="help-tabs">
+      <li id="p1" class="on"><span>Panel 1</span></li>
+      <li id="p2"><span>Panel 2</span></li>
+      <li id="p3"><span>Panel 3</span></li>
+      <li id="p4"><span>Panel 4</span></li>
+    </ul>    
+    <div id="p1-panel" class="input-panel">
+      <div class="constrain">
+        <div class="list">   
+        </div>
+      </div>
+    </div>
+    <div id="p2-panel" class="input-panel">
+      <div class="constrain">
+        <div class="list">
+        </div>
+      </div>
+    </div>
+    <div id="p3-panel" class="input-panel">
+      <div class="constrain">
+        <div class="list">
+        </div>
+      </div>
+    </div>
+    <div id="p4-panel" class="input-panel">
+      <div class="constrain">
+        <p id="problem-input">
+          <textarea class="textfield">Enter your problem</textarea> 
+        </p>
+        <p id="btn-report" class="btn"><span>Submit</span></p>
+      </div>
+    </div>
+  </div>
 </div>
 
 </body>
