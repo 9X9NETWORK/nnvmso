@@ -1381,14 +1381,12 @@ public class PlayerApiService {
 		CategoryChannelSetManager ccsMngr = new CategoryChannelSetManager();
 		ChannelSetManager csMngr = new ChannelSetManager();
 		//it's a set, find channel info
-		result[0] = id + "\n";
+		result[0] = "id" + "\t" + id + "\n";
 		if (id.startsWith("s")) {
 			long csId = Long.parseLong(id.substring(1, id.length()));
 			ChannelSet cs = csMngr.findById(csId);
 			if (cs != null) {
-				result[0] = "id" + "\t" + id + "\n";
 				result[0] += "piwik" + "\t" + cs.getPiwik() + "\n";
-				System.out.println(result[0]);
 			}
 			List<MsoChannel> channels = csMngr.findChannelsById(csId);			
 			for (MsoChannel c : channels) {
