@@ -27,9 +27,11 @@ import com.google.appengine.api.taskqueue.TaskOptions;
 import com.nnvmso.dao.MsoProgramDao;
 import com.nnvmso.lib.CacheFactory;
 import com.nnvmso.lib.NnLogUtil;
+import com.nnvmso.lib.NnStringUtil;
 import com.nnvmso.model.ChannelAutosharing;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
+import com.nnvmso.model.MsoConfig;
 import com.nnvmso.model.MsoProgram;
 import com.nnvmso.model.SnsAuth;
 import com.nnvmso.model.ViewLog;
@@ -82,7 +84,8 @@ public class MsoProgramManager {
 		if (cache != null) {
 			List<MsoProgram> programs = new ArrayList<MsoProgram>();
 			programs.add(program);
-			this.storeInCache(cache, programs, program.getChannelId());
+			String result = this.composeProgramInfoStr(programs);
+			this.storeInCache(cache, result, program.getChannelId());
 		}				
 		
 		// hook, auto share to facebook
@@ -138,7 +141,8 @@ public class MsoProgramManager {
 		if (cache != null) {
 			List<MsoProgram> programs = new ArrayList<MsoProgram>();
 			programs.add(program);
-			this.storeInCache(cache, programs, program.getChannelId());
+			String result = this.composeProgramInfoStr(programs);
+			this.storeInCache(cache, result, program.getChannelId());
 		}
 		//take the chance there's only 50 max per channel, shouldn't take too long, 
 		//and the performance of save is not a concern		
@@ -177,10 +181,12 @@ public class MsoProgramManager {
 	 */
 	public List<MsoProgram> findGoodProgramsByChannelId(long channelId) {
 		List<MsoProgram> programs = new ArrayList<MsoProgram>();
+		/*
 		Cache cache = CacheFactory.get();
-		//find from cache
+		//find from cache		
 		if (cache != null) {
 			@SuppressWarnings("unchecked")
+			String result = (ArrayList)cache.get(this.getCacheProgramListKey(channelId));
 			List<Long> list = (ArrayList<Long>)cache.get(this.getCacheProgramListKey(channelId));
 			//!!! flaw: bad if cache list is not empty but individual program is not in cache  
 			if (list != null) {
@@ -191,37 +197,113 @@ public class MsoProgramManager {
 				return programs;
 			}
 		}
+		*/
 		//find
-		MsoChannelManager channelMngr = new MsoChannelManager();		
+		MsoChannelManager channelMngr = new MsoChannelManager();
 		MsoChannel c = channelMngr.findById(channelId);
 		if (c == null)
 			return null;
 		programs = msoProgramDao.findGoodProgramsByChannelId(c);
 		//store in cache
-		if (cache != null) { this.storeInCache(cache, programs, channelId); }				
+		//if (cache != null) { this.storeInCache(cache, programs, channelId); }				
 		return programs;
 	}
 
-	private void storeInCache(Cache cache, List<MsoProgram>programs, long channelId) {
+	public String composeProgramInfoStr(List<MsoProgram> programs) {		
+		String output = "";
+		
+		String regexCache = "^(http|https)://(9x9cache.s3.amazonaws.com|s3.amazonaws.com/9x9cache)";
+		String regexPod = "^(http|https)://(9x9pod.s3.amazonaws.com|s3.amazonaws.com/9x9pod)";
+		String cache = "http://cache.9x9.tv";
+		String pod = "http://pod.9x9.tv";
+		for (MsoProgram p : programs) {
+			//file urls
+			String url1 = p.getMpeg4FileUrl();
+			String url2 = p.getWebMFileUrl();
+			String url3 = p.getOtherFileUrl();
+			String url4 = p.getAudioFileUrl();
+			if (url1 == null) {url1 = "";}
+			if (url2 == null) {url2 = "";}
+			if (url3 == null) {url3 = "";}
+			if (url4 == null) {url4 = "";}	
+			String imageUrl = p.getImageUrl();
+			String imageLargeUrl = p.getImageLargeUrl();
+			if (imageUrl == null) {imageUrl = "";}
+			if (imageLargeUrl == null) {imageLargeUrl = "";}
+			//!!!!
+			//if (config.getValue().equals(MsoConfig.CDN_AKAMAI)) {
+				url1 = url1.replaceFirst(regexCache, cache);
+				url1 = url1.replaceAll(regexPod, pod);
+				url2 = url2.replaceFirst(regexCache, cache);
+				url2 = url2.replaceAll(regexPod, pod);
+				url3 = url3.replaceFirst(regexCache, cache);
+				url3 = url3.replaceAll(regexPod, pod);
+				url4 = url4.replaceFirst(regexCache, cache);
+				url4 = url4.replaceAll(regexPod, pod);
+				imageUrl = imageUrl.replaceFirst(regexCache, cache);
+				imageUrl = imageUrl.replaceAll(regexPod, pod);
+				imageLargeUrl = imageLargeUrl.replaceFirst(regexCache, cache);
+				imageLargeUrl = imageLargeUrl.replaceAll(regexPod, pod);				 
+			//}
+					
+			//intro
+			String intro = p.getIntro();			
+			if (intro != null) {
+				int introLenth = (intro.length() > 256 ? 256 : intro.length()); 
+				intro = intro.replaceAll("\\s", " ");				
+				intro = intro.substring(0, introLenth);
+			}
+			
+			//the rest
+			String[] ori = {String.valueOf(p.getChannelId()), 
+					        String.valueOf(p.getKey().getId()), 
+					        p.getName(), 
+					        intro,
+					        String.valueOf(p.getType()), 
+					        p.getDuration(),
+					        imageUrl,
+					        imageLargeUrl,
+					        url1, 
+					        url2, 
+					        url3, 
+					        url4, 
+					        String.valueOf(p.getPubDate().getTime()),
+					        p.getComment()};
+			output = output + NnStringUtil.getDelimitedStr(ori);
+			output = output.replaceAll("null", "");
+			output = output + "\n";
+		}
+		return output;		
+	}
+	
+	public String findGoodProgramsByChannelId(long channelId, MsoConfig config) {
+		log.info("hit program info");
+		List<MsoProgram> programs = new ArrayList<MsoProgram>();
+		Cache cache = CacheFactory.get();
+		//find from cache
+		if (cache != null) {
+			String result = (String)cache.get(this.getCacheProgramListKey(channelId));
+			if (result != null) {
+				return result;
+			}				
+		}
+		//find
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		MsoChannel c = channelMngr.findById(channelId);
+		if (c == null)
+			return null;
+		programs = msoProgramDao.findGoodProgramsByChannelId(c);
+		String result = "";
+		result = this.composeProgramInfoStr(programs);
+		//store in cache
+		if (cache != null) { this.storeInCache(cache, result, channelId); }				
+		return result;
+	}
+	
+	private void storeInCache(Cache cache, String result, long channelId) {
 		if (cache == null) {return;}
 		//store individual program
-		for (MsoProgram p : programs) {
-			if (p.getStatus() != MsoProgram.STATUS_OK || p.getType() != MsoProgram.TYPE_VIDEO) {
-				cache.put(this.getCacheKey(p.getKey().getId()), null);
-			} else {
-				cache.put(this.getCacheKey(p.getKey().getId()), p);
-			}
-		}
-		
-        //store a channel's program list, sorted by pubDate
-		/*
-		List<MsoProgram>goodList = msoProgramDao.findGoodProgramsByChannelId(channelId);
-		List<Long> list = new ArrayList<Long>();
-		for (MsoProgram p : goodList) {
-			list.add(p.getKey().getId());
-		}
-		cache.put(this.getCacheProgramListKey(channelId), list);
-		*/
+		cache.put(this.getCacheProgramListKey(channelId), result);
 	}
 	
 	/**
@@ -348,9 +430,9 @@ public class MsoProgramManager {
 		return "program(" + id + ")";		
 	}
 
-	//example, channel(1)program(1)
+	//example, channel-programList(1)
 	private String getCacheProgramListKey(long channelId) {
-		return "channel-programList(" + channelId + ")";		
+		return "channel-programList1(" + channelId + ")";		
 	}	
 	
 	/*

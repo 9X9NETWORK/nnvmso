@@ -454,7 +454,7 @@ public class PlayerApiService {
 			List<MsoProgram> programs = new ArrayList<MsoProgram>();
 			programs.add(program);
 			MsoConfig config = new MsoConfigManager().findByMsoIdAndItem(mso.getKey().getId(), MsoConfig.CDN);
-			toPlay = toPlay + this.composeProgramInfoStr(programs, config);
+			toPlay = toPlay + programMngr.composeProgramInfoStr(programs);
 		} else {			
 			toPlay = toPlay + share.getChannelId() + "\t" + share.getProgramIdStr() + "\n";			
 		}
@@ -1166,6 +1166,7 @@ public class PlayerApiService {
 		String[] chArr = channelIds.split(",");
 		List<MsoProgram> programs = new ArrayList<MsoProgram>();
 		NnUser user = null;
+		String programStr = "";
 		if (channelIds.equals("*")) {
 			user = userMngr.findByToken(userToken);
 			if (user == null) {
@@ -1183,20 +1184,22 @@ public class PlayerApiService {
 				programs.addAll(programMngr.findGoodProgramsByChannelId(l));
 			}
 		} else {
-			programs = programMngr.findGoodProgramsByChannelId(Long.parseLong(channelIds));
+			//programs = programMngr.findGoodProgramsByChannelId(Long.parseLong(channelIds));
+			programStr = programMngr.findGoodProgramsByChannelId(Long.parseLong(channelIds), null);
 		}		
 				
 		MsoConfig config = new MsoConfigManager().findByMsoIdAndItem(mso.getKey().getId(), MsoConfig.CDN);
 		if (config == null) {
 			config = new MsoConfig(mso.getKey().getId(), MsoConfig.CDN, MsoConfig.CDN_AMAZON);
 			log.severe("mso config does not exist! mso: " + mso.getKey());
-		}		
+		}
 		String result = NnStatusMsg.successStr(locale) + separatorStr;
 		if (userInfo) {
 			if (user == null && userToken != null) {user = userMngr.findByToken(userToken);}
 			result = this.prepareUserInfo(user, null) + separatorStr; 
 		}
-		return result + this.composeProgramInfoStr(programs, config);
+		//return result + programMngr.composeProgramInfoStr(programs, config);
+		return result + programStr;
 	}
 
 	public String findCategoriesByLang(String lang) {
@@ -1255,7 +1258,7 @@ public class PlayerApiService {
 		String output = NnStringUtil.getDelimitedStr(ori);
 		return output;
 	}
-	
+	/*
 	private String composeProgramInfoStr(List<MsoProgram> programs, MsoConfig config) {		
 		String output = "";
 		
@@ -1263,7 +1266,6 @@ public class PlayerApiService {
 		String regexPod = "^(http|https)://(9x9pod.s3.amazonaws.com|s3.amazonaws.com/9x9pod)";
 		String cache = "http://cache.9x9.tv";
 		String pod = "http://pod.9x9.tv";
-		
 		for (MsoProgram p : programs) {
 			//file urls
 			String url1 = p.getMpeg4FileUrl();
@@ -1322,6 +1324,7 @@ public class PlayerApiService {
 		}
 		return output;		
 	}
+	*/
 		
 	public String findFeaturedSets(String lang) {
 		lang = this.checkLang(lang);	

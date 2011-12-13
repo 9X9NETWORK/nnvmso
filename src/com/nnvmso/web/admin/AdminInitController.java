@@ -50,21 +50,6 @@ import com.nnvmso.web.json.transcodingservice.RtnProgram;
  */
 
 
-/* first run */
-//wipe out data: Category, CategoryChannel, CategoryChannelSet, ChannelSet, ChannelSetChannel, ContentOwnership
-//change MsoChannel Schema 
-//initChannelsToTask (mark selected channel to good status)
-//mapreduce, updateFtsMapper (update channel fts)
-//initSetsToTask?isEnglish=true&isDevel=false
-//initChannelsToTask
-//initCategoriesToTask
-//initSetAndChannelsToTask
-//initCategoryAndSetsToTask
-//initRecommdned
-//initSetImagesToTask
-//initCategoryCount
-//initMso
-
 /* 2nd run */
 //wipe out data: Category, CategoryChannelSet, (ChannelSet, ChannelSetChannel, ContentOwnership)
 //admin/set/deleteMso?id=8001
@@ -120,10 +105,10 @@ public class AdminInitController {
 	public String groundStartPost(HttpServletRequest req) {
 		String host = NnNetUtil.getUrlRoot(req);
 		if (host.equals("http://localhost:8888")) {
-			initService.initAll(false, true);
+			initService.initAll(true, true);
 		}
 		return "admin/groundStart";
-	}	
+	}
 
 	@RequestMapping("file")
 	public ResponseEntity<String> file() {
@@ -445,10 +430,14 @@ public class AdminInitController {
 			HttpServletRequest req) {
 		initService.setRequest(req);
 		initService.initPiwikSet(isEnglish, isDevel);
-		this.sendEmail("init all the channels done", "done");
+		this.sendEmail("init piwik set", "done");
 		return NnNetUtil.textReturn("OK");		
 	}
 
+	//admin/init/initChannelPiwikToTask?isEnglish=true&isDevel=false
+	//admin/init/initChannelPiwikToTask?isEnglish=false&isDevel=false
+	//admin/init/initPiwikSetToTask?isEnglish=false&isDevel=false
+	//admin/init/initNnChannelsPiwikToTask
 	@RequestMapping("initChannelPiwikToTask")
 	public ResponseEntity<String> initChannelPiwikToTask(
 			@RequestParam(value="isEnglish",required=false) boolean isEnglish,
@@ -487,7 +476,7 @@ public class AdminInitController {
 	}
 
 	@RequestMapping("initNnChannelsPiwikToTask")
-	public ResponseEntity<String> initNNSetsPiwikToTask(
+	public ResponseEntity<String> initNnChannelsPiwikToTask(
 			@RequestParam(value="isEnglish",required=false) boolean isEnglish,
 			@RequestParam(value="isDevel",required=false) boolean isDevel) {
 		QueueFactory.getDefaultQueue().add(
