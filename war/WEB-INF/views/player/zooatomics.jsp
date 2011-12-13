@@ -6,7 +6,7 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9playerV68a"/>
-<c:set var="nroot" value="http://9x9ui.s3.amazonaws.com/9x9playerV92"/>
+<c:set var="nroot" value="http://9x9ui.s3.amazonaws.com/9x9playerV94"/>
 
 <!-- $Revision$ -->
 
@@ -39,7 +39,7 @@
 <script type="text/javascript" charset="utf-8" src="${root}/javascripts/jquery.swfobject.1-1-1.min.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/scripts/flowplayer-3.2.4.min.js"></script>
 
-<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/player19.js"></script>
+<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/player20.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/vertical.slider.V2.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/jquery.mousewheel.min.js"></script>
                                                                                                                                      
@@ -85,7 +85,7 @@ var brandinfo = "${brandInfo}";
   <div id="recent-holder">
     <h4><span>Recently Watched</span></h4>
     <img src="${nroot}/images/btn_winclose.png" id="btn-recent-close">
-    <ul id="recent-list"><li class="first"><img src="${nroot}/thumb/01.jpg" class="thumbnail"><p class="ch-title"><span>Top 10 and Top 9 and top 8</span></p></li><li><img src="${nroot}/thumb/01.jpg" class="thumbnail"><p class="ch-title"><span>Top 10</span></p></li><li><img src="${nroot}/thumb/01.jpg" class="thumbnail"><p class="ch-title"><span>Top 10</span></p></li><li><img src="${nroot}/thumb/01.jpg" class="thumbnail"><p class="ch-title"><span>Top 10</span></p></li></ul>
+    <ul id="recent-list"></ul>
   </div>
 </div>
 
@@ -434,21 +434,18 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
     <li id="btn-account">
       <p><span class="head">Hi,</span><span id="user">Guest</span><img src="${nroot}/images/icon_expand.png" class="icon-expand"></p>
       <ul id="account-dropdown" class="dropdown">
-        <li id="btn-sign"><span>Sign in / Sign up</span></li>
-        <li id="btn-settings"><span>Settings</span></li>
-        <li id="btn-signout"><span>Sign out</span></li>
       </ul>
     </li>
     <li class="divider"></li>
-    <li id="store" class="main"><span>Store</span></li>
+    <li id="store" class="main"><img src="${nroot}/images/icon_store.png" id="icon-store"><span>Store</span></li>
     <li class="divider"></li>
-    <li id="guide" class="main"><span>Guide</span></li>
+    <li id="guide" class="main"><img src="${nroot}/images/icon_guide.png" id="icon-guide"><span>Guide</span><span id="ch-sum"></span></li>
     <li class="divider"></li>
-    <li id="player" class="main"><span>Player</span></li>
+    <li id="player" class="main"><img src="${nroot}/images/icon_player.png" id="icon-player"><span>Player</span></li>
     <li class="divider"></li>
     <li id="curator"><span>Curator</span></li>
     <li class="divider"></li>
-    <li id="help"><span>Help</span></li>
+    <li id="help"><img src="${nroot}/images/icon_help.png" id="icon-help"><span>Help</span></li>
   </ul>
 </div>
 
@@ -478,11 +475,11 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
       <p><span>One moment...</span></p>
     </div>
     <h2><span>Channel Store</span></h2>
-    <img src="${nroot}/images/icon_cart_gray.png" id="btn-cart">
+    <!--img src="${nroot}/images/icon_cart_gray.png" id="btn-cart">
     <p id="cart-bubble">
       <img src="${nroot}/images/cart_bubble.png">
       <span>0</span>
-    </p>
+    </p-->
     <div id="btn-programlang">
       <p id="selected-programlang"><span>English Channels</span><img src="${nroot}/images/icon_expand.png" class="icon-expand"></p>
       <ul id="programlang-dropdown" class="dropdown">
@@ -495,9 +492,14 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
       <input type="text" class="textfield" value="Search" id="search-field">
     </p>
     <div id="preview-area">
-      <ul id="flip-ch-index">
-      </ul>
-      <p id="btn-flip-preview"><img src="${nroot}/images/btn_flip_L_off.png" id="btn-fp-off"><img src="${nroot}/images/btn_flip_L_on.png" id="btn-fp-on"></p>
+      <ul id="flip-ch-index"></ul>
+      <p id="btn-flip-back"><img src="${nroot}/images/btn_flip_back.png" id="icon-fp-back"></p>
+      <p id="btn-flip-preview">
+        <img src="${nroot}/images/btn_flip_bg.png" id="btn-fp-bg"> 
+        <img src="${nroot}/images/btn_flip_L_off.png" id="btn-fp-off"> 
+        <img src="${nroot}/images/btn_flip_L_on.png" id="btn-fp-on">
+        <img src="${nroot}/images/btn_flip_L_disable.png" id="btn-fp-disable">
+      </p>
       <p id="preview-index"><span>Previewing</span><span id="index-ch-title"></span><span>channel in</span><span id="index-catg-title"></span><span>set</span></p>
       <div id="preview-win">
         <div id="preview-video"></div>
@@ -535,7 +537,7 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
         <div id="chbubble-content">
           <div id="chbubble-list">
             <p><span></span></p>
-            <p id="chbubble-meta"><span></span><span class="divider">|</span><span></span><br><span></span></p>
+            <p id="chbubble-meta"><span></span><span class="divider">|</span><span></span><br><span id="chbubble-curator"></span></p>
           </div>
         </div>
       </div>
@@ -573,6 +575,12 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
      <p id="result-head"></p>
       <div id="search-slider" class="slider-wrap"><div class="slider-vertical"></div></div>
       <div id="search-content">
+        <div id="no-result">
+          <img src="${nroot}/images/sign_alert.png" id="sign-alert">
+          <p class="alert-msg"><span>Your search did not match any channels.</span></p>
+          <p class="head"><span>Suggestions:</span></p>
+          <p class="suggestions"><span>Please try different keywords<br>Broaden your search terms</span></p>
+        </div>
         <ul id="search-list">
         </ul>
       </div>
@@ -584,13 +592,15 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
   <div id="hint-holder">
     <img src="${nroot}/images/hint_1.png" id="hint-1"><img src="${nroot}/images/hint_2.png" id="hint-2"><img src="${nroot}/images/hint_3.png" id="hint-3">
   </div>
-  <div id="hint-bubble">
-    <img src="${nroot}/images/bubble_tip_up.png" id="hint-bubble-tip">
-    <img src="${nroot}/images/bg_bubble_up.png" class="bg-bubble">
-    <div id="hint-bubble-content">
-      <p class="head"><span>New to 9x9?</span></p>
-      <p><span>Click <!--span class="link" id="btn-hint2tutorial"-->here<!--/span--> to take a quick tutorial!</span></p>
-    </div>
+</div>
+
+<div id="hint-bubble">
+  <img src="${nroot}/images/bubble_tip_up.png" id="hint-bubble-tip">
+  <img src="${nroot}/images/bg_bubble_up.png" class="bg-bubble">
+  <div id="hint-bubble-content">
+    <p class="head"><span>New to 9x9?</span></p>
+    <p><span>Click <span class="link">Here</span> to take a quick tutorial!</span></p>
+    <img src="${nroot}/images/tutorial_screenshot.jpg" id="tutorial-screenshot">
   </div>
 </div>
 
@@ -628,8 +638,8 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
 <div id="player-layer" class="stage" style="display: none; background: #f0f0f0">
   <div id="player-video"></div>
   <ul id="control-bar">
-    <li id="btn-play"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/btn_play.png" title="Play"></li>
-    <li id="btn-pause"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/btn_pause.png" title="Pause"></li>
+    <li id="btn-play"><img src="${nroot}/images/btn_play.png" title="Play"></li>
+    <li id="btn-pause"><img src="${nroot}/images/btn_pause.png" title="Pause"></li>
     <li class="divider"></li>
     <li id="play-time"><span></span></li>
     <li class="divider"></li>
@@ -641,57 +651,62 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
       </div>
     </li>
     <li class="divider"></li>
-    <li id="btn-volume-down"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/btn_volume_down.png" title="Volume Down"></li>
+    <li id="btn-volume-down"><img src="${nroot}/images/btn_volume_down.png" title="Volume Down"></li>
     <li id="volume-constrain">
       <ul id="volume-bars"><li class="on"></li><li class="on"></li><li class="on"></li><li class="on"></li><li></li><li></li><li></li></ul>
     </li>
-    <li id="btn-volume-up"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/btn_volume_up.png" title="Volume Up"></li>
+    <li id="btn-volume-up"><img src="${nroot}/images/btn_volume_up.png" title="Volume Up"></li>
     <li class="divider"></li>
-    <li id="btn-full" class="right"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/btn_full.png" title="Full Screen"></li>
+    <li id="btn-full" class="right"><img src="${nroot}/images/btn_full.png" title="Full Screen"></li>
+    <li id="btn-shrink" class="right"><img src="${nroot}/images/btn_shrink.png" title="Exit Full Screen"></li>
     <li id="btn-sync" class="right">
-      <img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/btn_sync.png" title="9x9 Sync">
+      <img src="${nroot}/images/btn_sync.png" title="9x9 Sync">
       <ul id="sync-dropdown" class="dropdown">
       </ul>
     </li>
     <li id="btn-share" class="right">
-      <img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/btn_share.png" title="Share">
+      <img src="${nroot}/images/btn_share.png" title="Share">
       <ul id="share-dropdown" class="dropdown">
         <li class="combo">
           <span>Channel URL:</span>
           <p id="share-input"><input type="text" class="textfield" value=""></p>
         </li>
-        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/icon_mail.png" class="icon-mail"><span>Send by email</span></li>
-        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/icon_fb.png" class="icon-fb"><span>Share to facebook</span></li>
+        <li><img src="${nroot}/images/icon_mail.png" class="icon-mail"><span>Send by email</span></li>
+        <li><img src="${nroot}/images/icon_fb.png" class="icon-fb"><span>Share to facebook</span></li>
       </ul>
     </li>
     <li id="btn-sort" class="right">
-      <img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/btn_sort.png" title="Sort">
+      <img src="${nroot}/images/btn_sort.png" title="Sort">
       <ul id="sort-dropdown" class="dropdown">
         <li class="head"><span>Episodes sort by:</span></li>
-        <li class="on"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/icon_check.png" class="icon-check"><span>From Newest to Oldest</span></li>
-        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/icon_check.png" class="icon-check"><span>From Left off to Newest</span></li>
+        <li class="on"><img src="${nroot}/images/icon_check.png" class="icon-check"><span>From Newest to Oldest</span></li>
+        <li><img src="${nroot}/images/icon_check.png" class="icon-check"><span>From Left off to Newest</span></li>
       </ul>
     </li>
     <li id="btn-rez" class="right">
       <span id="selected-rez">360p</span>
       <ul id="rez-dropdown" class="dropdown">
-        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/icon_check.png" class="icon-check"><span>720p</span></li>
-        <li class="on"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/icon_check.png" class="icon-check"><span>480p</span></li>
-        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/icon_check.png" class="icon-check"><span>360p</span></li>
-        <li><img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/icon_check.png" class="icon-check"><span>240p</span></li>
+        <li><img src="${nroot}/images/icon_check.png" class="icon-check"><span>720p</span></li>
+        <li class="on"><img src="${nroot}/images/icon_check.png" class="icon-check"><span>480p</span></li>
+        <li><img src="${nroot}/images/icon_check.png" class="icon-check"><span>360p</span></li>
+        <li><img src="${nroot}/images/icon_check.png" class="icon-check"><span>240p</span></li>
       </ul>
     </li>
   </ul>
   <div id="player-holder">
     <h2><span>9x9 Player</span></h2>
     <div id="player-content">
-      <p id="btn-flip-play"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/btn_flip_L_off.png" id="btn-fpl-off"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/btn_flip_L_on.png" id="btn-fpl-on"></p> 
-      <img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/bg_player.jpg" id="player-bg">
+      <p id="btn-flip-play">
+        <img src="${nroot}/images/btn_flip_bg.png" id="btn-fpl-bg"> 
+        <img src="${nroot}/images/btn_flip_L_off.png" id="btn-fpl-off"> 
+        <img src="${nroot}/images/btn_flip_L_on.png" id="btn-fpl-on">
+      </p>
+      <img src="${nroot}/images/bg_player.jpg" id="player-bg">
       <p id="btn-player2store"><span>< Back to Store</span></p>
       <p id="player-index"><span>You are watching</span><span class="ch-title"></span><span>channel</span></p>
-      <img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/player_ep_panel.png" id="player-ep-panel">
-      <img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/arrow_right_on.png" id="player-arrow-right">
-      <img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/arrow_left_on.png" id="player-arrow-left">
+      <img src="${nroot}/images/player_ep_panel.png" id="player-ep-panel">
+      <img src="${nroot}/images/arrow_right_on.png" id="player-arrow-right">
+      <img src="${nroot}/images/arrow_left_on.png" id="player-arrow-left">
       <ul id="player-ep-list"></ul>
       <p id="player-ep-meta">
         <span class="meta-head">Episode:</span>
@@ -699,10 +714,20 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
         <span class="amount"></span>
       </p>
       <div id="player-ch-flipper">
-        <p id="play-next"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/arrow_down.png"><span>Next Ch</span></p>
-        <p id="play-prev"><img src="http://9x9ui.s3.amazonaws.com/9x9playerV92/images/arrow_up.png"><span>Prev Ch</span></p>
+        <div id="play-next">
+          <img src="${nroot}/images/arrow_down.png" id="arrow-next">
+          <p class="tooltip"><span>Next Ch</span></p>
+          <img src="" class="thumbnail">
+          <div id="next-title"><p class="txt-holder"><span></span></p></div>
+        </div>
+        <div id="play-prev">
+          <img src="${nroot}/images/arrow_up.png" id="arrow-prev">
+          <p class="tooltip"><span>Prev Ch</span></p>
+          <img src="" class="thumbnail">
+          <div id="prev-title"><p class="txt-holder"><span></span></p></div>
+        </div>
         <p id="play-ch-index"><span></span></p>
-      </div>      
+      </div>
       <div id="player-info">
         <div id="ep-description">
           <p class="head"><span>Episode Description</span></p>
@@ -712,6 +737,9 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
           <p class="head"><span>Curator's Comment</span></p>
           <p class="content"><span></span></p>
         </div>
+        <div id="ep-uploaded">
+          <p class="head"><span>Uploaded:</span></p>
+          <p class="content"><span></span></p></div></div>
       </div>
     </div>
   </div>
