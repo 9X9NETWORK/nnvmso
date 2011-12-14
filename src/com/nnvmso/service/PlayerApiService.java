@@ -954,7 +954,9 @@ public class PlayerApiService {
 			//create a new channel
 			channel = channelMngr.initChannelSubmittedFromPlayer(url, user);
 			if (channel == null) {
-				return this.assembleMsgs(NnStatusCode.CHANNEL_ERROR, null);
+				//return this.assembleMsgs(NnStatusCode.CHANNEL_ERROR, null);
+				//return messageSource.getMessage("nnstatus.channel_url_invalid", new Object[] {NnStatusCode.CHANNEL_URL_INVALID} , locale);
+				return this.assembleMsgs(NnStatusCode.CHANNEL_URL_INVALID, null);
 			}
 			channel.setTags(tags);
 			channel.setLangCode(lang);
