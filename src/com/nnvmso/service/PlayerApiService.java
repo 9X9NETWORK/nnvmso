@@ -1182,18 +1182,20 @@ public class PlayerApiService {
 			for (int i=0; i<chArr.length; i++) { list.add(Long.valueOf(chArr[i]));}
 			for (Long l : list) {
 				//programs.addAll(programMngr.findGoodProgramsByChannelId(l, false));
-				programStr += programMngr.findGoodProgramsByChannelId(l, false);
+				programStr += programMngr.findGoodProgramsByChannelId(l, true);
 			}
 		} else {
 			//programs = programMngr.findGoodProgramsByChannelId(Long.parseLong(channelIds));
-			programStr = programMngr.findGoodProgramsByChannelId(Long.parseLong(channelIds), false);
+			programStr = programMngr.findGoodProgramsByChannelId(Long.parseLong(channelIds), true);
 		}		
-				
+		
+		/*
 		MsoConfig config = new MsoConfigManager().findByMsoIdAndItem(mso.getKey().getId(), MsoConfig.CDN);
 		if (config == null) {
 			config = new MsoConfig(mso.getKey().getId(), MsoConfig.CDN, MsoConfig.CDN_AMAZON);
 			log.severe("mso config does not exist! mso: " + mso.getKey());
 		}
+		*/
 		String result = NnStatusMsg.successStr(locale) + separatorStr;
 		if (userInfo) {
 			if (user == null && userToken != null) {user = userMngr.findByToken(userToken);}

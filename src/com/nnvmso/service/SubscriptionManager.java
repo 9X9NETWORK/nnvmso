@@ -89,6 +89,10 @@ public class SubscriptionManager {
 	public boolean moveSeq(long userId, int seq1, int seq2) {						
 		Subscription sub = subDao.findByUserIdAndSeq(userId, seq1);
 		if (sub == null) {return false;}
+
+		Subscription target = subDao.findByUserIdAndSeq(userId, seq2);
+		if (target != null) { return false; }
+		
 		sub.setSeq(seq2);
 		subDao.save(sub);
 		return true;

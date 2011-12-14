@@ -78,7 +78,7 @@ public class MsoProgramManager {
 		}		
 
 		//store in cache
-		this.findGoodProgramsByChannelId(channel.getKey().getId(), true);
+		this.findGoodProgramsByChannelId(channel.getKey().getId(), false);
 		
 		// hook, auto share to facebook
 		AutosharingService sharingService = new AutosharingService();
@@ -140,7 +140,7 @@ public class MsoProgramManager {
 		//and the performance of save is not a concern		
 		MsoChannelManager channelMngr = new MsoChannelManager();
 		channelMngr.calculateAndSaveChannelCount(program.getChannelId());
-		this.findGoodProgramsByChannelId(program.getChannelId(), true);
+		this.findGoodProgramsByChannelId(program.getChannelId(), false);
 		return program;
 	}
 
@@ -170,7 +170,7 @@ public class MsoProgramManager {
 	}
 			
 	/**	 
-	 * @@@ Cached
+	 * @@@ NOT CACHED
 	 */
 	public List<MsoProgram> findGoodProgramsByChannelId(long channelId) {
 		List<MsoProgram> programs = new ArrayList<MsoProgram>();
@@ -269,14 +269,14 @@ public class MsoProgramManager {
 		return output;		
 	}
 	
-	public String findGoodProgramsByChannelId(long channelId, boolean reload) {
-		log.info("hit program info");
+	public String findGoodProgramsByChannelId(long channelId, boolean fromCache) {
 		List<MsoProgram> programs = new ArrayList<MsoProgram>();
 		Cache cache = CacheFactory.get();
 		//find from cache
-		if (reload && cache != null) {
+		if (fromCache && cache != null) {
 			String result = (String)cache.get(this.getCacheProgramListKey(channelId));
 			if (result != null) {
+				log.info("hit cache and return from cahce");
 				return result;
 			}				
 		}
