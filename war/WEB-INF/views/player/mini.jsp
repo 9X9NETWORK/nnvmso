@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9miniV9"/>
+<c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9miniV9a"/>
 
 <link rel="stylesheet" href="${root}/stylesheets/main.css" />
 
@@ -17,8 +17,10 @@
 <script type="text/javascript" charset="utf-8" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.8/i18n/jquery-ui-i18n.min.js"></script>
 
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/scripts/swfobject.js"></script>
-<script type="text/javascript" charset="utf-8" src="${root}/javascripts/jquery.swfobject.1-1-1.min.js"></script>
+<!--script type="text/javascript" charset="utf-8" src="${root}/javascripts/jquery.swfobject.1-1-1.min.js"></script-->
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/scripts/flowplayer-3.2.4.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/vertical.slider.V2.js"></script>
+<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/jquery.mousewheel.min.js"></script>
 
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/mini8.js"></script>
 
@@ -129,22 +131,25 @@
       <li id="p2"><span>Panel 2</span></li>
       <li id="p3"><span>Panel 3</span></li>
       <li id="p4"><span>Panel 4</span></li>
-    </ul>    
+    </ul>
     <div id="p1-panel" class="input-panel">
-      <div class="constrain">
-        <div class="list">   
+      <div id="p1-slider" class="slider-wrap"><div class="slider-vertical"></div></div>
+      <div id="p1-content" class="constrain">
+        <div id="p1-list" class="list">
         </div>
       </div>
     </div>
     <div id="p2-panel" class="input-panel">
-      <div class="constrain">
-        <div class="list">
+      <div id="p2-slider" class="slider-wrap"><div class="slider-vertical"></div></div>
+      <div id="p2-content" class="constrain">
+        <div id="p2-list" class="list">
         </div>
       </div>
     </div>
     <div id="p3-panel" class="input-panel">
-      <div class="constrain">
-        <div class="list">
+      <div id="p3-slider" class="slider-wrap"><div class="slider-vertical"></div></div>
+      <div id="p3-content" class="constrain">
+        <div id="p3-list" class="list">
         </div>
       </div>
     </div>
