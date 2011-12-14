@@ -1181,11 +1181,12 @@ public class PlayerApiService {
 			List<Long> list = new ArrayList<Long>();
 			for (int i=0; i<chArr.length; i++) { list.add(Long.valueOf(chArr[i]));}
 			for (Long l : list) {
-				programs.addAll(programMngr.findGoodProgramsByChannelId(l));
+				//programs.addAll(programMngr.findGoodProgramsByChannelId(l, false));
+				programStr += programMngr.findGoodProgramsByChannelId(l, false);
 			}
 		} else {
 			//programs = programMngr.findGoodProgramsByChannelId(Long.parseLong(channelIds));
-			programStr = programMngr.findGoodProgramsByChannelId(Long.parseLong(channelIds), null);
+			programStr = programMngr.findGoodProgramsByChannelId(Long.parseLong(channelIds), false);
 		}		
 				
 		MsoConfig config = new MsoConfigManager().findByMsoIdAndItem(mso.getKey().getId(), MsoConfig.CDN);

@@ -50,8 +50,7 @@ public class MsoProgramManager {
 	 * 
 	 * @param program
 	 */
-	public void create(MsoProgram program) {
-		
+	public void create(MsoProgram program) {		
 		program.setChannelId(0);
 		msoProgramDao.save(program);
 	}
@@ -75,18 +74,11 @@ public class MsoProgramManager {
 		//if the channel's original programCount is zero, its count will not be in the category, adding it now.
 		if (count == 1) {
 			CategoryManager categoryMngr = new CategoryManager();
-			System.out.println("mso program manager, channel create, addChannelCount");
 			categoryMngr.addChannelCounter(channel);
 		}		
 
 		//store in cache
-		Cache cache = CacheFactory.get();
-		if (cache != null) {
-			List<MsoProgram> programs = new ArrayList<MsoProgram>();
-			programs.add(program);
-			String result = this.composeProgramInfoStr(programs);
-			this.storeInCache(cache, result, program.getChannelId());
-		}				
+		this.findGoodProgramsByChannelId(channel.getKey().getId(), true);
 		
 		// hook, auto share to facebook
 		AutosharingService sharingService = new AutosharingService();
@@ -148,6 +140,7 @@ public class MsoProgramManager {
 		//and the performance of save is not a concern		
 		MsoChannelManager channelMngr = new MsoChannelManager();
 		channelMngr.calculateAndSaveChannelCount(program.getChannelId());
+		this.findGoodProgramsByChannelId(program.getChannelId(), true);
 		return program;
 	}
 
@@ -276,12 +269,12 @@ public class MsoProgramManager {
 		return output;		
 	}
 	
-	public String findGoodProgramsByChannelId(long channelId, MsoConfig config) {
+	public String findGoodProgramsByChannelId(long channelId, boolean reload) {
 		log.info("hit program info");
 		List<MsoProgram> programs = new ArrayList<MsoProgram>();
 		Cache cache = CacheFactory.get();
 		//find from cache
-		if (cache != null) {
+		if (reload && cache != null) {
 			String result = (String)cache.get(this.getCacheProgramListKey(channelId));
 			if (result != null) {
 				return result;
