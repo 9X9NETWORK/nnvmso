@@ -743,7 +743,6 @@ var page$ = {
     displayImportDetail: function() {
       if (page$.overallLayout.destroyRightSideContent(false) == false) return false;
       
-      
       $('#channel_import_detail [name="ch_import_button"]').unbind().click(function() {
         if ($('#channel_import_detail [name="ch_import_url"]').val() == "") {
           alert($('#lang_channel_source_is_empty').text());
@@ -904,23 +903,23 @@ var page$ = {
               }
             }, 'text');
           });
-        }, 'json');
-        cms.loadJSON('/CMSAPI/listOwnedChannelSets?sortby=lang', function(channelSets) {
-          $('#channel_import_detail .sys_directory option').remove();
-          $('#channel_import_detail .sys_directory').html('<option value="0">' + $('#lang_select_category').text() + '</option>');
-          for (i in channelSets) {
-            var icon = '/javascripts/plugins/dynatree/skin/ch.gif';
-            if (channelSets[i].lang == 'en') {
-              icon = '/javascripts/plugins/dynatree/skin/en.gif';
+          cms.loadJSON('/CMSAPI/listOwnedChannelSets', function(channelSets) {
+            $('#channel_import_detail .sys_directory option').remove();
+            $('#channel_import_detail .sys_directory').html('<option value="0">' + $('#lang_select_category').text() + '</option>');
+            for (i in channelSets) {
+              var icon = '/javascripts/plugins/dynatree/skin/ch.gif';
+              if (channelSets[i].lang == 'en') {
+                icon = '/javascripts/plugins/dynatree/skin/en.gif';
+              }
+              $('<option/>')
+                .attr('value', channelSets[i].key.id)
+                .text(channelSets[i].name)
+                .attr('title', icon)
+                .appendTo('#channel_import_detail .sys_directory');
             }
-            $('<option/>')
-              .attr('value', channelSets[i].key.id)
-              .text(channelSets[i].name)
-              .attr('title', icon)
-              .appendTo('#channel_import_detail .sys_directory');
-          }
-          $('#channel_import_detail .sys_directory').msDropDown();
-        });
+            $('#channel_import_detail .sys_directory').msDropDown();
+          }, { sortby: 'lang' });
+        }, 'json');
       });
       $('#channel_import_detail [name="ch_savebutton"]').css('width', 80).unbind().click(function() {
         alert($('#lang_warning_import_channel_source').text());
@@ -936,7 +935,27 @@ var page$ = {
       if (!isNew) {
         $('#ch_title').text($('#lang_title_edit_channel_info').text());
       }
-      
+      cms.loadJSON('/CMSAPI/listOwnedChannelSets', function(channelSets) { // set set set
+        var select_category = $('#lang_select_category').text();
+        $('#channel_detail .sys_directory').html('<option value="0">' + select_category + '</option>');
+        for (i in channelSets) {
+          var icon = '/javascripts/plugins/dynatree/skin/ch.gif';
+          if (channelSets[i].lang == 'en') {
+            icon = '/javascripts/plugins/dynatree/skin/en.gif';
+          }
+          $('<option/>')
+            .attr('value', channelSets[i].key.id)
+            .text(channelSets[i].name)
+            .attr('title', icon)
+            .appendTo('#channel_detail .sys_directory');
+        }
+        cms.post('/CMSAPI/channelSystemChannelSet', { 'channelId': channelId }, function(channelSet) {
+          if (channelSet != null) {
+            $('#channel_detail .sys_directory').val(channelSet.key.id);
+          }
+          $('#channel_detail .sys_directory').msDropDown();
+        }, 'json');
+      }, { sortby: 'lang' });
       cms.post('/CMSAPI/channelInfo', { 'channelId': channelId }, function(channel) {
         $('#ch_id').val(channel.key.id);
         $('#ch_name').val('').val(channel.name);
@@ -997,27 +1016,6 @@ var page$ = {
         page$.channelDetail.swfObject = new SWFUpload(swfupload_settings);
         $('#channel_detail').show();
       }, 'json');
-      cms.loadJSON('/CMSAPI/listOwnedChannelSets?sortby=lang', function(channelSets) { // set set set
-        var select_category = $('#lang_select_category').text();
-        $('#channel_detail .sys_directory').html('<option value="0">' + select_category + '</option>');
-        for (i in channelSets) {
-          var icon = '/javascripts/plugins/dynatree/skin/ch.gif';
-          if (channelSets[i].lang == 'en') {
-            icon = '/javascripts/plugins/dynatree/skin/en.gif';
-          }
-          $('<option/>')
-            .attr('value', channelSets[i].key.id)
-            .text(channelSets[i].name)
-            .attr('title', icon)
-            .appendTo('#channel_detail .sys_directory');
-        }
-        cms.post('/CMSAPI/channelSystemChannelSet', { 'channelId': channelId }, function(channelSet) {
-          if (channelSet != null) {
-            $('#channel_detail .sys_directory').val(channelSet.key.id);
-          }
-          $('#channel_detail .sys_directory').msDropDown();
-        }, 'json');
-      });
       $('#channel_detail_cancel').unbind().click(function() {
         if (page$.overallLayout.destroyRightSideContent(false) == false) return false;
         page$.channelList.init();

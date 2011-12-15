@@ -17,6 +17,9 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.sf.jsr107cache.Cache;
+
+import org.mortbay.log.Log;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,6 +29,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
+import com.nnvmso.lib.CacheFactory;
 import com.nnvmso.lib.FacebookLib;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnStringUtil;
@@ -395,19 +399,41 @@ public class CmsApiController {
 	/**
 	 * List all channel sets owned by mso
 	 */
+	@SuppressWarnings("unchecked")
 	@RequestMapping("listOwnedChannelSets")
 	public @ResponseBody List<ChannelSet> listOwnedChannelSets(
+			HttpServletResponse response,
 			@RequestParam(required=false) Long msoId,
 			@RequestParam(required=false) String sortby) {
 		
+		response.addDateHeader("Expires", System.currentTimeMillis() + 3600000);
+		
 		ContentOwnershipManager ownershipMngr = new ContentOwnershipManager();
 		List<ChannelSet> results = new ArrayList<ChannelSet>();
+		MsoManager msoMngr = new MsoManager();
+		Mso nn = msoMngr.findNNMso();
+		String cacheIdString = "System.ChannelSets(sortby=lang)";
 		
 		if (msoId == null) {
-			MsoManager msoMngr = new MsoManager();
-			Mso nn = msoMngr.findNNMso();
+			
 			logger.info("system channel sets");
 			msoId = nn.getKey().getId();
+			
+			Cache cache = CacheFactory.get();
+			if (sortby != null && cache != null) {
+				if (sortby.equalsIgnoreCase("lang")) {
+					// get from cache
+					results = (List<ChannelSet>)cache.get(cacheIdString);
+					if (results != null) {
+						logger.info("get from cache");
+						return results;
+					}
+				} else if (sortby.equalsIgnoreCase("reset")) {
+					// hack
+					logger.info("remove from cache");
+					cache.remove(cacheIdString);
+				}
+			}
 		}
 		logger.info("msoId = " + msoId);
 		results = ownershipMngr.findOwnedChannelSetsByMsoId(msoId);
@@ -433,8 +459,17 @@ public class CmsApiController {
 					return 1;
 			}
 		}
-		if (sortby != null && sortby.equalsIgnoreCase("lang"))
+		if (sortby != null && sortby.equalsIgnoreCase("lang")) {
 			Collections.sort(results, new ChannelSetComparator());
+			if (msoId == nn.getKey().getId()) {
+				// put to cache
+				Cache cache = CacheFactory.get();
+				if (cache != null) {
+					logger.info("put to cache");
+					cache.put(cacheIdString, results);
+				}
+			}
+		}
 		return results;
 	}
 	

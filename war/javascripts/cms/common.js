@@ -158,11 +158,15 @@ var cms = {
         $.post(url, parameters, callback, format);
     }
   },
-  loadJSON: function(url, callback) {
-    var cache = $.ajaxSettings.cache;
-    $.ajaxSettings.cache = true;
-    $.getJSON(url, callback);
-    $.ajaxSettings.cache = cache;
+  loadJSON: function(url, callback, data) {
+    $.ajax({
+      url: url,
+      dataType: 'json',
+      data: data,
+      async: true,
+      cache: true,
+      success: callback
+    });
   },
   loadScript: function(url, callback) {
     if ($.browser.msie && url.charAt(0) == '/') {
