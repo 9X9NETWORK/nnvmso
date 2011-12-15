@@ -306,8 +306,8 @@ var page$ = {
             var inputUrl = programDetailBlock.find('.ep_url_input').val();
             var videoId = null;
             
-            if (inputUrl.indexOf('youtube.com') >= 0) {
-              videoId = inputUrl.match(/\/watch\?v=([^\/&]+)/)[1];
+            if (inputUrl.indexOf('youtube.com/watch') >= 0) {
+              videoId = inputUrl.match(/(\?|&)v=([^\/&]+)/)[2];
             } else if (inputUrl.indexOf('/youtu.be/') >= 0) {
               videoId = inputUrl.match(/youtu\.be\/([^\/&]+)/)[1];
             }
@@ -374,7 +374,10 @@ var page$ = {
                   }
                 }, 'text');
               });
-            }, 'json');
+            }, 'json', function() {
+              alert($('#lang_program_source_invalid_format').text());
+              return false;
+            });
             /* server side approach
             var parameters = {
               'videoIdStr': videoId

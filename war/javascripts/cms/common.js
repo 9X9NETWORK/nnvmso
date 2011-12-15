@@ -141,21 +141,44 @@ var cms = {
       return 'video/unknown';
     }
   },
-  get: function(url, parameters, callback, format) {
-    if (!format) {
-      $.get(url, parameters, callback);
-    } else {
-      $.get(url, parameters, callback, format);
+  get: function(url, data, success, dataType, error) {
+    try {
+      $.ajax({
+        type:     'GET',
+        url:      url,
+        data:     data,
+        success:  success,
+        error:    error,
+        dataType: dataType,
+        statusCode: {
+          404: error,
+          400: error
+        }
+      });
+    } catch (e) {
+      log('ajax exception! GET');
+      if (typeof error == 'function')
+        error(null, null, e);
     }
   },
-  post: function(url, parameters, callback, format) {
-    if (!callback) {
-      $.post(url, parameters);
-    } else {
-      if (!format)
-        $.post(url, parameters, callback);
-      else
-        $.post(url, parameters, callback, format);
+  post: function(url, data, success, dataType, error) {
+    try {
+      $.ajax({
+        type:     'POST',
+        url:      url,
+        data:     data,
+        success:  success,
+        error:    error,
+        dataType: dataType,
+        statusCode: {
+          404: error,
+          400: error
+        }
+      });
+    } catch (e) {
+      log('ajax exception! POST');
+      if (typeof error == 'function')
+        error(null, null, e);
     }
   },
   loadJSON: function(url, callback, data) {
