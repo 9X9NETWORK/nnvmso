@@ -1,20 +1,27 @@
 package com.nnvmso.web;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.InputFormat;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.codehaus.jackson.JsonGenerationException;
+import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,6 +40,7 @@ import com.nnvmso.service.MsoChannelManager;
 import com.nnvmso.service.MsoProgramManager;
 import com.nnvmso.service.NnStatusCode;
 import com.nnvmso.service.NnStatusMsg;
+import com.nnvmso.service.PlayerService;
 import com.nnvmso.service.TranscodingService;
 import com.nnvmso.task.mapper.DeleteAllMapper;
 import com.nnvmso.web.json.transcodingservice.Channel;
@@ -299,6 +307,47 @@ public class TranscodingServiceController {
 			transcodingService.handleException(e);
 		}
 		return NnNetUtil.textReturn("OK");
+	}
+	
+	/**
+	 * Get Channel/Set Meta data (title,description,image)
+	 * 
+	 * @return
+	 */
+	
+	@RequestMapping("getMetaInfo")
+	public @ResponseBody void getMetaInfo(Model model,
+	                                                      HttpServletResponse resp,
+	                                                      @RequestParam(required=false) String jsoncallback,
+	                                                      @RequestParam(required=false) Long set,
+	                                                      @RequestParam(required=false) Long ch) {
+		PlayerService playerService = new PlayerService();
+		
+		ObjectMapper mapper = new ObjectMapper();
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		
+		if (set != null) {
+			model = playerService.prepareSetInfo(model, set);
+		} else if (ch != null) {
+			model = playerService.prepareChannel(model, ch);
+		}
+		
+		try {
+			if (jsoncallback == null) {
+				resp.setCharacterEncoding("utf-8");
+				resp.setContentType("application/json");
+				mapper.writeValue(resp.getOutputStream(), model.asMap());
+			} else {
+				resp.setCharacterEncoding("utf-8");
+				resp.setContentType("text/javascript");
+				mapper.writeValue(baos, model.asMap());
+				OutputStreamWriter osw = new OutputStreamWriter(resp.getOutputStream(), "utf-8");
+				osw.write(jsoncallback + "(" + baos.toString() + ")");
+				osw.flush();
+			}
+		} catch (Exception e) {
+			NnLogUtil.logException(e);
+		}
 	}
 	
 }

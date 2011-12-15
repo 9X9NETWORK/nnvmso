@@ -40,6 +40,20 @@ public class PlayerService {
 		return model;		
 	}
 	
+	public Model prepareSetInfo(Model model, Long setId) {
+		
+		ChannelSetManager setMngr = new ChannelSetManager();
+		ChannelSet channelSet = setMngr.findById(setId);
+		if (channelSet != null) {
+			logger.info("found set id = " + setId);
+			model.addAttribute("fbName", NnStringUtil.htmlSafeChars(channelSet.getName()));
+			model.addAttribute("fbDescription", NnStringUtil.htmlSafeChars(channelSet.getIntro()));
+			model.addAttribute("fbImg", NnStringUtil.htmlSafeChars(channelSet.getImageUrl()));
+		}
+		
+		return model;
+	}
+	
 	public Model prepareSetInfo(Model model, String name,
 			HttpServletResponse resp) {
 		
@@ -99,7 +113,19 @@ public class PlayerService {
 		}
 		return model;
 	}
-
+	
+	public Model prepareChannel(Model model, Long ch) {
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		MsoChannel channel = channelMngr.findById(ch);
+		if (channel != null) {
+			logger.info("found channel = " + ch);
+			model.addAttribute("fbName", NnStringUtil.htmlSafeChars(channel.getName()));
+			model.addAttribute("fbDescription", NnStringUtil.htmlSafeChars(channel.getIntro()));
+			model.addAttribute("fbImg", NnStringUtil.htmlSafeChars(channel.getImageUrl()));
+		}
+		return model;
+	}
+	
 	public Model prepareChannel(Model model, String cid,
 			HttpServletResponse resp) {
 		MsoChannelManager channelMngr = new MsoChannelManager();
