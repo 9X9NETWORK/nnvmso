@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.jdo.JDOUserException;
 
 import org.codehaus.jackson.map.ObjectMapper;
-import org.mortbay.log.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;

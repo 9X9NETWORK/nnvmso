@@ -19,7 +19,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.sf.jsr107cache.Cache;
 
-import org.mortbay.log.Log;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestBody;
