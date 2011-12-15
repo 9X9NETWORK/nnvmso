@@ -56,7 +56,7 @@ var page$ = {
                 node.setLazyNodeStatus(DTNodeStatus_Ok);
               }, 'json');
             } else if (node.data.isFolder && node.data.type == 'set') {
-              cms.post('/CMSAPI/defaultChannelSetChannels', { 'channelSetId': node.data.key }, function(channels) {
+              cms.post('/CMSAPI/defaultChannelSetChannels', { 'channelSetId': node.data.key, 'isGood': true }, function(channels) {
                 for (var i in channels) {
                   var channel = channels[i];
                   var channelId = channel.key.id;

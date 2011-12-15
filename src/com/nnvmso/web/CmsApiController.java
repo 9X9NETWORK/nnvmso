@@ -124,7 +124,9 @@ public class CmsApiController {
 	 * List all channel in mso default channel set
 	 */
 	@RequestMapping("defaultChannelSetChannels")
-	public @ResponseBody List<MsoChannel> defaultChannelSetChannels(@RequestParam(required=false) Long msoId, @RequestParam(required=false) Long channelSetId) {
+	public @ResponseBody List<MsoChannel> defaultChannelSetChannels(@RequestParam(required=false) Long msoId,
+	                                                                 @RequestParam(required=false) Boolean isGood,
+	                                                                 @RequestParam(required=false) Long channelSetId) {
 		CmsApiService cmsService = new CmsApiService();
 		ChannelSetManager setMngr = new ChannelSetManager();
 		ChannelSet channelSet = null;
@@ -135,22 +137,14 @@ public class CmsApiController {
 		}
 		if (channelSet == null)
 			return new ArrayList<MsoChannel>();
-		List<MsoChannel> results = cmsService.findChannelsByChannelSetId(channelSet.getKey().getId());
-		/*
-		class MsoChannelComparator implements Comparator<MsoChannel> {
-			@Override
-			public int compare(MsoChannel channel1, MsoChannel channel2) {
-				int seq1 = channel1.getSeq();
-				int seq2 = channel2.getSeq();
-				return (seq1 - seq2);
-			}
-		}
-		
-		Collections.sort(results, new MsoChannelComparator());
-		*/
+		List<MsoChannel> cadidate = cmsService.findChannelsByChannelSetId(channelSet.getKey().getId());
+		List<MsoChannel> results = new ArrayList<MsoChannel>();
 		SubscriptionLogManager subLogMngr = new SubscriptionLogManager();
-		for (MsoChannel channel : results) {
-			channel.setSubscriptionCount(subLogMngr.findTotalCountByChannelId(channel.getKey().getId()));
+		for (MsoChannel channel : cadidate) {
+			if (isGood == null || !isGood || channel.getStatus() == MsoChannel.STATUS_SUCCESS) {
+				channel.setSubscriptionCount(subLogMngr.findTotalCountByChannelId(channel.getKey().getId()));
+				results.add(channel);
+			}
 		}
 		return results;
 	}
