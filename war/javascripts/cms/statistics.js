@@ -177,6 +177,8 @@ var page$ = {
         }
         cms.initAddthis();
         $('#channel_set_list_ul').append('<div class="clear"/>');
+		var first = $('#channel_set_list_ul li').get(1);
+		$(first).click();
       });
     }
   },

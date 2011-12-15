@@ -120,7 +120,7 @@
             <div class="datePick"><spring:message code="cms.statistics.label.please_select_time_range"/>&nbsp;<input type="text"/></div>
             <div class="clear"></div>
           </div>
-          <iframe class="stastics_iframe" scrolling="no" frameborder="0" marginheight="0" marginwidth="0" style="display:none"></iframe>
+          <iframe class="stastics_iframe" scrolling="auto" frameborder="0" marginheight="0" marginwidth="0" style="display:none"></iframe>
           <div class="stastics_empty" style="display:none"><spring:message code="cms.statistics.label.no_report"/></div>
           <div class="stastics_chart" style="display:none">
             <select name="">

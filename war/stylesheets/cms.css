@@ -487,7 +487,7 @@ a.btnClose:hover { background:url(/images/cms/btnCloseHover.png) no-repeat; }
 
 .stastics_title { border-bottom:1px dashed #ddd; padding:20px 0px 10px 0px; font-size:1em; color:#313131; }
 .stastics_empty { padding:20px 0px 10px 0px; font-size:1em; color:#313131; }
-.stastics_iframe { margin-top: 5px; width: 500px; height: 600px; }
+.stastics_iframe { margin-top: 5px; width: 505px; height: 595px; overflow: auto; }
 .datePick { padding:10px 0 5px 0; float:right; }
 .datePick input { margin-right: 5px; }
 .datePick a { padding:0 0 0 5px; }
