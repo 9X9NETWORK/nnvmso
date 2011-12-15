@@ -43,6 +43,10 @@ var page$ = {
           params.moduleToWidgetize = 'VisitorInterest';
           params.actionToWidgetize = 'getNumberOfVisitsPerPage';
           break;
+        case 'page_titles':
+          params.moduleToWidgetize = 'Actions';
+          params.actionToWidgetize = 'getPageTitles';
+          break;
         case 'length_of_visits':
           params.moduleToWidgetize = 'VisitorInterest';
           params.actionToWidgetize = 'getNumberOfVisitsPerVisitDuration';
