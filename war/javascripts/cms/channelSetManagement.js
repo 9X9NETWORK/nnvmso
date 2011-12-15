@@ -85,14 +85,24 @@ var page$ = {
         if (sourceUrl == "") {
           alert($('#lang_channel_source_is_empty').text());
           return;
+        } else if (sourceUrl.indexOf(location.host) > 0) {
+          var channelId = sourceUrl.match(/channel=([0-9]+)/)[1];
+          cms.post('/CMSAPI/channelInfo', { 'channelId': channelId }, function(channel) {
+            if (channel == null) {
+              alert($('#lang_channel_source_is_wrong').text());
+              return;
+            }
+            page$.objChannelSetArea.appendChannel(channel);
+          }, 'json');
+        } else {
+          cms.post('/CMSAPI/importChannelByUrl', { 'sourceUrl': sourceUrl }, function(channel) {
+            if (channel == null) {
+              alert($('#lang_channel_source_is_wrong').text());
+              return;
+            }
+            page$.objChannelSetArea.appendChannel(channel);
+          }, 'json');
         }
-        cms.post('/CMSAPI/importChannelByUrl', { 'sourceUrl': sourceUrl }, function(channel) {
-          if (channel == null) {
-            alert($('#lang_channel_source_is_wrong').text());
-            return;
-          }
-          page$.objChannelSetArea.appendChannel(channel);
-        }, 'json');
       });
     }
   },
