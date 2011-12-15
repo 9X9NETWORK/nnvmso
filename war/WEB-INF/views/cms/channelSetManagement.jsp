@@ -156,7 +156,8 @@
         <div id="youtube_content" class="tab_content">
           <p><spring:message code="cms.channel_set_management.label.youtube_channel_playlist_url"/>:</p>
           <input name="" type="text" id="youtube_input"/>
-          <p id="youtube_button" class="btnGray"><span><spring:message code="cms.channel_set_management.btn.add"/></span></p>
+          <div id="youtube_button" class="btnGray floatL"><span><spring:message code="cms.channel_set_management.btn.add"/></span></div>
+          <div class="floatL" style="padding-left:15px"><spring:message code="cms.channel_set_management.msg.url_example"/></div>
         </div>
       </div>
     </div>
