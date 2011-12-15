@@ -2,11 +2,11 @@ package com.nnvmso.web;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -15,8 +15,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.InputFormat;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +32,7 @@ import com.google.appengine.tools.mapreduce.ConfigurationXmlUtil;
 import com.google.appengine.tools.mapreduce.DatastoreInputFormat;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnNetUtil;
+import com.nnvmso.lib.PiwikLib;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoProgram;
 import com.nnvmso.service.MsoChannelManager;
@@ -317,14 +316,15 @@ public class TranscodingServiceController {
 	
 	@RequestMapping("getMetaInfo")
 	public @ResponseBody void getMetaInfo(Model model,
-	                                                      HttpServletResponse resp,
-	                                                      @RequestParam(required=false) String jsoncallback,
-	                                                      @RequestParam(required=false) Long set,
-	                                                      @RequestParam(required=false) Long ch) {
+	                                      HttpServletResponse resp,
+	                                      HttpServletRequest req,
+	                                      @RequestParam(required=false) String jsoncallback,
+	                                      @RequestParam(required=false) Long set,
+	                                      @RequestParam(required=false) Long ch) {
+		
 		PlayerService playerService = new PlayerService();
 		
 		ObjectMapper mapper = new ObjectMapper();
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		
 		if (set != null) {
 			model = playerService.prepareSetInfo(model, set);
@@ -333,17 +333,26 @@ public class TranscodingServiceController {
 		}
 		
 		try {
+			OutputStream out = resp.getOutputStream();
+			resp.setCharacterEncoding("UTF-8");
 			if (jsoncallback == null) {
-				resp.setCharacterEncoding("utf-8");
 				resp.setContentType("application/json");
-				mapper.writeValue(resp.getOutputStream(), model.asMap());
+				mapper.writeValue(out, model.asMap());
 			} else {
-				resp.setCharacterEncoding("utf-8");
 				resp.setContentType("text/javascript");
-				mapper.writeValue(baos, model.asMap());
-				OutputStreamWriter osw = new OutputStreamWriter(resp.getOutputStream(), "utf-8");
-				osw.write(jsoncallback + "(" + baos.toString() + ")");
-				osw.flush();
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				OutputStreamWriter writer = new OutputStreamWriter(baos, "UTF-8");
+				writer.write(jsoncallback + "(");
+				writer.close();
+				baos.writeTo(out);
+				
+				baos = new ByteArrayOutputStream();
+				writer = new OutputStreamWriter(baos, "UTF-8");
+				log.info("encoding: " + writer.getEncoding());
+				mapper.writeValue(writer, model.asMap());
+				baos.writeTo(out);
+				out.write(')');
+				out.close();
 			}
 		} catch (Exception e) {
 			NnLogUtil.logException(e);

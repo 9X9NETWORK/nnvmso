@@ -49,6 +49,8 @@ public class PlayerService {
 			model.addAttribute("fbName", NnStringUtil.htmlSafeChars(channelSet.getName()));
 			model.addAttribute("fbDescription", NnStringUtil.htmlSafeChars(channelSet.getIntro()));
 			model.addAttribute("fbImg", NnStringUtil.htmlSafeChars(channelSet.getImageUrl()));
+		} else {
+			logger.warning("channel not found! " + setId);
 		}
 		
 		return model;
@@ -122,6 +124,8 @@ public class PlayerService {
 			model.addAttribute("fbName", NnStringUtil.htmlSafeChars(channel.getName()));
 			model.addAttribute("fbDescription", NnStringUtil.htmlSafeChars(channel.getIntro()));
 			model.addAttribute("fbImg", NnStringUtil.htmlSafeChars(channel.getImageUrl()));
+		} else {
+			logger.warning("channel not found! " + ch);
 		}
 		return model;
 	}
