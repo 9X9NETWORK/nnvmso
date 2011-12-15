@@ -678,6 +678,9 @@ public class CmsApiController {
 		if (ownership == null)
 			ownershipMngr.create(new ContentOwnership(), mso, channel);
 		
+		// piwik
+		PiwikLib.createPiwikSite(0, channel.getKey().getId(), req);
+		
 		return "OK";
 	}
 	
