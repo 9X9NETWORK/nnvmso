@@ -581,6 +581,8 @@ public class CmsApiController {
 			if (channel.getKey() != null && channel.getContentType() != MsoChannel.CONTENTTYPE_FACEBOOK) { //!!!
 				TranscodingService tranService = new TranscodingService();
 				tranService.submitToTranscodingService(channel.getKey().getId(), sourceUrl, req);
+				// piwik
+				PiwikLib.createPiwikSite(0, channel.getKey().getId(), req);
 			}
 		}
 		
@@ -677,9 +679,6 @@ public class CmsApiController {
 		ContentOwnership ownership = ownershipMngr.findByMsoIdAndChannelId(msoId, channel.getKey().getId());
 		if (ownership == null)
 			ownershipMngr.create(new ContentOwnership(), mso, channel);
-		
-		// piwik
-		PiwikLib.createPiwikSite(0, channel.getKey().getId(), req);
 		
 		return "OK";
 	}
