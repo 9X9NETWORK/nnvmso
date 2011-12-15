@@ -723,6 +723,22 @@ var page$ = {
             window.open(url, '_player');
           }
         });
+        $('#chn_table').jqGrid('navButtonAdd', '#chn_table_toppager', {
+          caption:    '',
+          title:      'Piwik Report',
+          buttonicon: 'ui-icon-print',
+          onClickButton: function() {
+            var rowId = $(this).jqGrid('getGridParam', 'selrow');
+            if (rowId == null) { return; }
+            var piwik = $(this).jqGrid('getCell', rowId, 'piwik');
+            if (!piwik) {
+              alert('This site has no piwik!');
+              return;
+            }
+            var url = piwik_host() + 'index.php?module=CoreHome&action=index&date=today&period=day&idSite=' + piwik;
+            window.open(url, '_piwik');
+          }
+        });
       }
     },
     gridCategoryList: {

@@ -10,6 +10,7 @@
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.15/jquery-ui.js"></script>
 <script type="text/javascript" src="/javascripts/grid.locale-en.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.jqGrid.src.js"></script>
+<script type="text/javascript" src="/javascripts/piwik-analytics.js"></script>
 <script type="text/javascript" src="/javascripts/admin-portal-ui.js"></script>
 <title>9x9 Admin Portal</title>
 </head>
