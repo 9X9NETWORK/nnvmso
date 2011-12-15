@@ -302,78 +302,90 @@ var page$ = {
           programDetailBlock.find('.ep_upload_button_place').hide();
           programDetailBlock.find('.ep_comment_block').hide();
           if (programDetailBlock.find('.ep_url_input').val().length > 0) {
+            
             var inputUrl = programDetailBlock.find('.ep_url_input').val();
+            var videoId = null;
+            
             if (inputUrl.indexOf('youtube.com') >= 0) {
-              var videoId = inputUrl.match(/\/watch\?v=([^\/&]+)/)[1];
-              if (!videoId) {
-                alert($('#lang_program_source_invalid_format').text());
-                return false;
-              }
-              var parameters = {
-                'alt': 'json-in-script',
-                'v':   2
-              };
-              cms.get('http://gdata.youtube.com/feeds/api/videos/' + videoId + '?callback=?', parameters, function(data) {
-                programDetailBlock.find('.ep_name').val(data.entry.media$group.media$title.$t);
-                programDetailBlock.find('.ep_intro').val(data.entry.media$group.media$description.$t);
-                programDetailBlock.find('.ep_image').attr('src', data.entry.media$group.media$thumbnail[1].url);
-                programDetailBlock.find('.ep_image_updated').val('true');
-                // youtube comment
-                programDetailBlock.find('.ep_name').attr('disabled', true);
-                programDetailBlock.find('.ep_intro').attr('disabled', true);
-                programDetailBlock.find('.ep_upload_button_place').hide();
-                programDetailBlock.find('.ep_comment_block').show();
-                
-                var btnSave = programDetailBlock.find('.ep_savebutton').css('width', 80).removeClass('btnDisable').addClass('btnSave');
-                btnSave.unbind().click(function() {
-                  if (programDetailBlock.find('.ep_name').val() == '') {
-                    alert($('#lang_warning_empty_name').text());
-                    return;
-                  }
-                  if (programDetailBlock.find('.ep_url_input').val() == '') {
-                    alert($('#lang_warning_import_program_source').text());
-                    return;
-                  }
-                  var parameters = {
-                    'channelId': channelId,
-                    'programId': programId,
-                    'sourceUrl': programDetailBlock.find('.ep_url_input').val(),
-                    'name':      programDetailBlock.find('.ep_name').val(),
-                    'intro':     programDetailBlock.find('.ep_intro').val(),
-                    'comment':   programDetailBlock.find('.ep_comment').val()
-                  };
-                  if (programDetailBlock.find('.ep_image_updated').val() == 'true') {
-                    parameters['imageUrl'] = programDetailBlock.find('.ep_image').attr('src');
-                  }
-                  cms.post('/CMSAPI/saveNewProgram', parameters, function(response) {
-                    if (response == 'OK') {
-                      alert($('#lang_update_successfully').text());
-                      programDetailBlock.removeClass('program_create_detail_block_cloned').parent().hide(); // IE compatible
-                      var size = $('.program_create_detail_block_cloned').size();
-                      if ($('.program_create_detail_block_cloned').size() == 0) {
-                        page$.programList.init(channelId, false, channelName);
-                      }
-                    } else {
-                      alert($('#lang_warning_error_occurs').text());
-                    }
-                  }, 'text');
-                });
-              }, 'json');
-              /* server side approach
-              var parameters = {
-                'videoIdStr': videoId
-              };
-              cms.post('/CMSAPI/getYouTubeVideoInfo', parameters, function(info) {
-                programDetailBlock.find('.ep_name').val(info.title);
-                programDetailBlock.find('.ep_intro').val(info.description);
-                programDetailBlock.find('.ep_image').attr('src', info.thumbnail);
-                programDetailBlock.find('.ep_image_updated').val('true');
-              }, 'json');
-              */
-            } else {
+              videoId = inputUrl.match(/\/watch\?v=([^\/&]+)/)[1];
+            } else if (inputUrl.indexOf('/youtu.be/') >= 0) {
+              videoId = inputUrl.match(/youtu\.be\/([^\/&]+)/)[1];
+            }
+            
+            if (!videoId) {
               alert($('#lang_program_source_invalid_format').text());
               return false;
             }
+            log('videoId: ' + videoId);
+            
+            var parameters = {
+              'alt': 'json-in-script',
+              'v':   2
+            };
+            cms.get('http://gdata.youtube.com/feeds/api/videos/' + videoId + '?callback=?', parameters, function(data) {
+              
+              if (!data) {
+                alert($('#lang_program_source_invalid_format').text());
+                return false;
+              }
+              
+              programDetailBlock.find('.ep_name').val(data.entry.media$group.media$title.$t);
+              programDetailBlock.find('.ep_intro').val(data.entry.media$group.media$description.$t);
+              programDetailBlock.find('.ep_image').attr('src', data.entry.media$group.media$thumbnail[1].url);
+              programDetailBlock.find('.ep_image_updated').val('true');
+              programDetailBlock.find('.ep_url_input').val('http://www.youtube.com/watch?v=' + videoId);
+              // youtube comment
+              programDetailBlock.find('.ep_name').attr('disabled', true);
+              programDetailBlock.find('.ep_intro').attr('disabled', true);
+              programDetailBlock.find('.ep_upload_button_place').hide();
+              programDetailBlock.find('.ep_comment_block').show();
+              
+              var btnSave = programDetailBlock.find('.ep_savebutton').css('width', 80).removeClass('btnDisable').addClass('btnSave');
+              btnSave.unbind().click(function() {
+                if (programDetailBlock.find('.ep_name').val() == '') {
+                  alert($('#lang_warning_empty_name').text());
+                  return;
+                }
+                if (programDetailBlock.find('.ep_url_input').val() == '') {
+                  alert($('#lang_warning_import_program_source').text());
+                  return;
+                }
+                var parameters = {
+                  'channelId': channelId,
+                  'programId': programId,
+                  'sourceUrl': programDetailBlock.find('.ep_url_input').val(),
+                  'name':      programDetailBlock.find('.ep_name').val(),
+                  'intro':     programDetailBlock.find('.ep_intro').val(),
+                  'comment':   programDetailBlock.find('.ep_comment').val()
+                };
+                if (programDetailBlock.find('.ep_image_updated').val() == 'true') {
+                  parameters['imageUrl'] = programDetailBlock.find('.ep_image').attr('src');
+                }
+                cms.post('/CMSAPI/saveNewProgram', parameters, function(response) {
+                  if (response == 'OK') {
+                    alert($('#lang_update_successfully').text());
+                    programDetailBlock.removeClass('program_create_detail_block_cloned').parent().hide(); // IE compatible
+                    var size = $('.program_create_detail_block_cloned').size();
+                    if ($('.program_create_detail_block_cloned').size() == 0) {
+                      page$.programList.init(channelId, false, channelName);
+                    }
+                  } else {
+                    alert($('#lang_warning_error_occurs').text());
+                  }
+                }, 'text');
+              });
+            }, 'json');
+            /* server side approach
+            var parameters = {
+              'videoIdStr': videoId
+            };
+            cms.post('/CMSAPI/getYouTubeVideoInfo', parameters, function(info) {
+              programDetailBlock.find('.ep_name').val(info.title);
+              programDetailBlock.find('.ep_intro').val(info.description);
+              programDetailBlock.find('.ep_image').attr('src', info.thumbnail);
+              programDetailBlock.find('.ep_image_updated').val('true');
+            }, 'json');
+            */
           } else {
             alert($('#lang_program_source_is_empty').text());
             return;
