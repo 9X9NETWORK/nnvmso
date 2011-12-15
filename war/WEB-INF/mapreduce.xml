@@ -258,6 +258,25 @@
     </property>    
   </configuration>
 
+  <configuration name="YouTube Channel Logo Mapper">
+    <property>
+      <name>mapreduce.map.class</name>      
+      <value>com.nnvmso.task.mapper.YouTubeChannelLogoMapper</value>
+    </property>
+    <property>
+      <name>mapreduce.inputformat.class</name>
+      <value>com.google.appengine.tools.mapreduce.DatastoreInputFormat</value>
+    </property>    
+    <property>
+      <name human="Entity Kind to Map Over">mapreduce.mapper.inputformat.datastoreinputformat.entitykind</name>
+      <value template="optional">MsoChannel</value>      
+    </property>    
+    <property>
+      <name human="Bad Logo Url">badLogoUrl</name>
+      <value template="optinonal">String</value>
+    </property>        
+  </configuration>
+
   <configuration name="Update Random Mapper">
     <property>
       <name>mapreduce.map.class</name>      
