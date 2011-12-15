@@ -301,18 +301,23 @@ var addthis_config = {
   'data_use_flash':       false,
   'data_track_clickback': false,
   'services_expanded':    'email,facebook,twitter,tumblr,sinaweibo,funp,plusone.google.com',
+  'pubid':                'ra-4dcccc98718a5dbe',
   'services_custom': [
     {
       name: "Google+",
       url:  "https://plusone.google.com/_/+1/confirm?hl=en&url={{URL}}",
       icon: "/images/cms/google-plus.png"
     }
-  ],
-  'pubid':                'ra-4dcccc98718a5dbe'
+  ]
 };
 
 // everything is start from here
 $(function() {
+  
+  addthis_config['ui_language'] = $('#locale').val();
+  log("locale: " + $('#locale').val());
+  log("msoId: " + $('#msoId').val());
+  log("msoType: " + $('#msoType').val());
   
   if (cms.debug) {
     cms.loadScript('http://www.netgrow.com.au/assets/files/jquery_plugins/jquery.dump.js');

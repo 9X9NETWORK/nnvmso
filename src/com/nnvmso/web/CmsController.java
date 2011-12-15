@@ -22,7 +22,6 @@ import com.nnvmso.lib.AmazonLib;
 import com.nnvmso.lib.CookieHelper;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.model.Mso;
-import com.nnvmso.model.MsoConfig;
 import com.nnvmso.model.NnUser;
 import com.nnvmso.model.LangTable;
 import com.nnvmso.service.AuthService;
@@ -121,6 +120,7 @@ public class CmsController {
 					return "redirect:/cms/channelManagement";
 				}
 				model = setAttributes(model, mso);
+				model.addAttribute("locale", request.getLocale().getLanguage());
 				if (cmsTab.equals("channelManagement") || cmsTab.equals("channelSetManagement")) {
 					String policy = AmazonLib.buildS3Policy("9x9tmp", "public-read", "");
 					model.addAttribute("s3Policy", policy);
@@ -178,6 +178,7 @@ public class CmsController {
 				}
 			}
 			model.addAttribute("msoLogo", mso.getLogoUrl());
+			model.addAttribute("locale", request.getLocale().getLanguage());
 			sessionService.removeSession();
 			return "cms/login";
 		}
@@ -274,6 +275,7 @@ public class CmsController {
 		if (sessionMso != null && sessionMso.getKey().getId() == mso.getKey().getId()) {
 			
 			model = setAttributes(model, mso);
+			model.addAttribute("locale", request.getLocale().getLanguage());
 			
 			if (cmsTab.equals("channelManagement") || cmsTab.equals("channelSetManagement")) {
 				String policy = AmazonLib.buildS3Policy("9x9tmp", "public-read", "");

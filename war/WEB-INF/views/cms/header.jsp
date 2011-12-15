@@ -2,6 +2,7 @@
   <input type="hidden" id="msoId" value="${msoId}"/>
   <input type="hidden" id="msoType" value="${msoType}"/>
   <input type="hidden" id="msoName" value="${msoName}"/>
+  <input type="hidden" id="locale" value="${locale}"/>
   <div class="floatL" id="mso_logo"><img alt="" src="${msoLogo}"/></div>
   <div id="setup_page" class="jqmWindow"></div>
   <div class="floatR">
