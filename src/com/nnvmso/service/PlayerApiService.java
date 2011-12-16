@@ -1114,6 +1114,7 @@ public class PlayerApiService {
 			//find subscribed channels 
 			SubscriptionManager subMngr = new SubscriptionManager();
 			channels = subMngr.findSubscribedChannels(user.getKey().getId(), mso.getKey().getId());
+			log.info("user: " + user.getToken() + " find subscribed size:" + channels.size());
 		} else {
 			//find specific channels
 			MsoChannelManager channelMngr = new MsoChannelManager();
