@@ -31,11 +31,13 @@ import com.nnvmso.model.Category;
 import com.nnvmso.model.CategoryChannel;
 import com.nnvmso.model.CategoryChannelSet;
 import com.nnvmso.model.ChannelSet;
+import com.nnvmso.model.ChannelSetChannel;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.SubscriptionLog;
 import com.nnvmso.service.CategoryChannelManager;
 import com.nnvmso.service.CategoryChannelSetManager;
 import com.nnvmso.service.CategoryManager;
+import com.nnvmso.service.ChannelSetChannelManager;
 import com.nnvmso.service.ChannelSetManager;
 import com.nnvmso.service.MsoChannelManager;
 import com.nnvmso.service.SubscriptionLogManager;
@@ -61,38 +63,14 @@ public class AdminCategoryController {
 		return "error/exception";				
 	}
 		
-	//list every channel under a category
-	@RequestMapping(value="channelList")
-	public ResponseEntity<String> channelList(@RequestParam("category")long id) {		
-		CategoryChannelManager ccMngr = new CategoryChannelManager();
-		MsoChannelManager cMngr = new MsoChannelManager();
-		List<CategoryChannel> ccs = ccMngr.findAllByCategoryId(id);
-		List<MsoChannel> channels = new ArrayList<MsoChannel>();
-		for (CategoryChannel cc : ccs) {
-			channels.add(cMngr.findById(cc.getChannelId()));
-		}
-		String output = "";
-		Category theC = new CategoryManager().findById(id);
-		if (theC == null) {
-			output = "category does not exist";
-		} else {
-			output = "category count = " + new CategoryManager().findById(id).getChannelCount() + "\n";
-			output = output + "id \t name \t program count \t status \t isPublic\n";
-			for (MsoChannel c : channels) {
-				output = output + c.getKey().getId() + "\t" + c.getName() + "\t" + + c.getProgramCount() + "\t" + c.getStatus() + "\t" + c.isPublic() + "\n";
-			}
-		}
-		return NnNetUtil.textReturn(output);
-	}
-	
+	//list every channel under a category	
 	@RequestMapping(value = "channelList", params = {"category", "page", "rows", "sidx", "sord"})
 	public void channelList(@RequestParam(value = "category") Long         categoryId,
 	                        @RequestParam(value = "page")     Integer      currentPage,
 	                        @RequestParam(value = "rows")     Integer      rowsPerPage,
 	                        @RequestParam(value = "sidx")     String       sortIndex,
 	                        @RequestParam(value = "sord")     String       sortDirection,
-	                                                          OutputStream out) {
-		
+	                                                          OutputStream out) {		
 		SubscriptionLogManager subLogMngr  = new SubscriptionLogManager();
 		CategoryChannelManager ccMngr      = new CategoryChannelManager();
 		MsoChannelManager      channelMngr = new MsoChannelManager();
@@ -150,10 +128,98 @@ public class AdminCategoryController {
 			logger.warning(e.getMessage());
 		}
 	}
+
+	@RequestMapping(value="addSet")
+	public @ResponseBody String addSet(
+			             @RequestParam(required = false) long category,
+			             @RequestParam(required = false) long set,
+	                     OutputStream out) {
+		System.out.println("category:" + category + ";set=" + set);
+		CategoryChannelSetManager ccsMngr = new CategoryChannelSetManager();
+		ChannelSetManager csMngr = new ChannelSetManager();
+		ChannelSet cs = csMngr.findById(set);
+		CategoryChannelSet existed = ccsMngr.findByCategoryIdAndChannelSetId(category, set);		
+		if (cs != null & existed == null) {
+			CategoryChannelSet csc = new CategoryChannelSet(category,set);
+			System.out.println("create new!!");
+			ccsMngr.create(csc);
+		}
+		return "OK";		
+	}
+
+	@RequestMapping(value="deleteSet")
+	public @ResponseBody String deleteSet(
+			             @RequestParam(required = false) long category,
+			             @RequestParam(required = false) long id,
+	                     OutputStream out) {		
+		CategoryChannelSetManager ccsMngr = new CategoryChannelSetManager();				
+		CategoryChannelSet ccs = ccsMngr.findByCategoryIdAndChannelSetId(category, id);
+		if (ccs != null)
+			ccsMngr.delete(ccs);
+		return "OK";		
+	}
 	
-	@RequestMapping("list")
-	public ResponseEntity<String> list(@RequestParam(required=false)String mso) {
+	//list every channel under a category	
+	@RequestMapping(value = "listSet", params = {"category", "page", "rows", "sidx", "sord"})
+	public void listSet(@RequestParam(value = "category") Long         categoryId,
+	                    @RequestParam(value = "page")     Integer      currentPage,
+	                    @RequestParam(value = "rows")     Integer      rowsPerPage,
+	                    @RequestParam(value = "sidx")     String       sortIndex,
+	                    @RequestParam(value = "sord")     String       sortDirection,
+	                    OutputStream out) {
+		System.out.println("hit setList");		
+		CategoryChannelManager ccMngr      = new CategoryChannelManager();
 		
+		ObjectMapper mapper = new ObjectMapper();
+		List<Map<String, Object>> dataRows = new ArrayList<Map<String, Object>>();
+		
+		Category category = categoryMngr.findById(categoryId);
+		if (category == null) {
+			try {
+				mapper.writeValue(out, JqgridHelper.composeJqgridResponse(1, 1, 0, new ArrayList<Map<String, Object>>()));
+			} catch (IOException e) {
+				logger.warning(e.getMessage());
+			}
+			return;
+		}
+		
+		String filter = "categoryId == " + categoryId;
+		int totalRecords = ccMngr.total(filter);
+		int totalPages = (int)Math.ceil((double)totalRecords / rowsPerPage);
+		if (currentPage > totalPages)
+			currentPage = totalPages;
+		
+		CategoryChannelSetManager ccsMngr = new CategoryChannelSetManager();
+		ChannelSetManager csMngr = new ChannelSetManager();
+		List<CategoryChannelSet> list = ccsMngr.findAllByCategoryId(categoryId);
+		System.out.println("size:" + list.size());
+		for (CategoryChannelSet ccs : list) {
+			
+			Map<String, Object> map = new HashMap<String, Object>();
+			List<Object> cell = new ArrayList<Object>();
+			ChannelSet set = csMngr.findById(ccs.getChannelSetId());
+			if (set != null) {
+				cell.add(ccs.getCategoryId());
+				cell.add(set.getKey().getId());
+				cell.add(set.getName());
+				cell.add(set.isPublic());
+				cell.add(set.getLang());
+				cell.add(set.getChannelCount());
+				map.put("id", set.getKey().getId());
+				map.put("cell", cell);
+				dataRows.add(map);
+			}
+		}
+		
+		try {
+			mapper.writeValue(out, JqgridHelper.composeJqgridResponse(currentPage, totalPages, totalRecords, dataRows));
+		} catch (IOException e) {
+			logger.warning(e.getMessage());
+		}
+	}
+		
+	@RequestMapping("list")
+	public ResponseEntity<String> list(@RequestParam(required=false)String mso) {		
 		List<Category> categories = null;
 		if (mso == null) {
 			categories = categoryMngr.findAll();
@@ -238,7 +304,8 @@ public class AdminCategoryController {
 	@RequestMapping("create") 	
 	public @ResponseBody String create(@RequestParam(required=true) String name,
 									   @RequestParam(required=true) String lang,
-	                                   @RequestParam(required=true) String setIds) {		
+	                                   @RequestParam(required=true) String setIds) {
+		System.out.println("hit category create");
 		Category category = new Category(name);
 		category.setLang(lang);		
 		category.setPublic(true);

@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -113,24 +114,10 @@ public class AdminMsoChannelController {
 				HttpServletRequest req,
 				@RequestParam(value="devel",required=false) boolean devel) {
 		String[] urls = {
-				"http://www.youtube.com/user/goodtv#grid/user/FBE16B28C166951F",
-				"http://www.youtube.com/user/goodtv#grid/user/A95700BA527EA728",
-				"http://www.youtube.com/user/goodtv#grid/user/E9CF038F35D6EEBC",
-				"http://www.youtube.com/user/goodtv#grid/user/6B8141F28B843D88",
-				"http://www.youtube.com/user/goodtv#grid/user/4554E7A23F1530BF",
-				"http://www.youtube.com/user/goodtv#grid/user/CF53AFA4B1499986",
-				"http://www.youtube.com/user/goodtv#grid/user/F23F18DCC8C8A819",
-				"http://www.youtube.com/user/goodtv#grid/user/0F10FA0EAD8B0875",
+				"http://www.youtube.com/playlist?list=PL189FD87828064376",
 		};
 		String[] names= {
-				"真情部落格",
-				"幸福來敲門",
-				"心靈樂飛揚",
-				"劉三講古",
-				"我們EYE旅行",
-				"健康新煮流",
-				"禱告大軍",
-				"空中主日學~神學與教會歷史~聖潔的國度-五經",
+				"八方論談廣播節目",
 		};
 		for (int i=0; i<urls.length; i++) {
 			channelMngr.create(urls[i], names[i], devel, req);
@@ -141,18 +128,18 @@ public class AdminMsoChannelController {
 	@RequestMapping("create")
 	public @ResponseBody String create(
 				HttpServletRequest req,
-			    @RequestParam(value="url")String url,
-				@RequestParam(value="name") String name,
+			    @RequestParam(value="sourceUrl", required=false)String url,
+				@RequestParam(value="name", required=false) String name,
 				@RequestParam(value="devel",required=false) boolean devel) {
-		channelMngr.create(url, name, devel, req);
+		channelMngr.create(url, name, false, req);
 		return "OK";
 	}	
 
+	/*
 	@RequestMapping("list")
 	public ResponseEntity<String> list(
 			@RequestParam(value="status", required=false)String status,
-			@RequestParam(value="since", required=false)String since) {
-		
+			@RequestParam(value="since", required=false)String since) {		
 		List<MsoChannel> channels = new ArrayList<MsoChannel>();
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 		Date sinceDate = null;
@@ -188,6 +175,7 @@ public class AdminMsoChannelController {
 		output = output + this.printChannelData(channels);		
 		return NnNetUtil.textReturn(output);
 	}
+	*/
 	
 	/**
 	 * List items in jqGrid format
@@ -209,15 +197,17 @@ public class AdminMsoChannelController {
 	 *
 	 */
 	@RequestMapping(value = "list", params = {"page", "rows", "sidx", "sord"})
-	public void list(@RequestParam(value = "page")   Integer      currentPage,
+	public @ResponseBody String list	(
+			         @RequestParam(value = "page")   Integer      currentPage,
 	                 @RequestParam(value = "rows")   Integer      rowsPerPage,
 	                 @RequestParam(value = "sidx")   String       sortIndex,
 	                 @RequestParam(value = "sord")   String       sortDirection,
 	                 @RequestParam(required = false) String       searchField,
 	                 @RequestParam(required = false) String       searchOper,
 	                 @RequestParam(required = false) String       searchString,
+	                 @RequestParam(required = false) String       set,
+	                 @RequestParam(required = false) boolean      notify,
 	                 OutputStream out) {
-		
 		SubscriptionLogManager subLogMngr = new SubscriptionLogManager();
 		ObjectMapper mapper = new ObjectMapper();
 		List<Map<String, Object>> dataRows = new ArrayList<Map<String, Object>>();
@@ -225,15 +215,13 @@ public class AdminMsoChannelController {
 		List<MsoChannel> results;
 		int totalRecords, totalPages;
 		if (searchField != null && searchOper != null && searchString != null
-		    && searchOper.equals("eq") && searchField.equals("channel")) {
-			
+		    && searchOper.equals("eq") && searchField.equals("channel")) {			
 			logger.info("searchString = " + searchString);
 			totalRecords = 0;
 			totalPages = 1;
 			currentPage = 1;
 			results = new ArrayList<MsoChannel>();
-			if (searchString.matches("^[0-9]+$")) {
-				
+			if (searchString.matches("^[0-9]+$")) {				
 				MsoChannel found = channelMngr.findById(Long.parseLong(searchString));
 				if (found != null) {
 					totalRecords++;
@@ -242,15 +230,18 @@ public class AdminMsoChannelController {
 			}
 		} else if (searchField != null && searchOper != null && searchString != null
 		           && searchOper.equals("eq")
-		           && (searchField.equals("status") || searchField.equals("contentType") || searchField.equals("isPublic") || searchField.equals("featured") || searchField.equals("sourceUrl") || searchField.equals("langCode"))) {
-			
+		           && (searchField.equals("status") || 
+		        	   searchField.equals("contentType") || 
+		        	   searchField.equals("isPublic") || 
+		        	   searchField.equals("featured") || 
+		        	   searchField.equals("sourceUrl") || 
+		        	   searchField.equals("langCode"))) {			
 			if (searchField.equals("sourceUrl")) {
 				searchString = NnStringUtil.escapedQuote(searchString.toLowerCase());
 				searchField += "Search";
 			}  else if (searchField.equals("langCode")) {
 				searchString = NnStringUtil.escapedQuote(searchString);
-			}
-			
+			}			
 			String filter = searchField + " == " + searchString;
 			logger.info("filter = " + filter);
 
@@ -300,8 +291,7 @@ public class AdminMsoChannelController {
 				totalPages = 1;
 				currentPage = 1;
 			}
-		}else {
-		
+		}else {		
 			totalRecords = channelMngr.total();
 			totalPages = (int)Math.ceil((double)totalRecords / rowsPerPage);
 			if (currentPage > totalPages)
@@ -309,29 +299,42 @@ public class AdminMsoChannelController {
 			results = channelMngr.list(currentPage, rowsPerPage, sortIndex, sortDirection);
 		}
 		
-		for (MsoChannel channel : results) {
-			
+		for (MsoChannel channel : results) {			
 			Map<String, Object> map = new HashMap<String, Object>();
 			List<Object> cell = new ArrayList<Object>();
-			
-			cell.add(channel.getImageUrl());
-			cell.add(channel.getKey().getId());
-			cell.add(channel.getName());
-			cell.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(channel.getUpdateDate()));
-			cell.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(channel.getCreateDate()));
-			cell.add(channel.getSourceUrl());
-			cell.add(channel.getStatus());
-			cell.add(channel.getContentType());
-			cell.add(channel.getLangCode());
-			cell.add(channel.isPublic());
-			cell.add(channel.getPiwik());
-			cell.add(channel.getProgramCount());
-			cell.add(subLogMngr.findTotalCountByChannelId(channel.getKey().getId()));
-			cell.add(channel.getIntro());
-			
-			map.put("id", channel.getKey().getId());
-			map.put("cell", cell);
-			dataRows.add(map);
+			boolean qualified = true;
+			if (notify) {
+				qualified = false;
+				Calendar cal = Calendar.getInstance();		
+				cal.add(Calendar.DAY_OF_MONTH, - 100);
+				Date d = cal.getTime();
+				if (channel.getCreateDate().after(d)) {
+					if (channel.getStatus() == MsoChannel.STATUS_SUCCESS) {
+						qualified = true;
+					}
+				}
+			}
+			if (qualified) {
+				//cell.add(channel.getImageUrl());
+				cell.add(channel.getKey().getId());
+				cell.add(channel.getName());
+				//cell.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(channel.getUpdateDate()));
+				//cell.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(channel.getCreateDate()));
+				cell.add(channel.getSourceUrl());
+				cell.add(channel.getStatus());
+				cell.add(channel.getContentType());
+				cell.add(channel.getLangCode());
+				cell.add(channel.isPublic());
+				cell.add(channel.getPiwik());
+				cell.add(channel.getProgramCount());
+				cell.add(subLogMngr.findTotalCountByChannelId(channel.getKey().getId()));
+				cell.add(channel.getSourceUrl());
+				//cell.add(channel.getIntro());
+				
+				map.put("id", channel.getKey().getId());
+				map.put("cell", cell);
+				dataRows.add(map);
+			}
 		}
 		
 		try {
@@ -339,6 +342,7 @@ public class AdminMsoChannelController {
 		} catch (IOException e) {
 			logger.warning(e.getMessage());
 		}
+		return "OK";
 	}
 	
 	private String printChannelData(List<MsoChannel> channels) {
@@ -465,8 +469,7 @@ public class AdminMsoChannelController {
 	                           @RequestParam(value = "rows")    Integer      rowsPerPage,
 	                           @RequestParam(value = "sidx")    String       sortIndex,
 	                           @RequestParam(value = "sord")    String       sortDirection,
-	                                                            OutputStream out) {
-		
+	                                                            OutputStream out) {		
 		CategoryManager categoryMngr = new CategoryManager();
 		CategoryChannelManager ccMngr = new CategoryChannelManager();
 		ObjectMapper mapper = new ObjectMapper();

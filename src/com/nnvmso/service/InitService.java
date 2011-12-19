@@ -118,10 +118,10 @@ public class InitService {
 		MsoChannelManager channelMngr = new MsoChannelManager();		
 		MsoChannel soap = new MsoChannel("mapel soap", "mapel soap", "", user.getKey().getId());
 		soap.setContentType(MsoChannel.CONTENTTYPE_MAPLE_SOAP);
-		channelMngr.create(soap);
+		channelMngr.create(soap, null);
 		MsoChannel variety = new MsoChannel("mapel variety", "mapel variety", "", user.getKey().getId());
 		variety.setContentType(MsoChannel.CONTENTTYPE_MAPLE_VARIETY);
-		channelMngr.create(variety);
+		channelMngr.create(variety, null);
 		
 		MsoProgramManager programMngr = new MsoProgramManager();
 		MsoProgram s1 = new MsoProgram("s1", "s1", "", MsoProgram.TYPE_VIDEO);
@@ -544,7 +544,7 @@ public class InitService {
 				c.setName(name);
 				c.setStatus(MsoChannel.STATUS_PROCESSING);	
 				c.setContentType(channelMngr.getContentTypeByUrl(url));
-				channelMngr.create(c);
+				channelMngr.create(c, null);
 				ContentOwnershipManager ownershipMngr = new ContentOwnershipManager();
 				ownershipMngr.create(new ContentOwnership(), mso, c);
 				if (!devel) {

@@ -153,8 +153,7 @@ public class AdminMsoController {
 		List<Map<String, Object>> dataRows = new ArrayList<Map<String, Object>>();
 		
 		String filter = "";
-		if (searchField != null && searchOper != null && searchString != null && !searchString.isEmpty()) {
-			
+		if (searchField != null && searchOper != null && searchString != null && !searchString.isEmpty()) {			
 			Map<String, String> opMap = JqgridHelper.getOpMap();
 			if (opMap.containsKey(searchOper)) {
 				filter = searchField + " " + opMap.get(searchOper) + " " + searchString;

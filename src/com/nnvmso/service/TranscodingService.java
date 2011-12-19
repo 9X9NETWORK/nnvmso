@@ -160,7 +160,7 @@ public class TranscodingService {
 		channel.setPublic(true);
 		channel.setErrorReason("");
 		
-		channelMngr.save(channel);		
+		channelMngr.save(channel);
 		return new PostResponse(String.valueOf(NnStatusCode.SUCCESS), "SUCCESS");
 	}
 

@@ -55,6 +55,324 @@ var utils = {
 };
 
 var page$ = {
+  tabSetManagement: {
+    gridSetList: {
+	    gridChannelList: {
+ 	     properties: {
+	      colModel: [
+	      {
+	        label:    'Channel ID',
+	        name:     'channel',
+	        index:    'channelId',
+	        width:    100,
+	        align:    'center',
+	        sortable: true,
+	        editable: true,
+	        editrules: {
+	          required: true,
+	          number:   true
+	        }
+	      },
+	      {
+	        label:    'Channel Name',
+	        name:     'name',
+	        index:    'name',
+	        width:    180,
+	        align:    'center',
+	        sortable: false
+	      },
+	      {
+		    label:    'Seq',
+		    name:     'seq',
+		    index:    'seq',
+		    width:    180,
+		    align:    'center',
+		    editable: true,
+		    sortable: true
+		  },	      
+	      {
+	        label:     'Type',
+	        name:      'type',
+	        index:     'type',
+	        width:     150,
+	        align:     'center',
+	        sortable:  true,
+	        formatter: 'select',
+	        edittype:  'select',
+	        editoptions: {
+			  value:    constants.channelContentType
+	        }
+	      }
+	    ],
+	    url:         null,
+	    datatype:    'json',
+	    caption:     'Channel List',
+	    sortname:    'updateDate',
+	    sortorder:   'desc',
+	    rowNum:      10,
+	    rowList:     [10, 20, 30, 40, 50, 100],
+	    viewrecords: true,
+	    height:      'auto',
+	    hidegrid:    false,
+	    toppager:    true,
+	    ondblClickRow: null,
+	    gridComplete: function() {
+	      var totaltime = $(this).jqGrid('getGridParam', 'totaltime');
+	      $(this).jqGrid('setCaption', 'Channel List (' + totaltime + 'ms)');
+	    }
+	  },
+	  init: function(subgridId, rowId) {		  
+	    var subgridTableId = subgridId + '_t';
+	    $('#' + subgridId).html('<table id="' + subgridTableId + '"></table>');
+	    $('#' + subgridId).attr('style', 'padding: 5px 5px 5px 5px');
+	    var grid$ = page$.tabSetManagement.gridSetList.gridChannelList;
+	    grid$.properties.url = '/admin/set/listCh?set=' + rowId;
+	    grid$.properties.ondblClickRow = function(subRowId) {
+	      $(this).jqGrid('editGridRow', subRowId,
+	      {
+	        url:               '/admin/set/editCh?set=' + rowId,
+	        caption:           'Edit Channel',
+	        width:             'auto',
+	        top:               $(window).scrollTop() + 100, // $(this).offset().top - 50,
+	        left:              200, // $(this).offset().left + $(this).width() + 20,
+	        modal:             false,
+	        jqModal:           true,
+	        closeAfterEdit:    true,
+	        closeOnEscape:     true,
+	        reloadAfterSubmit: true,
+	        viewPagerButtons:  false,
+	        recreateForm:      true,
+	        afterComplete:     utils.callbackAfterSubmitForm
+	      });
+	    };
+	    $('#' + subgridTableId).jqGrid(grid$.properties);
+	    $('#' + subgridTableId).jqGrid('navGrid', '#' + subgridTableId + '_toppager',
+	    {
+	      edit:     false,
+	      add:      true,
+	      del:      true,
+	      search:   false,
+	      view:     false,
+	      addtitle: 'Add A New Channel',
+	      deltitle: 'Remove A Channel'
+	    },
+	    {
+	      // 'edit' properties
+	    },
+	    {
+	      // 'add' properties
+	      url:               '/admin/set/addCh?set=' + rowId,
+	      addCaption:        'Add A Channel',
+	      width:             'auto',
+	      modal:             false,
+	      jqModal:           true,
+	      closeAfterAdd:     true,
+	      closeOnEscape:     true,
+	      reloadAfterSubmit: true,
+	      beforeShowForm: function(formId)
+	      {
+	        $('#channel', formId).attr('disabled', false);
+	      },
+	      afterComplete: utils.callbackAfterSubmitForm
+	    },
+	    {
+	      // 'delete' properties
+	      url:               '/admin/set/deleteCh?set=' + rowId,
+	      //grid$.properties.url = '/admin/msoIpg/list?mso=' + rowId;
+	      caption:           'Remove A Channel',
+	      msg:               'Do you want to remove a channel?',
+	      width:             'auto',
+	      modal:             false,
+	      jqModal:           true,
+	      closeOnEscape:     true,
+	      reloadAfterSubmit: true,
+	      afterComplete: utils.callbackAfterSubmitForm
+	    });
+	  }
+	},	
+      properties: {
+        colModel: [
+          {
+            label:    'Set ID',
+            name:     'setId',
+            index:    'setId',
+            width:    80,
+            align:    'center',
+            sortable: false,
+            editable: false
+          },
+          {
+            label:     'Recommended',
+            name:      'featured',
+            index:     'featured',
+            width:     100,
+            align:     'center',
+            sortable:  true,
+            formatter: 'checkbox',
+            editable:  true,
+            edittype:  'checkbox',
+            editoptions: {
+              value: 'true:false'
+            }
+          },
+          {
+              label:     'Public',
+              name:      'isPublic',
+              index:     'isPublic',
+              width:     100,
+              align:     'center',
+              sortable:  true,
+              formatter: 'checkbox',
+              editable:  true,
+              edittype:  'checkbox',
+              editoptions: {
+                value: 'true:false'
+              }
+          },
+          {
+              label:     'Language',
+              name:      'lang',
+              index:     'lang',
+              width:     90,
+              align:     'center',
+              search:    true,
+              sortable:  true,
+              formatter: 'select',
+              editable:  true,
+              edittype:  'select',
+              editoptions: {
+                value: 'en:en;zh:zh'
+              },
+              searchoptions: {
+                  sopt:  ['eq'],
+                  value: "en:en;zh:zh"
+                }              
+          },          
+          {
+            label:    'Set Name',
+            name:     'name',
+            index:    'name',
+            width:    150,
+            align:    'center',
+            search:   false,
+            sortable: true,
+            editable: true,
+            editrules: {
+              required: true
+            },
+            editoptions: {
+              maxlength: 100
+            }
+          },
+          {
+            label:    'Set Description',
+            name:     'intro',
+            index:    'intro',
+            width:    500,
+            align:    'center',
+            search:   false,
+            sortable: true,
+            //hidden:   false,
+            editable: true,
+            edittype: 'textarea',
+            editoptions: {
+              rows: '3'
+            }
+          },
+        ],
+        datatype:    'json',
+        url:         '/admin/set/list',
+        caption:     'Set List',
+        sortname:    'updateDate',
+        sortorder:   'desc',
+        rowNum:      10,
+        rowList:     [10, 20, 30, 40, 50, 100],
+        viewrecords: true,
+        height:      'auto',
+        hidegrid:    false,
+        toppager:    true,
+        gridComplete: function() {
+          var totaltime = $(this).jqGrid('getGridParam', 'totaltime');
+          $(this).jqGrid('setCaption', 'Set List (' + totaltime + 'ms)');
+        },
+        ondblClickRow: function(rowId) {
+          var logoUrl = $(this).jqGrid('getCell', rowId, 'logoUrl');
+          $(this).jqGrid('setColProp', 'logoUrl', {editoptions: {src: logoUrl}});
+          $(this).jqGrid('editGridRow', rowId, {
+            url:               '/admin/set/edit',
+            caption:           'Edit Set Meta',
+            width:             'auto',
+            top:               $(window).scrollTop() + 50, // $(this).offset().top - 50,
+            left:              200, // $(this).offset().left + $(this).width() + 20,
+            modal:             false,
+            jqModal:           true,
+            closeAfterEdit:    true,
+            closeOnEscape:     true,
+            reloadAfterSubmit: true,
+            viewPagerButtons:  true,
+            recreateForm:      true,
+            beforeCheckValues: function(postData, formId, mode) {
+              postData['logoUrl'] = $('#logoUrl', formId).attr('src');
+              return postData;
+            },
+            beforeShowForm: function(formId) {
+            },
+            afterclickPgButtons: function(whichButton, formId, rowId) {
+              var logoUrl = $('#mso_table').jqGrid('getCell', rowId, 'logoUrl');
+              $('#logoUrl', formId).attr('src', logoUrl);
+            },
+            afterComplete: utils.callbackAfterSubmitForm
+          });
+        }
+      },
+      init: function() {
+        this.properties.subGrid = true;
+        this.properties.subGridRowExpanded = this.gridChannelList.init;
+        $('#set_table').jqGrid(this.properties);
+        $('#set_table').jqGrid('navGrid', '#set_table_toppager',
+        {
+          edit:   false,
+          add:    true,
+          del:    true,
+          search: true,
+          view:   false,
+          addtitle: 'Create A New Set'
+        },
+        {
+          // 'edit' properties
+        },
+        {
+          // 'add' properties
+          url:               '/admin/set/create',
+          addCaption:        'Create A New Set',
+          width:             'auto',
+          modal:             false,
+          jqModal:           true,
+          closeAfterAdd:     true,
+          closeOnEscape:     true,
+          reloadAfterSubmit: true,
+          recreateForm:      true,
+          afterComplete: utils.callbackAfterSubmitForm
+        },
+        {
+            // 'delete' properties
+            url:               '/admin/set/delete',
+            caption:           'Remove A Set',
+            msg:               'Do you want to remove it',
+            width:             'auto',
+            modal:             false,
+            jqModal:           true,
+            closeOnEscape:     true,
+            reloadAfterSubmit: true,
+            afterComplete: utils.callbackAfterSubmitForm
+          });        
+      }
+    },
+    init: function() {
+      this.gridSetList.init();
+    }
+  },
+  /////////////////////////
   tabChannelManagement: {
     gridChannelList: {
       gridProgramList: {
@@ -247,11 +565,9 @@ var page$ = {
               edittype:  'select',
               editoptions: {
                 disabled: true,
-                value: {
-                  0: 'Direct Link',
-                  1: 'YouTube',
-                  2: 'Script'
-                }
+    	        editoptions: {
+      			  value:    constants.channelContentType
+      	        }
               }
             },
             {
@@ -302,8 +618,8 @@ var page$ = {
               }
             }
           ],
-          //url:         '/admin/program/list?channel=' + rowId,
           datatype:    'json',
+          //url:         '/admin/program/list?channel=' + rowId,
           caption:     'Program List',
           sortname:    'pubDate',
           sortorder:   'desc',
@@ -388,17 +704,17 @@ var page$ = {
       },
       properties: {
         colModel: [
+          /*         
           {
             label:    'Channel Logo',
             name:     'imageUrl',
             index:    'imageUrl',
             width:    150,
             align:    'center',
-            sortable: true,
-            hidden:   true,
+            sortable: false,
+            hidden:   false,
             search:   false,
-            editable: true,
-            edittype: 'image',
+            editable: false,
             editoptions: {
               disabled: true
             },
@@ -406,15 +722,16 @@ var page$ = {
               edithidden: true
             }
           },
+          */
           {
             label:    'Channel ID',
-            name:     'channel',
-            index:    'channel',
+            name:     'channelId',
+            index:    'channelId',
             width:    80,
             align:    'center',
             search:   true,
-            sortable: false,
             editable: true,
+            sortable: true,
             editoptions: {
               disabled: true
             },
@@ -426,7 +743,7 @@ var page$ = {
             label:    'Channel Name',
             name:     'name',
             index:    'name',
-            width:    200,
+            width:    150,
             align:    'center',
             search:   true,
             sortable: true,
@@ -439,47 +756,17 @@ var page$ = {
             }
           },
           {
-            label:    'Updated Time',
-            name:     'updateDate',
-            index:    'updateDate',
-            width:    140,
-            align:    'center',
-            search:   false,
-            sortable: true,
-            editable: true,
-            editoptions: {
-              disabled: true
-            }
-          },
-          {
-            label:    'Created Time',
-            name:     'createDate',
-            index:    'createDate',
-            width:    140,
-            align:    'center',
-            search:   false,
-            sortable: true,
-            editable: true,
-            hidden:   true,
-            editoptions: {
-              disabled: true
-            },
-            editrules: {
-              edithidden: true
-            }
-          },
-          {
             label:    'Source',
             name:     'sourceUrl',
             index:    'sourceUrl',
-            width:    150,
+            width:    380,
             align:    'center',
             search:   true,
             sortable: true,
-            hidden:   true,
+            hidden:   false,
             editable: true,
             editoptions: {
-              disabled: true
+              disabled: false
             },
             editrules: {
               edithidden: true
@@ -519,7 +806,7 @@ var page$ = {
             stype:     'select',
             sortable:  true,
             formatter: 'select',
-            editable:  true,
+            editable:  false,
             edittype:  'select',
             editoptions: {
               disabled: true,
@@ -535,6 +822,7 @@ var page$ = {
             name:      'langCode',
             index:     'langCode',
             width:     70,
+            hidden:    true,
             align:     'center',
             search:    true,
             stype:     'select',
@@ -544,11 +832,11 @@ var page$ = {
             edittype:  'select',
             editoptions: {
               disabled: false,
-              value:    "en:en;zh:zh;zh-tw:zh-tw"
+              value:    "en:en;zh:zh;"
             },
             searchoptions: {
               sopt:  ['eq'],
-              value: "en:en;zh:zh;zh-tw:zh-tw"
+              value: "en:en;zh:zh;"
             }
           },
           {
@@ -581,7 +869,7 @@ var page$ = {
             width:     70,
             align:     'center',
             sortable:  true,
-            editable:  true,
+            editable:  false,
             editoptions: {
               disabled: true
             }
@@ -595,7 +883,7 @@ var page$ = {
             search:   false,
             sortable: true,
             hidden:   false,
-            editable: true,
+            editable: false,
             editrules: {
               integer:    true,
               edithidden: true
@@ -616,24 +904,6 @@ var page$ = {
               edithidden: true
             }
           },
-          {
-            label:    'Introduction',
-            name:     'intro',
-            index:    'intro',
-            width:    150,
-            align:    'center',
-            search:   false,
-            sortable: true,
-            hidden:   true,
-            editable: true,
-            edittype: 'textarea',
-            editoptions: {
-              rows: '3'
-            },
-            editrules: {
-              edithidden: true
-            }
-          }
         ],
         url:         '/admin/channel/list',
         datatype:    'json',
@@ -703,11 +973,28 @@ var page$ = {
         $('#chn_table').jqGrid(grid$.properties);
         $('#chn_table').jqGrid('navGrid', '#chn_table_toppager', {
           edit:   false,
-          add:    false,
+          add:    true,
           del:    false,
           search: true,
           view:   false
-        }, {}, {}, {}, {
+        }, 
+        {
+        	// 'edit' properties
+        }, 
+        {
+            // 'add' properties
+            url:               '/admin/channel/create',
+            addCaption:        'Create A New Channel',
+            width:             'auto',
+            modal:             false,
+            jqModal:           true,
+            closeAfterAdd:     true,
+            closeOnEscape:     true,
+            reloadAfterSubmit: true,
+            recreateForm:      true,
+            afterComplete: utils.callbackAfterSubmitForm        	
+        }, 
+        {}, {
           closeAfterSearch: true,
           closeAfterReset:  true,
           closeOnEscape:    true
@@ -723,217 +1010,18 @@ var page$ = {
             window.open(url, '_player');
           }
         });
-        $('#chn_table').jqGrid('navButtonAdd', '#chn_table_toppager', {
-          caption:    '',
-          title:      'Piwik Report',
-          buttonicon: 'ui-icon-print',
-          onClickButton: function() {
-            var rowId = $(this).jqGrid('getGridParam', 'selrow');
-            if (rowId == null) { return; }
-            var piwik = $(this).jqGrid('getCell', rowId, 'piwik');
-            if (!piwik) {
-              alert('This site has no piwik!');
-              return;
-            }
-            var url = piwik_host() + 'index.php?module=CoreHome&action=index&date=today&period=day&idSite=' + piwik;
-            window.open(url, '_piwik');
-          }
-        });
       }
     },
-    gridCategoryList: {
-      properties: {
-        colModel: [
-          {
-            label:     'MSO ID',
-            name:      'msoId',
-            index:     'msoId',
-            width:     80,
-            align:     'center',
-            sortable:  false,
-            editable:  false
-          },
-          {
-            label:    'Channel ID',
-            name:     'channel',
-            index:    'channelId',
-            width:    100,
-            align:    'center',
-            sortable: true,
-            hidden:   true,
-            editable: true,
-            editoptions: {
-              disabled: true
-            },
-            editrules: {
-              edithidden: true,
-              required:   true,
-              number:     true
-            }
-          },
-          {
-            label:    'Categoty ID',
-            name:     'category',
-            index:    'categoryId',
-            width:    100,
-            align:    'center',
-            sortable: true,
-            editable: true,
-            edittype: 'select',
-            editoptions: {
-              dataUrl:  '/admin/category/categoriesHtmlSelectOptions',
-              disabled: false
-            },
-            editrules: {
-              required: true,
-              number:   true
-            }
-          },
-          {
-            label:    'Category Name',
-            name:     'name',
-            index:    'name',
-            width:    200,
-            align:    'center',
-            sortable: false,
-            editable: false,
-            editoptions: {
-              maxlength: 100
-            }
-          },
-          {
-            label:    'Updated Time',
-            name:     'updateDate',
-            index:    'updateDate',
-            width:    140,
-            align:    'center',
-            sortable: true,
-            editable: false,
-            editoptions: {
-              disabled: true
-            }
-          },
-          {
-            label:    'Created Time',
-            name:     'createDate',
-            index:    'createDate',
-            width:    140,
-            align:    'center',
-            sortable: true,
-            editable: false,
-            hidden:   true,
-            editoptions: {
-              disabled: true
-            },
-            editrules: {
-              edithidden: true
-            }
-          },
-          {
-            label:     'Public',
-            name:      'isPublic',
-            index:     'isPublic',
-            width:     50,
-            align:     'center',
-            sortable:  false,
-            formatter: 'checkbox',
-            editable:  false,
-            edittype:  'checkbox',
-            editoptions: {
-              value:    'true:false'
-            }
-          },
-          {
-            label:     'Ch. Count',
-            name:      'channelCount',
-            index:     'channelCount',
-            width:     70,
-            align:     'center',
-            sortable:  false,
-            editable:  false,
-            editoptions: {
-              disabled: true
-            },
-            editrules: {
-              integer: true
-            }
-          }
-        ],
-        url:         '/admin/channel/listCategories?channel=0',
-        datatype:    'json',
-        caption:     'Category List of Channel',
-        sortname:    'updateDate',
-        sortorder:   'desc',
-        rowNum:      10,
-        rowList:     [10, 20, 30, 40, 50, 100],
-        viewrecords: true,
-        height:      'auto',
-        hidegrid:    false,
-        toppager:    true,
-        gridComplete: function() {
-          var totaltime = $(this).jqGrid('getGridParam', 'totaltime');
-          $(this).jqGrid('setCaption', "Category List of Channel - " + $(this).attr('title') + ' (' + totaltime + 'ms)');
-        }
-      },
-      init: function() {
-        var grid$ = page$.tabChannelManagement.gridCategoryList;
-        $('#cc_table').jqGrid(grid$.properties);
-        $('#cc_table').jqGrid('navGrid', '#cc_table_toppager',
-        {
-          edit:     false,
-          add:      true,
-          del:      true,
-          search:   false,
-          view:     false,
-          addtitle: 'Add This Channel to A Category',
-          deltitle: 'Remove This Channel from Category'
-        },
-        {
-          // 'edit' properties
-        },
-        {
-          // 'add' properties
-          url:               '/admin/channel/addCategory',
-          addCaption:        'Add This Channel to Category',
-          width:             'auto',
-          modal:             false,
-          jqModal:           true,
-          closeAfterAdd:     true,
-          closeOnEscape:     true,
-          reloadAfterSubmit: true,
-          beforeShowForm: function(formId)
-          {
-            $('#channel', formId).val($('#cc_table').attr('channel'));
-            if ($('#cc_table').attr('channel') == '0') {
-              $('#category', formId).val('Select A Channel First !');
-              $('#category', formId).attr('disabled', true);
-            }
-          },
-          afterComplete: utils.callbackAfterSubmitForm
-        },
-        {
-          // 'delete' properties
-          url:               '/admin/channel/deleteCategory',
-          caption:           'Remove A Channel',
-          msg:               'Do you want to remove a channel from Category ?',
-          width:             'auto',
-          modal:             false,
-          jqModal:           true,
-          closeOnEscape:     true,
-          reloadAfterSubmit: true,
-          afterComplete: utils.callbackAfterSubmitForm
-        });
-      }
-    },
+
     init: function() {
       var tab$ = page$.tabChannelManagement;
       tab$.gridChannelList.init();
-      tab$.gridCategoryList.init();
+      //tab$.gridCategoryList.init();
     }
   },
   tabCategoryManagement: {
     gridCategoryList: {
-      gridChannelList: {
+      gridSetList: {
         properties: {
           colModel: [
             {
@@ -954,9 +1042,9 @@ var page$ = {
               }
             },
             {
-              label:    'Channel ID',
-              name:     'channel',
-              index:    'channelId',
+              label:    'Set ID',
+              name:     'set',
+              index:    'setId',
               width:    80,
               align:    'center',
               sortable: true,
@@ -969,7 +1057,7 @@ var page$ = {
               }
             },
             {
-              label:    'Channel Name',
+              label:    'Set Name',
               name:     'name',
               index:    'name',
               width:    200,
@@ -981,51 +1069,24 @@ var page$ = {
               }
             },
             {
-              label:    'Updated Time',
-              name:     'updateDate',
-              index:    'updateDate',
-              width:    140,
-              align:    'center',
-              sortable: true,
-              editable: false,
-              editoptions: {
-                disabled: true
-              }
-            },
-            {
-              label:    'Created Time',
-              name:     'createDate',
-              index:    'createDate',
-              width:    140,
-              align:    'center',
-              sortable: true,
-              editable: false,
-              hidden:   true,
-              editoptions: {
-                disabled: true
-              },
-              editrules: {
-                edithidden: true
-              }
-            },
-            {
-              label:     'Public',
-              name:      'isPublic',
-              index:     'isPublic',
-              width:     50,
-              align:     'center',
-              sortable:  false,
-              formatter: 'checkbox',
-              editable:  false,
-              edittype:  'checkbox',
-              editoptions: {
-                value:    'true:false'
-              }
-            },
+                label:     'Public',
+                name:      'isPublic',
+                index:     'isPublic',
+                width:     70,
+                align:     'center',
+                search:    false,
+                sortable:  true,
+                formatter: 'checkbox',
+                editable:  false,
+                edittype:  'checkbox',
+                editoptions: {
+                  value:    'true:false'
+                }
+            },            
             {
               label:     'Language',
-              name:      'langCode',
-              index:     'langCode',
+              name:      'lang',
+              index:     'lang',
               width:     70,
               align:     'center',
               search:    false,
@@ -1036,42 +1097,17 @@ var page$ = {
               edittype:  'select',
               editoptions: {
                 disabled: false,
-                value:    "en:en;zh:zh;zh-tw:zh-tw"
+                value:    "en:en;zh:zh;"
               },
               searchoptions: {
                 sopt:  ['eq'],
-                value: "en:en;zh:zh;zh-tw:zh-tw"
+                value: "en:en;zh:zh;"
               }
             },
-            {
-              label:     'Type',
-              name:      'contentType',
-              index:     'contentType',
-              width:     90,
-              align:     'center',
-              sortable:  false,
-              formatter: 'select',
-              editable:  false,
-              edittype:  'select',
-              editoptions: {
-                disabled: true,
-                value:    constants.channelContentType
-              }
-            },
-            {
-              label:    'Sub. Count',
-              name:     'subscriberCount',
-              index:    'subscriberCount',
-              width:    90,
-              align:    'center',
-              sortable: false,
-              hidden:   false,
-              editable: false
-            }
           ],
-          //url:         '/admin/category/channelList?category=' + rowId,
           datatype:    'json',
-          caption:     'Category Channel List',
+          //url:         '/admin/category/channelList?category=' + rowId,
+          caption:     'Category Set List',
           sortname:    'updateDate',
           sortorder:   'desc',
           rowNum:      10,
@@ -1085,15 +1121,15 @@ var page$ = {
           },
           gridComplete: function() {
             var totaltime = $(this).jqGrid('getGridParam', 'totaltime');
-            $(this).jqGrid('setCaption', 'Category Channel List (' + totaltime + 'ms)');
+            $(this).jqGrid('setCaption', 'Category Set List (' + totaltime + 'ms)');
           }
         },
         init: function(subgridId, rowId) {
-          var grid$ = page$.tabCategoryManagement.gridCategoryList.gridChannelList;
+          var grid$ = page$.tabCategoryManagement.gridCategoryList.gridSetList;
           var subgridTableId = subgridId + '_t';
           $('#' + subgridId).html('<table id="' + subgridTableId + '" category="' + rowId + '"></table>');
           $('#' + subgridId).attr('style', 'padding: 5px 5px 5px 5px');
-          grid$.properties.url = '/admin/category/channelList?category=' + rowId;
+          grid$.properties.url = '/admin/category/listSet?category=' + rowId;
           $('#' + subgridTableId).jqGrid(grid$.properties);
           $('#' + subgridTableId).jqGrid('navGrid', '#' + subgridTableId + '_toppager',
           {
@@ -1102,16 +1138,16 @@ var page$ = {
             del:      true,
             search:   false,
             view:     false,
-            addtitle: 'Add A Channel to This Category',
-            deltitle: 'Remove This Channel from Category'
+            addtitle: 'Add A Set to This Category',
+            deltitle: 'Remove This Set from Category'
           },
           {
             // 'edit' properties
           },
           {
             // 'add' properties
-            url:               '/admin/channel/addCategory',
-            addCaption:        'Add Channel to This Category',
+            url:               '/admin/category/addSet',
+            addCaption:        'Add Set to This Category',
             width:             'auto',
             modal:             false,
             jqModal:           true,
@@ -1126,9 +1162,10 @@ var page$ = {
           },
           {
             // 'delete' properties
-            url:               '/admin/channel/deleteCategory',
-            caption:           'Remove A Channel',
-            msg:               'Do you want to remove a channel from Category ?',
+        	//url:               '/admin/set/addCh?set=' + rowId,
+            url:               '/admin/category/deleteSet?category=' + rowId,
+            caption:           'Remove A Set',
+            msg:               'Do you want to remove a set from Category ?',
             width:             'auto',
             modal:             false,
             jqModal:           true,
@@ -1173,6 +1210,7 @@ var page$ = {
             search:   false,
             sortable: false
           },
+          /*
           {
             label:    'Parent ID',
             name:     'parentId',
@@ -1182,6 +1220,7 @@ var page$ = {
             search:   false,
             sortable: true
           },
+          */
           {
             label:    'Category Name',
             name:     'name',
@@ -1242,11 +1281,11 @@ var page$ = {
             edittype:  'select',
             editoptions: {
               disabled: false,
-              value:    "en:en;zh:zh;zh-tw:zh-tw"
+              value:    "en:en;zh:zh;"
             },
             searchoptions: {
               sopt:  ['eq'],
-              value: "en:en;zh:zh;zh-tw:zh-tw"
+              value: "en:en;zh:zh;"
             }
           },
           {
@@ -1316,7 +1355,7 @@ var page$ = {
       init: function() {
         var grid$ = page$.tabCategoryManagement.gridCategoryList;
         grid$.properties.subGrid = true;
-        grid$.properties.subGridRowExpanded = grid$.gridChannelList.init;
+        grid$.properties.subGridRowExpanded = grid$.gridSetList.init;
         $('#cat_table').jqGrid(grid$.properties);
         $('#cat_table').jqGrid('navGrid', '#cat_table_toppager',
         {
@@ -1460,7 +1499,6 @@ var page$ = {
           var subgridTableId = subgridId + '_t';
           $('#' + subgridId).html('<table id="' + subgridTableId + '"></table>');
           $('#' + subgridId).attr('style', 'padding: 5px 5px 5px 5px');
-          
           var grid$ = page$.tabMsoManagement.gridMsoList.gridMsoIpgList;
           grid$.properties.url = '/admin/msoIpg/list?mso=' + rowId;
           grid$.properties.ondblClickRow = function(subRowId) {
@@ -1873,6 +1911,306 @@ var page$ = {
       this.gridMsoList.init();
     }
   },
+/////////////!!!!!!!!!!
+  tabNewsManagement: {
+    gridSetList: {
+      properties: {	
+        colModel: [
+          {
+            label:    'Set ID',
+            name:     'setId',
+            index:    'setId',
+            width:    80,
+            align:    'center',
+            sortable: false,
+            editable: false
+          },
+          {
+            label:     'Recommended',
+            name:      'featured',
+            index:     'featured',
+            width:     100,
+            align:     'center',
+            sortable:  true,
+            formatter: 'checkbox',
+            editable:  true,
+            edittype:  'checkbox',
+            editoptions: {
+              value: 'true:false'
+            }
+          },
+          {
+              label:     'Public',
+              name:      'isPublic',
+              index:     'isPublic',
+              width:     100,
+              align:     'center',
+              sortable:  true,
+              formatter: 'checkbox',
+              editable:  true,
+              edittype:  'checkbox',
+              editoptions: {
+                value: 'true:false'
+              }
+          },
+          {
+              label:     'Language',
+              name:      'lang',
+              index:     'lang',
+              width:     90,
+              align:     'center',
+              search:    true,
+              sortable:  true,
+              formatter: 'select',
+              editable:  true,
+              edittype:  'select',
+              editoptions: {
+                value: 'en:en;zh:zh'
+              },
+              searchoptions: {
+                  sopt:  ['eq'],
+                  value: "en:en;zh:zh"
+                }              
+          },          
+          {
+            label:    'Set Name',
+            name:     'name',
+            index:    'name',
+            width:    150,
+            align:    'center',
+            search:   false,
+            sortable: true,
+            editable: true,
+            editrules: {
+              required: true
+            },
+            editoptions: {
+              maxlength: 100
+            }
+          },
+          {
+            label:    'Set Description',
+            name:     'intro',
+            index:    'intro',
+            width:    500,
+            align:    'center',
+            search:   false,
+            sortable: true,
+            //hidden:   false,
+            editable: true,
+            edittype: 'textarea',
+            editoptions: {
+              rows: '3'
+            }
+          },
+        ],
+        url:         '/admin/set/list?notify=true',
+        datatype:    'json',
+        caption:     'Set List',
+        sortname:    'updateDate',
+        sortorder:   'desc',
+        rowNum:      10,
+        rowList:     [10, 20, 30, 40, 50, 100],
+        viewrecords: true,
+        height:      'auto',
+        hidegrid:    false,
+        toppager:    true,
+        gridComplete: function() {
+          var totaltime = $(this).jqGrid('getGridParam', 'totaltime');
+          $(this).jqGrid('setCaption', 'Set List (' + totaltime + 'ms)');
+        },
+        ondblClickRow: function(rowId) {
+          var logoUrl = $(this).jqGrid('getCell', rowId, 'logoUrl');
+          $(this).jqGrid('setColProp', 'logoUrl', {editoptions: {src: logoUrl}});
+          $(this).jqGrid('editGridRow', rowId, {
+            url:               '/admin/set/edit',
+            caption:           'Edit MSO Meta',
+            width:             'auto',
+            top:               $(window).scrollTop() + 50, // $(this).offset().top - 50,
+            left:              200, // $(this).offset().left + $(this).width() + 20,
+            modal:             false,
+            jqModal:           true,
+            closeAfterEdit:    true,
+            closeOnEscape:     true,
+            reloadAfterSubmit: true,
+            viewPagerButtons:  true,
+            recreateForm:      true,
+            beforeCheckValues: function(postData, formId, mode) {
+              postData['logoUrl'] = $('#logoUrl', formId).attr('src');
+              return postData;
+            },
+            beforeShowForm: function(formId) {
+            },
+            afterclickPgButtons: function(whichButton, formId, rowId) {
+              var logoUrl = $('#mso_table').jqGrid('getCell', rowId, 'logoUrl');
+              $('#logoUrl', formId).attr('src', logoUrl);
+            },
+            afterComplete: utils.callbackAfterSubmitForm
+          });
+        }
+      },
+      init: function() {
+        this.properties.subGrid = true;
+        $('#news_table').jqGrid(this.properties);
+        $('#news_table').jqGrid('navGrid', '#news_table_toppager',
+        {
+            edit:   true,
+            add:    false,
+            del:    true,
+            search: true,
+            view:   false        	
+        },
+        {
+        },
+        {
+            // 'delete' properties
+            url:               '/admin/set/delete',
+            caption:           'Remove A Set',
+            msg:               'Do you want to remove it',
+            width:             'auto',
+            modal:             false,
+            jqModal:           true,
+            closeOnEscape:     true,
+            reloadAfterSubmit: true,
+            afterComplete: utils.callbackAfterSubmitForm
+          });        
+      }
+    },
+    init: function() {
+      this.gridSetList.init();
+    },
+    gridChannelList: {
+        properties: {	
+          colModel: [
+            {
+              label:    'Channel ID',
+              name:     'channelId',
+              index:    'channelId',
+              width:    80,
+              align:    'center',
+              sortable: false,
+              editable: false
+            },
+            {
+              label:    'Channel Name',
+              name:     'name',
+              index:    'name',
+              width:    150,
+              align:    'center',
+              search:   false,
+              sortable: true,
+              editable: true,
+              editrules: {
+                required: true
+              },
+              editoptions: {
+                maxlength: 100
+              }
+            },
+            {
+              label:     'Status',
+              name:      'status',
+              index:     'status',
+              width:     70,
+              align:     'center',
+              search:    true,
+              sortable:  true,
+              stype:     'select',
+              formatter: 'select',
+              editable:  true,
+              edittype:  'select',
+              editoptions: {
+                value: constants.channelStatus
+              },
+              searchoptions: {
+                sopt:  ['eq'],
+                value: constants.channelStatus
+              }
+             },
+          ],
+          url:         '/admin/channel/list?notify=true',
+          datatype:    'json',
+          caption:     'Channel List',
+          sortname:    'updateDate',
+          sortorder:   'desc',
+          rowNum:      10,
+          rowList:     [10, 20, 30, 40, 50, 100],
+          viewrecords: true,
+          height:      'auto',
+          hidegrid:    false,
+          toppager:    true,
+          gridComplete: function() {
+            var totaltime = $(this).jqGrid('getGridParam', 'totaltime');
+            $(this).jqGrid('setCaption', 'Channel List (' + totaltime + 'ms)');
+          },
+          ondblClickRow: function(rowId) {
+            //var logoUrl = $(this).jqGrid('getCell', rowId, 'logoUrl');
+            //$(this).jqGrid('setColProp', 'logoUrl', {editoptions: {src: logoUrl}});
+            $(this).jqGrid('editGridRow', rowId, {
+              url:               '/admin/channel/edit',
+              caption:           'Edit Channel Meta',
+              width:             'auto',
+              top:               $(window).scrollTop() + 50, // $(this).offset().top - 50,
+              left:              200, // $(this).offset().left + $(this).width() + 20,
+              modal:             false,
+              jqModal:           true,
+              closeAfterEdit:    true,
+              closeOnEscape:     true,
+              reloadAfterSubmit: true,
+              viewPagerButtons:  true,
+              recreateForm:      true,
+              /*
+              beforeCheckValues: function(postData, formId, mode) {
+                postData['logoUrl'] = $('#logoUrl', formId).attr('src');
+                return postData;
+              },
+              */
+              beforeShowForm: function(formId) {
+              },
+              afterclickPgButtons: function(whichButton, formId, rowId) {
+            	  /*
+                var logoUrl = $('#mso_table').jqGrid('getCell', rowId, 'logoUrl');
+                $('#logoUrl', formId).attr('src', logoUrl);
+                */
+              },
+              afterComplete: utils.callbackAfterSubmitForm
+            });
+          }
+        },
+        init: function() {
+          this.properties.subGrid = true;
+          $('#news_ch_table').jqGrid(this.properties);
+          $('#news_ch_table').jqGrid('navGrid', '#news_ch_table_toppager',
+          {
+              edit:   true,
+              add:    false,
+              del:    true,
+              search: true,
+              view:   false        	
+          },
+          {
+          },
+          {
+              // 'delete' properties
+              url:               '/admin/channel/delete',
+              caption:           'Remove A Channel',
+              msg:               'Do you want to remove it',
+              width:             'auto',
+              modal:             false,
+              jqModal:           true,
+              closeOnEscape:     true,
+              reloadAfterSubmit: true,
+              afterComplete: utils.callbackAfterSubmitForm
+            });        
+        }
+      },
+      init: function() {
+        this.gridSetList.init();
+        this.gridChannelList.init();
+      }    
+  },  
+  
+/////////////!!!!!!!!!!  
   tabUserManagement: {
     gridUserList: {
       gridSubscription: {
@@ -2193,10 +2531,11 @@ var page$ = {
   init: function() {
     $('#ui_tabs').tabs();
     $.jgrid.no_legacy_api = true;
-    
     page$.tabChannelManagement.init();
     page$.tabCategoryManagement.init();
     page$.tabMsoManagement.init();
+    page$.tabSetManagement.init(); 
+    page$.tabNewsManagement.init();
     page$.tabUserManagement.init();
   }
 };

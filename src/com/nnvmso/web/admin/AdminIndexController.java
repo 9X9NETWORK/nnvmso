@@ -25,6 +25,11 @@ public class AdminIndexController {
 	public String index() {
 		return "admin/index";
 	}
+
+	@RequestMapping("news")
+	public String news() {
+		return "admin/news";
+	}
 	
 	@RequestMapping("ui")
 	public String oss(Model model, HttpServletRequest request, HttpServletResponse response)

@@ -1,16 +1,25 @@
 package com.nnvmso.web.admin;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.nnvmso.lib.JqgridHelper;
 import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.lib.YouTubeLib;
 import com.nnvmso.model.Category;
@@ -40,7 +49,7 @@ public class AdminSetController {
 	public AdminSetController(ChannelSetManager setMngr) {
 		this.setMngr = setMngr;		
 	}
-
+		
 	@RequestMapping("deleteMso")
 	public ResponseEntity<String> deleteMso(@RequestParam(required=false) long id) {					
 		ChannelSetManager csMngr = new ChannelSetManager();
@@ -93,20 +102,14 @@ public class AdminSetController {
 	
 	@RequestMapping("createBatch")
 	public ResponseEntity<String> createBatch() {
-		String name="Good TV 好消息";
+		String name="史東";
 		String lang="zh";
-		String desc="Good TV";
-		String cname="非營利組織";
+		String desc="史東談世界";
+		String cname="新聞";
 		
 		String[] urls = {
-				"http://www.youtube.com/user/goodtv#grid/user/FBE16B28C166951F",
-				"http://www.youtube.com/user/goodtv#grid/user/A95700BA527EA728",
-				"http://www.youtube.com/user/goodtv#grid/user/E9CF038F35D6EEBC",
-				"http://www.youtube.com/user/goodtv#grid/user/6B8141F28B843D88",
-				"http://www.youtube.com/user/goodtv#grid/user/4554E7A23F1530BF",
-				"http://www.youtube.com/user/goodtv#grid/user/CF53AFA4B1499986",
-				"http://www.youtube.com/user/goodtv#grid/user/F23F18DCC8C8A819",
-				"http://www.youtube.com/user/goodtv#grid/user/0F10FA0EAD8B0875",
+				"http://www.youtube.com/playlist?list=PLF37EBDAA7C6762C9",
+				"http://www.youtube.com/user/dialogue360",				
 		};
 		MsoChannelManager channelMngr = new MsoChannelManager();
 		List<MsoChannel> channels = new ArrayList<MsoChannel>();
@@ -139,7 +142,7 @@ public class AdminSetController {
 	}
 
 	@RequestMapping("recommendedChange")
-	public ResponseEntity<String> recommended(
+	public ResponseEntity<String> recommendedChange(
 			@RequestParam(required=false) String lang,
 			@RequestParam(required=false) String ids,
 			@RequestParam(required=false) String seqs) {
@@ -178,24 +181,182 @@ public class AdminSetController {
 		}
 		return NnNetUtil.textReturn(output);
 	}
+	
+	@RequestMapping(value = "list", params = {"page", "rows", "sidx", "sord"})
+	public void list(@RequestParam(value = "page")   Integer      currentPage,
+	                 @RequestParam(value = "rows")   Integer      rowsPerPage,
+	                 @RequestParam(value = "sidx")   String       sortIndex,
+	                 @RequestParam(value = "sord")   String       sortDirection,
+	                 @RequestParam(required = false) String       searchField,
+	                 @RequestParam(required = false) String       searchOper,
+	                 @RequestParam(required = false) String       searchString,
+	                 @RequestParam(required = false) String       search,
+	                 @RequestParam(required = false) boolean      notify,
+	                 OutputStream out) {
+		ChannelSetManager csMngr = new ChannelSetManager();
+		ObjectMapper mapper = new ObjectMapper();
+		List<Map<String, Object>> dataRows = new ArrayList<Map<String, Object>>();
 
+		String filter = "";
+		if (searchField != null && searchOper != null && searchString != null && !searchString.isEmpty()) {			
+			Map<String, String> opMap = JqgridHelper.getOpMap();
+			if (opMap.containsKey(searchOper)) {
+				filter = searchField + " " + opMap.get(searchOper) + " " + searchString;
+				logger.info("filter: " + filter);
+				sortIndex = "updateDate";
+				sortDirection = "desc";
+			}
+		}
+
+		int totalRecords = csMngr.total(filter);
+		int totalPages = (int)Math.ceil((double)totalRecords / rowsPerPage);
+		if (currentPage > totalPages)
+			currentPage = totalPages;		
+		List<ChannelSet> results = csMngr.list(currentPage, rowsPerPage, sortIndex, sortDirection, filter);		
+		for (ChannelSet cs : results) {			
+			Map<String, Object> map = new HashMap<String, Object>();
+			List<Object> cell = new ArrayList<Object>();
+			boolean qualified = true;
+			if (notify) {
+				qualified = false;
+				Calendar cal = Calendar.getInstance();		
+				cal.add(Calendar.DAY_OF_MONTH, - 14);
+				Date d = cal.getTime();
+				if (cs.getCreateDate().after(d)) {
+					if (!cs.isPublic()) {
+						qualified = true;
+					}
+				}
+			}
+			if (qualified) {
+				cell.add(cs.getKey().getId());
+				cell.add(cs.isFeatured());
+				cell.add(cs.isPublic());
+				cell.add(cs.getLang());
+				cell.add(cs.getName());
+				cell.add(cs.getIntro());			
+				map.put("id", cs.getKey().getId());
+				map.put("cell", cell);
+				dataRows.add(map);
+			}
+		}
+		try {
+			mapper.writeValue(out, JqgridHelper.composeJqgridResponse(1, 50, totalRecords, dataRows));
+		} catch (IOException e) {
+			logger.warning(e.getMessage());
+		}
+				
+	}
+
+	@RequestMapping(value="deleteCh", params = {"id", "set"})
+	public @ResponseBody String deleteCh(@RequestParam(required = false) long set,	                 
+			             @RequestParam(required = false) long id,
+	                     OutputStream out) {
+		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
+		ChannelSetChannel csc = cscMngr.findBySetAndChannel(set, id);
+		if (csc != null)
+			cscMngr.delete(csc);
+		return "OK";
+		
+	}
+
+	@RequestMapping(value="addCh")
+	public @ResponseBody String addCh(
+			             @RequestParam(required = false) long channel,
+			             @RequestParam(required = false) long set,	                 
+			             @RequestParam(required = false) int seq,
+	                     OutputStream out) {
+		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
+		MsoChannelManager cMngr = new MsoChannelManager();
+		ChannelSetChannel csc = cscMngr.findBySetAndChannel(set, channel);
+		if (csc == null) {
+			MsoChannel c = cMngr.findById(channel);
+			if (c != null) {
+				csc = new ChannelSetChannel(set, channel, seq);
+				cscMngr.create(csc);
+			}
+		}
+		return "OK";		
+	}
+
+	@RequestMapping(value="editCh")
+	public @ResponseBody String editCh(
+			             @RequestParam(required = false) long id,
+			             @RequestParam(required = false) long channel,
+			             @RequestParam(required = false) long set,	                 
+			             @RequestParam(required = false) int seq,
+	                     OutputStream out) {
+		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
+		MsoChannelManager cMngr = new MsoChannelManager();
+		ChannelSetChannel csc = cscMngr.findBySetAndChannel(set, id);
+		if (csc != null) {
+			MsoChannel c = cMngr.findById(channel);
+			if (c != null) {
+				csc.setChannelId(channel);
+				csc.setSeq(seq);
+			}
+		}
+		return "OK";		
+	}
+	
+	@RequestMapping(value = "listCh", params = {"page", "rows", "sidx", "sord", "set"})
+	public @ResponseBody String listCh(
+			         @RequestParam(value = "page")   Integer      currentPage,
+	                 @RequestParam(value = "rows")   Integer      rowsPerPage,
+	                 @RequestParam(value = "sidx")   String       sortIndex,
+	                 @RequestParam(value = "sord")   String       sortDirection,
+	                 @RequestParam(required = false) String       searchField,
+	                 @RequestParam(required = false) String       searchOper,
+	                 @RequestParam(required = false) String       searchString,
+	                 @RequestParam(required = false) long       set,
+	                 OutputStream out) {
+		ChannelSetManager csMngr = new ChannelSetManager();
+		ObjectMapper mapper = new ObjectMapper();
+		List<Map<String, Object>> dataRows = new ArrayList<Map<String, Object>>();		
+		List<MsoChannel> channels = csMngr.findChannelsById(set);
+		for (MsoChannel c : channels) {
+			Map<String, Object> map = new HashMap<String, Object>();
+			List<Object> cell = new ArrayList<Object>();			
+			cell.add(c.getKey().getId());
+			cell.add(c.getName());
+			cell.add(c.getSeq());
+			cell.add(c.getContentType());
+			map.put("id", c.getKey().getId());
+			map.put("cell", cell);
+			dataRows.add(map);			
+		}
+		int totalRecords = channels.size();
+		try {
+			mapper.writeValue(out, JqgridHelper.composeJqgridResponse(1, 50, totalRecords, dataRows));
+		} catch (IOException e) {
+			logger.warning(e.getMessage());
+		}
+		return "OK";		
+	}
+	
+	/*
+	@RequestMapping(value = "create", params = {"name", "intro", "featured", "lang"})
+	public @ResponseBody String create(@RequestParam String name,	                                   
+	*/	
 	@RequestMapping("delete")
-	public ResponseEntity<String> delete(
-			@RequestParam(required=false) long id) {		
+	public @ResponseBody String delete(@RequestParam(required=false) long id) {
 		ChannelSetManager csMngr = new ChannelSetManager();
 		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
 		ChannelSet cs = csMngr.findById(id);		
 		List<ChannelSetChannel> list = cscMngr.findByChannelSetId(cs.getKey().getId());
 		cscMngr.deleteAll(list);		
 		csMngr.delete(cs);		
-		return NnNetUtil.textReturn("OK");
+		return "OK";
 	}
 
 	@RequestMapping("edit")
-	public ResponseEntity<String> edit(
+	public @ResponseBody String edit(
 			@RequestParam(required=false) long id,
 			@RequestParam(required=false) String name,
             @RequestParam(required=false) String desc,
+            @RequestParam(required=false) String lang,
+            @RequestParam(required=false) String isPublic,
+            @RequestParam(required=false) String featured,
             @RequestParam(required=false) String channelIds,
             @RequestParam(required=false) String seqs) {
 		ChannelSetManager csMngr = new ChannelSetManager();
@@ -204,13 +365,18 @@ public class AdminSetController {
 		ChannelSet cs = csMngr.findById(id);
 		if (name != null) cs.setName(name);
 		if (desc != null) cs.setIntro(desc);
+		if (isPublic != null)
+			cs.setPublic(Boolean.parseBoolean(isPublic));
+		if (featured != null)			
+			cs.setFeatured(Boolean.parseBoolean(featured));
+		cs.setLang(lang);
 		csMngr.save(cs);		
 		if (channelIds == null) 
-			return NnNetUtil.textReturn("OK");
+			return "OK";
 		
 		String[] chId = channelIds.split(",");
 		String[] chSeq = seqs.split(",");		
-					
+
 		List<ChannelSetChannel> list = cscMngr.findByChannelSetId(cs.getKey().getId());
 		cscMngr.deleteAll(list);
 		list = new ArrayList<ChannelSetChannel>();
@@ -221,10 +387,35 @@ public class AdminSetController {
 			list.add(csc);
 		}
 		cscMngr.saveAll(list);
-		return NnNetUtil.textReturn("OK");
+		return "OK";
 	}
 	
-	@RequestMapping("create")
+	//	@RequestMapping(value = "create", params = {"name", "contactEmail", "password", "logoUrl", "type"})
+	/*
+	public @ResponseBody String create(@RequestParam String name,
+            @RequestParam String contactEmail,
+            @RequestParam String password,
+            @RequestParam String logoUrl,
+            @RequestParam Short  type) {		
+	}	
+	*/	
+	
+	@RequestMapping(value = "create", params = {"name", "intro", "featured", "lang"})
+	public @ResponseBody String create(@RequestParam String name,	                                   
+	                                   @RequestParam String intro,
+	                                   @RequestParam boolean featured,
+	                                   @RequestParam String lang) {
+		Mso mso = new MsoManager().findNNMso();
+		ChannelSetManager channelSetMngr = new ChannelSetManager();
+		ChannelSet channelSet = new ChannelSet(mso.getKey().getId(), name, intro, true);		
+		channelSet.setDefaultUrl(name); 
+		channelSet.setBeautifulUrl(name);
+		channelSet.setLang(lang);
+		channelSetMngr.create(channelSet);						
+		return "OK";		
+	}
+	
+	@RequestMapping("createTest")
 	public ResponseEntity<String> create(@RequestParam(required=false) String name, 			                             
 			                             @RequestParam(required=false) String desc,
 			                             @RequestParam(required=false) String channelIds,

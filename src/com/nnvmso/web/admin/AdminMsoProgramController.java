@@ -29,7 +29,9 @@ import com.nnvmso.lib.JqgridHelper;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.lib.NnStringUtil;
+import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoProgram;
+import com.nnvmso.service.MsoChannelManager;
 import com.nnvmso.service.MsoProgramManager;
 
 @Controller
@@ -51,12 +53,7 @@ public class AdminMsoProgramController {
 		NnLogUtil.logException(e);
 		return "error/exception";				
 	}	
-	
-	@RequestMapping(value="create")
-	public @ResponseBody String create(@RequestParam String channel) {				
-		return "OK";
-	}
-	
+		
 	/*
 	// there should no delete, we only mark a program "Bad"
 	@RequestMapping(value="delete")

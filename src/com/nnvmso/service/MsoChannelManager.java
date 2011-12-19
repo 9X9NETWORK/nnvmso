@@ -129,6 +129,7 @@ public class MsoChannelManager {
 		}
 		channel.setCreateDate(now);
 		channel.setUpdateDate(now);
+		
 		msoChannelDao.save(channel);
 
 		//save to cache
@@ -156,8 +157,7 @@ public class MsoChannelManager {
 		CategoryManager categoryMngr = new CategoryManager();
 		if (this.isCounterQualified(channel)) {
 			categoryMngr.addChannelCounter(channel);
-		}
-		
+		}		
 		//save to cache
 		Cache cache = CacheFactory.get();		
 		String key = this.getCacheKey(channel.getKey().getId());
@@ -181,6 +181,7 @@ public class MsoChannelManager {
 		channel.setUpdateDate(new Date());
 		if (channel.getStatus() == MsoChannel.STATUS_SUCCESS)
 			MsoChannelManager.updateFTSStuffForMsoChannel(channel);
+		
 		channel = msoChannelDao.save(channel);
 		//save to cache
 		Cache cache = CacheFactory.get();		

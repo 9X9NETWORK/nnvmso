@@ -51,6 +51,22 @@ public class ChannelSetManager {
 	public ChannelSet findBybeautifulUrl(String url) {
 		return channelSetDao.findByBeautifulUrl(url);
 	}
+
+	public int total() {
+		return channelSetDao.total();
+	}
+	
+	public int total(String filter) {
+		return channelSetDao.total(filter);
+	}
+	
+	public List<ChannelSet> list(int page, int limit, String sidx, String sord) {
+		return channelSetDao.list(page, limit, sidx, sord);
+	}
+	
+	public List<ChannelSet> list(int page, int limit, String sidx, String sord, String filter) {
+		return channelSetDao.list(page, limit, sidx, sord, filter);
+	}
 	
 	public List<ChannelSet> findFeaturedSetsByMso(Mso mso) {
 		return channelSetDao.findFeaturedSetsByMso(mso);

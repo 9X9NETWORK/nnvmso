@@ -950,7 +950,7 @@ public class PlayerApiService {
 			//add categories if necessary
 			log.info("User submits a duplicate url:" + url);
 			categoryMngr.changeCategory(channel.getKey().getId(), categories);
-		} else {				
+		} else {
 			//create a new channel
 			channel = channelMngr.initChannelSubmittedFromPlayer(url, user);
 			if (channel == null) {
