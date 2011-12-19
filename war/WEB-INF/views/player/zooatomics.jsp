@@ -6,7 +6,7 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9playerV68a"/>
-<c:set var="nroot" value="http://9x9ui.s3.amazonaws.com/9x9playerV94"/>
+<c:set var="nroot" value="http://9x9ui.s3.amazonaws.com/9x9playerV95"/>
 
 <!-- $Revision$ -->
 
@@ -38,8 +38,9 @@
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/scripts/swfobject.js"></script>
 <script type="text/javascript" charset="utf-8" src="${root}/javascripts/jquery.swfobject.1-1-1.min.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/scripts/flowplayer-3.2.4.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="${nroot}/javascripts/jquery.ellipsis.js"></script>
 
-<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/player20.js"></script>
+<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/player21.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/vertical.slider.V2.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/jquery.mousewheel.min.js"></script>
                                                                                                                                      
@@ -112,13 +113,13 @@ var brandinfo = "${brandInfo}";
         </li>
         <!--li id="btn-forgot-pw"><span>Forgot your password?</span></li-->
         <!--li id="keep-signin"><p class="btn-check on"><img src="${nroot}/images/btn_check_on.png" class="btn-check-on"><img src="${nroot}/images/btn_check_off.png" class="btn-check-off"><span>Keep me sign in</span></p></li-->
-        <li><p class="btn" id="btn-signin"><span>Sign in</span></p></li>
+        <li><p class="btn-hilite" id="btn-signin"><span>Sign in</span></p></li>
       </ul>
       <div id="entry-switcher">
-        <p><span>New to 9x9?</span></p>
-        <p><span>Tired of searching for videos? Access thousands of curated channels and create your very own programming guide!</span></p>
-        <p><span>It's free and easy!</span></p>
-        <p class="btn" id="btn-create-account"><span>Create an Account</span></p>
+        <p class="head"><span>New to 9x9?</span></p>
+        <p class="content"><span>Tired of searching for videos? Access thousands of curated channels and create your very own programming guide!</span></p>
+        <p class="content"><span>It's free and easy!</span></p>
+        <p class="btn-hilite" id="btn-create-account"><span>Create an Account</span></p>
       </div>
     </div>
     <div id="signup-panel" class="input-panel">
@@ -172,7 +173,7 @@ var brandinfo = "${brandInfo}";
         <li>
           <p class="term-text"><span>Clicking I accept means that you agree to the <a href="">9x9 service agreement</a> and <a href="">privacy statement</a>. You also agree to receive email from 9x9 with service updates, special offers, and survey invitations. You can unsubscribe at any time.</span></p>
         </li>
-        <li><p class="btn" id="btn-signup"><span>I Accept</span></p></li>
+        <li><p class="btn-hilite" id="btn-signup"><span>I Accept</span></p></li>
       </ul>
     </div>   
   </div>
@@ -443,7 +444,7 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
     <li class="divider"></li>
     <li id="player" class="main"><img src="${nroot}/images/icon_player.png" id="icon-player"><span>Player</span></li>
     <li class="divider"></li>
-    <li id="curator"><span>Curator</span></li>
+    <li id="curate" class="main"><img src="${nroot}/images/icon_curate.png" id="icon-curate"><span>Curate</span></li>
     <li class="divider"></li>
     <li id="help"><img src="${nroot}/images/icon_help.png" id="icon-help"><span>Help</span></li>
   </ul>
@@ -617,9 +618,9 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
       <div id="channel-info">
         <p class="head"><span>Current Channel:</span></p>
         <p class="ch-title"><span>Jazz</span></p>
-        <p class="ch-description"><span>Last installment from my "Making Money from Podcasting" series...</span></p>
         <p class="ch-epNum"><span>Episode:</span><span class="amount">12</span></p>
         <p class="ch-updated"><span>Updated:</span><span class="date new">Today</span></p>
+        <p class="ch-description ellipsis multiline"><span>Last installment from my "Making Money from Podcasting" series...</span></p>
       </div>
       
       <ul id="guide-sync">
@@ -707,33 +708,34 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
       <img src="${nroot}/images/player_ep_panel.png" id="player-ep-panel">
       <img src="${nroot}/images/arrow_right_on.png" id="player-arrow-right">
       <img src="${nroot}/images/arrow_left_on.png" id="player-arrow-left">
-      <ul id="player-ep-list"></ul>
+      <ul id="player-ep-list"></ul>-
       <p id="player-ep-meta">
         <span class="meta-head">Episode:</span>
         <span class="ep-title"></span>
         <span class="amount"></span>
+        <span class="age">- Today</span>
       </p>
       <div id="player-ch-flipper">
         <div id="play-next">
           <img src="${nroot}/images/arrow_down.png" id="arrow-next">
           <p class="tooltip"><span>Next Ch</span></p>
           <img src="" class="thumbnail">
-          <div id="next-title"><p class="txt-holder"><span></span></p></div>
+          <div id="next-title" class="ellipsis multiline"><p class="txt-holder"><span></span></p></div>
         </div>
         <div id="play-prev">
           <img src="${nroot}/images/arrow_up.png" id="arrow-prev">
           <p class="tooltip"><span>Prev Ch</span></p>
           <img src="" class="thumbnail">
-          <div id="prev-title"><p class="txt-holder"><span></span></p></div>
+          <div id="prev-title" class="ellipsis multiline"><p class="txt-holder"><span></span></p></div>
         </div>
         <p id="play-ch-index"><span></span></p>
       </div>
       <div id="player-info">
-        <div id="ep-description">
+        <div id="ep-description" class="ellipsis multiline">
           <p class="head"><span>Episode Description</span></p>
           <p class="content"><span></span></p>
         </div>
-        <div id="comment">
+        <div id="comment" class="ellipsis multiline">
           <p class="head"><span>Curator's Comment</span></p>
           <p class="content"><span></span></p>
         </div>
@@ -878,6 +880,8 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
 
 <div id="footer">
   <ul id="footer-list">
+
+
     <li id="btn-company"><span>Company</span></li>
     <li class="divider"></li>
     <li id="btn-blog"><span>Blog</span></li>
@@ -885,9 +889,9 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
     <li id="btn-forum"><span>Forum</span></li>
     <li class="divider"></li>
     <li id="btn-sitelang">
-      <p id="selected-sitelang"><span>English site</span><img src="${nroot}/images/icon_expand.png" class="icon-expand"></p>
+      <p id="selected-sitelang"><span>English Site</span><img src="${nroot}/images/icon_expand.png" class="icon-expand"></p>
       <ul id="sitelang-dropdown" class="dropdown">
-        <li class="on"><img src="${nroot}/images/icon_check.png" class="icon-check"><span>English site</span></li>
+        <li class="on"><img src="${nroot}/images/icon_check.png" class="icon-check"><span>English Site</span></li>
         <li><img src="${nroot}/images/icon_check.png" class="icon-check"><span>中文網站</span></li>
       </ul>
     </li>
