@@ -385,7 +385,7 @@ var page$ = {
     }, function() {
       $('#pro_hint').hide();
     });
-    cms.post('/CMSAPI/listSnsAuth?msoId=' + $('#msoId').val(), function(snsAuths) {
+    cms.post('/CMSAPI/listSnsAuth', { 'msoId': $('#msoId').val() }, function(snsAuths) {
       for (i in snsAuths) {
         var sns = snsAuths[i];
         switch (snsAuths[i].type) {

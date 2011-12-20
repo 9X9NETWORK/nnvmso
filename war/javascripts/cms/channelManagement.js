@@ -31,7 +31,8 @@ var page$ = {
       }, 'json');
     },
     create9x9Program: function(channelId, channelName) {
-      cms.post('/CMSAPI/createProgramSkeleton', function(programId) {
+      cms.post('/CMSAPI/createProgramSkeleton', { }, function(programId) {
+        log('new program: ' + programId);
         if (programId != null)
           page$.programDetail.programCreation(programId, channelId, channelName);
       }, 'json');
