@@ -75,6 +75,11 @@ function piwik_get_widget_url (params)
     {
     url += encodeURIComponent(name) + '=' + encodeURIComponent(params[name]) + '&';
     }
+  var locale = $('#locale').val();
+  if (locale == 'zh' || locale == 'zh-tw')
+    {
+    url += 'language=zh-tw';
+    }
   return url.replace(/\&$/,'');
   }
 
