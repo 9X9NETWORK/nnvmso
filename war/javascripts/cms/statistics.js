@@ -66,7 +66,11 @@ var page$ = {
   channelAndChannelSetList: {
     init: function() {
       // load channels
-      cms.loadJSON('/CMSAPI/listOwnedAndDefaultSetChannels?msoId=' + $('#msoId').val(), function(channels) {
+      var method = 'listOwnedChannels';
+      if (cms.isEnterprise()) {
+        method = 'defaultChannelSetChannels';
+      }
+      cms.loadJSON('/CMSAPI/' + method + '?msoId=' + $('#msoId').val(), function(channels) {
         for (i in channels) {
           var channelInfoBlock = $('#channel_info_block').clone(true).removeAttr('id').addClass('channel_info_block_cloned');
           var channelId = channels[i].key.id;
