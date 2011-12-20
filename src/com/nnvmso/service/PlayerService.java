@@ -7,8 +7,11 @@ import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletResponse;
 
+import net.sf.jsr107cache.Cache;
+
 import org.springframework.ui.Model;
 
+import com.nnvmso.lib.CacheFactory;
 import com.nnvmso.lib.CookieHelper;
 import com.nnvmso.lib.NnStringUtil;
 import com.nnvmso.lib.YouTubeLib;
@@ -40,7 +43,20 @@ public class PlayerService {
 		return model;		
 	}
 	
+	// with cache
 	public Model prepareSetInfo(Model model, Long setId) {
+		
+		Cache cache = CacheFactory.get();
+		String cacheKey = "prepareSetInfo(" + setId + ")";
+		// get from cache
+		if (cache != null) {
+			Model cachedModel = (Model)cache.get(cacheKey);
+			if (cachedModel != null) {
+				logger.info("get from cache " + cacheKey);
+				model.mergeAttributes(cachedModel.asMap());
+				return model;
+			}
+		}
 		
 		ChannelSetManager setMngr = new ChannelSetManager();
 		ChannelSet channelSet = setMngr.findById(setId);
@@ -49,10 +65,14 @@ public class PlayerService {
 			model.addAttribute("fbName", NnStringUtil.htmlSafeChars(channelSet.getName()));
 			model.addAttribute("fbDescription", NnStringUtil.htmlSafeChars(channelSet.getIntro()));
 			model.addAttribute("fbImg", NnStringUtil.htmlSafeChars(channelSet.getImageUrl()));
+			// put to cache
+			if (cache != null) {
+				cache.put(cacheKey, model);
+				logger.info("put to cache " + cacheKey);
+			}
 		} else {
 			logger.warning("channel not found! " + setId);
 		}
-		
 		return model;
 	}
 	
@@ -116,7 +136,21 @@ public class PlayerService {
 		return model;
 	}
 	
+	// with cache
 	public Model prepareChannel(Model model, Long ch) {
+		
+		Cache cache = CacheFactory.get();
+		String cacheKey = "prepareChannelInfo(" + ch + ")";
+		// get from cache
+		if (cache != null) {
+			Model cachedModel = (Model)cache.get(cacheKey);
+			if (cachedModel != null) {
+				logger.info("get from cache " + cacheKey);
+				model.mergeAttributes(cachedModel.asMap());
+				return model;
+			}
+		}
+		
 		MsoChannelManager channelMngr = new MsoChannelManager();
 		MsoChannel channel = channelMngr.findById(ch);
 		if (channel != null) {
@@ -124,6 +158,11 @@ public class PlayerService {
 			model.addAttribute("fbName", NnStringUtil.htmlSafeChars(channel.getName()));
 			model.addAttribute("fbDescription", NnStringUtil.htmlSafeChars(channel.getIntro()));
 			model.addAttribute("fbImg", NnStringUtil.htmlSafeChars(channel.getImageUrl()));
+			// put to cache
+			if (cache != null) {
+				cache.put(cacheKey, model);
+				logger.info("put to cache " + cacheKey);
+			}
 		} else {
 			logger.warning("channel not found! " + ch);
 		}
