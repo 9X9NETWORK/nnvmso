@@ -135,7 +135,6 @@ public class AdminMsoChannelController {
 		return "OK";
 	}	
 
-	/*
 	@RequestMapping("list")
 	public ResponseEntity<String> list(
 			@RequestParam(value="status", required=false)String status,
@@ -152,22 +151,23 @@ public class AdminMsoChannelController {
 				return NnNetUtil.textReturn("wrong date format: yyyymmdd");
 			}			
 			channels.addAll(channelMngr.findSince(sinceDate));			
-		}
-		
+		}		
 		List<MsoChannel> bad = new ArrayList<MsoChannel>();		
 		if (status == null) {
 			channels = channelMngr.findAll();
 			for (MsoChannel c : channels) {
+				/*
 				if (c.getName() == null || c.getStatus() != MsoChannel.STATUS_SUCCESS || 
 					c.isPublic() != true || c.getProgramCount() < 1 ) {
 					bad.add(c);
 				}
+				*/
 			}
 			output = "Total count: " + channels.size() + "\n" + "Bad channel count(not public, name=null, status!=success, programCount < 1): " + bad.size();
 			output = output + "\n\n --------------- \n\n";
 			output = output + this.printChannelData(channels);				
 			output = output + "\n\n --------------- \n\n";
-			output = output + this.printChannelData(bad);			
+			//output = output + this.printChannelData(bad);			
 		} else {
 			channels = channelMngr.findAllByStatus(Short.valueOf(status));
 		}
@@ -175,8 +175,7 @@ public class AdminMsoChannelController {
 		output = output + this.printChannelData(channels);		
 		return NnNetUtil.textReturn(output);
 	}
-	*/
-	
+		
 	/**
 	 * List items in jqGrid format
 	 *
@@ -244,17 +243,15 @@ public class AdminMsoChannelController {
 			}			
 			String filter = searchField + " == " + searchString;
 			logger.info("filter = " + filter);
-
 			totalRecords = channelMngr.total(filter);
 			totalPages = (int)Math.ceil((double)totalRecords / rowsPerPage);
 			if (currentPage > totalPages)
 				currentPage = totalPages;
 			results = channelMngr.list(currentPage, rowsPerPage, "updateDate", "desc", filter);
-		}else if (searchField != null && searchOper != null && searchString != null
+		} else if (searchField != null && searchOper != null && searchString != null
 		           && searchOper.equals("eq")
 		           && searchField.equals("name")){
-			//use fuzzy search for "name"
-			
+			//use fuzzy search for "name"			
 			results = new ArrayList<MsoChannel>();
 			List<MsoChannel> totalResults = new ArrayList<MsoChannel>();
 			try{
@@ -329,8 +326,7 @@ public class AdminMsoChannelController {
 				cell.add(channel.getProgramCount());
 				cell.add(subLogMngr.findTotalCountByChannelId(channel.getKey().getId()));
 				cell.add(channel.getSourceUrl());
-				//cell.add(channel.getIntro());
-				
+				//cell.add(channel.getIntro());				
 				map.put("id", channel.getKey().getId());
 				map.put("cell", cell);
 				dataRows.add(map);

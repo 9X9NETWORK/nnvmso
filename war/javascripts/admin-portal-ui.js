@@ -247,7 +247,22 @@ var page$ = {
                   sopt:  ['eq'],
                   value: "en:en;zh:zh"
                 }              
-          },          
+          },  
+          {
+              label:     'Seq (recommended)',
+              name:      'seq',
+              index:     'seq',
+              width:     150,
+              align:     'center',
+              sortable:  true,
+              editable:  true,
+              editrules: {
+                minValue: 1,
+                maxValue: 81,
+                required: true,
+                integer:  true
+              }
+          },                    
           {
             label:    'Set Name',
             name:     'name',

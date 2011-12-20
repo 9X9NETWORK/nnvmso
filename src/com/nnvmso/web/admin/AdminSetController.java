@@ -233,8 +233,9 @@ public class AdminSetController {
 				cell.add(cs.isFeatured());
 				cell.add(cs.isPublic());
 				cell.add(cs.getLang());
+				cell.add(cs.getSeq());
 				cell.add(cs.getName());
-				cell.add(cs.getIntro());			
+				cell.add(cs.getIntro());		
 				map.put("id", cs.getKey().getId());
 				map.put("cell", cell);
 				dataRows.add(map);
@@ -358,7 +359,7 @@ public class AdminSetController {
             @RequestParam(required=false) String isPublic,
             @RequestParam(required=false) String featured,
             @RequestParam(required=false) String channelIds,
-            @RequestParam(required=false) String seqs) {
+            @RequestParam(required=false) String seq) {
 		ChannelSetManager csMngr = new ChannelSetManager();
 		MsoChannelManager cMngr = new MsoChannelManager();
 		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
@@ -370,12 +371,16 @@ public class AdminSetController {
 		if (featured != null)			
 			cs.setFeatured(Boolean.parseBoolean(featured));
 		cs.setLang(lang);
+		if (seq != null) {
+			System.out.println("seqs:" + seq);
+			cs.setSeq(Short.parseShort(seq));
+		}
 		csMngr.save(cs);		
 		if (channelIds == null) 
 			return "OK";
 		
 		String[] chId = channelIds.split(",");
-		String[] chSeq = seqs.split(",");		
+		String[] chSeq = seq.split(",");		
 
 		List<ChannelSetChannel> list = cscMngr.findByChannelSetId(cs.getKey().getId());
 		cscMngr.deleteAll(list);
