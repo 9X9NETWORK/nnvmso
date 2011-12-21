@@ -1403,7 +1403,8 @@ public class PlayerApiService {
 			}
 			List<MsoChannel> channels = csMngr.findChannelsById(csId);			
 			for (MsoChannel c : channels) {
-				result[2] += this.composeChannelLineupStr(c, mso) + "\n";
+				if (c.getStatus() == MsoChannel.STATUS_SUCCESS && c.isPublic())
+					result[2] += this.composeChannelLineupStr(c, mso) + "\n";
 			}
 			return this.assembleMsgs(NnStatusCode.SUCCESS, result);
 		}
