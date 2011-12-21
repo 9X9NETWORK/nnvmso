@@ -14,10 +14,11 @@ public class NnUserReportManager {
 	
 	private NnUserReportDao reportDao = new NnUserReportDao();
 	
-	public void create(NnUser user, NnDevice device, String session, String comment) {
+	public NnUserReport create(NnUser user, NnDevice device, String session, String comment) {
 		NnUserReport report = new NnUserReport(user, device, session, comment);
 		report.setCreateDate(new Date());
 		reportDao.save(report);
+		return report;
 	}
 	
 	public List<NnUserReport> findAll() {

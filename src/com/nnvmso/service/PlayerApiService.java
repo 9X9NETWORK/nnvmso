@@ -55,6 +55,7 @@ import com.nnvmso.model.NnGuest;
 import com.nnvmso.model.NnUser;
 import com.nnvmso.model.NnUserChannelSorting;
 import com.nnvmso.model.NnUserPref;
+import com.nnvmso.model.NnUserReport;
 import com.nnvmso.model.NnUserShare;
 import com.nnvmso.model.NnUserWatched;
 import com.nnvmso.model.Subscription;
@@ -359,8 +360,11 @@ public class PlayerApiService {
 			return this.assembleMsgs(NnStatusCode.ACCOUNT_INVALID, null);
 		
 		NnUserReportManager reportMngr = new NnUserReportManager();
-		reportMngr.create(user, device, session, comment);
-		return this.assembleMsgs(NnStatusCode.SUCCESS, null);
+		String[] result = {""};
+		NnUserReport report = reportMngr.create(user, device, session, comment);
+		if (report != null)
+			result[0] = this.assembleKeyValue("id", String.valueOf(report.getKey().getId()));
+		return this.assembleMsgs(NnStatusCode.SUCCESS, result);
 	}
 	
 	public String processPdr(

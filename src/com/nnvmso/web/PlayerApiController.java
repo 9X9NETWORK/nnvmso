@@ -1318,7 +1318,7 @@ public class PlayerApiController {
 	 * @param device device token
 	 * @param session session id, same as pdr session id
 	 * @param comment user's problem description
-	 * @return status
+	 * @return report id
 	 */
 	@RequestMapping(value="userReport")
 	public ResponseEntity<String> userReport(
