@@ -161,9 +161,10 @@ public class PdrController {
 			NnUser found = mngr.findByToken(r.getUserToken());
 			if (found != null)
 				email = found.getEmail();
-			output += "<p>" +   
+			output += "<p>" +
+			r.getKey().getId() + nbsp + 
 			"<a href='listPdr?user=" + r.getUserToken() + "&session=" + r.getSession() + "'>" + r.getSession() + "</a>" +						 
-			r.getUserToken() + nbsp + email + nbsp + r.getCreateDate() +
+			nbsp + r.getUserToken() + nbsp + email + nbsp + r.getCreateDate() +
 			"<br/>" + r.getComment() + "</p>";
 		}
 		return NnNetUtil.htmlReturn(output);
