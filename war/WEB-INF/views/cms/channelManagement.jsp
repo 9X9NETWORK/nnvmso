@@ -282,6 +282,7 @@
                       <label class="floatL"><spring:message code="cms.channel_management.label.program_comment"/></label>
                       <div class="bg_textarea floatL"><textarea class="ep_comment" name="" cols="33" rows="5"></textarea></div>
                       <div class="clear"></div>
+                      <p class="hint"><spring:message code="cms.channel_management.msg.two_hundred_characters"/></p>
                       <br/>
                     </div>
                     <div style="display:none"><!-- tag of program -->
@@ -394,6 +395,7 @@
                   <label class="floatL"><spring:message code="cms.channel_management.label.program_comment"/></label>
                   <div class="bg_textarea floatL"><textarea class="ep_comment" name="" cols="33" rows="5"></textarea></div>
                   <div class="clear"></div>
+                  <p class="hint"><spring:message code="cms.channel_management.msg.two_hundred_characters"/></p>
                   <br/>
                 </div>
                 <div style="display:none">
