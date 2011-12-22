@@ -135,6 +135,8 @@ public class MsoProgramManager {
 			programs.add(program);
 			String result = this.composeProgramInfoStr(programs);
 			this.storeInCache(cache, result, program.getChannelId());
+			
+			cache.remove(getCacheKey(program.getKey().getId()));
 		}
 		//take the chance there's only 50 max per channel, shouldn't take too long, 
 		//and the performance of save is not a concern		
