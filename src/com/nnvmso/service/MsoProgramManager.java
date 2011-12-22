@@ -384,6 +384,10 @@ public class MsoProgramManager {
 		return program;
 	}
 	
+	public MsoProgram findByIdCacheless(long programId) {
+		return msoProgramDao.findById(programId);
+	}
+	
 	public MsoProgram findByKey(Key key) {
 		return msoProgramDao.findByKey(key);
 	}

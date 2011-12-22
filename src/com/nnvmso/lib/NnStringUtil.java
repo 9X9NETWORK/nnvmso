@@ -138,4 +138,25 @@ public class NnStringUtil {
 		          .replaceAll(">", "&gt;")
 		          .replaceAll("\"", "&quot;");
 	}
+	
+	public static String revertHtml(String str) {
+		if (str == null) return null;
+		return str.replaceAll("&quot;", "\"")
+		           .replaceAll("&gt;", ">")
+		           .replaceAll("&lt;", "<")
+		           .replaceAll("&amp;", "&");
+	}
+	
+	public static String htmlSafeAndTrucated(String str) {
+		for (int i = MAX_JDO_STRING_LENGTH; i > 0; i--) {
+			String truncated = truncateUTF8(str, i);
+			String htmlSafe = htmlSafeChars(truncated);
+			Integer bytelen = htmlSafe.getBytes(Charset.forName("UTF-8")).length;
+			if (bytelen <= MAX_JDO_STRING_LENGTH) {
+				logger.info("length in bytes: " + bytelen);
+				return htmlSafe;
+			}
+		}
+		return null;
+	}
 }

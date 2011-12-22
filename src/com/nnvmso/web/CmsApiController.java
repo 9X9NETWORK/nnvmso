@@ -2,6 +2,7 @@ package com.nnvmso.web;
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -539,7 +540,11 @@ public class CmsApiController {
 	@RequestMapping("programInfo")
 	public @ResponseBody MsoProgram programInfo(@RequestParam Long programId) {
 		MsoProgramManager programMngr = new MsoProgramManager();
-		return programMngr.findById(programId);
+		MsoProgram program = programMngr.findByIdCacheless(programId);
+		program.setName(NnStringUtil.revertHtml(program.getName()));
+		program.setIntro(NnStringUtil.revertHtml(program.getIntro()));
+		program.setComment(NnStringUtil.revertHtml(program.getComment()));
+		return program;
 	}
 	
 	@RequestMapping("channelInfo")
@@ -733,13 +738,13 @@ public class CmsApiController {
 			workerService.programLogoProcess(program.getKey().getId(), imageUrl, prefix, req);
 		}
 		if (name != null) {
-			program.setName(name);
+			program.setName(NnStringUtil.htmlSafeAndTrucated(name));
 		}
 		if (intro != null) {
-			program.setIntro(intro);
+			program.setIntro(NnStringUtil.htmlSafeAndTrucated(intro));
 		}
 		if (comment != null) {
-			program.setComment(comment);
+			program.setComment(NnStringUtil.htmlSafeAndTrucated(comment));
 		}
 		program.setPublic(true);
 		programMngr.create(channel, program);
@@ -766,11 +771,11 @@ public class CmsApiController {
 			return "Invalid programId";
 		}
 		if (name != null)
-			program.setName(name);
+			program.setName(NnStringUtil.htmlSafeAndTrucated(name));
 		if (intro != null)
-			program.setIntro(intro);
+			program.setIntro(NnStringUtil.htmlSafeAndTrucated(intro));
 		if (comment != null)
-			program.setComment(comment);
+			program.setComment(NnStringUtil.htmlSafeAndTrucated(comment));
 		if (imageUrl != null) {
 			ContentWorkerService workerService = new ContentWorkerService();
 			Long timestamp = System.currentTimeMillis() / 1000L;
