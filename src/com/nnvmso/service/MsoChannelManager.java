@@ -54,7 +54,7 @@ public class MsoChannelManager {
 		Mso mso = msoMngr.findNNMso();		
 		boolean piwik = true;
 		
-		if (!url.contains("maplestage")) {  
+		if (!url.contains("maplestage") && !url.contains("9x9.tv")) {  
     		String checkedUrl = YouTubeLib.formatCheck(url);
     		System.out.println("checkedUrl:" + checkedUrl);
     		if (checkedUrl == null) {

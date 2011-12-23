@@ -114,10 +114,10 @@ public class AdminMsoChannelController {
 				HttpServletRequest req,
 				@RequestParam(value="devel",required=false) boolean devel) {
 		String[] urls = {
-				"http://www.youtube.com/playlist?list=PL189FD87828064376",
+				"http://www.youtube.com/user/yintuosi",
 		};
 		String[] names= {
-				"八方論談廣播節目",
+				"Let's Painting！電繪示範錄影",                       
 		};
 		for (int i=0; i<urls.length; i++) {
 			channelMngr.create(urls[i], names[i], devel, req);

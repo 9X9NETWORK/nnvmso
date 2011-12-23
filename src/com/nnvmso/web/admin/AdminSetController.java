@@ -99,22 +99,109 @@ public class AdminSetController {
 		return NnNetUtil.textReturn("OK");
 		
 	}
+
+	@RequestMapping("createBatch2")
+	public ResponseEntity<String> createBatch2() {
+		String name="頻道策展決賽";
+		String lang="zh";
+		String desc="展示一下你的策展talent! 精彩決賽頻道就在這！";
+		String cname="教育學習";
+		
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		List<MsoChannel> channels = new ArrayList<MsoChannel>();
+		String[] urls = {
+				"4575605",
+				"4503257", 
+				"4324184",
+				"4321246",
+				"4229572",
+				"4430392",
+				"4562725",
+				"4420612",
+				"4541346",
+				"4394854",
+				"4426972",       
+				"4429711",
+				"http://www.youtube.com/user/yintuosi",
+				"4560416",
+				"4583084",
+				"4570947",
+				"4565104",
+				"4519095",
+				"4576913",
+		};
+		for (int i=0; i<urls.length; i++) {
+			String checkedUrl = urls[i];
+			System.out.println("checked url:" + checkedUrl);
+			if (checkedUrl.contains("youtube.com")) {
+				checkedUrl = YouTubeLib.formatCheck(checkedUrl);
+				MsoChannel c = channelMngr.findBySourceUrlSearch(checkedUrl);
+				c.setSeq(i+1);
+				channels.add(c);
+			} else {
+				MsoChannel c = channelMngr.findById(Long.parseLong(urls[i]));
+				c.setSeq(i+1);
+				channels.add(c);				
+			}
+		}
+		String output = "";
+		for (MsoChannel c : channels) {
+			output += c.getKey().getId() + "\t" + c.getSourceUrl() + "\n";
+		}
+		Mso mso = new MsoManager().findNNMso();
+		ChannelSetManager channelSetMngr = new ChannelSetManager();
+		ChannelSet channelSet = new ChannelSet(mso.getKey().getId(), name, desc, true);
+		channelSet.setDefaultUrl(name); 
+		channelSet.setBeautifulUrl(name);
+		//related channels
+		channelSet.setLang(lang);
+		channelSetMngr.create(channelSet, channels);						
+		
+		//category and set		
+		CategoryChannelSetManager cscMngr = new CategoryChannelSetManager();
+		CategoryManager cMngr = new CategoryManager();
+		Category c = cMngr.findByName(cname);
+		CategoryChannelSet csc = new CategoryChannelSet(c.getKey().getId(), channelSet.getKey().getId());
+		cscMngr.save(csc);		
+		return NnNetUtil.textReturn("OK");
+		
+	}
 	
 	@RequestMapping("createBatch")
 	public ResponseEntity<String> createBatch() {
-		String name="史東";
+		String name="頻道策展決賽";
 		String lang="zh";
-		String desc="史東談世界";
-		String cname="新聞";
+		String desc="展示一下你的策展talent! 精彩決賽頻道就在這！";
+		String cname="教育學習";
 		
 		String[] urls = {
-				"http://www.youtube.com/playlist?list=PLF37EBDAA7C6762C9",
-				"http://www.youtube.com/user/dialogue360",				
+				"http://www.9x9.tv/view?channel=4575605",
+				"http://www.9x9.tv/view?channel=4503257", 
+				"http://www.9x9.tv/view?channel=4324184",
+				"http://www.9x9.tv/view?channel=4321246",
+				"http://www.9x9.tv/view?channel=4229572",
+				"http://www.9x9.tv/view?channel=4430392",
+				"http://www.9x9.tv/view?channel=4562725",
+				"http://www.9x9.tv/view?channel=4420612",
+				"http://www.9x9.tv/view?channel=4541346",
+				"http://www.9x9.tv/view?channel=4394854",
+				"http://www.9x9.tv/view?channel=4426972",
+				"http://www.9x9.tv/view?channel=4429711",
+				"http://www.youtube.com/user/yintuosi",
+				"http://www.9x9.tv/view?channel=4560416",
+				"http://www.9x9.tv/view?channel=4583084",
+				"http://www.9x9.tv/view?channel=4570947",
+				"www.9x9.tv/view?channel=4565104",
+				"http://www.9x9.tv/view?channel=4519095",
+				"http://www.9x9.tv/view?channel=4576913",
 		};
 		MsoChannelManager channelMngr = new MsoChannelManager();
 		List<MsoChannel> channels = new ArrayList<MsoChannel>();
 		for (int i=0; i<urls.length; i++) {
-			String checkedUrl = YouTubeLib.formatCheck(urls[i]);
+			String checkedUrl = urls[i];
+			if (!checkedUrl.contains("maplestage") && !checkedUrl.contains("9x9.tv")) {
+				checkedUrl = YouTubeLib.formatCheck(urls[i]);
+			}
 			MsoChannel c = channelMngr.findBySourceUrlSearch(checkedUrl);
 			c.setSeq(i+1);
 			channels.add(c);
@@ -236,6 +323,7 @@ public class AdminSetController {
 				cell.add(cs.getSeq());
 				cell.add(cs.getName());
 				cell.add(cs.getIntro());		
+				cell.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(cs.getUpdateDate()));
 				map.put("id", cs.getKey().getId());
 				map.put("cell", cell);
 				dataRows.add(map);

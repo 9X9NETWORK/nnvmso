@@ -248,11 +248,11 @@ var page$ = {
                   value: "en:en;zh:zh"
                 }              
           },  
-          {
-              label:     'Seq (recommended)',
+          {	
+              label:     'Seq(rec)',
               name:      'seq',
               index:     'seq',
-              width:     150,
+              width:     80,
               align:     'center',
               sortable:  true,
               editable:  true,
@@ -283,7 +283,7 @@ var page$ = {
             label:    'Set Description',
             name:     'intro',
             index:    'intro',
-            width:    500,
+            width:    400,
             align:    'center',
             search:   false,
             sortable: true,
@@ -294,6 +294,19 @@ var page$ = {
               rows: '3'
             }
           },
+          {
+            label:    'Updated Time',
+            name:     'updateDate',
+            index:    'updateDate',
+            width:    140,
+            align:    'center',
+            sortable: true,
+            editable: false,
+            hidden:   false,
+            editrules: {
+              edithidden: true
+            }
+          },          
         ],
         datatype:    'json',
         url:         '/admin/set/list',
@@ -1192,6 +1205,7 @@ var page$ = {
       },
       properties: {
         colModel: [
+          /*
           {
             label:     'MSO ID',
             name:      'msoId',
@@ -1216,6 +1230,7 @@ var page$ = {
               dataUrl: '/admin/mso/msoHtmlSelectOptions'
             }
           },
+          */          
           {
             label:    'Category ID',
             name:     'categoryId',

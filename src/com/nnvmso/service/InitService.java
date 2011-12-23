@@ -874,12 +874,12 @@ public class InitService {
 		List<ChannelSet> sets = csMngr.findAll();
 		int cnt = 0;
 		for (ChannelSet cs : sets) {
-			//if (cs.getPiwik() == null) {
+			if (cs.getPiwik() == null) {
 				String piwikId = PiwikLib.createPiwikSite(cs.getKey().getId(), 0, req);
 				cs.setPiwik(piwikId);
 				csMngr.save(cs);
 				cnt++;
-			//}
+			}
 		}
 		log.info("init piwik set count = " + cnt);
 	}
@@ -909,12 +909,12 @@ public class InitService {
 		List<MsoChannel> channels = channelMngr.findChannelsByType(MsoChannel.CONTENTTYPE_MIXED);
 		int cnt = 0;
 		for (MsoChannel c : channels) {
-			//if (c.getPiwik() == null || c.getPiwik().length() == 0) {
+			if (c.getPiwik() == null || c.getPiwik().length() == 0) {
 				String piwikId = PiwikLib.createPiwikSite(0, c.getKey().getId(), req);
 				c.setPiwik(piwikId);
 				channelMngr.save(c);					
 				cnt++;
-			//}
+			}
 			
 		}
 		log.info("init piwik channel count = " + cnt);

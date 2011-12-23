@@ -41,45 +41,7 @@ public class CategoryManager {
 	
 	public void cacheRefresh(Category category) {
 		this.findAllByMsoId(category.getMsoId());
-	}
-	
-	public String translate(String name) {
-		if (name == null) return null;
-		Locale locale = Locale.TRADITIONAL_CHINESE;
-		if (name.equals("News & Politics")) 
-			return messageSource.getMessage("category.news", null, locale);
-		if (name.equals("Finance & Management")) 
-			return messageSource.getMessage("category.finance", null, locale);
-		if (name.equals("Entertainment")) 
-			return messageSource.getMessage("category.entertainment", null, locale);
-		if (name.equals("Music")) 
-			return messageSource.getMessage("category.music", null, locale);
-		if (name.equals("Sports & Outdoors")) 
-			return messageSource.getMessage("category.sports", null, locale);
-		if (name.equals("Tech & Science")) 
-			return messageSource.getMessage("category.tech", null, locale);
-		if (name.equals("Gaming")) 
-			return messageSource.getMessage("category.gaming", null, locale);
-		if (name.equals("Lifestyle & Hobbies")) 
-			return messageSource.getMessage("category.lifestyle", null, locale);
-		if (name.equals("Travel & Living")) 
-			return messageSource.getMessage("category.travel", null, locale);
-		if (name.equals("Arts & Creative")) 
-			return messageSource.getMessage("category.arts", null, locale);
-		if (name.equals("Society & Organizations")) 
-			return messageSource.getMessage("category.org", null, locale);
-		if (name.equals("Education & How to")) 
-			return messageSource.getMessage("category.education", null, locale);
-		if (name.equals("Nature & Animals")) 
-			return messageSource.getMessage("category.nature", null, locale);
-		if (name.equals("People")) 
-			return messageSource.getMessage("category.people", null, locale);
-		if (name.equals("Religion & Spirituality")) 
-			return messageSource.getMessage("category.religion", null, locale);
-		if (name.equals("Others")) 
-			return messageSource.getMessage("category.others", null, locale);
-		return "其他類";
-	}			
+	}	
 	
 	public Category save(Category category) {
 		category.setUpdateDate(new Date());		

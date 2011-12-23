@@ -307,7 +307,7 @@ public class AdminCategoryController {
 	                                   @RequestParam(required=true) String setIds) {
 		System.out.println("hit category create");
 		Category category = new Category(name);
-		category.setLang(lang);		
+		category.setLang(lang);
 		category.setPublic(true);
 		ChannelSetManager csMngr = new ChannelSetManager();
 		CategoryChannelSetManager ccsMngr = new CategoryChannelSetManager();

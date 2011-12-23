@@ -119,7 +119,9 @@ public class PlayerApiService {
 		result[1] += assembleKeyValue("piwik", cs.getPiwik());
 		//4rd block, channel info		
 		for (MsoChannel c : channels) {
-			result[2] += this.composeChannelLineupStr(c, csMso) + "\n";													
+			if (c.getStatus() == MsoChannel.STATUS_SUCCESS && c.isPublic()) {
+				result[2] += this.composeChannelLineupStr(c, csMso) + "\n";	
+			}
 		}		
 		return this.assembleMsgs(NnStatusCode.SUCCESS, result);
 	}	
