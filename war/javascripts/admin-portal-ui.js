@@ -202,6 +202,37 @@ var page$ = {
             editable: false
           },
           {
+              label:    'Set Name',
+              name:     'name',
+              index:    'name',
+              width:    150,
+              align:    'center',
+              search:   false,
+              sortable: true,
+              editable: true,
+              editrules: {
+                required: true
+              },
+              editoptions: {
+                maxlength: 100
+              }
+          },
+          {
+              label:    'Set Description',
+              name:     'intro',
+              index:    'intro',
+              width:    280,
+              align:    'center',
+              search:   false,
+              sortable: true,
+              //hidden:   false,
+              editable: true,
+              edittype: 'textarea',
+              editoptions: {
+                rows: '3'
+              }
+          },
+          {
             label:     'Recommended',
             name:      'featured',
             index:     'featured',
@@ -219,7 +250,7 @@ var page$ = {
               label:     'Public',
               name:      'isPublic',
               index:     'isPublic',
-              width:     100,
+              width:     60,
               align:     'center',
               sortable:  true,
               formatter: 'checkbox',
@@ -233,9 +264,10 @@ var page$ = {
               label:     'Language',
               name:      'lang',
               index:     'lang',
-              width:     90,
+              width:     70,
               align:     'center',
               search:    true,
+              stype:     'select',
               sortable:  true,
               formatter: 'select',
               editable:  true,
@@ -252,61 +284,56 @@ var page$ = {
               label:     'Seq(rec)',
               name:      'seq',
               index:     'seq',
-              width:     80,
+              width:     60,
               align:     'center',
               sortable:  true,
               editable:  true,
               editrules: {
-                minValue: 1,
+                minValue: 0,
                 maxValue: 81,
-                required: true,
+                required: false,
                 integer:  true
               }
           },                    
+          {	
+              label:     'URL',
+              name:      'beautifulUrl',
+              index:     'beautifulUrl',
+              width:     60,
+              align:     'center',
+              sortable:  true,
+              editable:  true,
+              editrules: {
+                required: false
+              }
+          },                    
           {
-            label:    'Set Name',
-            name:     'name',
-            index:    'name',
+              label:    'Updated Time',
+              name:     'updateDate',
+              index:    'updateDate',
+              width:    140,
+              align:    'center',
+              sortable: true,
+              editable: false,
+              hidden:   false,
+              editrules: {
+                edithidden: true
+              }
+          },          
+          {
+            label:    'Image',
+            name:     'imageUrl',
+            index:    'imageUrl',
             width:    150,
-            align:    'center',
-            search:   false,
-            sortable: true,
-            editable: true,
-            editrules: {
-              required: true
-            },
-            editoptions: {
-              maxlength: 100
-            }
-          },
-          {
-            label:    'Set Description',
-            name:     'intro',
-            index:    'intro',
-            width:    400,
             align:    'center',
             search:   false,
             sortable: true,
             //hidden:   false,
             editable: true,
-            edittype: 'textarea',
             editoptions: {
               rows: '3'
             }
           },
-          {
-            label:    'Updated Time',
-            name:     'updateDate',
-            index:    'updateDate',
-            width:    140,
-            align:    'center',
-            sortable: true,
-            editable: false,
-            hidden:   false,
-            editrules: {
-              edithidden: true
-            }
-          },          
         ],
         datatype:    'json',
         url:         '/admin/set/list',
@@ -732,25 +759,6 @@ var page$ = {
       },
       properties: {
         colModel: [
-          /*         
-          {
-            label:    'Channel Logo',
-            name:     'imageUrl',
-            index:    'imageUrl',
-            width:    150,
-            align:    'center',
-            sortable: false,
-            hidden:   false,
-            search:   false,
-            editable: false,
-            editoptions: {
-              disabled: true
-            },
-            editrules: {
-              edithidden: true
-            }
-          },
-          */
           {
             label:    'Channel ID',
             name:     'channelId',
@@ -860,11 +868,11 @@ var page$ = {
             edittype:  'select',
             editoptions: {
               disabled: false,
-              value:    "en:en;zh:zh;"
+              value:    "en:en;zh:zh"
             },
             searchoptions: {
               sopt:  ['eq'],
-              value: "en:en;zh:zh;"
+              value: "en:en;zh:zh"
             }
           },
           {
@@ -902,6 +910,36 @@ var page$ = {
               disabled: true
             }
           },
+          {
+            label:    'Image',
+            name:     'imageUrl',
+            index:    'imageUrl',
+            width:    50,
+            align:    'center',
+            sortable: false,
+            hidden:   false,
+            search:   false,
+            editable: false,
+            editoptions: {
+              disabled: true
+            },
+            editrules: {
+              edithidden: true
+            }
+          },
+          {
+              label:    'Updated Time',
+              name:     'updateDate',
+              index:    'updateDate',
+              width:    140,
+              align:    'center',
+              sortable: true,
+              editable: false,
+              hidden:   false,
+              editrules: {
+                edithidden: true
+              }
+          },                    
           {
             label:    'Ep. Count',
             name:     'programCount',
@@ -1125,11 +1163,11 @@ var page$ = {
               edittype:  'select',
               editoptions: {
                 disabled: false,
-                value:    "en:en;zh:zh;"
+                value:    "en:en;zh:zh"
               },
               searchoptions: {
                 sopt:  ['eq'],
-                value: "en:en;zh:zh;"
+                value: "en:en;zh:zh"
               }
             },
           ],
@@ -1280,6 +1318,7 @@ var page$ = {
               disabled: true
             }
           },
+          /*
           {
             label:    'Created Time',
             name:     'createDate',
@@ -1297,6 +1336,7 @@ var page$ = {
               edithidden: true
             }
           },
+          */
           {
             label:     'Language',
             name:      'lang',
@@ -1311,11 +1351,11 @@ var page$ = {
             edittype:  'select',
             editoptions: {
               disabled: false,
-              value:    "en:en;zh:zh;"
+              value:    "en:en;zh:zh"
             },
             searchoptions: {
               sopt:  ['eq'],
-              value: "en:en;zh:zh;"
+              value: "en:en;zh:zh"
             }
           },
           {
@@ -1366,7 +1406,7 @@ var page$ = {
         },
         ondblClickRow: function(rowId) {
           $(this).jqGrid('editGridRow', rowId, {
-            url:               '/admin/category/modify',
+            url:               '/admin/category/edit',
             caption:           'Edit Category',
             width:             'auto',
             top:               $(window).scrollTop() + 100, // $(this).offset().top - 50,
@@ -1747,7 +1787,7 @@ var page$ = {
             editable:  true,
             edittype:  'select',
             editoptions: {
-              value: 'en:en;zh:zh;zh-tw:zh-tw'
+              value: 'en:en;zh:zh'
             }
           },
           {

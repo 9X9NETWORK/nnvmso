@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.jdo.JDOUserException;
@@ -114,10 +115,10 @@ public class AdminMsoChannelController {
 				HttpServletRequest req,
 				@RequestParam(value="devel",required=false) boolean devel) {
 		String[] urls = {
-				"http://www.youtube.com/user/yintuosi",
+				"http://www.youtube.com/playlist?list=PL3FC1CEA86F082B94",
 		};
 		String[] names= {
-				"Let's Painting！電繪示範錄影",                       
+				"Brand New Life",                       
 		};
 		for (int i=0; i<urls.length; i++) {
 			channelMngr.create(urls[i], names[i], devel, req);
@@ -306,7 +307,7 @@ public class AdminMsoChannelController {
 				cal.add(Calendar.DAY_OF_MONTH, - 100);
 				Date d = cal.getTime();
 				if (channel.getCreateDate().after(d)) {
-					if (channel.getStatus() == MsoChannel.STATUS_SUCCESS) {
+					if (channel.getStatus() != MsoChannel.STATUS_SUCCESS) {
 						qualified = true;
 					}
 				}
@@ -315,17 +316,16 @@ public class AdminMsoChannelController {
 				//cell.add(channel.getImageUrl());
 				cell.add(channel.getKey().getId());
 				cell.add(channel.getName());
-				//cell.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(channel.getUpdateDate()));
-				//cell.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(channel.getCreateDate()));
 				cell.add(channel.getSourceUrl());
 				cell.add(channel.getStatus());
 				cell.add(channel.getContentType());
 				cell.add(channel.getLangCode());
 				cell.add(channel.isPublic());
 				cell.add(channel.getPiwik());
+				cell.add(channel.getImageUrl());
+				cell.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(channel.getUpdateDate()));
 				cell.add(channel.getProgramCount());
 				cell.add(subLogMngr.findTotalCountByChannelId(channel.getKey().getId()));
-				cell.add(channel.getSourceUrl());
 				//cell.add(channel.getIntro());				
 				map.put("id", channel.getKey().getId());
 				map.put("cell", cell);

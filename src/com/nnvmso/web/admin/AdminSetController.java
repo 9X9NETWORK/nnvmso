@@ -103,6 +103,7 @@ public class AdminSetController {
 	@RequestMapping("createBatch2")
 	public ResponseEntity<String> createBatch2() {
 		String name="頻道策展決賽";
+		
 		String lang="zh";
 		String desc="展示一下你的策展talent! 精彩決賽頻道就在這！";
 		String cname="教育學習";
@@ -110,59 +111,67 @@ public class AdminSetController {
 		MsoChannelManager channelMngr = new MsoChannelManager();
 		List<MsoChannel> channels = new ArrayList<MsoChannel>();
 		String[] urls = {
-				"4575605",
-				"4503257", 
-				"4324184",
-				"4321246",
-				"4229572",
-				"4430392",
-				"4562725",
-				"4420612",
-				"4541346",
-				"4394854",
-				"4426972",       
-				"4429711",
-				"http://www.youtube.com/user/yintuosi",
-				"4560416",
-				"4583084",
-				"4570947",
-				"4565104",
-				"4519095",
-				"4576913",
+				"4599054",
+				"4562966",
+				"4553178",
+				"4420853",
+				"http://www.youtube.com/playlist?list=PL3FC1CEA86F082B94",
+				"4529036",
+				"4574781",
+				"4570843",
+				"4565833"
 		};
+		ChannelSetManager csMngr = new ChannelSetManager();
+		ChannelSet cs = csMngr.findByName(name);
+		if (cs == null) {
+			return NnNetUtil.textReturn("channel set zero");
+		}
+		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
 		for (int i=0; i<urls.length; i++) {
 			String checkedUrl = urls[i];
 			System.out.println("checked url:" + checkedUrl);
 			if (checkedUrl.contains("youtube.com")) {
 				checkedUrl = YouTubeLib.formatCheck(checkedUrl);
 				MsoChannel c = channelMngr.findBySourceUrlSearch(checkedUrl);
-				c.setSeq(i+1);
+				//c.setSeq(i+1+20);
+				if (c == null) {
+					System.out.println("---id null---");
+				}
 				channels.add(c);
 			} else {
 				MsoChannel c = channelMngr.findById(Long.parseLong(urls[i]));
-				c.setSeq(i+1);
+				if (c == null) {
+					System.out.println("---id null---");
+				}
+				//c.setSeq(i+1+20);
 				channels.add(c);				
 			}
 		}
 		String output = "";
+		int i = 20;
+		System.out.println("channels size:" + channels.size());
 		for (MsoChannel c : channels) {
-			output += c.getKey().getId() + "\t" + c.getSourceUrl() + "\n";
+			ChannelSetChannel csc = new ChannelSetChannel(cs.getKey().getId(), c.getKey().getId(), i);
+			cscMngr.create(csc);
+			i++;
 		}
-		Mso mso = new MsoManager().findNNMso();
-		ChannelSetManager channelSetMngr = new ChannelSetManager();
-		ChannelSet channelSet = new ChannelSet(mso.getKey().getId(), name, desc, true);
+		
+		/*
 		channelSet.setDefaultUrl(name); 
 		channelSet.setBeautifulUrl(name);
 		//related channels
 		channelSet.setLang(lang);
-		channelSetMngr.create(channelSet, channels);						
+		channelSetMngr.create(channelSet, channels);
+		*/						
 		
-		//category and set		
+		//category and set
+		/*
 		CategoryChannelSetManager cscMngr = new CategoryChannelSetManager();
 		CategoryManager cMngr = new CategoryManager();
 		Category c = cMngr.findByName(cname);
 		CategoryChannelSet csc = new CategoryChannelSet(c.getKey().getId(), channelSet.getKey().getId());
-		cscMngr.save(csc);		
+		cscMngr.save(csc);
+		*/		
 		return NnNetUtil.textReturn("OK");
 		
 	}
@@ -299,7 +308,8 @@ public class AdminSetController {
 		int totalPages = (int)Math.ceil((double)totalRecords / rowsPerPage);
 		if (currentPage > totalPages)
 			currentPage = totalPages;		
-		List<ChannelSet> results = csMngr.list(currentPage, rowsPerPage, sortIndex, sortDirection, filter);		
+		List<ChannelSet> results = csMngr.list(currentPage, rowsPerPage, sortIndex, sortDirection, filter);
+		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
 		for (ChannelSet cs : results) {			
 			Map<String, Object> map = new HashMap<String, Object>();
 			List<Object> cell = new ArrayList<Object>();
@@ -312,18 +322,27 @@ public class AdminSetController {
 				if (cs.getCreateDate().after(d)) {
 					if (!cs.isPublic()) {
 						qualified = true;
+					} else {
+						List<ChannelSetChannel> cscs = cscMngr.findByChannelSetId(cs.getKey().getId());
+						for (ChannelSetChannel csc : cscs) {
+							if (csc.getCreateDate().after(d)) {
+								qualified = true;
+							}
+						}
 					}
 				}
 			}
 			if (qualified) {
 				cell.add(cs.getKey().getId());
+				cell.add(cs.getName());
+				cell.add(cs.getIntro());
 				cell.add(cs.isFeatured());
 				cell.add(cs.isPublic());
 				cell.add(cs.getLang());
 				cell.add(cs.getSeq());
-				cell.add(cs.getName());
-				cell.add(cs.getIntro());		
+				cell.add(cs.getBeautifulUrl());
 				cell.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(cs.getUpdateDate()));
+				cell.add(cs.getImageUrl());
 				map.put("id", cs.getKey().getId());
 				map.put("cell", cell);
 				dataRows.add(map);
@@ -355,18 +374,22 @@ public class AdminSetController {
 			             @RequestParam(required = false) long set,	                 
 			             @RequestParam(required = false) int seq,
 	                     OutputStream out) {
+		ChannelSetManager csMngr = new ChannelSetManager();
 		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
 		MsoChannelManager cMngr = new MsoChannelManager();
+		MsoChannel c = cMngr.findById(channel);
+		if (c == null)
+			return "Channel does not exist";
+		ChannelSet cs = csMngr.findById(set);
+		if (cs == null)
+			return "Set does not exist";
 		ChannelSetChannel csc = cscMngr.findBySetAndChannel(set, channel);
 		if (csc == null) {
-			MsoChannel c = cMngr.findById(channel);
-			if (c != null) {
-				csc = new ChannelSetChannel(set, channel, seq);
-				cscMngr.create(csc);
-			}
-		}
+			csc = new ChannelSetChannel(set, channel, seq);
+			cscMngr.create(csc);
+		}			
 		return "OK";		
-	}
+	}	
 
 	@RequestMapping(value="editCh")
 	public @ResponseBody String editCh(
@@ -444,6 +467,7 @@ public class AdminSetController {
 			@RequestParam(required=false) String name,
             @RequestParam(required=false) String desc,
             @RequestParam(required=false) String lang,
+            @RequestParam(required=false) String imageUrl,
             @RequestParam(required=false) String isPublic,
             @RequestParam(required=false) String featured,
             @RequestParam(required=false) String channelIds,
@@ -458,12 +482,16 @@ public class AdminSetController {
 			cs.setPublic(Boolean.parseBoolean(isPublic));
 		if (featured != null)			
 			cs.setFeatured(Boolean.parseBoolean(featured));
+		if (imageUrl != null)
+			cs.setImageUrl(imageUrl);
 		cs.setLang(lang);
 		if (seq != null) {
 			System.out.println("seqs:" + seq);
 			cs.setSeq(Short.parseShort(seq));
 		}
-		csMngr.save(cs);		
+		csMngr.save(cs);
+		this.addRecCategory(cs);
+
 		if (channelIds == null) 
 			return "OK";
 		
@@ -480,6 +508,35 @@ public class AdminSetController {
 			list.add(csc);
 		}
 		cscMngr.saveAll(list);
+		
+		CategoryManager catMngr = new CategoryManager();
+		CategoryChannelSetManager ccsMngr = new CategoryChannelSetManager();
+		if (cs.getLang().equals("zh") && cs.getName().equals("綜合推薦")) {
+			Category cat = catMngr.findByName("推薦頻道");
+			if (cat != null) {
+				CategoryChannelSet existed = 
+					ccsMngr.findByCategoryIdAndChannelSetId(cat.getKey().getId(), cs.getKey().getId());
+				if (existed == null) {
+					CategoryChannelSet ccs = new CategoryChannelSet(cat.getKey().getId(), cs.getKey().getId());
+					ccsMngr.create(ccs);
+				}
+			}				
+		}
+		if (cs.getLang().equals("en") && cs.getName().equals("Recommended")) {
+			Category cat = catMngr.findByName("Recommended");
+			if (cat != null) {
+				if (cat != null) {
+					CategoryChannelSet existed = 
+						ccsMngr.findByCategoryIdAndChannelSetId(cat.getKey().getId(), cs.getKey().getId());
+					if (existed == null) {
+						CategoryChannelSet ccs = new CategoryChannelSet(cat.getKey().getId(), cs.getKey().getId());
+						ccsMngr.create(ccs);
+					}
+				}
+			}				
+		}
+		
+		
 		return "OK";
 	}
 	
@@ -493,27 +550,67 @@ public class AdminSetController {
 	}	
 	*/	
 	
-	@RequestMapping(value = "create", params = {"name", "intro", "featured", "lang"})
+	private void addRecCategory(ChannelSet cs) {
+		CategoryManager catMngr = new CategoryManager();
+		CategoryChannelSetManager ccsMngr = new CategoryChannelSetManager();
+		if (cs.getLang().equals("zh") && cs.getName().equals("綜合推薦")) {
+			Category cat = catMngr.findByName("推薦頻道");
+			if (cat != null) {
+				CategoryChannelSet existed = 
+					ccsMngr.findByCategoryIdAndChannelSetId(cat.getKey().getId(), cs.getKey().getId());
+				if (existed == null) {
+					CategoryChannelSet ccs = new CategoryChannelSet(cat.getKey().getId(), cs.getKey().getId());
+					ccsMngr.create(ccs);
+				}
+			}				
+		}
+		if (cs.getLang().equals("en") && cs.getName().equals("Recommended")) {
+			Category cat = catMngr.findByName("Recommended");
+			if (cat != null) {
+				if (cat != null) {
+					CategoryChannelSet existed = 
+						ccsMngr.findByCategoryIdAndChannelSetId(cat.getKey().getId(), cs.getKey().getId());
+					if (existed == null) {
+						CategoryChannelSet ccs = new CategoryChannelSet(cat.getKey().getId(), cs.getKey().getId());
+						ccsMngr.create(ccs);
+					}
+				}
+			}				
+		}
+	}
+	
+	@RequestMapping(value = "create", params = {"name", "intro", "featured", "lang", "imageUrl", "beautifulUrl", "seq"})
 	public @ResponseBody String create(@RequestParam String name,	                                   
 	                                   @RequestParam String intro,
 	                                   @RequestParam boolean featured,
+	                                   @RequestParam String imageUrl,
+	                                   @RequestParam String beautifulUrl,
+	                                   @RequestParam String seq,
 	                                   @RequestParam String lang) {
 		Mso mso = new MsoManager().findNNMso();
 		ChannelSetManager channelSetMngr = new ChannelSetManager();
-		ChannelSet channelSet = new ChannelSet(mso.getKey().getId(), name, intro, true);		
-		channelSet.setDefaultUrl(name); 
-		channelSet.setBeautifulUrl(name);
-		channelSet.setLang(lang);
-		channelSetMngr.create(channelSet);						
+		ChannelSet cs = new ChannelSet(mso.getKey().getId(), name, intro, true);		
+		cs.setDefaultUrl(name); 
+		cs.setBeautifulUrl(name);		
+		if (seq.length() == 0)		
+			cs.setSeq((short)1);
+		else 
+			cs.setSeq(Short.parseShort(seq));
+		cs.setLang(lang);		
+		cs.setBeautifulUrl(beautifulUrl);
+		cs.setImageUrl(imageUrl);
+		channelSetMngr.create(cs);
+		this.addRecCategory(cs);
 		return "OK";		
 	}
 	
 	@RequestMapping("createTest")
-	public ResponseEntity<String> create(@RequestParam(required=false) String name, 			                             
+	public ResponseEntity<String> createTest(@RequestParam(required=false) String name, 			                             
 			                             @RequestParam(required=false) String desc,
 			                             @RequestParam(required=false) String channelIds,
 			                             @RequestParam(required=false) String seqs,
 			                             @RequestParam(required=false) String lang,
+			                             @RequestParam(required=false) String imageUrl,
 			                             @RequestParam(required=false) String categoryIds) {
 		//set info
 		Mso mso = new MsoManager().findNNMso();
@@ -532,6 +629,7 @@ public class AdminSetController {
 			channels.get(i).setSeq(Short.valueOf(seqArr[i]));
 		}
 		channelSet.setLang(lang);
+		channelSet.setImageUrl(imageUrl);
 		channelSetMngr.create(channelSet, channels);						
 		
 		//channelSet ownership
