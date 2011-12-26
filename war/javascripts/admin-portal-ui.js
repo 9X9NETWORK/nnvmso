@@ -1431,7 +1431,7 @@ var page$ = {
         {
           edit:   false,
           add:    true,
-          del:    false,
+          del:    true,
           search: true,
           view:   false,
           addtitle: 'Create A New Category'
@@ -1457,14 +1457,26 @@ var page$ = {
           },
           afterComplete: utils.callbackAfterSubmitForm
         },
-        {
+	    {
+    	      // 'delete' properties
+    	      url:               '/admin/category/delete',
+    	      caption:           'Remove A Category',
+    	      msg:               'Do you want to remove a category?',
+    	      width:             'auto',
+    	      modal:             false,
+    	      jqModal:           true,
+    	      closeOnEscape:     true,
+    	      reloadAfterSubmit: true,
+    	      afterComplete: utils.callbackAfterSubmitForm
+    	},        
+        {	
           // 'search' properties
         },
         {
           closeAfterSearch: true,
           closeAfterReset:  true,
           closeOnEscape:    true
-        });
+        });        
       }
     },
     init: function() {

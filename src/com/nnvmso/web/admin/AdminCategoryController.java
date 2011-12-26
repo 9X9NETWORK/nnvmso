@@ -330,6 +330,7 @@ public class AdminCategoryController {
 	@RequestMapping("delete")
 	public @ResponseBody String delete(
 			@RequestParam(required=true)  Long    id) {
+		System.out.println("------------delete:" + id);
 		Category category = categoryMngr.findById(id);
 		CategoryChannelSetManager ccsMngr = new CategoryChannelSetManager();
 		List<CategoryChannelSet> oldList = ccsMngr.findAllByCategoryId(id);

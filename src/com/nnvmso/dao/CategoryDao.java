@@ -30,10 +30,6 @@ public class CategoryDao extends GenericDao<Category> {
 		return category;
 	}
 
-	public void delete(Category category) {
-		throw new JDOFatalException();
-	}
-
 	//can be duplicated
 	public Category findByName(String name) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
