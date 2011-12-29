@@ -193,7 +193,6 @@ public class AdminCategoryController {
 		CategoryChannelSetManager ccsMngr = new CategoryChannelSetManager();
 		ChannelSetManager csMngr = new ChannelSetManager();
 		List<CategoryChannelSet> list = ccsMngr.findAllByCategoryId(categoryId);
-		System.out.println("size:" + list.size());
 		for (CategoryChannelSet ccs : list) {
 			
 			Map<String, Object> map = new HashMap<String, Object>();
@@ -205,7 +204,7 @@ public class AdminCategoryController {
 				cell.add(set.getName());
 				cell.add(set.isPublic());
 				cell.add(set.getLang());
-				cell.add(set.getChannelCount());
+				cell.add(set.getSeq());
 				map.put("id", set.getKey().getId());
 				map.put("cell", cell);
 				dataRows.add(map);
@@ -287,6 +286,7 @@ public class AdminCategoryController {
 			cell.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(category.getUpdateDate()));
 			//cell.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(category.getCreateDate()));
 			cell.add(category.getLang());
+			cell.add(category.getSeq());
 			cell.add(category.isPublic());
 			cell.add(category.getChannelCount());
 			

@@ -287,19 +287,21 @@ var page$ = {
               width:     60,
               align:     'center',
               sortable:  true,
-              editable:  true,
+              editable:  true
+              /*
               editrules: {
                 minValue: 0,
                 maxValue: 81,
                 required: false,
                 integer:  true
               }
+              */
           },                    
           {	
-              label:     'URL',
+              label:     'Brand URL',
               name:      'beautifulUrl',
               index:     'beautifulUrl',
-              width:     60,
+              width:     80,
               align:     'center',
               sortable:  true,
               editable:  true,
@@ -308,7 +310,7 @@ var page$ = {
               }
           },                    
           {
-              label:    'Updated Time',
+        	  label:    'Updated Time',
               name:     'updateDate',
               index:    'updateDate',
               width:    140,
@@ -1170,6 +1172,17 @@ var page$ = {
                 value: "en:en;zh:zh"
               }
             },
+            /*
+  	        {
+      		    label:    'Seq',
+      		    name:     'seq',
+      		    index:    'seq',
+      		    width:    180,
+      		    align:    'center',
+      		    editable: true,
+      		    sortable: true
+      		  },
+      		  */            
           ],
           datatype:    'json',
           //url:         '/admin/category/channelList?category=' + rowId,
@@ -1373,6 +1386,15 @@ var page$ = {
               value:    'true:false'
             }
           },
+	      {
+  		    label:    'Seq',
+  		    name:     'seq',
+  		    index:    'seq',
+  		    width:    180,
+  		    align:    'center',
+  		    editable: true,
+  		    sortable: true
+  		  },
           {
             label:    'Ch. Count',
             name:     'channelCount',
@@ -1998,93 +2020,150 @@ var page$ = {
     gridSetList: {
       properties: {	
         colModel: [
-          {
-            label:    'Set ID',
-            name:     'setId',
-            index:    'setId',
-            width:    80,
-            align:    'center',
-            sortable: false,
-            editable: false
-          },
-          {
-            label:     'Recommended',
-            name:      'featured',
-            index:     'featured',
-            width:     100,
-            align:     'center',
-            sortable:  true,
-            formatter: 'checkbox',
-            editable:  true,
-            edittype:  'checkbox',
-            editoptions: {
-              value: 'true:false'
-            }
-          },
-          {
-              label:     'Public',
-              name:      'isPublic',
-              index:     'isPublic',
-              width:     100,
-              align:     'center',
-              sortable:  true,
-              formatter: 'checkbox',
-              editable:  true,
-              edittype:  'checkbox',
-              editoptions: {
-                value: 'true:false'
-              }
-          },
-          {
-              label:     'Language',
-              name:      'lang',
-              index:     'lang',
-              width:     90,
-              align:     'center',
-              search:    true,
-              sortable:  true,
-              formatter: 'select',
-              editable:  true,
-              edittype:  'select',
-              editoptions: {
-                value: 'en:en;zh:zh'
-              },
-              searchoptions: {
-                  sopt:  ['eq'],
-                  value: "en:en;zh:zh"
-                }              
-          },          
-          {
-            label:    'Set Name',
-            name:     'name',
-            index:    'name',
-            width:    150,
-            align:    'center',
-            search:   false,
-            sortable: true,
-            editable: true,
-            editrules: {
-              required: true
-            },
-            editoptions: {
-              maxlength: 100
-            }
-          },
-          {
-            label:    'Set Description',
-            name:     'intro',
-            index:    'intro',
-            width:    500,
-            align:    'center',
-            search:   false,
-            sortable: true,
-            //hidden:   false,
-            editable: true,
-            edittype: 'textarea',
-            editoptions: {
-              rows: '3'
-            }
-          },
+                   {
+                       label:    'Set ID',
+                       name:     'setId',
+                       index:    'setId',
+                       width:    80,
+                       align:    'center',
+                       sortable: false,
+                       editable: false
+                     },
+                     {
+                         label:    'Set Name',
+                         name:     'name',
+                         index:    'name',
+                         width:    150,
+                         align:    'center',
+                         search:   false,
+                         sortable: true,
+                         editable: true,
+                         editrules: {
+                           required: true
+                         },
+                         editoptions: {
+                           maxlength: 100
+                         }
+                     },
+                     {
+                         label:    'Set Description',
+                         name:     'intro',
+                         index:    'intro',
+                         width:    280,
+                         align:    'center',
+                         search:   false,
+                         sortable: true,
+                         //hidden:   false,
+                         editable: true,
+                         edittype: 'textarea',
+                         editoptions: {
+                           rows: '3'
+                         }
+                     },
+                     {
+                       label:     'Recommended',
+                       name:      'featured',
+                       index:     'featured',
+                       width:     100,
+                       align:     'center',
+                       sortable:  true,
+                       formatter: 'checkbox',
+                       editable:  true,
+                       edittype:  'checkbox',
+                       editoptions: {
+                         value: 'true:false'
+                       }
+                     },
+                     {
+                         label:     'Public',
+                         name:      'isPublic',
+                         index:     'isPublic',
+                         width:     60,
+                         align:     'center',
+                         sortable:  true,
+                         formatter: 'checkbox',
+                         editable:  true,
+                         edittype:  'checkbox',
+                         editoptions: {
+                           value: 'true:false'
+                         }
+                     },
+                     {
+                         label:     'Language',
+                         name:      'lang',
+                         index:     'lang',
+                         width:     70,
+                         align:     'center',
+                         search:    true,
+                         stype:     'select',
+                         sortable:  true,
+                         formatter: 'select',
+                         editable:  true,
+                         edittype:  'select',
+                         editoptions: {
+                           value: 'en:en;zh:zh'
+                         },
+                         searchoptions: {
+                             sopt:  ['eq'],
+                             value: "en:en;zh:zh"
+                           }              
+                     },  
+                     {	
+                         label:     'Seq(rec)',
+                         name:      'seq',
+                         index:     'seq',
+                         width:     60,
+                         align:     'center',
+                         sortable:  true,
+                         editable:  true
+                         /*
+                         editrules: {
+                           minValue: 0,
+                           maxValue: 81,
+                           required: false,
+                           integer:  true
+                         }
+                         */
+                     },                    
+                     {	
+                         label:     'Brand URL',
+                         name:      'beautifulUrl',
+                         index:     'beautifulUrl',
+                         width:     80,
+                         align:     'center',
+                         sortable:  true,
+                         editable:  true,
+                         editrules: {
+                           required: false
+                         }
+                     },                    
+                     {
+                   	  label:    'Updated Time',
+                         name:     'updateDate',
+                         index:    'updateDate',
+                         width:    140,
+                         align:    'center',
+                         sortable: true,
+                         editable: false,
+                         hidden:   false,
+                         editrules: {
+                           edithidden: true
+                         }
+                     },          
+                     {
+                       label:    'Image',
+                       name:     'imageUrl',
+                       index:    'imageUrl',
+                       width:    150,
+                       align:    'center',
+                       search:   false,
+                       sortable: true,
+                       //hidden:   false,
+                       editable: true,
+                       editoptions: {
+                         rows: '3'
+                       }
+                     },
         ],
         url:         '/admin/set/list?notify=true',
         datatype:    'json',
@@ -2164,51 +2243,217 @@ var page$ = {
     gridChannelList: {
         properties: {	
           colModel: [
-            {
-              label:    'Channel ID',
-              name:     'channelId',
-              index:    'channelId',
-              width:    80,
-              align:    'center',
-              sortable: false,
-              editable: false
-            },
-            {
-              label:    'Channel Name',
-              name:     'name',
-              index:    'name',
-              width:    150,
-              align:    'center',
-              search:   false,
-              sortable: true,
-              editable: true,
-              editrules: {
-                required: true
-              },
-              editoptions: {
-                maxlength: 100
-              }
-            },
-            {
-              label:     'Status',
-              name:      'status',
-              index:     'status',
-              width:     70,
-              align:     'center',
-              search:    true,
-              sortable:  true,
-              stype:     'select',
-              formatter: 'select',
-              editable:  true,
-              edittype:  'select',
-              editoptions: {
-                value: constants.channelStatus
-              },
-              searchoptions: {
-                sopt:  ['eq'],
-                value: constants.channelStatus
-              }
-             },
+                     {
+                         label:    'Channel ID',
+                         name:     'channelId',
+                         index:    'channelId',
+                         width:    80,
+                         align:    'center',
+                         search:   true,
+                         editable: true,
+                         sortable: true,
+                         editoptions: {
+                           disabled: true
+                         },
+                         searchoptions: {
+                           sopt: ['eq']
+                         }
+                       },
+                       {
+                         label:    'Channel Name',
+                         name:     'name',
+                         index:    'name',
+                         width:    150,
+                         align:    'center',
+                         search:   true,
+                         sortable: true,
+                         editable: true,
+                         editoptions: {
+                           maxlength: 100
+                         },
+                         searchoptions: {
+                           sopt: ['eq']
+                         }
+                       },
+                       {
+                         label:    'Source',
+                         name:     'sourceUrl',
+                         index:    'sourceUrl',
+                         width:    380,
+                         align:    'center',
+                         search:   true,
+                         sortable: true,
+                         hidden:   false,
+                         editable: true,
+                         editoptions: {
+                           disabled: false
+                         },
+                         editrules: {
+                           edithidden: true
+                         },
+                         searchoptions: {
+                           sopt: ['eq'],
+                           searchhidden: true
+                         }
+                       },
+                       {
+                         label:     'Status',
+                         name:      'status',
+                         index:     'status',
+                         width:     70,
+                         align:     'center',
+                         search:    true,
+                         sortable:  true,
+                         stype:     'select',
+                         formatter: 'select',
+                         editable:  true,
+                         edittype:  'select',
+                         editoptions: {
+                           value: constants.channelStatus
+                         },
+                         searchoptions: {
+                           sopt:  ['eq'],
+                           value: constants.channelStatus
+                         }
+                       },
+                       {
+                         label:     'Type',
+                         name:      'contentType',
+                         index:     'contentType',
+                         width:     90,
+                         align:     'center',
+                         search:    true,
+                         stype:     'select',
+                         sortable:  true,
+                         formatter: 'select',
+                         editable:  false,
+                         edittype:  'select',
+                         editoptions: {
+                           disabled: true,
+                           value:    constants.channelContentType
+                         },
+                         searchoptions: {
+                           sopt:  ['eq'],
+                           value: constants.channelContentType
+                         }
+                       },
+                       {
+                         label:     'Language',
+                         name:      'langCode',
+                         index:     'langCode',
+                         width:     70,
+                         hidden:    true,
+                         align:     'center',
+                         search:    true,
+                         stype:     'select',
+                         sortable:  true,
+                         formatter: 'select',
+                         editable:  true,
+                         edittype:  'select',
+                         editoptions: {
+                           disabled: false,
+                           value:    "en:en;zh:zh"
+                         },
+                         searchoptions: {
+                           sopt:  ['eq'],
+                           value: "en:en;zh:zh"
+                         }
+                       },
+                       {
+                         label:     'Public',
+                         name:      'isPublic',
+                         index:     'isPublic',
+                         width:     70,
+                         align:     'center',
+                         search:    true,
+                         stype:     'select',
+                         sortable:  true,
+                         formatter: 'checkbox',
+                         editable:  true,
+                         edittype:  'checkbox',
+                         editoptions: {
+                           value: 'true:false'
+                         },
+                         searchoptions: {
+                           sopt:  ['eq'],
+                           value: {
+                             'true':  'true',
+                             'false': 'false'
+                           }
+                         }
+                       },
+                       {
+                         label:     'Piwik',
+                         name:      'piwik',
+                         index:     'piwik',
+                         width:     70,
+                         align:     'center',
+                         sortable:  true,
+                         editable:  false,
+                         editoptions: {
+                           disabled: true
+                         }
+                       },
+                       {
+                         label:    'Image',
+                         name:     'imageUrl',
+                         index:    'imageUrl',
+                         width:    50,
+                         align:    'center',
+                         sortable: false,
+                         hidden:   false,
+                         search:   false,
+                         editable: false,
+                         editoptions: {
+                           disabled: true
+                         },
+                         editrules: {
+                           edithidden: true
+                         }
+                       },
+                       {
+                           label:    'Updated Time',
+                           name:     'updateDate',
+                           index:    'updateDate',
+                           width:    140,
+                           align:    'center',
+                           sortable: true,
+                           editable: false,
+                           hidden:   false,
+                           editrules: {
+                             edithidden: true
+                           }
+                       },                    
+                       {
+                         label:    'Ep. Count',
+                         name:     'programCount',
+                         index:    'programCount',
+                         width:    90,
+                         align:    'center',
+                         search:   false,
+                         sortable: true,
+                         hidden:   false,
+                         editable: false,
+                         editrules: {
+                           integer:    true,
+                           edithidden: true
+                         }
+                       },
+                       {
+                         label:    'Sub. Count',
+                         name:     'subscriptionCount',
+                         index:    'subscriptionCount',
+                         width:    80,
+                         align:    'center',
+                         search:   false,
+                         sortable: false,
+                         hidden:   false,
+                         editable: false,
+                         editrules: {
+                           integer:    true,
+                           edithidden: true
+                         }
+                       },                     
           ],
           url:         '/admin/channel/list?notify=true',
           datatype:    'json',
@@ -2229,7 +2474,7 @@ var page$ = {
             //var logoUrl = $(this).jqGrid('getCell', rowId, 'logoUrl');
             //$(this).jqGrid('setColProp', 'logoUrl', {editoptions: {src: logoUrl}});
             $(this).jqGrid('editGridRow', rowId, {
-              url:               '/admin/channel/edit',
+              url:               '/admin/channel/modify',
               caption:           'Edit Channel Meta',
               width:             'auto',
               top:               $(window).scrollTop() + 50, // $(this).offset().top - 50,
@@ -2619,6 +2864,12 @@ var page$ = {
     page$.tabSetManagement.init(); 
     page$.tabNewsManagement.init();
     page$.tabUserManagement.init();
+    
+    //$.jqGrid('gridDnD'), {connectWith:'page$.tabChannelManagement.gridChannelList'}
+    
+    //page$.tabChannelManagement.gridChannelList.properties
+
+    //jQuery("#grid2").jqGrid('gridDnD',{connectWith:'#grid1'});
   }
 };
 

@@ -304,7 +304,7 @@ public class AdminMsoChannelController {
 			if (notify) {
 				qualified = false;
 				Calendar cal = Calendar.getInstance();		
-				cal.add(Calendar.DAY_OF_MONTH, - 14);
+				cal.add(Calendar.DAY_OF_MONTH, - 100);
 				Date d = cal.getTime();
 				if (channel.getCreateDate().after(d)) {
 					if (channel.getStatus() != MsoChannel.STATUS_SUCCESS) {
@@ -519,6 +519,7 @@ public class AdminMsoChannelController {
 	
 	@RequestMapping("modify")
 	public @ResponseBody String modify(@RequestParam(required=true)  Long    id,
+			                           @RequestParam(required=true)  Long    channelId,
 	                                   @RequestParam(required=false) String  name,
 	                                   @RequestParam(required=false) String  intro,
 	                                   @RequestParam(required=false) String  imageUrl,
@@ -528,9 +529,7 @@ public class AdminMsoChannelController {
 	                                   @RequestParam(required=false) Boolean featured,
 	                                   @RequestParam(required=false) Integer programCount) {
 		
-		logger.info("admin = " + userService.getCurrentUser().getEmail());
-		
-		logger.info("channelId = " + id);
+		logger.info("admin = " + userService.getCurrentUser().getEmail());		
 		MsoChannel channel = channelMngr.findById(id);
 		if (channel == null)
 			return "Channel Not Found";
