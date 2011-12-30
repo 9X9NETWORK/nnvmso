@@ -2217,7 +2217,7 @@ var page$ = {
         {
             edit:   true,
             add:    false,
-            del:    true,
+            del:    false,
             search: true,
             view:   false        	
         },
@@ -2511,7 +2511,7 @@ var page$ = {
           {
               edit:   true,
               add:    false,
-              del:    true,
+              del:    false,
               search: true,
               view:   false        	
           },

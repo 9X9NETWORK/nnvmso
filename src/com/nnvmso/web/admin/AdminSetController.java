@@ -481,6 +481,9 @@ public class AdminSetController {
 		List<ChannelSetChannel> list = cscMngr.findByChannelSetId(cs.getKey().getId());
 		cscMngr.deleteAll(list);		
 		csMngr.delete(cs);		
+		CategoryChannelSetManager ccsMngr = new CategoryChannelSetManager();
+		List<CategoryChannelSet> list2 = ccsMngr.findAllBySetId(id);
+		ccsMngr.deleteAll(list2);
 		return "OK";
 	}
 
@@ -491,6 +494,7 @@ public class AdminSetController {
             @RequestParam(required=false) String desc,
             @RequestParam(required=false) String lang,
             @RequestParam(required=false) String imageUrl,
+            @RequestParam(required=false) String beautifulUrl,
             @RequestParam(required=false) String isPublic,
             @RequestParam(required=false) String featured,
             @RequestParam(required=false) String channelIds,
@@ -507,6 +511,8 @@ public class AdminSetController {
 			cs.setFeatured(Boolean.parseBoolean(featured));
 		if (imageUrl != null)
 			cs.setImageUrl(imageUrl);
+		if (beautifulUrl != null)
+			cs.setBeautifulUrl(beautifulUrl);
 		cs.setLang(lang);
 		if (seq != null) {
 			System.out.println("seqs:" + seq);
