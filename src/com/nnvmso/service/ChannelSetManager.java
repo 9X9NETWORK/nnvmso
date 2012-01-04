@@ -48,6 +48,10 @@ public class ChannelSetManager {
 		return channelSetDao.findByBeautifulUrl(url);
 	}
 
+	public ChannelSet findByLangAndSeq(String lang, String seq) {
+		return channelSetDao.findByLangAndSeq(lang, Short.parseShort(seq));
+	}
+	
 	public ChannelSet findBybeautifulUrl(String url) {
 		return channelSetDao.findByBeautifulUrl(url);
 	}

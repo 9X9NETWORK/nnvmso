@@ -34,6 +34,27 @@ public class ChannelSetDao extends GenericDao<ChannelSet> {
 		}
 		return detached;
 	}	
+
+	public ChannelSet findByLangAndSeq(String lang, short seq) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		ChannelSet detached = null;
+		
+		try {
+			Query query = pm.newQuery(ChannelSet.class);
+			query.setFilter("lang == langParam && seq == seqParam");
+			query.declareParameters("String langParam, int seqParam");
+			@SuppressWarnings("unchecked")
+			List<ChannelSet> channelSets = (List<ChannelSet>) query.execute(lang, seq);
+			if (channelSets.size() > 0) {
+				detached = pm.detachCopy(channelSets.get(0));
+			}
+		} catch (JDOObjectNotFoundException e) {
+		} finally {
+			pm.close();
+		}
+		
+		return detached;		
+	}
 	
 	public ChannelSet findById(long id) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();		

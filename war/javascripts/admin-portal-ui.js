@@ -296,7 +296,7 @@ var page$ = {
                 integer:  true
               }
               */
-          },                    
+          },
           {	
               label:     'Brand URL',
               name:      'beautifulUrl',

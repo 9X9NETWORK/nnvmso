@@ -317,7 +317,7 @@ public class AdminSetController {
 			if (notify) {
 				qualified = false;
 				Calendar cal = Calendar.getInstance();		
-				cal.add(Calendar.DAY_OF_MONTH, - 100);
+				cal.add(Calendar.DAY_OF_MONTH, - 14);
 				Date d = cal.getTime();
 				if (cs.getCreateDate().after(d)) {
 					if (!cs.isPublic()) {
@@ -411,27 +411,29 @@ public class AdminSetController {
 		return "OK";		
 	}
 	
-	private void adjustSeq(ChannelSet set) {
+	//seq, desired seq
+	private void adjustSeq(ChannelSet set, String seq) {		
 		ChannelSetManager csMngr = new ChannelSetManager();
-		if (set.isFeatured()) {
-			List<ChannelSet> list = new ArrayList<ChannelSet>();
-			if (set.getLang().equals("en")) {
-				list.addAll(csMngr.findFeaturedSets(LangTable.LANG_EN));				
-			}
-			if (set.getLang().equals("zh")) {
-				list.addAll(csMngr.findFeaturedSets(LangTable.LANG_ZH));
-			}
-			//old becomes new, new becomes old
-			List<ChannelSet> change = new ArrayList<ChannelSet>();
-			for (ChannelSet cs : list) {
-				if (set.getSeq() >= cs.getSeq()) {
-					int seq = cs.getSeq() + 1; 
-					cs.setSeq((short)seq);
-					change.add(cs);
-				}
-			}
-			csMngr.saveAll(change);
+		if (!set.isFeatured()) {
+			set.setSeq((short)0);
+			csMngr.save(set);
+			return;
 		}
+		System.out.println("original:" + set.getSeq());
+		System.out.println("new destination:" + seq);
+			
+		//swap
+		ChannelSet toBeSwapped = csMngr.findByLangAndSeq(set.getLang(), seq);
+		if (toBeSwapped != null) {			
+			toBeSwapped.setSeq(set.getSeq());
+			set.setSeq(Short.parseShort(seq));
+			csMngr.save(set);
+			csMngr.save(toBeSwapped);
+		} else {
+			set.setSeq(Short.parseShort(seq));
+			csMngr.save(set);
+		}
+		
 	}
 	
 	@RequestMapping(value = "listCh", params = {"page", "rows", "sidx", "sord", "set"})
@@ -515,10 +517,13 @@ public class AdminSetController {
 			cs.setBeautifulUrl(beautifulUrl);
 		cs.setLang(lang);
 		if (seq != null) {
+			/*
 			System.out.println("seqs:" + seq);
 			cs.setSeq(Short.parseShort(seq));
-		}
+			*/
+		}		
 		csMngr.save(cs);
+		this.adjustSeq(cs, seq);
 		this.addRecCategory(cs);
 
 		if (channelIds == null) 
@@ -539,9 +544,7 @@ public class AdminSetController {
 		cscMngr.saveAll(list);
 		
 		CategoryManager catMngr = new CategoryManager();
-		CategoryChannelSetManager ccsMngr = new CategoryChannelSetManager();
-		
-		//yiwen news -> recommended sets -> 灣區新聞 set.
+		CategoryChannelSetManager ccsMngr = new CategoryChannelSetManager();		
 		
 		if (cs.getLang().equals("zh") && cs.getName().equals("綜合推薦")) {
 			Category cat = catMngr.findByName("推薦頻道");
@@ -567,8 +570,7 @@ public class AdminSetController {
 				}
 			}				
 		}
-		this.adjustSeq(cs);
-		
+		this.adjustSeq(cs, seq);		
 		return "OK";
 	}
 	
@@ -624,19 +626,13 @@ public class AdminSetController {
 		ChannelSet cs = new ChannelSet(mso.getKey().getId(), name, intro, true);		
 		cs.setDefaultUrl(name); 
 		cs.setBeautifulUrl(name);
-		String[] seqs = seq.split(",");
-		System.out.println("length=" + seqs.length);
-		if (seq.length() == 0)
-			cs.setSeq((short)1);
-		else 
-			cs.setSeq(Short.parseShort(seq));
 		cs.setLang(lang);		
 		cs.setBeautifulUrl(beautifulUrl);
 		cs.setImageUrl(imageUrl);
 		cs.setFeatured(featured);
 		channelSetMngr.create(cs);
 		this.addRecCategory(cs);
-		//this.adjustSeq(cs);
+		this.adjustSeq(cs, seq);
 		return "OK";		
 	}
 	

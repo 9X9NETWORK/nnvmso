@@ -119,9 +119,10 @@ public class PlayerApiService {
 		result[1] += assembleKeyValue("piwik", cs.getPiwik());
 		//4rd block, channel info		
 		for (MsoChannel c : channels) {
-			//if (c.getStatus() == MsoChannel.STATUS_SUCCESS && c.isPublic()) {
+			if (c.getStatus() == MsoChannel.STATUS_SUCCESS && c.isPublic()) {
+				c.setSorting(MsoChannelManager.getDefaultSorting(c));
 				result[2] += this.composeChannelLineupStr(c, csMso) + "\n";	
-			//}
+			}
 		}		
 		return this.assembleMsgs(NnStatusCode.SUCCESS, result);
 	}	
@@ -1405,8 +1406,10 @@ public class PlayerApiService {
 			}
 			List<MsoChannel> channels = csMngr.findChannelsById(csId);			
 			for (MsoChannel c : channels) {
-				if (c.getStatus() == MsoChannel.STATUS_SUCCESS && c.isPublic())
+				if (c.getStatus() == MsoChannel.STATUS_SUCCESS && c.isPublic()) {
+					c.setSorting(MsoChannelManager.getDefaultSorting(c));
 					result[2] += this.composeChannelLineupStr(c, mso) + "\n";
+				}
 			}
 			return this.assembleMsgs(NnStatusCode.SUCCESS, result);
 		}

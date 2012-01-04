@@ -497,5 +497,51 @@ public class AdminInitController {
 		this.sendEmail("init all the 9x9 channels piwik done", "done");
 		return NnNetUtil.textReturn("OK");		
 	}
+
+	@RequestMapping("initSetPublicToTask")
+	public ResponseEntity<String> initSetPublicToTask(
+			@RequestParam(value="isEnglish",required=false) boolean isEnglish,
+			@RequestParam(value="isDevel",required=false) boolean isDevel) {
+		QueueFactory.getDefaultQueue().add(
+			      TaskOptions.Builder.withUrl("/admin/init/initSetPublic")
+			         .param("isEnglish", String.valueOf(isEnglish))
+			         .param("isDevel", String.valueOf(isDevel))			      			      
+		);			          
+		return NnNetUtil.textReturn("You will receive an email when it is done.");
+	}
+
+	@RequestMapping("initSetPublic")
+	public ResponseEntity<String> initSetPublic(
+			@RequestParam(value="isEnglish",required=false) boolean isEnglish,
+			@RequestParam(value="isDevel",required=false) boolean isDevel,			
+			HttpServletRequest req) {
+		initService.setRequest(req);
+		initService.initSetPublic(isEnglish, isDevel);
+		this.sendEmail("init all set to public", "done");
+		return NnNetUtil.textReturn("OK");		
+	}
+
+	@RequestMapping("initSetChannelPublicToTask")
+	public ResponseEntity<String> initSetChannelPublicToTask(
+			@RequestParam(value="isEnglish",required=false) boolean isEnglish,
+			@RequestParam(value="isDevel",required=false) boolean isDevel) {
+		QueueFactory.getDefaultQueue().add(
+			      TaskOptions.Builder.withUrl("/admin/init/initSetChannelPublic")
+			         .param("isEnglish", String.valueOf(isEnglish))
+			         .param("isDevel", String.valueOf(isDevel))			      			      
+		);			          
+		return NnNetUtil.textReturn("You will receive an email when it is done.");
+	}
+
+	@RequestMapping("initSetChannelPublic")
+	public ResponseEntity<String> initSetChannelPublic(
+			@RequestParam(value="isEnglish",required=false) boolean isEnglish,
+			@RequestParam(value="isDevel",required=false) boolean isDevel,			
+			HttpServletRequest req) {
+		initService.setRequest(req);
+		initService.initSetChannelPublic(isEnglish, isDevel);
+		this.sendEmail("init all set channels to public and success", "done");
+		return NnNetUtil.textReturn("OK");		
+	}	
 	
 }

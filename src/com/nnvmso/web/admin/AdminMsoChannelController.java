@@ -304,7 +304,7 @@ public class AdminMsoChannelController {
 			if (notify) {
 				qualified = false;
 				Calendar cal = Calendar.getInstance();		
-				cal.add(Calendar.DAY_OF_MONTH, - 100);
+				cal.add(Calendar.DAY_OF_MONTH, - 14);
 				Date d = cal.getTime();
 				if (channel.getCreateDate().after(d)) {
 					if (channel.getStatus() != MsoChannel.STATUS_SUCCESS) {

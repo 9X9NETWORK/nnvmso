@@ -23,6 +23,7 @@ import com.nnvmso.lib.SearchJanitorUtils;
 import com.nnvmso.lib.YouTubeLib;
 import com.nnvmso.model.Category;
 import com.nnvmso.model.CategoryChannel;
+import com.nnvmso.model.ChannelSet;
 import com.nnvmso.model.ContentOwnership;
 import com.nnvmso.model.LangTable;
 import com.nnvmso.model.Mso;
@@ -150,9 +151,11 @@ public class MsoChannelManager {
 		this.create(channel);
 		//create CategoryChannel
 		CategoryChannelManager ccMngr = new CategoryChannelManager();
+		/*
 		for (Category c : categories) {
 			ccMngr.create(new CategoryChannel(c.getKey().getId(), channel.getKey().getId()));
-		}		
+		}
+		*/		
 		//set category channelCount if necessary
 		CategoryManager categoryMngr = new CategoryManager();
 		if (this.isCounterQualified(channel)) {
@@ -608,6 +611,10 @@ public class MsoChannelManager {
 	}   
 	public List<MsoChannel> findChannelsByType(short type) {
 		return msoChannelDao.findChannelsByType(type);		
+	}
+
+	public void saveAll(List<MsoChannel> channels) {
+		msoChannelDao.saveAll(channels);
 	}
 	
 	public static List<MsoChannel> searchChannelEntries(String queryString) {

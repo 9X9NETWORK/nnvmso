@@ -946,5 +946,45 @@ public class InitService {
 		return list.toArray(new String[0]);
 		//return ;		
 	}
+
+	public void initSetPublic(boolean english, boolean devel) {
+		ChannelSetManager csMngr = new ChannelSetManager();
+		List<ChannelSet> list = csMngr.findAll();
+		for (ChannelSet cs : list) {
+			cs.setPublic(true);			
+		}
+		csMngr.saveAll(list);
+	}
+
+	public void initSetChannelPublic(boolean english, boolean devel) {
+		ChannelSetManager csMngr = new ChannelSetManager();
+		MsoChannelManager cMngr = new MsoChannelManager();
+		String lang = "en";
+		if (!english) {
+			lang = "zh";
+			log.info("change set channel status zh");
+		} else {
+			log.info("change set channel status en");
+		}
+		List<ChannelSet> list = csMngr.findAllByLang(lang);
+		List<MsoChannel> toBeChanged = new ArrayList<MsoChannel>();		
+		for (ChannelSet cs : list) {
+			List<MsoChannel> channels = csMngr.findChannelsById(cs.getKey().getId());
+			int cnt = 0;
+			for (MsoChannel c : channels) {
+				if (c.getStatus() == MsoChannel.STATUS_WAIT_FOR_APPROVAL || !c.isPublic()) {
+					c.setStatus(MsoChannel.STATUS_SUCCESS);
+					c.setPublic(true);
+					toBeChanged.add(c);
+				}
+				if (c.getStatus() == MsoChannel.STATUS_SUCCESS && c.isPublic()) {
+					cnt++;
+				}
+			}
+			cMngr.saveAll(toBeChanged);
+			cs.setChannelCount(cnt);			
+		}
+		csMngr.saveAll(list);
+	}
 	
 }
