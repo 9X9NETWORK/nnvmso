@@ -858,6 +858,9 @@ public class CmsApiController {
 			channel.setName(name);
 		if (intro != null)
 			channel.setIntro(intro);
+		if (msoId != null) { // first time the channel be saved
+			channel.setPublic(true);
+		}
 		channel.setUpdateDate(new Date());
 		channelMngr.save(channel);
 		
