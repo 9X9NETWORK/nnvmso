@@ -686,7 +686,7 @@ public class PlayerApiService {
 		if (user == null) {return NnStatusMsg.userInvalid(locale);}
 		SubscriptionManager subMngr = new SubscriptionManager();
 		
-		String result = NnStatusMsg.successStr(locale);		
+		String result = NnStatusMsg.successStr(locale) + separatorStr;		
 		if (channelId != null) {
 			String[] chArr = channelId.split(",");
 			if (chArr.length == 1) {
@@ -696,11 +696,19 @@ public class PlayerApiService {
 					s = subMngr.findByUserIdAndChannelId(user.getKey().getId(), Long.parseLong(channelId));
 				} else {
 					s = subMngr.findChannelSubscription(user.getKey().getId(), Long.parseLong(channelId), Integer.parseInt(grid));
-				}			
-				if (s == null || (s != null && s.getType() == MsoIpg.TYPE_READONLY)) {
+				}
+				/*
+				if (s == null || (s != null && s.getType() == MsoIpg.TYPE_READONLY)) {					
 					return messageSource.getMessage("nnstatus.subscription_ro_channel", new Object[] {NnStatusCode.SUBSCRIPTION_ERROR} , locale);			
 				}
+				*/
 				subMngr.unsubscribeChannel(s);
+				
+				NnUserWatchedManager watchedMngr = new NnUserWatchedManager();
+				NnUserWatched watched = watchedMngr.findByUserIdAndChannelId(user.getKey().getId(), Long.parseLong(channelId));
+				if (watched != null) {
+					watchedMngr.delete(watched);
+				}				
 				result += channelId + "\t" + messageSource.getMessage("nnstatus.success", new Object[] {NnStatusCode.SUCCESS} , locale); 
 			} else {
 				log.info("unsubscribe multiple channels");
@@ -711,15 +719,22 @@ public class PlayerApiService {
 				List<Integer> gridlist = new ArrayList<Integer>();
 				for (int i=0; i<chArr.length; i++) { chlist.add(Long.valueOf(chArr[i]));}
 				for (int i=0; i<gridArr.length; i++) { gridlist.add(Integer.valueOf(gridArr[i]));}
-				result = result + separatorStr;
+				NnUserWatchedManager watchedMngr = new NnUserWatchedManager();
 				for (int i=0; i<chlist.size(); i++) {
 					Subscription s = subMngr.findChannelSubscription(user.getKey().getId(), chlist.get(i), gridlist.get(i));
+					/*
 					if (s == null || (s != null && s.getType() == MsoIpg.TYPE_READONLY)) {
 						 result = result + chlist.get(i) + "\t" + messageSource.getMessage("nnstatus.subscription_ro_channel", new Object[] {NnStatusCode.SUBSCRIPTION_ERROR} , locale);
 					} else {
-						subMngr.unsubscribeChannel(s);
-						result = result + chlist.get(i) + "\t" + messageSource.getMessage("nnstatus.success", new Object[] {NnStatusCode.SUCCESS} , locale);
 					}
+					*/
+					subMngr.unsubscribeChannel(s);
+					NnUserWatched watched = watchedMngr.findByUserIdAndChannelId(user.getKey().getId(), chlist.get(i));
+					if (watched != null) {
+						watchedMngr.delete(watched);
+					}						
+					result = result + chlist.get(i) + "\t" + messageSource.getMessage("nnstatus.success", new Object[] {NnStatusCode.SUCCESS} , locale);
+
 				}
 			}
 		}

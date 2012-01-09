@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.nnvmso.dao.NnUserWatchedDao;
+import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.NnUserWatched;
 
 public class NnUserWatchedManager {
@@ -31,6 +32,10 @@ public class NnUserWatchedManager {
 	
 	public List<NnUserWatched> findAllByUserToken(String token) {
 		return watchedDao.findAllByUserToken(token);
+	}
+	
+	public void delete(NnUserWatched watched) {
+		watchedDao.delete(watched);
 	}
 
 }
