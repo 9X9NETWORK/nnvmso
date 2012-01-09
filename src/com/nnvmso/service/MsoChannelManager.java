@@ -184,7 +184,6 @@ public class MsoChannelManager {
 		channel.setUpdateDate(new Date());
 		if (channel.getStatus() == MsoChannel.STATUS_SUCCESS)
 			MsoChannelManager.updateFTSStuffForMsoChannel(channel);
-		
 		channel = msoChannelDao.save(channel);
 		//save to cache
 		Cache cache = CacheFactory.get();		

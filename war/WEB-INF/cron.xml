@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <cronentries>
+<?xml version="1.0" encoding="UTF-8"?>
   <cron>
-    <url>/task/calibration/categoryChannelCount</url>    
-    <description>Category Channel Count Calibration</description>
+    <url>/task/calibration/setChannelsToTask</url>    
+    <description>Set Channel Count Calibration</description>
     <schedule>every day 09:00</schedule>
   </cron>            
 </cronentries>

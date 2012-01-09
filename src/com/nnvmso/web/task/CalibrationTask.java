@@ -1,6 +1,7 @@
 package com.nnvmso.web.task;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -9,12 +10,15 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
 import com.nnvmso.lib.NnNetUtil;
+import com.nnvmso.model.ChannelSet;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoProgram;
+import com.nnvmso.service.ChannelSetManager;
 import com.nnvmso.service.MsoChannelManager;
 import com.nnvmso.service.MsoProgramManager;
 
@@ -26,6 +30,51 @@ import com.nnvmso.service.MsoProgramManager;
 @RequestMapping("task/calibration")
 public class CalibrationTask {
 	protected static final Logger log = Logger.getLogger(CalibrationTask.class.getName());
+	
+	@RequestMapping("setChannelsToTask")
+	public ResponseEntity<String> initSetChannelPublicToTask() {
+		QueueFactory.getDefaultQueue().add(
+			      TaskOptions.Builder.withUrl("/task/calibration/setChannels")
+			         .param("isEnglish", String.valueOf(true))
+			         .param("isDevel", String.valueOf(false))			      			      
+		);			          
+		QueueFactory.getDefaultQueue().add(
+			      TaskOptions.Builder.withUrl("/task/calibration/setChannels")
+			         .param("isEnglish", String.valueOf(false))
+			         .param("isDevel", String.valueOf(false))			      			      
+		);			          
+		return NnNetUtil.textReturn("You will receive an email when it is done.");
+	}
+
+	@RequestMapping("setChannels")
+	public ResponseEntity<String> initSetChannelPublic(
+			@RequestParam(value="isEnglish",required=false) boolean isEnglish,
+			@RequestParam(value="isDevel",required=false) boolean isDevel,			
+			HttpServletRequest req) {
+		ChannelSetManager csMngr = new ChannelSetManager();	
+		String lang = "en";
+		if (!isEnglish) {
+			lang = "zh";
+			log.info("change set channel status zh");
+		} else {
+			log.info("change set channel status en");
+		}
+		List<ChannelSet> list = csMngr.findAllByLang(lang);		
+		for (ChannelSet cs : list) {
+			List<MsoChannel> channels = csMngr.findChannelsById(cs.getKey().getId());
+			int cnt = 0;
+			for (MsoChannel c : channels) {
+				if (c.getStatus() == MsoChannel.STATUS_SUCCESS && c.isPublic()) {
+					cnt++;
+				}
+			}
+			cs.setChannelCount(cnt);			
+		}
+		csMngr.saveAll(list);
+		return NnNetUtil.textReturn("OK");		
+	}	
+	
+	
 	
 	//entry, correct channel's programCount: channelCount -> runChannels -> runPrograms
 	/*
@@ -64,6 +113,7 @@ public class CalibrationTask {
 	}
 	*/
 
+	/*
 	@RequestMapping(value="runPrograms")
 	public ResponseEntity<String> runPrograms(HttpServletRequest req) {
 		int channelId = Integer.parseInt(req.getParameter("channel"));
@@ -78,6 +128,7 @@ public class CalibrationTask {
 		channelMngr.save(channel);
 		return NnNetUtil.textReturn(output);
 	}
+	*/
 
 	//entry, remove programs more than 50, programsRemoveEntry->programRemoveChannels->programsRemove
 	/*
