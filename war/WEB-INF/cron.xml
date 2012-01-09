@@ -1,5 +1,5 @@
-<cronentries>
 <?xml version="1.0" encoding="UTF-8"?>
+<cronentries>
   <cron>
     <url>/task/calibration/setChannelsToTask</url>    
     <description>Set Channel Count Calibration</description>
