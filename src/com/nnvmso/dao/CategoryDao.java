@@ -12,6 +12,7 @@ import com.google.appengine.api.datastore.Key;
 import com.nnvmso.lib.NnStringUtil;
 import com.nnvmso.lib.PMF;
 import com.nnvmso.model.Category;
+import com.nnvmso.model.ChannelSet;
 
 public class CategoryDao extends GenericDao<Category> {
 	
@@ -96,6 +97,26 @@ public class CategoryDao extends GenericDao<Category> {
 		return detached;		
 	}
 	
+	public Category findByLangAndSeq(String lang, short seq) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		Category detached = null;		
+		try {
+			Query query = pm.newQuery(Category.class);
+			query.setFilter("lang == langParam && seq == seqParam");
+			query.declareParameters("String langParam, int seqParam");
+			@SuppressWarnings("unchecked")
+			List<Category> categories = (List<Category>) query.execute(lang, seq);
+			if (categories.size() > 0) {
+				detached = pm.detachCopy(categories.get(0));
+			}
+		} catch (JDOObjectNotFoundException e) {
+		} finally {
+			pm.close();
+		}
+		
+		return detached;		
+	}
+		
 	public List<Category> findByParentId(long id) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		List<Category> detached = new ArrayList<Category>();

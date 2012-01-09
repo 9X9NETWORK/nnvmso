@@ -286,8 +286,8 @@ public class AdminCategoryController {
 			cell.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(category.getUpdateDate()));
 			//cell.add(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(category.getCreateDate()));
 			cell.add(category.getLang());
-			cell.add(category.getSeq());
 			cell.add(category.isPublic());
+			cell.add(category.getSeq());
 			cell.add(category.getChannelCount());
 			
 			map.put("id", category.getKey().getId());
@@ -305,13 +305,15 @@ public class AdminCategoryController {
 	@RequestMapping("create") 	
 	public @ResponseBody String create(@RequestParam(required=true) String name,
 									   @RequestParam(required=true) String lang,
+									   @RequestParam String seq,
 									   @RequestParam(required=false) String isPublic) {
 	                                   //@RequestParam(required=true) String setIds
 		//System.out.println("hit category create");
 		Category category = new Category(name);
 		category.setLang(lang);
 		category.setPublic(Boolean.parseBoolean(isPublic));
-		categoryMngr.create(category);		
+		categoryMngr.create(category);
+		this.adjustSeq(category, seq);
 		/*
 		ChannelSetManager csMngr = new ChannelSetManager();
 		CategoryChannelSetManager ccsMngr = new CategoryChannelSetManager();
@@ -339,14 +341,30 @@ public class AdminCategoryController {
 		return "OK";
 	}
 
+	private void adjustSeq(Category category, String seq) {				
+		//swap
+		Category toBeSwapped = categoryMngr.findByLangAndSeq(category.getLang(), seq);
+		if (toBeSwapped != null) {			
+			toBeSwapped.setSeq(category.getSeq());
+			category.setSeq(Short.parseShort(seq));
+			categoryMngr.save(category);
+			categoryMngr.save(toBeSwapped);
+		} else {
+			category.setSeq(Short.parseShort(seq));
+			categoryMngr.save(category);
+		}
+	}
+	
 	@RequestMapping("edit")
 	public @ResponseBody String edit(
 			@RequestParam(required=true)  Long    id,
 			@RequestParam(required=false) String  name,			
 	        @RequestParam(required=false) Boolean isPublic,
+	        @RequestParam(required=false) String  seq,
 	        @RequestParam(required=false) String  lang) {
 	        //@RequestParam(required=false) String setIds		
 		
+		System.out.println("seq:" + seq);
 		logger.info("admin = " + userService.getCurrentUser().getEmail());		
 		Category category = categoryMngr.findById(id);
 		if (category == null) {
@@ -382,9 +400,9 @@ public class AdminCategoryController {
 		if (lang != null) {
 			logger.info("lang = " + lang);
 			category.setLang(lang);
-		}
-		
+		}		
 		categoryMngr.save(category);
+		this.adjustSeq(category, seq);
 		return "OK";
 	}
 	

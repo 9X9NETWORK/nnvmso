@@ -19,6 +19,7 @@ import com.nnvmso.dao.CategoryDao;
 import com.nnvmso.lib.CacheFactory;
 import com.nnvmso.model.Category;
 import com.nnvmso.model.CategoryChannel;
+import com.nnvmso.model.ChannelSet;
 import com.nnvmso.model.MsoChannel;
 
 @Service
@@ -48,6 +49,10 @@ public class CategoryManager {
 		category = categoryDao.save(category);
 		this.cacheRefresh(category);
 		return category;
+	}
+	
+	public Category findByLangAndSeq(String lang, String seq) {
+		return categoryDao.findByLangAndSeq(lang, Short.parseShort(seq));
 	}
 	
 	public List<Category> findCategoriesByChannelId(long channelId) {
