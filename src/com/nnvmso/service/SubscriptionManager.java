@@ -86,16 +86,16 @@ public class SubscriptionManager {
 	}
 
 	//move from seq1 to seq2
-	public boolean moveSeq(long userId, int seq1, int seq2) {						
+	public int moveSeq(long userId, int seq1, int seq2) {						
 		Subscription sub = subDao.findByUserIdAndSeq(userId, seq1);
-		if (sub == null) {return false;}
+		if (sub == null) {return NnStatusCode.SUBSCRIPTION_ERROR;}
 
 		Subscription target = subDao.findByUserIdAndSeq(userId, seq2);
-		if (target != null) { return false; }
+		if (target != null) { return NnStatusCode.SUBSCRIPTION_POS_OCCUPIED; }
 		
 		sub.setSeq(seq2);
 		subDao.save(sub);
-		return true;
+		return NnStatusCode.SUCCESS;
 	}
 	
 	public boolean copyChannel(long userId, long channelId, short seq) {

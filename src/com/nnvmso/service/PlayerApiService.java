@@ -490,11 +490,14 @@ public class PlayerApiService {
 		if (user == null) { return messageSource.getMessage("nnstatus.user_invalid", new Object[] {NnStatusCode.USER_INVALID} , locale); }
 		
 		SubscriptionManager subMngr = new SubscriptionManager();
-		boolean success = subMngr.moveSeq(user.getKey().getId(), Integer.parseInt(grid1), Integer.parseInt(grid2));
+		int status = subMngr.moveSeq(user.getKey().getId(), Integer.parseInt(grid1), Integer.parseInt(grid2));
+		return this.assembleMsgs(status, null);
+		/*
 		String result = NnStatusMsg.successStr(locale);
-		if (!success) 
+		if (status) 
 			result = messageSource.getMessage("nnstatus.subscription_error", new Object[] {NnStatusCode.SUBSCRIPTION_ERROR} , locale);
 		return result;
+			*/
 	}
 
 	public String copyChannel(String userToken, String channelId, String grid) {		

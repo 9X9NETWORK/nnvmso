@@ -473,7 +473,7 @@ public class PlayerApiController {
 			@RequestParam(value="grid", required=false) String gridId, 
 			@RequestParam(value="pos", required=false) String pos,
 			HttpServletRequest req,
-			HttpServletResponse resp) {		
+			HttpServletResponse resp) {
 		log.info("subscribe: userToken=" + userToken+ "; channel=" + channelId + "; grid=" + gridId + "; set=" + setId + ";pos=" + pos);
 		int status = this.prepService(req);
 		if (status != NnStatusCode.SUCCESS)
