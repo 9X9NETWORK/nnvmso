@@ -78,7 +78,7 @@ public class MsoProgramManager {
 		}		
 
 		//store in cache
-		this.findGoodProgramsByChannelId(channel.getKey().getId(), false);
+		this.findGoodProgramsByChannelId(channel.getKey().getId(), false, 0, 0);
 		
 		// hook, auto share to facebook
 		AutosharingService sharingService = new AutosharingService();
@@ -142,7 +142,7 @@ public class MsoProgramManager {
 		//and the performance of save is not a concern		
 		MsoChannelManager channelMngr = new MsoChannelManager();
 		channelMngr.calculateAndSaveChannelCount(program.getChannelId());
-		this.findGoodProgramsByChannelId(program.getChannelId(), false);
+		this.findGoodProgramsByChannelId(program.getChannelId(), false, 0, 0);
 		return program;
 	}
 
@@ -271,7 +271,7 @@ public class MsoProgramManager {
 		return output;		
 	}
 	
-	public String findGoodProgramsByChannelId(long channelId, boolean fromCache) {
+	public String findGoodProgramsByChannelId(long channelId, boolean fromCache, long sidx, long limit) {
 		List<MsoProgram> programs = new ArrayList<MsoProgram>();
 		Cache cache = CacheFactory.get();
 		//find from cache
@@ -279,7 +279,7 @@ public class MsoProgramManager {
 			String result = (String)cache.get(this.getCacheProgramListKey(channelId));
 			if (result != null) {
 				log.info("hit cache and return from cahce");
-				return result;
+				return this.processStr(result, sidx, limit);
 			}				
 		}
 		//find
@@ -292,6 +292,24 @@ public class MsoProgramManager {
 		result = this.composeProgramInfoStr(programs);
 		//store in cache
 		if (cache != null) { this.storeInCache(cache, result, channelId); }				
+		return this.processStr(result, sidx, limit);
+	}
+	
+	private String processStr(String input, long sidx, long limit) {
+		if (sidx == 0 && limit == 0)
+			return input;
+		String[] lines = input.split("\n");
+		String result = "";
+		long start = sidx - 1;
+		long end = start + limit;
+		for (int i=0; i<lines.length; i++) {
+			if (i>=start && i<end) {
+				result += lines[i] + "\n";
+			}
+			if (i > end) {
+				return result;
+			}
+		}		
 		return result;
 	}
 	

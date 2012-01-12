@@ -59,6 +59,7 @@ import com.nnvmso.model.NnUserReport;
 import com.nnvmso.model.NnUserShare;
 import com.nnvmso.model.NnUserWatched;
 import com.nnvmso.model.Subscription;
+import com.nnvmso.model.SubscriptionLog;
 import com.nnvmso.validation.NnUserValidator;
 
 @Service
@@ -1186,7 +1187,9 @@ public class PlayerApiService {
 	}
 	
 	//http://localhost:8888/playerAPI/programInfo?ipg=27852&channel=*
-	public String findProgramInfo(String channelIds, String userToken, String ipgId, boolean userInfo) {
+	public String findProgramInfo(String channelIds, String userToken, 
+			                      String ipgId, boolean userInfo,
+			                      String sidx, String limit) {
 		if (channelIds == null || (channelIds.equals("*") && userToken == null && ipgId == null)) {		   
 			return NnStatusMsg.inputMissing(locale);
 		}
@@ -1195,6 +1198,13 @@ public class PlayerApiService {
 		List<MsoProgram> programs = new ArrayList<MsoProgram>();
 		NnUser user = null;
 		String programStr = "";
+		long sidxL = 0;
+		long limitL = 0;
+		if (sidx != null) { sidxL = Long.parseLong(sidx); } 
+		if (limit != null) {limitL = Long.parseLong(limit);}
+		if ((sidx != null && limit == null) || (sidx == null && limit != null))
+			return NnStatusMsg.inputMissing(locale);
+		
 		if (channelIds.equals("*")) {
 			user = userMngr.findByToken(userToken);
 			if (user == null) {
@@ -1209,27 +1219,17 @@ public class PlayerApiService {
 			List<Long> list = new ArrayList<Long>();
 			for (int i=0; i<chArr.length; i++) { list.add(Long.valueOf(chArr[i]));}
 			for (Long l : list) {
-				//programs.addAll(programMngr.findGoodProgramsByChannelId(l, false));
-				programStr += programMngr.findGoodProgramsByChannelId(l, true);
+				programStr += programMngr.findGoodProgramsByChannelId(l, true, sidxL, limitL);
 			}
 		} else {
-			//programs = programMngr.findGoodProgramsByChannelId(Long.parseLong(channelIds));
-			programStr = programMngr.findGoodProgramsByChannelId(Long.parseLong(channelIds), true);
+			programStr = programMngr.findGoodProgramsByChannelId(Long.parseLong(channelIds), true, sidxL, limitL);
 		}		
 		
-		/*
-		MsoConfig config = new MsoConfigManager().findByMsoIdAndItem(mso.getKey().getId(), MsoConfig.CDN);
-		if (config == null) {
-			config = new MsoConfig(mso.getKey().getId(), MsoConfig.CDN, MsoConfig.CDN_AMAZON);
-			log.severe("mso config does not exist! mso: " + mso.getKey());
-		}
-		*/
 		String result = NnStatusMsg.successStr(locale) + separatorStr;
 		if (userInfo) {
 			if (user == null && userToken != null) {user = userMngr.findByToken(userToken);}
 			result = this.prepareUserInfo(user, null) + separatorStr; 
 		}
-		//return result + programMngr.composeProgramInfoStr(programs, config);
 		return result + programStr;
 	}
 
@@ -1261,6 +1261,9 @@ public class PlayerApiService {
 	}		 
 	
 	private String composeChannelLineupStr(MsoChannel c, Mso mso) {
+		SubscriptionLogManager sublogMngr = new SubscriptionLogManager();
+		SubscriptionLog sublog = sublogMngr.findByChannelId(c.getKey().getId());							
+		if (sublog != null) {c.setSubscriptionCount(sublog.getCount());}					
 		String intro = c.getIntro();
 		if (intro != null)
 			intro = intro.replaceAll("\n", " ").replaceAll("\t", " ");
@@ -1285,6 +1288,7 @@ public class PlayerApiService {
 					    c.getPiwik(),
 					    String.valueOf(c.getRecentlyWatchedProgram()),
 					    c.getOriName(),
+					    String.valueOf(c.getSubscriptionCount()),
 					    };
 		String output = NnStringUtil.getDelimitedStr(ori);
 		return output;

@@ -730,7 +730,8 @@ public class PlayerApiController {
 	 *         channel sorting (see note), <br/> 
 	 *         piwik id, <br/> 
 	 *         last watched episode <br/>
-	 *         youtube real channel name         
+	 *         youtube real channel name <br/>
+	 *         subscription count
 	 *         </blockquote>
 	 *         <p>
 	 *         set type: TYPE_USER = 1; TYPE_READONLY = 2;
@@ -856,6 +857,8 @@ public class PlayerApiController {
 	 * @param  user user's unique identifier, it is required for wildcard query
 	 * @param  userInfo true or false. Whether to return user information as login. If asked, it will be returned after status code. 
 	 * @param  ipg  ipg's unique identifier, it is required for wildcard query
+	 * @param  sidx start index, use with limit
+	 * @param  limit use with sidx, entries of queries. example, sidx=10 and limit=5 will return 5 entries starting from entry 10.
 	 * @return <p>Programs info. Each program is separate by \n.</p>
 	 *   	   <p>Program info has: <br/>
 	 *            channelId, programId, programName, description(max length=256),<br/>
@@ -870,6 +873,8 @@ public class PlayerApiController {
 			@RequestParam(value="user", required = false) String userToken,
 			@RequestParam(value="userInfo", required=false) String userInfo,
 			@RequestParam(value="ipg", required = false) String ipgId,
+			@RequestParam(value="sidx", required = false) String sidx,
+			@RequestParam(value="limit", required = false) String limit,
 			HttpServletRequest req,
 			HttpServletResponse resp) {
 		this.prepService(req);		
@@ -877,7 +882,7 @@ public class PlayerApiController {
 		String output = NnStatusMsg.errorStr(locale);
 		boolean isUserInfo = Boolean.parseBoolean(userInfo);
 		try {
-			output =  playerApiService.findProgramInfo(channelIds, userToken, ipgId, isUserInfo);
+			output =  playerApiService.findProgramInfo(channelIds, userToken, ipgId, isUserInfo, sidx, limit);
 		} catch (Exception e){
 			output = playerApiService.handleException(e);
 		}
