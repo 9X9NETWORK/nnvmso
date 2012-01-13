@@ -1,0 +1,29 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd"> 
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script type="text/javascript" src="jquery-1.6.2.min.js"></script>
+<title>redirect page</title>
+<script type="text/javascript">
+
+/* Ensure language code is in the format aa-AA. */
+function normaliseLang(lang) {
+	lang = lang.replace(/_/, '-').toLowerCase();
+	if (lang.length > 3) {
+		lang = lang.substring(0, 3) + lang.substring(3).toUpperCase();
+	}
+	return lang;
+}
+
+var langSet = normaliseLang(navigator.language||navigator.userLanguage);
+if((langSet=="zh-TW")||(langSet=="zh-CN")) {
+  window.location ="./tw";
+} else {
+  window.location ="./en";
+}
+
+</script>
+</head>
+<body>
+</body>
+</html>

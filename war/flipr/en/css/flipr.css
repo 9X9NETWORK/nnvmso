@@ -1,0 +1,293 @@
+﻿* {
+	margin: 0px;
+	padding: 0px;
+}
+
+body	{
+	margin: 0px;
+	background: #000 url(../images/bg.jpg) repeat-x top center;
+}
+
+body, table, div	{
+	font-family: Verdana, 微軟正黑體, 蘋果儷中黑;
+}
+
+img {	border: 0;}
+
+a:link, a:visited	{
+	color: #666;
+	text-decoration: none;
+	outline: none; 
+}
+
+a:hover	{
+	color: #333;
+	text-decoration: none;
+	outline: none;
+}
+
+#container {
+	margin-left: auto;
+	margin-right: auto;
+	width: 980px;
+	overflow: hidden;
+}
+
+.about {
+	width: 440px;
+	height: 357px;
+	background: #000;
+	color: #fff;
+	font-size: 9pt;
+	line-height: 27px;
+	float: left;
+	padding: 10px;
+	margin: 0 0 20px 0;
+	border-radius:10px;
+	-moz-border-radius:10px; /* Firefox 3.6 and earlier */
+	filter:alpha(opacity=80); /* ie  */
+	-moz-opacity:0.8;/* old mozilla browser like netscape  */
+	-khtml-opacity:0.8;/* for really really old safari */
+	opacity:0.8;/* css standard, currently it works in most modern browsers like firefox,  */
+}
+
+.about ul { padding: 0 20px 0 20px;}
+
+.about_movie {
+	width: 470px;
+	height: 327px;
+	background: #000;
+	float: left;
+	margin: 0 0 20px 20px;
+	padding: 50px 0 0 20px;
+	border-radius:10px;
+	-moz-border-radius:10px; /* Firefox 3.6 and earlier */
+}
+
+#contact {
+	width: 800px;
+	height: 347px;
+	background: #000;
+	margin: 0 auto 20px auto;
+	padding: 30px 0 0 0;
+	color: #fff;
+	border-radius:10px;
+	-moz-border-radius:10px; /* Firefox 3.6 and earlier */
+	filter:alpha(opacity=80); /* ie  */
+	-moz-opacity:0.8;/* old mozilla browser like netscape  */
+	-khtml-opacity:0.8;/* for really really old safari */
+	opacity:0.8;/* css standard, currently it works in most modern browsers like firefox,  */
+}
+
+.c_content {
+	width: 600px;
+	margin: 0 auto 0 auto;
+}
+
+.c_contente table, .c_content td, .c_content th {
+	border:1px solid #666;
+	padding: 10px;
+}
+
+.c1 {
+	border: 1px solid #fff;
+}
+
+.c2 {
+	background: #666;
+	border: none;
+	padding: 5px;
+	font-size: 12pt;
+	color: #999;
+	font-weight: bold;
+	cursor: pointer;
+	border-radius:10px;
+	-moz-border-radius:10px; /* Firefox 3.6 and earlier */
+	outline: none;
+}
+
+.c2:hover {
+	color: #fff;
+}
+
+.c2:active {
+	background: #333;
+}
+
+#qalist {
+	margin: 0 auto 20px auto;
+	width: 980px;
+	height: 377px;
+	list-style: none;
+}
+
+#qalist li {
+	width: 900px;
+	height: 50px;
+	margin: 0 0 0 40px;
+	padding: 0 0 0 20px;
+	font-size: 12pt;
+	line-height: 50px;
+	font-weight: bold;
+	background: url(../images/qa_bg.png) no-repeat;
+}
+
+.question {
+	cursor: pointer;
+}
+
+.answer {
+	width: 840px;
+	margin: 0 0 0 60px;
+	padding: 10px;
+	display: none;
+	background: #000;
+	color: #fff;
+	font-size: 9pt;
+	line-height: 23px;
+	overflow: hidden;
+	filter:alpha(opacity=70); /* ie  */
+	-moz-opacity:0.7;/* old mozilla browser like netscape  */
+	-khtml-opacity:0.7;/* for really really old safari */
+	opacity:0.7;/* css standard, currently it works in most modern browsers like firefox,  */
+}
+
+h3 { color: yellow;}
+
+.answer_box {
+	border-bottom: 1px solid #fff;
+	margin: 0 0 10px 0;
+	padding: 0 0 10px 0;
+	overflow: hidden;
+}
+
+.imgleft {
+	float: left;
+}
+
+.imghelp_r {
+	float: right;
+	padding: 5px;
+	margin: 5px;
+	border: 1px solid #fff;
+}
+
+.imghelp_l {
+	float: left;
+	padding: 5px;
+	margin: 5px;
+	border: 1px solid #fff;
+}
+
+.button {
+	margin:12px 0 5px 27px;
+	cursor: pointer;
+}
+
+#channel {
+	width: 573px;
+	height: 447px;
+	float: left;
+	background: url(../images/channel_bg.png) no-repeat bottom center;
+	padding: 0 0 0 23px;
+}
+
+.item {
+	width:180px;
+	height:130px;
+	margin:5px 5px 0 0;/* required to hide the image after resized */
+	overflow:hidden;/* for child absolute position */
+	position:relative;/* display div in line */
+	float:left;
+}
+
+.item .caption {
+	width:180px;
+	height:130px;
+	background:#000;
+	color:#fff;
+	font-weight:bold;/* fix it at the bottom */
+	position:absolute;
+	left:0;/* hide it by default */
+	display:none;/* opacity setting */
+	filter:alpha(opacity=80); /* ie  */
+	-moz-opacity:0.8;/* old mozilla browser like netscape  */
+	-khtml-opacity:0.8;/* for really really old safari */
+	opacity:0.8;/* css standard, currently it works in most modern browsers like firefox,  */
+}
+
+.item .caption p {
+	padding:5px;
+	margin:0;
+	font-size:12px;
+}
+
+.subtitle {
+	color:#0cc7dd;
+	font-size:16px;/* add spacing and make the whole row clickable*/
+	padding:10px;
+	display:block;
+}
+
+.item img {
+	border:0;/* allow javascript moves the img position*/
+	position:absolute;
+}
+
+.clear {
+	clear:both;
+}
+
+.show {
+	width: 384px;
+	height: 447px;
+}
+
+#footer {
+	width: 980px;
+	height: 100px;
+	overflow: hidden;
+	margin-left: auto;
+	margin-right: auto;
+	color: #fff;
+	list-style: none;
+	font-size: 11pt;
+	font-weight: bold;
+}
+
+#footer a { color: #fff;}
+#footer a:hover { color: #999;}
+
+#footer li {
+	width: 100px;
+	height: 40px;
+	float: left;
+	margin: 0 0 0 10px;
+	text-align: center;
+	line-height: 40px;
+}
+
+#footer img {
+	margin: 12px 0 0 0;
+}
+
+#language {
+	display: block;
+	cursor: pointer;
+}
+
+#language_s {
+	background: #fff;
+	width: 100px;
+	padding: 5px 0 5px 0;
+	display: none;
+	line-height: 18px;
+	font-size: 9pt;
+	border-radius:10px;
+	-moz-border-radius:10px; /* Firefox 3.6 and earlier */
+	box-shadow: 0 0 10px #fff;
+	-moz-box-shadow: 0 0 10px #fff; /* Firefox 3.6 and earlier */
+}
+
+#language_s a{ color: #666;}
+#language_s a:hover { color: #000;}

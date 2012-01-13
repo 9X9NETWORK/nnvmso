@@ -1,0 +1,79 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="utf-8" lang="utf-8">
+	<head>
+		<title>9x9 FLIPr YouTube Made Easy! Transform Your Computer into a TV Instantanously! Countless Free and Exciting Channels for You to Discover!</title>
+		<link href="css/flipr.css" rel="stylesheet" type="text/css" media="all" />
+		<link href="images/favicon.ico" rel="shortcut icon" type="image/x-icon" /><!-- if icon not in root -->
+		<script type="text/javascript" src="js/jquery-1.6.2.min.js"></script><!-- check the version you need from jQuery.com -->
+		<script type="text/javascript" src="../install.js"></script>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="Content-Script-Type" content="text/javascript" />
+		<meta name="description" content="9x9 FLIPr YouTube Made Easy! Transform Your Computer into a TV Instantanously! Countless Free and Exciting Channels for You to Discover!" />
+		<meta name="keywords" content="FLIPr,9x9,Cloud TV" />
+		<meta name="author" content="9x9 Cloud TV" />
+		<meta name="copyright" content="9x9 Cloud TV" />
+		<meta name="reply-to" content="feedback@9x9cloud.tv" />
+		<meta name="robots" content="INDEX,FOLLOW" />
+		<meta name="date" content="2012-1-9" />
+	</head>
+<body>
+<div id="fb-root"></div>
+<script type="text/javascript">(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));
+</script>
+	<div id="container">
+		<img class="imgleft" border="0" usemap="#home" src="images/title.png" alt="" title="9x9 FLIPr YouTube Made Easy! Transform Your Computer into a TV Instantanously! Countless Free and Exciting Channels for You to Discover!" />
+		<img class="button" alt="" title="FLIPr installer" id="installer" src="images/installer.png" 
+		onmouseover="this.src='images/installer_r.png';" 
+		onmouseout="this.src='images/installer.png';" 
+		onclick="install('en');" />
+		<img src="images/subtitle_about.png" title="About FLIPr" alt="About FLIPr" />
+		<div class="about">
+			<ul>
+				<li>9x9 FLIPr&trade; is a cloud video service that curates countless YouTube videos into thousands of both premium and non-premium TV channels.  Flip through them all in our 9x9 Channel Store™ and subscribe only to channels that excite you, and watch them whenever and wherever your heart desires!</li>
+				<li>With 9x9s YouTube FLIPr Remote, you can immediately turn your computer screen into a TV screen, with thousands of free TV channels for you to choose.  Forget the complicated mouse-and-keyboard, simply flip through channels with a move of the thumb!  Stop wasting time thinking of and searching for YouTube videos, start experiencing a whole new level of enjoyment of flipping and browsing!</li>
+			</ul>
+		</div>
+		<div class="about_movie">
+			<object width="450" height="259"><param name="movie" value="http://www.youtube.com/v/LLeTY7Bluy8?version=3&amp;hl=en_US&amp;rel=0"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/LLeTY7Bluy8?version=3&amp;hl=en_US&amp;rel=0" type="application/x-shockwave-flash" width="450" height="259" allowscriptaccess="always" allowfullscreen="true"></embed></object>
+		</div>
+		<ul id="footer">
+			<li id="language">Language
+				<div id="language_s">
+					<p><a href="../tw/index.html">中文網站</a></p>
+					<p><a href="index.html">English Site</a></p>
+				</div>
+			</li>
+			<li><a href="about.html">About FLIPr</a></li>
+			<li><a href="help.html">HELP</a></li>
+			<li><a href="contact.html">Contact Us</a></li>
+			<li><a href="index.html">Home</a></li>
+			<li><div class="fb-like" data-href="http://www.facebook.com/9x9.tv" data-send="false" data-layout="button_count" data-width="450" data-show-faces="false" data-colorscheme="dark"></div></li>
+			<li style="float: right; width: 300px; text-align: right">&copy; 2012 9x9.tv. All rights reserved</li>
+		</ul>
+	</div>
+	<map name="home" id="home" title="Flipr Home">
+		<area shape="rect" coords="16,27,83,79" href="index.html" alt="" />
+	</map>
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$('.question').click(function () {
+				var answer = $(this).next('.answer');
+				$('.answer').not(answer).slideUp('slow');
+				$(answer).stop(false,true).slideToggle('slow');
+			});
+		});
+
+		$(document).ready(function() {
+			$('#language').click(function () {
+				$('div#language_s').slideToggle(400);
+			});
+		});
+    </script>
+</body>
+</html>

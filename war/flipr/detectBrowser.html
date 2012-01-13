@@ -1,0 +1,90 @@
+<html>
+<head>
+<title>redirect page</title>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.js"></script>
+</head>
+<body>
+<div id="browser"></div>
+<div id="version"></div>
+<div id="lang"></div>
+<div id="fullVersion"></div>
+<div id="page"></div>
+<script type="text/javascript">
+var chromeRegex = / Chrome\/([0-9]+)[\.[0-9]+]* /;
+var safariRegex = / Version\/([0-9]+)[\.[0-9]+]* /;
+var firefoxRegex = / Firefox\/([0-9]+)[\.[0-9]+]*/;
+var msieRegex = / MSIE ([0-9]+)[\.[0-9]+]*/;
+var operaRegex = /Opera\/([0-9]+)[\.[0-9]+]* /;
+
+/* Ensure language code is in the format aa-AA. */
+function normaliseLang(lang) {
+	lang = lang.replace(/_/, '-').toLowerCase();
+	if (lang.length > 3) {
+		lang = lang.substring(0, 3) + lang.substring(3).toUpperCase();
+	}
+	return lang;
+}
+
+var langSet = normaliseLang(navigator.language||navigator.userLanguage);
+$("div#lang").html("lang : "+langSet);
+var redirectPage=new Array();
+if((langSet=="zh-TW")||(langSet=="zh-CN")) {
+  redirectPage[0]="9x9FLIPr-tc";
+  redirectPage[1]="9x9FLIPr-chrome-tc";
+} else {
+  redirectPage[0]="9x9FLIPr-en";
+  redirectPage[1]="9x9FLIPr-chrome-en";
+}
+
+var detectUserAgent = window.navigator.userAgent;
+//$("div#fullVersion").html(detectUserAgent);
+if ($.browser.msie) {
+  $("div#browser").html("browser : msie");
+  detectUserAgent = detectUserAgent.match(msieRegex);
+  $("div#version").html("main version : "+detectUserAgent[1]);
+  $("div#fullVersion").html("full version : "+detectUserAgent[0]);
+  if((detectUserAgent[1]=="8")||(detectUserAgent[1]=="9")) {
+    $("div#page").html("redirect page : "+redirectPage[0]);
+  } else {
+    $("div#page").html("redirect page : "+redirectPage[1]);
+  }
+} else if ($.browser.mozilla) {
+  $("div#browser").html("browser : firefox");
+  detectUserAgent = detectUserAgent.match(firefoxRegex);
+  $("div#version").html("main version : "+detectUserAgent[1]);
+  $("div#fullVersion").html("full version : "+detectUserAgent[0]);
+  if((detectUserAgent[1]=="6")||(detectUserAgent[1]=="7")||(detectUserAgent[1]=="8")) {
+    $("div#page").html("redirect page : "+redirectPage[0]);
+  } else {
+    $("div#page").html("redirect page : "+redirectPage[1]);
+  }
+} else if ($.browser.opera) {
+  $("div#browser").html("browser : opera");
+  detectUserAgent = detectUserAgent.match(operaRegex);
+  $("div#version").html("main version : "+detectUserAgent[1]);
+  $("div#fullVersion").html("full version : "+detectUserAgent[0]);
+  $("div#page").html("redirect page : "+redirectPage[1]);
+} else if (navigator.userAgent.match(chromeRegex)) {
+  $("div#browser").html("browser : chrome");
+  detectUserAgent = detectUserAgent.match(chromeRegex);
+  $("div#version").html("main version : "+detectUserAgent[1]);
+  $("div#fullVersion").html("full version : "+detectUserAgent[0]);
+  $("div#page").html("redirect page : "+redirectPage[0]);
+} else if (navigator.userAgent.match(safariRegex)) {
+  $("div#browser").html("browser : safari");
+  detectUserAgent = detectUserAgent.match(safariRegex);
+  $("div#version").html("main version : "+detectUserAgent[1]);
+  $("div#fullVersion").html("full version : "+detectUserAgent[0]);
+  if(detectUserAgent[1]=="5") {
+    $("div#page").html("redirect page : "+redirectPage[0]);
+  } else {
+    $("div#page").html("redirect page : "+redirectPage[1]);
+  }
+} else {
+  $("div#browser").html("browser : else");
+  $("div#fullVersion").html("full version : "+detectUserAgent);
+  $("div#page").html("redirect page : "+redirectPage[1]);
+}
+</script>
+</body>
+</html>
