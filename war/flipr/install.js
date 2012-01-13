@@ -19,37 +19,58 @@ if ($.browser.msie) {
   detectUserAgent = detectUserAgent.match(msieRegex);
   if((detectUserAgent[1]=="8")||(detectUserAgent[1]=="9")) {
     window.open(redirectPage[0],"","width=800,height=600");
-    //window.location = redirectPage[0];
   } else {
     window.open(redirectPage[1],"","width=800,height=600");
-    //window.location = redirectPage[1];
   }
 } else if ($.browser.mozilla) {
   detectUserAgent = detectUserAgent.match(firefoxRegex);
   if((detectUserAgent[1]=="6")||(detectUserAgent[1]=="7")||(detectUserAgent[1]=="8")) {
     window.open(redirectPage[0],"","width=800,height=600");
-    //window.location = redirectPage[0];
   } else {
     window.open(redirectPage[1],"","width=800,height=600");
-    //window.location = redirectPage[1];
   }
 } else if ($.browser.opera) {
   window.open(redirectPage[1],"","width=800,height=600");
-  //window.location = redirectPage[1];
 } else if (navigator.userAgent.match(chromeRegex)) {
   window.open(redirectPage[0],"","width=800,height=600");
-  //window.location = redirectPage[0];
 } else if (navigator.userAgent.match(safariRegex)) {
   detectUserAgent = detectUserAgent.match(safariRegex);
   if(detectUserAgent[1]=="5") {
     window.open(redirectPage[0],"","width=800,height=600");
-    //window.location = redirectPage[0];
   } else {
     window.open(redirectPage[1],"","width=800,height=600");
-    //window.location = redirectPage[1];
   }
 } else {
   window.open(redirectPage[1],"","width=800,height=600");
-  //window.location = redirectPage[1];
 }
+}
+function sendEmail() {
+  var from = null;
+  var to = "bartonboy@pixnet.net";//the default should be flipr@9x9cloud.tv
+  var subject = $("#content_t").val();
+  var msgBody = $("#content_w").val();
+
+  if(from==null)
+    from = "Anonymous@gmail.com";
+  if((subject==null)&&(msgBody==null)) {
+    alert("you should type something before send");
+    return;
+  }
+  if(subject==null)
+    subject = "none";
+  if(msgBody==null)
+    msgBody = "none"
+    	
+  $.post('/CMSAPI/sendEmail', { 'from': from, 'to': to, 'subject': subject, 'msgBody': msgBody }, function(response) {
+    if (response != "OK") {
+      alert("send fail");
+      return;
+    }
+    alert("send success");
+  }, 'text');
+
+}
+function erase() {
+  $("#content_t").val(null);
+  $("#content_w").val(null);
 }

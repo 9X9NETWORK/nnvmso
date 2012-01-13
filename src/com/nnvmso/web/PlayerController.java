@@ -90,5 +90,9 @@ public class PlayerController {
 		return NnNetUtil.textReturn("OK");
 	}
 	
+	@RequestMapping("flipr")
+	public String flipr() {
+		return "redirect:flipr/";
+	}
 	
 }

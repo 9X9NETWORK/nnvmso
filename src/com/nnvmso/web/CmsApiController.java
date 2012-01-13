@@ -13,8 +13,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Logger;
 
+import javax.mail.Message;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -1530,5 +1536,30 @@ public class CmsApiController {
 		
 		return "OK";
 	}
+	
+	@RequestMapping(value="sendEmail", params = {"from", "to", "subject", "msgBody"})
+	public @ResponseBody String sendEmail(
+					@RequestParam(value = "from") String from,
+					@RequestParam(value = "to") String to,
+					@RequestParam(value = "subject") String subject,
+					@RequestParam(value = "msgBody") String msgBody) {
+				
+		Properties props = new Properties();
+       Session session = Session.getDefaultInstance(props, null);
+       msgBody = "from: "+from+" , "+msgBody;
+       try {
+    	   Message msg = new MimeMessage(session);
+    	   msg.setFrom(new InternetAddress("bartonfor9x9@gmail.com", "barton"));//the mail that the GAE site owner's E-mail, ex: nncloudtv@gmail.com
+    	   msg.addRecipient(Message.RecipientType.TO, new InternetAddress(to, to));
+    	   msg.setSubject(subject);
+    	   msg.setText(msgBody);
+    	   Transport.send(msg);
+    	} catch (Exception e) {
+    		   NnLogUtil.logException(e);
+    		   return "Fail";
+    	}
+       return "OK";
+	}
+	
 }
 
