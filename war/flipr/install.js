@@ -56,9 +56,11 @@ function sendEmail() {
     alert("you should type something before send");
     return;
   }
-  if(subject==null)
+  if (subject == '' && msgBody == '')
+    return;
+  if(subject=='')
     subject = "none";
-  if(msgBody==null)
+  if(msgBody=='')
     msgBody = "none";
     	
   $.post('/CMSAPI/sendEmail', { 'from': from, 'to': to, 'subject': subject, 'msgBody': msgBody }, function(response) {
