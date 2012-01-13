@@ -55,6 +55,7 @@ import com.nnvmso.model.Ipg;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoProgram;
+import com.nnvmso.model.NnEmail;
 import com.nnvmso.model.NnUser;
 import com.nnvmso.model.SnsAuth;
 import com.nnvmso.service.AreaOwnershipManager;
@@ -67,6 +68,7 @@ import com.nnvmso.service.ChannelSetManager;
 import com.nnvmso.service.CmsApiService;
 import com.nnvmso.service.ContentOwnershipManager;
 import com.nnvmso.service.ContentWorkerService;
+import com.nnvmso.service.EmailService;
 import com.nnvmso.service.IpgManager;
 import com.nnvmso.service.MsoChannelManager;
 import com.nnvmso.service.MsoManager;
@@ -1543,22 +1545,20 @@ public class CmsApiController {
 					@RequestParam(value = "to") String to,
 					@RequestParam(value = "subject") String subject,
 					@RequestParam(value = "msgBody") String msgBody) {
-				
-		Properties props = new Properties();
-       Session session = Session.getDefaultInstance(props, null);
-       msgBody = "from: "+from+" , "+msgBody;
-       try {
-    	   Message msg = new MimeMessage(session);
-    	   msg.setFrom(new InternetAddress("bartonfor9x9@gmail.com", "barton"));//the mail that the GAE site owner's E-mail, ex: nncloudtv@gmail.com
-    	   msg.addRecipient(Message.RecipientType.TO, new InternetAddress(to, to));
-    	   msg.setSubject(subject);
-    	   msg.setText(msgBody);
-    	   Transport.send(msg);
-    	} catch (Exception e) {
-    		   NnLogUtil.logException(e);
-    		   return "Fail";
-    	}
-       return "OK";
+		
+		logger.info("sender: " + from);
+		logger.info("subject:" + subject);
+		logger.info("content:" + msgBody);
+		
+		EmailService emailService = new EmailService();
+		msgBody = "from: "+from+" , "+msgBody;
+		NnEmail email = new NnEmail(subject, msgBody);
+		email.setToEmail("flipr@9x9cloud.tv");
+		email.setToName("flipr");
+		email.setReplyToEmail(from);
+		emailService.sendEmail(email);
+		
+		return "OK";
 	}
 	
 }

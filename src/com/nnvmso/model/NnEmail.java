@@ -28,6 +28,8 @@ public class NnEmail {
 	}
 	
 	public NnEmail(String subject, String body) {
+		this.setSubject(subject);
+		this.setBody(body);
 		this.sendEmail = "nncloudtv@gmail.com";
 		this.sendName = "nncloudtv";
 		this.toEmail = "nncloudtv@gmail.com";
