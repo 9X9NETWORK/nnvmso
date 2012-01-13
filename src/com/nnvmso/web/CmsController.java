@@ -1,5 +1,6 @@
 package com.nnvmso.web;
 
+import java.io.IOException;
 import java.security.SignatureException;
 import java.util.Locale;
 import java.util.logging.Logger;
@@ -11,6 +12,7 @@ import javax.servlet.http.HttpSession;
 
 import org.springframework.context.MessageSource;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -19,8 +21,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import com.nnvmso.lib.AmazonLib;
+import com.nnvmso.lib.CacheFactory;
 import com.nnvmso.lib.CookieHelper;
 import com.nnvmso.lib.NnLogUtil;
+import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.NnUser;
 import com.nnvmso.model.LangTable;
@@ -29,6 +33,12 @@ import com.nnvmso.service.MsoConfigManager;
 import com.nnvmso.service.MsoManager;
 import com.nnvmso.service.NnUserManager;
 import com.nnvmso.service.SessionService;
+
+import twitter4j.*;
+import twitter4j.auth.*;
+import twitter4j.TwitterException;
+
+import net.sf.jsr107cache.Cache;
 
 @Controller
 public class CmsController {
@@ -291,6 +301,63 @@ public class CmsController {
 		} else {
 			sessionService.removeSession();
 			return "redirect:/" + msoName + "/admin";
+		}
+	}
+	
+	@RequestMapping("cms/twitter/authorization")
+	public ResponseEntity<String> twitterAuthorization(@RequestParam(required=false, value="oauth_token") String oauthToken, 			                             
+            @RequestParam(required=false, value="oauth_verifier") String oauthVerifier,
+            @RequestParam(required=false, value="msoId") String msoId) throws IOException, TwitterException {
+		
+		Twitter twitter = new TwitterFactory().getInstance();
+		twitter.setOAuthConsumer("udWzz6YrsaNlbJ18vZ7aCA", "Pf0TdB2QFXWKyphbIdnPG4vZhLVze0cPCxlLkfBwtQ");
+		Cache cache = CacheFactory.get();
+		
+		if(oauthToken==null)
+		{
+			RequestToken requestToken = twitter.getOAuthRequestToken();
+			if(msoId!=null) {
+				System.out.println("msoId:"+msoId);
+				System.out.println("request token:"+requestToken.getToken());
+				cache.put(requestToken.getToken()+"msoId", msoId);
+				cache.put(requestToken.getToken(), requestToken.getTokenSecret());
+			}
+			else
+				return NnNetUtil.textReturn("you are not permit authorization");
+			String output = "<script language=\"javascript\">location.replace(\""+requestToken.getAuthorizationURL()+"\");</script>";
+			return NnNetUtil.htmlReturn(output);
+		}
+		else
+		{
+			String requestTokenSecret = cache.get(oauthToken).toString();
+			msoId = cache.get(oauthToken+"msoId").toString();
+			System.out.println("request token:"+oauthToken);
+			System.out.println("verifier:"+oauthVerifier);
+			if(requestTokenSecret!=null && msoId!=null)
+			{
+				long userID = Long.parseLong(msoId.trim());
+				Short type = 2;
+				
+				RequestToken requestToken = new RequestToken(oauthToken,requestTokenSecret);
+				AccessToken accessToken = twitter.getOAuthAccessToken(requestToken, oauthVerifier);
+				cache.remove(oauthToken);
+				cache.remove(oauthToken+"msoId");
+				
+				System.out.println("msoId:"+userID);
+				System.out.println("access token:"+accessToken.getToken());
+				
+				CmsApiController cmsApiController = new CmsApiController();
+				cmsApiController.createSnsAuth(userID, type, accessToken.getToken(), accessToken.getTokenSecret());
+
+				String output = "<script language=\"javascript\">window.opener.pageSetup.showTwitterDisconnect(true);" +
+						"window.close();</script>";
+				
+				return NnNetUtil.htmlReturn(output);
+			}
+			else
+			{
+				return NnNetUtil.textReturn("cache error : there are no request token in the cache");
+			}
 		}
 	}
 }

@@ -141,4 +141,23 @@ public class ChannelAutosharingDao extends GenericDao<ChannelAutosharing> {
 		}
 		return results;
 	}
+	
+	public List<ChannelAutosharing> findAllChannelsByMsoIdAndType(long msoId, short type) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		List<ChannelAutosharing> results = new ArrayList<ChannelAutosharing>();
+		
+		try {
+			Query query = pm.newQuery(ChannelAutosharing.class);
+			query.setFilter("msoId == msoIdParam && type == typeParam");
+			query.declareParameters("long msoIdParam, short typeParam");
+			@SuppressWarnings("unchecked")
+			List<ChannelAutosharing> list = (List<ChannelAutosharing>) query.execute(msoId, type);
+			if (list.size() > 0)
+				results = (List<ChannelAutosharing>) pm.detachCopyAll(list);
+		} catch (JDOObjectNotFoundException e) {
+		} finally {
+			pm.close();
+		}
+		return results;
+	}
 }

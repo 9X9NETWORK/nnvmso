@@ -459,10 +459,10 @@ a.btnClose:hover { background:url(/images/cms/btnCloseHover.png) no-repeat; }
 .syncAcc p { padding:3px 0; width:540px; padding:5px 10px; color:#404040; font-size:0.9em }
 .syncAcc ul { padding:10px 0 0 10px; }
 .syncAcc li { padding-bottom:10px; font-size:0.9em }
-.syncAcc li span { width:80px; display:block; float:left }
+.syncAcc li span { width:96px; display:block; float:left }
 .syncFb { background:url(/images/cms/icon_fb.png) no-repeat; height:33px; padding-left:45px; line-height:33px; }
 .syncPlurk { background:url(/images/cms/icon_plurk.png) no-repeat; height:33px; padding-left:45px; line-height:33px; display:none; }
-.syncTwitter { background:url(/images/cms/icon_twitter.png) no-repeat; height:33px; padding-left:45px; line-height:33px; display:none; }
+.syncTwitter { background:url(/images/cms/icon_twitter.png) no-repeat; height:33px; padding-left:45px; line-height:33px; }
 .syncSina { background:url(/images/cms/icon_sina.png) no-repeat; height:33px; padding-left:45px; line-height:33px; display:none; }
 .syncInfo { background:url(/images/cms/icon_info.png) no-repeat 10px 8px;  padding: 10px 25px 5px 10px; display: none; }
 .sync_hint { font-size:12px; color:#444; width:300px; background:#FFC; position:absolute; top:310px; right:40px; z-index:5;  padding:7px; line-height:15px; display:none; }

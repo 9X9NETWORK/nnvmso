@@ -81,4 +81,8 @@ public class AutosharingService {
 	public List<ChannelAutosharing> findAllChannelsByMsoId(long msoId) {
 		return channelAutosharingDao.findAllChannelsByMsoId(msoId);
 	}
+	
+	public List<ChannelAutosharing> findAllChannelsByMsoIdAndType(long msoId, short type) {
+		return channelAutosharingDao.findAllChannelsByMsoIdAndType(msoId, type);
+	}
 }

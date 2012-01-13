@@ -28,8 +28,9 @@
         </li>
         <li class="syncTwitter">
           <span><spring:message code="cms.setup.label.twitter"/></span>&nbsp;&nbsp;
-          <a href="javascript:"><spring:message code="cms.setup.button.account_connect"/></a>
-          <a href="#" style="display:none"><spring:message code="cms.setup.button.account_disconnect"/></a>&nbsp; | &nbsp;<a href="#"><spring:message code="cms.setup.button.disable_autosharing"/> </a>
+          <span><a style="display:none" href="javascript:" id="twitter_connect"><spring:message code="cms.setup.button.account_connect"/></a></span>&nbsp;&nbsp;
+          <span><a style="display:none" href="javascript:" id="twitter_disconnect"><spring:message code="cms.setup.button.account_disconnect"/></a></span>&nbsp;&nbsp;
+          <span><a style="display:none" href="javascript:" id="tw_switch"><spring:message code="cms.setup.button.disable_autosharing"/></a></span>
         </li>
         <li class="syncPlurk">
           <span><spring:message code="cms.setup.label.plurk"/></span>&nbsp;&nbsp;
@@ -127,6 +128,7 @@
 <label class="lang" id="image_bg_setup"><spring:message code="cms.image.bg_setup"/></label>
 <label class="lang" id="lang_warning_error_occurs"><spring:message code="cms.warning.error_occurs"/></label>
 <label class="lang" id="lang_confirm_disconnect_with_facebook"><spring:message code="cms.setup.confirm_disconnect_with_facebook"/></label>
+<label class="lang" id="lang_confirm_disconnect_with_twitter"><spring:message code="cms.setup.confirm_disconnect_with_twitter"/></label>
 <label class="lang" id="lang_warning_retype_not_match"><spring:message code="cms.warning.retype_not_match"/></label>
 <label class="lang" id="lang_update_successfully"><spring:message code="cms.warning.update_successfully"/></label>
 

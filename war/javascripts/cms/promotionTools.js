@@ -404,6 +404,7 @@ var page$ = {
           break;
           case 2:
           $('input[name="sns_twitter"]').attr('disabled', false).parent().unbind('click').css('color', 'black');
+          $('.twitter_label').css('color', 'black');
           break;
           case 3:
           $('input[name="sns_plurk"]').attr('disabled', false).parent().unbind('click').css('color', 'black');

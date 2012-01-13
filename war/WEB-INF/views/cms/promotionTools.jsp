@@ -90,7 +90,9 @@
           <option value="0"><spring:message code="cms.promotion_tools.label.my_profile_page"/></option>
         </select>
         <br/>
-        <label class="pro_check" style="display:none"><input type="checkbox" class="sns_checkbox" name="sns_twitter" disabled="disabled"/>&nbsp; <spring:message code="cms.promotion_tools.label.twitter"/></label>
+        <label class="pro_check">
+          <input type="checkbox" class="sns_checkbox" name="sns_twitter" disabled="disabled"/>&nbsp; <span style="color:grey" class="twitter_label"><spring:message code="cms.promotion_tools.label.twitter"/></span>
+        </label>
         <label class="pro_check" style="display:none"><input type="checkbox" class="sns_checkbox" name="sns_plurk" disabled="disabled"/>&nbsp; <spring:message code="cms.promotion_tools.label.plurk"/></label>
         <label class="pro_check" style="display:none"><input type="checkbox" class="sns_checkbox" name="sns_sina" disabled="disabled"/>&nbsp; <spring:message code="cms.promotion_tools.label.sina"/></label>
         <br/><br/><br/>

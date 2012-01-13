@@ -14,6 +14,12 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.codehaus.jackson.map.ObjectMapper;
+
+import twitter4j.Twitter;
+import twitter4j.TwitterException;
+import twitter4j.TwitterFactory;
+import twitter4j.auth.AccessToken;
+
 import com.nnvmso.model.MsoConfig;
 import com.nnvmso.model.SnsAuth;
 import com.nnvmso.service.MsoConfigManager;
@@ -117,6 +123,14 @@ public class FacebookLib {
 		String line = reader.readLine();
 		reader.close();
 		log.info(line);
+	}
+	
+	public static void postToTwitter(FBPost fbPost) throws IOException, TwitterException {
+		Twitter twitter = new TwitterFactory().getInstance();
+		twitter.setOAuthConsumer("udWzz6YrsaNlbJ18vZ7aCA", "Pf0TdB2QFXWKyphbIdnPG4vZhLVze0cPCxlLkfBwtQ");
+		AccessToken accessToken = new AccessToken(fbPost.getFacebookId(), fbPost.getAccessToken());
+		twitter.setOAuthAccessToken(accessToken);
+		twitter.updateStatus(fbPost.getName()+" "+fbPost.getLink());
 	}
 	
 	static public void populatePageList(SnsAuth sns) {

@@ -27,6 +27,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import twitter4j.TwitterException;
+
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
 import com.nnvmso.lib.CacheFactory;
@@ -1312,7 +1314,7 @@ public class CmsApiController {
 		if (snsAuth != null) {
 			snsMngr.delete(snsAuth);
 		}
-		List<ChannelAutosharing> autoshareList = shareService.findAllChannelsByMsoId(msoId);
+		List<ChannelAutosharing> autoshareList = shareService.findAllChannelsByMsoIdAndType(msoId, type);
 		for (ChannelAutosharing autoshare : autoshareList) {
 			shareService.delete(autoshare);
 		}
@@ -1456,6 +1458,19 @@ public class CmsApiController {
 			FacebookLib.postToFacebook(fbPost);
 		} catch (IOException e) {
 			exception(e);
+		}
+	}
+	
+	@RequestMapping("postToTwitter")
+	public @ResponseBody void postToTwitter(@RequestBody FBPost fbPost, HttpServletRequest req) {
+		try {
+			fbPost.setLink(fbPost.getLink().replaceFirst("localhost", req.getServerName()));
+			logger.info(fbPost.toString());
+			FacebookLib.postToTwitter(fbPost);
+		} catch (IOException e) {
+			exception(e);
+		} catch (TwitterException e) {
+			logger.info("post to twitter operation terminated : "+e.getErrorMessage());
 		}
 	}
 	

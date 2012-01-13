@@ -12,12 +12,17 @@ var pageSetup = {
     $('.setupContent').hide();
     $('#setPs').show();
   },
-  showConnect: function() {
+  showFacebookConnect: function() {
     $('#facebook_connect').show();
     $('#facebook_disconnect').hide();
     $('#fb_field').hide();
   },
-  showDisconnect: function(enabled) {
+  showTwitterConnect: function() {
+    $('#twitter_connect').show();
+    $('#twitter_disconnect').hide();
+    $('#tw_switch').hide();
+  },
+  showFacebookDisconnect: function(enabled) {
     $('#facebook_connect').hide();
     $('#facebook_disconnect').show();
     $('#fb_switch').unbind();
@@ -30,7 +35,7 @@ var pageSetup = {
             return;
           }
           alert($('#lang_update_successfully').text());
-          pageSetup.showDisconnect(false);
+          pageSetup.showFacebookDisconnect(false);
         }, 'text');
       });
     } else {
@@ -42,21 +47,56 @@ var pageSetup = {
             return;
           }
           alert($('#lang_update_successfully').text());
-          pageSetup.showDisconnect(true);
+          pageSetup.showFacebookDisconnect(true);
         }, 'text');
       });
     }
     $('#fb_field').show();
   },
+  showTwitterDisconnect: function(enabled) {
+	$('#twitter_connect').hide();
+	$('#twitter_disconnect').show();
+	$('#tw_switch').show();
+	$('#tw_switch').unbind();
+	if (enabled) {
+	  $('#tw_switch').text($('#lang_button_disable_autosharing').text()).click(function() {
+	    $.post('/CMSAPI/setSnsAuth', { 'msoId': $('#msoId').val(), 'enabled': false, 'type': 2 }, function(response) {
+	      if (response != "OK") {
+	        log('response: ' + response);
+	        alert($('#lang_warning_error_occurs').text());
+	        return;
+	      }
+	      alert($('#lang_update_successfully').text());
+	      pageSetup.showTwitterDisconnect(false);
+	    }, 'text');
+	  });
+	} else {
+	  $('#tw_switch').text($('#lang_button_enable_autosharing').text()).click(function() {
+	    $.post('/CMSAPI/setSnsAuth', { 'msoId': $('#msoId').val(), 'enabled': true, 'type': 2 }, function(response) {
+	      if (response != "OK") {
+	        log('response: ' + response);
+	        alert($('#lang_warning_error_occurs').text());
+	        return;
+	      }
+	      alert($('#lang_update_successfully').text());
+	      pageSetup.showTwitterDisconnect(true);
+	    }, 'text');
+	  });
+	}
+  },
   init: function() {
     $('#tabB').hide();
     $('.setup_context').css('background', 'url(' + $('#image_bg_setup').text() + ') no-repeat');
+    $('#twitter_connect').show();
     
     $.post('/CMSAPI/listSnsAuth', { 'msoId': $('#msoId').val() }, function(snsList) {
       for (i in snsList) {
         var sns = snsList[i];
         if (sns.type == 1) {
-          pageSetup.showDisconnect(sns.enabled);
+          pageSetup.showFacebookDisconnect(sns.enabled);
+        }
+        if (sns.type == 2) {
+          pageSetup.showTwitterDisconnect(sns.enabled);
         }
       }
     });
@@ -109,7 +149,7 @@ var pageSetup = {
               alert($('#lang_warning_error_occurs').text());
               return;
             }
-            pageSetup.showDisconnect(true);
+            pageSetup.showFacebookDisconnect(true);
           }, 'text');
         }, { 'scope': pageSetup.sFacebookPermissions });
       });
@@ -126,7 +166,27 @@ var pageSetup = {
             alert($('#lang_warning_error_occurs').text());
             return;
           }
-          pageSetup.showConnect();
+          pageSetup.showFacebookConnect();
+        });
+      }
+    });
+    
+    $('#twitter_connect').unbind().click(function() {
+    	window.open("http://"+location.host+"/cms/twitter/authorization?msoId="+$('#msoId').val(),"twitter authorization","width=800,height=600");
+    });
+    
+    $('#twitter_disconnect').unbind().click(function() {
+      if (confirm($('#lang_confirm_disconnect_with_twitter').text())) {
+        var parameters = {
+          'msoId': $('#msoId').val(),
+          'type': 2
+        };
+        $.post('/CMSAPI/removeSnsAuth', parameters, function(response) {
+          if (response != "OK") {
+            alert($('#lang_warning_error_occurs').text());
+            return;
+          }
+          pageSetup.showTwitterConnect();
         });
       }
     });
@@ -137,6 +197,7 @@ var pageSetup = {
       else
         $('#save_password_button').attr('disabled', false);
     });
+    
     $('#save_password_button').unbind().click(function() {
       if ($('#password').val() == '') { return; }
       if ($('#password').val() != $('#retype').val()) {

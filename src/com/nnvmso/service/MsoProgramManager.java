@@ -124,6 +124,46 @@ public class MsoProgramManager {
 		} catch (IOException e) {
 			NnLogUtil.logException(e);
 		}
+		
+		// hook, auto share to twitter
+		channelAutosharings = sharingService.findAllByChannelIdAndType(channel.getKey().getId(), SnsAuth.TYPE_TWITTER);
+		log.info("twitter autosharing count = " + channelAutosharings.size());
+		try {
+			FBPost fbPost = new FBPost(program.getName(), program.getIntro(), program.getImageUrl());
+			MsoManager msoMngr = new MsoManager();
+			InetAddress local = InetAddress.getLocalHost();
+			String url = "http://" + local.getHostName() + "/view?channel=" + channel.getKey().getId() + "&episode=" + program.getKey().getId();
+			fbPost.setLink(url);
+			if (program.getComment() != null) {
+				fbPost.setMessage(program.getComment());
+			}
+			for (ChannelAutosharing autosharing : channelAutosharings) {
+				SnsAuth snsAuth = snsMngr.findTitterAuthByMsoId(autosharing.getMsoId());
+				Mso mso = msoMngr.findById(autosharing.getMsoId());
+				if (mso.getPreferredLangCode() != null && mso.getPreferredLangCode().equals("en")) {
+					fbPost.setCaption(messageSource.getMessage("cms.autosharing.episode_added", null, Locale.ENGLISH));
+				} else {
+					fbPost.setCaption(messageSource.getMessage("cms.autosharing.episode_added", null, Locale.TRADITIONAL_CHINESE));
+				}
+				if (snsAuth != null && snsAuth.isEnabled()) {
+
+					fbPost.setFacebookId(snsAuth.getToken());
+					fbPost.setAccessToken(snsAuth.getSecrete());
+					
+					QueueFactory.getDefaultQueue().add(TaskOptions.Builder
+                            .withUrl("/CMSAPI/postToTwitter")
+                            .payload(new ObjectMapper().writeValueAsBytes(fbPost), "application/json"));
+				}
+			}
+		} catch (UnknownHostException e) {
+			NnLogUtil.logException(e);
+		} catch (JsonGenerationException e) {
+			NnLogUtil.logException(e);
+		} catch (JsonMappingException e) {
+			NnLogUtil.logException(e);
+		} catch (IOException e) {
+			NnLogUtil.logException(e);
+		}
 	} 
 	
 	public MsoProgram save(MsoProgram program) {		
