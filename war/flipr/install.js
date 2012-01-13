@@ -59,7 +59,7 @@ function sendEmail() {
   if(subject==null)
     subject = "none";
   if(msgBody==null)
-    msgBody = "none"
+    msgBody = "none";
     	
   $.post('/CMSAPI/sendEmail', { 'from': from, 'to': to, 'subject': subject, 'msgBody': msgBody }, function(response) {
     if (response != "OK") {
