@@ -335,11 +335,13 @@ public class TranscodingServiceController {
 		try {
 			OutputStream out = resp.getOutputStream();
 			resp.setCharacterEncoding("UTF-8");
+			resp.addDateHeader("Expires", System.currentTimeMillis() + 3600000);
+			resp.addHeader("Cache-Control", "private, max-age=3600");
 			if (jsoncallback == null) {
 				resp.setContentType("application/json");
 				mapper.writeValue(out, model.asMap());
 			} else {
-				resp.setContentType("text/javascript");
+				resp.setContentType("application/x-javascript");
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
 				OutputStreamWriter writer = new OutputStreamWriter(baos, "UTF-8");
 				writer.write(jsoncallback + "(");

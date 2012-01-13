@@ -65,6 +65,8 @@ public class PlayerService {
 			model.addAttribute("fbName", NnStringUtil.htmlSafeChars(channelSet.getName()));
 			model.addAttribute("fbDescription", NnStringUtil.htmlSafeChars(channelSet.getIntro()));
 			model.addAttribute("fbImg", NnStringUtil.htmlSafeChars(channelSet.getImageUrl()));
+			model.addAttribute("type", "set");
+			model.addAttribute("id", setId);
 			// put to cache
 			if (cache != null) {
 				cache.put(cacheKey, model);
@@ -158,6 +160,8 @@ public class PlayerService {
 			model.addAttribute("fbName", NnStringUtil.htmlSafeChars(channel.getName()));
 			model.addAttribute("fbDescription", NnStringUtil.htmlSafeChars(channel.getIntro()));
 			model.addAttribute("fbImg", NnStringUtil.htmlSafeChars(channel.getImageUrl()));
+			model.addAttribute("type", "ch");
+			model.addAttribute("id", ch);
 			// put to cache
 			if (cache != null) {
 				cache.put(cacheKey, model);
