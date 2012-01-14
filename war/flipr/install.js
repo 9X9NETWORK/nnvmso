@@ -1,4 +1,7 @@
 function install(lang) {
+
+return;
+
 var chromeRegex = / Chrome\/([0-9]+)[\.[0-9]+]* /;
 var safariRegex = / Version\/([0-9]+)[\.[0-9]+]* /;
 var firefoxRegex = / Firefox\/([0-9]+)[\.[0-9]+]*/;
