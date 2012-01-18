@@ -56,6 +56,7 @@ public class MsoProgram implements Serializable {
 	public static final short CONTENTTYPE_DIRECTLINK = 0;
 	public static final short CONTENTTYPE_YOUTUBE = 1;
 	public static final short CONTENTTYPE_SCRIPT = 2;
+	public static final short CONTENTTYPE_RADIO = 3;
 	
 	@Persistent
 	private String errorCode;

@@ -215,7 +215,11 @@
         <div class="right_title"><div class="floatL">小灰熊的大愛劇場</div> - <spring:message code="cms.channel_management.title.program_management"/></div>
         <div class="createEpList">
           <div class="createEpStep1">
-            <div ><a href="javascript:" class="btnCreate create_program_button"><spring:message code="cms.channel_management.btn.create_program"/></a></div>
+            <div>
+              <a href="javascript:" class="btnCreate create_program_button"><spring:message code="cms.channel_management.btn.create_program"/></a>
+              <br/>
+              <a href="javascript:" class="btnCreate create_radio_program_button"><spring:message code="cms.channel_management.btn.create_radio_program"/></a>
+            </div>
             <p><spring:message code="cms.channel_management.msg.empty_program_list"/></p>
           </div>
         </div>
@@ -299,6 +303,79 @@
                 </form>
               </div>
             </li>
+            <li style="display:none">
+              <div class="uploadSection radio_program_create_detail_block" id="radio_program_create_detail_block">
+                <form>
+                  <fieldset class="setAlbum">
+                    <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.upload_file"/></label>
+                    <div class="floatL epImport ep_select_block">
+                      <div class="floatL"><input type="radio" name="ep_upload_from" class="ep_urlbutton" checked="checked"/>&nbsp;<spring:message code="cms.channel_management.btn.from_url"/>&nbsp;&nbsp;</div>
+                      <div class="floatL"><input type="radio" name="ep_upload_from" class="ep_localdrive"/>&nbsp;<spring:message code="cms.channel_management.btn.from_local_drive"/></div>
+                    </div>
+                    <!--  upload by URL link -->
+                    <div class="floatL uploadURL ep_url_block">
+                      <div class="bg_input floatL" style="margin-top:5px"><input type="text" size="33" maxlength="100" class="ep_url_input"/></div>
+                      <div class="clear"></div>
+                      <p class="hint audio_url_hint"><spring:message code="cms.channel_management.msg.audio_url_hint"/></p>
+                      <br/>
+                    </div>
+                    <div class="floatL uploadURL ep_localdrive_block" style="display:none">
+                      <div class="floatL" style="margin:10px 0 0 80px"><a onclick="return false;" href="javascript:"><span class="ep_upload_audio btnCreate">Upload</span></a>&nbsp;</div>
+                      <div class="clear"></div>
+                      <p class="hint audio_localdrive_hint"><spring:message code="cms.channel_management.msg.audio_localdrive_hint"/></p>
+                      <div style="width:300px;padding-left:80px;padding-bottom:10px;" class="floatL ep_uploading_audio" style="display:none"><div></div></div>
+                    </div>
+                    <label class="floatL"><spring:message code="cms.channel_management.label.program_logo"/></label>
+                    <div class="uploadImg">
+                      <img alt="" src="/images/cms/upload_img.jpg" class="floatL ep_image"/><input type="hidden" class="ep_image_updated" value="fase"/>
+                      <div class="floatL imgBtn">
+                        <br />
+                        <input type="radio" name="ep_image_upload_from" class="ep_image_urlradio" checked="checked"/>&nbsp;<spring:message code="cms.channel_management.btn.from_url"/>
+                        <br /><br />
+                        <input type="radio" name="ep_image_upload_from" class="ep_image_localdrive"/>&nbsp;<spring:message code="cms.channel_management.btn.from_local_drive"/>
+                      </div>
+                      <div class="clear"></div>
+                      <div style="margin-top:10px" class="ep_image_url_block">
+                        <div class="bg_input floatL"><input type="text" size="33" maxlength="100" class="ep_image_url_input"/></div>
+                      </div>
+                      <div style="margin-top:10px;display:none" class="ep_image_localdrive_block">
+                        <span class="ep_upload_button_place"><a onclick="return false;" href="javascript:" class="uploadBtn ep_upload_image"></a></span>
+                        <span class="ep_uploading_image" style="display:none"><spring:message code="cms.channel_management.msg.uploading"/></span>
+                      </div>
+                      <p class="gray"><spring:message code="cms.channel_management.msg.best_resolution"/></p>
+                    </div>
+                    <div class="clear"></div><br/>
+                    <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.program_name"/></label>
+                    <div class="bg_input floatL"><input class="ep_name" type="text" size="33" maxlength="40"/></div>
+                    <div class="clear"></div>
+                    <p class="hint"><spring:message code="cms.channel_management.msg.fourty_characters"/></p>
+                    <br/>
+                    <label class="floatL"><spring:message code="cms.channel_management.label.program_introduction"/></label>
+                    <div class="bg_textarea floatL"><textarea class="ep_intro" name="" cols="33" rows="5"></textarea></div>
+                    <div class="clear"></div>
+                    <p class="hint"><spring:message code="cms.channel_management.msg.two_hundred_characters"/></p>
+                    <br/>
+                    <div class="ep_comment_block" style="display:none">
+                      <label class="floatL"><spring:message code="cms.channel_management.label.program_comment"/></label>
+                      <div class="bg_textarea floatL"><textarea class="ep_comment" name="" cols="33" rows="5"></textarea></div>
+                      <div class="clear"></div>
+                      <p class="hint"><spring:message code="cms.channel_management.msg.two_hundred_characters"/></p>
+                      <br/>
+                    </div>
+                    <div style="display:none"><!-- tag of program -->
+                      <label class="floatL"><spring:message code="cms.channel_management.label.tag"/></label>
+                      <div class="bg_input floatL"><input type="text" size="35" maxlength="40"/></div>
+                      <div class="clear"></div>
+                      <p class="hint"><spring:message code="cms.channel_management.msg.camma_seperated"/></p><br/>
+                    </div>
+                    <div class="epBtns" >
+                      <a onclick="return false;" href="javascript:" class="btnDisable floatL ep_savebutton" style="width:80px"><spring:message code="cms.channel_management.btn.save"/></a>
+                      <a onclick="return false;" href="javascript:" class="btnGray floatL ep_cancelbutton"><span><spring:message code="cms.channel_management.btn.cancel"/></span></a>
+                    </div>
+                  </fieldset>
+                </form>
+              </div>
+            </li>
           </ul>
           <a style="display:none" onclick="return false;" href="javascript:" class="addNew" id="continue_add_new_program_button"><spring:message code="cms.channel_management.btn.continue_creating_program"/></a>
         </div>
@@ -309,7 +386,9 @@
       <div class="epList" style="display:none" id="program_list">
         <div class="right_title"><div class="floatL">小灰熊的大愛劇場</div> - <spring:message code="cms.channel_management.title.program_management"/> </div>
         <div class="createEpList">
-          <a class="btnCreate create_program_button" href="javascript:"><spring:message code="cms.channel_management.btn.create_program"/></a>
+          <a class="btnCreate create_program_button floatL" href="javascript:"><spring:message code="cms.channel_management.btn.create_program"/></a>
+          <a class="btnCreate create_radio_program_button floatL" style="margin:0 0 10px 10px" href="javascript:"><spring:message code="cms.channel_management.btn.create_radio_program"/></a>
+          <div style="clear:both"></div>
           <ul id="program_list_ul">
             <li style="display:none">
               <div class="epItem program_info_block" id="program_info_block">

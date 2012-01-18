@@ -236,7 +236,7 @@ var page$ = {
                 'acl':            'public-read',
                 'policy':         $('#s3_policy').val(),
                 'signature':      $('#s3_signature').val(),
-                'content-type':   (file.type == '.jpg') ? 'image/jpeg' : 'image/png',
+                'content-type':   cms.getContentTypeByFileExtention(file.type),
                 'success_action_status': '201'
               };
               this.setPostParams(post_params);

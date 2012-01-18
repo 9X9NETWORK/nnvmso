@@ -95,6 +95,31 @@ var cms = {
     
     switch(ext) {
       
+      case '.gif':
+      return 'image/gif';
+      break;
+      
+      case '.png':
+      return 'image/png';
+      break;
+      
+      case '.jpg':
+      case '.jpeg':
+      return 'image/jpeg';
+      break;
+      
+      case '.wma':
+      return 'audio/x-ms-wma';
+      break;
+      
+      case '.wav':
+      return 'audio/wav';
+      break;
+      
+      case '.mp3':
+      return 'audio/mpeg';
+      break;
+      
       case '.mpg':
       case '.mpeg':
       return 'video/mpeg';

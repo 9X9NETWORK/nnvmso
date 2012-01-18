@@ -36,6 +36,13 @@ var page$ = {
         if (programId != null)
           page$.programDetail.programCreation(programId, channelId, channelName);
       }, 'json');
+    },
+    createRadioProgram: function(channelId, channelName) {
+      cms.post('/CMSAPI/createProgramSkeleton', { contentType: 3 }, function(programId) {
+        log('new program: ' + programId);
+        if (programId != null)
+          page$.programDetail.radioProgramCreation(programId, channelId, channelName);
+      }, 'json');
     }
   },
   programDetail: {
@@ -128,6 +135,12 @@ var page$ = {
         programDetailBlock.find('.ep_intro').attr('disabled', true);
         programDetailBlock.find('.ep_comment_block').show();
         break;
+        case 2:
+        programDetailBlock.find('.ep_source a').text('SlideShow');
+        break;
+        case 3:
+        programDetailBlock.find('.ep_source a').text('Radio');
+        break;
         default:
         programDetailBlock.find('.ep_source a').text('Unknown');
       }
@@ -204,7 +217,7 @@ var page$ = {
             "acl":            "public-read",
             "policy":         $('#s3_policy').val(),
             "signature":      $('#s3_signature').val(),
-            "content-type":   (file.type == '.jpg') ? "image/jpeg" : "image/png",
+            "content-type":   cms.getContentTypeByFileExtention(file.type),
             "success_action_status": "201"
           };
           this.setPostParams(post_params);
@@ -256,6 +269,195 @@ var page$ = {
       programDetailBlock.find('.ep_source').text(sourceName).attr('href', source);
       $('#program_list_readonly').hide();
       $('#program_detail_readonly').show();
+    },
+    radioProgramCreation: function(programId, channelId, channelName) {
+      $('#program_create_detail .right_title div').text(channelName);
+      $('#program_create_detail .ep_return').unbind().click(function() {
+        page$.programList.init(channelId, false, channelName);
+      });
+      cms.post('/CMSAPI/programInfo', { 'programId': programId }, function(program) {
+        var programDetailBlock = $('#radio_program_create_detail_block')
+                                   .clone(true)
+                                   .removeAttr('id')
+                                   .addClass('program_create_detail_block_cloned');
+        var programId = program.key.id;
+        log('new programId: ' + programId);
+        log(program);
+        
+        programDetailBlock.find('.ep_urlbutton').click(function() {
+          programDetailBlock.find('.ep_url_block').show();
+          programDetailBlock.find('.ep_localdrive_block').hide();
+        });
+        
+        programDetailBlock.find('.ep_localdrive').click(function() {
+          programDetailBlock.find('.ep_url_block').hide();
+          programDetailBlock.find('.ep_localdrive_block').show();
+        });
+        
+        programDetailBlock.find('.ep_image_urlradio').click(function() {
+          programDetailBlock.find('.ep_image_url_block').show();
+          programDetailBlock.find('.ep_image_localdrive_block').hide();
+        });
+        
+        programDetailBlock.find('.ep_image_localdrive').click(function() {
+          programDetailBlock.find('.ep_image_url_block').hide();
+          programDetailBlock.find('.ep_image_localdrive_block').show();
+        });
+        
+        programDetailBlock.find('.ep_name').val(program.name);
+        programDetailBlock.find('.ep_image').attr('src', program.imageUrl);
+        programDetailBlock.find('.ep_image_updated').val('false');
+        programDetailBlock.find('.ep_intro').val(program.intro);
+        
+        $('#program_create_detail').show();
+        $('<li></li>').append(programDetailBlock).appendTo('#program_create_ul');
+        
+        // audio uploading
+        var swfupload_settings = {
+          flash_url:          '/javascripts/swfupload/swfupload.swf',
+          upload_url:         'http://9x9tmp.s3.amazonaws.com/',
+          file_size_limit:    '1024000',
+          file_types:         '*.mp3;*.wma;*.wav',
+          file_types_description: 'Audio Files',
+          file_post_name:     'file',
+          button_placeholder: programDetailBlock.find('.ep_upload_audio').get(0),
+          button_action:      SWFUpload.BUTTON_ACTION.SELECT_FILE,
+          button_image_url:   $('#image_btn_from_disk').text(),
+          button_width:       '95',
+          button_height:      '32',
+          button_cursor:      SWFUpload.CURSOR.HAND,
+          button_window_mode : SWFUpload.WINDOW_MODE.OPAQUE,
+          debug:              false,
+          http_success :      [201],
+          upload_progress_handler: function(file, completed, total) {
+            programDetailBlock.find('.ep_uploading_audio div').progressBar((completed * 100) / total);
+          },
+          upload_success_handler: function(file, serverData, recievedResponse) {
+            programDetailBlock.find('.ep_url_input').val('http://9x9tmp.s3.amazonaws.com/' + 'prog_audio_' + programId + file.type);
+            programDetailBlock.find('.ep_url_import').click();
+          },
+          upload_error_handler: function(file, code, message) {
+            programDetailBlock.find('.ep_uploading_audio div').text($('#lang_upload_failed').text()).show();
+            alert('error: ' + message);
+          },
+          file_queued_handler: function(file) {
+            var post_params = {
+              "AWSAccessKeyId": $('#s3_id').val(),
+              "key":            'prog_audio_' + programId + file.type,
+              "acl":            "public-read",
+              "policy":         $('#s3_policy').val(),
+              "signature":      $('#s3_signature').val(),
+              "content-type":   cms.getContentTypeByFileExtention(file.type),
+              "success_action_status": "201"
+            };
+            log('start upload audio');
+            log(post_params);
+            this.setPostParams(post_params);
+            this.startUpload(file.id);
+            programDetailBlock.find('.ep_uploading_audio div').text('').progressBar({
+              barImage: '/images/cms/progressbg_black.gif'
+            }).parent().show();
+            programDetailBlock.find('.ep_url_input').val('');
+            programDetailBlock.find('.ep_url_block').hide();
+            programDetailBlock.find('.audio_localdrive_hint').hide();
+            
+         }
+        };
+        var swfObject = new SWFUpload(swfupload_settings);
+        page$.programDetail.swfObjectVideo.push(swfObject);
+        
+        // logo uploading
+        var swfupload_settings = {
+          flash_url:              '/javascripts/swfupload/swfupload.swf',
+          upload_url:             'http://9x9tmp.s3.amazonaws.com/',
+          file_size_limit:        '10240',
+          file_types:             '*.jpg;*.png;*.gif',
+          file_types_description: 'Image Files',
+          file_post_name:         'file',
+          button_placeholder:     programDetailBlock.find('.ep_upload_image').get(0),
+          button_action:          SWFUpload.BUTTON_ACTION.SELECT_FILE,
+          button_image_url:       $('#image_btn_upload').text(),
+          button_width:           '95',
+          button_height:          '32',
+          button_cursor:          SWFUpload.CURSOR.HAND,
+          button_window_mode :    SWFUpload.WINDOW_MODE.OPAQUE,
+          debug:                  false,
+          http_success :          [201],
+          upload_success_handler: function(file, serverData, recievedResponse) {
+            var imageUrl = 'http://9x9tmp.s3.amazonaws.com/prog_logo_' + programId + '_' + file.size + file.type;
+            log('imageUrl: ' + imageUrl);
+            programDetailBlock.find('.ep_uploading_image').hide();
+            programDetailBlock.find('.ep_image').attr('src', imageUrl);
+            programDetailBlock.find('.ep_image_url_input').val(imageUrl);;
+            programDetailBlock.find('.ep_image_updated').val('true');
+          },
+          upload_error_handler: function(file, code, message) {
+            programDetailBlock.find('.ep_uploading_image').hide();
+            alert('error: ' + message);
+          },
+          file_queued_handler: function(file) {
+            var post_params = {
+              "AWSAccessKeyId": $('#s3_id').val(),
+              "key":            'prog_logo_' + programId + '_' + file.size + file.type,
+              "acl":            "public-read",
+              "policy":         $('#s3_policy').val(),
+              "signature":      $('#s3_signature').val(),
+              "content-type":   cms.getContentTypeByFileExtention(file.type),
+              "success_action_status": "201"
+            };
+            this.setPostParams(post_params);
+            this.startUpload(file.id);
+            programDetailBlock.find('.ep_uploading_image').show();
+          }
+        };
+        var swfObjectImage = new SWFUpload(swfupload_settings);
+        page$.programDetail.swfObjectImage.push(swfObjectImage);
+        
+        programDetailBlock.find('.ep_cancelbutton').click(function() {
+          if (confirm($('#lang_confirm_cancel').text()) == false) return;
+          swfObjectImage.destroy();
+          swfObject.destroy();
+          programDetailBlock.parent().remove();
+          if ($('.program_create_detail_block_cloned').size() == 0) {
+            page$.programList.init(channelId, false, channelName);
+          }
+        });
+        
+        var btnSave = programDetailBlock.find('.ep_savebutton').css('width', 80).removeClass('btnDisable').addClass('btnSave');
+        btnSave.unbind().click(function() {
+          if (programDetailBlock.find('.ep_name').val() == '') {
+            alert($('#lang_warning_empty_name').text());
+            return;
+          }
+          if (programDetailBlock.find('.ep_url_input').val() == '') {
+            alert($('#lang_warning_import_program_source').text());
+            return;
+          }
+          var parameters = {
+            'channelId': channelId,
+            'programId': programId,
+            'sourceUrl': programDetailBlock.find('.ep_url_input').val(),
+            'name':      programDetailBlock.find('.ep_name').val(),
+            'intro':     programDetailBlock.find('.ep_intro').val()
+          };
+          if (programDetailBlock.find('.ep_image_url_input').val() != '') {
+            parameters['imageUrl'] = programDetailBlock.find('.ep_image_url_input').val();
+          }
+          cms.post('/CMSAPI/saveNewProgram', parameters, function(response) {
+            if (response == 'OK') {
+              alert($('#lang_update_successfully').text());
+              programDetailBlock.removeClass('program_create_detail_block_cloned').parent().hide(); // IE compatible
+              var size = $('.program_create_detail_block_cloned').size();
+              if ($('.program_create_detail_block_cloned').size() == 0) {
+                page$.programList.init(channelId, false, channelName);
+              }
+            } else {
+              alert($('#lang_warning_error_occurs').text());
+            }
+          }, 'text');
+        });
+      }, 'json');
+      
     },
     programCreation: function(programId, channelId, channelName) {
       $('#program_create_detail .right_title div').text(channelName);
@@ -485,7 +687,7 @@ var page$ = {
               "acl":            "public-read",
               "policy":         $('#s3_policy').val(),
               "signature":      $('#s3_signature').val(),
-              "content-type":   (file.type == '.jpg') ? "image/jpeg" : "image/png",
+              "content-type":   cms.getContentTypeByFileExtention(file.type),
               "success_action_status": "201"
             };
             this.setPostParams(post_params);
@@ -527,6 +729,10 @@ var page$ = {
         $('.create_program_button').unbind().click({ 'channelId': channelId, 'channelName': channelName }, function(event) {
           if (page$.overallLayout.destroyRightSideContent(false) == false) return false;
           page$.skeletonCreation.create9x9Program(event.data.channelId, event.data.channelName);
+        });
+        $('.create_radio_program_button').unbind().click({ 'channelId': channelId, 'channelName': channelName }, function(event) {
+          if (page$.overallLayout.destroyRightSideContent(false) == false) return false;
+          page$.skeletonCreation.createRadioProgram(event.data.channelId, event.data.channelName);
         });
         if (programs.length == 0) {
           if (readonly) {
@@ -627,6 +833,12 @@ var page$ = {
           break;
           case 1:
           type = 'YouTube';
+          break;
+          case 2:
+          type = 'SlideShow';
+          break;
+          case 3:
+          type = 'Radio';
           break;
           default:
         }
@@ -817,7 +1029,7 @@ var page$ = {
                 "acl":            "public-read",
                 "policy":         $('#s3_policy').val(),
                 "signature":      $('#s3_signature').val(),
-                "content-type":   (file.type == '.jpg') ? "image/jpeg" : "image/png",
+                "content-type":   cms.getContentTypeByFileExtention(file.type),
                 "success_action_status": "201"
               };
               this.setPostParams(post_params);
@@ -1021,7 +1233,7 @@ var page$ = {
               "acl":            "public-read",
               "policy":         $('#s3_policy').val(),
               "signature":      $('#s3_signature').val(),
-              "content-type":   (file.type == '.jpg') ? "image/jpeg" : "image/png",
+              "content-type":   cms.getContentTypeByFileExtention(file.type),
               "success_action_status": "201"
             };
             this.setPostParams(post_params);
