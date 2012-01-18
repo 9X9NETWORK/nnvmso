@@ -1,6 +1,7 @@
 package com.nnvmso.web;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.security.SignatureException;
 import java.util.Locale;
 import java.util.logging.Logger;
@@ -307,7 +308,8 @@ public class CmsController {
 	@RequestMapping("cms/twitter/authorization")
 	public ResponseEntity<String> twitterAuthorization(@RequestParam(required=false, value="oauth_token") String oauthToken, 			                             
             @RequestParam(required=false, value="oauth_verifier") String oauthVerifier,
-            @RequestParam(required=false, value="msoId") String msoId) throws IOException, TwitterException {
+            @RequestParam(required=false, value="msoId") String msoId,
+            HttpServletRequest req) throws IOException, TwitterException {
 		
 		Twitter twitter = new TwitterFactory().getInstance();
 		twitter.setOAuthConsumer("udWzz6YrsaNlbJ18vZ7aCA", "Pf0TdB2QFXWKyphbIdnPG4vZhLVze0cPCxlLkfBwtQ");
@@ -315,10 +317,10 @@ public class CmsController {
 		
 		if(oauthToken==null)
 		{
-			RequestToken requestToken = twitter.getOAuthRequestToken();
+			// overwrite the application call_back_url setting
+			String call_back_url = "http://"+req.getServerName()+"/cms/twitter/authorization";
+			RequestToken requestToken = twitter.getOAuthRequestToken(call_back_url);
 			if(msoId!=null) {
-				System.out.println("msoId:"+msoId);
-				System.out.println("request token:"+requestToken.getToken());
 				cache.put(requestToken.getToken()+"msoId", msoId);
 				cache.put(requestToken.getToken(), requestToken.getTokenSecret());
 			}
@@ -331,8 +333,6 @@ public class CmsController {
 		{
 			String requestTokenSecret = cache.get(oauthToken).toString();
 			msoId = cache.get(oauthToken+"msoId").toString();
-			System.out.println("request token:"+oauthToken);
-			System.out.println("verifier:"+oauthVerifier);
 			if(requestTokenSecret!=null && msoId!=null)
 			{
 				long userID = Long.parseLong(msoId.trim());
@@ -342,9 +342,6 @@ public class CmsController {
 				AccessToken accessToken = twitter.getOAuthAccessToken(requestToken, oauthVerifier);
 				cache.remove(oauthToken);
 				cache.remove(oauthToken+"msoId");
-				
-				System.out.println("msoId:"+userID);
-				System.out.println("access token:"+accessToken.getToken());
 				
 				CmsApiController cmsApiController = new CmsApiController();
 				cmsApiController.createSnsAuth(userID, type, accessToken.getToken(), accessToken.getTokenSecret());
