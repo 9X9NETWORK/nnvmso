@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9miniV9a"/>
+<c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9miniV11"/>
 
 <link rel="stylesheet" href="${root}/stylesheets/main.css" />
 
@@ -22,7 +22,7 @@
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/vertical.slider.V2.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/jquery.mousewheel.min.js"></script>
 
-<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/mini9.js"></script>
+<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/mini10.js"></script>
 
 <!-- Quantcast Tag -->
 <script type="text/javascript">
@@ -57,13 +57,20 @@ qacct:"p-b2xUunKYSaIeQ"
 <div id="video" style="position: absolute; z-Index: 2; height: 100%; width: 100%; background-color: black">
 </div>
 
-<div id="sync-layer">
-  <div id="sync-holder">
-    <p><span>Please initiate account binding.<br>The name of this device is:</span></p>
-    <p><span class="device-name"></span></p>
-    <p><span class="note">Need help? Please visit 9x9.tv or email feedback@9x9.tv</span></p>
-  </div>
-</div>
+<div id="sync-layer"> 
+  <div id="sync-holder"> 
+    <p class="head"><span>Welcome to 9x9!</span></p> 
+    <ul id="values"> 
+      <li><span>Sign up to access thousands of curated channels</span></li> 
+      <li><span>Create your very own personalized channel guide</span></li> 
+      <li><span>Watch your favorite channels just like watching TV!</span></li> 
+    </ul> 
+    <p><span>It's free and easy!</span></p> 
+    <p class="btn-hilite"><span>Sign in or Sign up now!</span></p> 
+    <p><span>Use iPhone/iPad to remote control 9x9?<br>The name of this device is:</span></p> 
+    <p class="device-name"><span>Google TV</span></p> 
+  </div> 
+</div> 
 
 <div id="welcome-layer">
   <div id="welcome-holder">
@@ -87,6 +94,20 @@ qacct:"p-b2xUunKYSaIeQ"
   </div>
 </div>
 
+<div id="confirm-layer"> 
+  <div id="confirm-holder"> 
+    <p class="head"><span>Sign up complete.<br>You may <strong>start flipping!</strong></span></p> 
+    <p class="main"><span>Browse our <strong>Channel Store</strong>, add new channels to your personalized <strong>Channel Guide</strong>, and watch your favorite channels just like how you would on a TV!</span></p>
+    <p class="btn-hilite" id="btn-start-add"><span>Start adding channels</span></p>
+  </div>
+</div> 
+
+<div id="notice-layer">
+  <div id="notice-holder">
+    <p><span>Added to your guide successfully!</span></p>
+  </div>
+</div>
+
 <div id="player-layer">
   <div id="osd-layer">
     <div id="osd-holder">
@@ -101,33 +122,37 @@ qacct:"p-b2xUunKYSaIeQ"
 </div>
 
 <div id="sg-layer">
-  <div id="sg-header">
-    <img src="${root}/images/logo.png" id="logo">
-    <p id="slogan"><span>Your Personal Channel Browser</span></p>
-    <p id="device">
-      <span>Device:</span>
-      <span id="device-name">Not connected</span>
-    </p>
-  </div>
   <div id="sg-holder">
-      <div id="user">
-        <p class="section-title"><span>User</span></p>
-        <p id="selected-user"><span>Guest</span><img src="${root}/images/icon_expand.png" class="icon-expand"></p>
-        <ul id="user-list">
-        </ul>
+    <div id="sg-header">
+      <img src="${root}/images/logo.png" id="sg-logo">
+      <p id="device"><span>Device:</span><span id="device-name">Not connected</span></p>
+      <img src="${root}/images/icon_store.png" id="btn-store">
+      <img src="${root}/images/icon_help.png" id="btn-help">
+      <img src="${root}/images/icon_pc.png" id="btn-pc">
+    </div>
+    <div id="user">
+      <p id="selected-user">
+        <span id="user-name">No users</span><span class="tail">'s Channels</span><img src="${root}/images/icon_expand.png" class="icon-expand">
+      </p>
+      <ul id="user-list">
+      </ul>
+    </div>
+    <div id="sg-grid" class="x9">
+      <div id="sg-constrain">
+        <div id="slider">
+        </div>
       </div>
-      <div id="sg-grid">
-      </div>
-      <div id="channel-info">
-        <p class="section-title"><span>Current Channel</span></p>
-        <p id="channel-title"><span>Golden Drama</span></p>
-        <p id="channel-description"><span>Last installment from my "Making Money from Podcasting" series...</span></p>
-        <p id="channel-meta">
-          <span id="eps-number">Episodes: 12</span><br>
-          <span id="updates">Updated: Today</span>
-        </p>
-        <p id="ch-set"><span>Channel set: <br>Da Ai March Golden Selection Set</span></p>
-      </div>
+    </div>
+    <div id="channel-info">
+      <p class="section-title"><span>Current Channel</span></p>
+      <p id="channel-title"><span>Golden Drama</span></p>
+      <p id="channel-description"><span>Last installment from my "Making Money from Podcasting" series...</span></p>
+      <p id="channel-meta">
+        <span id="eps-number">Episodes: 12</span><br>
+        <span id="updates">Updated: Today</span>
+      </p>
+      <p id="ch-set"><span>Channel set: <br>Da Ai March Golden Selection Set</span></p>
+    </div>
   </div>
 </div>
 
@@ -186,6 +211,141 @@ qacct:"p-b2xUunKYSaIeQ"
         <p id="btn-report" class="btn"><span>Submit</span></p>
       </div>
     </div>
+  </div>
+</div>
+
+<div id="store-layer">
+  <div id="store-holder"> 
+    <div id="store-header">
+      <img src="${root}/images/logo.png" id="store-logo">
+      <p id="store-title"><span>Channel Store</span></p>
+    </div>
+    <img src="${root}/images/arrow_up.png" id="ch-up">
+    <img src="${root}/images/arrow_left.png" id="set-left">
+    <img src="${root}/images/arrow_right.png" id="set-right">
+    <div id="store-constrain">    
+        <div id="open-set">
+          <div id="ch1"></div>
+          <div id="ch2"><img src="" class="thumbnail"></div>
+          <div id="ch3"><img src="" class="thumbnail"></div>
+          <p id="open-titles" class="open-txt"><span id="set-name">News</span><span class="divider">/</span><span id="ch-name">BBC News</span><span id="ch-order">(Ch 3 of 20)</span></p>
+          <p id="open-description" class="open-txt"><span>Breaking news, sport, TV, radio and a whole lot more. The BBC informs, educates 
+and entertains - wherever you are, whatever your age.</span></p>
+          <p id="open-meta" class="open-txt"><span>Subscribers:</span><span id="open-subscriber">1234</span><span class="divider">|</span><span>Updated:</span><span id="open-age">Today</span></p>
+          <p id="store-hint" class="open-txt"><span>Press <img src="${root}/images/btn_ok.png" class="icon-btn-ok"> to add this channel. Press <img src="${root}/images/btn_9x9.png" class="icon-btn-9x9"> or <img src="${root}/images/btn_m.png" class="icon-btn-m"> to Guide.</span></p>
+        </div>
+        <ul id="set-list">
+        </ul>
+    </div>
+  </div>
+</div>
+
+<div id="signin-layer">
+  <div id="signin-holder">
+    <p id="btn-signin-close"><img src="${root}/images/btn_delete_off.png" class="off"><img src="${root}/images/btn_delete_on.png" class="on"></p>
+    <ul id="signin-tabs">
+      <li id="signin" class="on"><span>Returning Users</span></li>
+      <li id="signup"><span>New Users</span></li>
+    </ul>
+    <div id="signin-panel" class="input-panel">
+      <ul class="input-list">
+        <li>
+          <span>Your 9x9 ID:</span>
+          <p class="signin-input">
+            <input type="text" class="textfield" id="return-email">
+          </p>
+        </li>
+        <li>
+          <span>Password:</span>
+          <p class="signin-input">
+            <input type="password" class="textfield" id="signin-password">
+          </p>
+        </li>
+        <li><p class="btn" id="btn-signin"><span>Sign in</span></p></li>
+      </ul>
+      <div id="entry-switcher">
+        <p class="head"><span>Need help?</span></p>
+        <p class="content"><span>Please visit 9x9.tv or email <a href="mailto:feedback@9x9cloud.tv">feedback@9x9cloud.tv</a></span></p>
+      </div>
+    </div>
+    <div id="signup-panel" class="input-panel">
+      <ul class="input-list">
+        <li>
+          <span>Email:</span>
+          <p class="signin-input">
+            <input type="text" class="textfield" id="signup-email">
+          </p>
+        </li>
+        <li>
+          <span>Password:</span>
+          <p class="signin-input">
+            <input type="password" class="textfield" id="signup-password">
+          </p>
+          <span class="hint">6-character minimum</span>
+        </li>
+        <li>
+          <span>Retype Password:</span>
+          <p class="signin-input">
+            <input type="password" class="textfield" id="signup-password2">
+          </p>
+        </li>
+        <li>
+          <span>Name:</span>
+          <p class="signin-input">
+            <input type="text" class="textfield" id="signup-name">
+          </p>
+        </li>
+        <li>
+          <p><span>Gender:</span></p>
+          <p class="radio-item on"><img src="${root}/images/btn_radio_off.png" class="btn-radio-off"><img src="${root}/images/btn_radio_on.png" class="btn-radio-on"><span>Male</span></p>
+          <p class="radio-item"><img src="${root}/images/btn_radio_off.png" class="btn-radio-off"><img src="${root}/images/btn_radio_on.png" class="btn-radio-on"><span>Female</span></p>
+        </li>
+      </ul>
+      <ul class="input-list-right"> 
+        <li id="birth-input">
+          <span>Birth Year:</span>
+          <p class="signin-input">
+            <input type="text" class="textfield" value="Example: 1985" id="signup-birthyear">
+          </p>
+        </li>
+        <li>
+          <p class="term-text"><span>Clicking I accept means that you agree to the <strong id="btn-agreement">9x9 service agreement</strong> and <strong id="btn-legal">privacy statement</strong>. You also agree to receive email from 9x9 with service updates, special offers, and survey invitations. You can unsubscribe at any time.</span></p>
+        </li>
+        <li><p class="btn" id="btn-signup"><span>I Accept</span></p></li>
+        <li>
+          <p class="help-txt"><span>Need help? Please visit 9x9.tv or email <a href="mailto:feedback@9x9cloud.tv">feedback@9x9cloud.tv</a></span></p>
+        </li>
+      </ul>
+    </div>   
+  </div>
+</div>
+
+<div id="doc-layer"> 
+  <div id="doc-holder"> 
+    <p id="btn-doc-close"><img src="${root}/images/btn_delete_off.png" class="off"><img src="${root}/images/btn_delete_on.png" class="on"></p> 
+    <ul id="doc-tabs"> 
+      <li id="agreement"><span>Agreement</span></li> 
+      <li id="legal" class="on"><span>Legal</span></li> 
+    </ul> 
+    <div id="agreement-panel" class="input-panel"> 
+      <div id="agreement-slider" class="slider-wrap"><div class="slider-vertical"></div></div> 
+      <div id="agreement-content" class="constrain"> 
+        <div id="agreement-list"> 
+        </div> 
+      </div> 
+    </div> 
+    <div id="legal-panel" class="input-panel"> 
+      <div id="legal-slider" class="slider-wrap"><div class="slider-vertical"></div></div> 
+      <div id="legal-content" class="constrain"> 
+        <div id="legal-list"> 
+        </div> 
+      </div> 
+    </div> 
+  </div> 
+</div>
+
+<div id="tutorial-layer">
+  <div id="tutorial-holder">
   </div>
 </div>
 
