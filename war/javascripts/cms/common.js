@@ -9,6 +9,9 @@ var log = function(text) {
 
 var cms = {
   debug: false,
+  videoTypes: '*.m4v;*.mp4;*.mpg;*.mpeg;*.mov;*.webm;*.rm;*.rmvb;*.avi;*.wmv;*.flv;*.ogg',
+  audioTypes: '*.mp3;*.wma;*.wav;*.aac;*.aif;*.aiff',
+  imageTypes: '*.jpeg;*.jpg;*.png;*.gif',
   isFacebookLoaded: false,
   loadFacebook: function(callback) {
     if (this.isFacebookLoaded) {
@@ -106,6 +109,15 @@ var cms = {
       case '.jpg':
       case '.jpeg':
       return 'image/jpeg';
+      break;
+      
+      case '.aac':
+      return 'audio/aac';
+      break;
+      
+      case '.aif':
+      case '.aiff':
+      return 'audio/aiff';
       break;
       
       case '.wma':

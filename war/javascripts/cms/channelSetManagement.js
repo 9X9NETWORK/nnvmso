@@ -208,7 +208,7 @@ var page$ = {
             flash_url:              '/javascripts/swfupload/swfupload.swf',
             upload_url:             'http://9x9tmp.s3.amazonaws.com/',
             file_size_limit:        '10240',
-            file_types:             '*.jpg;*.png;*.gif',
+            file_types:             cms.imageTypes,
             file_types_description: 'Image Files',
             file_post_name:         'file',
             button_placeholder:     $('#upload_image').get(0),
