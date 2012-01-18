@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+﻿﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="utf-8" lang="utf-8">
 	<head>
 		<title>FLIPr 電腦一秒變電視 近千種推薦頻任您享受</title>
@@ -31,13 +31,14 @@
 		<img class="button" alt="" title="安裝FLIPr軟體" id="installer" src="images/installer.png" 
 		onmouseover="this.src='images/installer_r.png';" 
 		onmouseout="this.src='images/installer.png';" 
-		onclick="install('zh');" />
+		onclick="" />
 		<img src="images/subtitle_contact.png" title="聯絡我們" alt="聯絡我們" />
 		<div id="contact">
 			<table class="c_content">
 				<tr><th>聯絡主旨</th><td><input class="c1" name="content_s" type="text" size="30" id="content_t" /></td></tr>
+				<tr><th>聯絡信箱</th><td><input class="c1" name="content_m" type="text" size="30" id="content_m" /></td></tr>
 				<tr><th>聯絡內容</th><td><textarea class="c1" name="content_w" cols="35" rows="9" id="content_w"></textarea></td></tr>
-				<tr><td style="text-align: center;" colspan="2"><input class="c2" name="submit" type="button" id="submit" value="確定送出" onclick="sendEmail();" />
+				<tr><td style="text-align: center;" colspan="2"><input class="c2" name="submit" type="button" id="submit" value="確定送出" onclick="sendEmail('zh');" />
 																		<input class="c2" name="reset" type="button" id="reset" value="清除重填" onclick="erase();" /></td></tr>
 			</table>
 		</div>
@@ -73,6 +74,12 @@
 				$('div#language_s').slideToggle(400);
 			});
 		});
+		
+/*		
+		$(document).ready(function() {
+			install('zh');
+		});
+*/
     </script>
 </body>
 </html>

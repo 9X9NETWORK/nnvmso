@@ -1,5 +1,6 @@
 package com.nnvmso.web;
 
+import java.util.Locale;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -91,8 +92,13 @@ public class PlayerController {
 	}
 	
 	@RequestMapping("flipr")
-	public String flipr() {
-		return "redirect:flipr/";
+	public String flipr(HttpServletRequest request) {
+		Locale locale = request.getLocale();
+		if((locale.getCountry()=="TW")||(locale.getCountry()=="CN")) {
+			return "redirect:flipr/tw/";
+		} else {
+			return "redirect:flipr/en/";
+		}
 	}
 	
 }
