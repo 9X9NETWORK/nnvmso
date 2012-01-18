@@ -294,7 +294,7 @@ public class MsoProgramManager {
 					        String.valueOf(p.getKey().getId()), 
 					        p.getName(), 
 					        intro,
-					        String.valueOf(p.getType()), 
+					        String.valueOf(p.getContentType()), 
 					        p.getDuration(),
 					        imageUrl,
 					        imageLargeUrl,

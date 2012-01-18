@@ -163,8 +163,10 @@ public class MsoProgramDao extends GenericDao<MsoProgram> {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		try {
 			Query q = pm.newQuery(MsoProgram.class);
-			q.setFilter("channelId == channelIdParam && status == statusParam && type == typeParam");
-			q.declareParameters("long channelIdParam, short statusParam, short typeParam");
+			//q.setFilter("channelId == channelIdParam && status == statusParam && type == typeParam");
+			//q.declareParameters("long channelIdParam, short statusParam, short typeParam");
+			q.setFilter("channelId == channelIdParam && status == statusParam");
+			q.declareParameters("long channelIdParam, short statusParam");
 			if (c.getContentType() == MsoChannel.CONTENTTYPE_MAPLE_SOAP) {
 				q.setOrdering("seq asc, subSeq asc"); 
 		    } else if (c.getContentType() == MsoChannel.CONTENTTYPE_MAPLE_VARIETY) {
@@ -174,7 +176,7 @@ public class MsoProgramDao extends GenericDao<MsoProgram> {
 			}
 			//q.setRange(0, 50);			
 			@SuppressWarnings("unchecked")
-			List<MsoProgram> programs = (List<MsoProgram>)q.execute(c.getKey().getId(), MsoProgram.STATUS_OK, MsoProgram.TYPE_VIDEO);
+			List<MsoProgram> programs = (List<MsoProgram>)q.execute(c.getKey().getId(), MsoProgram.STATUS_OK);
 			detached = (List<MsoProgram>)pm.detachCopyAll(programs);
 		} finally {
 			pm.close();

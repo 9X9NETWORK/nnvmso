@@ -890,7 +890,7 @@ public class PlayerApiController {
 	}
 	
 	/**
-	 * Save User Shareing
+	 * Save User Sharing
 	 *
 	 * @param user user's unique identifier
 	 * @param channel channel id
