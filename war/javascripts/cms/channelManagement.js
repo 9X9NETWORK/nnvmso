@@ -299,11 +299,17 @@ var page$ = {
         });
         
         programDetailBlock.find('.ep_image_urlradio').click(function() {
+log('urlradio');
+          programDetailBlock.find('.best_resolution_from_url').show();
+          programDetailBlock.find('.best_resolution_from_disk').hide();
           programDetailBlock.find('.ep_image_url_block').show();
           programDetailBlock.find('.ep_image_localdrive_block').hide();
         });
         
         programDetailBlock.find('.ep_image_localdrive').click(function() {
+log('localdrive');
+          programDetailBlock.find('.best_resolution_from_url').hide();
+          programDetailBlock.find('.best_resolution_from_disk').show();
           programDetailBlock.find('.ep_image_url_block').hide();
           programDetailBlock.find('.ep_image_localdrive_block').show();
         });

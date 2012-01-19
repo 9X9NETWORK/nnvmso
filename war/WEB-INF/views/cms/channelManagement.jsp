@@ -342,7 +342,9 @@
                         <span class="ep_upload_button_place"><a onclick="return false;" href="javascript:" class="uploadBtn ep_upload_image"></a></span>
                         <span class="ep_uploading_image" style="display:none"><spring:message code="cms.channel_management.msg.uploading"/></span>
                       </div>
-                      <p class="gray"><spring:message code="cms.channel_management.msg.best_resolution"/></p>
+                      <div class="clear"></div>
+                      <p class="gray best_resolution_from_disk" style="display:none"><spring:message code="cms.channel_management.msg.best_resolution"/></p>
+                      <p class="gray best_resolution_from_url"><spring:message code="cms.channel_management.msg.best_resolution_from_url"/></p>
                     </div>
                     <div class="clear"></div><br/>
                     <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.program_name"/></label>
