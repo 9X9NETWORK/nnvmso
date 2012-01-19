@@ -198,10 +198,12 @@ var page$ = {
         button_width:       '95',
         button_height:      '32',
         button_cursor:      SWFUpload.CURSOR.HAND,
-        button_window_mode : SWFUpload.WINDOW_MODE.TRANSPARENT,
+        button_window_mode : SWFUpload.WINDOW_MODE.OPAQUE,
         debug:              false,
         http_success :      [201],
         upload_success_handler: function(file, serverData, recievedResponse) {
+          if (!file.type)
+            file.type = cms.getFileTypeByName(file.name);
           programDetailBlock.find('.ep_uploading_image').hide();
           programDetailBlock.find('.ep_image').attr('src', 'http://9x9tmp.s3.amazonaws.com/prog_logo_' + programId + '_' + file.size + file.type);
           programDetailBlock.find('.ep_image_updated').val('true');
@@ -211,6 +213,8 @@ var page$ = {
           alert('error: ' + message);
         },
         file_queued_handler: function(file) {
+          if (!file.type)
+            file.type = cms.getFileTypeByName(file.name);
           var post_params = {
             "AWSAccessKeyId": $('#s3_id').val(),
             "key":            'prog_logo_' + programId + '_' + file.size + file.type,
@@ -333,6 +337,8 @@ var page$ = {
             programDetailBlock.find('.ep_uploading_audio div').progressBar((completed * 100) / total);
           },
           upload_success_handler: function(file, serverData, recievedResponse) {
+            if (!file.type)
+              file.type = cms.getFileTypeByName(file.name);
             programDetailBlock.find('.ep_url_input').val('http://9x9tmp.s3.amazonaws.com/' + 'prog_audio_' + programId + file.type);
             programDetailBlock.find('.ep_url_import').click();
           },
@@ -341,6 +347,8 @@ var page$ = {
             alert('error: ' + message);
           },
           file_queued_handler: function(file) {
+            if (!file.type)
+              file.type = cms.getFileTypeByName(file.name);
             var post_params = {
               "AWSAccessKeyId": $('#s3_id').val(),
               "key":            'prog_audio_' + programId + file.type,
@@ -384,6 +392,8 @@ var page$ = {
           debug:                  false,
           http_success :          [201],
           upload_success_handler: function(file, serverData, recievedResponse) {
+            if (!file.type)
+              file.type = cms.getFileTypeByName(file.name);
             var imageUrl = 'http://9x9tmp.s3.amazonaws.com/prog_logo_' + programId + '_' + file.size + file.type;
             log('imageUrl: ' + imageUrl);
             programDetailBlock.find('.ep_uploading_image').hide();
@@ -396,6 +406,8 @@ var page$ = {
             alert('error: ' + message);
           },
           file_queued_handler: function(file) {
+            if (!file.type)
+              file.type = cms.getFileTypeByName(file.name);
             var post_params = {
               "AWSAccessKeyId": $('#s3_id').val(),
               "key":            'prog_logo_' + programId + '_' + file.size + file.type,
@@ -613,13 +625,15 @@ var page$ = {
           button_width:       '95',
           button_height:      '32',
           button_cursor:      SWFUpload.CURSOR.HAND,
-          button_window_mode : SWFUpload.WINDOW_MODE.TRANSPARENT,
+          button_window_mode : SWFUpload.WINDOW_MODE.OPAQUE,
           debug:              false,
           http_success :      [201],
           upload_progress_handler: function(file, completed, total) {
             programDetailBlock.find('.ep_uploading_video div').progressBar((completed * 100) / total);
           },
           upload_success_handler: function(file, serverData, recievedResponse) {
+            if (!file.type)
+              file.type = cms.getFileTypeByName(file.name);
             programDetailBlock.find('.ep_url_input').val('http://9x9tmp.s3.amazonaws.com/' + 'prog_video_' + programId + file.type);
             programDetailBlock.find('.ep_url_import').click();
           },
@@ -628,6 +642,8 @@ var page$ = {
             alert('error: ' + message);
           },
           file_queued_handler: function(file) {
+            if (!file.type)
+              file.type = cms.getFileTypeByName(file.name);
             var post_params = {
               "AWSAccessKeyId": $('#s3_id').val(),
               "key":            'prog_video_' + programId + file.type,
@@ -668,10 +684,12 @@ var page$ = {
           button_width:       '95',
           button_height:      '32',
           button_cursor:      SWFUpload.CURSOR.HAND,
-          button_window_mode : SWFUpload.WINDOW_MODE.TRANSPARENT,
+          button_window_mode : SWFUpload.WINDOW_MODE.OPAQUE,
           debug:              false,
           http_success :      [201],
           upload_success_handler: function(file, serverData, recievedResponse) {
+            if (!file.type)
+              file.type = cms.getFileTypeByName(file.name);
             programDetailBlock.find('.ep_uploading_image').hide();
             programDetailBlock.find('.ep_image').attr('src', 'http://9x9tmp.s3.amazonaws.com/prog_logo_' + programId + '_' + file.size + file.type);
             programDetailBlock.find('.ep_image_updated').val('true');
@@ -681,6 +699,8 @@ var page$ = {
             alert('error: ' + message);
           },
           file_queued_handler: function(file) {
+            if (!file.type)
+              file.type = cms.getFileTypeByName(file.name);
             var post_params = {
               "AWSAccessKeyId": $('#s3_id').val(),
               "key":            'prog_logo_' + programId + '_' + file.size + file.type,
@@ -1010,19 +1030,23 @@ var page$ = {
             button_width:       '95',
             button_height:      '32',
             button_cursor:      SWFUpload.CURSOR.HAND,
-            button_window_mode : SWFUpload.WINDOW_MODE.TRANSPARENT,
+            button_window_mode : SWFUpload.WINDOW_MODE.OPAQUE,
             debug:              false,
             http_success :      [201],
             upload_success_handler: function(file, serverData, recievedResponse) {
+              if (!file.type)
+                file.type = cms.getFileTypeByName(file.name);
               $('#channel_import_detail [name="ch_uploading_image"]').hide();
               $('#channel_import_detail [name="ch_image"]').attr('src', 'http://9x9tmp.s3.amazonaws.com/' + 'ch_logo_' + channel.key.id + '_' + file.size + file.type);
               $('#channel_import_detail [name="ch_image_updated"]').val('true');
-              },
+            },
             upload_error_handler: function(file, code, message) {
               $('#channel_import_detail [name="ch_uploading_image"]').hide();
               alert('error: ' + message);
             },
-            file_queued_handler: function(file) {
+            file_queued_handler: function(file) { 
+              if (!file.type)
+                file.type = cms.getFileTypeByName(file.name);
               var post_params = {
                 "AWSAccessKeyId": $('#s3_id').val(),
                 "key":            'ch_logo_' + channel.key.id + '_' + file.size + file.type,
@@ -1213,10 +1237,12 @@ var page$ = {
           button_width:       '95',
           button_height:      '32',
           button_cursor:      SWFUpload.CURSOR.HAND,
-          button_window_mode : SWFUpload.WINDOW_MODE.TRANSPARENT,
+          button_window_mode : SWFUpload.WINDOW_MODE.OPAQUE,
           debug:              false,
           http_success :      [201],
           upload_success_handler: function(file, serverData, recievedResponse) {
+            if (!file.type)
+              file.type = cms.getFileTypeByName(file.name);
             $('#ch_uploading').hide();
             var imageUrl = 'http://9x9tmp.s3.amazonaws.com/' + 'ch_logo_' + channel.key.id + '_' + file.size + file.type;
             $('#ch_image').attr('src', imageUrl);
@@ -1227,6 +1253,8 @@ var page$ = {
             alert('error: ' + message);
           },
           file_queued_handler: function(file) {
+            if (!file.type)
+              file.type = cms.getFileTypeByName(file.name);
             var post_params = {
               "AWSAccessKeyId": $('#s3_id').val(),
               "key":            'ch_logo_' + channel.key.id + '_' + file.size + file.type,

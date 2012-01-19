@@ -216,11 +216,13 @@ var page$ = {
             button_width:           '95',
             button_height:          '32',
             button_cursor:          SWFUpload.CURSOR.HAND,
-            button_window_mode:     SWFUpload.WINDOW_MODE.TRANSPARENT,
+            button_window_mode:     SWFUpload.WINDOW_MODE.OPAQUE,
             button_action:          SWFUpload.BUTTON_ACTION.SELECT_FILE,
             debug:                  false,
             http_success:           [201],
             upload_success_handler: function(file, serverData, recievedResponse) {
+              if (!file.type)
+                file.type = cms.getFileTypeByName(file.name);
               $('#uploading').hide();
               $('#cc_image').attr('src', 'http://9x9tmp.s3.amazonaws.com/ch_set_logo_' + channelSet.key.id + '_' + file.size + file.type);
               $('#cc_image_updated').val('true');
@@ -230,6 +232,8 @@ var page$ = {
               alert('error: ' + message);
             },
             file_queued_handler: function(file) {
+              if (!file.type)
+                file.type = cms.getFileTypeByName(file.name);
               var post_params = {
                 'AWSAccessKeyId': $('#s3_id').val(),
                 'key':            'ch_set_logo_' + channelSet.key.id + '_' + file.size + file.type,

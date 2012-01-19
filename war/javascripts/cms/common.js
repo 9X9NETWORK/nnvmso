@@ -94,6 +94,12 @@ var cms = {
     }
     return url;
   },
+  getFileTypeByName: function(name) {
+    if (typeof name == 'undefined' || name == null || name == '' || name.indexOf('.') <= 0) {
+      return '';
+    }
+    return name.substr(name.indexOf('.'));
+  },
   getContentTypeByFileExtention: function(ext) {
     
     switch(ext) {
@@ -175,7 +181,7 @@ var cms = {
       break;
       
       default:
-      return 'video/unknown';
+      return 'application/octet-stream';
     }
   },
   get: function(url, data, success, dataType, error) {
