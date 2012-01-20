@@ -299,7 +299,6 @@ var page$ = {
         });
         
         programDetailBlock.find('.ep_image_urlradio').click(function() {
-log('urlradio');
           programDetailBlock.find('.best_resolution_from_url').show();
           programDetailBlock.find('.best_resolution_from_disk').hide();
           programDetailBlock.find('.ep_image_url_block').show();
@@ -307,7 +306,6 @@ log('urlradio');
         });
         
         programDetailBlock.find('.ep_image_localdrive').click(function() {
-log('localdrive');
           programDetailBlock.find('.best_resolution_from_url').hide();
           programDetailBlock.find('.best_resolution_from_disk').show();
           programDetailBlock.find('.ep_image_url_block').hide();
@@ -475,7 +473,6 @@ log('localdrive');
           }, 'text');
         });
       }, 'json');
-      
     },
     programCreation: function(programId, channelId, channelName) {
       $('#program_create_detail .right_title div').text(channelName);
@@ -1310,7 +1307,7 @@ log('localdrive');
             alert($('#lang_warning_error_occurs').text());
           } else {
             alert($('#lang_update_successfully').text());
-            page$.channelList.init();
+            page$.channelList.init(isNew);
           }
         }, 'text');
       });
@@ -1323,7 +1320,7 @@ log('localdrive');
       });
       $('#channel_list_empty').hide();
     },
-    init: function() {
+    init: function(click) {
       page$.channelList.destroy();
       
       // load channels
@@ -1441,6 +1438,10 @@ log('localdrive');
         }
         $('#channel_list').show();
         cms.initAddthis();
+        log('channel count: ' + $('.channel_info_block_cloned').size());
+        if (click) {
+          $($('.channel_info_block_cloned').get(0)).click();
+        }
       }, 'json');
       if (cms.isGeneric()) {
         $('.create_channel_button').unbind().click(function() {
