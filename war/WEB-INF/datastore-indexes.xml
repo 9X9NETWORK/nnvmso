@@ -182,6 +182,12 @@
   <datastore-index kind="MsoProgram" ancestor="false" source="manual">
     <property name="channelId" direction="asc"/>
     <property name="status" direction="asc"/>
+    <property name="seq" direction="desc"/>
+    <property name="subSeq" direction="asc"/>
+  </datastore-index>
+  <datastore-index kind="MsoProgram" ancestor="false" source="manual">
+    <property name="channelId" direction="asc"/>
+    <property name="status" direction="asc"/>
     <property name="type" direction="asc"/>
     <property name="seq" direction="desc"/>
     <property name="subSeq" direction="asc"/>
