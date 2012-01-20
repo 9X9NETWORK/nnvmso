@@ -243,7 +243,9 @@ div.page{
 .error { color: red; }
 
 /* channel management - never create channel yet*/
-.btnCreate:hover { background:url(/images/cms/btn_create_hover.jpg) no-repeat;}
+.btnCreate:hover {
+  background: url(/images/cms/btn_create_hover.jpg) 0 0 repeat-x;
+}
 .btnCreate, a.btnSave , a.btnCancel {		
   height: 30px;
   line-height:30px;
