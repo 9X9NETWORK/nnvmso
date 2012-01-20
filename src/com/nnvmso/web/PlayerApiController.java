@@ -1056,11 +1056,12 @@ public class PlayerApiController {
 	}
 
 	/**
-	 * User's recently watched channel and its episode
+	 * User's recently watched channel and its episode.
 	 * 
 	 * @param user user token
 	 * @param count number of recently watched entries
 	 * @param channelInfo true or false
+	 * @param episodeIndex true or false. if episodeIndex = true, count has to be less 5.
 	 * @return Fist block: Lines of channel id and program id.<br/>
 	 *         Second block: if channelInfo is set to true, detail channel information will be returned. Please reference channelLineup for format.
 	 */
@@ -1069,12 +1070,14 @@ public class PlayerApiController {
 			@RequestParam(value="user", required=false) String userToken,
 			@RequestParam(value="count", required=false) String count,
 			@RequestParam(value="channelInfo", required=false) String channelInfo,
+			@RequestParam(value="episodeIndex", required=false) String episodeIndex,
 			HttpServletRequest req) {				                                
 		this.prepService(req);
 		boolean isChannelInfo = Boolean.parseBoolean(channelInfo);
+		boolean isEpisodeIndex = Boolean.parseBoolean(episodeIndex);
 		String output = NnStatusMsg.errorStr(locale);
 		try {
-			output = playerApiService.findUserWatched(userToken, count, isChannelInfo);
+			output = playerApiService.findUserWatched(userToken, count, isChannelInfo, isEpisodeIndex);
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}

@@ -353,6 +353,19 @@ public class MsoProgramManager {
 		return result;
 	}
 	
+	public int getEpisodeIndex(String input, String programId) {
+		String[] lines = input.split("\n");
+		int index = 0;
+		for (int i=0; i<lines.length; i++) {
+			String[] tabs = lines[i].split("\t");
+			if (tabs[1].equals(programId)) {
+				index = i+1;
+				i = lines.length + 1;
+			}
+		}		
+		return index;
+	}
+	
 	private void storeInCache(Cache cache, String result, long channelId) {
 		if (cache == null) {return;}
 		//store individual program

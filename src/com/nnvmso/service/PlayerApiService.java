@@ -1567,7 +1567,7 @@ public class PlayerApiService {
 		return this.assembleMsgs(NnStatusCode.SUCCESS, null);
 	}
 	
-	public String findUserWatched(String userToken, String count, boolean channelInfo) {
+	public String findUserWatched(String userToken, String count, boolean channelInfo, boolean episodeIndex) {
 		@SuppressWarnings("rawtypes")
 		HashMap map = this.checkUser(userToken, false);
 		if ((Integer)map.get("s") != NnStatusCode.SUCCESS) {
@@ -1575,18 +1575,31 @@ public class PlayerApiService {
 		}
 		if (count == null) 
 			return this.assembleMsgs(NnStatusCode.INPUT_MISSING, null);		
-
+		int cnt = Integer.parseInt(count);
+		if (episodeIndex) {
+			if (cnt > 5) {
+				return this.assembleMsgs(NnStatusCode.INPUT_BAD, null);
+			}
+		}
 		String[] result = {"", ""};
 		NnUserWatchedManager watchedMngr = new NnUserWatchedManager();
 		MsoChannelManager channelMngr = new MsoChannelManager();
+		MsoProgramManager programMngr = new MsoProgramManager();
 		List<NnUserWatched> watched = watchedMngr.findAllByUserToken(userToken);
 		List<MsoChannel> channels = new ArrayList<MsoChannel>();
-		int cnt = Integer.parseInt(count);
 		int i = 1;
 		for (NnUserWatched w : watched) {
 			if (i > cnt)
 				break;
-			result[0] += w.getChannelId() + "\t" + w.getProgram() + "\n";
+			int index = 0;			
+			if (episodeIndex && Pattern.matches("^\\d*$", w.getProgram())) {
+				String programInfo = programMngr.findGoodProgramsByChannelId(w.getChannelId(), true, 0, 0);
+				if (programInfo != null) {
+					index = programMngr.getEpisodeIndex(programInfo, w.getProgram());
+				}
+			}
+			
+			result[0] += w.getChannelId() + "\t" + w.getProgram() + "\t" + index + "\n";
 			MsoChannel c = channelMngr.findById(w.getChannelId());
 			if (c != null) { 
 				channels.add(c);
