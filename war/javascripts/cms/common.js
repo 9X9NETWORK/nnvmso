@@ -317,6 +317,7 @@ var cms = {
   },
   initEnterpriseOne: function() {
     $('#mso_logo').wrapAll('<a href="/' + $('#msoName').val() + '"></a>');
+    this.enableChannelManagement();
     this.enableChannelSetManagement();
     this.enableStatistics();
   },
