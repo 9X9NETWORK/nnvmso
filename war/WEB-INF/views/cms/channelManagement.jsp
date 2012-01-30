@@ -182,7 +182,7 @@
                 <p class="hint"><spring:message code="cms.channel_management.msg.two_hundred_characters"/></p>
                 <br/>
                 <label class="floatL"><spring:message code="cms.channel_management.label.tag"/></label>
-                <div class="bg_input floatL"><input id="ch_tag" type="text" size="25" maxlength="100" /></div>
+                <div class="bg_input floatL"><input id="ch_tag" type="text" size="25" maxlength="200"/></div>
                 <div class="clear"></div>
                 <p class="hint"><spring:message code="cms.channel_management.msg.camma_seperated"/></p>
                 <br/>
@@ -255,7 +255,7 @@
                     <div style="width:300px;padding-left:80px;padding-bottom:10px;" class="floatL ep_uploading_video" style="display:none"><div></div></div>
                     <!--  upload by URL link -->
                     <div class="floatL uploadURL ep_url_block" style="display:none">
-                      <div class="bg_input floatL"><input type="text" size="33" maxlength="100" class="ep_url_input"/></div>&nbsp;<div class="floatL"><a onclick="return false;" href="javascript:" class="ep_url_import btnCreate"><spring:message code="cms.channel_management.btn.import"/></a></div>
+                      <div class="bg_input floatL"><input type="text" size="33" maxlength="200" class="ep_url_input"/></div>&nbsp;<div class="floatL"><a onclick="return false;" href="javascript:" class="ep_url_import btnCreate"><spring:message code="cms.channel_management.btn.import"/></a></div>
                       <div class="clear"></div>
                       <p class="hint video_url_hint" style="display:none"><spring:message code="cms.channel_management.msg.video_url_hint"/></p>
                       <p class="hint youtube_hint" style="display:none"><spring:message code="cms.channel_management.msg.youtube_hint"/></p>
@@ -314,7 +314,7 @@
                     </div>
                     <!--  upload by URL link -->
                     <div class="floatL uploadURL ep_url_block">
-                      <div class="bg_input floatL" style="margin-top:5px"><input type="text" size="33" maxlength="100" class="ep_url_input"/></div>
+                      <div class="bg_input floatL" style="margin-top:5px"><input type="text" size="33" maxlength="200" class="ep_url_input"/></div>
                       <div class="clear"></div>
                       <p class="hint audio_url_hint"><spring:message code="cms.channel_management.msg.audio_url_hint"/></p>
                       <br/>
@@ -336,7 +336,7 @@
                       </div>
                       <div class="clear"></div>
                       <div style="margin-top:10px" class="ep_image_url_block">
-                        <div class="bg_input floatL"><input type="text" size="33" maxlength="100" class="ep_image_url_input"/></div>
+                        <div class="bg_input floatL"><input type="text" size="33" maxlength="200" class="ep_image_url_input"/></div>
                       </div>
                       <div style="margin-top:10px;display:none" class="ep_image_localdrive_block">
                         <span class="ep_upload_button_place"><a onclick="return false;" href="javascript:" class="uploadBtn ep_upload_image"></a></span>
@@ -607,7 +607,7 @@
             <form>
               <fieldset class="setAlbum">
                 <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.channel_source"/></label>
-                <div class="bg_input floatL"><input type="text" size="33" maxlength="100" name="ch_import_url"/></div>
+                <div class="bg_input floatL"><input type="text" size="33" maxlength="200" name="ch_import_url"/></div>
                 <a href="javascript:" class="btnCreate floatL" name="ch_import_button"><spring:message code="cms.channel_management.btn.import"/></a>
                 <div class="clear"></div><br/>
                 <label class="floatL"><span style="display:none" class="red">＊</span><spring:message code="cms.channel_management.label.logo"/></label>
