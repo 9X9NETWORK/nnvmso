@@ -172,7 +172,7 @@
                 <input type="hidden" id="ch_id" value="0"/>
                 <div class="clear"></div><br/>
                 <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.name"/></label>
-                <div class="bg_input floatL"><input id="ch_name" type="text" size="25" maxlength="40"/></div>
+                <div class="bg_input floatL"><input id="ch_name" type="text" size="33" maxlength="40"/></div>
                 <div class="clear"></div>
                 <p class="hint"><spring:message code="cms.channel_management.msg.fourty_characters"/></p>
                 <br/>
@@ -182,7 +182,7 @@
                 <p class="hint"><spring:message code="cms.channel_management.msg.two_hundred_characters"/></p>
                 <br/>
                 <label class="floatL"><spring:message code="cms.channel_management.label.tag"/></label>
-                <div class="bg_input floatL"><input id="ch_tag" type="text" size="25" maxlength="200"/></div>
+                <div class="bg_input floatL"><input id="ch_tag" type="text" size="33" maxlength="200"/></div>
                 <div class="clear"></div>
                 <p class="hint"><spring:message code="cms.channel_management.msg.camma_seperated"/></p>
                 <br/>
@@ -291,7 +291,7 @@
                     </div>
                     <div style="display:none"><!-- tag of program -->
                       <label class="floatL"><spring:message code="cms.channel_management.label.tag"/></label>
-                      <div class="bg_input floatL"><input type="text" size="35" maxlength="40"/></div>
+                      <div class="bg_input floatL"><input type="text" size="33" maxlength="40"/></div>
                       <div class="clear"></div>
                       <p class="hint"><spring:message code="cms.channel_management.msg.camma_seperated"/></p><br/>
                     </div>
@@ -366,7 +366,7 @@
                     </div>
                     <div style="display:none"><!-- tag of program -->
                       <label class="floatL"><spring:message code="cms.channel_management.label.tag"/></label>
-                      <div class="bg_input floatL"><input type="text" size="35" maxlength="40"/></div>
+                      <div class="bg_input floatL"><input type="text" size="33" maxlength="40"/></div>
                       <div class="clear"></div>
                       <p class="hint"><spring:message code="cms.channel_management.msg.camma_seperated"/></p><br/>
                     </div>
@@ -624,7 +624,7 @@
                 </div>
                 <div class="clear"></div><br/>
                 <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.name"/></label>
-                <div class="bg_input floatL"><input name="ch_name" type="text" size="25" maxlength="40"/></div>
+                <div class="bg_input floatL"><input name="ch_name" type="text" size="33" maxlength="40"/></div>
                 <div class="clear"></div>
                 <p class="hint"><spring:message code="cms.channel_management.msg.fourty_characters"/></p>
                 <br/>

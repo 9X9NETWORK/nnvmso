@@ -418,7 +418,10 @@ a.addNew{ padding:10px 0 0 0; display:block; font-size:0.9em;}
 .createEpList{ overflow:auto; height:548px; width:500px; }
 .createEpList2{ overflow:auto; height:510px;}
 .createEp { width:500px; }
-textarea, input { font-size:0.9em; }
+textarea, input {
+  font-size:   12px;
+  font-family: monospace;
+}
 form a { font-size:0.8em; }
 
 .directory_ch { width:450px; }

@@ -60,7 +60,7 @@
           </div>
           <div class="clear"></div><br/>
           <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_set_management.label.name"/></label>
-          <div class="bg_input floatL"><input type="text" id="cc_name" name="cc_name" size="25" maxlength="40"/></div>
+          <div class="bg_input floatL"><input type="text" id="cc_name" name="cc_name" size="33" maxlength="40"/></div>
           <div class="clear"></div>
           <p class="hint"><spring:message code="cms.channel_set_management.msg.fourty_characters"/></p>
           <br/>
@@ -70,7 +70,7 @@
           <p class="hint"><spring:message code="cms.channel_set_management.msg.two_hundred_characters"/></p>
           <br/>
           <label class="floatL"><spring:message code="cms.channel_set_management.label.tag"/></label>
-          <div class="bg_input floatL"><input name="cc_tag" id="cc_tag" type="text" size="25" maxlength="40"/></div>
+          <div class="bg_input floatL"><input name="cc_tag" id="cc_tag" type="text" size="33" maxlength="40"/></div>
           <div class="clear"></div>
           <p class="hint"><spring:message code="cms.channel_set_management.msg.camma_seperated"/></p>
           <br/>
