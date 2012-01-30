@@ -749,11 +749,11 @@ var page$ = {
       if (page$.overallLayout.destroyRightSideContent(false) == false) return false;
       
       cms.post('/CMSAPI/programList', { 'channelId': channelId }, function(programs) {
-        $('.create_program_button').width(160).unbind().click({ 'channelId': channelId, 'channelName': channelName }, function(event) {
+        $('.create_program_button').width(175).unbind().click({ 'channelId': channelId, 'channelName': channelName }, function(event) {
           if (page$.overallLayout.destroyRightSideContent(false) == false) return false;
           page$.skeletonCreation.create9x9Program(event.data.channelId, event.data.channelName);
         });
-        $('.create_radio_program_button').width(160).unbind().click({ 'channelId': channelId, 'channelName': channelName }, function(event) {
+        $('.create_radio_program_button').width(175).unbind().click({ 'channelId': channelId, 'channelName': channelName }, function(event) {
           if (page$.overallLayout.destroyRightSideContent(false) == false) return false;
           page$.skeletonCreation.createRadioProgram(event.data.channelId, event.data.channelName);
         });
