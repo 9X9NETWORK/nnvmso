@@ -961,7 +961,7 @@ public class CmsApiController {
 		
 		if (contentType != null && contentType == MsoProgram.CONTENTTYPE_RADIO) {
 			
-			program = new MsoProgram("Radio Program", "Radio Program", "/images/cms/radio.jpg", MsoProgram.TYPE_AUDIO);
+			program = new MsoProgram("New Program", "New Program", "/images/cms/radio.jpg", MsoProgram.TYPE_AUDIO);
 			program.setPublic(false);
 			program.setType(MsoProgram.TYPE_AUDIO);
 			program.setContentType(MsoProgram.CONTENTTYPE_RADIO);
