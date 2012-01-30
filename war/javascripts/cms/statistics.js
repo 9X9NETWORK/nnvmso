@@ -133,9 +133,10 @@ var page$ = {
             $('.channel_info_title', this).removeClass('chUnFocusTitle').addClass('chFocusTitle');
             $('.channel_info_image', this).removeClass('chUnFocusImg').addClass('chFocusImg');
             
-            // load auto-sharing info
-            var statistics = $('.channel_info_statistics', this).val();
-            page$.statisticsReport.initChannel(event.data.channel, statistics);
+            $('.channel_info_statistics', this).change();
+          });
+          channelInfoBlock.find('.channel_info_statistics').change({ 'channel': channels[i] }, function(event) {
+            page$.statisticsReport.initChannel(event.data.channel, $(this).val());
           });
         }
         cms.initAddthis();
@@ -174,9 +175,10 @@ var page$ = {
             $('.channel_info_title', this).removeClass('chUnFocusTitle').addClass('chFocusTitle');
             $('.channel_info_image', this).removeClass('chUnFocusImg').addClass('chFocusImg');
             
-            var statistics = $('.channel_info_statistics', this).val();
-            page$.statisticsReport.initChannel(event.data.channelSet, statistics);
-            
+            $('.channel_info_statistics', this).change();
+          });
+          channelSetInfoBlock.find('.channel_info_statistics').change({ 'channelSet': channelSets[i] }, function(event) {
+            page$.statisticsReport.initChannel(event.data.channelSet, $(this).val());
           });
         }
         cms.initAddthis();
