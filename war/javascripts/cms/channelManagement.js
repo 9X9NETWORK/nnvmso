@@ -139,7 +139,7 @@ var page$ = {
         programDetailBlock.find('.ep_source a').text('SlideShow');
         break;
         case 3:
-        programDetailBlock.find('.ep_source a').text('Radio');
+        programDetailBlock.find('.ep_source a').text('Audio');
         break;
         default:
         programDetailBlock.find('.ep_source a').text('Unknown');
@@ -861,7 +861,7 @@ var page$ = {
           type = 'SlideShow';
           break;
           case 3:
-          type = 'Radio';
+          type = 'Audio';
           break;
           default:
         }
