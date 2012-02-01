@@ -6,6 +6,9 @@
 		<link href="images/favicon.ico" rel="shortcut icon" type="image/x-icon" /><!-- if icon not in root -->
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script><!-- check the version you need from jQuery.com -->
 		<script type="text/javascript" src="../install.js"></script>
+		<script type="text/javascript" src="js/jquery.shadow.js"></script>
+		<script type="text/javascript" src="js/jquery.ifixpng.js"></script>
+		<script type="text/javascript" src="js/jquery.fancyzoom.js"></script>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 		<meta http-equiv="Content-Script-Type" content="text/javascript" />
 		<meta name="description" content="FLIPr 電腦一秒變電視 近千種推薦頻任您享受" />
@@ -102,6 +105,7 @@
 			<li><a href="about.html">關於FLIPr</a></li>
 			<li><a href="help.html">幫助</a></li>
 			<li><a href="contact.html">聯絡我們</a></li>
+			<li><a href="images/luckyList.png" id="luckyList" alt="得獎名單">得獎名單</a></li>
 			<li><div style="margin:10px 0 0 10px" class="fb-like" data-href="http://www.facebook.com/9x9.tv" data-send="false" data-layout="button_count" data-width="450" data-show-faces="false" data-colorscheme="dark"></div></li>
 			<li style="float: right; width: 300px; text-align: right">&copy; 2012 9x9.tv. All rights reserved</li>
 		</ul>
@@ -154,6 +158,12 @@
 			});
 
 		});
+		
+		$(document).ready(function() {
+			$.fn.fancyzoom.defaultsOptions.imgDir='images/';
+			$('#luckyList').fancyzoom();
+		});
+		
 /*
 		$(document).ready(function() {
 			install('zh');
