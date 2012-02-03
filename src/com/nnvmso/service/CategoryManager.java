@@ -17,8 +17,10 @@ import org.springframework.stereotype.Service;
 import com.google.appengine.api.datastore.Key;
 import com.nnvmso.dao.CategoryDao;
 import com.nnvmso.lib.CacheFactory;
+import com.nnvmso.lib.NnStringUtil;
 import com.nnvmso.model.Category;
 import com.nnvmso.model.CategoryChannel;
+import com.nnvmso.model.CategoryChannelSet;
 import com.nnvmso.model.ChannelSet;
 import com.nnvmso.model.MsoChannel;
 
@@ -70,7 +72,25 @@ public class CategoryManager {
 		}
 		return categories;
 	}
-	
+
+	public List<ChannelSet> findSetsByCategory(long categoryId) {
+		CategoryChannelSetManager ccsMngr = new CategoryChannelSetManager();	
+		ChannelSetManager csMngr = new ChannelSetManager();
+		List<CategoryChannelSet> list = ccsMngr.findAllByCategoryId(categoryId);
+		List<Long> channelSetIdList = new ArrayList<Long>();
+		for (CategoryChannelSet l : list) {
+			channelSetIdList.add(l.getChannelSetId());
+		}
+		List<ChannelSet> csList = csMngr.findAllByChannelSetIds(channelSetIdList);
+		List<ChannelSet> result = new ArrayList<ChannelSet>();
+		for (ChannelSet cs : csList) {
+			if (cs.isPublic()) {
+				result.add(cs);
+			}
+		}
+		return result;
+	}
+
 	public Category findCategory(String categoryName, String subCategoryName) {
 		return categoryDao.findCategory(categoryName, subCategoryName);
 	}

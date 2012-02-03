@@ -1411,8 +1411,8 @@ public class PlayerApiService {
         }                 
         return result;
     }
-	
-	public String findCategoryInfo(String id, String lang) {
+
+	public String findCategoryInfo(String id, String lang, boolean flatten) {
 		lang = this.checkLang(lang);	
         if (lang == null)
             return this.assembleMsgs(NnStatusCode.INPUT_BAD, null);				
@@ -1477,7 +1477,30 @@ public class PlayerApiService {
 					                       subcategory};				
 			result[1] += NnStringUtil.getDelimitedStr(str) + "\n";
 		}
-		return this.assembleMsgs(NnStatusCode.SUCCESS, result);
+		
+		if (id.equals("0") && flatten) {
+			List<String> flattenResult = new ArrayList<String>();
+			flattenResult.add(result[0]);
+			flattenResult.add(result[1]);
+			for (Category c : categories) {
+				List<ChannelSet> list = categoryMngr.findSetsByCategory(c.getKey().getId());
+				int setCnt = 0;
+				String s = "";
+				for (ChannelSet cs : list) {
+					String name =  cs.getName();
+					int cnt = cs.getChannelCount();
+					String[] str = {"s" + String.valueOf(cs.getKey().getId()), name, String.valueOf(cnt), "ch"};				
+					s += NnStringUtil.getDelimitedStr(str) + "\n";
+					setCnt++;
+				}
+				flattenResult.add(s);
+			}
+			String size[] = new String[flattenResult.size()];
+			return this.assembleMsgs(NnStatusCode.SUCCESS, flattenResult.toArray(size));
+		} else {
+			return this.assembleMsgs(NnStatusCode.SUCCESS, result);			
+		}
+
 	}
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
