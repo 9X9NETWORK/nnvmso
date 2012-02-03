@@ -40,7 +40,7 @@
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/scripts/flowplayer-3.2.4.min.js"></script>
 <script type="text/javascript" charset="utf-8" src="${nroot}/javascripts/jquery.ellipsis.js"></script>
 
-<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/player22.js"></script>
+<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/player23.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/vertical.slider.V2.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/jquery.mousewheel.min.js"></script>
                                                                                                                                      
@@ -103,6 +103,10 @@ var brandinfo = "${brandInfo}";
 </div>
 
 <div id="bg-layer"><img src="${nroot}/images/bg_body.png"></div>
+
+<div id="audio1" style="display:block;width:750px;height:30px;visibility:hidden" href=""></div>
+<div id="audio2" style="display:block;width:750px;height:30px;visibility:hidden" href=""></div>
+<div id="audio3" style="display:block;width:750px;height:30px;visibility:hidden" href=""></div>
 
 <div id="recent-layer" style="display: none">
   <div id="recent-holder">

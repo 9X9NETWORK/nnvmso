@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9miniV11"/>
+<c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9miniV13"/>
 
 <link rel="stylesheet" href="${root}/stylesheets/main.css" />
 
@@ -21,8 +21,9 @@
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/scripts/flowplayer-3.2.4.min.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/vertical.slider.V2.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/jquery.mousewheel.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="${root}/javascripts/jquery.ellipsis.js"></script>
 
-<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/mini10.js"></script>
+<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/mini12.js"></script>
 
 <!-- Quantcast Tag -->
 <script type="text/javascript">
@@ -53,6 +54,10 @@ qacct:"p-b2xUunKYSaIeQ"
 <body>
 
 <div id="bg-layer"></div>
+
+<div id="audio1" style="display:block;width:750px;height:30px;visibility:hidden" href=""></div>
+<div id="audio2" style="display:block;width:750px;height:30px;visibility:hidden" href=""></div>
+<div id="audio3" style="display:block;width:750px;height:30px;visibility:hidden" href=""></div>
 
 <div id="video" style="position: absolute; z-Index: 2; height: 100%; width: 100%; background-color: black">
 </div>
@@ -113,7 +118,7 @@ qacct:"p-b2xUunKYSaIeQ"
     <div id="osd-holder">
       <p id="ch-info"><span class="head">Channel: </span><span id="ch-title"></span></p>
       <p id="ep-info"><span class="head">Episode: </span><span id="ep-title"></span><span class="dash"> &#8212; </span><span id="ep-age"></span></p>
-      <p id="key-hints"><img src="${root}/images/key_hints.png"></p>
+      <p id="player-hint"><span>Press <img src="${root}/images/btn_9x9.png" class="icon-btn-9x9"> or <img src="${root}/images/btn_m.png" class="icon-btn-m"><br>to go to Guide.</span></p> 
     </div>
   </div>
   <div id="player-holder">
@@ -156,18 +161,12 @@ qacct:"p-b2xUunKYSaIeQ"
   </div>
 </div>
 
-<div id="volume-layer" style="display: none">
-  <p id="volume-up"><img src="${root}/images/btn_volume_up.png" title="Volume Up"></p>
-  <ul id="volume-bars">
-    <li></li>
-    <li></li>
-    <li></li>
-    <li class="on"></li>
-    <li class="on"></li>
-    <li class="on"></li>
-    <li class="on"></li>
-  </ul>
-  <p id="volume-down"><img src="${root}/images/btn_volume_down.png" title="Volume Down"></p>
+<div id="volume-layer">
+  <div id="volume-holder">
+    <p id="volume-down"><img src="${root}/images/btn_volume_down.png" title="Volume Down"></p>
+    <ul id="volume-bars"><li class="on"></li><li class="on"></li><li class="on"></li><li class="on"></li><li></li><li></li><li></li><li></li><li></li><li></li></ul>
+    <p id="volume-up"><img src="${root}/images/btn_volume_up.png" title="Volume Up"></p>
+  </div>
 </div>
 
 <div id="relaydiv" style="z-index: 1; position: absolute; top: 0px; left: 0px">
@@ -225,9 +224,10 @@ qacct:"p-b2xUunKYSaIeQ"
     <img src="${root}/images/arrow_right.png" id="set-right">
     <div id="store-constrain">    
         <div id="open-set">
-          <div id="ch1"></div>
-          <div id="ch2"><img src="" class="thumbnail"></div>
-          <div id="ch3"><img src="" class="thumbnail"></div>
+          <div id="ch4"></div>
+          <div id="ch1" class="i1"><div id="ch1-video"><img src="${root}/thumb/01.jpg" class="thumbnail"></div></div>
+          <div id="ch2" class="i2"><div id="ch2-video"><img src="${root}/thumb/02.jpg" class="thumbnail"></div></div>
+          <div id="ch3" class="i3"><div id="ch3-video"><img src="${root}/thumb/08.jpg" class="thumbnail"></div></div>
           <p id="open-titles" class="open-txt"><span id="set-name">News</span><span class="divider">/</span><span id="ch-name">BBC News</span><span id="ch-order">(Ch 3 of 20)</span></p>
           <p id="open-description" class="open-txt"><span>Breaking news, sport, TV, radio and a whole lot more. The BBC informs, educates 
 and entertains - wherever you are, whatever your age.</span></p>
