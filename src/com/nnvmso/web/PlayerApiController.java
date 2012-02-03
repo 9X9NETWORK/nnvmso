@@ -1069,6 +1069,7 @@ public class PlayerApiController {
 	public ResponseEntity<String> recentlyWatched(
 			@RequestParam(value="user", required=false) String userToken,
 			@RequestParam(value="count", required=false) String count,
+			@RequestParam(value="channel", required=false) String channel,
 			@RequestParam(value="channelInfo", required=false) String channelInfo,
 			@RequestParam(value="episodeIndex", required=false) String episodeIndex,
 			HttpServletRequest req) {				                                
@@ -1077,7 +1078,7 @@ public class PlayerApiController {
 		boolean isEpisodeIndex = Boolean.parseBoolean(episodeIndex);
 		String output = NnStatusMsg.errorStr(locale);
 		try {
-			output = playerApiService.findUserWatched(userToken, count, isChannelInfo, isEpisodeIndex);
+			output = playerApiService.findUserWatched(userToken, count, isChannelInfo, isEpisodeIndex, channel);
 		} catch (Exception e) {
 			output = playerApiService.handleException(e);
 		}
