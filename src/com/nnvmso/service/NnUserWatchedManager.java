@@ -29,6 +29,10 @@ public class NnUserWatchedManager {
 	public NnUserWatched findByUserIdAndChannelId(long userId, long channelId) {
 		return watchedDao.findByUserIdAndChannelId(userId, channelId);
 	}
+
+	public NnUserWatched findByUserTokenAndChannelId(String token, long channelId) {
+		return watchedDao.findByUserTokenAndChannelId(token, channelId);
+	}
 	
 	public List<NnUserWatched> findAllByUserToken(String token) {
 		return watchedDao.findAllByUserToken(token);
