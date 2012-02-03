@@ -59,6 +59,25 @@ public class NnUserWatchedDao extends GenericDao<NnUserWatched>{
 		}
 		return results;		
 	}
+
+	public NnUserWatched findByUserTokenAndChannelId(String token, long channelId) {
+		NnUserWatched w = null;
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		try {
+			Query q = pm.newQuery(NnUserWatched.class);
+			q.setFilter("userToken == userTokenParam && channelId== channelIdParam");
+			q.declareParameters("String userTokenParam, long channelIdParam");
+			@SuppressWarnings("unchecked")
+			List<NnUserWatched> watches = (List<NnUserWatched>)q.execute(token, channelId);
+			if (watches.size() > 0) {
+				w = watches.get(0);
+				w = pm.detachCopy(w);
+			}
+		} finally {
+			pm.close();
+		}
+		return w;		
+	}
 	
 	public NnUserWatched findByUserIdAndChannelId(long userId, long channelId) {
 		NnUserWatched w = null;
