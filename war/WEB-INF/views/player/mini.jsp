@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9miniV13"/>
+<c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9miniV14"/>
 
 <link rel="stylesheet" href="${root}/stylesheets/main.css" />
 
@@ -149,14 +149,13 @@ qacct:"p-b2xUunKYSaIeQ"
       </div>
     </div>
     <div id="channel-info">
-      <p class="section-title"><span>Current Channel</span></p>
-      <p id="channel-title"><span>Golden Drama</span></p>
-      <p id="channel-description"><span>Last installment from my "Making Money from Podcasting" series...</span></p>
-      <p id="channel-meta">
-        <span id="eps-number">Episodes: 12</span><br>
-        <span id="updates">Updated: Today</span>
+      <p class="section-title"><span>Current Channel:</span></p>
+      <p id="channel-title"><span></span></p>
+      <p id="channel-meta"> <span id="eps-number">Episodes: </span><br>
+        <span id="updates">Updated: </span>
       </p>
-      <p id="ch-set"><span>Channel set: <br>Da Ai March Golden Selection Set</span></p>
+      <p id="channel-description" class="ellipsis multiline"><span></span></p>
+    </div>
     </div>
   </div>
 </div>
