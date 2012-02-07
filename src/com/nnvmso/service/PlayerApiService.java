@@ -178,6 +178,9 @@ public class PlayerApiService {
 			if (key[i].equals("name")) {
 				if (value[i].equals(NnUser.GUEST_NAME))
 					return this.assembleMsgs(NnStatusCode.INPUT_ERROR, null);
+				if (value[i].length() == 0 || value[i] == null) {
+					return this.assembleMsgs(NnStatusCode.INPUT_ERROR, null);
+				}
 				user.setName(value[i]);
 			}
 			if (key[i].equals("year"))
@@ -1482,18 +1485,21 @@ public class PlayerApiService {
 			List<String> flattenResult = new ArrayList<String>();
 			flattenResult.add(result[0]);
 			flattenResult.add(result[1]);
-			for (Category c : categories) {
-				List<ChannelSet> list = categoryMngr.findSetsByCategory(c.getKey().getId());
-				int setCnt = 0;
-				String s = "";
-				for (ChannelSet cs : list) {
-					String name =  cs.getName();
-					int cnt = cs.getChannelCount();
-					String[] str = {"s" + String.valueOf(cs.getKey().getId()), name, String.valueOf(cnt), "ch"};				
-					s += NnStringUtil.getDelimitedStr(str) + "\n";
-					setCnt++;
+			for (Category c : categories) {				
+				if (c.getName().equals("All") || c.getName().equals("頻道總覽")) { //shortcut
+					List<ChannelSet> list = categoryMngr.findSetsByCategory(c.getKey().getId());
+					int setCnt = 0;
+					String s = "";
+					for (ChannelSet cs : list) {
+						String name =  cs.getName();
+						int cnt = cs.getChannelCount();
+						String[] str = {"s" + String.valueOf(cs.getKey().getId()), name, String.valueOf(cnt), "ch"};				
+						s += NnStringUtil.getDelimitedStr(str) + "\n";
+						setCnt++;
+					}
+					if (s.length() > 0)
+						flattenResult.add(s);
 				}
-				flattenResult.add(s);
 			}
 			String size[] = new String[flattenResult.size()];
 			return this.assembleMsgs(NnStatusCode.SUCCESS, flattenResult.toArray(size));
