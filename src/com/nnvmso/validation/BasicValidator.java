@@ -16,7 +16,7 @@ public class BasicValidator {
 	
     public static boolean validateRequired(String[] inputs) {
         for (int i=0; i<inputs.length; i++) {
-            if (inputs[i] == null || inputs[i].length() < 0 || inputs[i].equals("undefined")) {
+            if (inputs[i] == null || inputs[i].length() == 0 || inputs[i].equals("undefined")) {
             	return false;
             }
         }
