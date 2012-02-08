@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9miniV14"/>
+<c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9miniV15"/>
 
 <link rel="stylesheet" href="${root}/stylesheets/main.css" />
 
@@ -55,9 +55,9 @@ qacct:"p-b2xUunKYSaIeQ"
 
 <div id="bg-layer"></div>
 
-<div id="audio1" style="display:block;width:750px;height:30px;visibility:hidden" href=""></div>
-<div id="audio2" style="display:block;width:750px;height:30px;visibility:hidden" href=""></div>
-<div id="audio3" style="display:block;width:750px;height:30px;visibility:hidden" href=""></div>
+<div id="audio1" style="display:block;width:750px;height:30px;visibility:hidden;position:absolute;top:0;left:0" href=""></div>
+<div id="audio2" style="display:block;width:750px;height:30px;visibility:hidden;position:absolute;top:0;left:0" href=""></div>
+<div id="audio3" style="display:block;width:750px;height:30px;visibility:hidden;position:absolute;top:0;left:0" href=""></div>
 
 <div id="video" style="position: absolute; z-Index: 2; height: 100%; width: 100%; background-color: black">
 </div>
@@ -230,7 +230,7 @@ qacct:"p-b2xUunKYSaIeQ"
           <p id="open-titles" class="open-txt"><span id="set-name">News</span><span class="divider">/</span><span id="ch-name">BBC News</span><span id="ch-order">(Ch 3 of 20)</span></p>
           <p id="open-description" class="open-txt"><span>Breaking news, sport, TV, radio and a whole lot more. The BBC informs, educates 
 and entertains - wherever you are, whatever your age.</span></p>
-          <p id="open-meta" class="open-txt"><span>Subscribers:</span><span id="open-subscriber">1234</span><span class="divider">|</span><span>Updated:</span><span id="open-age">Today</span></p>
+          <p id="open-meta" class="open-txt"><span id="open-epi"></span><span class="divider">|</span><span>Subscribers:</span><span id="open-subscriber"></span><span class="divider">|</span><span>Updated:</span><span id="open-age"></span></p>
           <p id="store-hint" class="open-txt"><span>Press <img src="${root}/images/btn_ok.png" class="icon-btn-ok"> to add this channel. Press <img src="${root}/images/btn_9x9.png" class="icon-btn-9x9"> or <img src="${root}/images/btn_m.png" class="icon-btn-m"> to Guide.</span></p>
         </div>
         <ul id="set-list">
@@ -308,7 +308,7 @@ and entertains - wherever you are, whatever your age.</span></p>
           </p>
         </li>
         <li>
-          <p class="term-text"><span>Clicking I accept means that you agree to the <strong id="btn-agreement">9x9 service agreement</strong> and <strong id="btn-legal">privacy statement</strong>. You also agree to receive email from 9x9 with service updates, special offers, and survey invitations. You can unsubscribe at any time.</span></p>
+          <p class="term-text"><span>Clicking I accept means that you agree to the <strong id="btn-agreement">9x9 service agreement</strong> and <strong id="btn-legal">legal statement</strong>. You also agree to receive email from 9x9 with service updates, special offers, and survey invitations. You can unsubscribe at any time.</span></p>
         </li>
         <li><p class="btn" id="btn-signup"><span>I Accept</span></p></li>
         <li>
