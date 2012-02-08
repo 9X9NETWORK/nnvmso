@@ -128,6 +128,12 @@ public class MsoChannelManager {
 		if (channel.getLangCode() == null || channel.getLangCode().length() == 0) {
 			channel.setLangCode(LangTable.LANG_EN);
 		}
+		if (channel.getName() != null) {
+			channel.setName(channel.getName().replaceAll("\n", ""));
+		}
+		if (channel.getIntro() != null) {
+			channel.setIntro(channel.getIntro().replaceAll("\n", ""));
+		}
 		channel.setCreateDate(now);
 		channel.setUpdateDate(now);
 		
@@ -180,7 +186,12 @@ public class MsoChannelManager {
 			channel.setSourceUrl(channel.getSourceUrl().trim());
 			channel.setSourceUrlSearch(channel.getSourceUrl().toLowerCase());
 		}
-		
+		if (channel.getName() != null) {
+			channel.setName(channel.getName().replaceAll("\n", ""));
+		}
+		if (channel.getIntro() != null) {
+			channel.setIntro(channel.getIntro().replaceAll("\n", ""));
+		}		
 		channel.setUpdateDate(new Date());
 		if (channel.getStatus() == MsoChannel.STATUS_SUCCESS)
 			MsoChannelManager.updateFTSStuffForMsoChannel(channel);

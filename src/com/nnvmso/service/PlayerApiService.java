@@ -1271,8 +1271,11 @@ public class PlayerApiService {
 	private String composeChannelLineupStr(MsoChannel c, Mso mso) {
 		SubscriptionLogManager sublogMngr = new SubscriptionLogManager();
 		SubscriptionLog sublog = sublogMngr.findByChannelId(c.getKey().getId());							
-		if (sublog != null) {c.setSubscriptionCount(sublog.getCount());}					
-		String intro = c.getIntro();
+		if (sublog != null) {c.setSubscriptionCount(sublog.getCount());}
+		String name = c.getName();
+		if (name != null)
+			name = name.replaceAll("\n", " ").replaceAll("\t", " ");		
+		String intro = c.getIntro();		
 		if (intro != null)
 			intro = intro.replaceAll("\n", " ").replaceAll("\t", " ");
 		String imageUrl = c.getPlayerPrefImageUrl();	
@@ -1283,7 +1286,7 @@ public class PlayerApiService {
 			youtubeId = c.getSourceUrl();
 		String[] ori = {Integer.toString(c.getSeq()),				         
 					    String.valueOf(c.getKey().getId()),
-					    c.getName(),
+					    name,
 					    intro,
 					    imageUrl,
 					    String.valueOf(c.getProgramCount()),
