@@ -339,7 +339,7 @@ var page$ = {
           debug:                  false,
           http_success :          [ 201 ],
           upload_progress_handler: function(file, completed, total) {
-            if (completed % 10 > 1) {
+            if (completed % 10 > 1 && completed != total) {
               return;
             }
             var remaining = file.timeRemaining.toString();
@@ -360,11 +360,12 @@ var page$ = {
             this.setButtonDisabled(false);
           },
           upload_error_handler: function(file, code, message) {
-            log(code);
+            log('upload error: ' + code);
             programDetailBlock.find('.ep_audio_cancel').remove();
             if (code == -280) {
               programDetailBlock.find('.ep_uploading_audio .progress').text('').hide();
               programDetailBlock.find('.ep_uploading_audio .eta').text('').hide();
+              programDetailBlock.find('.ep_uploading_audio .filename').text('').hide();
               try {
                 this.setButtonDisabled(false);
               } catch(e) { }
@@ -387,7 +388,7 @@ var page$ = {
               "content-type":   cms.getContentTypeByFileExtention(file.type),
               "success_action_status": "201"
             };
-            //log(file);
+            log(file);
             log('start upload audio');
             log(post_params);
             this.setPostParams(post_params);
@@ -403,6 +404,7 @@ var page$ = {
               .click({ 'swfupload': this, 'file': file }, function(event) {
                 event.data.swfupload.cancelUpload(event.data.file.id);
               }).prependTo(programDetailBlock.find('.ep_uploading_audio'));
+            programDetailBlock.find('.ep_uploading_audio .filename').text(file.name).show();
             
          }
         };
