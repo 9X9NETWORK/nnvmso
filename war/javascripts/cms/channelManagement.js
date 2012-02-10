@@ -3,6 +3,8 @@
  */
 
 var page$ = {
+  imageUrlExample: 'http://www.9x9.tv/logo.jpg',
+  audioUrlExample: 'Copy and past audio URL here',
   overallLayout: {
     destroyRightSideContent: function(cleanup) {
       /* not to confirm program creation
@@ -285,7 +287,6 @@ var page$ = {
                                    .removeAttr('id')
                                    .addClass('program_create_detail_block_cloned');
         var programId = program.key.id;
-        log('new programId: ' + programId);
         log(program);
         
         programDetailBlock.find('.ep_urlbutton').click(function() {
@@ -317,6 +318,38 @@ var page$ = {
         programDetailBlock.find('.ep_image').attr('src', program.imageUrl);
         programDetailBlock.find('.ep_image_updated').val('false');
         programDetailBlock.find('.ep_intro').val(program.intro);
+        
+        programDetailBlock.find('.ep_url_input').val(page$.audioUrlExample).css('color', '#999');
+        programDetailBlock.find('.ep_url_input').focus(function() {
+          programDetailBlock.find('.ep_url_input').css('color', '#000');
+          var audioUrl = programDetailBlock.find('.ep_url_input').val();
+          if (audioUrl == page$.audioUrlExample) {
+            programDetailBlock.find('.ep_url_input').val('');
+          }
+        });
+        programDetailBlock.find('.ep_url_input').blur(function() {
+          var audioUrl = programDetailBlock.find('.ep_url_input').val();
+          if (audioUrl == '') {
+            programDetailBlock.find('.ep_url_input').val(page$.audioUrlExample).css('color', '#999');
+          }
+        });
+        
+        programDetailBlock.find('.ep_image_url_input').val(page$.imageUrlExample).css('color', '#999');
+        programDetailBlock.find('.ep_image_url_input').focus(function() {
+          programDetailBlock.find('.ep_image_url_input').css('color', '#000');
+          var imageUrl = programDetailBlock.find('.ep_image_url_input').val();
+          if (imageUrl == page$.imageUrlExample) {
+            programDetailBlock.find('.ep_image_url_input').val('');
+          }
+        });
+        programDetailBlock.find('.ep_image_url_input').blur(function() {
+          var imageUrl = programDetailBlock.find('.ep_image_url_input').val();
+          if (imageUrl == '') {
+            programDetailBlock.find('.ep_image_url_input').val(page$.imageUrlExample).css('color', '#999');
+          } else {
+            programDetailBlock.find('.ep_image').attr('src', imageUrl);
+          }
+        });
         
         $('#program_create_detail').show();
         $('<li></li>').append(programDetailBlock).appendTo('#program_create_ul');
@@ -397,7 +430,7 @@ var page$ = {
             programDetailBlock.find('.ep_uploading_audio .progress').text('').progressBar({
               barImage: '/images/cms/progressbg_black.gif'
             }).show();
-            programDetailBlock.find('.ep_url_input').val('');
+            programDetailBlock.find('.ep_url_input').val('').css('color', '#000');
             programDetailBlock.find('.ep_url_block').hide();
             programDetailBlock.find('.audio_localdrive_hint').hide();
             $('<span class="floatL ep_audio_cancel"><a onclick="return false;" href="javascript:" class="ui-icon ui-icon-cancel"></a></span>')
@@ -435,7 +468,7 @@ var page$ = {
             log('imageUrl: ' + imageUrl);
             programDetailBlock.find('.ep_uploading_image').hide();
             programDetailBlock.find('.ep_image').attr('src', imageUrl);
-            programDetailBlock.find('.ep_image_url_input').val(imageUrl);;
+            programDetailBlock.find('.ep_image_url_input').val(imageUrl).css('color', '#000');
             programDetailBlock.find('.ep_image_updated').val('true');
           },
           upload_error_handler: function(file, code, message) {
@@ -478,19 +511,21 @@ var page$ = {
             alert($('#lang_warning_empty_name').text());
             return;
           }
-          if (programDetailBlock.find('.ep_url_input').val() == '') {
+          var audioUrl = programDetailBlock.find('.ep_url_input').val();
+          if (audioUrl == '' || audioUrl == page$.audioUrlExample) {
             alert($('#lang_warning_import_program_source').text());
             return;
           }
           var parameters = {
             'channelId': channelId,
             'programId': programId,
-            'sourceUrl': programDetailBlock.find('.ep_url_input').val(),
+            'sourceUrl': audioUrl,
             'name':      programDetailBlock.find('.ep_name').val(),
             'intro':     programDetailBlock.find('.ep_intro').val()
           };
-          if (programDetailBlock.find('.ep_image_url_input').val() != '') {
-            parameters['imageUrl'] = programDetailBlock.find('.ep_image_url_input').val();
+          var imageUrl = programDetailBlock.find('.ep_image_url_input').val();
+          if (imageUrl != '' && imageUrl != page$.imageUrlExample) {
+            parameters['imageUrl'] = imageUrl;
           }
           cms.post('/CMSAPI/saveNewProgram', parameters, function(response) {
             if (response == 'OK') {
