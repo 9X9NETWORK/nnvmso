@@ -186,21 +186,21 @@ var page$ = {
       });
       $('<span/>').addClass('ep_upload_image').appendTo(programDetailBlock.find('.upload_button_place'));
       var swfupload_settings = {
-        flash_url:          '/javascripts/swfupload/swfupload.swf',
-        upload_url:         'http://9x9tmp.s3.amazonaws.com/',
-        file_size_limit:    '10240',
-        file_types:         cms.imageTypes,
+        flash_url:              '/javascripts/swfupload/swfupload.swf',
+        upload_url:             'http://9x9tmp.s3.amazonaws.com/',
+        file_size_limit:        '10240',
+        file_types:             cms.imageTypes,
         file_types_description: 'Image Files',
-        file_post_name:     'file',
-        button_placeholder: programDetailBlock.find('.ep_upload_image').get(0),
-        button_action:      SWFUpload.BUTTON_ACTION.SELECT_FILE,
-        button_image_url:   $('#image_btn_upload').text(),
-        button_width:       '95',
-        button_height:      '32',
-        button_cursor:      SWFUpload.CURSOR.HAND,
-        button_window_mode : SWFUpload.WINDOW_MODE.OPAQUE,
-        debug:              false,
-        http_success :      [201],
+        file_post_name:         'file',
+        button_placeholder:     programDetailBlock.find('.ep_upload_image').get(0),
+        button_action:          SWFUpload.BUTTON_ACTION.SELECT_FILE,
+        button_image_url:       $('#image_btn_upload').text(),
+        button_width:           '95',
+        button_height:          '32',
+        button_cursor:          SWFUpload.CURSOR.HAND,
+        button_window_mode :    SWFUpload.WINDOW_MODE.OPAQUE,
+        debug:                  false,
+        http_success :          [ 201 ],
         upload_success_handler: function(file, serverData, recievedResponse) {
           if (!file.type)
             file.type = cms.getFileTypeByName(file.name);
@@ -289,6 +289,7 @@ var page$ = {
         log(program);
         
         programDetailBlock.find('.ep_urlbutton').click(function() {
+          programDetailBlock.find('.ep_audio_cancel a').click();
           programDetailBlock.find('.ep_url_block').show();
           programDetailBlock.find('.ep_localdrive_block').hide();
         });
@@ -322,21 +323,21 @@ var page$ = {
         
         // audio uploading
         var swfupload_settings = {
-          flash_url:          '/javascripts/swfupload/swfupload.swf',
-          upload_url:         'http://9x9tmp.s3.amazonaws.com/',
-          file_size_limit:    '1024000',
-          file_types:         cms.audioTypes,
+          flash_url:              '/javascripts/swfupload/swfupload.swf',
+          upload_url:             'http://9x9tmp.s3.amazonaws.com/',
+          file_size_limit:        '100 MB',
+          file_types:             cms.audioTypes,
           file_types_description: 'Audio Files',
-          file_post_name:     'file',
-          button_placeholder: programDetailBlock.find('.ep_upload_audio').get(0),
-          button_action:      SWFUpload.BUTTON_ACTION.SELECT_FILE,
-          button_image_url:   $('#image_btn_from_disk').text(),
-          button_width:       '95',
-          button_height:      '32',
-          button_cursor:      SWFUpload.CURSOR.HAND,
-          button_window_mode : SWFUpload.WINDOW_MODE.OPAQUE,
-          debug:              false,
-          http_success :      [201],
+          file_post_name:         'file',
+          button_placeholder:     programDetailBlock.find('.ep_upload_audio').get(0),
+          button_action:          SWFUpload.BUTTON_ACTION.SELECT_FILE,
+          button_image_url:       $('#image_btn_from_disk').text(),
+          button_width:           '95',
+          button_height:          '32',
+          button_cursor:          SWFUpload.CURSOR.HAND,
+          button_window_mode :    SWFUpload.WINDOW_MODE.OPAQUE,
+          debug:                  false,
+          http_success :          [ 201 ],
           upload_progress_handler: function(file, completed, total) {
             programDetailBlock.find('.ep_uploading_audio div').progressBar((completed * 100) / total);
           },
@@ -344,9 +345,21 @@ var page$ = {
             if (!file.type)
               file.type = cms.getFileTypeByName(file.name);
             programDetailBlock.find('.ep_url_input').val('http://9x9tmp.s3.amazonaws.com/' + 'prog_audio_' + programId + file.type);
-            programDetailBlock.find('.ep_url_import').click();
+            programDetailBlock.find('.ep_audio_cancel').remove();
+            this.setButtonDisabled(false);
           },
           upload_error_handler: function(file, code, message) {
+            log(code);
+            programDetailBlock.find('.ep_audio_cancel').remove();
+            if (code == -280) {
+              programDetailBlock.find('.ep_uploading_audio div').text('').hide();
+              try {
+                this.setButtonDisabled(false);
+              } catch(e) { }
+              programDetailBlock.find('.audio_localdrive_hint').show();
+              return;
+            }
+            this.setButtonDisabled(false);
             programDetailBlock.find('.ep_uploading_audio div').text($('#lang_upload_failed').text()).show();
             alert('error: ' + message);
           },
@@ -362,16 +375,22 @@ var page$ = {
               "content-type":   cms.getContentTypeByFileExtention(file.type),
               "success_action_status": "201"
             };
+            //log(file);
             log('start upload audio');
             log(post_params);
             this.setPostParams(post_params);
             this.startUpload(file.id);
+            this.setButtonDisabled(true);
             programDetailBlock.find('.ep_uploading_audio div').text('').progressBar({
               barImage: '/images/cms/progressbg_black.gif'
-            }).parent().show();
+            }).show();
             programDetailBlock.find('.ep_url_input').val('');
             programDetailBlock.find('.ep_url_block').hide();
             programDetailBlock.find('.audio_localdrive_hint').hide();
+            $('<span class="floatL ep_audio_cancel"><a onclick="return false;" href="javascript:" class="ui-icon ui-icon-cancel"></a></span>')
+              .click({ 'swfupload': this, 'file': file }, function(event) {
+                event.data.swfupload.cancelUpload(event.data.file.id);
+              }).prependTo(programDetailBlock.find('.ep_uploading_audio'));
             
          }
         };
@@ -382,7 +401,7 @@ var page$ = {
         var swfupload_settings = {
           flash_url:              '/javascripts/swfupload/swfupload.swf',
           upload_url:             'http://9x9tmp.s3.amazonaws.com/',
-          file_size_limit:        '10240',
+          file_size_limit:        '10 MB',
           file_types:             cms.imageTypes,
           file_types_description: 'Image Files',
           file_post_name:         'file',
@@ -394,7 +413,7 @@ var page$ = {
           button_cursor:          SWFUpload.CURSOR.HAND,
           button_window_mode :    SWFUpload.WINDOW_MODE.OPAQUE,
           debug:                  false,
-          http_success :          [201],
+          http_success :          [ 201 ],
           upload_success_handler: function(file, serverData, recievedResponse) {
             if (!file.type)
               file.type = cms.getFileTypeByName(file.name);
@@ -616,21 +635,21 @@ var page$ = {
         $('<li></li>').append(programDetailBlock).appendTo('#program_create_ul');
         // video uploading
         var swfupload_settings = {
-          flash_url:          '/javascripts/swfupload/swfupload.swf',
-          upload_url:         'http://9x9tmp.s3.amazonaws.com/',
-          file_size_limit:    '1024000',
-          file_types:         cms.videoTypes,
+          flash_url:              '/javascripts/swfupload/swfupload.swf',
+          upload_url:             'http://9x9tmp.s3.amazonaws.com/',
+          file_size_limit:        '1 GB',
+          file_types:             cms.videoTypes,
           file_types_description: 'Video Files',
-          file_post_name:     'file',
-          button_placeholder: programDetailBlock.find('.ep_upload_video').get(0),
-          button_action:      SWFUpload.BUTTON_ACTION.SELECT_FILE,
-          button_image_url:   $('#image_btn_from_disk').text(),
-          button_width:       '95',
-          button_height:      '32',
-          button_cursor:      SWFUpload.CURSOR.HAND,
-          button_window_mode : SWFUpload.WINDOW_MODE.OPAQUE,
-          debug:              false,
-          http_success :      [201],
+          file_post_name:         'file',
+          button_placeholder:     programDetailBlock.find('.ep_upload_video').get(0),
+          button_action:          SWFUpload.BUTTON_ACTION.SELECT_FILE,
+          button_image_url:       $('#image_btn_from_disk').text(),
+          button_width:           '95',
+          button_height:          '32',
+          button_cursor:          SWFUpload.CURSOR.HAND,
+          button_window_mode :    SWFUpload.WINDOW_MODE.OPAQUE,
+          debug:                  false,
+          http_success :          [ 201 ],
           upload_progress_handler: function(file, completed, total) {
             programDetailBlock.find('.ep_uploading_video div').progressBar((completed * 100) / total);
           },
@@ -675,21 +694,21 @@ var page$ = {
         page$.programDetail.swfObjectVideo.push(swfObject);
         // logo uploading
         var swfupload_settings = {
-          flash_url:          '/javascripts/swfupload/swfupload.swf',
-          upload_url:         'http://9x9tmp.s3.amazonaws.com/',
-          file_size_limit:    '10240',
-          file_types:         cms.imageTypes,
+          flash_url:              '/javascripts/swfupload/swfupload.swf',
+          upload_url:             'http://9x9tmp.s3.amazonaws.com/',
+          file_size_limit:        '10 MB',
+          file_types:             cms.imageTypes,
           file_types_description: 'Image Files',
-          file_post_name:     'file',
-          button_placeholder: programDetailBlock.find('.ep_upload_image').get(0),
-          button_action:      SWFUpload.BUTTON_ACTION.SELECT_FILE,
-          button_image_url:   $('#image_btn_upload').text(),
-          button_width:       '95',
-          button_height:      '32',
-          button_cursor:      SWFUpload.CURSOR.HAND,
-          button_window_mode : SWFUpload.WINDOW_MODE.OPAQUE,
-          debug:              false,
-          http_success :      [201],
+          file_post_name:         'file',
+          button_placeholder:     programDetailBlock.find('.ep_upload_image').get(0),
+          button_action:          SWFUpload.BUTTON_ACTION.SELECT_FILE,
+          button_image_url:       $('#image_btn_upload').text(),
+          button_width:           '95',
+          button_height:          '32',
+          button_cursor:          SWFUpload.CURSOR.HAND,
+          button_window_mode :    SWFUpload.WINDOW_MODE.OPAQUE,
+          debug:                  false,
+          http_success :          [ 201 ],
           upload_success_handler: function(file, serverData, recievedResponse) {
             if (!file.type)
               file.type = cms.getFileTypeByName(file.name);
@@ -1021,21 +1040,21 @@ var page$ = {
             page$.channelDetail.swfObject.destroy();
           }
           var swfupload_settings = {
-            flash_url:          '/javascripts/swfupload/swfupload.swf',
-            upload_url:         'http://9x9tmp.s3.amazonaws.com/',
-            file_size_limit:    '10240',
-            file_types:         cms.imageTypes,
+            flash_url:              '/javascripts/swfupload/swfupload.swf',
+            upload_url:             'http://9x9tmp.s3.amazonaws.com/',
+            file_size_limit:        '10 MB',
+            file_types:             cms.imageTypes,
             file_types_description: 'Image Files',
-            file_post_name:     'file',
-            button_placeholder: $('#channel_import_detail [name="ch_upload_image"]').get(0),
-            button_action:       SWFUpload.BUTTON_ACTION.SELECT_FILE,
-            button_image_url:   $('#image_btn_upload').text(),
-            button_width:       '95',
-            button_height:      '32',
-            button_cursor:      SWFUpload.CURSOR.HAND,
-            button_window_mode : SWFUpload.WINDOW_MODE.OPAQUE,
-            debug:              false,
-            http_success :      [201],
+            file_post_name:         'file',
+            button_placeholder:     $('#channel_import_detail [name="ch_upload_image"]').get(0),
+            button_action:          SWFUpload.BUTTON_ACTION.SELECT_FILE,
+            button_image_url:       $('#image_btn_upload').text(),
+            button_width:           '95',
+            button_height:          '32',
+            button_cursor:          SWFUpload.CURSOR.HAND,
+            button_window_mode :    SWFUpload.WINDOW_MODE.OPAQUE,
+            debug:                  false,
+            http_success :          [ 201 ],
             upload_success_handler: function(file, serverData, recievedResponse) {
               if (!file.type)
                 file.type = cms.getFileTypeByName(file.name);
@@ -1228,21 +1247,21 @@ var page$ = {
         }
         $('<span/>').attr('id', 'ch_upload_image').appendTo('#upload_button_place');
         var swfupload_settings = {
-          flash_url:          '/javascripts/swfupload/swfupload.swf',
-          upload_url:         'http://9x9tmp.s3.amazonaws.com/',
-          file_size_limit:    '10240',
-          file_types:         cms.imageTypes,
+          flash_url:              '/javascripts/swfupload/swfupload.swf',
+          upload_url:             'http://9x9tmp.s3.amazonaws.com/',
+          file_size_limit:        '10 MB',
+          file_types:             cms.imageTypes,
           file_types_description: 'Image Files',
-          file_post_name:     'file',
-          button_placeholder: document.getElementById('ch_upload_image'),
-          button_action:      SWFUpload.BUTTON_ACTION.SELECT_FILE,
-          button_image_url:   $('#image_btn_upload').text(),
-          button_width:       '95',
-          button_height:      '32',
-          button_cursor:      SWFUpload.CURSOR.HAND,
-          button_window_mode : SWFUpload.WINDOW_MODE.OPAQUE,
-          debug:              false,
-          http_success :      [201],
+          file_post_name:         'file',
+          button_placeholder:     document.getElementById('ch_upload_image'),
+          button_action:          SWFUpload.BUTTON_ACTION.SELECT_FILE,
+          button_image_url:       $('#image_btn_upload').text(),
+          button_width:           '95',
+          button_height:          '32',
+          button_cursor:          SWFUpload.CURSOR.HAND,
+          button_window_mode :    SWFUpload.WINDOW_MODE.OPAQUE,
+          debug:                  false,
+          http_success :          [ 201 ],
           upload_success_handler: function(file, serverData, recievedResponse) {
             if (!file.type)
               file.type = cms.getFileTypeByName(file.name);

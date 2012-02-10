@@ -10,7 +10,7 @@ var log = function(text) {
 var cms = {
   debug: false,
   videoTypes: '*.m4v;*.mp4;*.mpg;*.mpeg;*.mov;*.webm;*.rm;*.rmvb;*.avi;*.wmv;*.flv;*.ogg',
-  audioTypes: '*.mp3;*.wma;*.wav;*.aac;*.aif;*.aiff',
+  audioTypes: '*.mp3',//;*.wma;*.wav;*.aac;*.aif;*.aiff',
   imageTypes: '*.jpeg;*.jpg;*.png;*.gif',
   isFacebookLoaded: false,
   loadFacebook: function(callback) {

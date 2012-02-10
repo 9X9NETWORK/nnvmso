@@ -207,7 +207,7 @@ var page$ = {
           var swfupload_settings = {
             flash_url:              '/javascripts/swfupload/swfupload.swf',
             upload_url:             'http://9x9tmp.s3.amazonaws.com/',
-            file_size_limit:        '10240',
+            file_size_limit:        '10 MB',
             file_types:             cms.imageTypes,
             file_types_description: 'Image Files',
             file_post_name:         'file',
@@ -219,7 +219,7 @@ var page$ = {
             button_window_mode:     SWFUpload.WINDOW_MODE.OPAQUE,
             button_action:          SWFUpload.BUTTON_ACTION.SELECT_FILE,
             debug:                  false,
-            http_success:           [201],
+            http_success:           [ 201 ],
             upload_success_handler: function(file, serverData, recievedResponse) {
               if (!file.type)
                 file.type = cms.getFileTypeByName(file.name);

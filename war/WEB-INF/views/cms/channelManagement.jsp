@@ -323,7 +323,7 @@
                       <div class="floatL" style="margin:10px 0 0 80px"><a onclick="return false;" href="javascript:"><span class="ep_upload_audio btnCreate">Upload</span></a>&nbsp;</div>
                       <div class="clear"></div>
                       <p class="hint audio_localdrive_hint"><spring:message code="cms.channel_management.msg.audio_localdrive_hint"/></p>
-                      <div style="width:300px;padding-left:80px;padding-bottom:10px;" class="floatL ep_uploading_audio" style="display:none"><div></div></div>
+                      <div style="width:300px;padding-left:80px;padding-bottom:10px" class="floatL ep_uploading_audio"><div style="display:none" class="floatL"></div></div>
                     </div>
                     <label class="floatL"><spring:message code="cms.channel_management.label.program_logo"/></label>
                     <div class="uploadImg">
