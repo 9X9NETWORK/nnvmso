@@ -16,6 +16,11 @@ $(function() {
             + 'a.btnLogin:hover { background-image: url(' + $('#image_btn_login_hover').text() + '); }'
             + '</style>';
   $(style).appendTo('head');
+  $('#login_form').keypress(function(event) {
+    if (event.which == 13) {
+      $('#login_form').submit();
+    }
+  });
 });
 </script>
 </head>
