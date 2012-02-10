@@ -398,7 +398,15 @@ a.addNew{ padding:10px 0 0 0; display:block; font-size:0.9em;}
 .epItemFocus ul, .epItem ul { padding-top:5px; }
 .icon { padding-left:5px; }
 
-.epItem a.btnDel , .epItemFocus a.btnDel{background:url(/images/cms/btnClose.png) no-repeat; width:24px; height:23px; display:block; position:relative; top:-28px; left:420px;}
+.epItem a.btnDel, .epItemFocus a.btnDel {
+  background: url(/images/cms/btnClose.png) no-repeat;
+  width:      24px;
+  height:     23px;
+  display:    block;
+  position:   relative;
+  top:        -28px;
+  left:       420px;
+}
 .chList li , .epList li{ padding-bottom:5px;}
 .chList { padding-top:5px; }
 .chList select { margin: 3px 0 0 5px; }

@@ -392,7 +392,7 @@
            1. first li is normal status , second is active status , when user click a  li, switch status to this "epItemFocus"  and epItemFocusTitle than switch into chInfo div
            -->
       <div class="epList" style="display:none" id="program_list">
-        <div class="right_title"><div class="floatL">小灰熊的大愛劇場</div> - <spring:message code="cms.channel_management.title.program_management"/> </div>
+        <div class="right_title"><div class="floatL">小灰熊的大愛劇場</div> - <spring:message code="cms.channel_management.title.program_management"/> <p id="publish_button" class="btnGray reorder_button"><span><spring:message code="cms.channel_management.btn.reorder"/></span></p></div>
         <div class="createEpList">
           <a class="btnCreate create_program_button floatL" href="javascript:"><spring:message code="cms.channel_management.btn.create_program"/></a>
           <a class="btnCreate create_radio_program_button floatL" style="margin:0 0 10px 10px" href="javascript:"><spring:message code="cms.channel_management.btn.create_radio_program"/></a>
@@ -654,7 +654,7 @@
                 <br/><br/>
                 <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.system_category"/></label>
                 <div class="floatL">
-                  <select name="ch_category" class="sys_directory">
+                  <select name="ch_category" class="sys_directory" style="width:200px">
                     <option selected="selected">請選擇分類</option>
                     <option>新聞 / 政治</option>
                     <option>財經企管</option>
@@ -716,6 +716,8 @@
 <label class="lang" id="lang_button_from_disk">從硬碟</label>
 <label class="lang" id="image_btn_upload"><spring:message code="cms.image.btn_upload"/></label>
 <label class="lang" id="image_btn_from_disk"><spring:message code="cms.image.btn_from_disk"/></label>
+<label class="lang" id="image_btn_save"><spring:message code="cms.image.btn_save"/></label>
+<label class="lang" id="image_btn_reorder"><spring:message code="cms.channel_management.btn.reorder"/></label>
 <label class="lang" id="image_ch_public"><spring:message code="cms.image.ch_public"/></label>
 <label class="lang" id="image_ch_unpublic"><spring:message code="cms.image.ch_unpublic"/></label>
 </body>

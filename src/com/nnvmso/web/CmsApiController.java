@@ -932,6 +932,40 @@ public class CmsApiController {
 		return "OK";
 	}
 	
+	@RequestMapping("updateProgramListSeq")
+	public @ResponseBody String updateProgramListSeq(@RequestParam Long channelId, @RequestParam String programIdList) {
+		logger.info("channelId: " + channelId);
+		logger.info("programIdList" + programIdList);
+		
+		MsoProgramManager programMngr = new MsoProgramManager();
+		
+		List<Long> programIds = new ArrayList<Long>();
+		String[] splitted = programIdList.split(",");
+		for (int i = 0; i < splitted.length; i++) {
+			programIds.add(Long.valueOf(splitted[i]));
+		}
+		
+		List<Long> origProgramIds = new ArrayList<Long>();
+		List<MsoProgram> origProgramList = programMngr.findAllByChannelId(channelId);
+		if (origProgramList.size() != programIds.size()) {
+			return "SIZE_NOT_MATCH";
+		}
+		for (int i = 0; i < origProgramList.size(); i++) {
+			origProgramIds.add(origProgramList.get(i).getKey().getId());
+		}
+		if (!programIds.containsAll(origProgramIds)) {
+			return "NOT_MATCH";
+		}
+		
+		for (MsoProgram program : origProgramList) {
+			int seq = programIds.indexOf(program.getKey().getId());
+			program.setSeq(String.valueOf(seq));
+			programMngr.save(program);
+		}
+		
+		return "OK";
+	}
+	
 	@RequestMapping("channelSystemChannelSet")
 	public @ResponseBody ChannelSet channelSystemChannelSet(@RequestParam Long channelId) {
 		CmsApiService cmsService = new CmsApiService();
@@ -1002,8 +1036,21 @@ public class CmsApiController {
 	
 	@RequestMapping("programList")
 	public @ResponseBody List<MsoProgram> programList(Long channelId) {
+		
 		MsoProgramManager programMngr = new MsoProgramManager();
-		return programMngr.findAllByChannelId(channelId);
+		List<MsoProgram> results = programMngr.findAllByChannelId(channelId);
+		
+		class MsoProgramComparator implements Comparator<MsoProgram> {
+			@Override
+			public int compare(MsoProgram program1, MsoProgram program2) {
+				int seq1 = (program1.getSeq() == null) ? 0 : Integer.valueOf(program1.getSeq());
+				int seq2 = (program2.getSeq() == null) ? 0 : Integer.valueOf(program2.getSeq());
+				return (seq1 - seq2);
+			}
+		}
+		Collections.sort(results, new MsoProgramComparator());
+
+		return results;
 	}
 	
 	//////////////////// Directory Management ////////////////////

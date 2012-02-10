@@ -21,6 +21,8 @@ var page$ = {
       page$.programDetail.destroy();
       page$.programList.destroy();
       $('#choose_channel_type').hide();
+      $('#publish_button').css('background-image', 'url(/images/cms/graybtn.png)').html('<span>' + $('#image_btn_reorder').text() + '</span>');
+      $('.program_info_removebutton').css('background-image', 'url(/images/cms/btnClose.png)');
       return true;
     }
   },
@@ -835,6 +837,40 @@ var page$ = {
           }
           return;
         }
+        $('#publish_button').unbind().click({ 'channelId': channelId, 'channelName': channelName }, function(event) { // actually, its re-order button
+          $('.program_info_removebutton').unbind().css('background-image', 'url(/images/cms/btn_move.png)');
+          $(this).css('background-image', 'url(' + $('#image_btn_save').text() + ')');
+          $('#program_list_ul').sortable({
+            disable: false,
+            cursor:  'crosshair',
+            forcePlaceHolderSize: true,
+            update: function() {
+            }
+          }).disableSelection();
+          $(this).text('').unbind().click(function() {
+            var programDoms = $('.program_info_block_cloned').toArray();
+            var programIdList = [ ];
+            for (var i = 0; i < programDoms.length; i++) {
+              var programId = $(programDoms[i]).find('[name="programId"]').val();
+              programIdList.push(programId);
+            }
+            log(programIdList);
+            var parameters = {
+              channelId:     event.data.channelId,
+              programIdList: programIdList.join(',')
+            };
+            cms.post('/CMSAPI/updateProgramListSeq', parameters, function(response) {
+              if (response != 'OK') {
+                alert($('#lang_warning_error_occurs').text());
+              } else {
+                alert($('#lang_update_successfully').text());
+                $('#program_list_ul').sortable({ disabled: true });
+                page$.overallLayout.destroyRightSideContent(true);
+                page$.programList.init(event.data.channelId, false, event.data.channelName);
+              }
+            }, 'text');
+          });
+        });
         if (readonly) {
           $('#program_list_readonly .right_title div').text(channelName);
           page$.programList.displayProgramListReadonly(programs);
@@ -975,6 +1011,7 @@ var page$ = {
           promoteUrlTruncated = promoteUrl.substring(0, 36) + '...';
         }
         programInfoBlock.find('.program_info_promoteurl').text(promoteUrlTruncated).attr('href', promoteUrl);
+        $('<input type="hidden" name="programId"/>').val(programId).appendTo(programInfoBlock);
         $('<li></li>').append(programInfoBlock).appendTo('#program_list_ul');
         programInfoBlock.click({ 'programId': programId }, function(event) {
           $('.program_info_block').removeClass('epItemFocus').addClass('epItem');
