@@ -1,5 +1,5 @@
 /**
- *
+ * this comment is test for EGIT pull
  */
 
 var pageSetup = {
