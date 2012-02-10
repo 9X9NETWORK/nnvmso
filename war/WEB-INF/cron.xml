@@ -8,6 +8,6 @@
   <cron>
     <url>/CMSAPI/listOwnedChannelSets?sortby=lang</url>    
     <description>Build system channel sets cache automatically</description>
-    <schedule>every 29 minutes</schedule>
+    <schedule>every 19 minutes</schedule>
   </cron>            
 </cronentries>
