@@ -60,23 +60,23 @@
           </div>
           <div class="clear"></div><br/>
           <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_set_management.label.name"/></label>
-          <div class="bg_input floatL"><input type="text" id="cc_name" name="cc_name" size="33" maxlength="40"/></div>
+          <div class="bg_input floatL"><input type="text" id="cc_name" name="cc_name" size="32" maxlength="40"/></div>
           <div class="clear"></div>
           <p class="hint"><spring:message code="cms.channel_set_management.msg.fourty_characters"/></p>
           <br/>
           <label class="floatL"><spring:message code="cms.channel_set_management.label.introduction"/></label>
-          <div class="bg_textarea floatL"><textarea name="cc_intro" id="cc_intro" cols="33" rows="5"></textarea></div>
+          <div class="bg_textarea floatL"><textarea name="cc_intro" id="cc_intro" cols="32" rows="5"></textarea></div>
           <div class="clear"></div>
           <p class="hint"><spring:message code="cms.channel_set_management.msg.two_hundred_characters"/></p>
           <br/>
           <label class="floatL"><spring:message code="cms.channel_set_management.label.tag"/></label>
-          <div class="bg_input floatL"><input name="cc_tag" id="cc_tag" type="text" size="33" maxlength="40"/></div>
+          <div class="bg_input floatL"><input name="cc_tag" id="cc_tag" type="text" size="32" maxlength="40"/></div>
           <div class="clear"></div>
           <p class="hint"><spring:message code="cms.channel_set_management.msg.camma_seperated"/></p>
           <br/>
           <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_set_management.label.system_category"/></label>
           <div class="floatL">
-            <select id="sys_directory" name="sys_directory" class="sys_directory">
+            <select id="sys_directory" name="sys_directory" class="sys_directory" style="width:200px">
               <option value="0" selected="selected"><spring:message code="cms.channel_set_management.msg.select_category"/></option>
             </select>
           </div>
@@ -174,6 +174,7 @@
 <label class="lang" id="lang_channel_had_been_added"><spring:message code="cms.info.channel_has_been_added"/></label>
 <label class="lang" id="lang_warning_channel_has_not_been_saved"><spring:message code="cms.warning.change_has_not_been_saved"/></label>
 <label class="lang" id="lang_warning_set_is_empty"><spring:message code="cms.warning.set_is_empty"/></label>
+<label class="lang" id="lang_warning_new_channels_will_be_reviewed"><spring:message code="cms.warning.new_channels_will_be_reviewed"/></label>
 <label class="lang" id="image_bg_album"><spring:message code="cms.image.bg_album"/></label>
 <label class="lang" id="image_btn_upload"><spring:message code="cms.image.btn_upload"/></label>
 </body>

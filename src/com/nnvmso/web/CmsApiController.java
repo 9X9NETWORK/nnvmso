@@ -597,6 +597,7 @@ public class CmsApiController {
 				// piwik
 				PiwikLib.createPiwikSite(0, channel.getKey().getId(), req);
 			}
+			channel.setTags("NEW_CHANNEL");
 		} else {
 			// piwik
 			PiwikLib.createPiwikSite(0, channel.getKey().getId(), req);

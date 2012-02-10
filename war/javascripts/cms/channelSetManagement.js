@@ -270,6 +270,7 @@ var page$ = {
       $('<img/>').attr('src', channel.imageUrl).appendTo(item);
       $('<p/>').text(channel.name).appendTo(item);
       $('<input type="hidden" name="channelId"/>').val(channel.key.id).appendTo(item);
+      $('<input type="hidden" name="tags"/>').val(channel.tags).appendTo(item);
       return item;
     },
     appendChannel: function(channel, suppress) {
@@ -379,10 +380,19 @@ var page$ = {
     }
     var items = $('#set_ch_list li').toArray();
     var channelIds = '';
+    var titleNewChannels = '';
     for (var i = 0; i < items.length; i++) {
       if (channelIds != '')
         channelIds += ',';
       var channelId = $(items[i]).find('input[name="channelId"]').val();
+      var title = $(items[i]).find('p').text();
+      var tags = $(items[i]).find('input[name="tags"]').val();
+      if (tags == 'NEW_CHANNEL') { // hacks
+        if (titleNewChannels != '') {
+          titleNewChannels += ', ';
+        }
+        titleNewChannels += title;
+      }
       channelIds += channelId;
     }
     if (channelIds == '') {
@@ -390,6 +400,11 @@ var page$ = {
       return;
     }
     log(channelIds);
+    
+    if (titleNewChannels != '') {
+      alert(titleNewChannels + ' ' + $('#lang_warning_new_channels_will_be_reviewed').text());
+    }
+    
     var parameters = {
       'channelSetId': $('#cc_id').val(),
       'channelIds':   channelIds,

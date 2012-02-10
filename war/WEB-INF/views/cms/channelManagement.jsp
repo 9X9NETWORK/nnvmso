@@ -173,17 +173,17 @@
                 <input type="hidden" id="ch_id" value="0"/>
                 <div class="clear"></div><br/>
                 <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.name"/></label>
-                <div class="bg_input floatL"><input id="ch_name" type="text" size="33" maxlength="40"/></div>
+                <div class="bg_input floatL"><input id="ch_name" type="text" size="32" maxlength="40"/></div>
                 <div class="clear"></div>
                 <p class="hint"><spring:message code="cms.channel_management.msg.fourty_characters"/></p>
                 <br/>
                 <label class="floatL"><spring:message code="cms.channel_management.label.introduction"/></label>
-                <div class="bg_textarea floatL"><textarea id="ch_intro" name="" cols="33" rows="5"></textarea></div>
+                <div class="bg_textarea floatL"><textarea id="ch_intro" name="" cols="32" rows="5"></textarea></div>
                 <div class="clear"></div>
                 <p class="hint"><spring:message code="cms.channel_management.msg.two_hundred_characters"/></p>
                 <br/>
                 <label class="floatL"><spring:message code="cms.channel_management.label.tag"/></label>
-                <div class="bg_input floatL"><input id="ch_tag" type="text" size="33" maxlength="200"/></div>
+                <div class="bg_input floatL"><input id="ch_tag" type="text" size="32" maxlength="200"/></div>
                 <div class="clear"></div>
                 <p class="hint"><spring:message code="cms.channel_management.msg.camma_seperated"/></p>
                 <br/>
@@ -256,7 +256,7 @@
                     <div style="width:300px;padding-left:80px;padding-bottom:10px;" class="floatL ep_uploading_video" style="display:none"><div></div></div>
                     <!--  upload by URL link -->
                     <div class="floatL uploadURL ep_url_block" style="display:none">
-                      <div class="bg_input floatL"><input type="text" size="33" maxlength="200" class="ep_url_input"/></div>&nbsp;<div class="floatL"><a onclick="return false;" href="javascript:" class="ep_url_import btnCreate"><spring:message code="cms.channel_management.btn.import"/></a></div>
+                      <div class="bg_input floatL"><input type="text" size="32" maxlength="200" class="ep_url_input"/></div>&nbsp;<div class="floatL"><a onclick="return false;" href="javascript:" class="ep_url_import btnCreate"><spring:message code="cms.channel_management.btn.import"/></a></div>
                       <div class="clear"></div>
                       <p class="hint video_url_hint" style="display:none"><spring:message code="cms.channel_management.msg.video_url_hint"/></p>
                       <p class="hint youtube_hint" style="display:none"><spring:message code="cms.channel_management.msg.youtube_hint"/></p>
@@ -274,25 +274,25 @@
                     </div>
                     <div class="clear"></div><br/>
                     <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.program_name"/></label>
-                    <div class="bg_input floatL"><input class="ep_name" type="text" size="33" maxlength="40"/></div>
+                    <div class="bg_input floatL"><input class="ep_name" type="text" size="32" maxlength="40"/></div>
                     <div class="clear"></div>
                     <p class="hint"><spring:message code="cms.channel_management.msg.fourty_characters"/></p>
                     <br/>
                     <label class="floatL"><spring:message code="cms.channel_management.label.program_introduction"/></label>
-                    <div class="bg_textarea floatL"><textarea class="ep_intro" name="" cols="33" rows="5"></textarea></div>
+                    <div class="bg_textarea floatL"><textarea class="ep_intro" name="" cols="32" rows="5"></textarea></div>
                     <div class="clear"></div>
                     <p class="hint"><spring:message code="cms.channel_management.msg.two_hundred_characters"/></p>
                     <br/>
                     <div class="ep_comment_block" style="display:none">
                       <label class="floatL"><spring:message code="cms.channel_management.label.program_comment"/></label>
-                      <div class="bg_textarea floatL"><textarea class="ep_comment" name="" cols="33" rows="5"></textarea></div>
+                      <div class="bg_textarea floatL"><textarea class="ep_comment" name="" cols="32" rows="5"></textarea></div>
                       <div class="clear"></div>
                       <p class="hint"><spring:message code="cms.channel_management.msg.two_hundred_characters"/></p>
                       <br/>
                     </div>
                     <div style="display:none"><!-- tag of program -->
                       <label class="floatL"><spring:message code="cms.channel_management.label.tag"/></label>
-                      <div class="bg_input floatL"><input type="text" size="33" maxlength="40"/></div>
+                      <div class="bg_input floatL"><input type="text" size="32" maxlength="40"/></div>
                       <div class="clear"></div>
                       <p class="hint"><spring:message code="cms.channel_management.msg.camma_seperated"/></p><br/>
                     </div>
@@ -315,7 +315,7 @@
                     </div>
                     <!--  upload by URL link -->
                     <div class="floatL uploadURL ep_url_block">
-                      <div class="bg_input floatL" style="margin-top:5px"><input type="text" size="33" maxlength="200" class="ep_url_input"/></div>
+                      <div class="bg_input floatL" style="margin-top:5px"><input type="text" size="32" maxlength="200" class="ep_url_input"/></div>
                       <div class="clear"></div>
                       <p class="hint audio_url_hint"><spring:message code="cms.channel_management.msg.audio_url_hint"/></p>
                       <br/>
@@ -342,7 +342,7 @@
                       </div>
                       <div class="clear"></div>
                       <div style="margin-top:10px" class="ep_image_url_block">
-                        <div class="bg_input floatL"><input type="text" size="33" maxlength="200" class="ep_image_url_input"/></div>
+                        <div class="bg_input floatL"><input type="text" size="32" maxlength="200" class="ep_image_url_input"/></div>
                       </div>
                       <div style="margin-top:10px;display:none" class="ep_image_localdrive_block">
                         <span class="ep_upload_button_place"><a onclick="return false;" href="javascript:" class="uploadBtn ep_upload_image"></a></span>
@@ -354,25 +354,25 @@
                     </div>
                     <div class="clear"></div><br/>
                     <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.program_name"/></label>
-                    <div class="bg_input floatL"><input class="ep_name" type="text" size="33" maxlength="40"/></div>
+                    <div class="bg_input floatL"><input class="ep_name" type="text" size="32" maxlength="40"/></div>
                     <div class="clear"></div>
                     <p class="hint"><spring:message code="cms.channel_management.msg.fourty_characters"/></p>
                     <br/>
                     <label class="floatL"><spring:message code="cms.channel_management.label.program_introduction"/></label>
-                    <div class="bg_textarea floatL"><textarea class="ep_intro" name="" cols="33" rows="5"></textarea></div>
+                    <div class="bg_textarea floatL"><textarea class="ep_intro" name="" cols="32" rows="5"></textarea></div>
                     <div class="clear"></div>
                     <p class="hint"><spring:message code="cms.channel_management.msg.two_hundred_characters"/></p>
                     <br/>
                     <div class="ep_comment_block" style="display:none">
                       <label class="floatL"><spring:message code="cms.channel_management.label.program_comment"/></label>
-                      <div class="bg_textarea floatL"><textarea class="ep_comment" name="" cols="33" rows="5"></textarea></div>
+                      <div class="bg_textarea floatL"><textarea class="ep_comment" name="" cols="32" rows="5"></textarea></div>
                       <div class="clear"></div>
                       <p class="hint"><spring:message code="cms.channel_management.msg.two_hundred_characters"/></p>
                       <br/>
                     </div>
                     <div style="display:none"><!-- tag of program -->
                       <label class="floatL"><spring:message code="cms.channel_management.label.tag"/></label>
-                      <div class="bg_input floatL"><input type="text" size="33" maxlength="40"/></div>
+                      <div class="bg_input floatL"><input type="text" size="32" maxlength="40"/></div>
                       <div class="clear"></div>
                       <p class="hint"><spring:message code="cms.channel_management.msg.camma_seperated"/></p><br/>
                     </div>
@@ -468,26 +468,26 @@
                 <div class="clear"></div><br/>
                 <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.name"/></label>
                 <div class="bg_input floatL">
-                  <input type="text" size="27" maxlength="40" class="ep_name"/>
+                  <input type="text" size="32" maxlength="40" class="ep_name"/>
                 </div>
                 <div class="clear"></div>
                 <p class="hint"><spring:message code="cms.channel_management.msg.fourty_characters"/></p>
                 <br/>
                 <label class="floatL"><spring:message code="cms.channel_management.label.introduction"/></label>
-                <div class="bg_textarea floatL"><textarea name="" cols="30" rows="5" class="ep_intro"></textarea></div>
+                <div class="bg_textarea floatL"><textarea name="" cols="32" rows="5" class="ep_intro"></textarea></div>
                 <div class="clear"></div>
                 <p class="hint"><spring:message code="cms.channel_management.msg.two_hundred_characters"/></p>
                 <br/>
                 <div class="ep_comment_block" style="display:none">
                   <label class="floatL"><spring:message code="cms.channel_management.label.program_comment"/></label>
-                  <div class="bg_textarea floatL"><textarea class="ep_comment" name="" cols="33" rows="5"></textarea></div>
+                  <div class="bg_textarea floatL"><textarea class="ep_comment" name="" cols="32" rows="5"></textarea></div>
                   <div class="clear"></div>
                   <p class="hint"><spring:message code="cms.channel_management.msg.two_hundred_characters"/></p>
                   <br/>
                 </div>
                 <div style="display:none">
                   <label class="floatL"><spring:message code="cms.channel_management.label.tag"/></label>
-                  <div class="bg_input floatL"><input type="text" size="40" maxlength="40" disabled="disabled"/></div>
+                  <div class="bg_input floatL"><input type="text" size="32" maxlength="40" disabled="disabled"/></div>
                   <div class="clear"></div>
                   <p class="hint"><spring:message code="cms.channel_management.msg.camma_seperated"/></p>
                   <br/>
@@ -613,7 +613,7 @@
             <form>
               <fieldset class="setAlbum">
                 <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.channel_source"/></label>
-                <div class="bg_input floatL"><input type="text" size="33" maxlength="200" name="ch_import_url"/></div>
+                <div class="bg_input floatL"><input type="text" size="32" maxlength="200" name="ch_import_url"/></div>
                 <a href="javascript:" class="btnCreate floatL" name="ch_import_button"><spring:message code="cms.channel_management.btn.import"/></a>
                 <div class="clear"></div><br/>
                 <label class="floatL"><span style="display:none" class="red">＊</span><spring:message code="cms.channel_management.label.logo"/></label>
@@ -630,17 +630,17 @@
                 </div>
                 <div class="clear"></div><br/>
                 <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.name"/></label>
-                <div class="bg_input floatL"><input name="ch_name" type="text" size="33" maxlength="40"/></div>
+                <div class="bg_input floatL"><input name="ch_name" type="text" size="32" maxlength="40"/></div>
                 <div class="clear"></div>
                 <p class="hint"><spring:message code="cms.channel_management.msg.fourty_characters"/></p>
                 <br/>
                 <label class="floatL"><spring:message code="cms.channel_management.label.introduction"/></label>
-                <div class="bg_textarea floatL"><textarea name="ch_intro" cols="30" rows="5"></textarea></div>
+                <div class="bg_textarea floatL"><textarea name="ch_intro" cols="32" rows="5"></textarea></div>
                 <div class="clear"></div>
                 <p class="hint"><spring:message code="cms.channel_management.msg.two_hundred_characters"/></p>
                 <br/>
                 <label class="floatL"><spring:message code="cms.channel_management.label.tag"/></label>
-                <div class="bg_input floatL"><input name="ch_tag" type="text" size="30" maxlength="40"/></div>
+                <div class="bg_input floatL"><input name="ch_tag" type="text" size="32" maxlength="40"/></div>
                 <div class="clear"></div>
                 <p class="hint"><spring:message code="cms.channel_management.msg.camma_seperated"/></p>
                 <br/>
