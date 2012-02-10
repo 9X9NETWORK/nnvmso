@@ -124,11 +124,9 @@ public class CmsApiController {
 		ChannelSet channelSet = cmsService.getDefaultChannelSet(msoId);
 		if (channelSet == null)
 			return null;
-		List<Category> categoryList = cmsService.whichSystemCategoriesContainingTheChannelSet(channelSet.getKey().getId());
-		if (categoryList.size() > 0)
-			return categoryList.get(0);
-		else
-			return null;
+		Category category = cmsService.whichSystemCategoryContainingTheChannelSet(channelSet.getKey().getId());
+		
+		return category;
 	}
 	
 	/**
@@ -410,11 +408,15 @@ public class CmsApiController {
 			@RequestParam(required=false) Long msoId,
 			@RequestParam(required=false) String sortby) {
 		
-		response.addDateHeader("Expires", System.currentTimeMillis() + 3600000);
+		Long expires = Long.valueOf(24 * 60 * 60);
+		response.addHeader("Cache-Control", "private, max-age=" + expires);
+		response.addDateHeader("Expires", System.currentTimeMillis() + (expires * 1000));
 		
 		ContentOwnershipManager ownershipMngr = new ContentOwnershipManager();
 		List<ChannelSet> results = new ArrayList<ChannelSet>();
 		MsoManager msoMngr = new MsoManager();
+		CmsApiService cmsService = new CmsApiService();
+		AreaOwnershipManager areaMngr = new AreaOwnershipManager();
 		Mso nn = msoMngr.findNNMso();
 		String cacheIdString = "System.ChannelSets(sortby=lang)";
 		
@@ -442,13 +444,16 @@ public class CmsApiController {
 		logger.info("msoId = " + msoId);
 		results = ownershipMngr.findOwnedChannelSetsByMsoId(msoId);
 		for (ChannelSet channelSet : results) {
-			CmsApiService cmsService = new CmsApiService();
-			AreaOwnershipManager areaMngr = new AreaOwnershipManager();
 			channelSet.setSubscriptionCount(areaMngr.findTotalCountBySetId(channelSet.getKey().getId()));
-			List<Category> sysCategories = cmsService.whichSystemCategoriesContainingTheChannelSet(channelSet.getKey().getId());
-			if (sysCategories.size() > 0) {
-				channelSet.setLang(sysCategories.get(0).getLang());
+			Category category = cmsService.whichSystemCategoryContainingTheChannelSet(channelSet.getKey().getId());
+			if (category != null) {
+				logger.info("found category = " + category.getKey().getId());
+				channelSet.setLang(category.getLang());
 			}
+			// remove some unused field to reduce cached size
+			channelSet.setIntro("");
+			channelSet.setImageUrl("");
+			channelSet.setNameSearch("");
 		}
 		class ChannelSetComparator implements Comparator<ChannelSet> {  // yes, I know, its a little dirty
 			@Override

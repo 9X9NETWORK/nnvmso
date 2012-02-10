@@ -22,6 +22,7 @@ import com.nnvmso.model.Category;
 import com.nnvmso.model.CategoryChannel;
 import com.nnvmso.model.CategoryChannelSet;
 import com.nnvmso.model.ChannelSet;
+import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
 
 @Service
@@ -29,7 +30,7 @@ public class CategoryManager {
 	
 	protected static final Logger log = Logger.getLogger(CategoryManager.class.getName());
 	private static MessageSource messageSource = new ClassPathXmlApplicationContext("locale.xml");
-	
+	private static List<Category> systemCategories = new ArrayList<Category>();
 	private CategoryDao categoryDao = new CategoryDao();
 		
 	public void create(Category category) {		
@@ -251,6 +252,17 @@ public class CategoryManager {
 
 	public List<Category> findAllByParentId(long parentId) {
 		return categoryDao.findAllByParanetId(parentId);
+	}
+
+	public List<Category> findAllSystemCategories() {
+		
+		if (systemCategories.size() == 0) {
+			MsoManager msoMngr = new MsoManager();
+			Mso nnmso = msoMngr.findNNMso();
+			systemCategories = findAllByMsoId(nnmso.getKey().getId());
+		}
+		
+		return systemCategories;
 	}
 	
 }

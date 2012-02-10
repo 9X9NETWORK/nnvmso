@@ -5,4 +5,9 @@
     <description>Set Channel Count Calibration</description>
     <schedule>every day 09:00</schedule>
   </cron>            
+  <cron>
+    <url>/CMSAPI/listOwnedChannelSets?sortby=lang</url>    
+    <description>Build system channel sets cache automatically</description>
+    <schedule>every 29 minutes</schedule>
+  </cron>            
 </cronentries>

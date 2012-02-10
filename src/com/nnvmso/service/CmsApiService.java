@@ -38,8 +38,7 @@ public class CmsApiService {
 	}
 	
 	public List<CategoryChannelSet> whichCCSContainingTheChannelSet(long channelSetId) {
-		Mso nnmso = msoMngr.findNNMso();
-		List<Category> sysCategories = catMngr.findAllByMsoId(nnmso.getKey().getId());
+		List<Category> sysCategories = catMngr.findAllSystemCategories();
 		List<Long> categoryIds = new ArrayList<Long>();
 		for (Category category : sysCategories) {
 			categoryIds.add(category.getKey().getId());
@@ -48,16 +47,18 @@ public class CmsApiService {
 		return ccsMngr.findByChannelSetIdAndCategoryIds(channelSetId, categoryIds);
 	}
 	
-	public List<Category> whichSystemCategoriesContainingTheChannelSet(long channelSetId) {
+	public Category whichSystemCategoryContainingTheChannelSet(long channelSetId) {
 		
-		List<CategoryChannelSet> ccss = this.whichCCSContainingTheChannelSet(channelSetId);
+		List<Category> sysCategories = catMngr.findAllSystemCategories();
 		
-		List<Long> categoryIds = new ArrayList<Long>();
-		for (CategoryChannelSet ccs : ccss) {
-			categoryIds.add(ccs.getCategoryId());
+		for (Category category : sysCategories) {
+			CategoryChannelSet ccs = ccsMngr.findByCategoryIdAndChannelSetId(category.getKey().getId(), channelSetId);
+			if (ccs != null) {
+				return catMngr.findById(ccs.getCategoryId());
+			}
 		}
 		
-		return catMngr.findAllByIds(categoryIds);
+		return null;
 	}
 	
 	public List<Category> whichSystemCategoriesContainingTheChannel(long channelId) {
@@ -75,8 +76,7 @@ public class CmsApiService {
 	}
 	
 	public List<CategoryChannel> whichCCContainingTheChannel(Long channelId) {
-		Mso nnmso = msoMngr.findNNMso();
-		List<Category> sysCategories = catMngr.findAllByMsoId(nnmso.getKey().getId());
+		List<Category> sysCategories = catMngr.findAllSystemCategories();
 		List<Long> categoryIds = new ArrayList<Long>();
 		for (Category category : sysCategories) {
 			categoryIds.add(category.getKey().getId());
