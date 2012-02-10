@@ -339,7 +339,18 @@ var page$ = {
           debug:                  false,
           http_success :          [ 201 ],
           upload_progress_handler: function(file, completed, total) {
-            programDetailBlock.find('.ep_uploading_audio div').progressBar((completed * 100) / total);
+            if (completed % 10 > 1) {
+              return;
+            }
+            var remaining = file.timeRemaining.toString();
+            var eta;
+            if (remaining == 0) {
+              eta = '--';
+            } else {
+              eta = remaining.substring(0, remaining.indexOf('.')) + ' s';
+            }
+            programDetailBlock.find('.ep_uploading_audio .progress').progressBar((completed * 100) / total);
+            programDetailBlock.find('.ep_uploading_audio .eta').html('&nbsp;&nbsp;ETA: ' + eta).show();
           },
           upload_success_handler: function(file, serverData, recievedResponse) {
             if (!file.type)
@@ -352,7 +363,8 @@ var page$ = {
             log(code);
             programDetailBlock.find('.ep_audio_cancel').remove();
             if (code == -280) {
-              programDetailBlock.find('.ep_uploading_audio div').text('').hide();
+              programDetailBlock.find('.ep_uploading_audio .progress').text('').hide();
+              programDetailBlock.find('.ep_uploading_audio .eta').text('').hide();
               try {
                 this.setButtonDisabled(false);
               } catch(e) { }
@@ -360,7 +372,7 @@ var page$ = {
               return;
             }
             this.setButtonDisabled(false);
-            programDetailBlock.find('.ep_uploading_audio div').text($('#lang_upload_failed').text()).show();
+            programDetailBlock.find('.ep_uploading_audio .eta').text(' ' + $('#lang_upload_failed').text()).show();
             alert('error: ' + message);
           },
           file_queued_handler: function(file) {
@@ -381,7 +393,7 @@ var page$ = {
             this.setPostParams(post_params);
             this.startUpload(file.id);
             this.setButtonDisabled(true);
-            programDetailBlock.find('.ep_uploading_audio div').text('').progressBar({
+            programDetailBlock.find('.ep_uploading_audio .progress').text('').progressBar({
               barImage: '/images/cms/progressbg_black.gif'
             }).show();
             programDetailBlock.find('.ep_url_input').val('');
