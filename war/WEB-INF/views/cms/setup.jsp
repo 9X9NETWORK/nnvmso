@@ -29,8 +29,9 @@
         <li class="syncTwitter">
           <span><spring:message code="cms.setup.label.twitter"/></span>&nbsp;&nbsp;
           <span><a style="display:none" href="javascript:" id="twitter_connect"><spring:message code="cms.setup.button.account_connect"/></a></span>&nbsp;&nbsp;
-          <span><a style="display:none" href="javascript:" id="twitter_disconnect"><spring:message code="cms.setup.button.account_disconnect"/></a></span>&nbsp;&nbsp;
-          <span><a style="display:none" href="javascript:" id="tw_switch"><spring:message code="cms.setup.button.disable_autosharing"/></a></span>
+          <span id="twitter_field" style="display:none;width:300px"><a style="display:none" href="javascript:" id="twitter_disconnect"><spring:message code="cms.setup.button.account_disconnect"/></a>
+          &nbsp;&nbsp;|&nbsp;&nbsp;
+          <a style="display:none" href="javascript:" id="tw_switch"><spring:message code="cms.setup.button.disable_autosharing"/></a></span>
         </li>
         <li class="syncPlurk">
           <span><spring:message code="cms.setup.label.plurk"/></span>&nbsp;&nbsp;

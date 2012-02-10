@@ -19,6 +19,7 @@ var pageSetup = {
   },
   showTwitterConnect: function() {
     $('#twitter_connect').show();
+    $('#twitter_field').hide();
     $('#twitter_disconnect').hide();
     $('#tw_switch').hide();
   },
@@ -55,6 +56,7 @@ var pageSetup = {
   },
   showTwitterDisconnect: function(enabled) {
 	$('#twitter_connect').hide();
+	$('#twitter_field').show();
 	$('#twitter_disconnect').show();
 	$('#tw_switch').show();
 	$('#tw_switch').unbind();
