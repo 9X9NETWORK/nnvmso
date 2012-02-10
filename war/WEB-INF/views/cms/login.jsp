@@ -9,6 +9,7 @@
 <title><spring:message code="cms.login.title"/></title>
 <link href="/stylesheets/cms.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="/javascripts/jquery-1.6.4.fixed.js"></script>
+<script type="text/javascript" src="/javascripts/cms/common.js"></script>
 <script type="text/javascript">
 $(function() {
   var style = '<style>'
@@ -21,6 +22,7 @@ $(function() {
       $('#login_form').submit();
     }
   });
+  cms.loadJSON('/CMSAPI/listOwnedChannelSets', null, { sortby: 'lang' }); // pre-cache data
 });
 </script>
 </head>

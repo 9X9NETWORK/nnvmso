@@ -8,7 +8,8 @@ import java.util.logging.Logger;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import com.google.appengine.repackaged.com.google.common.util.Base64;
+
+import com.google.gdata.util.common.util.Base64;
 
 public class AmazonLib {
 	
