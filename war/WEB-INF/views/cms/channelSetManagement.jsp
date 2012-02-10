@@ -100,17 +100,7 @@
       <div class="right_title"><spring:message code="cms.channel_set_management.title.edit_channel_set"/><p id="publish_button" class="btnGray"><span><spring:message code="cms.channel_set_management.btn.pubish"/></span></p></div>
       <div class="set_ch_arrange">
         <div id="set_ch_holder">
-          <ul id="set_ch_list" class="connectedSortable">
-            <li class="ch_normal"><p class="btnAdd"></p><p class="btnRemove"></p><p class="btnPlay"></p><img src="http://teltel.co.cc/louis/cms3.1/channelSetManagement_files/ch_logo_85005_11902.jpg"/><p class="chTitle">街舞1</p></li>
-            <li class="ch_normal"><p class="btnAdd"></p><p class="btnRemove"></p><p class="btnPlay"></p><img src="http://teltel.co.cc/louis/cms3.1/channelSetManagement_files/hqdefault.jpg"/><p class="chTitle">街舞2</p></li>
-            <li class="ch_normal"><p class="btnAdd"></p><p class="btnRemove"></p><p class="btnPlay"></p><img src="http://teltel.co.cc/louis/cms3.1/channelSetManagement_files/hqdefault(1).jpg"/><p class="chTitle">街舞3</p></li>
-            <li class="ch_normal"><p class="btnAdd"></p><p class="btnRemove"></p><p class="btnPlay"></p><img src="http://teltel.co.cc/louis/cms3.1/channelSetManagement_files/hqdefault(2).jpg"/><p class="chTitle">街舞4</p></li>
-            <li class="ch_normal"><p class="btnAdd"></p><p class="btnRemove"></p><p class="btnPlay"></p><img src="http://teltel.co.cc/louis/cms3.1/channelSetManagement_files/hqdefault(3).jpg"/><p class="chTitle">街舞5</p></li>
-            <li class="ch_normal"><p class="btnAdd"></p><p class="btnRemove"></p><p class="btnPlay"></p><img src="http://teltel.co.cc/louis/cms3.1/channelSetManagement_files/hqdefault(4).jpg"/><p class="chTitle">街舞6</p></li>
-            <li class="ch_normal"><p class="btnAdd"></p><p class="btnRemove"></p><p class="btnPlay"></p><img src="http://teltel.co.cc/louis/cms3.1/channelSetManagement_files/hqdefault(5).jpg"/><p class="chTitle">街舞7</p></li>
-            <li class="ch_normal"><p class="btnAdd"></p><p class="btnRemove"></p><p class="btnPlay"></p><img src="http://teltel.co.cc/louis/cms3.1/channelSetManagement_files/default(1).jpg"/><p class="chTitle">街舞8</p></li>
-            <li class="ch_normal"><p class="btnAdd"></p><p class="btnRemove"></p><p class="btnPlay"></p><img src="http://teltel.co.cc/louis/cms3.1/channelSetManagement_files/default(2).jpg"/><p class="chTitle">街舞9</p></li>
-          </ul>
+          <ul id="set_ch_list" class="connectedSortable"></ul>
         </div>
       </div>
       <div class="ch_pool">
