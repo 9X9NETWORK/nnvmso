@@ -402,7 +402,11 @@ var page$ = {
     log(channelIds);
     
     if (titleNewChannels != '') {
-      alert(titleNewChannels + ' ' + $('#lang_warning_new_channels_will_be_reviewed').text());
+      if (titleNewChannels.indexOf(',') > 0) {
+        alert(titleNewChannels + ' ' + $('#lang_warning_new_channels_will_be_reviewed').text());
+      } else {
+        alert(titleNewChannels + ' ' + $('#lang_warning_new_channel_will_be_reviewed').text());
+      }
     }
     
     var parameters = {

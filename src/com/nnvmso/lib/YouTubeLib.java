@@ -194,7 +194,7 @@ public class YouTubeLib {
 				log.info("description: " + content);
 			}
 			if (videoFeed.getTitle() != null) {
-				String title = videoFeed.getTitle().getPlainText();
+				String title = profileEntry.getTitle().getPlainText();
 				results.put("title", title);
 				log.info("title: " + title);
 			}

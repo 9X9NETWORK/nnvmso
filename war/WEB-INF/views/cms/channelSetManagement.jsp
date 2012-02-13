@@ -174,6 +174,7 @@
 <label class="lang" id="lang_channel_had_been_added"><spring:message code="cms.info.channel_has_been_added"/></label>
 <label class="lang" id="lang_warning_channel_has_not_been_saved"><spring:message code="cms.warning.change_has_not_been_saved"/></label>
 <label class="lang" id="lang_warning_set_is_empty"><spring:message code="cms.warning.set_is_empty"/></label>
+<label class="lang" id="lang_warning_new_channel_will_be_reviewed"><spring:message code="cms.warning.new_channel_will_be_reviewed"/></label>
 <label class="lang" id="lang_warning_new_channels_will_be_reviewed"><spring:message code="cms.warning.new_channels_will_be_reviewed"/></label>
 <label class="lang" id="image_bg_album"><spring:message code="cms.image.bg_album"/></label>
 <label class="lang" id="image_btn_upload"><spring:message code="cms.image.btn_upload"/></label>
