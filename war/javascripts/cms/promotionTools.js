@@ -322,6 +322,8 @@ var page$ = {
         }
         //$('#channel_list').show();
         cms.initAddthis();
+        var pivot = $('.channel_info_block_cloned').get(0);
+        $(pivot).click();
       });
       /*
       // load channel sets

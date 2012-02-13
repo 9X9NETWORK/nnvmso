@@ -388,8 +388,8 @@ a.addNew{ padding:10px 0 0 0; display:block; font-size:0.9em;}
 .right_title a.floatR , .right_title a.floatR:active , .right_title a.floatR:visited { color:#FFF; font-size:0.8em; padding-right:10px; }
 .right_title a.floatR:hover{text-decoration:none; color:#fff;}
 
-.epItem{ border:1px solid #d0d0d0; height:120px; width:460px; cursor:pointer;}
-.epItemFocus{border:1px solid #ffce3a; height:120px; width:460px; cursor:pointer; }
+.epItem { border:1px solid #d0d0d0; height:120px; width:460px; cursor:pointer; }
+.epItemFocus { border:1px solid #ffce3a; height:120px; width:460px; cursor:pointer; }
 .epItemFocusTitle{background:#FFF89A; color:#5F4800; height:30px; line-height:30px; padding-left:10px; font-size:1.1em; border-bottom:1px dotted #d0d0d0;}
 .epInfo{ padding-left:10px;}
 .epInfoTitle{ height:30px; color:#242424; line-height:30px; padding-left:10px; font-size:1.1em; border-bottom:1px dotted #d0d0d0; }

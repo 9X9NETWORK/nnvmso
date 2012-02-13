@@ -22,7 +22,8 @@ var page$ = {
       page$.programList.destroy();
       $('#choose_channel_type').hide();
       $('#publish_button').css('background-image', 'url(/images/cms/graybtn.png)').html('<span>' + $('#image_btn_reorder').text() + '</span>');
-      $('.program_info_removebutton').css('background-image', 'url(/images/cms/btnClose.png)');
+      $('.program_info_removebutton').css('background-image', 'url(/images/cms/btnClose.png)').css('cursor', 'pointer');
+      $('.program_info_block_cloned').css('cursor', 'pointer');
       return true;
     }
   },
@@ -838,15 +839,16 @@ var page$ = {
           return;
         }
         $('#publish_button').unbind().click({ 'channelId': channelId, 'channelName': channelName }, function(event) { // actually, its re-order button
-          $('.program_info_removebutton').unbind().css('background-image', 'url(/images/cms/btn_move.png)');
+          $('.program_info_removebutton').unbind().css('background-image', 'url(/images/cms/btn_move.png)').css('cursor', 'move');
           $(this).css('background-image', 'url(' + $('#image_btn_save').text() + ')');
           $('#program_list_ul').sortable({
             disable: false,
-            cursor:  'crosshair',
+            cursor:  'move',
             forcePlaceHolderSize: true,
             update: function() {
             }
           }).disableSelection();
+          $('.program_info_block_cloned').css('cursor', 'move');
           $(this).text('').unbind().click(function() {
             var programDoms = $('.program_info_block_cloned').toArray();
             var programIdList = [ ];
@@ -1412,7 +1414,7 @@ var page$ = {
             alert($('#lang_warning_error_occurs').text());
           } else {
             alert($('#lang_update_successfully').text());
-            page$.channelList.init(isNew);
+            page$.channelList.init();
           }
         }, 'text');
       });
@@ -1425,7 +1427,7 @@ var page$ = {
       });
       $('#channel_list_empty').hide();
     },
-    init: function(click) {
+    init: function() {
       page$.channelList.destroy();
       
       // load channels
@@ -1544,9 +1546,8 @@ var page$ = {
         $('#channel_list').show();
         cms.initAddthis();
         log('channel count: ' + $('.channel_info_block_cloned').size());
-        if (click) {
-          $($('.channel_info_block_cloned').get(0)).click();
-        }
+        var pivot = $('.channel_info_block_cloned').get(0);
+        $(pivot).click();
       }, 'json');
       if (cms.isGeneric()) {
         $('.create_channel_button').unbind().click(function() {
