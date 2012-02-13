@@ -5,9 +5,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
+import net.sf.jsr107cache.Cache;
+
 import org.springframework.stereotype.Service;
 
 import com.nnvmso.dao.ChannelSetDao;
+import com.nnvmso.lib.CacheFactory;
 import com.nnvmso.model.Category;
 import com.nnvmso.model.CategoryChannelSet;
 import com.nnvmso.model.ChannelSet;
@@ -169,6 +172,29 @@ public class ChannelSetManager {
 				results.add(set);
 			}
 		}
+		return results;
+	}
+	
+	public List<ChannelSet> findAllSystemChannelSets() {
+		
+		List<ChannelSet> results = new ArrayList<ChannelSet>();
+		ContentOwnershipManager ownershipMngr = new ContentOwnershipManager();
+		String cacheIdString = "System.ChannelSets(sortby=lang)";
+		Cache cache = CacheFactory.get();
+		if (cache != null) {
+			@SuppressWarnings("unchecked")
+			List<ChannelSet> cached = (List<ChannelSet>)cache.get(cacheIdString);
+			if (cached != null && cached.size() > 0) {
+				logger.info("get system sets from cache");
+				return cached;
+			}
+		}
+		
+		MsoManager msoMngr = new MsoManager();
+		Mso nnMso = msoMngr.findNNMso();
+		
+		results = ownershipMngr.findOwnedChannelSetsByMsoId(nnMso.getKey().getId());
+		
 		return results;
 	}
 	

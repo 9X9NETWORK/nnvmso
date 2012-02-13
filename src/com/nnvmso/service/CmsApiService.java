@@ -98,12 +98,11 @@ public class CmsApiService {
 	
 	public List<ChannelSetChannel> whichSystemCSCContainingThisChannel(long channelId) {
 		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
-		MsoManager msoMngr = new MsoManager();
-		ContentOwnershipManager ownershipMngr = new ContentOwnershipManager();
+		ChannelSetManager csMngr = new ChannelSetManager();
 		List<ChannelSetChannel> results = new ArrayList<ChannelSetChannel>();
 		
 		List<ChannelSetChannel> cscs = cscMngr.findAllByChannelId(channelId);
-		List<ChannelSet> systemChannelSets = ownershipMngr.findOwnedChannelSetsByMsoId(msoMngr.findNNMso().getKey().getId());
+		List<ChannelSet> systemChannelSets = csMngr.findAllSystemChannelSets();
 		List<Long> systemChannelSetIds = new ArrayList<Long>();
 		for (ChannelSet set : systemChannelSets) {
 			systemChannelSetIds.add(set.getKey().getId());
