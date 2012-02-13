@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9miniV15"/>
+<c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9miniV17"/>
 
 <link rel="stylesheet" href="${root}/stylesheets/main.css" />
 
@@ -22,8 +22,9 @@
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/vertical.slider.V2.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/jquery.mousewheel.min.js"></script>
 <script type="text/javascript" charset="utf-8" src="${root}/javascripts/jquery.ellipsis.js"></script>
+<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/soundmanager/soundmanager2.js"></script>
 
-<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/mini12.js"></script>
+<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/mini13.js"></script>
 
 <!-- Quantcast Tag -->
 <script type="text/javascript">
@@ -49,6 +50,15 @@ qacct:"p-b2xUunKYSaIeQ"
 </div>
 </noscript>
 <!-- End Quantcast tag -->
+
+<script type="text/javascript">
+soundManager.url = '/javascripts/player/';
+soundManager.useFlashBlock = false;
+soundManager.onready(function()
+  {
+  log ('***************************************** SOUND MANAGER READY **********************************************\n');
+  });
+</script>
 
 </head>
 <body>
@@ -345,6 +355,55 @@ and entertains - wherever you are, whatever your age.</span></p>
 
 <div id="tutorial-layer">
   <div id="tutorial-holder">
+  </div>
+</div>
+
+<div id="settings-layer">
+  <div id="settings-holder">
+    <p id="btn-settings-close"><img src="${root}/images/btn_delete_off.png" class="off"><img src="${root}/images/btn_delete_on.png" class="on"></p>
+    <ul id="settings-tabs">
+      <li id="preload" class="on"><span>Preload</span></li>
+      <li id="resolution"><span>Resolution</span></li>
+      <li id="acceleration"><span>Acceleration</span></li>
+    </ul>
+    <div id="preload-panel" class="input-panel">
+      <ul class="input-list">
+        <li>
+          <p class="head"><span>I want to set 9x9's preloading capacity to:</span></p>
+          <p class="option radio-item on"><img src="${root}/images/btn_radio_off.png" class="btn-radio-off"><img src="${root}/images/btn_radio_on.png" class="btn-radio-on"><span>Off</span><span class="explanation">Turn off smooth channel flipping for faster buffering</span></p>
+          <p class="option radio-item"><img src="${root}/images/btn_radio_off.png" class="btn-radio-off"><img src="${root}/images/btn_radio_on.png" class="btn-radio-on"><span>On</span><span class="explanation">Turn on smooth channel flipping for faster browsing</span></p>
+        </li>
+      </ul>
+      <ul class="action-list">
+        <li><p id="btn-preload-save" class="btn"><span>Save</span></p></li>
+      </ul>
+    </div>
+    <div id="resolution-panel" class="input-panel">
+      <ul class="input-list">
+        <li>
+          <p class="head"><span>Set 9x9's default playback resolution at:</span></p>
+          <p class="option radio-item on"><img src="${root}/images/btn_radio_off.png" class="btn-radio-off"><img src="${root}/images/btn_radio_on.png" class="btn-radio-on"><span>1080p</span></p>
+          <p class="option radio-item"><img src="${root}/images/btn_radio_off.png" class="btn-radio-off"><img src="${root}/images/btn_radio_on.png" class="btn-radio-on"><span>720p</span></p>
+          <p class="option radio-item"><img src="${root}/images/btn_radio_off.png" class="btn-radio-off"><img src="${root}/images/btn_radio_on.png" class="btn-radio-on"><span>480p (Default)</span></p>
+          <p class="option radio-item"><img src="${root}/images/btn_radio_off.png" class="btn-radio-off"><img src="${root}/images/btn_radio_on.png" class="btn-radio-on"><span>360p</span></p>
+        </li>
+      </ul>
+      <ul class="action-list">
+        <li><p id="btn-resolution-save" class="btn"><span>Save</span></p></li>
+      </ul>
+    </div>
+    <div id="acceleration-panel" class="input-panel">
+      <ul class="input-list">
+        <li>
+          <p class="head"><span>I want to set 9x9's hardware acceleration capacity to:</span></p>
+          <p class="option radio-item on"><img src="${root}/images/btn_radio_off.png" class="btn-radio-off"><img src="${root}/images/btn_radio_on.png" class="btn-radio-on"><span>Off</span><span class="explanation">Turn off hardware acceleration for more stable video playback.  It requires faster CPU, and maybe jerky in video.</span></p>
+          <p class="option radio-item"><img src="${root}/images/btn_radio_off.png" class="btn-radio-off"><img src="${root}/images/btn_radio_on.png" class="btn-radio-on"><span>On</span><span class="explanation">Turn on hardware acceleration for smoother video playback in HD and big screen. It requires supported GPU and driver, and maybe unstable in some systems.</span></p>
+        </li>
+      </ul>
+      <ul class="action-list">
+        <li><p id="btn-preload-save" class="btn"><span>Save</span></p></li>
+      </ul>
+    </div>    
   </div>
 </div>
 

@@ -40,10 +40,11 @@
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/scripts/flowplayer-3.2.4.min.js"></script>
 <script type="text/javascript" charset="utf-8" src="${nroot}/javascripts/jquery.ellipsis.js"></script>
 
-<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/player23.js"></script>
+<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/player24.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/vertical.slider.V2.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/jquery.mousewheel.min.js"></script>
-                                                                                                                                     
+<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/soundmanager/soundmanager2.js"></script>
+                                                                                                                        
 <script type="text/javascript">
 var analytz = false;
 var _gaq = _gaq || [];
@@ -92,6 +93,14 @@ qacct:"p-b2xUunKYSaIeQ"
 var brandinfo = "${brandInfo}";
 </script>
 
+<script type="text/javascript">
+soundManager.url = '/javascripts/player/';
+soundManager.useFlashBlock = false;
+soundManager.onready(function()
+  {
+  log ('***************************************** SOUND MANAGER READY **********************************************\n');
+  });
+</script>
 
 <title>9x9.tv</title>
 
