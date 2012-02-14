@@ -159,6 +159,8 @@ h2.popTitle { border-bottom:1px dashed #b3b3b3; padding-bottom:10px; max-width:3
 #slidesContainer li { float:left; width:100px; height:83px; text-align:center; padding: 5px 0 0 2px; }
 .ch_name { padding:2px 2px 0 4px; width:84px; font-size:0.9em; overflow:hidden; white-space:nowrap; }
 .ch_normal p {
+  margin-left:  7px;
+  margin-right: 5px;
   line-height: 14px;
   font-size:   12px;
   height:      28px;
@@ -226,7 +228,7 @@ p{ margin-left:5px;}
 .loginPanel{ background:url(/images/cms/bg_login_panel.png) no-repeat; width:619px; height:388px; margin:auto; padding:20px 0 0 20px}
 .loginContent{ padding-top:50px;}
 .loginPanel img { height: 85px; }
-.loginPanel label{ width:100px; text-align:right; padding-right:20px; white-space:nowrap;}
+.loginPanel label { width:150px; text-align:right; padding-right:20px; white-space:nowrap; }
 .loginPanel form{width:500px; padding: 30px 0 0 90px;}
 a.btnLogin{ background:url(/images/cms/btn_login.png) no-repeat; width:95px; height:32px; display:block;  float:left;}
 a.btnLogin:hover { background:url(/images/cms/btn_login_hover.png) no-repeat;}
