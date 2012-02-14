@@ -842,8 +842,8 @@ var page$ = {
           $('.program_info_removebutton').unbind().css('background-image', 'url(/images/cms/btn_move.png)').css('cursor', 'move');
           $(this).css('background-image', 'url(' + $('#image_btn_save').text() + ')');
           $('#program_list_ul').sortable({
-            disable: false,
-            cursor:  'move',
+            disabled: false,
+            cursor:   'move',
             forcePlaceHolderSize: true,
             update: function() {
             }
