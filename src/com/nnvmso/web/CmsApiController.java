@@ -304,6 +304,7 @@ public class CmsApiController {
 		return "Failed";
 	}
 	
+	// not used ?
 	@RequestMapping("addChannelSetChannel")
 	public @ResponseBody String addChannelSetChannel(@RequestParam Long  channelSetId,
 	                                 @RequestParam Long  channelId,
@@ -959,7 +960,7 @@ public class CmsApiController {
 		
 		for (MsoProgram program : origProgramList) {
 			int seq = programIds.indexOf(program.getKey().getId());
-			program.setSeq(String.valueOf(seq));
+			program.setSeq(String.format("%08d", seq + 1));
 			programMngr.save(program);
 		}
 		

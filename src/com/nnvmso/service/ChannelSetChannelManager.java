@@ -89,7 +89,7 @@ public class ChannelSetChannelManager {
 		ChannelSetChannel csc = cscDao.findBySetAndChannel(channelSetId, channel.getKey().getId());
 		if (csc != null)
 			return;
-		for (int i = 1; i < 1000; i++) {
+		for (int i = 1; i < 1000; i++) { // find first unused seq
 			if (cscDao.findByChannelSetIdAndSeq(channelSetId, i) == null) {
 				csc = new ChannelSetChannel(channelSetId, channel.getKey().getId(), i);
 				this.create(csc);
