@@ -713,7 +713,8 @@
 <label class="lang" id="lang_warning_import_channel_source"><spring:message code="cms.warning.import_channel_source"/></label>
 <label class="lang" id="lang_warning_import_program_source"><spring:message code="cms.warning.import_program_source"/></label>
 <label class="lang" id="lang_channel_source_is_wrong"><spring:message code="cms.warning.channel_source_is_wrong"/></label>
-<label class="lang" id="lang_button_from_disk">從硬碟</label>
+<label class="lang" id="lang_audio_url_example"><spring:message code="cms.channel_management.msg.audio_url_example"/></label>
+<label class="lang" id="lang_image_url_example"><spring:message code="cms.channel_management.msg.image_url_example"/></label>
 <label class="lang" id="image_btn_upload"><spring:message code="cms.image.btn_upload"/></label>
 <label class="lang" id="image_btn_from_disk"><spring:message code="cms.image.btn_from_disk"/></label>
 <label class="lang" id="image_btn_save"><spring:message code="cms.image.btn_save"/></label>

@@ -3,8 +3,6 @@
  */
 
 var page$ = {
-  imageUrlExample: 'http://www.9x9.tv/logo.jpg',
-  audioUrlExample: 'Copy and past audio URL here',
   overallLayout: {
     destroyRightSideContent: function(cleanup) {
       /* not to confirm program creation
@@ -215,7 +213,7 @@ var page$ = {
         },
         upload_error_handler: function(file, code, message) {
           programDetailBlock.find('.ep_uploading_image').hide();
-          alert('error: ' + message);
+          alert(message);
         },
         file_queued_handler: function(file) {
           if (!file.type)
@@ -322,33 +320,33 @@ var page$ = {
         programDetailBlock.find('.ep_image_updated').val('false');
         programDetailBlock.find('.ep_intro').val(program.intro);
         
-        programDetailBlock.find('.ep_url_input').val(page$.audioUrlExample).css('color', '#999');
+        programDetailBlock.find('.ep_url_input').val($('#lang_audio_url_example').text()).css('color', '#999');
         programDetailBlock.find('.ep_url_input').focus(function() {
           programDetailBlock.find('.ep_url_input').css('color', '#000');
           var audioUrl = programDetailBlock.find('.ep_url_input').val();
-          if (audioUrl == page$.audioUrlExample) {
+          if (audioUrl == $('#lang_audio_url_example').text()) {
             programDetailBlock.find('.ep_url_input').val('');
           }
         });
         programDetailBlock.find('.ep_url_input').blur(function() {
           var audioUrl = programDetailBlock.find('.ep_url_input').val();
           if (audioUrl == '') {
-            programDetailBlock.find('.ep_url_input').val(page$.audioUrlExample).css('color', '#999');
+            programDetailBlock.find('.ep_url_input').val($('#lang_audio_url_example').text()).css('color', '#999');
           }
         });
         
-        programDetailBlock.find('.ep_image_url_input').val(page$.imageUrlExample).css('color', '#999');
+        programDetailBlock.find('.ep_image_url_input').val($('#lang_image_url_example').text()).css('color', '#999');
         programDetailBlock.find('.ep_image_url_input').focus(function() {
           programDetailBlock.find('.ep_image_url_input').css('color', '#000');
           var imageUrl = programDetailBlock.find('.ep_image_url_input').val();
-          if (imageUrl == page$.imageUrlExample) {
+          if (imageUrl == $('#lang_image_url_example').text()) {
             programDetailBlock.find('.ep_image_url_input').val('');
           }
         });
         programDetailBlock.find('.ep_image_url_input').blur(function() {
           var imageUrl = programDetailBlock.find('.ep_image_url_input').val();
           if (imageUrl == '') {
-            programDetailBlock.find('.ep_image_url_input').val(page$.imageUrlExample).css('color', '#999');
+            programDetailBlock.find('.ep_image_url_input').val($('#lang_image_url_example').text()).css('color', '#999');
           } else {
             programDetailBlock.find('.ep_image').attr('src', imageUrl);
           }
@@ -396,7 +394,7 @@ var page$ = {
             this.setButtonDisabled(false);
           },
           upload_error_handler: function(file, code, message) {
-            log('upload error: ' + code);
+            log('upload audio error: ' + code + ', message: ' + message);
             programDetailBlock.find('.ep_audio_cancel').remove();
             if (code == -280) {
               programDetailBlock.find('.ep_uploading_audio .progress').text('').hide();
@@ -409,8 +407,8 @@ var page$ = {
               return;
             }
             this.setButtonDisabled(false);
-            programDetailBlock.find('.ep_uploading_audio .eta').text(' ' + $('#lang_upload_failed').text()).show();
-            alert('error: ' + message);
+            programDetailBlock.find('.ep_uploading_audio .eta').html('&nbsp;' + $('#lang_upload_failed').text()).show();
+            alert(message);
           },
           file_queued_handler: function(file) {
             if (!file.type)
@@ -476,7 +474,7 @@ var page$ = {
           },
           upload_error_handler: function(file, code, message) {
             programDetailBlock.find('.ep_uploading_image').hide();
-            alert('error: ' + message);
+            alert(message);
           },
           file_queued_handler: function(file) {
             if (!file.type)
@@ -515,7 +513,7 @@ var page$ = {
             return;
           }
           var audioUrl = programDetailBlock.find('.ep_url_input').val();
-          if (audioUrl == '' || audioUrl == page$.audioUrlExample) {
+          if (audioUrl == '' || audioUrl == $('#lang_audio_url_example').text()) {
             alert($('#lang_warning_import_program_source').text());
             return;
           }
@@ -527,7 +525,7 @@ var page$ = {
             'intro':     programDetailBlock.find('.ep_intro').val()
           };
           var imageUrl = programDetailBlock.find('.ep_image_url_input').val();
-          if (imageUrl != '' && imageUrl != page$.imageUrlExample) {
+          if (imageUrl != '' && imageUrl != $('#lang_image_url_example').text()) {
             parameters['imageUrl'] = imageUrl;
           }
           cms.post('/CMSAPI/saveNewProgram', parameters, function(response) {
@@ -713,7 +711,7 @@ var page$ = {
           },
           upload_error_handler: function(file, code, message) {
             programDetailBlock.find('.ep_uploading_video div').text($('#lang_upload_failed').text()).show();
-            alert('error: ' + message);
+            alert(message);
           },
           file_queued_handler: function(file) {
             if (!file.type)
@@ -770,7 +768,7 @@ var page$ = {
           },
           upload_error_handler: function(file, code, message) {
             programDetailBlock.find('.ep_uploading_image').hide();
-            alert('error: ' + message);
+            alert(message);
           },
           file_queued_handler: function(file) {
             if (!file.type)
@@ -1152,7 +1150,7 @@ var page$ = {
             },
             upload_error_handler: function(file, code, message) {
               $('#channel_import_detail [name="ch_uploading_image"]').hide();
-              alert('error: ' + message);
+              alert(message);
             },
             file_queued_handler: function(file) { 
               if (!file.type)
@@ -1360,7 +1358,7 @@ var page$ = {
           },
           upload_error_handler: function(file, code, message) {
             $('#ch_uploading').hide();
-            alert('error: ' + message);
+            alert(message);
           },
           file_queued_handler: function(file) {
             if (!file.type)
