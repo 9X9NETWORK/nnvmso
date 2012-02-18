@@ -53,7 +53,7 @@ public class AdminSetController {
 	@RequestMapping("deleteMso")
 	public ResponseEntity<String> deleteMso(@RequestParam(required=false) long id) {					
 		ChannelSetManager csMngr = new ChannelSetManager();
-		List<ChannelSet> sets = csMngr.findMsoSets(id);
+		List<ChannelSet> sets = csMngr.findByMso(id);
 		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
 		for (ChannelSet cs : sets) {
 			List<ChannelSetChannel> list = cscMngr.findByChannelSetId(cs.getKey().getId());

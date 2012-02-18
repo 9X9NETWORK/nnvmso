@@ -332,7 +332,7 @@ public class AdminMsoChannelController {
 				dataRows.add(map);
 			}
 		}
-		
+
 		try {
 			mapper.writeValue(out, JqgridHelper.composeJqgridResponse(currentPage, totalPages, totalRecords, dataRows));
 		} catch (IOException e) {

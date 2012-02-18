@@ -82,6 +82,7 @@ public class MsoChannel implements Serializable {
 	public static final short CONTENTTYPE_SLIDE = 7;
 	public static final short CONTENTTYPE_MAPLE_VARIETY = 8;
 	public static final short CONTENTTYPE_MAPLE_SOAP = 9;
+	public static final short CONTENTTYPE_YOUTUBE_SPECIAL_SORTING = 10;
 	
 	@Persistent
 	private short status;

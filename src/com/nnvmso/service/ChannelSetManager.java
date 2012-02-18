@@ -46,6 +46,10 @@ public class ChannelSetManager {
 		channelSet.setUpdateDate(now);
 		channelSetDao.save(channelSet);
 	}
+
+	public List<ChannelSet> findByMso(long msoId) {
+		return channelSetDao.findByMso(msoId);
+	}
 	
 	public ChannelSet findByBeautifulUrl(String url) {
 		return channelSetDao.findByBeautifulUrl(url);
@@ -77,10 +81,6 @@ public class ChannelSetManager {
 	
 	public List<ChannelSet> findFeaturedSetsByMso(Mso mso) {
 		return channelSetDao.findFeaturedSetsByMso(mso);
-	}
-
-	public List<ChannelSet> findMsoSets(long id) {
-		return channelSetDao.findMsoSets(id);
 	}
 	
 	public List<ChannelSet> findFeaturedSets(String lang) {

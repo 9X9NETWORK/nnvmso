@@ -521,6 +521,19 @@ public class InitService {
 		}
 	}
 	
+	public void specialSorting(long channelId, HttpServletRequest req) {
+		MsoChannelManager channelMngr = new MsoChannelManager();		
+		TranscodingService tranService = new TranscodingService();
+		MsoChannel c = channelMngr.findById(channelId);
+		if (c == null) {
+			log.info("this channel is empty");
+		} else {
+			c.setContentType(MsoChannel.CONTENTTYPE_YOUTUBE_SPECIAL_SORTING);
+			channelMngr.save(c);
+			tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
+		}
+	}
+	
 	public void initChannels(boolean english, boolean devel) {
 		NnUserManager userMngr = new NnUserManager();
 		user = userMngr.findByEmail(NNEMAIL);		
@@ -531,6 +544,9 @@ public class InitService {
 		TranscodingService tranService = new TranscodingService();
 		boolean piwik = true;
 		int zeroProgramCnt = 0;
+		int newChCnt = 0;
+		int cntMapleShow = 0;
+		int cntMapleVariety = 0;
 		for (String entry : entries) {	
 			String[] data = entry.split(",");
 			String url = data[0];
@@ -540,6 +556,7 @@ public class InitService {
 			}
 			MsoChannel c = channelMngr.findBySourceUrlSearch(url);
 			if (c == null) {
+				newChCnt = newChCnt + 1;
 				c = new MsoChannel(url, user.getKey().getId());
 				c.setName(name);
 				c.setStatus(MsoChannel.STATUS_PROCESSING);	
@@ -592,11 +609,14 @@ public class InitService {
 			if (piwik) {
 				String piwikId = PiwikLib.createPiwikSite(0, c.getKey().getId(), req);
 				c.setPiwik(piwikId);
-			}
+			}			
 			c.setName(name);
 			channelMngr.save(c);				
 		}
-		log.info("< 5 program count:" + zeroProgramCnt); 
+		log.info("new channel count:" + newChCnt);
+		log.info("maple variety:" + cntMapleVariety);
+		log.info("maple show:" + cntMapleShow);
+		
 	}
 		
 	public void initSetAndChannels(boolean english) {
@@ -606,6 +626,7 @@ public class InitService {
 		InputStream input;
 		Workbook wb;
 		List<ChannelSet> setList = new ArrayList<ChannelSet>();
+		int newCsc = 0;
 		try {
 			if (english)
 				input = new FileInputStream("WEB-INF/views/admin/ESets.xlsx");
@@ -704,6 +725,7 @@ public class InitService {
  						ChannelSetChannel csc = cscMngr.findBySetAndChannel(cs.getKey().getId(), c.getKey().getId());
  						//avoid the duplication
  						if (csc == null) {
+ 							newCsc++;
  							csc = new ChannelSetChannel(cs.getKey().getId(), c.getKey().getId(), j);				
  							cscMngr.create(csc);
  							j++;
@@ -718,6 +740,7 @@ public class InitService {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		log.info("new relationship:" + newCsc );
 	}
 				
 	public List<String> getSetNamesFromExcel(boolean english) {		

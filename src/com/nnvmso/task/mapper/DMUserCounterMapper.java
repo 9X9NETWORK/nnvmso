@@ -10,39 +10,34 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.tools.mapreduce.AppEngineMapper;
 import com.google.appengine.tools.mapreduce.DatastoreMutationPool;
-import com.nnvmso.model.NnUser;
 
 public class DMUserCounterMapper extends AppEngineMapper<Key, Entity, NullWritable, NullWritable>{
 	
 	@Override
-	public void map(Key key, Entity value, Context context) {			
+	public void map(Key key, Entity value, Context context) {		
 		String since = context.getConfiguration().get("since");
+		String before = context.getConfiguration().get("before");
+		
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
 		Date sinceDate = null;
+		Date beforeDate = null;
 		try {
-			if (since!= null) {
-				sinceDate = sdf.parse(since);
-			}
+			sinceDate = sdf.parse(since);
+			beforeDate = sdf.parse(before);
 		} catch (ParseException e) {
 			return;
 		}
 		
-		String email = (String) value.getProperty("email");
 		Date createDate = (Date)value.getProperty("createDate");
-		context.getCounter("AccountCount", "totalAccountCount").increment(1);
-		if (email != null) {
-			if (email.equals(NnUser.GUEST_EMAIL)) {
-				context.getCounter("AccountCount", "totalGuestCount").increment(1);
-				if (createDate.after(sinceDate)) {
-					context.getCounter("AccountCount", "newGuestCount").increment(1);
-				}
-			} else {
-				context.getCounter("AccountCount", "totalUserCount").increment(1);
-				if (createDate.after(sinceDate)) {
-					context.getCounter("AccountCount", "newUserCount").increment(1);
-				}
-			}			
+		Date updateDate = (Date)value.getProperty("updateDate");
+		context.getCounter("AccountCount", "totalUserCount").increment(1);
+		if (createDate.after(sinceDate) && createDate.before(beforeDate)) {
+			context.getCounter("AccountCount", "newUserCount").increment(1);
 		}
+		if (updateDate.after(sinceDate) && createDate.before(beforeDate)) {
+			context.getCounter("AccountCount", "activeUserCount").increment(1);
+		}
+
 		DatastoreMutationPool mutationPool = this.getAppEngineContext(context).getMutationPool();
 		mutationPool.put(value);
 	}

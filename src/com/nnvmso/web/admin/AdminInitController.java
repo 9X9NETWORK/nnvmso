@@ -32,6 +32,7 @@ import com.google.appengine.api.taskqueue.TaskOptions;
 import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.lib.PiwikLib;
+import com.nnvmso.lib.YouTubeLib;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.NnUser;
@@ -56,9 +57,9 @@ import com.nnvmso.web.json.transcodingservice.RtnProgram;
 //ChannelStatusMapper (mark all the channels to waiting_approval status)
 
 //initSetsToTask?isEnglish=true&isDevel=false
-//initChannelsToTask?isEnglish=true&isDevel=false
-//initCategoriesToTask?isEnglish=true&isDevel=false
-//initSetAndChannelsToTask?isEnglish=true&isDevel=false
+//initChannelsToTask?isEnglish=true&isDevel=false  @@@
+//initCategoriesToTask?isEnglish=true&isDevel=false  
+//initSetAndChannelsToTask?isEnglish=true&isDevel=false @@@
 //initCategoryAndSetsToTask?isEnglish=true&isDevel=false
 //initRecommdned?isEnglish=true
 //initSetImagesToTask?isEnglish=true
@@ -115,6 +116,21 @@ public class AdminInitController {
 		return NnNetUtil.textReturn("You will receive an email when it isdone.");
 	}
 
+	@RequestMapping("youtubeLink")
+	public ResponseEntity<String> youtubeLink(
+			@RequestParam(value="url",required=false) String url) {
+			String result = YouTubeLib.formatCheck(url);
+			return NnNetUtil.textReturn(result);
+	}
+
+	@RequestMapping("specialSortin")
+	public ResponseEntity<String> specialSorting(
+			@RequestParam(value="channel",required=false) long channelId,
+			HttpServletRequest req) {
+		initService.specialSorting(channelId, req);
+		return NnNetUtil.textReturn("You will receive an email when it is done.");
+	}		
+	
 	//gae environment	
 	@RequestMapping("initChannelsToTask")
 	public ResponseEntity<String> initChannelsToTask(
@@ -317,17 +333,28 @@ public class AdminInitController {
 		NnUserManager userMngr = new NnUserManager();
 		NnUser user = userMngr.findByEmail("mso@9x9.tv");		
 		MsoChannelManager channelMngr = new MsoChannelManager();
-			
-		String url="http://www.maplestage.net/show/國民女王/";
-		MsoChannel c = channelMngr.findBySourceUrlSearch(url);
-		if (c == null) {					
-			c = new MsoChannel(url, user.getKey().getId());
-			c.setStatus(MsoChannel.STATUS_PROCESSING);
-			c.setContentType(channelMngr.getContentTypeByUrl(url));
-			channelMngr.create(c);
-			TranscodingService tranService = new TranscodingService();
-			tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
-			channelMngr.save(c);
+		String[] urls = {
+				"http://www.maplestage.net/show/綜藝大集合 /",
+				"http://www.maplestage.net/show/流行in House /",
+				"http://www.maplestage.net/show/超級夜總會 (Super Night Club)/"
+		};	
+		for (String url: urls) {
+			log.info("url to look for: " + url);
+			MsoChannel c = channelMngr.findBySourceUrlSearch(url);
+			if (c == null) {				
+				log.info("channel not found:" + url);
+				c = new MsoChannel(url, user.getKey().getId());
+				c.setStatus(MsoChannel.STATUS_PROCESSING);
+				c.setContentType(channelMngr.getContentTypeByUrl(url));
+				channelMngr.create(c);
+				TranscodingService tranService = new TranscodingService();
+				tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
+				channelMngr.save(c);
+			} else {
+				log.info("resubmit:" + url);
+				TranscodingService tranService = new TranscodingService();
+				tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);				
+			}
 		}
 		return NnNetUtil.textReturn("OK");		
 	}				

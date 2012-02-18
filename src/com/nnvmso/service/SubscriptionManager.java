@@ -20,6 +20,10 @@ public class SubscriptionManager {
 	public List<Subscription> findAllByUser(long userId) {
 		return subDao.findAllByUserId(userId);
 	}
+
+	public List<Subscription> findByChannel(long channelId) {
+		return subDao.findByChannel(channelId);
+	}
 	
 	public boolean subscribeChannel(long userId, long channelId, int seq, short type, long msoId) {
 		Subscription existed = subDao.findByUserIdAndChannelId(userId, channelId);

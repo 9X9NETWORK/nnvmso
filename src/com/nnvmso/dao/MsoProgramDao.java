@@ -167,11 +167,14 @@ public class MsoProgramDao extends GenericDao<MsoProgram> {
 			//q.declareParameters("long channelIdParam, short statusParam, short typeParam");
 			q.setFilter("channelId == channelIdParam && status == statusParam");
 			q.declareParameters("long channelIdParam, short statusParam");
-			if (c.getContentType() == MsoChannel.CONTENTTYPE_MAPLE_SOAP || 
-				c.getContentType() == MsoChannel.CONTENTTYPE_MIXED) {
+			if (c.getContentType() == MsoChannel.CONTENTTYPE_MAPLE_SOAP) { 				
 				q.setOrdering("seq asc, subSeq asc"); 
 		    } else if (c.getContentType() == MsoChannel.CONTENTTYPE_MAPLE_VARIETY) {
 				q.setOrdering("seq desc, subSeq asc");	
+			} else if (c.getContentType() == MsoChannel.CONTENTTYPE_MIXED) {
+				q.setOrdering("seq asc");
+			} else if (c.getContentType() == MsoChannel.CONTENTTYPE_YOUTUBE_SPECIAL_SORTING) {
+				q.setOrdering("seq desc, subSeq asc");				
 			} else {
 				q.setOrdering("pubDate desc");
 			}

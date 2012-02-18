@@ -244,13 +244,23 @@ public class MsoProgramManager {
 		return programs;
 	}
 
-	public String composeProgramInfoStr(List<MsoProgram> programs) {		
+	public String composeProgramInfoStr(List<MsoProgram> programs) {
+		if (programs.size() == 0) return null;
+		long cid = programs.get(0).getChannelId();
+		if (cid != 0) {
+			MsoChannelManager cMngr = new MsoChannelManager();
+			MsoChannel c = cMngr.findById(cid);
+			if (c.getContentType() == MsoChannel.CONTENTTYPE_MIXED) {
+				List<MsoProgram> list = new ArrayList<MsoProgram>();
+			}
+		}
 		String output = "";
 		
 		String regexCache = "^(http|https)://(9x9cache.s3.amazonaws.com|s3.amazonaws.com/9x9cache)";
 		String regexPod = "^(http|https)://(9x9pod.s3.amazonaws.com|s3.amazonaws.com/9x9pod)";
 		String cache = "http://cache.9x9.tv";
 		String pod = "http://pod.9x9.tv";
+		
 		for (MsoProgram p : programs) {
 			//file urls
 			String url1 = p.getMpeg4FileUrl();
