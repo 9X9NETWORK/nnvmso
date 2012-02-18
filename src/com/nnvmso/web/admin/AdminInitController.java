@@ -123,7 +123,7 @@ public class AdminInitController {
 			return NnNetUtil.textReturn(result);
 	}
 
-	@RequestMapping("specialSortin")
+	@RequestMapping("specialSorting")
 	public ResponseEntity<String> specialSorting(
 			@RequestParam(value="channel",required=false) long channelId,
 			HttpServletRequest req) {
