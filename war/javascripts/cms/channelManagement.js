@@ -931,8 +931,8 @@ var page$ = {
           return false;
         });
         var promoteUrlTruncated = promoteUrl;
-        if (promoteUrl.length > 40) {
-          promoteUrlTruncated = promoteUrl.substring(0, 36) + '...';
+        if (promoteUrl.length > 48) {
+          promoteUrlTruncated = promoteUrl.substring(0, 44) + '...';
         }
         programInfoBlock.find('.program_info_promoteurl').text(promoteUrlTruncated).attr('href', promoteUrl);
         $('<li></li>').append(programInfoBlock).appendTo('#program_list_ul_readonly');
@@ -1009,8 +1009,8 @@ var page$ = {
           return false;
         });
         var promoteUrlTruncated = promoteUrl;
-        if (promoteUrl.length > 40) {
-          promoteUrlTruncated = promoteUrl.substring(0, 36) + '...';
+        if (promoteUrl.length > 48) {
+          promoteUrlTruncated = promoteUrl.substring(0, 44) + '...';
         }
         programInfoBlock.find('.program_info_promoteurl').text(promoteUrlTruncated).attr('href', promoteUrl);
         $('<input type="hidden" name="programId"/>').val(programId).appendTo(programInfoBlock);
@@ -1060,8 +1060,8 @@ var page$ = {
           return false;
         });
         var promoteUrlTruncated = promoteUrl;
-        if (promoteUrl.length > 40) {
-          promoteUrlTruncated = promoteUrl.substring(0, 36) + '...';
+        if (promoteUrl.length > 48) {
+          promoteUrlTruncated = promoteUrl.substring(0, 44) + '...';
         }
         programInfoBlock.find('.program_info_promoteurl').text(promoteUrlTruncated).attr('href', promoteUrl);
         $('<li></li>').append(programInfoBlock).appendTo('#program_list_ul_readonly');

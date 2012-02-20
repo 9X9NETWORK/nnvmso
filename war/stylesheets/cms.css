@@ -453,7 +453,7 @@ form a { font-size:0.8em; }
 
 .lang { display:none; }
 
-.promote_title { border-bottom:1px dashed #ddd; padding:20px 0px 10px 0px; font-size:1.2em; position:relative; }
+.promote_title { border-bottom:1px dashed #ddd; padding:20px 0px 10px 0px; font-size:1em; position:relative; }
 .promote_title a { font-size:0.8em; }
 .promoteInfo { background:url(/images/cms/icon_info.jpg) no-repeat; width:21px; height:20px; padding:5px 25px 0 0; display:none; float:left; }
 .pro_check { padding:0 20px 0 0 }
