@@ -58,7 +58,7 @@ var cms = {
       addthis.init();
     });
   },
-  formatDate: function(timestamp) {
+  formatDate: function(timestamp, short) {
     var updateDate = new Date(timestamp);
     var year = updateDate.getFullYear();
     var month = updateDate.getMonth() + 1;
@@ -70,6 +70,9 @@ var cms = {
       minute = "0" + minute;
     if (second.length < 2)
       second = "0" + second;
+    if (short) {
+      return year + '/' + month + '/' + date;
+    }
     return year + '/' + month + '/' + date + ' ' + hour + ':' + minute + ':' + second;
   },
   bubblePopupProperties: {

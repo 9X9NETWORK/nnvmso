@@ -310,7 +310,7 @@ a.btnDel{ background:url(/images/cms/btnClose.png) no-repeat; width:24px; height
 a.btnDel:hover { background:url(/images/cms/btnCloseHover.png) no-repeat;}
 .chInfo p { color:#343434; padding-top:2px; width:230px;}
 .epInfo { color:#343434; padding-top:2px; width:350px; }
-.chInfo a , .epInfo , .chInfo p { font-size:0.85em; }
+.chInfo a , .epInfo , .chInfo p { font-size: 13px; }
 /*
 .chInfo a { margin-right:3px; }
 */

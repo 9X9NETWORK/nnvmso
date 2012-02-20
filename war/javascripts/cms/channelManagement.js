@@ -1468,7 +1468,7 @@ var page$ = {
           channelInfoBlock.find('.channel_info_contenttype span').text(contentType);
           channelInfoBlock.find('.channel_info_programcount span').text(channels[i].programCount);
           channelInfoBlock.find('.channel_info_subscribers span').text(channels[i].subscriptionCount);
-          channelInfoBlock.find('.channel_info_updatedate span').text(cms.formatDate(channels[i].updateDate));
+          channelInfoBlock.find('.channel_info_updatedate span').text(cms.formatDate(channels[i].updateDate, true));
           // add this
           var promoteUrl = 'http://' + location.host + '/view?channel=' + channelId;
           channelInfoBlock.find('.addthis_button_expanded').attr('addthis:url', promoteUrl + '&_=' + channels[i].updateDate);
