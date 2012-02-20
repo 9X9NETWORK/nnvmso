@@ -884,8 +884,6 @@ var page$ = {
       if (page$.overallLayout.destroyRightSideContent(false) == false) return false;
       
       var requestUrl = 'http://gdata.youtube.com/feeds/api/users/' + username + '/uploads?callback=?';
-      if (isPlaylist)
-        requestUrl = 'http://gdata.youtube.com/feeds/api/playlists/' + username + '?callback=?';
       var parameters = {
         'orderby':     'published',
         'start-index': 1,
@@ -894,6 +892,10 @@ var page$ = {
         'format':      5,
         'v':           2
       };
+      if (isPlaylist) {
+        requestUrl = 'http://gdata.youtube.com/feeds/api/playlists/' + username + '?callback=?';
+        parameters['orderby'] = 'position';
+      }
       cms.get(requestUrl, parameters, function(data) {
         if (data == null) return;
         var feed = data.feed;
