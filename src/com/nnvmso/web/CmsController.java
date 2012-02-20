@@ -242,7 +242,7 @@ public class CmsController {
 		}
 		
 		HttpSession session = sessionService.getSession();
-		session.setAttribute("mso", msoAuth);
+		session.setAttribute("mso", mso);
 		sessionService.saveSession(session);
 		
 		// set cookie

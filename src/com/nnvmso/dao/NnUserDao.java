@@ -13,6 +13,7 @@ import com.google.appengine.api.datastore.Key;
 import com.nnvmso.lib.AuthLib;
 import com.nnvmso.lib.PMF;
 import com.nnvmso.model.NnUser;
+import com.nnvmso.service.MsoManager;
 
 public class NnUserDao extends GenericDao<NnUser> {
 
@@ -73,16 +74,18 @@ public class NnUserDao extends GenericDao<NnUser> {
 	public NnUser findAuthenticatedMsoUser(String email, String password, long msoId) {
 		NnUser user = null;
 		PersistenceManager pm = PMF.get().getPersistenceManager();
+		MsoManager msoMngr = new MsoManager();
+		long nnId = msoMngr.findNNMso().getKey().getId();
 		try {
 			Query query = pm.newQuery(NnUser.class);
 			query.setFilter("email == emailParam && msoId == msoIdParam && type == typeParam");
-			query.declareParameters("String emailParam, long msoIdParam, short typeParam");				
+			query.declareParameters("String emailParam, long msoIdParam, short typeParam");
 			List<NnUser> results = (List<NnUser>) query.execute(email, msoId, NnUser.TYPE_3X3);
 			if (results.size() > 0) {
 				user = results.get(0);		
 			} else {
 				// make 9x9 and 5F login as possible
-				results = (List<NnUser>) query.execute(email, msoId, NnUser.TYPE_NN);
+				results = (List<NnUser>) query.execute(email, nnId, NnUser.TYPE_NN);  // super account !!!
 				if (results.size() > 0) {
 					user = results.get(0);
 				} else {
