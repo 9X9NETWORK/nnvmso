@@ -148,12 +148,22 @@ public class TranscodingServiceController {
 	@RequestMapping("getChannelList")
 	public @ResponseBody ChannelInfo getChannelList(@RequestParam(value="page", required=false)String page, 
 			                                    @RequestParam(value="msoName", required=false)String msoName,
+			                                    @RequestParam(value="type", required=false)String type,
 			                                    HttpServletRequest req) {
 		ChannelInfo info = new ChannelInfo();
 		List<MsoChannel> channels = new ArrayList<MsoChannel>();
-		MsoChannelManager channelMngr = new MsoChannelManager();		
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		short srtType = 0;
+		if (type== null)
+			srtType = 0;//place holder
+		else
+			srtType = Short.parseShort(type);
 		try {
-			channels = channelMngr.findMaples();
+			if (srtType == MsoChannel.CONTENTTYPE_YOUTUBE_SPECIAL_SORTING) {
+				channels = channelMngr.findChannelsByType(MsoChannel.CONTENTTYPE_YOUTUBE_SPECIAL_SORTING);
+			} else {
+				channels = channelMngr.findMaples();
+			}
 			String[] transcodingEnv = transcodingService.getTranscodingEnv(req);		
 			String callbackUrl = transcodingEnv[1];		
 			List<Channel> cs = new ArrayList<Channel>();

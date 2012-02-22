@@ -23,7 +23,6 @@ import com.nnvmso.lib.SearchJanitorUtils;
 import com.nnvmso.lib.YouTubeLib;
 import com.nnvmso.model.Category;
 import com.nnvmso.model.CategoryChannel;
-import com.nnvmso.model.ChannelSet;
 import com.nnvmso.model.ContentOwnership;
 import com.nnvmso.model.LangTable;
 import com.nnvmso.model.Mso;
@@ -31,7 +30,6 @@ import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoIpg;
 import com.nnvmso.model.MsoProgram;
 import com.nnvmso.model.NnUser;
-import com.nnvmso.model.NnUserReport;
 import com.nnvmso.model.SubscriptionLog;
 
 @Service

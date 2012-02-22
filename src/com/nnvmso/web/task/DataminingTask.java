@@ -243,7 +243,8 @@ public class DataminingTask {
 			
 			for (int i=0; i<grid.length; i++) {
 				long cnt = counterGroup.findCounter(String.valueOf(grid[i])).getValue();
-				content += "number of users subscribe to " + grid[i] + "  channels: " + cnt + "\n";
+				//content += "number of users subscribe to " + grid[i] + "  channels: " + cnt + "\n";
+				content += cnt + "\n";
 			}
 						
 			EmailService emailService = new EmailService();
