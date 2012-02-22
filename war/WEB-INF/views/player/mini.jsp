@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9miniV17"/>
+<c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9miniV18"/>
 
 <link rel="stylesheet" href="${root}/stylesheets/main.css" />
 
@@ -24,7 +24,7 @@
 <script type="text/javascript" charset="utf-8" src="${root}/javascripts/jquery.ellipsis.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/soundmanager/soundmanager2.js"></script>
 
-<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/mini13.js"></script>
+<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/mini14.js"></script>
 
 <!-- Quantcast Tag -->
 <script type="text/javascript">
