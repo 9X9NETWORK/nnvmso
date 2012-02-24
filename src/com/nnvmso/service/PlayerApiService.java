@@ -100,7 +100,7 @@ public class PlayerApiService {
 			long setId = Long.parseLong(id);
 			cs = csMngr.findById(setId);
 		} else {
-			cs = csMngr.findBybeautifulUrl(beautifulUrl);
+			cs = csMngr.findByBeautifulUrl(beautifulUrl);
 		}
 		if (cs == null)
 			return messageSource.getMessage("nnstatus.set_invalid", new Object[] {NnStatusCode.SET_INVALID} , locale);

@@ -30,7 +30,9 @@ public class DMUserCounterMapper extends AppEngineMapper<Key, Entity, NullWritab
 		
 		Date createDate = (Date)value.getProperty("createDate");
 		Date updateDate = (Date)value.getProperty("updateDate");
-		context.getCounter("AccountCount", "totalUserCount").increment(1);
+		if (createDate.before(beforeDate)) {
+			context.getCounter("AccountCount", "totalUserCount").increment(1);			
+		}
 		if (createDate.after(sinceDate) && createDate.before(beforeDate)) {
 			context.getCounter("AccountCount", "newUserCount").increment(1);
 		}

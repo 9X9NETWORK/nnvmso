@@ -9,5 +9,21 @@
     <url>/CMSAPI/listOwnedChannelSets?sortby=lang</url>    
     <description>Build system channel sets cache automatically</description>
     <schedule>every 19 minutes</schedule>
+  </cron>
+  <!-- data mining -->
+  <cron>
+    <url>/task/datamining/userCountTask</url>    
+    <description>User Count</description>
+    <schedule>every day 09:00</schedule>
   </cron>            
+  <cron>
+    <url>/task/datamining/setSubCountToTask</url>                              
+    <description>Set Subscription Count</description>
+    <schedule>every friday 09:00</schedule>
+  </cron>            
+  <cron>
+    <url>/task/datamining/subCountTask</url>                              
+    <description>User Subscription Count</description>
+    <schedule>every friday 09:00</schedule>
+  </cron>
 </cronentries>
