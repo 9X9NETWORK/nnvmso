@@ -41,6 +41,8 @@ public class ChannelSetManager {
 
 	public void create(ChannelSet channelSet) {
 		channelSet.setNameSearch(channelSet.getName().trim().toLowerCase());
+		if (channelSet.getBeautifulUrl() != null)
+			channelSet.setBeautifulUrl(channelSet.getBeautifulUrl().toLowerCase());
 		Date now = new Date();
 		channelSet.setCreateDate(now);
 		channelSet.setUpdateDate(now);
@@ -52,17 +54,13 @@ public class ChannelSetManager {
 	}
 	
 	public ChannelSet findByBeautifulUrl(String url) {
-		return channelSetDao.findByBeautifulUrl(url);
+		return channelSetDao.findByBeautifulUrl(url.toLowerCase());
 	}
 
 	public ChannelSet findByLangAndSeq(String lang, String seq) {
 		return channelSetDao.findByLangAndSeq(lang, Short.parseShort(seq));
 	}
 	
-	public ChannelSet findBybeautifulUrl(String url) {
-		return channelSetDao.findByBeautifulUrl(url);
-	}
-
 	public int total() {
 		return channelSetDao.total();
 	}
