@@ -1,10 +1,11 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <head>
 <meta charset="UTF-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9miniV19"/>
+<c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9miniV21"/>
 
 <link rel="stylesheet" href="${root}/stylesheets/main.css" />
 
@@ -224,6 +225,7 @@ soundManager.onready(function()
 </div>
 
 <div id="store-layer">
+  <div id="store-hint"><p><img src="${root}/images/btn_ok.png" class="icon-btn-ok"><span>to add this channel.</span></p><p><img src="${root}/images/btn_9x9.png" class="icon-btn-9x9"><span>or<img src="${root}/images/btn_m.png" class="icon-btn-m">to Guide.</span></p><p><img src="${root}/images/arrow_left.png" class="icon-btn-left"><img src="${root}/images/arrow_right.png" class="icon-btn-right"><span>to flip set.</span></p><p><img src="${root}/images/arrow_up.png" class="icon-btn-up"><img src="${root}/images/arrow_down.png" class="icon-btn-down"><span>to flip channels in the current set.</span></p></div>
   <div id="store-holder"> 
     <div id="store-header">
       <img src="${root}/images/logo.png" id="store-logo">
@@ -238,11 +240,11 @@ soundManager.onready(function()
           <div id="ch1" class="i1"><div id="ch1-video"><img src="${root}/thumb/01.jpg" class="thumbnail"></div></div>
           <div id="ch2" class="i2"><div id="ch2-video"><img src="${root}/thumb/02.jpg" class="thumbnail"></div></div>
           <div id="ch3" class="i3"><div id="ch3-video"><img src="${root}/thumb/08.jpg" class="thumbnail"></div></div>
-          <p id="open-titles" class="open-txt"><span id="set-name">News</span><span class="divider">/</span><span id="ch-name">BBC News</span><span id="ch-order">(Ch 3 of 20)</span></p>
-          <p id="open-description" class="open-txt"><span>Breaking news, sport, TV, radio and a whole lot more. The BBC informs, educates 
-and entertains - wherever you are, whatever your age.</span></p>
-          <p id="open-meta" class="open-txt"><span id="open-epi"></span><span class="divider">|</span><span>Subscribers:</span><span id="open-subscriber"></span><span class="divider">|</span><span>Updated:</span><span id="open-age"></span></p>
-          <p id="store-hint" class="open-txt"><span>Press <img src="${root}/images/btn_ok.png" class="icon-btn-ok"> to add this channel. Press <img src="${root}/images/btn_9x9.png" class="icon-btn-9x9"> or <img src="${root}/images/btn_m.png" class="icon-btn-m"> to Guide.</span></p>
+          <p id="set-titles" class="open-txt"><span class="head">Set: </span><span id="set-name">Newest Channels</span></p>
+          <p id="ch-titles" class="open-txt"><span id="ch-name">BBC News</span><span id="ch-order">(Ch 3 of 20)</span></p>
+          <p id="open-description" class="open-txt ellipsis multiline"><span>Breaking news, sport, TV, radio and a whole lot more. The BBC informs, educates 
+and entertains - wherever you are, whatever your age. The BBC's heritage and history since it was founded in 1922.</span></p>
+          <p id="open-meta" class="open-txt"><span id="open-epi">30 episodes</span><span class="divider">|</span><span>Subscribers:</span><span id="open-subscriber">1234</span><span class="divider">|</span><span>Updated:</span><span id="open-age">Today</span></p>
         </div>
         <ul id="set-list">
         </ul>
@@ -287,11 +289,10 @@ and entertains - wherever you are, whatever your age.</span></p>
           </p>
         </li>
         <li>
-          <span>Password:</span>
+          <span>Password:</span><span class="hint">6-character minimum</span> 
           <p class="signin-input">
             <input type="password" class="textfield" id="signup-password">
           </p>
-          <span class="hint">6-character minimum</span>
         </li>
         <li>
           <span>Retype Password:</span>
@@ -305,18 +306,28 @@ and entertains - wherever you are, whatever your age.</span></p>
             <input type="text" class="textfield" id="signup-name">
           </p>
         </li>
-        <li>
+        <li id="signup-gender">
           <p><span>Gender:</span></p>
           <p class="radio-item on"><img src="${root}/images/btn_radio_off.png" class="btn-radio-off"><img src="${root}/images/btn_radio_on.png" class="btn-radio-on"><span>Male</span></p>
           <p class="radio-item"><img src="${root}/images/btn_radio_off.png" class="btn-radio-off"><img src="${root}/images/btn_radio_on.png" class="btn-radio-on"><span>Female</span></p>
         </li>
-      </ul>
-      <ul class="input-list-right"> 
         <li id="birth-input">
           <span>Birth Year:</span>
           <p class="signin-input">
             <input type="text" class="textfield" value="Example: 1985" id="signup-birthyear">
           </p>
+        </li>
+      </ul>
+      <ul class="input-list-right"> 
+        <li id="signup-language">
+          <p><span>Display Language:</span></p>
+          <p class="radio-item on"><img src="${root}/images/btn_radio_off.png" class="btn-radio-off"><img src="${root}/images/btn_radio_on.png" class="btn-radio-on"><span>English</span></p>
+          <p class="radio-item"><img src="${root}/images/btn_radio_off.png" class="btn-radio-off"><img src="${root}/images/btn_radio_on.png" class="btn-radio-on"><span>中文</span></p>
+        </li>
+        <li id="signup-region">
+          <p><span>Content Region:</span></p>
+          <p class="radio-item on"><img src="${root}/images/btn_radio_off.png" class="btn-radio-off"><img src="${root}/images/btn_radio_on.png" class="btn-radio-on"><span>US</span></p>
+          <p class="radio-item"><img src="${root}/images/btn_radio_off.png" class="btn-radio-off"><img src="${root}/images/btn_radio_on.png" class="btn-radio-on"><span>Chinese</span></p>
         </li>
         <li>
           <p class="term-text"><span>Clicking I accept means that you agree to the <strong id="btn-agreement">9x9 service agreement</strong> and <strong id="btn-legal">legal statement</strong>. You also agree to receive email from 9x9 with service updates, special offers, and survey invitations. You can unsubscribe at any time.</span></p>
@@ -366,6 +377,7 @@ and entertains - wherever you are, whatever your age.</span></p>
       <li id="preload" class="on hilite"><p class="tab-hilite"></p><span>Preload</span></li>
       <li id="resolution"><p class="tab-hilite"></p><span>Resolution</span></li>
       <li id="acceleration"><p class="tab-hilite"></p><span>Acceleration</span></li>
+      <li id="language"><p class="tab-hilite"></p><span>Language &amp; Region</span></li>
     </ul>
     
     <div id="preload-panel" class="input-panel">
@@ -377,7 +389,7 @@ and entertains - wherever you are, whatever your age.</span></p>
         </li>
       </ul>
     </div>
-    
+
     <div id="resolution-panel" class="input-panel">
       <ul class="input-list">
         <li>
@@ -389,13 +401,28 @@ and entertains - wherever you are, whatever your age.</span></p>
         </li>
       </ul>
     </div>
-    
+
     <div id="acceleration-panel" class="input-panel">
       <ul class="input-list">
         <li>
           <p class="head"><span>I want to set 9x9's hardware acceleration capacity to:</span></p>
-          <p class="option radio-item on" id="a1"><img src="${root}/images/btn_radio_off.png" class="btn-radio-off"><img src="${root}/images/btn_radio_on.png" class="btn-radio-on"><span>Off</span><span class="explanation">Turn off hardware acceleration for more stable video playback.  It requires faster CPU, and maybe jerky in video.</span></p>
-          <p class="option radio-item" id="a2"><img src="${root}/images/btn_radio_off.png" class="btn-radio-off"><img src="${root}/images/btn_radio_on.png" class="btn-radio-on"><span>On</span><span class="explanation">Turn on hardware acceleration for smoother video playback in HD and big screen. It requires supported GPU and driver, and maybe unstable in some systems.</span></p>
+          <p class="option radio-item on" id="a1"><img src="${root}/images/btn_radio_off.png" class="btn-radio-off"><img src="${root}/images/btn_radio_on.png" class="btn-radio-on"><span>Off</span><span class="explanation">Turn off hardware acceleration for more stable video playback. It requires a faster CPU, and may be jerky in video.</span></p>
+          <p class="option radio-item" id="a2"><img src="${root}/images/btn_radio_off.png" class="btn-radio-off"><img src="${root}/images/btn_radio_on.png" class="btn-radio-on"><span>On</span><span class="explanation">Turn on hardware acceleration for smoother video playback in HD and big screen. It requires a supported GPU and driver, and may be unstable on some systems.</span></p>
+        </li>
+      </ul>
+    </div>
+
+    <div id="language-panel" class="input-panel">
+      <ul class="input-list">
+        <li>
+          <p class="head"><span>Choose the language in which you want to view 9x9.tv. This will only change the interface.</span></p>
+          <p class="option radio-item on" id="l1"><img src="${root}/images/btn_radio_off.png" class="btn-radio-off"><img src="${root}/images/btn_radio_on.png" class="btn-radio-on"><span>English</span></p>
+          <p class="option radio-item" id="l2"><img src="${root}/images/btn_radio_off.png" class="btn-radio-off"><img src="${root}/images/btn_radio_on.png" class="btn-radio-on"><span>中文</span></p>
+        </li>
+        <li>
+          <p class="head"><span>Choose which region's content you would like to watch. This will only change the video content.</span></p>
+          <p class="option radio-item on" id="l3"><img src="${root}/images/btn_radio_off.png" class="btn-radio-off"><img src="${root}/images/btn_radio_on.png" class="btn-radio-on"><span>US</span></p>
+          <p class="option radio-item" id="l4"><img src="${root}/images/btn_radio_off.png" class="btn-radio-off"><img src="${root}/images/btn_radio_on.png" class="btn-radio-on"><span>Chinese</span></p>
         </li>
       </ul>
     </div>
