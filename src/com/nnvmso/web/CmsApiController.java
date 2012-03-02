@@ -271,7 +271,7 @@ public class CmsApiController {
 		if (channelIds != null) {
 			ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
 			MsoChannelManager channelMngr = new MsoChannelManager();
-			List<ChannelSetChannel> cscs = cscMngr.findByChannelSetId(channelSetId);
+			List<ChannelSetChannel> cscs = cscMngr.findByChannelSet(channelSet);
 			for (ChannelSetChannel csc : cscs) {
 				cscMngr.delete(csc);
 			}
@@ -531,7 +531,7 @@ public class CmsApiController {
 		// remove channels in set
 		List<ChannelSet> channelSets = ownershipMngr.findOwnedChannelSetsByMsoId(msoId);
 		for (ChannelSet channelSet : channelSets) {
-			List<ChannelSetChannel> cscs = cscMngr.findByChannelSetId(channelSet.getKey().getId());
+			List<ChannelSetChannel> cscs = cscMngr.findByChannelSet(channelSet);
 			for (ChannelSetChannel csc : cscs) {
 				if (csc.getChannelId() == channelId) {
 					cscMngr.removeChannel(channelSet.getKey().getId(), csc.getSeq());

@@ -56,7 +56,7 @@ public class AdminSetController {
 		List<ChannelSet> sets = csMngr.findByMso(id);
 		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
 		for (ChannelSet cs : sets) {
-			List<ChannelSetChannel> list = cscMngr.findByChannelSetId(cs.getKey().getId());
+			List<ChannelSetChannel> list = cscMngr.findByChannelSet(cs);
 			cscMngr.deleteAll(list);
 			csMngr.delete(cs);		
 		}
@@ -81,7 +81,7 @@ public class AdminSetController {
 		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
 		ChannelSet set = setMngr.findByName("本周主打星");
 		if (set != null) {
-			List<ChannelSetChannel> list = cscMngr.findByChannelSetId(set.getKey().getId());
+			List<ChannelSetChannel> list = cscMngr.findByChannelSet(set);
 			cscMngr.deleteAll(list);
 			List<MsoChannel> channels = new ArrayList<MsoChannel>();
 			for (int i=0; i<urls.length; i++) {
@@ -323,7 +323,7 @@ public class AdminSetController {
 					if (!cs.isPublic()) {
 						qualified = true;
 					} else {
-						List<ChannelSetChannel> cscs = cscMngr.findByChannelSetId(cs.getKey().getId());
+						List<ChannelSetChannel> cscs = cscMngr.findByChannelSet(cs);
 						for (ChannelSetChannel csc : cscs) {
 							if (csc.getCreateDate().after(d)) {
 								qualified = true;
@@ -449,8 +449,9 @@ public class AdminSetController {
 	                 OutputStream out) {
 		ChannelSetManager csMngr = new ChannelSetManager();
 		ObjectMapper mapper = new ObjectMapper();
-		List<Map<String, Object>> dataRows = new ArrayList<Map<String, Object>>();		
-		List<MsoChannel> channels = csMngr.findChannelsById(set);
+		List<Map<String, Object>> dataRows = new ArrayList<Map<String, Object>>();
+		ChannelSet cs = csMngr.findById(set);
+		List<MsoChannel> channels = csMngr.findChannelsBySet(cs);
 		for (MsoChannel c : channels) {
 			Map<String, Object> map = new HashMap<String, Object>();
 			List<Object> cell = new ArrayList<Object>();			
@@ -480,7 +481,7 @@ public class AdminSetController {
 		ChannelSetManager csMngr = new ChannelSetManager();
 		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
 		ChannelSet cs = csMngr.findById(id);		
-		List<ChannelSetChannel> list = cscMngr.findByChannelSetId(cs.getKey().getId());
+		List<ChannelSetChannel> list = cscMngr.findByChannelSet(cs);
 		cscMngr.deleteAll(list);		
 		csMngr.delete(cs);		
 		CategoryChannelSetManager ccsMngr = new CategoryChannelSetManager();
@@ -532,7 +533,7 @@ public class AdminSetController {
 		String[] chId = channelIds.split(",");
 		String[] chSeq = seq.split(",");		
 
-		List<ChannelSetChannel> list = cscMngr.findByChannelSetId(cs.getKey().getId());
+		List<ChannelSetChannel> list = cscMngr.findByChannelSet(cs);
 		cscMngr.deleteAll(list);
 		list = new ArrayList<ChannelSetChannel>();
 		for (int i=0; i<chId.length; i++) {

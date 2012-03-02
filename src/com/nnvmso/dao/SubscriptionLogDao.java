@@ -1,5 +1,6 @@
 package com.nnvmso.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -10,9 +11,30 @@ import javax.jdo.Query;
 import com.nnvmso.lib.PMF;
 import com.nnvmso.model.SubscriptionLog;
 
-public class SubscriptionLogDao {
+public class SubscriptionLogDao extends GenericDao<SubscriptionLog> {
 	
 	protected static final Logger logger = Logger.getLogger(SubscriptionLogDao.class.getName());
+	
+	public SubscriptionLogDao() {
+		super(SubscriptionLog.class);
+	} 
+	
+	public List<SubscriptionLog> findAll() {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		List<SubscriptionLog> detached = new ArrayList<SubscriptionLog>();		
+		try {
+			Query query = pm.newQuery(SubscriptionLog.class);
+			query.setOrdering("count desc");
+			@SuppressWarnings("unchecked")
+			List<SubscriptionLog> list = (List<SubscriptionLog>)query.execute();
+			detached = (List<SubscriptionLog>)pm.detachCopyAll(list);
+		} catch (JDOObjectNotFoundException e) {
+		} finally {
+			pm.close();
+		}
+		return detached;
+		
+	}
 	
 	public SubscriptionLog save(SubscriptionLog log) {		
 		PersistenceManager pm = PMF.get().getPersistenceManager();

@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 import org.springframework.stereotype.Service;
 
 import com.nnvmso.dao.ChannelSetChannelDao;
+import com.nnvmso.model.ChannelSet;
 import com.nnvmso.model.ChannelSetChannel;
 import com.nnvmso.model.MsoChannel;
 
@@ -41,8 +42,8 @@ public class ChannelSetChannelManager {
 		return csc;
 	}
 	
-	public List<ChannelSetChannel> findByChannelSetId(long channelSetId) {
-		return cscDao.findByChannelSetId(channelSetId);
+	public List<ChannelSetChannel> findByChannelSet(ChannelSet set) {
+		return cscDao.findByChannelSet(set);
 	}
 
 	public ChannelSetChannel findBySetAndChannel(long channelSetId, long channelId) {

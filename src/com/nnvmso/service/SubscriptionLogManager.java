@@ -17,8 +17,13 @@ public class SubscriptionLogManager {
 	public void create(SubscriptionLog log) {
 		this.save(log);
 	}
+	
 	public SubscriptionLog save(SubscriptionLog log) {
 		return subDao.save(log);
+	}
+	
+	public void delete(SubscriptionLog log) {
+		subDao.delete(log);
 	}
 	
 	public SubscriptionLog findById(long id) {
@@ -44,6 +49,10 @@ public class SubscriptionLogManager {
 	
 	public SubscriptionLog findByChannelId(long channelId) {
 		return subDao.findByChannelId(channelId);
+	}
+
+	public List<SubscriptionLog> findAll() {
+		return subDao.findAll();
 	}
 	
 	public List<SubscriptionLog> findBySetIds(List<Long> setIds) {

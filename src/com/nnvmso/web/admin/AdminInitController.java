@@ -5,6 +5,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -33,9 +34,13 @@ import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.lib.PiwikLib;
 import com.nnvmso.lib.YouTubeLib;
+import com.nnvmso.model.ChannelSet;
+import com.nnvmso.model.ChannelSetChannel;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.NnUser;
+import com.nnvmso.service.ChannelSetChannelManager;
+import com.nnvmso.service.ChannelSetManager;
 import com.nnvmso.service.InitService;
 import com.nnvmso.service.MsoChannelManager;
 import com.nnvmso.service.MsoManager;
@@ -329,29 +334,17 @@ public class AdminInitController {
 	}
 	
 	@RequestMapping("mapleTest")
-	public ResponseEntity<String> mapleTest(HttpServletRequest req) {
-		NnUserManager userMngr = new NnUserManager();
-		NnUser user = userMngr.findByEmail("mso@9x9.tv");		
+	public ResponseEntity<String> mapleTest(HttpServletRequest req) {		
 		MsoChannelManager channelMngr = new MsoChannelManager();
-		String[] urls = {
-				"http://www.maplestage.net/show/綜藝大集合 /",
-				"http://www.maplestage.net/show/流行in House /",
-				"http://www.maplestage.net/show/超級夜總會 (Super Night Club)/"
-		};	
-		for (String url: urls) {
-			log.info("url to look for: " + url);
-			MsoChannel c = channelMngr.findBySourceUrlSearch(url);
+		long[] ids = {
+				4989396 				
+		};
+		for (long id: ids) {
+			MsoChannel c = channelMngr.findById(id);
 			if (c == null) {				
-				log.info("channel not found:" + url);
-				c = new MsoChannel(url, user.getKey().getId());
-				c.setStatus(MsoChannel.STATUS_PROCESSING);
-				c.setContentType(channelMngr.getContentTypeByUrl(url));
-				channelMngr.create(c);
-				TranscodingService tranService = new TranscodingService();
-				tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);
-				channelMngr.save(c);
+				log.info("channel not found:" + id);
 			} else {
-				log.info("resubmit:" + url);
+				log.info("resubmit:" + id);
 				TranscodingService tranService = new TranscodingService();
 				tranService.submitToTranscodingService(c.getKey().getId(), c.getSourceUrl(), req);				
 			}
@@ -359,6 +352,93 @@ public class AdminInitController {
 		return NnNetUtil.textReturn("OK");		
 	}				
 
+	@RequestMapping("statusChange")
+	public ResponseEntity<String> statusChange(HttpServletRequest req) {		
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		long[] ids = {
+				4458625,
+				4507132,
+				4535459,
+				4467357,
+				4447970,
+				4490257,
+				4484403,
+				4467858,
+				4491096,
+				4458914,
+				4492132,
+				4447485,
+				4392431,
+				4481448,
+				4599433,                                    
+				4638023,
+				4585910,
+				4591999,
+				4077178,
+				4534113,
+				4605690,
+				4583658,
+				4598634,
+				4586306,
+				4484407,
+				4449957,
+				4477508,
+				4449959,
+				4487215,
+				4458972,
+				4491157,
+				4492249,
+				4576784,
+				4485162,
+				4472592,
+				4490431,
+				4468763,
+				4472985,
+				4571588,
+				4612262,
+				4434218,
+				4570791,
+				4579678,
+				4565104,
+				4599094,
+				4415214,
+				4562915,
+				4832241,
+				4426972,
+				4560933,
+				4541346,
+				4427909,
+				4420726,
+				4565833,
+				4430392,
+				4484407,
+				4449957,
+				4477508,
+				4449959,
+				4487215,
+				4458972,
+				4491157,
+				4492249,
+				4566436,
+				4576784,
+				4561940,
+				4586306,
+				4576913,
+				4401253,
+				4598610,
+		};
+		for (long id: ids) {
+			MsoChannel c = channelMngr.findById(id);
+			if (c == null) {				
+				log.info("channel not found:" + id);
+			} else {
+				c.setStatus(MsoChannel.STATUS_WAIT_FOR_APPROVAL);
+				channelMngr.save(c);
+			}
+		}
+		return NnNetUtil.textReturn("OK");		
+	}				
+	
 //	@RequestMapping("mapleTest")
 //	public ResponseEntity<String> mapleTest(HttpServletRequest req) {
 //		
@@ -570,5 +650,28 @@ public class AdminInitController {
 		this.sendEmail("init all set channels to public and success", "done");
 		return NnNetUtil.textReturn("OK");		
 	}	
-	
+
+	@RequestMapping("recommendedCleanup")
+	public ResponseEntity<String> recommendedCleanup(@RequestParam(required=false) String lang) {			
+		ChannelSetManager setMngr = new ChannelSetManager();		
+		List<ChannelSet> sets = setMngr.findFeaturedSets(lang);
+		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
+		String output = "";
+		for (ChannelSet s : sets) {
+			List<ChannelSetChannel> cscs = cscMngr.findByChannelSet(s);
+			int[] seqs = new int[cscs.size()+1];
+			for (ChannelSetChannel csc : cscs) {
+				try {
+					if (seqs[csc.getSeq()] != 0)
+						output += "duplication:" + s.getKey().getId() + "\n";
+					else
+						seqs[csc.getSeq()] = csc.getSeq();
+				} catch (ArrayIndexOutOfBoundsException e) {
+					output += "error:" + s.getKey().getId() + "\n"; 
+				}
+					
+			}
+		}
+		return NnNetUtil.textReturn(output);
+	}
 }

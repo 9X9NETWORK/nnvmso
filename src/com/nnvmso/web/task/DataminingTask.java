@@ -1,7 +1,9 @@
 package com.nnvmso.web.task;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -32,9 +34,12 @@ import com.nnvmso.model.ChannelSet;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.Subscription;
+import com.nnvmso.model.SubscriptionLog;
 import com.nnvmso.service.ChannelSetManager;
 import com.nnvmso.service.EmailService;
+import com.nnvmso.service.MsoChannelManager;
 import com.nnvmso.service.MsoManager;
+import com.nnvmso.service.SubscriptionLogManager;
 import com.nnvmso.service.SubscriptionManager;
 import com.nnvmso.task.mapper.DMSubscriptionCounterMapper;
 import com.nnvmso.task.mapper.DMUserCounterMapper;
@@ -42,7 +47,8 @@ import com.nnvmso.task.mapper.DMUserCounterMapper;
 ///task/datamining/setSubCountToTask
 ///task/datamining/userCountTask
 ///task/datamining/subCountTask
-
+///task/datamining/channelSubCountToTask
+///task/datamining/newChannelCountToTask
 
 @Controller
 @RequestMapping("task/datamining")
@@ -68,7 +74,7 @@ public class DataminingTask {
 			if (!m.getName().contains("test")) {
 				List<ChannelSet> setlist = csMngr.findByMso(m.getKey().getId());
 				for (ChannelSet set : setlist) {
-					List<MsoChannel> chlist = csMngr.findChannelsById(set.getKey().getId());
+					List<MsoChannel> chlist = csMngr.findChannelsBySet(set);
 					long cnt = 0;
 					for (MsoChannel ch : chlist) {
 						List<Subscription> list = subMngr.findByChannel(ch.getKey().getId());
@@ -266,5 +272,80 @@ public class DataminingTask {
 	}
 	
 
+	@RequestMapping("channelSubCountToTask")
+	public ResponseEntity<String> channelSubCountToTask() {
+		QueueFactory.getDefaultQueue().add(
+			      TaskOptions.Builder.withUrl("/task/datamining/channelSubCount")
+		);			          
+		return NnNetUtil.textReturn("You will receive an email when it is done.");
+	}
+			
+	@RequestMapping("channelSubCount")
+	public ResponseEntity<String> channelSubCount(HttpServletRequest req) throws IOException {
+		SubscriptionLogManager logMngr = new SubscriptionLogManager();
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		List<SubscriptionLog> list = logMngr.findAll();
+		String content = "";
+		for (int i=0; i<200; i++) {
+			if (list.size() > i) {
+				MsoChannel c = channelMngr.findById(list.get(i).getChannelId());
+				if (c !=null) {
+					content += 
+						"channel " + c.getKey().getId() + ", " + c.getName() + " : " + list.get(i).getCount() + "\n";
+				}
+			}
+		}
+		
+		EmailService emailService = new EmailService();		
+    	String host = NnNetUtil.getUrlRoot(req);
+		String subject = "[statistics] channel performance";
+		String msgBody = "host:" + host + "\n\n" + content;
+		//log.info(content);
+		String toEmail = this.toEmail(host);
+		emailService.sendEmail(subject, msgBody, toEmail, "nncloudtv");
+		
+		return NnNetUtil.textReturn("OK");
+	}
+
+	@RequestMapping("newChannelCountToTask")
+	public ResponseEntity<String> channelCountToTask() {
+		QueueFactory.getDefaultQueue().add(
+			      TaskOptions.Builder.withUrl("/task/datamining/newChannelCount")
+		);			          
+		return NnNetUtil.textReturn("You will receive an email when it is done.");
+	}
+	
+	//mapreduce it somehow?	
+	@RequestMapping("newChannelCount")
+	public ResponseEntity<String> newChannelCount(HttpServletRequest req) throws IOException {
+		List<MsoChannel> list = new ArrayList<MsoChannel>();
+		Calendar now = Calendar.getInstance();
+	    now.add(Calendar.DATE, -1);
+    	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+    	String since = sdf.format(now.getTime());
+    	now.add(Calendar.DATE, 1);
+    	String before = sdf.format(now.getTime());
+		try {
+			Date sinceDate = sdf.parse(since);
+			Date beforeDate = sdf.parse(before);
+			log.info("sinceDate:" + sinceDate + ";beforeDate:" + beforeDate);
+	    	MsoChannelManager channelMngr = new MsoChannelManager();
+	    	list = channelMngr.findBetweenDates(sinceDate, beforeDate);
+			EmailService emailService = new EmailService();						
+	    	String host = NnNetUtil.getUrlRoot(req);
+			String content = "New Channel Count:" + list.size() + "\n\n";
+			String subject = "[statistics] new channel added";
+			String msgBody = "host:" + host + "\n\n" + content;
+			for (MsoChannel c : list) {
+				msgBody += c.getKey().getId() + "  name:" +  c.getName() + ";url=" + c.getSourceUrl() + "\n";
+			}
+			log.info("msgBody" + msgBody);
+			String toEmail = this.toEmail(host);
+			emailService.sendEmail(subject, msgBody, toEmail, "nncloudtv");
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+    	return NnNetUtil.textReturn("OK");
+	}
 	
 }

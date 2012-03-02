@@ -30,17 +30,17 @@ public class MsoChannelDao extends GenericDao<MsoChannel> {
 		super(MsoChannel.class);
 	}
 
-	public List<MsoChannel> findSince(Date since) {
+	public List<MsoChannel> findBetweenDates(Date since, Date before) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		List<MsoChannel> detached = new ArrayList<MsoChannel>();
 		try {
-			Query query = pm.newQuery(NnUserReport.class);
-			query.setFilter("createDate > createDateParam");
+			Query query = pm.newQuery(MsoChannel.class);
+			query.setFilter("createDate > createDateParam && createDate < beforeDateParam");
 			query.declareImports("import java.util.Date");
-			query.declareParameters("Date createDateParam");			 
+			query.declareParameters("Date createDateParam, Date beforeDateParam");			 
 			 
 			@SuppressWarnings("unchecked")
-			List<MsoChannel> results = (List<MsoChannel>) query.execute(since);
+			List<MsoChannel> results = (List<MsoChannel>) query.execute(since, before);
 			detached = (List<MsoChannel>)pm.detachCopyAll(results);
 		} finally {
 			pm.close();

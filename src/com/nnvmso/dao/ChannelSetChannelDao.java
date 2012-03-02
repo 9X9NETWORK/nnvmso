@@ -1,7 +1,7 @@
 package com.nnvmso.dao;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.jdo.JDOObjectNotFoundException;
@@ -9,6 +9,7 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import com.nnvmso.lib.PMF;
+import com.nnvmso.model.ChannelSet;
 import com.nnvmso.model.ChannelSetChannel;
 
 public class ChannelSetChannelDao extends GenericDao<ChannelSetChannel> {
@@ -19,7 +20,7 @@ public class ChannelSetChannelDao extends GenericDao<ChannelSetChannel> {
 		super(ChannelSetChannel.class);
 	}
 	
-	public List<ChannelSetChannel> findByChannelSetId(long channelSetId) {		
+	public List<ChannelSetChannel> findByChannelSet(ChannelSet set) {		
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		List<ChannelSetChannel> detached = new ArrayList<ChannelSetChannel>();
 		
@@ -27,9 +28,12 @@ public class ChannelSetChannelDao extends GenericDao<ChannelSetChannel> {
 			Query query = pm.newQuery(ChannelSetChannel.class);
 			query.setFilter("channelSetId == channelSetIdParam");
 			query.declareParameters("long channelSetIdParam");
-			query.setOrdering("seq");
+			if (set.isFeatured())
+				query.setOrdering("seq");
+			else 
+				query.setOrdering("updateDate desc");
 			@SuppressWarnings("unchecked")
-			List<ChannelSetChannel> list = (List<ChannelSetChannel>)query.execute(channelSetId);
+			List<ChannelSetChannel> list = (List<ChannelSetChannel>)query.execute(set.getKey().getId());
 			detached = (List<ChannelSetChannel>)pm.detachCopyAll(list);
 		} catch (JDOObjectNotFoundException e) {
 		} finally {

@@ -262,7 +262,7 @@ public class InitService {
 		HashMap<Long, MsoChannel> map = new HashMap<Long, MsoChannel>();
 		List<ChannelSetChannel> list = new ArrayList<ChannelSetChannel>();
 		for (ChannelSet cs : sets) {
-			list.addAll(cscMngr.findByChannelSetId(cs.getKey().getId()));
+			list.addAll(cscMngr.findByChannelSet(cs));
 		}
 		List<MsoChannel> channels = new ArrayList<MsoChannel>();
 		for (ChannelSetChannel csc : list) {
@@ -806,7 +806,7 @@ public class InitService {
 		ChannelSetManager csMngr = new ChannelSetManager();
 		List<ChannelSet> list = csMngr.findAll();
 		for (ChannelSet cs : list) {
-			List<MsoChannel> channels = csMngr.findChannelsById(cs.getKey().getId());
+			List<MsoChannel> channels = csMngr.findChannelsBySet(cs);
 			if (channels.size() == 0) { 
 				log.info("no channels in this set" + cs.getName());
 			} else { 
@@ -837,7 +837,7 @@ public class InitService {
 		List<ChannelSet> sets = csMngr.findAll();
 		HashMap<Long, Integer> map = new HashMap<Long, Integer>();
 		for (ChannelSet cs : sets) {
-			List<ChannelSetChannel> list = cscMngr.findByChannelSetId(cs.getKey().getId());
+			List<ChannelSetChannel> list = cscMngr.findByChannelSet(cs);
 			cs.setChannelCount(list.size());
 			System.out.println("cs name:" + cs.getName() + ";size:" + list.size());
 			csMngr.save(cs);
@@ -992,7 +992,7 @@ public class InitService {
 		List<ChannelSet> list = csMngr.findAllByLang(lang);
 		List<MsoChannel> toBeChanged = new ArrayList<MsoChannel>();		
 		for (ChannelSet cs : list) {
-			List<MsoChannel> channels = csMngr.findChannelsById(cs.getKey().getId());
+			List<MsoChannel> channels = csMngr.findChannelsBySet(cs);
 			int cnt = 0;
 			for (MsoChannel c : channels) {
 				if (c.getStatus() == MsoChannel.STATUS_WAIT_FOR_APPROVAL || !c.isPublic()) {

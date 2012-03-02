@@ -41,10 +41,6 @@ public class MsoChannelManager {
 	public static final int MAX_NUMBER_OF_WORDS_TO_PUT_IN_INDEX = 200;
 	
 	private MsoChannelDao msoChannelDao = new MsoChannelDao();
-
-	public List<MsoChannel> findSince(Date since) {
-		return msoChannelDao.findSince(since);
-	}
 	
 	public boolean create(String url, String name, boolean devel, HttpServletRequest req) {
 		NnUserManager userMngr = new NnUserManager();
@@ -468,9 +464,9 @@ public class MsoChannelManager {
 		return channels;
 	}
 		
-	public List<MsoChannel> findfindAllAfterTheDate(Date since) {
-		return msoChannelDao.findAllAfterTheDate(since);
-	}
+	public List<MsoChannel> findBetweenDates(Date since, Date before) {
+		return msoChannelDao.findBetweenDates(since, before);
+	}	
 	
 	//!!! limit
 	public List<MsoChannel> findAll() {

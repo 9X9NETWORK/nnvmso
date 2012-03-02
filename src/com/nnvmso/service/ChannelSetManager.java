@@ -87,7 +87,7 @@ public class ChannelSetManager {
 	
 	public void resetRelatedChannelCnt(ChannelSet channelSet, List<MsoChannel> channels) {
 		if (channels == null)
-			channels = this.findChannelsById(channelSet.getKey().getId());
+			channels = this.findChannelsBySet(channelSet);
 		CategoryManager categoryMngr = new CategoryManager();
 		CategoryChannelSetManager ccsMngr = new CategoryChannelSetManager();
 		List<CategoryChannelSet> list = ccsMngr.findAllByCategoryId(channelSet.getKey().getId());
@@ -112,7 +112,7 @@ public class ChannelSetManager {
 		//NOTE check name existence if needed
 		channelSet.setUpdateDate(new Date());
 		//shouldn't be too many, should be ok
-		List<MsoChannel> channels = this.findChannelsById(channelSet.getKey().getId());
+		List<MsoChannel> channels = this.findChannelsBySet(channelSet);
 		channelSet.setChannelCount(channels.size());
 		channelSetDao.save(channelSet);
 		this.resetRelatedChannelCnt(channelSet, channels);
@@ -123,16 +123,20 @@ public class ChannelSetManager {
 		return channelSetDao.findByNameSearch(name.trim().toLowerCase());
 	}
 	
-	public List<MsoChannel> findChannelsById(long channelSetId) {
+	public List<MsoChannel> findChannelsBySet(ChannelSet set) {
 		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
 		MsoChannelManager channelMngr = new MsoChannelManager();		
-		List<ChannelSetChannel> cscs = cscMngr.findByChannelSetId(channelSetId); 
+		List<ChannelSetChannel> cscs = cscMngr.findByChannelSet(set); 
 		ArrayList<MsoChannel> results = new ArrayList<MsoChannel>();
 		
+		int i=1;
 		for (ChannelSetChannel csc : cscs) {
 			MsoChannel channel = channelMngr.findById(csc.getChannelId());
 			if (channel != null) {
-				channel.setSeq(csc.getSeq());
+				if (set.isFeatured())
+					channel.setSeq(csc.getSeq());
+				else 
+					channel.setSeq(i++);
 				results.add(channel);
 			}
 		}

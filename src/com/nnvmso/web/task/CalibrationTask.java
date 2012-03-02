@@ -1,7 +1,5 @@
 package com.nnvmso.web.task;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -17,10 +15,7 @@ import com.google.appengine.api.taskqueue.TaskOptions;
 import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.model.ChannelSet;
 import com.nnvmso.model.MsoChannel;
-import com.nnvmso.model.MsoProgram;
 import com.nnvmso.service.ChannelSetManager;
-import com.nnvmso.service.MsoChannelManager;
-import com.nnvmso.service.MsoProgramManager;
 
 /**
  * temporary fix, to be removed
@@ -61,7 +56,7 @@ public class CalibrationTask {
 		}
 		List<ChannelSet> list = csMngr.findAllByLang(lang);		
 		for (ChannelSet cs : list) {
-			List<MsoChannel> channels = csMngr.findChannelsById(cs.getKey().getId());
+			List<MsoChannel> channels = csMngr.findChannelsBySet(cs);
 			int cnt = 0;
 			for (MsoChannel c : channels) {
 				if (c.getStatus() == MsoChannel.STATUS_SUCCESS && c.isPublic()) {

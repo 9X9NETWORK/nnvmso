@@ -105,7 +105,7 @@ public class PlayerApiService {
 		if (cs == null)
 			return messageSource.getMessage("nnstatus.set_invalid", new Object[] {NnStatusCode.SET_INVALID} , locale);
 		
-		List<MsoChannel> channels = csMngr.findChannelsById(cs.getKey().getId());
+		List<MsoChannel> channels = csMngr.findChannelsBySet(cs);
 		String[] result = {"", "", ""};
 		//first block: status
 		Mso csMso = msoMngr.findById(cs.getMsoId());
@@ -433,8 +433,7 @@ public class PlayerApiService {
 		}
 		if (!Pattern.matches("^\\d*$", channelId)) {
 			return NnStatusMsg.inputError(locale);
-		}
-
+		}		
 		if (Long.parseLong(channelId) == 0)
 			return NnStatusMsg.inputError(locale);
 		
@@ -1437,7 +1436,7 @@ public class PlayerApiService {
 			if (cs != null) {
 				result[0] += "piwik" + "\t" + cs.getPiwik() + "\n";
 			}
-			List<MsoChannel> channels = csMngr.findChannelsById(csId);			
+			List<MsoChannel> channels = csMngr.findChannelsBySet(cs);			
 			for (MsoChannel c : channels) {
 				if (c.getStatus() == MsoChannel.STATUS_SUCCESS && c.isPublic()) {
 					c.setSorting(MsoChannelManager.getDefaultSorting(c));

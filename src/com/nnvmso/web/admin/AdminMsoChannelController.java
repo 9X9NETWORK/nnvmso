@@ -151,7 +151,7 @@ public class AdminMsoChannelController {
 			} catch (ParseException e) {
 				return NnNetUtil.textReturn("wrong date format: yyyymmdd");
 			}			
-			channels.addAll(channelMngr.findSince(sinceDate));			
+			channels.addAll(channelMngr.findBetweenDates(sinceDate, new Date()));			
 		}		
 		List<MsoChannel> bad = new ArrayList<MsoChannel>();		
 		if (status == null) {

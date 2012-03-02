@@ -34,7 +34,8 @@ public class CmsApiService {
 	}
 	
 	public List<MsoChannel> findChannelsByChannelSetId(long channelSetId) {
-		return channelSetMngr.findChannelsById(channelSetId);
+		ChannelSet set = channelSetMngr.findById(channelSetId);
+		return channelSetMngr.findChannelsBySet(set);
 	}
 	
 	public List<CategoryChannelSet> whichCCSContainingTheChannelSet(long channelSetId) {

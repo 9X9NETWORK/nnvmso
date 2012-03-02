@@ -24,8 +24,10 @@ import com.nnvmso.lib.NnLogUtil;
 import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.MsoProgram;
+import com.nnvmso.model.SubscriptionLog;
 import com.nnvmso.service.MsoChannelManager;
 import com.nnvmso.service.MsoProgramManager;
+import com.nnvmso.service.SubscriptionLogManager;
 
 @Controller
 @RequestMapping("task/channel")
@@ -150,6 +152,59 @@ public class ChannelCleanupTask {
         } catch (Exception e) {
         	NnLogUtil.logException(e);
 		}					
+	}
+
+	@RequestMapping("sub")
+	public ResponseEntity<String> sub(@RequestParam("start")int start) 
+			throws IOException {
+		try {						
+			QueueFactory.getDefaultQueue().add(
+					TaskOptions.Builder.withUrl("/task/channel/runSub")
+			         .param("start", String.valueOf(start))					
+		    );
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return NnNetUtil.textReturn("OK");
+	}
+
+	@RequestMapping(value="runSub")
+	public ResponseEntity<String> runSub(
+			@RequestParam("start")int start,
+			HttpServletRequest req) {
+		String output = "";
+		SubscriptionLogManager logMngr = new SubscriptionLogManager();
+		MsoChannelManager channelMngr = new MsoChannelManager();
+		List<SubscriptionLog> list = logMngr.findAll();
+		int cnt = 0;
+		for (SubscriptionLog log : list) {
+			if (log.getChannelId() != 0) {
+				MsoChannel c = channelMngr.findById(log.getChannelId());
+				if (c == null) {
+					cnt++;
+					logMngr.delete(log);
+				}
+			}			
+		}
+		/*
+		List<MsoChannel> channels = new ArrayList<MsoChannel>();
+		int end = start + 200;
+		if (end > channels.size()) 
+			end = channels.size();
+		for (int i=start; i<end; i++) {	
+			SubscriptionLog log = list.get(i);
+			if (log.getChannelId() != 0) {
+				MsoChannel c = channelMngr.findById(log.getChannelId());
+				if (c == null) {
+					cnt++;
+					logMngr.delete(log);
+				}
+			}
+		}
+		*/
+		this.sendEmail("runCleanSub start " + start, "done, count = " + cnt);
+		return NnNetUtil.textReturn(output);
 	}
 	
 }
