@@ -142,6 +142,13 @@ public class ChannelSetManager {
 		}
 		return results;
 	}
+
+	public List<ChannelSetChannel> findChannelSetChannelsBySet(ChannelSet set) {
+		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();		
+		List<ChannelSetChannel> cscs = cscMngr.findByChannelSet(set); 
+		return cscs;		
+	}
+	
 	
 	public ChannelSet findById(long channelSetId) {
 		return channelSetDao.findById(channelSetId);

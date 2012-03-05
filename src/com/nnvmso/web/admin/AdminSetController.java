@@ -356,16 +356,57 @@ public class AdminSetController {
 				
 	}
 
+	public void channelSeqAdjust(ChannelSet set, MsoChannel channel, int seq, boolean delete, boolean edit) {
+		if (!set.isFeatured())
+			return;
+		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
+		List<ChannelSetChannel> list = cscMngr.findByChannelSet(set);		
+		for (ChannelSetChannel csc : list) {
+			if (!delete && csc.getSeq() >= seq) {
+				System.out.println("enter correct adjustment:" + csc.getSeq() + ";" + csc.getSeq()+1);
+				csc.setSeq(csc.getSeq() + 1);
+				cscMngr.save(csc);
+			}			
+			if (delete) {
+				if (csc.getSeq() >= seq) {
+					if (csc != null) {
+						csc.setSeq(csc.getSeq() - 1);
+						cscMngr.save(csc);
+					}
+				}				
+			}
+			
+		}
+		if (!delete) {
+			ChannelSetChannel csc = cscMngr.findBySetAndChannel(set.getKey().getId(), channel.getKey().getId());
+			if (csc == null) { //add
+				csc = new ChannelSetChannel(set.getKey().getId(), channel.getKey().getId(), seq);
+				cscMngr.create(csc);
+			} else {
+				if (!edit) {
+					csc.setSeq(csc.getSeq() + 1);
+				} else {
+					csc.setSeq(csc.getSeq());
+				}
+				cscMngr.save(csc);
+			}
+		}
+	}
+	
 	@RequestMapping(value="deleteCh", params = {"id", "set"})
 	public @ResponseBody String deleteCh(@RequestParam(required = false) long set,	                 
 			             @RequestParam(required = false) long id,
 	                     OutputStream out) {
 		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
 		ChannelSetChannel csc = cscMngr.findBySetAndChannel(set, id);
-		if (csc != null)
+		if (csc != null) {
+			int seq = csc.getSeq();
 			cscMngr.delete(csc);
-		return "OK";
-		
+			ChannelSet cs = new ChannelSetManager().findById(set);
+			MsoChannel c = new MsoChannelManager().findById(id);
+			this.channelSeqAdjust(cs, c, seq, true, false);
+		}
+		return "OK";		
 	}
 
 	@RequestMapping(value="addCh")
@@ -383,11 +424,15 @@ public class AdminSetController {
 		ChannelSet cs = csMngr.findById(set);
 		if (cs == null)
 			return "Set does not exist";
-		ChannelSetChannel csc = cscMngr.findBySetAndChannel(set, channel);
+		/*
+		ChannelSetChannel csc = cscMngr.findBySetAndChannel(set, channel);		
 		if (csc == null) {
+			System.out.println("enter empty?:" + set + ";" + channel + ";" + seq);
 			csc = new ChannelSetChannel(set, channel, seq);
 			cscMngr.create(csc);
-		}			
+		}
+		*/
+		this.channelSeqAdjust(cs, c, seq, false, false);
 		return "OK";		
 	}	
 
@@ -399,14 +444,24 @@ public class AdminSetController {
 			             @RequestParam(required = false) int seq,
 	                     OutputStream out) {
 		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
-		MsoChannelManager cMngr = new MsoChannelManager();
 		ChannelSetChannel csc = cscMngr.findBySetAndChannel(set, id);
 		if (csc != null) {
+			ChannelSetChannel c1 = cscMngr.findBySetAndChannel(set, channel);
+			ChannelSetChannel c2 = cscMngr.findBySetAndSeq(set, seq);
+			if (c1 != null && c2 != null) {
+				c2.setSeq(c1.getSeq());
+				c1.setSeq(seq);
+			}
+			/*
+			//this.channelSeqAdjust(cs, c, seq, false, true);
+		MsoChannelManager cMngr = new MsoChannelManager();
+		ChannelSetManager csMngr = new ChannelSetManager();
 			MsoChannel c = cMngr.findById(channel);
 			if (c != null) {
 				csc.setChannelId(channel);
 				csc.setSeq(seq);
 			}
+			*/
 		}
 		return "OK";		
 	}
@@ -421,7 +476,7 @@ public class AdminSetController {
 		}
 		System.out.println("original:" + set.getSeq());
 		System.out.println("new destination:" + seq);
-			
+
 		//swap
 		ChannelSet toBeSwapped = csMngr.findByLangAndSeq(set.getLang(), seq);
 		if (toBeSwapped != null) {			
