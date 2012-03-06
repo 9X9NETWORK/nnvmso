@@ -5,16 +5,16 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <link type="text/css" rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.15/themes/start/jquery-ui.css"/>
-<link type="text/css" rel="stylesheet" href="/javascripts/plugins/msdropdown/dd.css"/>
-<link type="text/css" rel="stylesheet" href="/stylesheets/cms.css"/>
-<script type="text/javascript" src="/javascripts/jquery-1.6.4.fixed.js"></script>
+<link type="text/css" rel="stylesheet" href="http://s3.amazonaws.com/9x9ui/cms/javascripts/plugins/msdropdown/dd.css"/>
+<link type="text/css" rel="stylesheet" href="http://s3.amazonaws.com/9x9ui/cms/stylesheets/cms.css"/>
+<script type="text/javascript" src="http://s3.amazonaws.com/9x9ui/cms/javascripts/jquery-1.6.4.fixed.js"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.15/jquery-ui.min.js"></script>
-<script type="text/javascript" src="/javascripts/plugins/jquery.progressbar.js"></script>
-<script type="text/javascript" src="/javascripts/plugins/msdropdown/jquery.dd.js"></script>
-<script type="text/javascript" src="/javascripts/swfupload/swfupload.js"></script>
-<script type="text/javascript" src="/javascripts/swfupload/swfupload.speed.js"></script>
-<script type="text/javascript" src="/javascripts/cms/common.js"></script>
-<script type="text/javascript" src="/javascripts/cms/channelManagement.js"></script>
+<script type="text/javascript" src="http://s3.amazonaws.com/9x9ui/cms/javascripts/plugins/jquery.progressbar.js"></script>
+<script type="text/javascript" src="http://s3.amazonaws.com/9x9ui/cms/javascripts/plugins/msdropdown/jquery.dd.js"></script>
+<script type="text/javascript" src="http://s3.amazonaws.com/9x9ui/cms/javascripts/swfupload/swfupload.js"></script>
+<script type="text/javascript" src="http://s3.amazonaws.com/9x9ui/cms/javascripts/swfupload/swfupload.speed.js"></script>
+<script type="text/javascript" src="http://s3.amazonaws.com/9x9ui/cms/javascripts/cms/common.js"></script>
+<script type="text/javascript" src="http://s3.amazonaws.com/9x9ui/cms/javascripts/cms/channelManagement.js"></script>
 <title><spring:message code="cms.channel_management.title"/></title>
 </head>
 <body>
@@ -159,7 +159,7 @@
               <fieldset class="setAlbum">
                 <label class="floatL"><span class="red" style="display:none">＊</span><spring:message code="cms.channel_management.label.logo"/></label>
                 <div class="uploadImg">
-                  <img id="ch_image" alt="" src="/images/cms/upload_img.jpg" class="floatL"/><input type="hidden" id="ch_image_updated" value="false"/>
+                  <img id="ch_image" alt="" src="http://s3.amazonaws.com/9x9ui/cms/images/upload_img.jpg" class="floatL"/><input type="hidden" id="ch_image_updated" value="false"/>                                                                   
                   <div class="floatL imgBtn">
                     <p class="gray"><spring:message code="cms.channel_management.msg.best_resolution"/></p>
                     <span id="upload_button_place"></span>
@@ -264,7 +264,7 @@
                     </div>
                     <label class="floatL"><spring:message code="cms.channel_management.label.program_logo"/></label>
                     <div class="uploadImg">
-                      <img alt="" src="/images/cms/upload_img.jpg" class="floatL ep_image"/><input type="hidden" class="ep_image_updated" value="fase"/>
+                      <img alt="" src="http://s3.amazonaws.com/9x9ui/cms/images/upload_img.jpg" class="floatL ep_image"/><input type="hidden" class="ep_image_updated" value="fase"/>
                       <div class="floatL imgBtn">
                         <p class="gray"><spring:message code="cms.channel_management.msg.best_resolution"/></p>
                         <span class="ep_upload_button_place"><a onclick="return false;" href="javascript:" class="uploadBtn ep_upload_image"></a></span>
@@ -333,7 +333,7 @@
                     </div>
                     <label class="floatL"><spring:message code="cms.channel_management.label.program_logo"/></label>
                     <div class="uploadImg">
-                      <img alt="" src="/images/cms/upload_img.jpg" class="floatL ep_image"/><input type="hidden" class="ep_image_updated" value="fase"/>
+                      <img alt="" src="http://s3.amazonaws.com/9x9ui/cms/images/upload_img.jpg" class="floatL ep_image"/><input type="hidden" class="ep_image_updated" value="fase"/>
                       <div class="floatL imgBtn">
                         <br />
                         <input type="radio" name="ep_image_upload_from" class="ep_image_urlradio" checked="checked"/>&nbsp;<spring:message code="cms.channel_management.btn.from_url"/>
@@ -457,7 +457,7 @@
                 <p class="ep_createdate">2011/04/25 14:30</p><br/>
                 <label class="floatL"><span class="red" style="display:none">＊</span><spring:message code="cms.channel_management.label.program_logo"/></label>
                 <div class="uploadImg">
-                  <img alt="" src="/images/cms/upload_img.jpg" class="floatL ep_image"/><input type="hidden" class="ep_image_updated" value="fase"/>
+                  <img alt="" src="http://s3.amazonaws.com/9x9ui/cms/images/upload_img.jpg" class="floatL ep_image"/><input type="hidden" class="ep_image_updated" value="fase"/>
                   <div class="floatL imgBtn">
                     <p class="gray"><spring:message code="cms.channel_management.msg.best_resolution"/></p>
                     <span class="upload_button_place"></span>
@@ -589,7 +589,7 @@
                 <p class="ep_createdate">2011/04/25 14:30</p><br/><br/>
                 <label class="floatL"><spring:message code="cms.channel_management.label.program_logo"/></label>
                 <div class="uploadImg">
-                  <img class="ep_image" alt="" src="/images/cms/upload_img.jpg" />
+                  <img class="ep_image" alt="" src="http://s3.amazonaws.com/9x9ui/cms/images/upload_img.jpg" />
                 </div>
                 <div class="clear"></div><br/><br/>
                 <label class="floatL"><spring:message code="cms.channel_management.label.name"/></label>
@@ -618,7 +618,7 @@
                 <div class="clear"></div><br/>
                 <label class="floatL"><span style="display:none" class="red">＊</span><spring:message code="cms.channel_management.label.logo"/></label>
                 <div class="uploadImg">
-                  <img name="ch_image" alt="" src="/images/cms/upload_img.jpg" class="floatL"/><input type="hidden" name="ch_image_updated" value="false"/>
+                  <img name="ch_image" alt="" src="http://s3.amazonaws.com/9x9ui/cms/images/upload_img.jpg" class="floatL"/><input type="hidden" name="ch_image_updated" value="false"/>
                   <div class="floatL imgBtn">
                     <p class="gray"><spring:message code="cms.channel_management.msg.best_resolution"/></p>
                     <span name="upload_button_place">

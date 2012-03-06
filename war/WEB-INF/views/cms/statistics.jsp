@@ -6,11 +6,11 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.15/themes/start/jquery-ui.css" />
-<link rel="stylesheet" type="text/css" href="/stylesheets/cms.css" />
-<script type="text/javascript" src="/javascripts/jquery-1.6.4.fixed.js"></script>
+<link rel="stylesheet" type="text/css" href="http://s3.amazonaws.com/9x9ui/cms/stylesheets/cms.css" />
+<script type="text/javascript" src="http://s3.amazonaws.com/9x9ui/cms/javascripts/jquery-1.6.4.fixed.js"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.15/jquery-ui.min.js"></script>
-<script type="text/javascript" src="/javascripts/cms/common.js"></script>
-<script type="text/javascript" src="/javascripts/cms/statistics.js"></script>
+<script type="text/javascript" src="http://s3.amazonaws.com/9x9ui/cms/javascripts/cms/common.js"></script>
+<script type="text/javascript" src="http://s3.amazonaws.com/9x9ui/cms/javascripts/cms/statistics.js"></script>
 <title><spring:message code="cms.statistics.title"/></title>
 </head>
 <body>
@@ -82,7 +82,7 @@
             <option><spring:message code="cms.statistics.label.average_elapsed_time"/></option>
             <option><spring:message code="cms.statistics.label.returning_rate"/></option>
           </select>
-          <img alt="" src="/images/cms/img_stastics.png"/>
+          <img alt="" src="http://s3.amazonaws.com/9x9ui/cms/images/img_stastics.png"/>
         </div>
         <table border="0" cellpadding="0" cellspacing="0" class="stastics_list">
           <tr>
@@ -130,7 +130,7 @@
               <option><spring:message code="cms.statistics.label.average_elapsed_time"/></option>
               <option><spring:message code="cms.statistics.label.returning_rate"/></option>
             </select>
-            <img alt="" src="/images/cms/img_stastics.png"/>
+            <img alt="" src="http://s3.amazonaws.com/9x9ui/cms/images/img_stastics.png"/>
           </div>
           <table border="0" cellpadding="0" cellspacing="0" class="stastics_list" style="display:none">
             <tr>
@@ -168,7 +168,7 @@
               <option><spring:message code="cms.statistics.label.shared_times"/></option>
               <option><spring:message code="cms.statistics.label.average_watch_time_each"/></option>
             </select>
-            <img alt="" src="/images/cms/img_stastics.png"/>
+            <img alt="" src="http://s3.amazonaws.com/9x9ui/cms/images/img_stastics.png"/>
           </div>
           <table border="0" cellpadding="0" cellspacing="0" class="stastics_list">
             <tr>

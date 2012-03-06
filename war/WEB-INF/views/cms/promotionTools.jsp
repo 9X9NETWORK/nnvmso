@@ -7,11 +7,11 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.15/themes/start/jquery-ui.css" />
-<link rel="stylesheet" type="text/css" href="/stylesheets/cms.css" />
-<script type="text/javascript" src="/javascripts/jquery-1.6.4.fixed.js"></script>
+<link rel="stylesheet" type="text/css" href="http://s3.amazonaws.com/9x9ui/cms/stylesheets/cms.css" />
+<script type="text/javascript" src="http://s3.amazonaws.com/9x9ui/cms/javascripts/jquery-1.6.4.fixed.js"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.15/jquery-ui.min.js"></script>
-<script type="text/javascript" src="/javascripts/cms/common.js"></script>
-<script type="text/javascript" src="/javascripts/cms/promotionTools.js"></script>
+<script type="text/javascript" src="http://s3.amazonaws.com/9x9ui/cms/javascripts/cms/common.js"></script>
+<script type="text/javascript" src="http://s3.amazonaws.com/9x9ui/cms/javascripts/cms/promotionTools.js"></script>
 <title><spring:message code="cms.promotion_tools.title"/></title>
 </head>
 <body>

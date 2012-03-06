@@ -7,13 +7,13 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <link type="text/css" rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.15/themes/start/jquery-ui.css"/>
-<link type="text/css" rel="stylesheet" href="/stylesheets/jquery.bubble.css"/>
-<link type="text/css" rel="stylesheet" href="/stylesheets/cms.css"/>
-<script type="text/javascript" src="/javascripts/jquery-1.6.4.fixed.js"><!-- 1.6.1 for compatibility --></script>
+<link type="text/css" rel="stylesheet" href="http://s3.amazonaws.com/9x9ui/cms/stylesheets/jquery.bubble.css"/>
+<link type="text/css" rel="stylesheet" href="http://s3.amazonaws.com/9x9ui/cms/stylesheets/cms.css"/>
+<script type="text/javascript" src="http://s3.amazonaws.com/9x9ui/cms/javascripts/jquery-1.6.4.fixed.js"><!-- 1.6.1 for compatibility --></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.15/jquery-ui.min.js"></script>
-<script type="text/javascript" src="/javascripts/plugins/jquery.bubble.js"></script>
-<script type="text/javascript" src="/javascripts/cms/common.js"></script>
-<script type="text/javascript" src="/javascripts/cms/directoryManagement.js"></script>
+<script type="text/javascript" src="http://s3.amazonaws.com/9x9ui/cms/javascripts/plugins/jquery.bubble.js"></script>
+<script type="text/javascript" src="http://s3.amazonaws.com/9x9ui/cms/javascripts/cms/common.js"></script>
+<script type="text/javascript" src="http://s3.amazonaws.com/9x9ui/cms/javascripts/cms/directoryManagement.js"></script>
 <title><spring:message code="cms.directory_management.title"/></title>
 </head>
 <body>

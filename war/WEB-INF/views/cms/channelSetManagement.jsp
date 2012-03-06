@@ -6,19 +6,19 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <link type="text/css" rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.15/themes/start/jquery-ui.css"/>
-<link type="text/css" rel="stylesheet" href="/stylesheets/cms.css"/>
-<link type="text/css" rel="stylesheet" href="/stylesheets/jquery.bubble.css"/>
-<link type="text/css" rel="stylesheet" href="/javascripts/plugins/dynatree/ui.dynatree.css"/>
-<link type="text/css" rel="stylesheet" href="/javascripts/plugins/msdropdown/dd.css"/>
-<script type="text/javascript" src="/javascripts/jquery-1.6.4.fixed.js"></script>
+<link type="text/css" rel="stylesheet" href="http://s3.amazonaws.com/9x9ui/cms/stylesheets/cms.css"/>
+<link type="text/css" rel="stylesheet" href="http://s3.amazonaws.com/9x9ui/cms/stylesheets/jquery.bubble.css"/>
+<link type="text/css" rel="stylesheet" href="http://s3.amazonaws.com/9x9ui/cms/javascripts/plugins/dynatree/ui.dynatree.css"/>
+<link type="text/css" rel="stylesheet" href="http://s3.amazonaws.com/9x9ui/cms/javascripts/plugins/msdropdown/dd.css"/>
+<script type="text/javascript" src="http://s3.amazonaws.com/9x9ui/cms/javascripts/jquery-1.6.4.fixed.js"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.15/jquery-ui.min.js"></script>
-<script type="text/javascript" src="/javascripts/plugins/jquery.bubble.js"></script>
-<script type="text/javascript" src="/javascripts/plugins/dynatree/jquery.dynatree.js"></script>
-<script type="text/javascript" src="/javascripts/plugins/msdropdown/jquery.dd.js"></script>
-<script type="text/javascript" src="/javascripts/plugins/jquery.scrollTo-1.4.2.js"></script>
-<script type="text/javascript" src="/javascripts/swfupload/swfupload.js"></script>
-<script type="text/javascript" src="/javascripts/cms/common.js"></script>
-<script type="text/javascript" src="/javascripts/cms/channelSetManagement.js"></script>
+<script type="text/javascript" src="http://s3.amazonaws.com/9x9ui/cms/javascripts/plugins/jquery.bubble.js"></script>
+<script type="text/javascript" src="http://s3.amazonaws.com/9x9ui/cms/javascripts/plugins/dynatree/jquery.dynatree.js"></script>
+<script type="text/javascript" src="http://s3.amazonaws.com/9x9ui/cms/javascripts/plugins/msdropdown/jquery.dd.js"></script>
+<script type="text/javascript" src="http://s3.amazonaws.com/9x9ui/cms/javascripts/plugins/jquery.scrollTo-1.4.2.js"></script>
+<script type="text/javascript" src="http://s3.amazonaws.com/9x9ui/cms/javascripts/swfupload/swfupload.js"></script>
+<script type="text/javascript" src="http://s3.amazonaws.com/9x9ui/cms/javascripts/cms/common.js"></script>
+<script type="text/javascript" src="http://s3.amazonaws.com/9x9ui/cms/javascripts/cms/channelSetManagement.js"></script>
 <title><spring:message code="cms.channel_set_management.title"/></title>
 </head>
 <body>
@@ -42,7 +42,7 @@
           <input type="hidden" id="cc_id" value="0"/>
           <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_set_management.label.logo"/></label>
           <div class="uploadImg">
-            <img alt="" id="cc_image" src="/images/cms/upload_img.jpg" class="floatL"/><input type="hidden" id="cc_image_updated" value="false"/>
+            <img alt="" id="cc_image" src="http://s3.amazonaws.com/9x9ui/cms/images/upload_img.jpg" class="floatL"/><input type="hidden" id="cc_image_updated" value="false"/>
             <div class="floatL imgBtn">
               <p class="gray"><spring:message code="cms.channel_set_management.msg.best_resolution"/></p>
               <a href="javascript:" id="upload_image" class="uploadBtn"></a>

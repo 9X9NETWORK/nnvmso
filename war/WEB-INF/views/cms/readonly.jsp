@@ -6,7 +6,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <title><spring:message code="cms.readonly.title"/></title>
-<link href="/stylesheets/cms.css" rel="stylesheet" type="text/css"/>
+<link href="http://s3.amazonaws.com/9x9ui/cms/stylesheets/cms.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
 <div class="header"></div>
