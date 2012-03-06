@@ -858,7 +858,10 @@ public class PlayerApiService {
 		sphere = this.checkLang(sphere);
         if (lang == null || sphere == null)
             return this.assembleMsgs(NnStatusCode.INPUT_BAD, null);				
-		
+		if (year != null && !Pattern.matches("^\\d*$", year)) {
+			return this.assembleMsgs(NnStatusCode.INPUT_BAD, null);
+		}
+        
 		//find mso
 		if (mso == null) { return NnStatusMsg.msoInvalid(locale);}
 		
@@ -884,7 +887,7 @@ public class PlayerApiService {
 
 		user = new NnUser(email, password, name, NnUser.TYPE_USER, mso.getKey().getId());
 		user.setSphere(sphere);
-		user.setLang(lang);		
+		user.setLang(lang);
 		user.setDob(year);
 		userMngr.create(user, token);
 		userMngr.subscibeDefaultChannels(user);							
