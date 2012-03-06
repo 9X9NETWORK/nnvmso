@@ -1,4 +1,4 @@
-package com.nnvmso.web.json.facebook;
+package com.nncloudtv.web.json.facebook;
 
 public class FacebookError {
 	private String message;
