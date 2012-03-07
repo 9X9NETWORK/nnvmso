@@ -1,4 +1,4 @@
-package com.nncloudtv.web.json.facebook;
+package com.nnvmso.web.json.facebook;
 
 import java.util.List;
 import java.util.Map;
