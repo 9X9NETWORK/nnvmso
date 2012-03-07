@@ -371,7 +371,7 @@ public class PlayerApiController {
 	 *  @param password password
 	 *  @param name display name
 	 *  @param sphere content region, en or zh
-	 *  @param lang user preferred language, en or zh
+	 *  @param ui-lang user preferred language, en or zh
 	 *  @return please reference login
 	 */	
 	@RequestMapping(value="signup")
@@ -384,7 +384,7 @@ public class PlayerApiController {
 		String text = req.getParameter("text");
 		String sphere = req.getParameter("sphere");
 		String year = req.getParameter("year");
-		String lang = req.getParameter("lang");
+		String lang = req.getParameter("ui-lang");
 		
 		log.info("signup: email=" + email + ";name=" + name + ";userToken=" + userToken + ";password=" + password);
 
