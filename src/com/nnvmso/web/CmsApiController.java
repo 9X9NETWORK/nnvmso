@@ -37,6 +37,7 @@ import twitter4j.TwitterException;
 
 import com.google.appengine.api.taskqueue.QueueFactory;
 import com.google.appengine.api.taskqueue.TaskOptions;
+import com.google.common.base.Joiner;
 import com.nnvmso.lib.CacheFactory;
 import com.nnvmso.lib.FacebookLib;
 import com.nnvmso.lib.NnLogUtil;
@@ -86,6 +87,16 @@ import com.sun.syndication.io.XmlReader;
 @Controller
 @RequestMapping("CMSAPI")
 public class CmsApiController {
+	
+	class MsoProgramSeqComparator implements Comparator<MsoProgram> {
+		@Override
+		public int compare(MsoProgram program1, MsoProgram program2) {
+			int seq1 = (program1.getSeq() == null) ? 0 : Integer.valueOf(program1.getSeq());
+			int seq2 = (program2.getSeq() == null) ? 0 : Integer.valueOf(program2.getSeq());
+			return (seq1 - seq2);
+		}
+	}
+	
 	protected static final Logger logger = Logger.getLogger(CmsApiController.class.getName());
 	
 	@ExceptionHandler(Exception.class)
@@ -730,7 +741,8 @@ public class CmsApiController {
 		MsoChannel channel = channelMngr.findById(channelId);
 		if (channel == null) {
 			return "Invalid channelId";
-		}		
+		}
+		
 		Long timestamp = System.currentTimeMillis() / 1000L;
 		MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
 		sha1.update(sourceUrl.getBytes());
@@ -773,6 +785,8 @@ public class CmsApiController {
 		}
 		program.setPublic(true);
 		programMngr.create(channel, program);
+		
+		updateAllProgramsSeq(channelId);
 		
 		return "OK";
 	}
@@ -933,6 +947,23 @@ public class CmsApiController {
 		return "OK";
 	}
 	
+	// this is a wrapper of updateProgramListSeq
+	private void updateAllProgramsSeq(long channelId) {
+		
+		MsoProgramManager programMngr = new MsoProgramManager();
+		
+		// update all episode sequence
+		List<MsoProgram> programList = programMngr.findAllByChannelId(channelId);
+		Collections.sort(programList, new MsoProgramSeqComparator());
+		List<Long> programIdList = new ArrayList<Long>();
+		for (MsoProgram program : programList) {
+			programIdList.add(program.getKey().getId());
+		}
+		String programListStr = Joiner.on(",").join(programIdList);
+		updateProgramListSeq(channelId, programListStr);
+		
+	}
+	
 	@RequestMapping("updateProgramListSeq")
 	public @ResponseBody String updateProgramListSeq(@RequestParam Long channelId, @RequestParam String programIdList) {
 		logger.info("channelId: " + channelId);
@@ -1041,16 +1072,8 @@ public class CmsApiController {
 		MsoProgramManager programMngr = new MsoProgramManager();
 		List<MsoProgram> results = programMngr.findAllByChannelId(channelId);
 		
-		class MsoProgramComparator implements Comparator<MsoProgram> {
-			@Override
-			public int compare(MsoProgram program1, MsoProgram program2) {
-				int seq1 = (program1.getSeq() == null) ? 0 : Integer.valueOf(program1.getSeq());
-				int seq2 = (program2.getSeq() == null) ? 0 : Integer.valueOf(program2.getSeq());
-				return (seq1 - seq2);
-			}
-		}
-		Collections.sort(results, new MsoProgramComparator());
-
+		Collections.sort(results, new MsoProgramSeqComparator());
+		
 		return results;
 	}
 	
