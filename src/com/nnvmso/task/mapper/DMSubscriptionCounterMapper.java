@@ -6,6 +6,7 @@ import java.util.Date;
 
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.Counter;
+import org.mortbay.log.Log;
 
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
@@ -22,6 +23,7 @@ public class DMSubscriptionCounterMapper extends AppEngineMapper<Key, Entity, Nu
 		try {
 			beforeDate = sdf.parse(before);
 		} catch (ParseException e) {
+			Log.info("parse error");
 			return;
 		}
 		

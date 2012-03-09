@@ -103,7 +103,7 @@ public class DataminingTask {
 		String to = "nncloudtv@gmail.com";
 		if (host.contains("9x9tvprod") || host.contains("prod.9x9.tv") || 
 			host.contains("9x9.tv") || host.contains("www.9x9.tv")) {
-			to = "dan.lee@9x9.tv";
+			//to = "dan.lee@9x9.tv";
 		}
 		return to;
 			
@@ -117,11 +117,10 @@ public class DataminingTask {
 	        conf.setClass("mapreduce.inputformat.class", DatastoreInputFormat.class, InputFormat.class);
 	    	conf.set(DatastoreInputFormat.ENTITY_KIND_KEY, "NnUser");
 			Calendar now = Calendar.getInstance();
-		    now.add(Calendar.DATE, -2);
 	    	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd000000");
-	    	String since = sdf.format(now.getTime());
-	    	now.add(Calendar.DATE, -1);
 	    	String before = sdf.format(now.getTime());
+	    	now.add(Calendar.DATE, -1);
+	    	String since = sdf.format(now.getTime());
 	    	
 	    	log.info("Count user since:" + since + "; before:" + before);	    	
 	    	conf.set("since", since);	    	
@@ -215,8 +214,8 @@ public class DataminingTask {
 	    	conf.set(DatastoreInputFormat.ENTITY_KIND_KEY, "Subscription");	    	
 	    	
 			Calendar now = Calendar.getInstance();
-		    now.add(Calendar.DATE, -1);
-	    	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+		    //now.add(Calendar.DATE, -1);
+	    	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd000000");
 	    	String before = sdf.format(now.getTime());
 	    	log.info("before:" + before);	    	
 	    	conf.set("before", before);	    		    		    		    	
@@ -327,7 +326,6 @@ public class DataminingTask {
 		List<MsoChannel> list = new ArrayList<MsoChannel>();
 		Calendar now = Calendar.getInstance();
     	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");    	
-    	//now.add(Calendar.DATE, -1);
     	String before = sdf.format(now.getTime());
 	    now.add(Calendar.DATE, -1);
     	String since = sdf.format(now.getTime());
