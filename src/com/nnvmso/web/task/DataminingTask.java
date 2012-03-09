@@ -103,7 +103,7 @@ public class DataminingTask {
 		String to = "nncloudtv@gmail.com";
 		if (host.contains("9x9tvprod") || host.contains("prod.9x9.tv") || 
 			host.contains("9x9.tv") || host.contains("www.9x9.tv")) {
-			//to = "dan.lee@9x9.tv";
+			to = "dan.lee@9x9.tv";
 		}
 		return to;
 			
