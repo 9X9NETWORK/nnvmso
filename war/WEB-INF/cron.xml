@@ -17,6 +17,11 @@
     <schedule>every day 09:00</schedule>
   </cron>            
   <cron>
+    <url>/task/datamining/newChannelCountToTask</url>    
+    <description>New Channel Count</description>
+    <schedule>every day 09:00</schedule>
+  </cron>            
+  <cron>
     <url>/task/datamining/setSubCountToTask</url>                              
     <description>Set Subscription Count</description>
     <schedule>every friday 09:00</schedule>

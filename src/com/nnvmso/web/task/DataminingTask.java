@@ -33,12 +33,14 @@ import com.nnvmso.lib.NnNetUtil;
 import com.nnvmso.model.ChannelSet;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
+import com.nnvmso.model.NnUser;
 import com.nnvmso.model.Subscription;
 import com.nnvmso.model.SubscriptionLog;
 import com.nnvmso.service.ChannelSetManager;
 import com.nnvmso.service.EmailService;
 import com.nnvmso.service.MsoChannelManager;
 import com.nnvmso.service.MsoManager;
+import com.nnvmso.service.NnUserManager;
 import com.nnvmso.service.SubscriptionLogManager;
 import com.nnvmso.service.SubscriptionManager;
 import com.nnvmso.task.mapper.DMSubscriptionCounterMapper;
@@ -114,20 +116,11 @@ public class DataminingTask {
 	    	conf.setClass("mapreduce.map.class", DMUserCounterMapper.class, Mapper.class);
 	        conf.setClass("mapreduce.inputformat.class", DatastoreInputFormat.class, InputFormat.class);
 	    	conf.set(DatastoreInputFormat.ENTITY_KIND_KEY, "NnUser");
-
-	    	/*
-	    	Date now = new Date();
-	    	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd000000");
-	    	String since = sdf.format(now);
-	    	log.info("Count user since:" + since);	    	
-	    	conf.set("since", since);
-	    	*/
-	    	
 			Calendar now = Calendar.getInstance();
-		    now.add(Calendar.DATE, -1);
+		    now.add(Calendar.DATE, -2);
 	    	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd000000");
 	    	String since = sdf.format(now.getTime());
-	    	now.add(Calendar.DATE, 1);
+	    	now.add(Calendar.DATE, -1);
 	    	String before = sdf.format(now.getTime());
 	    	
 	    	log.info("Count user since:" + since + "; before:" + before);	    	
@@ -148,13 +141,21 @@ public class DataminingTask {
 	@RequestMapping(value="test")
 	public ResponseEntity<String> test(HttpServletRequest req) {
 		Calendar now = Calendar.getInstance();
-	    now.add(Calendar.DATE, -1);
-    	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd000000");
-    	String since = sdf.format(now.getTime());
-    	now.add(Calendar.DATE, 1);
+    	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+    	now.add(Calendar.DATE, -1);
     	String before = sdf.format(now.getTime());
+	    now.add(Calendar.DATE, -1);
+    	String since = sdf.format(now.getTime());
     	
     	return NnNetUtil.textReturn(since + ";" + before);
+	}
+
+	@RequestMapping(value="test1")
+	public ResponseEntity<String> test1(HttpServletRequest req) {
+		String astr = "1";
+		int a = Integer.parseInt(astr);
+		astr = String.format("%08d", a + 1);
+    	return NnNetUtil.textReturn("a=" + astr);
 	}
 	
 	@RequestMapping(value="userCountTaskCompleted")
@@ -211,8 +212,14 @@ public class DataminingTask {
 	    try {
 	    	conf.setClass("mapreduce.map.class", DMSubscriptionCounterMapper.class, Mapper.class);
 	        conf.setClass("mapreduce.inputformat.class", DatastoreInputFormat.class, InputFormat.class);
-	    	conf.set(DatastoreInputFormat.ENTITY_KIND_KEY, "Subscription");
+	    	conf.set(DatastoreInputFormat.ENTITY_KIND_KEY, "Subscription");	    	
 	    	
+			Calendar now = Calendar.getInstance();
+		    now.add(Calendar.DATE, -1);
+	    	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+	    	String before = sdf.format(now.getTime());
+	    	log.info("before:" + before);	    	
+	    	conf.set("before", before);	    		    		    		    	
 	    	conf.set("mapreduce.appengine.donecallback.url", "/task/datamining/subCountTaskCompleted");
 	    	String configXml = ConfigurationXmlUtil.convertConfigurationToXml(conf);
 			QueueFactory.getDefaultQueue().add(
@@ -253,8 +260,7 @@ public class DataminingTask {
 				content += cnt + "\n";
 			}
 						
-			EmailService emailService = new EmailService();
-			
+			EmailService emailService = new EmailService();			
 	    	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 	    	Date now = new Date();
 	    	String since = sdf.format(now);
@@ -300,7 +306,7 @@ public class DataminingTask {
     	String host = NnNetUtil.getUrlRoot(req);
 		String subject = "[statistics] channel performance";
 		String msgBody = "host:" + host + "\n\n" + content;
-		//log.info(content);
+		log.info(content);
 		String toEmail = this.toEmail(host);
 		emailService.sendEmail(subject, msgBody, toEmail, "nncloudtv");
 		
@@ -320,24 +326,31 @@ public class DataminingTask {
 	public ResponseEntity<String> newChannelCount(HttpServletRequest req) throws IOException {
 		List<MsoChannel> list = new ArrayList<MsoChannel>();
 		Calendar now = Calendar.getInstance();
-	    now.add(Calendar.DATE, -1);
-    	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-    	String since = sdf.format(now.getTime());
-    	now.add(Calendar.DATE, 1);
+    	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");    	
+    	//now.add(Calendar.DATE, -1);
     	String before = sdf.format(now.getTime());
+	    now.add(Calendar.DATE, -1);
+    	String since = sdf.format(now.getTime());
 		try {
 			Date sinceDate = sdf.parse(since);
 			Date beforeDate = sdf.parse(before);
 			log.info("sinceDate:" + sinceDate + ";beforeDate:" + beforeDate);
 	    	MsoChannelManager channelMngr = new MsoChannelManager();
+	    	NnUserManager userMngr = new NnUserManager();
 	    	list = channelMngr.findBetweenDates(sinceDate, beforeDate);
 			EmailService emailService = new EmailService();						
 	    	String host = NnNetUtil.getUrlRoot(req);
+	    	String range = "sinceDate:" + sinceDate + ";beforeDate:" + beforeDate;
 			String content = "New Channel Count:" + list.size() + "\n\n";
 			String subject = "[statistics] new channel added";
-			String msgBody = "host:" + host + "\n\n" + content;
+			String msgBody = "host:" + host + "\n" + "range:" + range + "\n\n" + content;
 			for (MsoChannel c : list) {
-				msgBody += c.getKey().getId() + "  name:" +  c.getName() + ";url=" + c.getSourceUrl() + "\n";
+				msgBody += c.getKey().getId() + "  name:" +  c.getName() + ";url=" + c.getSourceUrl();
+				NnUser user = userMngr.findById(c.getUserId());
+				if (user != null) {
+					msgBody += ";user=" + user.getEmail();
+				}
+				msgBody += "\n";
 			}
 			log.info("msgBody" + msgBody);
 			String toEmail = this.toEmail(host);

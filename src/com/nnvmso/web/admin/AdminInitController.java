@@ -1,15 +1,8 @@
 package com.nnvmso.web.admin;
 
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.net.URLEncoder;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.mail.Message;
 import javax.mail.Session;
@@ -23,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -38,16 +30,17 @@ import com.nnvmso.model.ChannelSet;
 import com.nnvmso.model.ChannelSetChannel;
 import com.nnvmso.model.Mso;
 import com.nnvmso.model.MsoChannel;
+import com.nnvmso.model.MsoProgram;
 import com.nnvmso.model.NnUser;
 import com.nnvmso.service.ChannelSetChannelManager;
 import com.nnvmso.service.ChannelSetManager;
 import com.nnvmso.service.InitService;
 import com.nnvmso.service.MsoChannelManager;
 import com.nnvmso.service.MsoManager;
+import com.nnvmso.service.MsoProgramManager;
 import com.nnvmso.service.NnUserManager;
 import com.nnvmso.service.TranscodingService;
 import com.nnvmso.web.json.transcodingservice.PostUrl;
-import com.nnvmso.web.json.transcodingservice.RtnProgram;
 
 /**
  * for testing only, works only for small set of data
@@ -674,4 +667,74 @@ public class AdminInitController {
 		}
 		return NnNetUtil.textReturn(output);
 	}
+	
+	@RequestMapping("seqChange")
+	public ResponseEntity<String> seqChange(HttpServletRequest req) {		
+		MsoProgramManager programMngr = new MsoProgramManager();
+		long[] ids = {
+				5087015,
+				5073025,
+				5087014,
+				5074033,
+				5036146,
+				5024353,
+				5027171,
+				5034182,
+				5035189,
+				5026097,
+				5037112,
+				5031104,
+				5035017,
+				5027016,
+				5041015,
+				5024023,
+				5001148,
+				5014115,
+				4999086,
+				5010082,
+				4984756,
+				4970361,
+				4981770,
+				4981769,
+				4981493,
+				4986190,
+				4986189,
+				4983234,
+				4990080,
+				4979087,
+				4979086,
+				4981194,
+				4944214,
+				4942216,
+				4928189,
+				4948181,
+				4945128,
+				4922142,
+				4955146,
+				4912154,
+				4912085,
+				4957057,
+				4958063,
+				4939074,
+				4898354,
+				4901309,
+				4883710,
+				4893372,
+				4899277,
+				4899276,
+		};
+		int i=0;
+		for (long id: ids) {
+			MsoProgram p = programMngr.findById(id);
+			if (p == null) {				
+				log.info("program not found:" + id);
+			} else {				
+				String seq = String.format("%08d", i++);
+				p.setSeq(seq);
+				programMngr.save(p);
+			}
+		}
+		return NnNetUtil.textReturn("OK");		
+	}				
+	
 }
