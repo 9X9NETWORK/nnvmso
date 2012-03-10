@@ -424,15 +424,14 @@ public class AdminSetController {
 		ChannelSet cs = csMngr.findById(set);
 		if (cs == null)
 			return "Set does not exist";
-		/*
-		ChannelSetChannel csc = cscMngr.findBySetAndChannel(set, channel);		
-		if (csc == null) {
-			System.out.println("enter empty?:" + set + ";" + channel + ";" + seq);
+		if (cs.isFeatured())
+			this.channelSeqAdjust(cs, c, seq, false, false);
+		else {
+			System.out.println("enter not existing");
+			ChannelSetChannel csc = cscMngr.findBySetAndChannel(set, channel);		
 			csc = new ChannelSetChannel(set, channel, seq);
-			cscMngr.create(csc);
+			cscMngr.create(csc);			
 		}
-		*/
-		this.channelSeqAdjust(cs, c, seq, false, false);
 		return "OK";		
 	}	
 
