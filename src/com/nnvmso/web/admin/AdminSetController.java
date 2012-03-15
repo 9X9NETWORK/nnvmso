@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import org.codehaus.jackson.map.ObjectMapper;
+import org.mortbay.log.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -428,7 +429,10 @@ public class AdminSetController {
 			this.channelSeqAdjust(cs, c, seq, false, false);
 		else {
 			System.out.println("enter not existing");
-			ChannelSetChannel csc = cscMngr.findBySetAndChannel(set, channel);		
+			ChannelSetChannel csc = cscMngr.findBySetAndChannel(set, channel);
+			if (csc != null) {
+				return "Channel exists in this set"; 
+			}
 			csc = new ChannelSetChannel(set, channel, seq);
 			cscMngr.create(csc);			
 		}
@@ -490,6 +494,8 @@ public class AdminSetController {
 		
 	}
 	
+	
+	//http://www.9x9.tv/admin/set/listCh?set=4445485&_search=false&nd=1331586429556&rows=40&page=2&sidx=updateDate&sord=desc
 	@RequestMapping(value = "listCh", params = {"page", "rows", "sidx", "sord", "set"})
 	public @ResponseBody String listCh(
 			         @RequestParam(value = "page")   Integer      currentPage,
@@ -515,11 +521,11 @@ public class AdminSetController {
 			cell.add(c.getContentType());
 			map.put("id", c.getKey().getId());
 			map.put("cell", cell);
-			dataRows.add(map);			
+			dataRows.add(map);
 		}
 		int totalRecords = channels.size();
-		try {
-			mapper.writeValue(out, JqgridHelper.composeJqgridResponse(1, 50, totalRecords, dataRows));
+		try {			
+			mapper.writeValue(out, JqgridHelper.composeJqgridResponse(currentPage, 50, totalRecords, dataRows));
 		} catch (IOException e) {
 			logger.warning(e.getMessage());
 		}
