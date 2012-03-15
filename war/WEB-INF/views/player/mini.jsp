@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+﻿<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <head>
 <meta charset="UTF-8" />
@@ -6,6 +6,8 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9miniV21"/>
+
+<title>9x9.tv/tv</title>
 
 <link rel="stylesheet" href="${root}/stylesheets/main.css" />
 
@@ -25,7 +27,7 @@
 <script type="text/javascript" charset="utf-8" src="${root}/javascripts/jquery.ellipsis.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/soundmanager/soundmanager2.js"></script>
 
-<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/mini16.js"></script>
+<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/mini17.js"></script>
 
 <!-- Quantcast Tag -->
 <script type="text/javascript">
