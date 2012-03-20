@@ -6,7 +6,7 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <c:set var="root" value="http://9x9ui.s3.amazonaws.com/9x9playerV68a"/>
-<c:set var="nroot" value="http://9x9ui.s3.amazonaws.com/9x9playerV95"/>
+<c:set var="nroot" value="http://9x9ui.s3.amazonaws.com/9x9playerV98"/>
 
 <!-- $Revision$ -->
 
@@ -40,7 +40,7 @@
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/scripts/flowplayer-3.2.4.min.js"></script>
 <script type="text/javascript" charset="utf-8" src="${nroot}/javascripts/jquery.ellipsis.js"></script>
 
-<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/player26.js"></script>
+<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/player27.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/vertical.slider.V2.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/jquery.mousewheel.min.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/soundmanager/soundmanager2.js"></script>
@@ -511,18 +511,29 @@ width=500 height=500 type="application/x-shockwave-flash" allowScriptAccess="alw
       <p><span>One moment...</span></p>
     </div>
     <h2><span>Channel Store</span></h2>
+    <ul id="programlang">
+      <li class="on"><span>English Channels</span></li>
+      <li><span>中文頻道</span></li>
+    </ul>
+    <div id="sound-float">
+      <p id="btn-sound-switch">
+        <img src="${nroot}/images/icon_sound_on.png" class="sound-on"><img src="${nroot}/images/icon_sound_off.png" class="sound-off">
+        <span>Click for Sound</span>
+      </p>
+      <p id="btn-sound-close"><img src="${nroot}/images/btn_delete_off.png" class="off"><img src="${nroot}/images/btn_delete_on.png" class="on"></p>
+    </div>
     <!--img src="${nroot}/images/icon_cart_gray.png" id="btn-cart">
     <p id="cart-bubble">
       <img src="${nroot}/images/cart_bubble.png">
       <span>0</span>
     </p-->
-    <div id="btn-programlang">
+    <!--div id="btn-programlang">
       <p id="selected-programlang"><span>English Channels</span><img src="${nroot}/images/icon_expand.png" class="icon-expand"></p>
       <ul id="programlang-dropdown" class="dropdown">
         <li class="on"><img src="${nroot}/images/icon_check.png" class="icon-check"><span>English Channels</span></li>
         <li><img src="${nroot}/images/icon_check.png" class="icon-check"><span>中文頻道</span></li>
       </ul>
-    </div>
+    </div-->
     <p id="search-input">
       <img src="${nroot}/images/icon_search.png" class="icon-search">
       <input type="text" class="textfield" value="Search" id="search-field">
