@@ -3,10 +3,10 @@ package com.nnvmso.task.mapper;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.logging.Logger;
 
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.Counter;
-import org.mortbay.log.Log;
 
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
@@ -14,6 +14,8 @@ import com.google.appengine.tools.mapreduce.AppEngineMapper;
 import com.google.appengine.tools.mapreduce.DatastoreMutationPool;
 
 public class DMSubscriptionCounterMapper extends AppEngineMapper<Key, Entity, NullWritable, NullWritable>{
+	
+	protected static final Logger log = Logger.getLogger(DMSubscriptionCounterMapper.class.getName());
 	
 	@Override
 	public void map(Key key, Entity value, Context context) {		
@@ -23,7 +25,7 @@ public class DMSubscriptionCounterMapper extends AppEngineMapper<Key, Entity, Nu
 		try {
 			beforeDate = sdf.parse(before);
 		} catch (ParseException e) {
-			Log.info("parse error");
+			log.info("parse error");
 			return;
 		}
 		
