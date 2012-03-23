@@ -1,17 +1,14 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ include file="global.jsp" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.15/themes/start/jquery-ui.css" />
-<link rel="stylesheet" type="text/css" href="http://s3.amazonaws.com/9x9ui/cms/stylesheets/cms.css" />
-<script type="text/javascript" src="http://s3.amazonaws.com/9x9ui/cms/javascripts/jquery-1.6.4.fixed.js"></script>
+<link rel="stylesheet" type="text/css" href="${root}/stylesheets/cms.css" />
+<script type="text/javascript" src="${root}/javascripts/jquery-1.6.4.fixed.js"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.15/jquery-ui.min.js"></script>
-<script type="text/javascript" src="http://s3.amazonaws.com/9x9ui/cms/javascripts/cms/common.js"></script>
-<script type="text/javascript" src="http://s3.amazonaws.com/9x9ui/cms/javascripts/cms/promotionTools.js"></script>
+<script type="text/javascript" src="${root}/javascripts/cms/common.js"></script>
+<script type="text/javascript" src="${root}/javascripts/cms/promotionTools.js"></script>
 <title><spring:message code="cms.promotion_tools.title"/></title>
 </head>
 <body>

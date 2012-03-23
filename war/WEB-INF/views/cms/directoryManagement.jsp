@@ -1,19 +1,16 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ include file="global.jsp" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <link type="text/css" rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.15/themes/start/jquery-ui.css"/>
-<link type="text/css" rel="stylesheet" href="http://s3.amazonaws.com/9x9ui/cms/stylesheets/jquery.bubble.css"/>
-<link type="text/css" rel="stylesheet" href="http://s3.amazonaws.com/9x9ui/cms/stylesheets/cms.css"/>
-<script type="text/javascript" src="http://s3.amazonaws.com/9x9ui/cms/javascripts/jquery-1.6.4.fixed.js"><!-- 1.6.1 for compatibility --></script>
+<link type="text/css" rel="stylesheet" href="${root}/stylesheets/jquery.bubble.css"/>
+<link type="text/css" rel="stylesheet" href="${root}/stylesheets/cms.css"/>
+<script type="text/javascript" src="${root}/javascripts/jquery-1.6.4.fixed.js"><!-- 1.6.1 for compatibility --></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.15/jquery-ui.min.js"></script>
-<script type="text/javascript" src="http://s3.amazonaws.com/9x9ui/cms/javascripts/plugins/jquery.bubble.js"></script>
-<script type="text/javascript" src="http://s3.amazonaws.com/9x9ui/cms/javascripts/cms/common.js"></script>
-<script type="text/javascript" src="http://s3.amazonaws.com/9x9ui/cms/javascripts/cms/directoryManagement.js"></script>
+<script type="text/javascript" src="${root}/javascripts/plugins/jquery.bubble.js"></script>
+<script type="text/javascript" src="${root}/javascripts/cms/common.js"></script>
+<script type="text/javascript" src="${root}/javascripts/cms/directoryManagement.js"></script>
 <title><spring:message code="cms.directory_management.title"/></title>
 </head>
 <body>
