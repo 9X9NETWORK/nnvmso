@@ -194,12 +194,6 @@
                   </select>
                 </div>
                 <br/><br/>
-                <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.system_category"/></label>
-                <div class="floatL">
-                  <select id="ch_category" class="sys_directory"></select>
-                </div>
-                <div class="clear"><small><small>&nbsp;</small></small></div>
-                <p class="hint" style="display:none"><spring:message code="cms.channel_management.msg.system_category_explanation"/></p>
                 <p class="hint create_channel_hint" style="display:none"><spring:message code="cms.channel_management.msg.create_channel_hint"/></p>
                 <div class="commitPlace">
                   <a href="javascript:" class="btnCreate floatL" id="channel_detail_savebutton"><span><spring:message code="cms.channel_management.btn.save"/></span></a>
@@ -484,37 +478,6 @@
                   <p class="hint"><spring:message code="cms.channel_management.msg.two_hundred_characters"/></p>
                   <br/>
                 </div>
-                <div style="display:none">
-                  <label class="floatL"><spring:message code="cms.channel_management.label.tag"/></label>
-                  <div class="bg_input floatL"><input type="text" size="32" maxlength="40" disabled="disabled"/></div>
-                  <div class="clear"></div>
-                  <p class="hint"><spring:message code="cms.channel_management.msg.camma_seperated"/></p>
-                  <br/>
-                  <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.system_category"/></label>
-                  <div class="floatL">
-                    <select name="" class="sys_directory" disabled="disabled">
-                      <option selected="selected">請選擇分類</option>
-                      <option>新聞 / 政治</option>
-                      <option>財經企管</option>
-                      <option>影視娛樂</option>
-                      <option>運動休閒</option>
-                      <option>科技 / 軟體應用</option>
-                      <option>電玩遊戲</option>
-                      <option>嗜好興趣</option>
-                      <option>旅遊生活</option>
-                      <option>藝術 / 文創</option>
-                      <option>非營利組織與社會行動</option>
-                      <option>教育 / 教學</option>
-                      <option>自然 / 動物</option>
-                      <option>個人 / 名人</option>
-                      <option>企業品牌 / 社團單位</option>
-                      <option>宗教 / 心靈</option>
-                      <option>其他</option>
-                    </select>
-                  </div>
-                  <div class="clear"></div>
-                  <p class="hint"><spring:message code="cms.channel_management.msg.system_category_explanation"/></p>
-                </div>
                 <div class="commitPlace">
                   <a href="javascript:" class="btnCreate floatL ep_savebutton"><span><spring:message code="cms.channel_management.btn.save"/></span></a>
                   <a href="javascript:" class="floatL btnGray ep_cancel" style="margin-left:5px"><span><spring:message code="cms.channel_management.btn.cancel"/></span></a>
@@ -651,30 +614,6 @@
                   </select>
                 </div>
                 <br/><br/>
-                <label class="floatL"><span class="red">＊</span><spring:message code="cms.channel_management.label.system_category"/></label>
-                <div class="floatL">
-                  <select name="ch_category" class="sys_directory" style="width:200px">
-                    <option selected="selected">請選擇分類</option>
-                    <option>新聞 / 政治</option>
-                    <option>財經企管</option>
-                    <option>影視娛樂</option>
-                    <option>運動休閒</option>
-                    <option>科技 / 軟體應用</option>
-                    <option>電玩遊戲</option>
-                    <option>嗜好興趣</option>
-                    <option>旅遊生活</option>
-                    <option>藝術 / 文創</option>
-                    <option>非營利組織與社會行動</option>
-                    <option>教育 / 教學</option>
-                    <option>自然 / 動物</option>
-                    <option>個人 / 名人</option>
-                    <option>企業品牌 / 社團單位</option>
-                    <option>宗教 / 心靈</option>
-                    <option>其他</option>
-                  </select>
-                </div>
-                <div class="clear"><small><small>&nbsp;</small></small></div>
-                <p class="hint" style="display:none"><spring:message code="cms.channel_management.msg.system_category_explanation"/></p>
                 <p class="hint create_channel_hint" style="display:none"><spring:message code="cms.channel_management.msg.create_channel_hint"/></p>
                 <div class="commitPlace">
                   <a href="javascript:" name="ch_savebutton" class="btnCreate floatL"><span><spring:message code="cms.channel_management.btn.save"/></span></a>
@@ -717,7 +656,7 @@
 <label class="lang" id="image_btn_upload">${root}/images/<spring:message code="cms.image.btn_upload"/></label>
 <label class="lang" id="image_btn_from_disk">${root}/images/<spring:message code="cms.image.btn_from_disk"/></label>
 <label class="lang" id="image_btn_save">${root}/images/<spring:message code="cms.image.btn_save"/></label>
-<label class="lang" id="image_btn_reorder">${root}/images/<spring:message code="cms.channel_management.btn.reorder"/></label>
+<label class="lang" id="image_btn_reorder"><spring:message code="cms.channel_management.btn.reorder"/></label>
 <label class="lang" id="image_ch_public">${root}/images/<spring:message code="cms.image.ch_public"/></label>
 <label class="lang" id="image_ch_unpublic">${root}/images/<spring:message code="cms.image.ch_unpublic"/></label>
 </body>

@@ -619,7 +619,6 @@ public class CmsApiController {
 	                                            @RequestParam String intro,
 	                                            @RequestParam String tag,
 	                                            @RequestParam String langCode,
-	                                            @RequestParam Long channelSetId,
 	                                            @RequestParam Long msoId) throws NoSuchAlgorithmException {
 		
 		logger.info("sourceUrl = " + sourceUrl);
@@ -628,7 +627,6 @@ public class CmsApiController {
 		logger.info("intro = " + intro);
 		logger.info("tag = " + tag);
 		logger.info("langCode = " + langCode);
-		logger.info("categoryId = " + channelSetId);
 		logger.info("msoId = " + msoId);
 		
 		CmsApiService cmsApiService = new CmsApiService();
@@ -671,30 +669,6 @@ public class CmsApiController {
 		if (channel.getKey() != null && channel.getContentType() != MsoChannel.CONTENTTYPE_FACEBOOK) { //!!!
 			TranscodingService tranService = new TranscodingService();
 			tranService.submitToTranscodingService(channel.getKey().getId(), sourceUrl, req);
-		}
-		
-		ChannelSet channelSet = csMngr.findById(channelSetId);
-		if (channelSet == null)
-			return "Invalid channelSetId";
-		
-		// NOTE: channel can only in one system Channel Set
-		List<ChannelSetChannel> removable = new ArrayList<ChannelSetChannel>();
-		List<ChannelSetChannel> sysCSCs = cmsApiService.whichSystemCSCContainingThisChannel(channel.getKey().getId());
-		for (ChannelSetChannel csc : sysCSCs) {
-			if (csc.getChannelSetId() != channelSetId) {
-				removable.add(csc);
-			}
-		}
-		for (ChannelSetChannel csc : removable) {
-			sysCSCs.remove(csc);
-			cscMngr.delete(csc);
-		}
-		logger.info("sysCSCs size = " + sysCSCs.size());
-		if (sysCSCs.isEmpty()) {
-			// create a new ChannelSetChannel
-			cscMngr.appendChannel(channelSetId, channel);
-			logger.info("create new ChannelSetChannel channelId = " + channel.getKey().getId() + ", channelSetId = " + channelSetId);
-			//csMngr.save(channelSet);
 		}
 		
 		// create ownership
@@ -847,8 +821,7 @@ public class CmsApiController {
 	                                        @RequestParam(required = false) String name,
 	                                        @RequestParam(required = false) String intro,
 	                                        @RequestParam(required = false) String tag,
-	                                        @RequestParam(required = false) String langCode,
-	                                        @RequestParam Long channelSetId) throws NoSuchAlgorithmException {
+	                                        @RequestParam(required = false) String langCode) throws NoSuchAlgorithmException {
 		
 		logger.info("channelId = " + channelId);
 		logger.info("imageUrl = " + imageUrl);
@@ -856,7 +829,6 @@ public class CmsApiController {
 		logger.info("intro = " + intro);
 		logger.info("tag = " + tag);
 		logger.info("langCode = " + langCode);
-		logger.info("categoryId = " + channelSetId);
 		logger.info("msoId = " + msoId);
 		
 		CmsApiService cmsApiService = new CmsApiService();
@@ -896,30 +868,6 @@ public class CmsApiController {
 		}
 		channel.setUpdateDate(new Date());
 		channelMngr.save(channel);
-		
-		ChannelSet channelSet = csMngr.findById(channelSetId);
-		if (channelSet == null)
-			return "Invalid channelSetId";
-		
-		// NOTE: channel can only in one system Channel Set
-		List<ChannelSetChannel> removable = new ArrayList<ChannelSetChannel>();
-		List<ChannelSetChannel> sysCSCs = cmsApiService.whichSystemCSCContainingThisChannel(channel.getKey().getId());
-		for (ChannelSetChannel csc : sysCSCs) {
-			if (csc.getChannelSetId() != channelSetId) {
-				removable.add(csc);
-			}
-		}
-		for (ChannelSetChannel csc : removable) {
-			sysCSCs.remove(csc);
-			cscMngr.delete(csc);
-		}
-		logger.info("sysCSCs size = " + sysCSCs.size());
-		if (sysCSCs.isEmpty()) {
-			// create a new ChannelSetChannel
-			cscMngr.appendChannel(channelSetId, channel);
-			logger.info("create new ChannelSetChannel channelId = " + channel.getKey().getId() + ", channelSetId = " + channelSetId);
-			//csMngr.save(channelSet); // update channelCount
-		}
 		
 		//channel1 ownership
 		if (msoId != null) {
