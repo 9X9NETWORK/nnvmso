@@ -43,7 +43,7 @@ $(function() {
       </form>
     </div>
 </div>
-<label class="lang" id="image_btn_login"><spring:message code="cms.image.btn_login"/></label>
-<label class="lang" id="image_btn_login_hover"><spring:message code="cms.image.btn_login_hover"/></label>
+<label class="lang" id="image_btn_login">${root}/images/<spring:message code="cms.image.btn_login"/></label>
+<label class="lang" id="image_btn_login_hover">${root}/images/<spring:message code="cms.image.btn_login_hover"/></label>
 </body>
 </html>

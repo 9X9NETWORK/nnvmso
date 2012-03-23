@@ -27,7 +27,7 @@
       <li><a class="menuD"></a></li>
       <li><a class="menuE"></a></li>
     </ul>
-    <label class="lang" id="image_menu"><spring:message code="cms.image.menu"/></label>
+    <label class="lang" id="image_menu">${root}/images/<spring:message code="cms.image.menu"/></label>
     <div class="clear"></div>
     <div class="left_body">
       <!-- channel management - never create channel yet -->
@@ -714,11 +714,11 @@
 <label class="lang" id="lang_channel_source_is_wrong"><spring:message code="cms.warning.channel_source_is_wrong"/></label>
 <label class="lang" id="lang_audio_url_example"><spring:message code="cms.channel_management.msg.audio_url_example"/></label>
 <label class="lang" id="lang_image_url_example"><spring:message code="cms.channel_management.msg.image_url_example"/></label>
-<label class="lang" id="image_btn_upload"><spring:message code="cms.image.btn_upload"/></label>
-<label class="lang" id="image_btn_from_disk"><spring:message code="cms.image.btn_from_disk"/></label>
-<label class="lang" id="image_btn_save"><spring:message code="cms.image.btn_save"/></label>
-<label class="lang" id="image_btn_reorder"><spring:message code="cms.channel_management.btn.reorder"/></label>
-<label class="lang" id="image_ch_public"><spring:message code="cms.image.ch_public"/></label>
-<label class="lang" id="image_ch_unpublic"><spring:message code="cms.image.ch_unpublic"/></label>
+<label class="lang" id="image_btn_upload">${root}/images/<spring:message code="cms.image.btn_upload"/></label>
+<label class="lang" id="image_btn_from_disk">${root}/images/<spring:message code="cms.image.btn_from_disk"/></label>
+<label class="lang" id="image_btn_save">${root}/images/<spring:message code="cms.image.btn_save"/></label>
+<label class="lang" id="image_btn_reorder">${root}/images/<spring:message code="cms.channel_management.btn.reorder"/></label>
+<label class="lang" id="image_ch_public">${root}/images/<spring:message code="cms.image.ch_public"/></label>
+<label class="lang" id="image_ch_unpublic">${root}/images/<spring:message code="cms.image.ch_unpublic"/></label>
 </body>
 </html>

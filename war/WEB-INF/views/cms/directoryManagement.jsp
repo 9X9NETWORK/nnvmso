@@ -24,7 +24,7 @@
       <li><a class="menuD"></a></li>
       <li><a class="menuE"></a></li>
     </ul>
-    <label class="lang" id="image_menu"><spring:message code="cms.image.menu"/></label>
+    <label class="lang" id="image_menu">${root}/images/<spring:message code="cms.image.menu"/></label>
     <div class="clear"></div>
     <div class="left_body">
       <p class="ch_sub_title"><span><spring:message code="cms.directory_management.msg.directory_explanation"/></span></p>

@@ -22,7 +22,7 @@
       <li><a class="menuD"></a></li>
       <li><a class="menuE_active"></a></li>
     </ul>
-    <label class="lang" id="image_menu"><spring:message code="cms.image.menu"/></label>
+    <label class="lang" id="image_menu">${root}/images/<spring:message code="cms.image.menu"/></label>
     <div class="clear"></div>
     <div class="left_body">
       <div class="createChList2" style="height: 548px">
@@ -194,7 +194,7 @@
 <label class="lang" id="lang_label_channel_set"><spring:message code="cms.statistics.label.channel_set"/></label>
 <label class="lang" id="lang_title_set_statistics"><spring:message code="cms.statistics.title.channel_set_statistics"/></label>
 <label class="lang" id="lang_label_please_select_program"><spring:message code="cms.statistics.lable.please_select_program"/></label>
-<label class="lang" id="image_ch_public"><spring:message code="cms.image.ch_public"/></label>
-<label class="lang" id="image_ch_unpublic"><spring:message code="cms.image.ch_unpublic"/></label>
+<label class="lang" id="image_ch_public">${root}/images/<spring:message code="cms.image.ch_public"/></label>
+<label class="lang" id="image_ch_unpublic">${root}/images/<spring:message code="cms.image.ch_unpublic"/></label>
 </body>
 </html>

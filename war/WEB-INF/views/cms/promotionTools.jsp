@@ -22,7 +22,7 @@
       <li><a class="menuD_active"></a></li>
       <li><a class="menuE"></a></li>
     </ul>
-    <label class="lang" id="image_menu"><spring:message code="cms.image.menu"/></label>
+    <label class="lang" id="image_menu">${root}/images/<spring:message code="cms.image.menu"/></label>
     <div class="clear"></div>
     <div class="left_body">
       <div class="left_title"><spring:message code="cms.promotion_tools.title.channel_list"/></div>
@@ -108,7 +108,7 @@
 <label class="lang" id="lang_confirm_goto_setting_page"><spring:message code="cms.warning.goto_setting_page"/></label>
 <label class="lang" id="lang_update_successfully"><spring:message code="cms.warning.update_successfully"/></label>
 <label class="lang" id="lang_warning_error_occurs"><spring:message code="cms.warning.error_occurs"/></label>
-<label class="lang" id="image_ch_public"><spring:message code="cms.image.ch_public"/></label>
-<label class="lang" id="image_ch_unpublic"><spring:message code="cms.image.ch_unpublic"/></label>
+<label class="lang" id="image_ch_public">${root}/images/<spring:message code="cms.image.ch_public"/></label>
+<label class="lang" id="image_ch_unpublic">${root}/images/<spring:message code="cms.image.ch_unpublic"/></label>
 </body>
 </html>

@@ -30,7 +30,7 @@
       <li><a class="menuD"></a></li>
       <li><a class="menuE"></a></li>
     </ul>
-    <label class="lang" id="image_menu"><spring:message code="cms.image.menu"/></label>
+    <label class="lang" id="image_menu">${root}/images/<spring:message code="cms.image.menu"/></label>
     <div class="clear"></div>
     <div class="left_body">
       <div class="left_title"><spring:message code="cms.channel_set_management.title.channel_set_info"/></div>
@@ -174,7 +174,7 @@
 <label class="lang" id="lang_warning_set_is_empty"><spring:message code="cms.warning.set_is_empty"/></label>
 <label class="lang" id="lang_warning_new_channel_will_be_reviewed"><spring:message code="cms.warning.new_channel_will_be_reviewed"/></label>
 <label class="lang" id="lang_warning_new_channels_will_be_reviewed"><spring:message code="cms.warning.new_channels_will_be_reviewed"/></label>
-<label class="lang" id="image_bg_album"><spring:message code="cms.image.bg_album"/></label>
-<label class="lang" id="image_btn_upload"><spring:message code="cms.image.btn_upload"/></label>
+<label class="lang" id="image_bg_album">${root}/images/<spring:message code="cms.image.bg_album"/></label>
+<label class="lang" id="image_btn_upload">${root}/images/<spring:message code="cms.image.btn_upload"/></label>
 </body>
 </html>
