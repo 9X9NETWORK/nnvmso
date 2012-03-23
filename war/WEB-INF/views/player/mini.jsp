@@ -27,7 +27,7 @@
 <script type="text/javascript" charset="utf-8" src="${root}/javascripts/jquery.ellipsis.js"></script>
 <script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/soundmanager/soundmanager2.js"></script>
 
-<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/mini18.js"></script>
+<script type="text/javascript" charset="utf-8" src="http://9x9ui.s3.amazonaws.com/mini19.js"></script>
 
 <!-- Quantcast Tag -->
 <script type="text/javascript">
