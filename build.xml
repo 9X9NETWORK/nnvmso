@@ -23,6 +23,30 @@
     </exec>
   </target>
 
+  <target name="sync" description="Sync static files to S3">
+    <exec executable="s3cmd">
+      <env key="LC_ALL" value="C"/>
+      <arg value="-rvP"/>
+      <arg value="sync"/>
+      <arg value="war/javascripts/"/>
+      <arg value="s3://9x9ui/cms/javascripts/"/>
+    </exec>
+    <exec executable="s3cmd">
+      <env key="LC_ALL" value="C"/>
+      <arg value="-rvP"/>
+      <arg value="sync"/>
+      <arg value="war/stylesheets/"/>
+      <arg value="s3://9x9ui/cms/stylesheets/"/>
+    </exec>
+    <exec executable="s3cmd">
+      <env key="LC_ALL" value="C"/>
+      <arg value="-rvP"/>
+      <arg value="sync"/>
+      <arg value="war/images/cms/"/>
+      <arg value="s3://9x9ui/cms/images/"/>
+    </exec>
+  </target>
+
   <target name="copyfiles" depends="svnrevision"
       description="Copies necessary file to the WAR.">
     <copy todir="war/WEB-INF/classes">
