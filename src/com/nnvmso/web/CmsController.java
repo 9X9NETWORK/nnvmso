@@ -130,6 +130,7 @@ public class CmsController {
 				if (cmsTab.equals("admin")) {
 					return "redirect:/cms/channelManagement";
 				}
+				mso.setLogoUrl("http://9x9ui.s3.amazonaws.com/images/9x9.tv.png");
 				model = setAttributes(model, mso);
 				model.addAttribute("locale", request.getLocale().getLanguage());
 				if (cmsTab.equals("channelManagement") || cmsTab.equals("channelSetManagement")) {
