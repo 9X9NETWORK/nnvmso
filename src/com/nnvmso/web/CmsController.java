@@ -103,7 +103,7 @@ public class CmsController {
 				Mso mso = new Mso(user.getEmail(), user.getIntro(), user.getEmail(), Mso.TYPE_TCO);
 				mso.setTitle(user.getName());
 				mso.setPreferredLangCode(LangTable.LANG_ZH);
-				mso.setLogoUrl("/images/logo_9x9.png");
+				mso.setLogoUrl("http://9x9ui.s3.amazonaws.com/images/9x9.tv.png");
 				msoMngr.create(mso);
 				if (mso.getKey() == null) {
 					logger.info("failed to migrate to TCO");
