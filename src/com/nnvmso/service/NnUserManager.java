@@ -180,5 +180,8 @@ public class NnUserManager {
 	public int total(String filter) {
 		return nnUserDao.total(filter);
 	}
-	
+
+	public List<NnUser> findActiveUser(Date since, Date before) {
+		return nnUserDao.findActiveUser(since, before);
+	}
 }

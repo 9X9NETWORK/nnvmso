@@ -833,6 +833,38 @@ public class InitService {
 	
 	public void initCategoryCount() {
 		ChannelSetManager csMngr = new ChannelSetManager();
+		List<ChannelSet> sets = csMngr.findAll();
+		HashMap<Long, Integer> map = new HashMap<Long, Integer>();
+		for (ChannelSet cs : sets) {
+			if (cs.isPublic()) {
+				int cnt = 0;
+				List<MsoChannel> channels = csMngr.findChannelsBySet(cs);
+				for (MsoChannel c : channels) {
+					if (c.getStatus() == MsoChannel.STATUS_SUCCESS && c.isPublic()) {
+						cnt++;					
+					}
+				}
+				cs.setChannelCount(cnt);
+				map.put(cs.getKey().getId(), cnt);
+			}
+		}
+		CategoryManager categoryMngr = new CategoryManager();
+		CategoryChannelSetManager ccsMngr = new CategoryChannelSetManager();
+		List<Category> categories= categoryMngr.findAll();
+		for (Category c : categories) {
+			List<CategoryChannelSet> list = ccsMngr.findAllByCategoryId(c.getKey().getId());
+			int cnt = 0;
+			for (CategoryChannelSet l : list) {
+				try {
+					cnt += map.get(l.getChannelSetId());
+				} catch (NullPointerException e) {					
+				}
+			}			
+			c.setChannelCount(cnt);
+			categoryMngr.save(c);			
+		}
+
+		/*
 		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
 		List<ChannelSet> sets = csMngr.findAll();
 		HashMap<Long, Integer> map = new HashMap<Long, Integer>();
@@ -855,6 +887,7 @@ public class InitService {
 			c.setChannelCount(cnt);
 			categoryMngr.save(c);			
 		}
+		*/
 	}
 	
 	public void initRecommended(boolean english) {		

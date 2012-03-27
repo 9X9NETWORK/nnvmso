@@ -277,6 +277,7 @@ public class DataminingTask {
 	}
 	
 
+	
 	@RequestMapping("channelSubCountToTask")
 	public ResponseEntity<String> channelSubCountToTask() {
 		QueueFactory.getDefaultQueue().add(
@@ -357,6 +358,50 @@ public class DataminingTask {
 			e.printStackTrace();
 		}
     	return NnNetUtil.textReturn("OK");
+	}
+
+	@RequestMapping("userEmailToTask")
+	public ResponseEntity<String> userEmailToTask() {
+		QueueFactory.getDefaultQueue().add(
+			      TaskOptions.Builder.withUrl("/task/datamining/userEmail")
+		);
+		return NnNetUtil.textReturn("You will receive an email when it is done.");
+	}
+			
+	@RequestMapping("userEmail")
+	public ResponseEntity<String> userEmail(HttpServletRequest req) {
+		Calendar now = Calendar.getInstance();
+    	//SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd000000");
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+    	String beforeStr = sdf.format(now.getTime());
+    	now.add(Calendar.DATE, -1);
+    	String sinceStr = sdf.format(now.getTime());
+    	log.info("date:" + beforeStr + ";" + sinceStr);
+		try {
+			Date since = sdf.parse(sinceStr);
+			Date before = sdf.parse(beforeStr);
+	    	NnUserManager userMngr = new NnUserManager();
+	    	List<NnUser> list = userMngr.findActiveUser(since, before);
+			log.info("active user size:" + list.size());
+			EmailService emailService = new EmailService();						
+	    	String host = NnNetUtil.getUrlRoot(req);
+	    	String range = "sinceDate:" + sinceStr + ";beforeDate:" + beforeStr;
+			String content = "Active User:" + "\n\n";
+			String subject = "[statistics] active user list";
+			String msgBody = "host:" + host + "\n" + "range:" + range + "\n\n" + content;
+			for (NnUser u : list) {
+				msgBody += u.getKey().getId() + "  name:" +  u.getName() + ";email=" + u.getEmail();
+				msgBody += "\n";
+			}
+			log.info("msgBody" + msgBody);
+			String toEmail = this.toEmail(host);
+			emailService.sendEmail(subject, msgBody, toEmail, "nncloudtv");	    	
+		} catch (ParseException e) {
+			log.info("enter parsing exception");
+			return NnNetUtil.textReturn("parsing error");
+		}
+    	
+		return NnNetUtil.textReturn("OK");
 	}
 	
 }

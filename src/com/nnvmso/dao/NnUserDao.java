@@ -2,6 +2,7 @@ package com.nnvmso.dao;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -12,6 +13,7 @@ import javax.jdo.Query;
 import com.google.appengine.api.datastore.Key;
 import com.nnvmso.lib.AuthLib;
 import com.nnvmso.lib.PMF;
+import com.nnvmso.model.MsoChannel;
 import com.nnvmso.model.NnUser;
 import com.nnvmso.service.MsoManager;
 
@@ -282,6 +284,24 @@ public class NnUserDao extends GenericDao<NnUser> {
 			pm.close();
 		}
 		return detached;
+	}
+
+	public List<NnUser> findActiveUser(Date since, Date before) {
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		List<NnUser> detached = new ArrayList<NnUser>();
+		try {
+			Query query = pm.newQuery(NnUser.class);
+			query.setFilter("updateDate > sinceDateParam && updateDate < beforeDateParam");
+			query.declareImports("import java.util.Date");
+			query.declareParameters("Date sinceDateParam, Date beforeDateParam");			 
+			 
+			@SuppressWarnings("unchecked")
+			List<NnUser> results = (List<NnUser>) query.execute(since, before);
+			detached = (List<NnUser>)pm.detachCopyAll(results);
+		} finally {
+			pm.close();
+		}
+		return detached;		
 	}
 	
 }

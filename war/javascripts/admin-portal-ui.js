@@ -110,7 +110,7 @@ var page$ = {
 	    sortname:    'updateDate',
 	    sortorder:   'desc',
 	    rowNum:      10,
-	    rowList:     [10, 20, 30, 40, 50, 100],
+	    rowList:     [10, 20, 30, 40, 50, 100, 200],
 	    viewrecords: true,
 	    height:      'auto',
 	    hidegrid:    false,
