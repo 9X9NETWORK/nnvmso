@@ -845,6 +845,7 @@ public class InitService {
 					}
 				}
 				cs.setChannelCount(cnt);
+				csMngr.save(cs);
 				map.put(cs.getKey().getId(), cnt);
 			}
 		}

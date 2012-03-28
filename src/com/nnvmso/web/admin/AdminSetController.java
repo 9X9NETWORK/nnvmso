@@ -553,7 +553,7 @@ public class AdminSetController {
 	public @ResponseBody String edit(
 			@RequestParam(required=false) long id,
 			@RequestParam(required=false) String name,
-            @RequestParam(required=false) String desc,
+            @RequestParam(required=false) String intro,
             @RequestParam(required=false) String lang,
             @RequestParam(required=false) String imageUrl,
             @RequestParam(required=false) String beautifulUrl,
@@ -566,7 +566,7 @@ public class AdminSetController {
 		ChannelSetChannelManager cscMngr = new ChannelSetChannelManager();
 		ChannelSet cs = csMngr.findById(id);
 		if (name != null) cs.setName(name);
-		if (desc != null) cs.setIntro(desc);
+		if (intro != null) cs.setIntro(intro);
 		if (isPublic != null)
 			cs.setPublic(Boolean.parseBoolean(isPublic));
 		if (featured != null)			
@@ -575,6 +575,8 @@ public class AdminSetController {
 			cs.setImageUrl(imageUrl);
 		if (beautifulUrl != null)
 			cs.setBeautifulUrl(beautifulUrl);
+		
+		System.out.println("desc:" + intro);
 		cs.setLang(lang);
 		if (seq != null) {
 			/*
