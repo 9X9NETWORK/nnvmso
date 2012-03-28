@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <cronentries>
   <cron>
-    <url>/task/calibration/setChannelsToTask</url>    
-    <description>Set Channel Count Calibration</description>
-    <schedule>every day 09:00</schedule>
-  </cron>            
-  <cron>
     <url>/CMSAPI/listOwnedChannelSets?sortby=lang</url>    
     <description>Build system channel sets cache automatically</description>
     <schedule>every 19 minutes</schedule>
@@ -15,6 +10,11 @@
     <url>/task/datamining/userCountTask</url>    
     <description>User Count</description>
     <schedule>every day 09:00</schedule>
+  </cron>            
+  <cron>
+    <url>/task/datamining/userEmailToTask</url>    
+    <description>User Detail Report</description>
+    <schedule>every day 09:10</schedule>
   </cron>            
   <cron>
     <url>/task/datamining/newChannelCountToTask</url>    
@@ -30,5 +30,10 @@
     <url>/task/datamining/subCountTask</url>                              
     <description>User Subscription Count</description>
     <schedule>every friday 09:00</schedule>
+  </cron>
+  <cron>
+    <url>/admin/init/initCategoryCountToTask</url>                              
+    <description>calibrate the counter</description>
+    <schedule>every four hour</schedule>
   </cron>
 </cronentries>
