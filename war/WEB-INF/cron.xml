@@ -34,6 +34,6 @@
   <cron>
     <url>/admin/init/initCategoryCountToTask</url>                              
     <description>calibrate the counter</description>
-    <schedule>every four hour</schedule>
+    <schedule>every 4 hours</schedule>
   </cron>
 </cronentries>
