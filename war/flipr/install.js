@@ -1,4 +1,10 @@
-function install(lang) {
+var lang = null;
+var fileUrl = null;
+function install(lang2) {
+  lang = lang2;
+  getFileUrl();
+}
+function setFileLink() {
 
 var chromeRegex = / Chrome\/([0-9]+)[\.[0-9]+]* /;
 var safariRegex = / Version\/([0-9]+)[\.[0-9]+]* /;
@@ -8,11 +14,11 @@ var operaRegex = /Opera\/([0-9]+)[\.[0-9]+]* /;
 
 var redirectPage=new Array();
 if(lang=="zh") {
-  redirectPage[0]="../install/a.html";//9x9FLIPr-tc
-  redirectPage[1]="../install/b.html";//9x9FLIPr-chrome-tc
+  redirectPage[0]=fileUrl;//9x9FLIPr-tc
+  redirectPage[1]=fileUrl;//9x9FLIPr-chrome-tc
 } else {
-  redirectPage[0]="../install/c.html";//9x9FLIPr-en
-  redirectPage[1]="../install/d.html";//9x9FLIPr-chrome-en
+  redirectPage[0]=fileUrl;//9x9FLIPr-en
+  redirectPage[1]=fileUrl;//9x9FLIPr-chrome-en
 }
 
 var detectUserAgent = window.navigator.userAgent;
@@ -89,4 +95,26 @@ function erase() {
   $("#content_t").val(null);
   $("#content_m").val(null);
   $("#content_w").val(null);
+}
+function getFileUrl() {
+  var targetUrl = "http://202.5.224.30/update.php?callback=?";
+  var parameters = "";
+
+  $.ajax({    
+    type: "GET",
+    contentType: "application/x-www-form-urlencoded",
+    dataType: "jsonp",
+    jsonp: "jsonpcallback",
+    async: true,
+    url: targetUrl,
+    data: parameters,
+    success: function(param1, param2){
+      fileUrl = param1;
+      setFileLink();
+    },
+    error: function(param1, param2){
+      alert("error by ajax call: http://202.5.224.30/update.php");
+    }
+  });
+  
 }
