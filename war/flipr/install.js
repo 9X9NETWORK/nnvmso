@@ -25,30 +25,30 @@ var detectUserAgent = window.navigator.userAgent;
 if ($.browser.msie) {
   detectUserAgent = detectUserAgent.match(msieRegex);
   if((detectUserAgent[1]=="8")||(detectUserAgent[1]=="9")) {
-    $("#installer").attr("onclick","window.open('"+redirectPage[0]+"','','width=800,height=600');");
+    $("#installer2").attr("href",redirectPage[0]);
   } else {
-    $("#installer").attr("onclick","window.open('"+redirectPage[1]+"','','width=800,height=600');");
+    $("#installer2").attr("href",redirectPage[1]);
   }
 } else if ($.browser.mozilla) {
   detectUserAgent = detectUserAgent.match(firefoxRegex);
   if((detectUserAgent[1]=="6")||(detectUserAgent[1]=="7")||(detectUserAgent[1]=="8")) {
-    $("#installer").attr("onclick","window.open('"+redirectPage[0]+"','','width=800,height=600');");
+    $("#installer2").attr("href",redirectPage[0]);
   } else {
-    $("#installer").attr("onclick","window.open('"+redirectPage[1]+"','','width=800,height=600');");
+    $("#installer2").attr("href",redirectPage[1]);
   }
 } else if ($.browser.opera) {
-  $("#installer").attr("onclick","window.open('"+redirectPage[1]+"','','width=800,height=600');");
+  $("#installer2").attr("href",redirectPage[1]);
 } else if (navigator.userAgent.match(chromeRegex)) {
-  $("#installer").attr("onclick","window.open('"+redirectPage[0]+"','','width=800,height=600');");
+  $("#installer2").attr("href",redirectPage[0]);
 } else if (navigator.userAgent.match(safariRegex)) {
   detectUserAgent = detectUserAgent.match(safariRegex);
   if(detectUserAgent[1]=="5") {
-    $("#installer").attr("onclick","window.open('"+redirectPage[0]+"','','width=800,height=600');");
+    $("#installer2").attr("href",redirectPage[0]);
   } else {
-    $("#installer").attr("onclick","window.open('"+redirectPage[1]+"','','width=800,height=600');");
+    $("#installer2").attr("href",redirectPage[1]);
   }
 } else {
-  $("#installer").attr("onclick","window.open('"+redirectPage[1]+"','','width=800,height=600');");
+  $("#installer2").attr("href",redirectPage[1]);
 }
 }
 function sendEmail(lang) {
@@ -113,7 +113,7 @@ function getFileUrl() {
       setFileLink();
     },
     error: function(param1, param2){
-      alert("error by ajax call: http://202.5.224.30/update.php");
+      //alert("error by ajax call: http://202.5.224.30/update.php");
     }
   });
   
