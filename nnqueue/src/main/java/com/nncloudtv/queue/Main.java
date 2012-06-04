@@ -4,7 +4,7 @@ import java.util.logging.Logger;
 
 import org.springframework.stereotype.Component;
 
-import com.nncloudtv.lib.QueueMessage;
+import com.nncloudtv.lib.QueueFactory;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
@@ -20,11 +20,11 @@ public class Main
 	    factory.setHost("localhost");
 	    Connection connection = factory.newConnection();
 	    Channel channel = connection.createChannel();
-	    channel.queueDeclare(QueueMessage.QUEUE_NNCLOUDTV, true, false, false, null);	    
+	    channel.queueDeclare(QueueFactory.QUEUE_NNCLOUDTV, true, false, false, null);	    
 	    log.info("[*] Waiting for messages. To exit press CTRL+C");
 	    channel.basicQos(1);
 	    QueueingConsumer consumer = new QueueingConsumer(channel);
-	    channel.basicConsume(QueueMessage.QUEUE_NNCLOUDTV, false, consumer);
+	    channel.basicConsume(QueueFactory.QUEUE_NNCLOUDTV, false, consumer);
 	    while (true) {
 	      QueueingConsumer.Delivery delivery = consumer.nextDelivery();
 	      Task.doWork(delivery.getBody());

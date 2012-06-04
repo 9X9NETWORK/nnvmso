@@ -10,6 +10,15 @@ Packaging from Eclipse
   Finish
   
 ================================
+Packaging from Apache Maven
+================================ 
+- mvn assembly:single
+  A big JAR file with dependencies included will be built under the "target/" called "nnqueue-0.0.1-SNAPSHOT-jar-with-dependencies.jar"
+  After packaging, you have runnable standalone JAR file
+
+> java -jar target/nnqueue-0.0.1-SNAPSHOT-jar-with-dependencies.jar
+
+================================
 Run
 ================================
 it currently takes 4 params, hello, brand_counter, category_create, channel_create_related.
@@ -19,10 +28,12 @@ an example would be,
 > java -jar nnqueue.jar brand_counter
 > java -jar nnqueue.jar category_create
 > java -jar nnqueue.jar channel_create_related
+
+Or simply via Maven
+
+> mvn exec:java
  
 ================================
 In the pipeline
 ================================
-- ps. currently it has problem running as a standalone app, can only run in eclipse 
-- build by maven
 - error handling, logging
