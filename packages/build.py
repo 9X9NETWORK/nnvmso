@@ -48,18 +48,31 @@ def get_choices(pkgs):
       choice = raw_input('install nncloudtv (y/n) : ')
       if choice == 'n':           
          nncloudtv_installed = True     
-     
+                                                                           
 #================================================================
 def copy_property_files():
-   server = choices['server']
-
-   os.chdir("../nncloudtv")
    list=['datanucleus_analytics.properties', 'datanucleus_content.properties', 'datanucleus_nnuser1.properties', 'datanucleus_nnuser2.properties', 'aws.properties', 'memcache.properties', 'queue.properties', 'sns.properties', 'piwik.properties']
-   for l in list:   
-     src = "installer/" + server + "/" + l
+   server = choices['server']
+   
+   os.chdir("../nncloudtv")
+   for l in list:                                                                                        
+     src = "installer/" + server + "/" + l                                                                    
      dst = "src/main/resources/" + l
      shutil.copyfile(src, dst)
-   
+
+   if choices['cms'] == 'y':   
+      os.chdir("../nncms")
+      for l in list:                   
+        src = "../nncloudtv/installer/" + server + "/" + l                                                
+        dst = "src/main/resources/" + l
+        shutil.copyfile(src, dst)                                                                        
+
+   if choices['mgnt'] == 'y':    
+      os.chdir("../nnadmin")
+      src = "installer/" + server + "/resource.properties"                                                                    
+      dst = "src/main/resources/" + l
+      shutil.copyfile(src, dst)
+
    os.chdir("../packages")
    
 #================================================================                         
@@ -70,7 +83,7 @@ def modify_version_file():
    cnt = 0
    for line in source:
      cnt = cnt + 1
-     if cnt == 4:
+     if cnt == 4:          
        versions['rev'] =  line.rstrip()
        rev = versions['rev']
        break
@@ -107,7 +120,7 @@ def build_root():
       os.chdir("../packages")
 
 #================================================================
-def build_cms():          
+def build_cms():          c
    if choices['cms'] == "y":
       global nncloudtv_installed      
       if nncloudtv_installed == False:
@@ -118,7 +131,7 @@ def build_cms():
       os.chdir("../nncms")      
       os.system("mvn clean compile war:war")
       os.system("cp target/cms.war \"../packages/cms.war\"")            
-      os.chdir("../packages")
+      os.chdir("../packages")                                                     
       print "../packages"
 
 #================================================================
@@ -141,7 +154,6 @@ def build_queue():
          os.chdir("../nncloudtv")
          os.system("mvn clean compile install")
          nncloudtv_installed = True
-  
       os.chdir("../nnqueue1")
       os.system("mvn clean compile")
       os.system("mvn clean assembly:assembly")
