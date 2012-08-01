@@ -87,7 +87,7 @@ def md5_prep(name):
    dest = open(command, "w")
    line = md5 + " " + name + ".war" + "\x00\x0a"
    dest.write(line)
-   dest.close()
+   dest.close()                                     
 
 # generate md5
 def files_prep():  
@@ -159,57 +159,57 @@ def upload():
          
       if ((choices['server'] is "prod") or (choices['server'] is "alpha")):
           command = scp_command + key + root_file + server + path + version + "/" + root_file
-          print command
-          #os.system(command)                        
+          #print command
+          os.system(command)                        
           command = scp_command + key + "root.md5 " + server + path + version + "/" + "root.md5"
-          print command
-          #os.system(command)
+          #print command
+          os.system(command)
           command = scp_command + key + "version " + server + path + version + "/" + "version"
-          print command      
-          #os.system(command)
+          #print command      
+          os.system(command)
           command = scp_command + key + "version " + server + path + "version"
-          print command
-          #os.system(command)
+          #print command
+          os.system(command)
       else:                                                          
           command = scp_command + key + root_file + server + path + root_file
-          print command
+          #print command
           
    #---cms              
    if choices['cms'] == 'y':
       print "upload cms"
       if ((choices['server'] is "prod") or (choices['server'] is "alpha")):
          command = scp_command + key + "cms.md5 " + server + path + "cms/cms.md5"
-         print command
-         #os.system(command)
+         #print command
+         os.system(command)
          command = scp_command + key + cms_file + server + path + "cms/" + cms_file
-         print command
-         #os.system(command)
+         #print command
+         os.system(command)
       else:   
         command = scp_command + key + cms_file + server + path + cms_file
-        print command
-        #os.system(command)
+        #print command
+        os.system(command)
 
    #---mgnt   
    if choices['mgnt'] == 'y':
       print "upload mgnt"
       if ((choices['server'] is "prod") or (choices['server'] is "alpha")):
          command = scp_command + key + "mgnt.md5 " + server + path + "mgnt/mgnt.md5"
-         print command
-         #os.system(command)
+         #print command
+         os.system(command)
          command = scp_command + key + mgnt_file + server + path + "mgnt/" + mgnt_file
-         print command
-         #os.system(command)
+         #print command
+         os.system(command)
       else:   
         command = scp_command + key + mgnt_file + server + path + mgnt_file
-        print command
-        #os.system(command)
+        #print command
+        os.system(command)
                 
    #---queue    
    if choices['queue'] == 'y': 
       print "upload queue"
       command = scp_command + key + queue_file + server + "/var/www/updates/nnqueue/" + queue_file
-      print command                
-      #os.system(command)                          
+      #print command                
+      os.system(command)                          
 
    print "--- " + datetime.now().strftime("%d/%m/%y %H:%M:%S %Z") + "---"                                                 
                                 

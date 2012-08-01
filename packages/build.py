@@ -15,7 +15,7 @@ def get_choices(pkgs):
    version = raw_input('Enter version number : ')
    versions['version'] = version
 
-   if (pkgs == None): 
+   if (len(pkgs) < 2): 
       root = raw_input('Build root (y/n) : ')
       choices['root'] = root
       
@@ -70,7 +70,7 @@ def copy_property_files():
    if choices['mgnt'] == 'y':    
       os.chdir("../nnadmin")
       src = "installer/" + server + "/resource.properties"                                                                    
-      dst = "src/main/resources/" + l
+      dst = "src/main/resources/resource.properties"
       shutil.copyfile(src, dst)
 
    os.chdir("../packages")
