@@ -120,7 +120,7 @@ def build_root():
       os.chdir("../packages")
 
 #================================================================
-def build_cms():          c
+def build_cms():
    if choices['cms'] == "y":
       global nncloudtv_installed      
       if nncloudtv_installed == False:
