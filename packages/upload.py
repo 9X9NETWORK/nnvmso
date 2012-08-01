@@ -137,56 +137,57 @@ def upload():
    prod_server = "ubuntu@moveout-log.9x9.tv"
    #default values
    key = devel_key
-   path = dev_path 
+   path = dev_path                                  
    server = dev_server
    
    if choices['server'] is 'alpha':      
       path = prod_path
       server = alpha_server
-   if choices['server'] is 'stage':   
+   if choices['server'] is 'stage':               
       server = stage_server
-   if choices['server'] is 'prod':
       key = prod_key
+   if choices['server'] is 'prod':
+      key = prod_key                               
       path = prod_path
       server = prod_server
    
    #---root
    if choices['root'] == 'y':
-      print "upload root"
+      print "upload root"                  
       #scp -i ~/keys/dev-west2.pem root.war ubuntu@devel2.9x9.tv:/home/ubuntu/files/root.war
       if (choices['server'] is "prod") or (choices['server'] is "alpha"):
          folder_create()
          
       if ((choices['server'] is "prod") or (choices['server'] is "alpha")):
           command = scp_command + key + root_file + server + path + version + "/" + root_file
-          #print command
+          print command
           os.system(command)                        
           command = scp_command + key + "root.md5 " + server + path + version + "/" + "root.md5"
-          #print command
+          print command                                                        
           os.system(command)
           command = scp_command + key + "version " + server + path + version + "/" + "version"
-          #print command      
+          print command      
           os.system(command)
           command = scp_command + key + "version " + server + path + "version"
-          #print command
+          print command
           os.system(command)
       else:                                                          
           command = scp_command + key + root_file + server + path + root_file
-          #print command
+          print command
           
    #---cms              
    if choices['cms'] == 'y':
       print "upload cms"
       if ((choices['server'] is "prod") or (choices['server'] is "alpha")):
          command = scp_command + key + "cms.md5 " + server + path + "cms/cms.md5"
-         #print command
+         print command
          os.system(command)
          command = scp_command + key + cms_file + server + path + "cms/" + cms_file
-         #print command
+         print command
          os.system(command)
       else:   
         command = scp_command + key + cms_file + server + path + cms_file
-        #print command
+        print command
         os.system(command)
 
    #---mgnt   
@@ -194,21 +195,21 @@ def upload():
       print "upload mgnt"
       if ((choices['server'] is "prod") or (choices['server'] is "alpha")):
          command = scp_command + key + "mgnt.md5 " + server + path + "mgnt/mgnt.md5"
-         #print command
+         print command
          os.system(command)
          command = scp_command + key + mgnt_file + server + path + "mgnt/" + mgnt_file
-         #print command
+         print command
          os.system(command)
       else:   
         command = scp_command + key + mgnt_file + server + path + mgnt_file
-        #print command
+        print command
         os.system(command)
                 
    #---queue    
    if choices['queue'] == 'y': 
       print "upload queue"
       command = scp_command + key + queue_file + server + "/var/www/updates/nnqueue/" + queue_file
-      #print command                
+      print command                
       os.system(command)                          
 
    print "--- " + datetime.now().strftime("%d/%m/%y %H:%M:%S %Z") + "---"                                                 
